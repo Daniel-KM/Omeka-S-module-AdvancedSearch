@@ -1,0 +1,8 @@
+@media screen {
+    #advanced-search #datetime-queries .value:first-child select:nth-child(2) {
+        margin-left: 0;
+    }
+    #advanced-search #datetime-queries .query-text:disabled {
+        display: none;
+    }
+}

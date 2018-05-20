@@ -1,0 +1,92 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-05-21 00:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: Module.php:146 view/common/advanced-search-plus.phtml:69
+msgid "after"
+msgstr ""
+
+#: Module.php:147 view/common/advanced-search-plus.phtml:70
+msgid "after or on"
+msgstr ""
+
+#: Module.php:148 view/common/advanced-search-plus.phtml:71
+msgid "on"
+msgstr ""
+
+#: Module.php:149 view/common/advanced-search-plus.phtml:72
+msgid "not on"
+msgstr ""
+
+#: Module.php:150 view/common/advanced-search-plus.phtml:73
+msgid "before or on"
+msgstr ""
+
+#: Module.php:151 view/common/advanced-search-plus.phtml:74
+msgid "before"
+msgstr ""
+
+#: Module.php:152 view/common/advanced-search-plus.phtml:75
+msgid "has any date / time"
+msgstr ""
+
+#: Module.php:153 view/common/advanced-search-plus.phtml:76
+msgid "has no date / time"
+msgstr ""
+
+#: Module.php:164
+msgid "Modified"
+msgstr ""
+
+#: view/common/advanced-search-plus.phtml:29
+msgid "Date / time"
+msgstr ""
+
+#: view/common/advanced-search-plus.phtml:35
+msgid "Search by date / time"
+msgstr ""
+
+#: view/common/advanced-search-plus.phtml:39
+msgid ""
+"Date / time can be full like \"2018-01-23 12:34:56\", or partial like "
+"\"2018-12-25\" or \"2017-11\"."
+msgstr ""
+
+#: view/common/advanced-search-plus.phtml:51
+msgid "And"
+msgstr ""
+
+#: view/common/advanced-search-plus.phtml:52
+msgid "Or"
+msgstr ""
+
+#: view/common/advanced-search-plus.phtml:64
+msgid "Creation or modification date / time"
+msgstr ""
+
+#: view/common/advanced-search-plus.phtml:68
+msgid "Query type"
+msgstr ""
+
+#: view/common/advanced-search-plus.phtml:79
+msgid "Remove date / time"
+msgstr ""
+
+#: view/common/advanced-search-plus.phtml:85
+msgid "Add new date / time"
+msgstr ""

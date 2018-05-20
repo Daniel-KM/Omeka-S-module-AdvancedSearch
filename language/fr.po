@@ -1,0 +1,94 @@
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Daniel Berthereau <Daniel.github@Berthereau.net>, 2018.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-05-21 00:00+0000\n"
+"PO-Revision-Date: 2018-05-21 00:00+0000\n"
+"Last-Translator: Daniel Berthereau <Daniel.github@Berthereau.net>\n"
+"Language-Team: French <kde-i18n-doc@kde.org>\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Lokalize 2.0\n"
+
+#: Module.php:146 view/common/advanced-search-plus.phtml:69
+msgid "after"
+msgstr "après"
+
+#: Module.php:147 view/common/advanced-search-plus.phtml:70
+msgid "after or on"
+msgstr "après ou le"
+
+#: Module.php:148 view/common/advanced-search-plus.phtml:71
+msgid "on"
+msgstr "le"
+
+#: Module.php:149 view/common/advanced-search-plus.phtml:72
+msgid "not on"
+msgstr "pas"
+
+#: Module.php:150 view/common/advanced-search-plus.phtml:73
+msgid "before or on"
+msgstr "avant ou le"
+
+#: Module.php:151 view/common/advanced-search-plus.phtml:74
+msgid "before"
+msgstr "avant"
+
+#: Module.php:152 view/common/advanced-search-plus.phtml:75
+msgid "has any date / time"
+msgstr "a une date / heure"
+
+#: Module.php:153 view/common/advanced-search-plus.phtml:76
+msgid "has no date / time"
+msgstr "n’a pas de date / heure"
+
+#: Module.php:164
+msgid "Modified"
+msgstr "Modifié"
+
+#: view/common/advanced-search-plus.phtml:29
+msgid "Date / time"
+msgstr "Date / heure"
+
+#: view/common/advanced-search-plus.phtml:35
+msgid "Search by date / time"
+msgstr "Recherche par date / heure"
+
+#: view/common/advanced-search-plus.phtml:39
+msgid ""
+"Date / time can be full like \"2018-01-23 12:34:56\", or partial like "
+"\"2018-12-25\" or \"2017-11\"."
+msgstr ""
+"La date / heure peut être complète, comme \"2018-01-23 12:34:56\", ou"
+" partielle, comme \"2018-12-25\" ou \"2017-11\"."
+
+#: view/common/advanced-search-plus.phtml:51
+msgid "And"
+msgstr "Et"
+
+#: view/common/advanced-search-plus.phtml:52
+msgid "Or"
+msgstr "Ou"
+
+#: view/common/advanced-search-plus.phtml:64
+msgid "Creation or modification date / time"
+msgstr "Date / heure de création ou de modification"
+
+#: view/common/advanced-search-plus.phtml:68
+msgid "Query type"
+msgstr "Type de requête"
+
+#: view/common/advanced-search-plus.phtml:79
+msgid "Remove date / time"
+msgstr "Supprimer la date / heure"
+
+#: view/common/advanced-search-plus.phtml:85
+msgid "Add new date / time"
+msgstr "Ajouter une date / heure"

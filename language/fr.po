@@ -17,51 +17,64 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Lokalize 2.0\n"
 
-#: Module.php:146 view/common/advanced-search-plus.phtml:69
+#: Module.php:157 view/common/advanced-search-datetime.phtml:69
 msgid "after"
 msgstr "après"
 
-#: Module.php:147 view/common/advanced-search-plus.phtml:70
+#: Module.php:158 view/common/advanced-search-datetime.phtml:70
 msgid "after or on"
 msgstr "après ou le"
 
-#: Module.php:148 view/common/advanced-search-plus.phtml:71
+#: Module.php:159 view/common/advanced-search-datetime.phtml:71
 msgid "on"
 msgstr "le"
 
-#: Module.php:149 view/common/advanced-search-plus.phtml:72
+#: Module.php:160 view/common/advanced-search-datetime.phtml:72
 msgid "not on"
 msgstr "pas"
 
-#: Module.php:150 view/common/advanced-search-plus.phtml:73
+#: Module.php:161 view/common/advanced-search-datetime.phtml:73
 msgid "before or on"
 msgstr "avant ou le"
 
-#: Module.php:151 view/common/advanced-search-plus.phtml:74
+#: Module.php:162 view/common/advanced-search-datetime.phtml:74
 msgid "before"
 msgstr "avant"
 
-#: Module.php:152 view/common/advanced-search-plus.phtml:75
+#: Module.php:163 view/common/advanced-search-datetime.phtml:75
 msgid "has any date / time"
 msgstr "a une date / heure"
 
-#: Module.php:153 view/common/advanced-search-plus.phtml:76
+#: Module.php:164 view/common/advanced-search-datetime.phtml:76
 msgid "has no date / time"
 msgstr "n’a pas de date / heure"
 
-#: Module.php:164
+#: Module.php:175
 msgid "Modified"
 msgstr "Modifié"
 
-#: view/common/advanced-search-plus.phtml:29
+#: Module.php:192 Module.php:195 view/common/advanced-search-has-media.phtml:6
+#: view/common/advanced-search-has-media.phtml:21
+msgid "Has media"
+msgstr "A un média"
+
+#: Module.php:193
+msgid "yes"
+msgstr "oui"
+
+#: Module.php:196
+msgid "no"
+msgstr "non"
+
+#: view/common/advanced-search-datetime.phtml:29
 msgid "Date / time"
 msgstr "Date / heure"
 
-#: view/common/advanced-search-plus.phtml:35
+#: view/common/advanced-search-datetime.phtml:35
 msgid "Search by date / time"
 msgstr "Recherche par date / heure"
 
-#: view/common/advanced-search-plus.phtml:39
+#: view/common/advanced-search-datetime.phtml:39
 msgid ""
 "Date / time can be full like \"2018-01-23 12:34:56\", or partial like "
 "\"2018-12-25\" or \"2017-11\"."
@@ -69,26 +82,30 @@ msgstr ""
 "La date / heure peut être complète, comme \"2018-01-23 12:34:56\", ou"
 " partielle, comme \"2018-12-25\" ou \"2017-11\"."
 
-#: view/common/advanced-search-plus.phtml:51
+#: view/common/advanced-search-datetime.phtml:51
 msgid "And"
 msgstr "Et"
 
-#: view/common/advanced-search-plus.phtml:52
+#: view/common/advanced-search-datetime.phtml:52
 msgid "Or"
 msgstr "Ou"
 
-#: view/common/advanced-search-plus.phtml:64
+#: view/common/advanced-search-datetime.phtml:64
 msgid "Creation or modification date / time"
 msgstr "Date / heure de création ou de modification"
 
-#: view/common/advanced-search-plus.phtml:68
+#: view/common/advanced-search-datetime.phtml:68
 msgid "Query type"
 msgstr "Type de requête"
 
-#: view/common/advanced-search-plus.phtml:79
+#: view/common/advanced-search-datetime.phtml:79
 msgid "Remove date / time"
 msgstr "Supprimer la date / heure"
 
-#: view/common/advanced-search-plus.phtml:85
+#: view/common/advanced-search-datetime.phtml:85
 msgid "Add new date / time"
 msgstr "Ajouter une date / heure"
+
+#: view/common/advanced-search-has-media.phtml:16
+msgid "Any"
+msgstr "Tous"

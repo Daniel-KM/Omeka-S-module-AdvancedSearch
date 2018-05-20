@@ -7,6 +7,7 @@ advanced search form to make search more precise.
 Added fields are:
 
 - before/on/after creation/modification date/time of any resource
+- has media (for item)
 
 
 Installation

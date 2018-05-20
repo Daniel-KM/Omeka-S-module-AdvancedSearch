@@ -2,7 +2,8 @@
 /**
  * AdvancedSearchPlus
  *
- * Add some fields to the advanced search form (before/after creation date, etc.).
+ * Add some fields to the advanced search form (before/after creation date, has
+ * media, etc.).
  *
  * @copyright Daniel Berthereau, 2018
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
@@ -34,6 +35,7 @@ namespace AdvancedSearchPlus;
 
 use Doctrine\ORM\QueryBuilder;
 use Omeka\Api\Adapter\AbstractResourceEntityAdapter;
+use Omeka\Api\Adapter\ItemAdapter;
 use Omeka\Module\AbstractModule;
 use Zend\EventManager\Event;
 use Zend\EventManager\SharedEventManagerInterface;
@@ -111,6 +113,9 @@ class Module extends AbstractModule
         $adapter = $event->getTarget();
         $query = $event->getParam('request')->getContent();
         $this->searchDateTime($qb, $adapter, $query);
+        if ($adapter instanceof ItemAdapter) {
+            $this->searchHasMedia($qb, $adapter, $query);
+        }
     }
 
     /**
@@ -122,10 +127,17 @@ class Module extends AbstractModule
     {
         $query = $event->getParam('query', []);
         $query['datetime'] = isset($query['datetime']) ? $query['datetime'] : '';
-        $event->setParam('query', $query);
 
         $partials = $event->getParam('partials', []);
-        $partials[] = 'common/advanced-search-plus';
+        $partials[] = 'common/advanced-search-datetime';
+
+        $resourceType = $event->getParam('resourceType');
+        if ($resourceType === 'item') {
+            $query['has_media'] = isset($query['has_media']) ? $query['has_media'] : '';
+            $partials[] = 'common/advanced-search-has-media';
+        }
+
+        $event->setParam('query', $query);
         $event->setParam('partials', $partials);
     }
 
@@ -172,6 +184,17 @@ class Module extends AbstractModule
                 }
                 $filters[$filterLabel][] = $datetimeValue;
                 ++$index;
+            }
+        }
+
+        if (isset($query['has_media'])) {
+            $value = $query['has_media'];
+            if ($value) {
+                $filterLabel = $translate('Has media'); // @translate
+                $filters[$filterLabel][] = $translate('yes'); // @translate
+            } elseif ($value !== '') {
+                $filterLabel = $translate('Has media'); // @translate
+                $filters[$filterLabel][] = $translate('no'); // @translate
             }
         }
 
@@ -384,6 +407,51 @@ class Module extends AbstractModule
 
         if ($where) {
             $qb->andWhere($where);
+        }
+    }
+
+    /**
+     * Build query to check if an item has media or not.
+     *
+     * The argument uses "has_media", with value "1" or "0".
+     *
+     * @param QueryBuilder $qb
+     * @param AbstractResourceEntityAdapter $adapter
+     * @param array $query
+     */
+    protected function searchHasMedia(
+        QueryBuilder $qb,
+        ItemAdapter $adapter,
+        array $query
+    ) {
+        if (!isset($query['has_media'])) {
+            return;
+        }
+
+        $value = (string) $query['has_media'];
+        if ($value === '') {
+            return;
+        }
+
+        // With media.
+        $mediaAlias = $adapter->createAlias();
+        if ($value) {
+            $qb->innerJoin(
+                \Omeka\Entity\Media::class,
+                $mediaAlias,
+                'WITH',
+                $qb->expr()->eq($mediaAlias . '.item', $adapter->getEntityClass() . '.id')
+            );
+        }
+        // Without media.
+        else {
+            $qb->leftJoin(
+                \Omeka\Entity\Media::class,
+                $mediaAlias,
+                'WITH',
+                $qb->expr()->eq($mediaAlias . '.item', $adapter->getEntityClass() . '.id')
+            );
+            $qb->andWhere($qb->expr()->isNull($mediaAlias . '.id'));
         }
     }
 }

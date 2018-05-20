@@ -1,0 +1,27 @@
+<?php
+$translate = $this->plugin('translate');
+?>
+<div id="hasmedia-queries" class="field" role="group" aria-labelledby="by-has-media-label">
+    <div class="field-meta">
+        <span id="by-has-media-label" class="label"><?php echo $translate('Has media'); ?></span>
+    </div>
+    <div class="inputs">
+        <div class="value">
+            <?php
+            $select = (new \Zend\Form\Element\Radio())
+                ->setName('has_media')
+                ->setValueOptions([
+                    '1' => 'Yes', // @translate
+                    '0' => 'No', // @translate
+                    '' => 'Any', // @translate
+                ])
+                ->setAttributes([
+                    'class' => 'query-datetime',
+                    'value' => isset($query['has_media']) ? $query['has_media'] : '',
+                    'aria-label' => $translate('Has media'),
+                ]);
+            echo $this->formRadio($select);
+            ?>
+        </div>
+    </div>
+</div>

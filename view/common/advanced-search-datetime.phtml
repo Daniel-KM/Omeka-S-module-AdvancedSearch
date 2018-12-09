@@ -1,17 +1,22 @@
 <?php
+/**
+ * @var \Zend\View\Renderer\PhpRenderer $this
+ * @var array $query
+ */
+
+$translate = $this->plugin('translate');
+$escape = $this->plugin('escapeHtml');
 // Adapted from the advanced-search/properties.phtml template.
 $this->headLink()->appendStylesheet($this->assetUrl('css/advanced-search-plus-admin.css', 'AdvancedSearchPlus'));
 $this->headScript()->appendFile($this->assetUrl('js/advanced-search-plus-admin.js', 'AdvancedSearchPlus'));
-$translate = $this->plugin('translate');
 
 // Prepare the datetime queries.
-$datetimes = isset($query['datetime']) ? $query['datetime'] : [];
+$datetimes = isset($query['datetime']) ? (is_array($query['datetime']) ? $query['datetime'] : [['value' => $query['datetime']]]) : [];
 $datetimes = array_filter($datetimes, function ($v) {
-    return isset($v['value']) ? trim($v['value']) !== '' : true;
+    return isset($v['value']) ? trim($v['value']) !== '' : (isset($v['type']) && in_array($v['type'], ['ex', 'nex']));
 });
-if (empty($datetimes)) {
-    $datetimes[] = [];
-}
+// Allows to display one empty field.
+if (empty($datetimes)) $datetimes = [[]];
 
 $querySelectOption = function($value, array $search, $key, $text) {
     $selected = null;
@@ -20,13 +25,16 @@ $querySelectOption = function($value, array $search, $key, $text) {
     }
     return sprintf('<option value="%s"%s>%s</option>', $value, $selected, $text);
 };
+
 // TODO Use a widget or a validator (but allow partial date/time: year only, date only, etc.).
 $queryInputText = function(array $search, $index) {
     $value = isset($search['value']) ? $search['value'] : null;
+    $translate = $this->plugin('translate');
+    $escape = $this->plugin('escapeHtml');
     return sprintf('<input type="text" class="query-datetime query-text" name="%s" value="%s" aria-label="%s" placeholder="2017-11-07 17:21:17">',
-        $this->escapeHtml("datetime[$index][value]"),
-        $this->escapeHtml($value),
-        $this->escapeHtml($this->translate('Date / time')));
+        $escape("datetime[$index][value]"),
+        $escape($value),
+        $escape($translate('Date / time')));
 }
 ?>
 
@@ -47,7 +55,7 @@ $queryInputText = function(array $search, $index) {
         $stem = 'datetime[' . $index . ']';
         ?>
         <div class="value">
-            <select class="joiner" name="<?php echo $this->escapeHtml($stem . '[joiner]'); ?>">
+            <select class="joiner" name="<?php echo $escape($stem . '[joiner]'); ?>">
                 <?php echo $querySelectOption('and', $datetime, 'joiner', $translate('And')); ?>
                 <?php echo $querySelectOption('or', $datetime, 'joiner', $translate('Or')); ?>
             </select>
@@ -65,7 +73,7 @@ $queryInputText = function(array $search, $index) {
                 ]);
             echo $this->formSelect($select);
             ?>
-            <select class="query-type" name="<?php echo $this->escapeHtml($stem . '[type]'); ?>" aria-label="<?php echo $translate('Query type'); ?>">
+            <select class="query-type" name="<?php echo $escape($stem . '[type]'); ?>" aria-label="<?php echo $translate('Query type'); ?>">
                 <?php echo $querySelectOption('gt', $datetime, 'type', $translate('after')); ?>
                 <?php echo $querySelectOption('gte', $datetime, 'type', $translate('after or on')); ?>
                 <?php echo $querySelectOption('eq', $datetime, 'type', $translate('on')); ?>

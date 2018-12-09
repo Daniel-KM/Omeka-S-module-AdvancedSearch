@@ -49,6 +49,7 @@ class Module extends AbstractModule
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager)
     {
+        // Add the search query filters for resources.
         $adapters = [
             \Omeka\Api\Adapter\ItemAdapter::class,
             \Omeka\Api\Adapter\ItemSetAdapter::class,
@@ -56,7 +57,6 @@ class Module extends AbstractModule
             // TODO Add user.
         ];
         foreach ($adapters as $adapter) {
-            // Add the tagging and tag filters to resource search.
             $sharedEventManager->attach(
                 $adapter,
                 'api.search.query',
@@ -64,7 +64,7 @@ class Module extends AbstractModule
             );
         }
 
-        // Add the tag field to the admin and public advanced search page.
+        // Add the search field to the admin and public advanced search page.
         $controllers = [
             'Omeka\Controller\Admin\Item',
             'Omeka\Controller\Admin\ItemSet',

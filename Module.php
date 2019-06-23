@@ -62,7 +62,7 @@ class Module extends AbstractModule
                 [$this, 'beforeSearch']
             );
         }
-        
+
         // Add the search query filters for resources.
         $adapters = [
             \Omeka\Api\Adapter\ItemAdapter::class,
@@ -78,7 +78,6 @@ class Module extends AbstractModule
             );
         }
 
-        // Add the search field to the admin and public advanced search page.
         $controllers = [
             'Omeka\Controller\Admin\Item',
             'Omeka\Controller\Admin\ItemSet',
@@ -89,23 +88,12 @@ class Module extends AbstractModule
             // TODO Add user.
         ];
         foreach ($controllers as $controller) {
+            // Add the search field to the advanced search pages.
             $sharedEventManager->attach(
                 $controller,
                 'view.advanced_search',
                 [$this, 'displayAdvancedSearch']
             );
-        }
-
-        $controllers = [
-            'Omeka\Controller\Admin\Item',
-            'Omeka\Controller\Admin\ItemSet',
-            'Omeka\Controller\Admin\Media',
-            // 'Omeka\Controller\Site\Item',
-            // 'Omeka\Controller\Site\ItemSet',
-            // 'Omeka\Controller\Site\Media',
-            // TODO Add user.
-        ];
-        foreach ($controllers as $controller) {
             // Filter the search filters for the advanced search pages.
             $sharedEventManager->attach(
                 $controller,
@@ -119,7 +107,7 @@ class Module extends AbstractModule
      * Removes is_public from the query if the value is '', before
      * passing it to AbstractResourceEntityAdapter, as it would
      * coerce it to boolean false for the query builder.
-     * 
+     *
      * @param Event $event
      */
     public function beforeSearch(Event $event)
@@ -129,8 +117,8 @@ class Module extends AbstractModule
             if ($query['is_public'] === '') {
                 unset($query['is_public']);
                 $event->getParam('request')->setContent($query);
-            } 
-        } 
+            }
+        }
     }
 
     /**
@@ -161,15 +149,15 @@ class Module extends AbstractModule
         $query['datetime'] = isset($query['datetime']) ? $query['datetime'] : '';
 
         $partials = $event->getParam('partials', []);
-        $partials[] = 'common/advanced-search-datetime';
+        $partials[] = 'common/advanced-search/date-time';
 
         $resourceType = $event->getParam('resourceType');
         if ($resourceType === 'item') {
             $query['has_media'] = isset($query['has_media']) ? $query['has_media'] : '';
-            $partials[] = 'common/advanced-search-has-media';
+            $partials[] = 'common/advanced-search/has-media';
         }
 
-        $partials[] = 'common/advanced-search-visibility';
+        $partials[] = 'common/advanced-search/visibility';
 
         $event->setParam('query', $query);
         $event->setParam('partials', $partials);

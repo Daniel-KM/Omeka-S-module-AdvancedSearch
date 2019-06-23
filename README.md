@@ -8,6 +8,7 @@ Added fields are:
 
 - before/on/after creation/modification date/time of any resource
 - has media (for item)
+- visibility public/private
 
 
 Installation

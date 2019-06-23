@@ -49,6 +49,20 @@ class Module extends AbstractModule
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager)
     {
+        // Adjust resource search by visibility
+        $adapters = [
+            \Omeka\Api\Adapter\ItemAdapter::class,
+            \Omeka\Api\Adapter\ItemSetAdapter::class,
+            \Omeka\Api\Adapter\MediaAdapter::class,
+        ];
+        foreach ($adapters as $adapter) {
+            $sharedEventManager->attach(
+                $adapter,
+                'api.search.pre',
+                [$this, 'beforeSearch']
+            );
+        }
+        
         // Add the search query filters for resources.
         $adapters = [
             \Omeka\Api\Adapter\ItemAdapter::class,
@@ -102,6 +116,24 @@ class Module extends AbstractModule
     }
 
     /**
+     * Removes is_public from the query if the value is '', before
+     * passing it to AbstractResourceEntityAdapter, as it would
+     * coerce it to boolean false for the query builder.
+     * 
+     * @param Event $event
+     */
+    public function beforeSearch(Event $event)
+    {
+        $query = $event->getParam('request')->getContent();
+        if (isset($query['is_public'])) {
+            if ($query['is_public'] === '') {
+                unset($query['is_public']);
+                $event->getParam('request')->setContent($query);
+            } 
+        } 
+    }
+
+    /**
      * Helper to filter search queries.
      *
      * @param Event $event
@@ -136,6 +168,8 @@ class Module extends AbstractModule
             $query['has_media'] = isset($query['has_media']) ? $query['has_media'] : '';
             $partials[] = 'common/advanced-search-has-media';
         }
+
+        $partials[] = 'common/advanced-search-visibility';
 
         $event->setParam('query', $query);
         $event->setParam('partials', $partials);
@@ -196,6 +230,12 @@ class Module extends AbstractModule
                 $filterLabel = $translate('Has media'); // @translate
                 $filters[$filterLabel][] = $translate('no'); // @translate
             }
+        }
+
+        if (isset($query['is_public']) && $query['is_public'] !== '') {
+            $value = $query['is_public'] === '0' ? $translate('Private') : $translate('Public');
+            $filters[$translate('Visibility')][] = $value;
+            $event->setParam('filters', $filters);
         }
 
         $event->setParam('filters', $filters);

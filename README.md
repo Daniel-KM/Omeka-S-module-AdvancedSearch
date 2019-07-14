@@ -8,13 +8,14 @@ Added fields are:
 
 - before/on/after creation/modification date/time of any resource
 - has media (for item)
+- media type
 - visibility public/private
 
 
 Installation
 ------------
 
-Uncompress files and rename module folder "AdvancedSearchPlus".
+Uncompress files and rename module folder `AdvancedSearchPlus`.
 
 Then install it like any other Omeka module and follow the config instructions.
 
@@ -77,7 +78,7 @@ Current maintainers:
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2018
+* Copyright Daniel Berthereau, 2018-2019
 
 
 [Advanced Search Plus]: https://github.com/Daniel-KM/Omeka-S-module-AdvancedSearchPlus

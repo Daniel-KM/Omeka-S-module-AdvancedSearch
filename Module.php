@@ -136,6 +136,7 @@ class Module extends AbstractModule
         $this->searchDateTime($qb, $adapter, $query);
         if ($adapter instanceof ItemAdapter) {
             $this->searchHasMedia($qb, $adapter, $query);
+            $this->searchItemByMediaType($qb, $adapter, $query);
         } elseif ($adapter instanceof MediaAdapter) {
             $this->searchMediaType($qb, $adapter, $query);
         }
@@ -164,6 +165,8 @@ class Module extends AbstractModule
         if ($resourceType === 'item') {
             $query['has_media'] = isset($query['has_media']) ? $query['has_media'] : '';
             $partials[] = 'common/advanced-search/has-media';
+            $query['media_type'] = isset($query['media_type']) ? (array) $query['media_type'] : [];
+            $partials[] = 'common/advanced-search/media-type';
         }
 
         $partials[] = 'common/advanced-search/visibility';
@@ -499,6 +502,47 @@ class Module extends AbstractModule
             );
             $qb->andWhere($qb->expr()->isNull($mediaAlias . '.id'));
         }
+    }
+
+    /**
+     * Build query to check if media types.
+     *
+     * @param QueryBuilder $qb
+     * @param AbstractResourceEntityAdapter $adapter
+     * @param array $query
+     */
+
+    protected function searchItemByMediaType(
+        QueryBuilder $qb,
+        ItemAdapter $adapter,
+        array $query
+    ) {
+        if (!isset($query['media_type'])) {
+            return;
+        }
+
+        $values = is_array($query['media_type'])
+            ? $query['media_type']
+            : [$query['media_type']];
+        $values = array_filter(array_map('trim', $values));
+        if (empty($values)) {
+            return;
+        }
+
+        $mediaAlias = $adapter->createAlias();
+        $expr = $qb->expr();
+        $qb->innerJoin(
+            \Omeka\Entity\Media::class,
+            $mediaAlias,
+            'WITH',
+            $expr->andX(
+                $expr->eq($mediaAlias . '.item', $adapter->getEntityClass() . '.id'),
+                $expr->in(
+                    $mediaAlias . '.mediaType',
+                    $adapter->createNamedParameter($qb, $values)
+                )
+            )
+        );
     }
 
     /**

@@ -5,7 +5,7 @@
  * Add some fields to the advanced search form (before/after creation date, has
  * media, etc.).
  *
- * @copyright Daniel Berthereau, 2018
+ * @copyright Daniel Berthereau, 2018-2019
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
  *
  * This software is governed by the CeCILL license under French law and abiding
@@ -36,6 +36,7 @@ namespace AdvancedSearchPlus;
 use Doctrine\ORM\QueryBuilder;
 use Omeka\Api\Adapter\AbstractResourceEntityAdapter;
 use Omeka\Api\Adapter\ItemAdapter;
+use Omeka\Api\Adapter\MediaAdapter;
 use Omeka\Module\AbstractModule;
 use Zend\EventManager\Event;
 use Zend\EventManager\SharedEventManagerInterface;
@@ -59,7 +60,7 @@ class Module extends AbstractModule
             $sharedEventManager->attach(
                 $adapter,
                 'api.search.pre',
-                [$this, 'beforeSearch']
+                [$this, 'handleApiSearchPre']
             );
         }
 
@@ -74,7 +75,7 @@ class Module extends AbstractModule
             $sharedEventManager->attach(
                 $adapter,
                 'api.search.query',
-                [$this, 'searchQuery']
+                [$this, 'handleApiSearchQuery']
             );
         }
 
@@ -110,7 +111,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function beforeSearch(Event $event)
+    public function handleApiSearchPre(Event $event)
     {
         $query = $event->getParam('request')->getContent();
         if (isset($query['is_public'])) {
@@ -126,7 +127,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function searchQuery(Event $event)
+    public function handleApiSearchQuery(Event $event)
     {
         /** @var \Doctrine\ORM\QueryBuilder $qb */
         $qb = $event->getParam('queryBuilder');
@@ -135,6 +136,8 @@ class Module extends AbstractModule
         $this->searchDateTime($qb, $adapter, $query);
         if ($adapter instanceof ItemAdapter) {
             $this->searchHasMedia($qb, $adapter, $query);
+        } elseif ($adapter instanceof MediaAdapter) {
+            $this->searchMediaType($qb, $adapter, $query);
         }
     }
 
@@ -146,12 +149,18 @@ class Module extends AbstractModule
     public function displayAdvancedSearch(Event $event)
     {
         $query = $event->getParam('query', []);
-        $query['datetime'] = isset($query['datetime']) ? $query['datetime'] : '';
 
         $partials = $event->getParam('partials', []);
+        $resourceType = $event->getParam('resourceType');
+
+        if ($resourceType === 'media') {
+            $query['media_type'] = isset($query['media_type']) ? (array) $query['media_type'] : [];
+            $partials[] = 'common/advanced-search/media-type';
+        }
+
+        $query['datetime'] = isset($query['datetime']) ? $query['datetime'] : '';
         $partials[] = 'common/advanced-search/date-time';
 
-        $resourceType = $event->getParam('resourceType');
         if ($resourceType === 'item') {
             $query['has_media'] = isset($query['has_media']) ? $query['has_media'] : '';
             $partials[] = 'common/advanced-search/has-media';
@@ -209,6 +218,11 @@ class Module extends AbstractModule
             }
         }
 
+        if (isset($query['is_public']) && $query['is_public'] !== '') {
+            $value = $query['is_public'] === '0' ? $translate('Private') : $translate('Public');
+            $filters[$translate('Visibility')][] = $value;
+        }
+
         if (isset($query['has_media'])) {
             $value = $query['has_media'];
             if ($value) {
@@ -220,10 +234,14 @@ class Module extends AbstractModule
             }
         }
 
-        if (isset($query['is_public']) && $query['is_public'] !== '') {
-            $value = $query['is_public'] === '0' ? $translate('Private') : $translate('Public');
-            $filters[$translate('Visibility')][] = $value;
-            $event->setParam('filters', $filters);
+        if (!empty($query['media_type'])) {
+            $value = is_array($query['media_type'])
+                ? $query['media_type']
+                : [$query['media_type']];
+            foreach ($value as $subValue) {
+                $filterLabel = $translate('Media type');
+                $filters[$filterLabel][] = $subValue;
+            }
         }
 
         $event->setParam('filters', $filters);
@@ -481,5 +499,35 @@ class Module extends AbstractModule
             );
             $qb->andWhere($qb->expr()->isNull($mediaAlias . '.id'));
         }
+    }
+
+    /**
+     * Build query to check if media types.
+     *
+     * @param QueryBuilder $qb
+     * @param AbstractResourceEntityAdapter $adapter
+     * @param array $query
+     */
+    protected function searchMediaType(
+        QueryBuilder $qb,
+        MediaAdapter $adapter,
+        array $query
+    ) {
+        if (!isset($query['media_type'])) {
+            return;
+        }
+
+        $values = is_array($query['media_type'])
+            ? $query['media_type']
+            : [$query['media_type']];
+        $values = array_filter(array_map('trim', $values));
+        if (empty($values)) {
+            return;
+        }
+
+        $qb->andWhere($qb->expr()->in(
+            $adapter->getEntityClass() . '.mediaType',
+            $adapter->createNamedParameter($qb, $values)
+        ));
     }
 }

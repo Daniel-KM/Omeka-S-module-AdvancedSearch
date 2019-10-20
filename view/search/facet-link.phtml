@@ -3,14 +3,15 @@
  * @var \Zend\View\Renderer\PhpRenderer $this
  * @var string $name
  * @var string $value
- * @var string $url
+ * @var string $label
  * @var int $count
  * @var bool $active
+ * @var string $url
  * @var \Zend\View\Helper\EscapeHtml $escapeHtml
  */
 ?>
 
 <span class="<?= $active ? 'active' : 'inactive' ?>">
-    <a href="<?= $escapeHtml($url) ?>"><?= $escapeHtml($value) ?></a>
+    <a href="<?= $escapeHtml($url) ?>"><?= $escapeHtml($label) ?></a>
     (<span class="count"><?= $count ?></span>)
 </span>

@@ -13,9 +13,19 @@ class AbstractFacetElement extends AbstractHelper
     protected $partial;
 
     /**
-     * @param Application $application
+     * @var Application $application
      */
     protected $application;
+
+    /**
+     * @var \Omeka\View\Helper\Api
+     */
+    protected $api;
+
+    /**
+     * @var \Zend\I18n\View\Helper\Translate}
+     */
+    protected $translate;
 
     /**
      * @param Application $application
@@ -29,7 +39,7 @@ class AbstractFacetElement extends AbstractHelper
      * Create one facet link.
      *
      * @param string $name
-     * @param string $facet
+     * @param array $facet
      * @return string
      */
     public function __invoke($name, $facet)
@@ -52,6 +62,8 @@ class AbstractFacetElement extends AbstractHelper
             $urlHelper = $plugins->get('url');
             $partialHelper = $plugins->get('partial');
             $escapeHtml = $plugins->get('escapeHtml');
+            $this->api =  $plugins->get('api');
+            $this->translate =  $plugins->get('translate');
 
             $mvcEvent = $this->application->getMvcEvent();
             $routeMatch = $mvcEvent->getRouteMatch();
@@ -66,26 +78,100 @@ class AbstractFacetElement extends AbstractHelper
 
         $query = $queryBase;
 
-        if (isset($query['limit'][$name]) && array_search($facet['value'], $query['limit'][$name]) !== false) {
+        // The facet value is compared against a string (the query args).
+        $facetValue = (string) $facet['value'];
+        $facetValueLabel = $this->facetValueLabel($name, $facetValue);
+        if (!strlen($facetValueLabel)) {
+            return '';
+        }
+
+        if (isset($query['limit'][$name]) && array_search($facetValue, $query['limit'][$name]) !== false) {
             $values = $query['limit'][$name];
-            $values = array_filter($values, function ($v) use ($facet) {
-                return $v != $facet['value'];
+            $values = array_filter($values, function ($v) use ($facetValue) {
+                return $v !== $facetValue;
             });
             $query['limit'][$name] = $values;
             $active = true;
         } else {
-            $query['limit'][$name][] = $facet['value'];
+            $query['limit'][$name][] = $facetValue;
             $active = false;
         }
 
         return $partialHelper($this->partial, [
             'name' => $name,
-            'value' => $facet['value'],
-            'url' => $urlHelper($route, $params, ['query' => $query]),
-            'active' => $active,
+            'value' => $facetValue,
+            'label' => $facetValueLabel,
             'count' => $facet['count'],
+            'active' => $active,
+            'url' => $urlHelper($route, $params, ['query' => $query]),
             // To speed up process.
             'escapeHtml' => $escapeHtml,
         ]);
+    }
+
+    protected function facetValueLabel($name, $facetValue)
+    {
+        if (!strlen($facetValue)) {
+            return null;
+        }
+
+        // TODO Simplify the list of field names (for historical reasons).
+        switch ($name) {
+            case 'item_sets':
+            case 'itemSet':
+            case 'item_set_id':
+            case 'item_set_id_field':
+                /** @var \Omeka\Api\Representation\ItemSetRepresentation $resource */
+                $resource = $this->api->searchOne('item_sets', ['id' => $facetValue])->getContent();
+                return $resource
+                    ? $resource->displayTitle()
+                    // Manage the case where a resource was indexed but removed.
+                    : null;
+
+            case 'resource_classes':
+            case 'resourceClass':
+            case 'resource_class_id':
+            case 'resource_class_id_field':
+                $translate = $this->translate;
+                /** @var \Omeka\Api\Representation\ResourceClassRepresentation $resource */
+                if (is_numeric($facetValue)) {
+                    try {
+                        $resource = $this->api->read('resource_classes', ['id' => $facetValue])->getContent();
+                    } catch (\Exception $e) {
+                        return null;
+                    }
+                    return $translate($resource->label());
+                }
+                $resource = $this->api->searchOne('resource_classes', ['term' => $facetValue])->getContent();
+                return $resource
+                    ? $translate($resource->label())
+                    // Manage the case where a resource was indexed but removed.
+                    : null;
+                break;
+
+            case 'resource_templates':
+            case 'resourceTemplate':
+            case 'resource_template_id':
+            case 'resource_template_id_field':
+                /** @var \Omeka\Api\Representation\ResourceTemplateRepresentation $resource */
+                if (is_numeric($facetValue)) {
+                    try {
+                        $resource = $this->api->read('resource_templates', ['id' => $facetValue])->getContent();
+                    } catch (\Exception $e) {
+                        return null;
+                    }
+                    return $resource->label();
+                }
+                $resource = $this->api->searchOne('resource_templates', ['label' => $facetValue])->getContent();
+                return $resource
+                    ? $resource->label()
+                    // Manage the case where a resource was indexed but removed.
+                    : null;
+                break;
+
+            case 'properties':
+            default:
+                return $facetValue;
+        }
     }
 }

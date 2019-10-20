@@ -200,8 +200,9 @@ class SearchPageController extends AbstractActionController
             ? $this->extractSimpleFields()
             : $this->extractFullFields();
 
+        // TODO Check simple fields.
         $form->setData($params);
-        if (!$form->isValid()) {
+        if (!$isSimple && !$form->isValid()) {
             $messages = $form->getMessages();
             if (isset($messages['csrf'])) {
                 $this->messenger()->addError('Invalid or missing CSRF token'); // @translate
@@ -211,9 +212,12 @@ class SearchPageController extends AbstractActionController
             return $view;
         }
 
-        // TODO Why the fieldset "form" is removed from the params? Add an intermediate fieldset?
+        // TODO Why the fieldset "form" is removed from the params? Add an intermediate fieldset? Check if it is still the case.
         $formParams = isset($params['form']) ? $params['form'] : [];
-        $params = $form->getData();
+        // TODO Check simple fields.
+        if (!$isSimple) {
+            $params = $form->getData();
+        }
         $params['form'] = $formParams;
         unset($params['csrf']);
 
@@ -358,7 +362,7 @@ class SearchPageController extends AbstractActionController
     }
 
     /**
-     * Convert settings into strings in ordeer to manage many fields.
+     * Convert settings into strings in ordeer to manage many fields inside form.
      *
      * @param SearchPageRepresentation $searchPage
      * @param array $settings
@@ -408,9 +412,13 @@ class SearchPageController extends AbstractActionController
     {
         $params = $this->getRequest()->getPost()->toArray();
 
+        unset($params['fieldsets']);
+        unset($params['form_class']);
+        unset($params['available_facets']);
+        unset($params['available_sort_fields']);
+
         $data = $params['facets'] ?: '';
         unset($params['facets']);
-        unset($params['available_facets']);
         $data = $this->stringToList($data);
         foreach ($data as $key => $value) {
             list($term, $label) = array_map('trim', explode('|', $value));
@@ -425,7 +433,6 @@ class SearchPageController extends AbstractActionController
 
         $data = $params['sort_fields'] ?: '';
         unset($params['sort_fields']);
-        unset($params['available_sort_fields']);
         $data = $this->stringToList($data);
         foreach ($data as $key => $value) {
             list($term, $label) = array_map('trim', explode('|', $value));
@@ -437,8 +444,6 @@ class SearchPageController extends AbstractActionController
                 ],
             ];
         }
-
-        unset($params['form_class']);
 
         return $params;
     }

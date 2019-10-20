@@ -58,15 +58,18 @@ class InternalQuerier extends AbstractQuerier
 
         // TODO FIx the process for facets: all the facets should be displayed, and "or" by group of facets.
         // TODO Make core search properties groupable ("or" inside a group, "and" between group).
+        // Note: when a facet is selected, it is managed like a filter.
         $filters = $query->getFilters();
         foreach ($filters as $name => $values) {
             // "is_public" is automatically managed by this internal adapter.
             // "creation_date_year_field" should be a property.
             // "date_range_field" is managed below.
             switch ($name) {
+                case 'is_public':
                 case 'is_public_field':
                     continue 2;
 
+                case 'item_set_id':
                 case 'item_set_id_field':
                     if (!is_array($values)) {
                         $values = [$values];
@@ -76,22 +79,28 @@ class InternalQuerier extends AbstractQuerier
                     $data['item_set_id'] = array_filter(array_map('intval', $values));
                     continue 2;
 
+                case 'resource_class_id':
                 case 'resource_class_id_field':
                     if (!is_array($values)) {
                         $values = [$values];
                     } elseif (is_array(reset($values))) {
                         $values = array_merge(...$values);
                     }
-                    $data['resource_class_id'] = array_filter(array_map('intval', $values));
+                    $data['resource_class_id'] = is_numeric(reset($values))
+                        ? array_filter(array_map('intval', $values))
+                        : $this->listResourceClassIds($values);
                     continue 2;
 
+                case 'resource_template_id':
                 case 'resource_template_id_field':
                     if (!is_array($values)) {
                         $values = [$values];
                     } elseif (is_array(reset($values))) {
                         $values = array_merge(...$values);
                     }
-                    $data['resource_template_id'] = array_filter(array_map('intval', $values));
+                    $data['resource_template_id'] = is_numeric(reset($values))
+                        ? array_filter(array_map('intval', $values))
+                        : $this->listResourceTemplateIds($values);
                     continue 2;
 
                 default:
@@ -235,5 +244,139 @@ class InternalQuerier extends AbstractQuerier
         }
 
         return $response;
+    }
+
+    /**
+     * Convert a list of terms into a list of property ids.
+     *
+     * @see \Reference\Mvc\Controller\Plugin\Reference::listPropertyIds()
+     *
+     * @param array $values
+     * @return array Only values that are terms are converted into ids, the
+     * other are removed.
+     */
+    protected function listPropertyIds(array $values)
+    {
+        $values = array_filter(array_map(function($term) {
+            return $this->isTerm($term) ? $term : null;
+        }, $values));
+        return array_intersect_key($this->getPropertyIds(), array_fill_keys($values, null));
+    }
+
+    /**
+     * Get all property ids by term.
+     *
+     * @see \Reference\Mvc\Controller\Plugin\Reference::getPropertyIds()
+     *
+     * @return array Associative array of ids by term.
+     */
+    protected function getPropertyIds()
+    {
+        static $properties;
+
+        if (is_null($properties)) {
+            $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
+            $qb = $entityManager->createQueryBuilder();
+            $qb
+                ->select([
+                    "CONCAT(vocabulary.prefix, ':', property.localName) AS term",
+                    'property.id AS id',
+                ])
+                ->from(\Omeka\Entity\Property::class, 'property')
+                ->innerJoin(
+                    \Omeka\Entity\Vocabulary::class,
+                    'vocabulary',
+                    \Doctrine\ORM\Query\Expr\Join::WITH,
+                    $qb->expr()->eq('vocabulary.id', 'property.vocabulary')
+                )
+            ;
+            $properties = $qb->getQuery()->getScalarResult();
+        }
+
+        return $properties;
+    }
+
+    /**
+     * Convert a list of terms into a list of resource class ids.
+     *
+     * @see \Reference\Mvc\Controller\Plugin\Reference::listResourceClassIds()
+     *
+     * @param array $values
+     * @return array Only values that are terms are converted into ids, the
+     * other are removed.
+     */
+    protected function listResourceClassIds(array $values)
+    {
+        return array_intersect_key($this->getResourceClassIds(), array_fill_keys($values, null));
+    }
+
+    /**
+     * Get all resource class ids by term.
+     *
+     * @see \Reference\Mvc\Controller\Plugin\Reference::getResourceClassIds()
+     *
+     * @return array Associative array of ids by term.
+     */
+    protected function getResourceClassIds()
+    {
+        static $resourceClasses;
+
+        if (is_null($resourceClasses)) {
+            $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
+            $qb = $entityManager->createQueryBuilder();
+            $qb
+                ->select([
+                    "CONCAT(vocabulary.prefix, ':', resource_class.localName) AS term",
+                    'resource_class.id AS id',
+                ])
+                ->from(\Omeka\Entity\ResourceClass::class, 'resource_class')
+                ->innerJoin(
+                    \Omeka\Entity\Vocabulary::class,
+                    'vocabulary',
+                    \Doctrine\ORM\Query\Expr\Join::WITH,
+                    $qb->expr()->eq('vocabulary.id', 'resource_class.vocabulary')
+                )
+            ;
+            $resourceClasses = $qb->getQuery()->getScalarResult();
+        }
+
+        return $resourceClasses;
+    }
+
+    /**
+     * Convert a list of terms into a list of resource template ids.
+     *
+     * @param array $values
+     * @return array Only values that are labels are converted into ids, the
+     * other are removed.
+     */
+    protected function listResourceTemplateIds(array $values)
+    {
+        return array_intersect_key($this->getResourceTemplateIds(), array_fill_keys($values, null));
+    }
+
+    /**
+     * Get all resource template ids by term.
+     *
+     * @return array Associative array of ids by term.
+     */
+    protected function getResourceTemplateIds()
+    {
+        static $resourceTemplates;
+
+        if (is_null($resourceTemplates)) {
+            $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
+            $qb = $entityManager->createQueryBuilder();
+            $qb
+                ->select([
+                    'resource_template.label AS label',
+                    'resource_template.id AS id',
+                ])
+                ->from(\Omeka\Entity\ResourceTemplate::class, 'resource_template')
+            ;
+            $resourceTemplates = $qb->getQuery()->getScalarResult();
+        }
+
+        return $resourceTemplates;
     }
 }

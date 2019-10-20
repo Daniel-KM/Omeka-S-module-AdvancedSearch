@@ -47,7 +47,7 @@ class SearchPageConfigureSimpleForm extends SearchPageConfigureForm
             ],
             'attributes' => [
                 'id' => 'facets',
-                'placeholder' => 'dcterms:subject | Subject (asc)',
+                'placeholder' => 'dcterms:subject | Subjects',
                 'rows' => 12,
             ],
         ]);
@@ -61,7 +61,7 @@ class SearchPageConfigureSimpleForm extends SearchPageConfigureForm
             ],
             'attributes' => [
                 'id' => 'available_facets',
-                'placeholder' => 'dcterms:subject | Subject (asc)',
+                'placeholder' => 'dcterms:subject | Subjects',
                 'rows' => 12,
             ],
         ]);

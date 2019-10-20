@@ -45,7 +45,8 @@ $this->headLink()
     ->appendStylesheet($assetUrl('css/search-page-configure.css', 'Search'));
 $this->headScript()
     ->appendFile($assetUrl('jquery-ui.min.js', 'jQueryUI'))
-    ->appendFile($assetUrl('js/search-admin.js', 'Search'));
+    ->appendFile($assetUrl('js/search-admin.js', 'Search'))
+;
 
 $index = $searchPage->index();
 $adapter = $index ? $index->adapter() : null;

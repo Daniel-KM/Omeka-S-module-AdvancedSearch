@@ -165,7 +165,7 @@ class SearchPageController extends AbstractActionController
         $adapter = $index ? $index->adapter() : null;
         if (empty($adapter)) {
             $message = new Message(
-                'The index adapter "%s" is unavailable', // @translate
+                'The index adapter "%s" is unavailable.', // @translate
                 $index->adapterLabel()
             );
             $this->messenger()->addError($message); // @translate
@@ -214,31 +214,7 @@ class SearchPageController extends AbstractActionController
                 continue;
             }
             // Sort enabled first, then available, else sort by weigth.
-            uasort($params[$type], function ($a, $b) {
-                // Sort by availability.
-                if (isset($a['enabled']) && isset($b['enabled'])) {
-                    if ($a['enabled'] > $b['enabled']) {
-                        return -1;
-                    } elseif ($a['enabled'] < $b['enabled']) {
-                        return 1;
-                    }
-                } elseif (isset($a['enabled'])) {
-                    return -1;
-                } elseif (isset($b['enabled'])) {
-                    return 1;
-                }
-                // In other cases, sort by weight.
-                if (isset($a['weight']) && isset($b['weight'])) {
-                    return $a['weight'] == $b['weight']
-                        ? 0
-                        : ($a['weight'] < $b['weight'] ? -1 : 1);
-                } elseif (isset($a['weight'])) {
-                    return -1;
-                } elseif (isset($b['weight'])) {
-                    return 1;
-                }
-                return 0;
-            });
+            uasort($params[$type], [$this, 'sortByEnabledFirst']);
         }
 
         $page = $searchPage->getEntity();
@@ -345,7 +321,7 @@ class SearchPageController extends AbstractActionController
      * full form or the simple form is set to 200.
      *
      * @param SearchPageRepresentation $searchPage
-     * @return \Search\Form\Admin\SearchPageConfigureForm|\Search\Form\Admin\SearchPageConfigureSimpleForm
+     * @return \Search\Form\Admin\SearchPageConfigureForm|\Search\Form\Admin\SearchPageConfigureSimpleForm|null
      */
     protected function getConfigureForm(SearchPageRepresentation $searchPage)
     {
@@ -633,6 +609,41 @@ class SearchPageController extends AbstractActionController
         }
 
         $this->messenger()->addSuccess($message);
+    }
+
+    /**
+     * Compare fields to be sorted, with enabled fields first, and by weight.
+     *
+     * @param array $a First value
+     * @param array $b Second value
+     * @return int -1, 0, 1.
+     */
+    protected function sortByEnabledFirst($a, $b)
+    {
+        // Sort by availability.
+        if (isset($a['enabled']) && isset($b['enabled'])) {
+            if ($a['enabled'] > $b['enabled']) {
+                return -1;
+            } elseif ($a['enabled'] < $b['enabled']) {
+                return 1;
+            }
+        } elseif (isset($a['enabled'])) {
+            return -1;
+        } elseif (isset($b['enabled'])) {
+            return 1;
+        }
+
+        // In other cases, sort by weight.
+        if (isset($a['weight']) && isset($b['weight'])) {
+            return $a['weight'] == $b['weight']
+                ? 0
+                : ($a['weight'] < $b['weight'] ? -1 : 1);
+        } elseif (isset($a['weight'])) {
+            return -1;
+        } elseif (isset($b['weight'])) {
+            return 1;
+        }
+        return 0;
     }
 
     /**

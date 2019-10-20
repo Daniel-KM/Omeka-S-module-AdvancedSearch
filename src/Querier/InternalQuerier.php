@@ -36,7 +36,6 @@ class InternalQuerier extends AbstractQuerier
                 'text' => $q,
             ];
         }
-
         // "is_public" is automatically managed by the api.
 
         $indexerResourceTypes = $this->getSetting('resources', []);
@@ -61,43 +60,62 @@ class InternalQuerier extends AbstractQuerier
         // TODO Make core search properties groupable ("or" inside a group, "and" between group).
         $filters = $query->getFilters();
         foreach ($filters as $name => $values) {
+            // "is_public" is automatically managed by this internal adapter.
             // "creation_date_year_field" should be a property.
             // "date_range_field" is managed below.
-            // "is_public" is automatically managed by this adapter.
-            if ($name === 'is_public_field') {
-                continue;
-            }
-            if ($name === 'item_set_id_field') {
-                if (!is_array($values)) {
-                    $values = [$values];
-                } elseif (is_array(reset($values))) {
-                    $values = array_merge(...$values);
-                }
-                $data['item_set_id'] = array_filter(array_map('intval', $values));
-                continue;
-            }
-            foreach ($values as $value) {
-                // Use "or" when multiple (checkbox), else "and" (radio).
-                if (is_array($value)) {
-                    if (empty($value)) {
-                        continue;
+            switch ($name) {
+                case 'is_public_field':
+                    continue 2;
+
+                case 'item_set_id_field':
+                    if (!is_array($values)) {
+                        $values = [$values];
+                    } elseif (is_array(reset($values))) {
+                        $values = array_merge(...$values);
                     }
-                    foreach ($value as $val) {
-                        $data['property'][] = [
-                            'joiner' => 'or',
-                            'property' => $name,
-                            'type' => 'eq',
-                            'text' => $val,
-                        ];
+                    $data['item_set_id'] = array_filter(array_map('intval', $values));
+                    continue 2;
+
+                case 'resource_class_id_field':
+                    if (!is_array($values)) {
+                        $values = [$values];
+                    } elseif (is_array(reset($values))) {
+                        $values = array_merge(...$values);
                     }
-                } else {
-                    $data['property'][] = [
-                        'joiner' => 'and',
-                        'property' => $name,
-                        'type' => 'eq',
-                        'text' => $value,
-                    ];
-                }
+                    $data['resource_class_id'] = array_filter(array_map('intval', $values));
+                    continue 2;
+
+                case 'resource_template_id_field':
+                    if (!is_array($values)) {
+                        $values = [$values];
+                    } elseif (is_array(reset($values))) {
+                        $values = array_merge(...$values);
+                    }
+                    $data['resource_template_id'] = array_filter(array_map('intval', $values));
+                    continue 2;
+
+                default:
+                    foreach ($values as $value) {
+                        // Use "or" when multiple (checkbox), else "and" (radio).
+                        if (is_array($value)) {
+                            foreach ($value as $val) {
+                                $data['property'][] = [
+                                    'joiner' => 'or',
+                                    'property' => $name,
+                                    'type' => 'eq',
+                                    'text' => $val,
+                                ];
+                            }
+                        } else {
+                            $data['property'][] = [
+                                'joiner' => 'and',
+                                'property' => $name,
+                                'type' => 'eq',
+                                'text' => $value,
+                            ];
+                        }
+                    }
+                    break;
             }
         }
 
@@ -181,13 +199,36 @@ class InternalQuerier extends AbstractQuerier
         }
 
         if ($reference) {
+             $metadataFieldsToNames = [
+                 'is_public' => 'is_public',
+                 'is_public_field' => 'is_public',
+                 'item_set_id' => 'item_sets',
+                 'item_set_id_field' => 'item_sets',
+                 'resource_class_id' => 'resource_classes',
+                 'resource_class_id_field' => 'resource_classes',
+                 'resource_template_id' => 'resource_templates',
+                 'resource_template_id_field' => 'resource_templates',
+             ];
+
+            // For items and item sets.
+            // FIXME Like in Solr, the facets for items and item sets are mixed, and may be complex to understand.
             foreach ($resourceTypes as $resourceType) {
+                if ($resourceType === 'item_sets') {
+                    continue;
+                }
                 foreach ($facetFields as $facetField) {
-                    $values = $reference($facetField, 'properties', $resourceType, ['count' => 'DESC'], $facetData, $facetLimit, 1);
-                    foreach ($values as $value => $count) {
-                        if ($count > 0) {
-                            $response->addFacetCount($facetField, $value, $count);
+                    if (isset($metadataFieldsToNames[$facetField])) {
+                        $name = $metadataFieldsToNames[$facetField];
+                        if ($name === 'is_public') {
+                            continue;
                         }
+                        $values = $reference('', $name, $resourceType, ['count' => 'DESC'], $facetData, $facetLimit, 1);
+                    } else {
+                        $values = $reference($facetField, 'properties', $resourceType, ['count' => 'DESC'], $facetData, $facetLimit, 1);
+                    }
+                    $values = array_filter($values);
+                    foreach ($values as $value => $count) {
+                        $response->addFacetCount($facetField, $value, $count);
                     }
                 }
             }

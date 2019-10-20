@@ -47,7 +47,27 @@ class InternalAdapter extends AbstractAdapter
         $stmt = $connection->executeQuery($qb);
         $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
+        // Public field cannot be managed with internal adapter.
         $fields = [];
+        $fields['item_set_id'] = [
+            'name' => 'item_set_id',
+            'label' => 'Item set',
+        ];
+        $fields['resource_class_id'] = [
+            'name' => 'resource_class_id',
+            'label' => 'Resource class',
+        ];
+        $fields['resource_template_id'] = [
+            'name' => 'resource_template_id',
+            'label' => 'Resource template',
+        ];
+        // TODO Manage query on owner (only one in core).
+        /*
+        $fields['owner_id'] = [
+            'name' => 'owner_id',
+            'label' => 'Owner',
+        ];
+        */
         foreach ($result as $field) {
             $fields[$field['name']] = $field;
         }

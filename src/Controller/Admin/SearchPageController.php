@@ -173,6 +173,15 @@ class SearchPageController extends AbstractActionController
         }
 
         $form = $this->getConfigureForm($searchPage);
+        if (empty($form)) {
+            $message = new Message(
+                'This index adapter "%s" has no config form.', // @translate
+                $index->adapterLabel()
+            );
+            $this->messenger()->addWarning($message); // @translate
+            return $view;
+        }
+
         $isSimple = $form instanceof SearchPageConfigureSimpleForm;
 
         $settings = $searchPage->settings() ?: [];
@@ -326,7 +335,10 @@ class SearchPageController extends AbstractActionController
     protected function getConfigureForm(SearchPageRepresentation $searchPage)
     {
         $index = $searchPage->index();
-        $adapter = $index ? $index->adapter() : null;
+        if (!$index) {
+            return null;
+        }
+        $adapter = $index->adapter();
         $availableFields = $adapter->getAvailableFields($index);
 
         $isPostSimple = $this->getRequest()->isPost()

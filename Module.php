@@ -378,8 +378,7 @@ class Module extends AbstractModule
         $where = '';
         $expr = $qb->expr();
 
-        $resourceClass = $adapter->getEntityClass();
-        $alias = $this->isOldOmeka ? $resourceClass : 'omeka_root';
+        $alias = $this->isOldOmeka ? $adapter->getEntityClass() : 'omeka_root';
 
         foreach ($query['datetime'] as $queryRow) {
             $joiner = $queryRow['joiner'];
@@ -492,8 +491,7 @@ class Module extends AbstractModule
             return;
         }
 
-        $resourceClass = $adapter->getEntityClass();
-        $alias = $this->isOldOmeka ? $resourceClass : 'omeka_root';
+        $alias = $this->isOldOmeka ? $adapter->getEntityClass() : 'omeka_root';
         $expr = $qb->expr();
 
         // With media.
@@ -543,8 +541,7 @@ class Module extends AbstractModule
         }
 
         $mediaAlias = $adapter->createAlias();
-        $resourceClass = $adapter->getEntityClass();
-        $alias = $this->isOldOmeka ? $resourceClass : 'omeka_root';
+        $alias = $this->isOldOmeka ? $adapter->getEntityClass() : 'omeka_root';
         $expr = $qb->expr();
 
         $qb->innerJoin(

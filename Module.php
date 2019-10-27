@@ -34,6 +34,7 @@
 namespace AdvancedSearchPlus;
 
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Query\Expr\Join;
 use Omeka\Api\Adapter\AbstractResourceEntityAdapter;
 use Omeka\Api\Adapter\ItemAdapter;
 use Omeka\Api\Adapter\MediaAdapter;
@@ -50,34 +51,39 @@ class Module extends AbstractModule
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager)
     {
-        // Adjust resource search by visibility
-        $adapters = [
+        // Adjust resource search by visibility.
+        $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemAdapter::class,
+            'api.search.pre',
+            [$this, 'handleApiSearchPre']
+        );
+        $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemSetAdapter::class,
+            'api.search.pre',
+            [$this, 'handleApiSearchPre']
+        );
+        $sharedEventManager->attach(
             \Omeka\Api\Adapter\MediaAdapter::class,
-        ];
-        foreach ($adapters as $adapter) {
-            $sharedEventManager->attach(
-                $adapter,
-                'api.search.pre',
-                [$this, 'handleApiSearchPre']
-            );
-        }
+            'api.search.pre',
+            [$this, 'handleApiSearchPre']
+        );
 
         // Add the search query filters for resources.
-        $adapters = [
+        $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemAdapter::class,
+            'api.search.query',
+            [$this, 'handleApiSearchQuery']
+        );
+        $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemSetAdapter::class,
+            'api.search.query',
+            [$this, 'handleApiSearchQuery']
+        );
+        $sharedEventManager->attach(
             \Omeka\Api\Adapter\MediaAdapter::class,
-            // TODO Add user.
-        ];
-        foreach ($adapters as $adapter) {
-            $sharedEventManager->attach(
-                $adapter,
-                'api.search.query',
-                [$this, 'handleApiSearchQuery']
-            );
-        }
+            'api.search.query',
+            [$this, 'handleApiSearchQuery']
+        );
 
         $controllers = [
             'Omeka\Controller\Admin\Item',
@@ -368,6 +374,7 @@ class Module extends AbstractModule
         }
 
         $where = '';
+        $expr = $qb->expr();
 
         foreach ($query['datetime'] as $queryRow) {
             $joiner = $queryRow['joiner'];
@@ -385,14 +392,14 @@ class Module extends AbstractModule
                         $value = substr_replace('9999-12-31 23:59:59', $value, 0, strlen($value) - 19);
                     }
                     $param = $adapter->createNamedParameter($qb, $value);
-                    $predicateExpr = $qb->expr()->gt($resourceClass . '.' . $field, $param);
+                    $predicateExpr = $expr->gt($resourceClass . '.' . $field, $param);
                     break;
                 case 'gte':
                     if (strlen($value) < 19) {
                         $value = substr_replace('0000-01-01 00:00:00', $value, 0, strlen($value) - 19);
                     }
                     $param = $adapter->createNamedParameter($qb, $value);
-                    $predicateExpr = $qb->expr()->gte($resourceClass . '.' . $field, $param);
+                    $predicateExpr = $expr->gte($resourceClass . '.' . $field, $param);
                     break;
                 case 'eq':
                     if (strlen($value) < 19) {
@@ -400,10 +407,10 @@ class Module extends AbstractModule
                         $valueTo = substr_replace('9999-12-31 23:59:59', $value, 0, strlen($value) - 19);
                         $paramFrom = $adapter->createNamedParameter($qb, $valueFrom);
                         $paramTo = $adapter->createNamedParameter($qb, $valueTo);
-                        $predicateExpr = $qb->expr()->between($resourceClass . '.' . $field, $paramFrom, $paramTo);
+                        $predicateExpr = $expr->between($resourceClass . '.' . $field, $paramFrom, $paramTo);
                     } else {
                         $param = $adapter->createNamedParameter($qb, $value);
-                        $predicateExpr = $qb->expr()->eq($resourceClass . '.' . $field, $param);
+                        $predicateExpr = $expr->eq($resourceClass . '.' . $field, $param);
                     }
                     break;
                 case 'neq':
@@ -412,12 +419,12 @@ class Module extends AbstractModule
                         $valueTo = substr_replace('9999-12-31 23:59:59', $value, 0, strlen($value) - 19);
                         $paramFrom = $adapter->createNamedParameter($qb, $valueFrom);
                         $paramTo = $adapter->createNamedParameter($qb, $valueTo);
-                        $predicateExpr = $qb->expr()->not(
-                            $qb->expr()->between($resourceClass . '.' . $field, $paramFrom, $paramTo)
+                        $predicateExpr = $expr->not(
+                            $expr->between($resourceClass . '.' . $field, $paramFrom, $paramTo)
                         );
                     } else {
                         $param = $adapter->createNamedParameter($qb, $value);
-                        $predicateExpr = $qb->expr()->neq($resourceClass . '.' . $field, $param);
+                        $predicateExpr = $expr->neq($resourceClass . '.' . $field, $param);
                     }
                     break;
                 case 'lte':
@@ -425,20 +432,20 @@ class Module extends AbstractModule
                         $value = substr_replace('9999-12-31 23:59:59', $value, 0, strlen($value) - 19);
                     }
                     $param = $adapter->createNamedParameter($qb, $value);
-                    $predicateExpr = $qb->expr()->lte($resourceClass . '.' . $field, $param);
+                    $predicateExpr = $expr->lte($resourceClass . '.' . $field, $param);
                     break;
                 case 'lt':
                     if (strlen($value) < 19) {
                         $value = substr_replace('0000-01-01 00:00:00', $value, 0, strlen($value) - 19);
                     }
                     $param = $adapter->createNamedParameter($qb, $value);
-                    $predicateExpr = $qb->expr()->lt($resourceClass . '.' . $field, $param);
+                    $predicateExpr = $expr->lt($resourceClass . '.' . $field, $param);
                     break;
                 case 'ex':
-                    $predicateExpr = $qb->expr()->isNotNull($resourceClass . '.' . $field);
+                    $predicateExpr = $expr->isNotNull($resourceClass . '.' . $field);
                     break;
                 case 'nex':
-                    $predicateExpr = $qb->expr()->isNull($resourceClass . '.' . $field);
+                    $predicateExpr = $expr->isNull($resourceClass . '.' . $field);
                     break;
                 default:
                     continue 2;
@@ -482,14 +489,16 @@ class Module extends AbstractModule
             return;
         }
 
+        $expr = $qb->expr();
+
         // With media.
         $mediaAlias = $adapter->createAlias();
         if ($value) {
             $qb->innerJoin(
                 \Omeka\Entity\Media::class,
                 $mediaAlias,
-                'WITH',
-                $qb->expr()->eq($mediaAlias . '.item', $adapter->getEntityClass() . '.id')
+                Join::WITH,
+                $expr->eq($mediaAlias . '.item', $adapter->getEntityClass() . '.id')
             );
         }
         // Without media.
@@ -497,10 +506,10 @@ class Module extends AbstractModule
             $qb->leftJoin(
                 \Omeka\Entity\Media::class,
                 $mediaAlias,
-                'WITH',
-                $qb->expr()->eq($mediaAlias . '.item', $adapter->getEntityClass() . '.id')
+                Join::WITH,
+                $expr->eq($mediaAlias . '.item', $adapter->getEntityClass() . '.id')
             );
-            $qb->andWhere($qb->expr()->isNull($mediaAlias . '.id'));
+            $qb->andWhere($expr->isNull($mediaAlias . '.id'));
         }
     }
 
@@ -511,7 +520,6 @@ class Module extends AbstractModule
      * @param AbstractResourceEntityAdapter $adapter
      * @param array $query
      */
-
     protected function searchItemByMediaType(
         QueryBuilder $qb,
         ItemAdapter $adapter,
@@ -534,7 +542,7 @@ class Module extends AbstractModule
         $qb->innerJoin(
             \Omeka\Entity\Media::class,
             $mediaAlias,
-            'WITH',
+            Join::WITH,
             $expr->andX(
                 $expr->eq($mediaAlias . '.item', $adapter->getEntityClass() . '.id'),
                 $expr->in(
@@ -569,7 +577,8 @@ class Module extends AbstractModule
             return;
         }
 
-        $qb->andWhere($qb->expr()->in(
+        $expr = $qb->expr();
+        $qb->andWhere($expr->in(
             $adapter->getEntityClass() . '.mediaType',
             $adapter->createNamedParameter($qb, $values)
         ));

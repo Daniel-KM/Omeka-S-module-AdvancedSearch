@@ -8,7 +8,7 @@ Added fields are:
 
 - before/on/after creation/modification date/time of any resource
 - has media (for item)
-- media type
+- media type (included in Omeka S > 2.0.2)
 - visibility public/private
 
 
@@ -67,18 +67,10 @@ The fact that you are presently reading this means that you have had knowledge
 of the CeCILL license and that you accept its terms.
 
 
-Contact
--------
-
-Current maintainers:
-
-* Daniel Berthereau (see [Daniel-KM] on GitHub)
-
-
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2018-2019
+* Copyright Daniel Berthereau, 2018-2019, (see [Daniel-KM] on GitHub)
 
 
 [Advanced Search Plus]: https://github.com/Daniel-KM/Omeka-S-module-AdvancedSearchPlus

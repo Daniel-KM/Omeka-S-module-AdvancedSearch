@@ -246,10 +246,7 @@ SQL;
         $api = $services->get('Omeka\ApiManager');
         $pages = $api->search('search_pages')->getContent();
 
-        $isOldOmeka = version_compare(\Omeka\Module::VERSION, '1.3.0', '<');
-        $isAdminRequest = $isOldOmeka
-            ? strpos($_SERVER['REQUEST_URI'], '/admin/') !== false
-            : $status->isAdminRequest();
+        $isAdminRequest = $status->isAdminRequest();
         if ($isAdminRequest) {
             $settings = $services->get('Omeka\Settings');
             $adminSearchPages = $settings->get('search_pages', []);

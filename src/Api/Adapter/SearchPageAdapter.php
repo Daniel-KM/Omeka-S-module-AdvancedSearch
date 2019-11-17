@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2017-2018
+ * Copyright Daniel Berthereau, 2017-2019
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -63,8 +63,10 @@ class SearchPageAdapter extends AbstractEntityAdapter
 
     public function buildQuery(QueryBuilder $qb, array $query)
     {
+        $expr = $qb->expr();
+
         if (isset($query['id'])) {
-            $qb->andWhere($qb->expr()->eq(
+            $qb->andWhere($expr->eq(
                 $this->getEntityClass() . '.id',
                 $this->createNamedParameter($qb, $query['id']))
             );
@@ -75,10 +77,10 @@ class SearchPageAdapter extends AbstractEntityAdapter
             $qb->innerJoin(
                 SearchIndex::class,
                 $searchIndexAlias,
-                'WITH',
-                $qb->expr()->andX(
-                    $qb->expr()->eq($searchIndexAlias . '.id', $this->getEntityClass(). '.index'),
-                    $qb->expr()->in(
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                $expr->andX(
+                    $expr->eq($searchIndexAlias . '.id', $this->getEntityClass(). '.index'),
+                    $expr->in(
                         $searchIndexAlias . '.id',
                         $this->createNamedParameter($qb, $query['index_id'])
                     )
@@ -86,19 +88,19 @@ class SearchPageAdapter extends AbstractEntityAdapter
             );
         }
         if (isset($query['name'])) {
-            $qb->andWhere($qb->expr()->eq(
+            $qb->andWhere($expr->eq(
                 $this->getEntityClass() . ".name",
                 $this->createNamedParameter($qb, $query['name']))
             );
         }
         if (isset($query['path'])) {
-            $qb->andWhere($qb->expr()->eq(
+            $qb->andWhere($expr->eq(
                 $this->getEntityClass() . ".path",
                 $this->createNamedParameter($qb, $query['path']))
             );
         }
         if (isset($query['form'])) {
-            $qb->andWhere($qb->expr()->eq(
+            $qb->andWhere($expr->eq(
                 $this->getEntityClass() . ".formAdapter",
                 $this->createNamedParameter($qb, $query['form']))
             );

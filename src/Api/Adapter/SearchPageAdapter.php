@@ -63,11 +63,13 @@ class SearchPageAdapter extends AbstractEntityAdapter
 
     public function buildQuery(QueryBuilder $qb, array $query)
     {
+        $isOldOmeka = \Omeka\Module::VERSION < 2;
+        $alias = $isOldOmeka ? $this->getEntityClass() : 'omeka_root';
         $expr = $qb->expr();
 
         if (isset($query['id'])) {
             $qb->andWhere($expr->eq(
-                $this->getEntityClass() . '.id',
+                $alias . '.id',
                 $this->createNamedParameter($qb, $query['id']))
             );
         }
@@ -79,7 +81,7 @@ class SearchPageAdapter extends AbstractEntityAdapter
                 $searchIndexAlias,
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 $expr->andX(
-                    $expr->eq($searchIndexAlias . '.id', $this->getEntityClass(). '.index'),
+                    $expr->eq($searchIndexAlias . '.id', $alias . '.index'),
                     $expr->in(
                         $searchIndexAlias . '.id',
                         $this->createNamedParameter($qb, $query['index_id'])
@@ -89,19 +91,19 @@ class SearchPageAdapter extends AbstractEntityAdapter
         }
         if (isset($query['name'])) {
             $qb->andWhere($expr->eq(
-                $this->getEntityClass() . ".name",
+                $alias . ".name",
                 $this->createNamedParameter($qb, $query['name']))
             );
         }
         if (isset($query['path'])) {
             $qb->andWhere($expr->eq(
-                $this->getEntityClass() . ".path",
+                $alias . ".path",
                 $this->createNamedParameter($qb, $query['path']))
             );
         }
         if (isset($query['form'])) {
             $qb->andWhere($expr->eq(
-                $this->getEntityClass() . ".formAdapter",
+                $alias . ".formAdapter",
                 $this->createNamedParameter($qb, $query['form']))
             );
         }

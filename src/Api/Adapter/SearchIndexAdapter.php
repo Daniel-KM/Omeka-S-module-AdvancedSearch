@@ -62,23 +62,25 @@ class SearchIndexAdapter extends AbstractEntityAdapter
 
     public function buildQuery(QueryBuilder $qb, array $query)
     {
+        $isOldOmeka = \Omeka\Module::VERSION < 2;
+        $alias = $isOldOmeka ? $this->getEntityClass() : 'omeka_root';
         $expr = $qb->expr();
 
         if (isset($query['id'])) {
             $qb->andWhere($expr->eq(
-                $this->getEntityClass() . '.id',
+                $alias . '.id',
                 $this->createNamedParameter($qb, $query['id']))
             );
         }
         if (isset($query['name'])) {
             $qb->andWhere($expr->eq(
-                $this->getEntityClass() . '.name',
+                $alias . '.name',
                 $this->createNamedParameter($qb, $query['name']))
             );
         }
         if (isset($query['adapter'])) {
             $qb->andWhere($expr->eq(
-                $this->getEntityClass() . '.adapter',
+                $alias . '.adapter',
                 $this->createNamedParameter($qb, $query['adapter']))
             );
         }

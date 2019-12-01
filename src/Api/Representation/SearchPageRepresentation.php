@@ -160,14 +160,13 @@ class SearchPageRepresentation extends AbstractEntityRepresentation
             return null;
         }
 
-        $services = $this->getServiceLocator();
-        $formElementManager = $services->get('FormElementManager');
-
-        $form = $formElementManager->get($formClass, [
-            'search_page' => $this,
-        ]);
-        $form->setAttribute('method', 'GET');
-        return $form;
+        $form = $this->getServiceLocator()
+            ->get('FormElementManager')
+            ->get($formClass, [
+                'search_page' => $this,
+            ]);
+        return $form
+            ->setAttribute('method', 'GET');
     }
 
     /**

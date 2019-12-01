@@ -91,19 +91,19 @@ class SearchPageAdapter extends AbstractEntityAdapter
         }
         if (isset($query['name'])) {
             $qb->andWhere($expr->eq(
-                $alias . ".name",
+                $alias . '.name',
                 $this->createNamedParameter($qb, $query['name']))
             );
         }
         if (isset($query['path'])) {
             $qb->andWhere($expr->eq(
-                $alias . ".path",
+                $alias . '.path',
                 $this->createNamedParameter($qb, $query['path']))
             );
         }
         if (isset($query['form'])) {
             $qb->andWhere($expr->eq(
-                $alias . ".formAdapter",
+                $alias . '.formAdapter',
                 $this->createNamedParameter($qb, $query['form']))
             );
         }
@@ -133,12 +133,12 @@ class SearchPageAdapter extends AbstractEntityAdapter
     public function validateEntity(EntityInterface $entity, ErrorStore $errorStore)
     {
         if (false == $entity->getName()) {
-            $errorStore->addError('o:name', 'The name cannot be empty.');
+            $errorStore->addError('o:name', 'The name cannot be empty.'); // @translate
         }
 
         $path = $entity->getPath();
         if (!$this->isUnique($entity, ['path' => $path])) {
-            $errorStore->addError('o:path', sprintf('The path "%s" is already taken.', $path));
+            $errorStore->addError('o:path', sprintf('The path "%s" is already taken.', $path)); // @translate
         }
     }
 }

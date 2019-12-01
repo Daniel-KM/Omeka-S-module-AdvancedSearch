@@ -45,7 +45,6 @@ use Zend\EventManager\Event;
 use Zend\EventManager\SharedEventManagerInterface;
 use Zend\ModuleManager\ModuleManager;
 use Zend\Mvc\MvcEvent;
-use Zend\ServiceManager\ServiceLocatorInterface;
 
 class Module extends AbstractModule
 {
@@ -78,10 +77,8 @@ class Module extends AbstractModule
         $this->addRoutes();
     }
 
-    public function install(ServiceLocatorInterface $serviceLocator)
+    protected function postInstall()
     {
-        parent::install($serviceLocator);
-
         $messenger = new Messenger;
         $optionalModule = 'jQueryUI';
         if (!$this->isModuleActive($optionalModule)) {
@@ -92,30 +89,7 @@ class Module extends AbstractModule
             $messenger->addWarning('The module Reference is required to use the facets with the default internal adapter.'); // @translate
         }
 
-        // TODO Move internal adapter in another module.
-        // Create the internal adapter.
-        $connection = $serviceLocator->get('Omeka\Connection');
-        $sql = <<<'SQL'
-INSERT INTO `search_index`
-(`name`, `adapter`, `settings`, `created`)
-VALUES
-('Internal', 'internal', ?, NOW());
-SQL;
-        $sarchIndexSettings = ['resources' => ['items', 'item_sets']];
-        $connection->executeQuery($sql, [
-            json_encode($sarchIndexSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
-        ]);
-        $sql = <<<'SQL'
-INSERT INTO `search_page`
-(`index_id`, `name`, `path`, `form_adapter`, `settings`, `created`)
-VALUES
-('1', 'Internal', 'find', 'basic', ?, NOW());
-SQL;
-        $sarchPageSettings = require __DIR__ . '/config/adapter_internal.php';
-        $connection->executeQuery($sql, [
-            json_encode($sarchPageSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
-        ]);
-        $messenger->addNotice('The internal search engine is available. Enable it in the main settings (for admin) and in site settings (for public).'); // @translate
+        $this->installResources();
     }
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager)
@@ -480,5 +454,37 @@ SQL;
         $view->headLink()->appendStylesheet($view->assetUrl('css/search-admin-search.css', 'Search'));
         $view->headScript()->appendScript(sprintf('var searchUrl = %s;', json_encode($adminSearchPage, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)));
         $view->headScript()->appendFile($view->assetUrl('js/search-admin-search.js', 'Search'));
+    }
+
+    protected function installResources()
+    {
+        $services = $this->getServiceLocator();
+
+        // TODO Move internal adapter in another module.
+        // Create the internal adapter.
+        $connection = $services->get('Omeka\Connection');
+        $sql = <<<'SQL'
+INSERT INTO `search_index`
+(`name`, `adapter`, `settings`, `created`)
+VALUES
+('Internal', 'internal', ?, NOW());
+SQL;
+        $searchIndexSettings = ['resources' => ['items', 'item_sets']];
+        $connection->executeQuery($sql, [
+            json_encode($searchIndexSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+        ]);
+        $sql = <<<'SQL'
+INSERT INTO `search_page`
+(`index_id`, `name`, `path`, `form_adapter`, `settings`, `created`)
+VALUES
+('1', 'Internal', 'find', 'basic', ?, NOW());
+SQL;
+        $searchPageSettings = require __DIR__ . '/config/adapter_internal.php';
+        $connection->executeQuery($sql, [
+            json_encode($searchPageSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+        ]);
+
+        $messenger = new Messenger;
+        $messenger->addNotice('The internal search engine is available. Enable it in the main settings (for admin) and in site settings (for public).'); // @translate
     }
 }

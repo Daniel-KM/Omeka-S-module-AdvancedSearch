@@ -42,7 +42,6 @@ return [
     ],
     'form_elements' => [
         'invokables' => [
-            Form\ConfigForm::class => Form\ConfigForm::class,
             Form\Element\OptionalSelect::class => Form\Element\OptionalSelect::class,
         ],
         'factories' => [
@@ -212,13 +211,11 @@ return [
         ],
     ],
     'search' => [
-        'config' => [
-            'search_batch_size' => 100,
-        ],
         'settings' => [
             'search_main_page' => '',
             'search_pages' => [],
             'search_api_page' => '',
+            'search_batch_size' => 100,
         ],
         'site_settings' => [
             'search_main_page' => null,

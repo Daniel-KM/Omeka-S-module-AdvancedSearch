@@ -80,6 +80,20 @@ class SettingsFieldset extends Fieldset
                 'id' => 'search_api_page',
             ],
         ]);
+
+        $this->add([
+            'name' => 'search_batch_size',
+            'type' => Element\Number::class,
+            'options' => [
+                'label' => 'Search batch size for reindexation', // @translate
+                'info' => 'Default is 100, but it can be adapted according to your resource average size, your mapping and your architecture.', // @translate
+            ],
+            'attributes' => [
+                'id' => 'search_batch_size',
+                'min' => 1,
+                'step' => 10,
+            ],
+        ]);
     }
 
     /**

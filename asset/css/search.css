@@ -16,6 +16,7 @@
   flex-basis: 25%;
   order: -1;
   padding: 0 0.5em;
+  min-width: 240px;
 }
 .search-facets > ul {
   padding-left: 0;

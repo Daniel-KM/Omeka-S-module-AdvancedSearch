@@ -62,8 +62,8 @@ class AbstractFacetElement extends AbstractHelper
             $urlHelper = $plugins->get('url');
             $partialHelper = $plugins->get('partial');
             $escapeHtml = $plugins->get('escapeHtml');
-            $this->api =  $plugins->get('api');
-            $this->translate =  $plugins->get('translate');
+            $this->api = $plugins->get('api');
+            $this->translate = $plugins->get('translate');
 
             $mvcEvent = $this->application->getMvcEvent();
             $routeMatch = $mvcEvent->getRouteMatch();
@@ -133,7 +133,7 @@ class AbstractFacetElement extends AbstractHelper
             case 'resource_class_id':
             case 'resource_class_id_field':
                 $translate = $this->translate;
-                /** @var \Omeka\Api\Representation\ResourceClassRepresentation $resource */
+                /* @var \Omeka\Api\Representation\ResourceClassRepresentation $resource */
                 if (is_numeric($facetValue)) {
                     try {
                         $resource = $this->api->read('resource_classes', ['id' => $facetValue])->getContent();
@@ -153,7 +153,7 @@ class AbstractFacetElement extends AbstractHelper
             case 'resourceTemplate':
             case 'resource_template_id':
             case 'resource_template_id_field':
-                /** @var \Omeka\Api\Representation\ResourceTemplateRepresentation $resource */
+                /* @var \Omeka\Api\Representation\ResourceTemplateRepresentation $resource */
                 if (is_numeric($facetValue)) {
                     try {
                         $resource = $this->api->read('resource_templates', ['id' => $facetValue])->getContent();

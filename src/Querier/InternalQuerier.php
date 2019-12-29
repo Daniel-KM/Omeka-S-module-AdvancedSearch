@@ -208,7 +208,7 @@ class InternalQuerier extends AbstractQuerier
         }
 
         if ($reference) {
-             $metadataFieldsToNames = [
+            $metadataFieldsToNames = [
                  'is_public' => 'is_public',
                  'is_public_field' => 'is_public',
                  'item_set_id' => 'item_sets',
@@ -257,7 +257,7 @@ class InternalQuerier extends AbstractQuerier
      */
     protected function listPropertyIds(array $values)
     {
-        $values = array_filter(array_map(function($term) {
+        $values = array_filter(array_map(function ($term) {
             return $this->isTerm($term) ? $term : null;
         }, $values));
         return array_intersect_key($this->getPropertyIds(), array_fill_keys($values, null));

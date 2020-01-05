@@ -54,19 +54,20 @@ class IndexController extends AbstractActionController
     public function searchAction()
     {
         $pageId = (int) $this->params('id');
-        $isAdmin = $this->params()->fromRoute('__ADMIN__');
-        if ($isAdmin) {
-            $site = null;
-        } else {
+        $isPublic = $this->status()->isSiteRequest();
+        if ($isPublic) {
             $site = $this->currentSite();
-            $siteSearchPages = $this->siteSettings()->get('search_pages', []);
+            $siteSettings = $this->siteSettings();
+            $siteSearchPages = $siteSettings->get('search_pages', []);
             if (!in_array($pageId, $siteSearchPages)) {
                 return $this->notFoundAction();
             }
+        } else {
+            $site = null;
         }
 
         $view = new ViewModel;
-        $view->setVariable('isPartial', $isAdmin);
+        $view->setVariable('isPartial', !$isPublic);
         $api = $this->api();
         $response = $api->read('search_pages', $pageId);
         $this->page = $response->getContent();
@@ -170,24 +171,27 @@ class IndexController extends AbstractActionController
 
         // Note: the global limit is managed via the pagination.
         $pageNumber = isset($request['page']) && $request['page'] > 0 ? (int) $request['page'] : 1;
-        $perPage = isset($request['per_page']) && $request['per_page'] > 0
-            ? (int) $request['per_page']
-            : (int) $this->settings()->get('pagination_per_page', Paginator::PER_PAGE);
+        if (isset($request['per_page']) && $request['per_page'] > 0) {
+            $perPage = (int) $request['per_page'];
+        } elseif ($isPublic) {
+            $perPage = $siteSettings->get('pagination_per_page') ?: $this->settings()->get('pagination_per_page', Paginator::PER_PAGE);
+        } else {
+            $perPage = $this->settings()->get('pagination_per_page', Paginator::PER_PAGE);
+        }
         $query->setLimitPage($pageNumber, $perPage);
 
-        $settings = $page->settings();
-        $hasFacets = !empty($settings['facets']);
+        $hasFacets = !empty($searchPageSettings['facets']);
         if ($hasFacets) {
-            foreach ($settings['facets'] as $name => $facet) {
+            foreach ($searchPageSettings['facets'] as $name => $facet) {
                 if ($facet['enabled']) {
                     $query->addFacetField($name);
                 }
             }
-            if (isset($settings['facet_limit'])) {
-                $query->setFacetLimit($settings['facet_limit']);
+            if (isset($searchPageSettings['facet_limit'])) {
+                $query->setFacetLimit($searchPageSettings['facet_limit']);
             }
-            if (isset($settings['facet_languages'])) {
-                $query->setFacetLanguages($settings['facet_languages']);
+            if (isset($searchPageSettings['facet_languages'])) {
+                $query->setFacetLanguages($searchPageSettings['facet_languages']);
             }
             if (!empty($request['limit']) && is_array($request['limit'])) {
                 foreach ($request['limit'] as $name => $values) {

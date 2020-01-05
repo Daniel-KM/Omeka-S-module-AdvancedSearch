@@ -228,7 +228,7 @@ Copyright
 See commits for full list of contributors.
 
 * Copyright BibLibre, 2016-2017 (see [BibLibre])
-* Copyright Daniel Berthereau, 2017-2019 (see [Daniel-KM])
+* Copyright Daniel Berthereau, 2017-2020 (see [Daniel-KM])
 
 
 [Search]: https://github.com/BibLibre/Omeka-S-module-Search

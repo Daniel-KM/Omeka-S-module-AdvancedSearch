@@ -28,6 +28,11 @@ class AbstractFacetElement extends AbstractHelper
     protected $translate;
 
     /**
+     * @var int
+     */
+    protected $siteId;
+
+    /**
      * @param Application $application
      */
     public function __construct(Application $application)
@@ -72,6 +77,14 @@ class AbstractFacetElement extends AbstractHelper
             $route = $routeMatch->getMatchedRouteName();
             $params = $routeMatch->getParams();
             $queryBase = $request->getQuery()->toArray();
+
+            if ($plugins->get('status')->isSiteRequest()) {
+                $this->siteId = $plugins
+                    ->get('Zend\View\Helper\ViewModel')
+                    ->getRoot()
+                    ->getVariable('site')
+                    ->id();
+            }
 
             unset($queryBase['page']);
         }
@@ -121,11 +134,17 @@ class AbstractFacetElement extends AbstractHelper
             case 'itemSet':
             case 'item_set_id':
             case 'item_set_id_field':
+                $data = ['id' => $facetValue];
+                // The site id is required in public.
+                if ($this->siteId) {
+                    $data['site_id'] = $this->siteId;
+                }
                 /** @var \Omeka\Api\Representation\ItemSetRepresentation $resource */
-                $resource = $this->api->searchOne('item_sets', ['id' => $facetValue])->getContent();
+                $resource = $this->api->searchOne('item_sets', $data)->getContent();
                 return $resource
                     ? $resource->displayTitle()
                     // Manage the case where a resource was indexed but removed.
+                    // In public side, the item set should belong to a site too.
                     : null;
 
             case 'resource_classes':

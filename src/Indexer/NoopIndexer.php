@@ -13,10 +13,12 @@ class NoopIndexer implements IndexerInterface
 
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
     {
+        return $this;
     }
 
     public function setSearchIndex(SearchIndexRepresentation $index)
     {
+        return $this;
     }
 
     public function canIndex($resourceName)

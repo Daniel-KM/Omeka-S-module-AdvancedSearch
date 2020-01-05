@@ -19,10 +19,12 @@ class NoopQuerier implements QuerierInterface
 
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
     {
+        return $this;
     }
 
     public function setSearchIndex(SearchIndexRepresentation $index)
     {
+        return $this;
     }
 
     public function query(Query $query)

@@ -48,12 +48,10 @@ abstract class AbstractIndexer implements IndexerInterface
      */
     protected $index;
 
-    /**
-     * @param ServiceLocatorInterface $serviceLocator
-     */
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
     {
         $this->serviceLocator = $serviceLocator;
+        return $this;
     }
 
     /**
@@ -67,6 +65,7 @@ abstract class AbstractIndexer implements IndexerInterface
     public function setSearchIndex(SearchIndexRepresentation $index)
     {
         $this->index = $index;
+        return $this;
     }
 
     /**

@@ -40,11 +40,13 @@ interface QuerierInterface extends LoggerAwareInterface
 {
     /**
      * @param ServiceLocatorInterface $serviceLocator
+     * @return self
      */
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator);
 
     /**
      * @param SearchIndexRepresentation $index
+     * @return self
      */
     public function setSearchIndex(SearchIndexRepresentation $index);
 

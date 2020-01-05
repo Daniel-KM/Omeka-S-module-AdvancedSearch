@@ -58,6 +58,7 @@ class InternalQuerier extends AbstractQuerier
             $facetData = $data;
             $facetFields = $query->getFacetFields();
             $facetLimit = $query->getFacetLimit();
+            $facetLanguages = $query->getFacetLanguages();
         }
 
         // TODO FIx the process for facets: all the facets should be displayed, and "or" by group of facets.
@@ -242,7 +243,7 @@ class InternalQuerier extends AbstractQuerier
                     'sort_by' => 'total',
                     'sort_order' => 'DESC',
                     'filters' => [
-                        'languages' => [],
+                        'languages' => $facetLanguages,
                     ],
                     'values' => [],
                     // Output options.

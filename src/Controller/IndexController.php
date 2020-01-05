@@ -186,6 +186,9 @@ class IndexController extends AbstractActionController
             if (isset($settings['facet_limit'])) {
                 $query->setFacetLimit($settings['facet_limit']);
             }
+            if (isset($settings['facet_languages'])) {
+                $query->setFacetLanguages($settings['facet_languages']);
+            }
             if (!empty($request['limit']) && is_array($request['limit'])) {
                 foreach ($request['limit'] as $name => $values) {
                     foreach ($values as $value) {

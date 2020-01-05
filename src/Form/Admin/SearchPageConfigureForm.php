@@ -64,7 +64,9 @@ class SearchPageConfigureForm extends Form
 
     protected function addFacets()
     {
-        $this->addFacetLimit();
+        $this
+            ->addFacetLimit()
+            ->addFacetLanguages();
 
         /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
         $searchPage = $this->getOption('search_page');
@@ -140,6 +142,43 @@ class SearchPageConfigureForm extends Form
                 'required' => true,
             ],
         ]);
+        return $this;
+    }
+
+    protected function addFacetLanguages()
+    {
+        $this
+            ->add([
+                'name' => 'facet_languages',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Get facets from specific languages', // @translate
+                    'info' => 'Generally, facets are translated in the view, but in some cases, facet values may be translated directly in a multivalued property. Use "|" to separate multiple languages. Use "||" for values without language. When fields with languages (like subjects) and fields without language (like date) are facets, the empty language must be set to get results.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'facet_languages',
+                    'placeholder' => 'fra|way|apy||',
+                ],
+            ]);
+        // FIXME This filter is not processed and manually applied in controller.
+        $this
+            ->getInputFilter()
+            ->add([
+                'name' => 'facet_languages',
+                'required' => false,
+                'filters' => [
+                    [
+                        'name' => \Zend\Filter\Callback::class,
+                        'options' => [
+                            'callback' => function ($string) {
+                                return strlen(trim($string))
+                                    ? array_unique(array_map('trim', explode('|', $string)))
+                                    : [];
+                            }
+                        ],
+                    ],
+                ],
+            ]);
         return $this;
     }
 

@@ -189,6 +189,13 @@ class SearchPageController extends AbstractActionController
         if ($isSimple) {
             $settings = $this->prepareSettingsForSimpleForm($searchPage, $settings);
         }
+
+        if (empty($settings['facet_languages'])) {
+            $settings['facet_languages'] = '';
+        } elseif (is_array($settings['facet_languages'])) {
+            $settings['facet_languages'] = implode('|', $settings['facet_languages']);
+        }
+
         $form->setData($settings);
         $view->setVariable('form', $form);
 
@@ -220,6 +227,11 @@ class SearchPageController extends AbstractActionController
         }
         $params['form'] = $formParams;
         unset($params['csrf']);
+
+        // Should be checked in form.
+        $params['facet_languages'] = strlen(trim($params['facet_languages']))
+            ? array_unique(array_map('trim', explode('|', $params['facet_languages'])))
+            : [];
 
         // Sort facets and sort fields to simplify next load.
         foreach (['facets', 'sort_fields'] as $type) {

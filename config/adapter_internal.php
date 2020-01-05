@@ -4,6 +4,7 @@
 
 return [
     'facet_limit' => 10,
+    'facet_languages' => [],
     'facets' => [
         'dcterms:title' => [
             'enabled' => 0,

@@ -89,6 +89,11 @@ class Query implements \JsonSerializable
     protected $facetLimit = 0;
 
     /**
+     * @var array
+     */
+    protected $facetLanguages = [];
+
+    /**
      * @var int
      */
     protected $siteId;
@@ -298,6 +303,24 @@ class Query implements \JsonSerializable
     }
 
     /**
+     * @param array $facetLanguages
+     * @return \Search\Query
+     */
+    public function setFacetLanguages(array $facetLanguages)
+    {
+        $this->facetLanguages = $facetLanguages;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFacetLanguages()
+    {
+        return $this->facetLanguages;
+    }
+
+    /**
      * @param int $siteId
      */
     public function setSiteId($siteId)
@@ -327,6 +350,7 @@ class Query implements \JsonSerializable
             'limit' => $this->getLimit(),
             'facet_fields' => $this->getFacetFields(),
             'facet_limit' => $this->getFacetLimit(),
+            'facet_languages' => $this->getFacetLanguages(),
             'site_id' => $this->getSiteId(),
         ];
     }

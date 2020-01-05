@@ -35,7 +35,9 @@ class SearchPageConfigureSimpleForm extends SearchPageConfigureForm
 {
     protected function addFacets()
     {
-        $this->addFacetLimit();
+        $this
+            ->addFacetLimit()
+            ->addFacetLanguages();
 
         // field (term) | label (order means weight).
         $this->add([

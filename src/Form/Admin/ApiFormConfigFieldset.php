@@ -270,6 +270,7 @@ class ApiFormConfigFieldset extends Fieldset
     public function setApiManager(ApiManager $api)
     {
         $this->api = $api;
+        return $this;
     }
 
     public function getApiManager()

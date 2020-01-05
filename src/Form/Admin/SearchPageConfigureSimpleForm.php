@@ -65,6 +65,8 @@ class SearchPageConfigureSimpleForm extends SearchPageConfigureForm
                 'rows' => 12,
             ],
         ]);
+
+        return $this;
     }
 
     protected function addSortFields()
@@ -97,6 +99,8 @@ class SearchPageConfigureSimpleForm extends SearchPageConfigureForm
                 'rows' => 12,
             ],
         ]);
+
+        return $this;
     }
 
     // TODO setData() or populateValues() in order to manage formatting in form.

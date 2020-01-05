@@ -102,6 +102,7 @@ class SettingsFieldset extends Fieldset
     public function setApi(Api $api)
     {
         $this->api = $api;
+        return $this;
     }
 
     /**
@@ -118,6 +119,7 @@ class SettingsFieldset extends Fieldset
     public function setBasePath(BasePath $basePath)
     {
         $this->basePath = $basePath;
+        return $this;
     }
 
     /**

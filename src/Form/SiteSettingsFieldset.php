@@ -62,6 +62,7 @@ class SiteSettingsFieldset extends Fieldset
     public function setApi(Api $api)
     {
         $this->api = $api;
+        return $this;
     }
 
     /**

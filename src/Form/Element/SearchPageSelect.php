@@ -24,6 +24,7 @@ class SearchPageSelect extends Select
     public function setApiManager($apiManager)
     {
         $this->apiManager = $apiManager;
+        return $this;
     }
 
     public function getApiManager()

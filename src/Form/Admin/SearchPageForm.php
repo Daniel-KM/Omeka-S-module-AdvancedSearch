@@ -158,6 +158,7 @@ class SearchPageForm extends Form
     public function setApiManager(ApiManager $apiManager)
     {
         $this->apiManager = $apiManager;
+        return $this;
     }
 
     public function getApiManager()
@@ -168,6 +169,7 @@ class SearchPageForm extends Form
     public function setFormAdapterManager($formAdapterManager)
     {
         $this->formAdapterManager = $formAdapterManager;
+        return $this;
     }
 
     public function getFormAdapterManager()

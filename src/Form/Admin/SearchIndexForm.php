@@ -70,6 +70,7 @@ class SearchIndexForm extends Form
     public function setSearchAdapterManager($searchAdapterManager)
     {
         $this->searchAdapterManager = $searchAdapterManager;
+        return $this;
     }
 
     public function getSearchAdapterManager()

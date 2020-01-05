@@ -3,9 +3,10 @@
  * @var \Zend\View\Renderer\PhpRenderer $this
  * @var string $name
  * @var string $value
- * @var string $url
+ * @var string $label
  * @var int $count
  * @var bool $active
+ * @var string $url
  * @var \Zend\View\Helper\EscapeHtml $escapeHtml
  */
 
@@ -14,4 +15,4 @@ $escapedId = $name . '[]' . $escapedValue;
 ?>
 
 <input type="checkbox" name="<?= $name ?>[]" id="<?= $escapedId ?>" value="<?= $escapedValue ?>" data-url="<?= $url ?>" <?php if ($active) echo ' checked="checked"'; ?>/>
-<label for="<?= $escapedId ?>"><?= $escapedValue ?> (<span class="count"><?= $count ?></span>)</label>
+<label for="<?= $escapedId ?>"><?= $escapeHtml($label) ?> (<span class="count"><?= $count ?></span>)</label>

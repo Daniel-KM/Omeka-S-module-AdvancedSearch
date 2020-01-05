@@ -240,11 +240,12 @@ class IndexController extends AbstractActionController
 
         // Form is not set in the view.
         // $view->setVariable('form', $form);
-        $view->setVariable('query', $query);
-        $view->setVariable('site', $site);
-        $view->setVariable('response', $response);
-        $view->setVariable('facets', $facets);
-        $view->setVariable('sortOptions', $sortOptions);
+        $view
+            ->setVariable('query', $query)
+            ->setVariable('site', $site)
+            ->setVariable('response', $response)
+            ->setVariable('facets', $facets)
+            ->setVariable('sortOptions', $sortOptions);
         return $view;
     }
 

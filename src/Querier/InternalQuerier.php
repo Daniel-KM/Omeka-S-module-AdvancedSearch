@@ -16,8 +16,12 @@ class InternalQuerier extends AbstractQuerier
         $plugins = $services->get('ControllerPluginManager');
         /** @var \Omeka\Mvc\Controller\Plugin\Api $api */
         $api = $plugins->get('api');
+        /** @var \Reference\Mvc\Controller\Plugin\References $references */
+        $references = $plugins->has('references') ? $plugins->get('references') : null;
+        // Keep compatibility with old version of module Reference (< 3.4.16).
         /** @var \Reference\Mvc\Controller\Plugin\Reference $reference */
-        $reference = $plugins->has('reference') ? $plugins->get('reference') : null;
+        $reference = !$references && $plugins->has('reference') ? $plugins->get('reference') : null;
+        $hasReference = $references || $reference;
 
         // The data are the ones used to build the query with the standard api.
         // Queries are multiple (one by resource type and by facet).
@@ -50,7 +54,7 @@ class InternalQuerier extends AbstractQuerier
             $data['site_id'] = $siteId;
         }
 
-        if ($reference) {
+        if ($hasReference) {
             $facetData = $data;
             $facetFields = $query->getFacetFields();
             $facetLimit = $query->getFacetLimit();
@@ -164,7 +168,7 @@ class InternalQuerier extends AbstractQuerier
         }
 
         // TODO To be removed when the filters will be groupable.
-        if ($reference) {
+        if ($hasReference) {
             $facetData = $data;
         }
 
@@ -207,7 +211,65 @@ class InternalQuerier extends AbstractQuerier
             $response->addResults($resourceType, $result);
         }
 
-        if ($reference) {
+        if ($references) {
+            $metadataFieldsToNames = [
+                'is_public' => 'is_public',
+                'is_public_field' => 'is_public',
+                'item_set_id' => 'o:item_set',
+                'item_set_id_field' => 'o:item_set',
+                'resource_class_id' => 'o:resource_class',
+                'resource_class_id_field' => 'o:resource_class',
+                'resource_template_id' => 'o:resource_template',
+                'resource_template_id_field' => 'o:resource_template',
+            ];
+
+            // For items and item sets.
+            // FIXME Like in Solr, the facets for items and item sets are mixed, and may be complex to understand.
+            foreach ($resourceTypes as $resourceType) {
+                if ($resourceType === 'item_sets') {
+                    continue;
+                }
+
+                $fields = array_map(function ($v) use($metadataFieldsToNames) {
+                    return isset($metadataFieldsToNames[$v]) ? $metadataFieldsToNames[$v] : $v;
+                }, $facetFields);
+
+                $options = [
+                    'resource_name' => $resourceType,
+                    // Options sql.
+                    'per_page' => $facetLimit,
+                    'page' => 1,
+                    'sort_by' => 'total',
+                    'sort_order' => 'DESC',
+                    'filters' => [
+                        'languages' => [],
+                    ],
+                    'values' => [],
+                    // Output options.
+                    'first_id' => false,
+                    'initial' => false,
+                    'lang' => false,
+                    'include_without_meta' => false,
+                    'output' => 'associative',
+                ];
+
+                $values = $references
+                    ->setMetadata($fields)
+                    ->setQuery($facetData)
+                    ->setOptions($options)
+                    ->list();
+
+                $key = 0;
+                foreach ($values as $result) {
+                    foreach ($result['o-module-reference:values'] as $value => $count) {
+                        $response->addFacetCount($facetFields[$key], $value, $count);
+                    }
+                    ++$key;
+                }
+            }
+        }
+        // Facets with old module Reference.
+        elseif ($reference) {
             $metadataFieldsToNames = [
                  'is_public' => 'is_public',
                  'is_public_field' => 'is_public',

@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2018
+ * Copyright Daniel Berthereau, 2018-2019
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -58,6 +58,7 @@ class Response
     public function setTotalResults($totalResults)
     {
         $this->totalResults = (int) $totalResults;
+        return $this;
     }
 
     /**
@@ -75,6 +76,7 @@ class Response
     public function setResourceTotalResults($resourceType, $totalResults)
     {
         $this->resourceTotalResults[$resourceType] = (int) $totalResults;
+        return $this;
     }
 
     /**
@@ -99,6 +101,7 @@ class Response
         $this->results[$resourceType] = isset($this->results[$resourceType])
             ? array_merge($this->results[$resourceType], array_values($results))
             : array_values($results);
+        return $this;
     }
 
     /**
@@ -110,6 +113,7 @@ class Response
     public function addResult($resourceType, $result)
     {
         $this->results[$resourceType][] = $result;
+        return $this;
     }
 
     /**
@@ -136,6 +140,7 @@ class Response
         $this->facetCounts[$name] = isset($this->facetCounts[$name])
             ? array_merge($this->facetCounts[$name], array_values($counts))
             : array_values($counts);
+        return $this;
     }
 
     /**
@@ -151,6 +156,7 @@ class Response
             'value' => $value,
             'count' => $count,
         ];
+        return $this;
     }
 
     /**

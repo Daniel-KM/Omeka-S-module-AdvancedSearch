@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2018
+ * Copyright Daniel Berthereau, 2018-2019
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software. You can use, modify and/ or
@@ -104,6 +104,7 @@ class Query implements \JsonSerializable
     public function setQuery($query)
     {
         $this->query = $query;
+        return $this;
     }
 
     /**
@@ -120,6 +121,7 @@ class Query implements \JsonSerializable
     public function setResources($resources)
     {
         $this->resources = $resources;
+        return $this;
     }
 
     /**
@@ -136,6 +138,7 @@ class Query implements \JsonSerializable
     public function setIsPublic($isPublic)
     {
         $this->isPublic = $isPublic;
+        return $this;
     }
 
     /**
@@ -153,6 +156,7 @@ class Query implements \JsonSerializable
     public function addFilter($name, $value)
     {
         $this->filters[$name][] = $value;
+        return $this;
     }
 
     /**
@@ -174,6 +178,7 @@ class Query implements \JsonSerializable
             'start' => $start,
             'end' => $end,
         ];
+        return $this;
     }
 
     /**
@@ -197,6 +202,7 @@ class Query implements \JsonSerializable
     public function addFilterQuery($name, $value, $type = 'in', $joiner = 'and')
     {
         $this->filterQueries[$name][] = ['value' => $value, 'type' => $type, 'joiner' => $joiner];
+        return $this;
     }
 
     /**
@@ -214,6 +220,7 @@ class Query implements \JsonSerializable
     public function setSort($sort)
     {
         $this->sort = $sort;
+        return $this;
     }
 
     /**
@@ -251,6 +258,7 @@ class Query implements \JsonSerializable
         $rowCount = ($rowCount > 0) ? $rowCount : 1;
         $this->limit = (int) $rowCount;
         $this->offset = (int) $rowCount * ($page - 1);
+        return $this;
     }
 
     /**
@@ -259,6 +267,7 @@ class Query implements \JsonSerializable
     public function addFacetField($field)
     {
         $this->facetFields[] = $field;
+        return $this;
     }
 
     /**
@@ -277,6 +286,7 @@ class Query implements \JsonSerializable
     public function setFacetLimit($facetLimit)
     {
         $this->facetLimit = (int) $facetLimit;
+        return $this;
     }
 
     /**
@@ -293,6 +303,7 @@ class Query implements \JsonSerializable
     public function setSiteId($siteId)
     {
         $this->siteId = $siteId;
+        return $this;
     }
 
     /**
@@ -327,6 +338,7 @@ class Query implements \JsonSerializable
     public function setSite(SiteRepresentation $site)
     {
         $this->site = $site;
+        return $this;
     }
 
     /**

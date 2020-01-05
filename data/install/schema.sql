@@ -1,7 +1,7 @@
 CREATE TABLE search_index (
     id INT AUTO_INCREMENT NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    adapter VARCHAR(255) NOT NULL,
+    name VARCHAR(190) NOT NULL,
+    adapter VARCHAR(190) NOT NULL,
     settings LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json_array)',
     created DATETIME NOT NULL,
     modified DATETIME DEFAULT NULL,
@@ -10,9 +10,9 @@ CREATE TABLE search_index (
 CREATE TABLE search_page (
     id INT AUTO_INCREMENT NOT NULL,
     index_id INT NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    path VARCHAR(255) NOT NULL,
-    form_adapter VARCHAR(255) NOT NULL,
+    name VARCHAR(190) NOT NULL,
+    path VARCHAR(190) NOT NULL,
+    form_adapter VARCHAR(190) NOT NULL,
     settings LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json_array)',
     created DATETIME NOT NULL,
     modified DATETIME DEFAULT NULL,

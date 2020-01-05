@@ -2,6 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
+ * Copyright Daniel Berthereau, 2020
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -41,6 +42,8 @@ use Omeka\Entity\AbstractEntity;
 class SearchPage extends AbstractEntity
 {
     /**
+     * @var int
+     *
      * @Id
      * @Column(type="integer")
      * @GeneratedValue
@@ -48,16 +51,22 @@ class SearchPage extends AbstractEntity
     protected $id;
 
     /**
-     * @Column(type="string", length=255)
+     * @var string
+     *
+     * @Column(type="string", length=190)
      */
     protected $name;
 
     /**
-     * @Column(type="string", length=255)
+     * @var string
+     *
+     * @Column(type="string", length=190)
      */
     protected $path;
 
     /**
+     * @var SearchIndex
+     *
      * @ManyToOne(
      *     targetEntity="SearchIndex",
      *     inversedBy="pages"
@@ -70,21 +79,29 @@ class SearchPage extends AbstractEntity
     protected $index;
 
     /**
-     * @Column(type="string", length=255)
+     * @var string
+     *
+     * @Column(type="string", length=190)
      */
     protected $formAdapter;
 
     /**
+     * @var array
+     *
      * @Column(type="json_array", nullable=true)
      */
     protected $settings;
 
     /**
+     * @var DateTime
+     *
      * @Column(type="datetime")
      */
     protected $created;
 
     /**
+     * @var DateTime
+     *
      * @Column(type="datetime", nullable=true)
      */
     protected $modified;
@@ -94,71 +111,127 @@ class SearchPage extends AbstractEntity
         return $this->id;
     }
 
+    /**
+     * @param string $name
+     * @return self
+     */
     public function setName($name)
     {
         $this->name = $name;
+        return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getName()
     {
         return $this->name;
     }
 
+    /**
+     * @param string $path
+     * @return self
+     */
     public function setPath($path)
     {
         $this->path = $path;
+        return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getPath()
     {
         return $this->path;
     }
 
+    /**
+     * @param SearchIndex $index
+     * @return self
+     */
     public function setIndex(SearchIndex $index)
     {
         $this->index = $index;
+        return $this;
     }
 
+    /**
+     * @return \Search\Entity\SearchIndex
+     */
     public function getIndex()
     {
         return $this->index;
     }
 
+    /**
+     * @param string $formAdapter
+     * @return self
+     */
     public function setFormAdapter($formAdapter)
     {
         $this->formAdapter = $formAdapter;
+        return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getFormAdapter()
     {
         return $this->formAdapter;
     }
 
+    /**
+     * @param array $settings
+     * @return self
+     */
     public function setSettings($settings)
     {
         $this->settings = $settings;
+        return $this;
     }
 
+    /**
+     * @return array
+     */
     public function getSettings()
     {
         return $this->settings;
     }
 
+    /**
+     * @param DateTime $created
+     * @return self
+     */
+    public function setCreated(DateTime $created)
+    {
+        $this->created = $created;
+        return $this;
+    }
+
+    /**
+     * @return DateTime
+     */
     public function getCreated()
     {
         return $this->created;
     }
 
-    public function setCreated(DateTime $created)
-    {
-        $this->created = $created;
-    }
-
+    /**
+     * @param DateTime $dateTime
+     * @return self
+     */
     public function setModified(DateTime $dateTime)
     {
         $this->modified = $dateTime;
+        return $this;
     }
 
+    /**
+     * @return DateTime
+     */
     public function getModified()
     {
         return $this->modified;
@@ -170,6 +243,7 @@ class SearchPage extends AbstractEntity
     public function prePersist(LifecycleEventArgs $eventArgs)
     {
         $this->created = new DateTime('now');
+        return $this;
     }
 
     /**
@@ -178,5 +252,6 @@ class SearchPage extends AbstractEntity
     public function preUpdate(PreUpdateEventArgs $eventArgs)
     {
         $this->modified = new DateTime('now');
+        return $this;
     }
 }

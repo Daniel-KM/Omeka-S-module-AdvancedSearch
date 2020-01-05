@@ -174,7 +174,7 @@ class SearchPageConfigureForm extends Form
                                 return strlen(trim($string))
                                     ? array_unique(array_map('trim', explode('|', $string)))
                                     : [];
-                            }
+                            },
                         ],
                     ],
                 ],

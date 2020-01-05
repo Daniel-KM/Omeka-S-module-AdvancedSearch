@@ -231,7 +231,7 @@ class InternalQuerier extends AbstractQuerier
                     continue;
                 }
 
-                $fields = array_map(function ($v) use($metadataFieldsToNames) {
+                $fields = array_map(function ($v) use ($metadataFieldsToNames) {
                     return isset($metadataFieldsToNames[$v]) ? $metadataFieldsToNames[$v] : $v;
                 }, $facetFields);
 

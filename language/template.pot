@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-14 00:00+0200\n"
+"POT-Creation-Date: 2020-01-06 00:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,11 +17,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/Adapter/InternalAdapter.php:68
+#: src/Adapter/InternalAdapter.php:88
 msgid "Asc"
 msgstr ""
 
-#: src/Adapter/InternalAdapter.php:69
+#: src/Adapter/InternalAdapter.php:89
 msgid "Desc"
 msgstr ""
 
@@ -38,17 +38,17 @@ msgstr ""
 msgid "The site path will be automatically prepended."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:498
+#: src/Generic/AbstractModule.php:518
 #, php-format
 msgid "This module requires the module \"%s\"."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:518
+#: src/Generic/AbstractModule.php:538
 #, php-format
 msgid "This module requires modules \"%s\"."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:586
+#: src/Generic/AbstractModule.php:606
 #, php-format
 msgid ""
 "The module \"%s\" was automatically deactivated because the dependencies are "
@@ -171,25 +171,25 @@ msgstr ""
 msgid "Add search page"
 msgstr ""
 
-#: view/search/admin/search-page/configure.phtml:61
+#: view/search/admin/search-page/configure.phtml:62
 #, php-format
 msgid "Configure search page \"%s\""
 msgstr ""
 
-#: view/search/admin/search-page/configure.phtml:65
+#: view/search/admin/search-page/configure.phtml:66
 msgid "Save configuration"
 msgstr ""
 
-#: view/search/admin/search-page/configure.phtml:70
+#: view/search/admin/search-page/configure.phtml:71
 msgid "Use visual form."
 msgstr ""
 
-#: view/search/admin/search-page/configure.phtml:72
+#: view/search/admin/search-page/configure.phtml:73
 msgid ""
 "Warning: you have more than 200 properties, the form will be slow to load."
 msgstr ""
 
-#: view/search/admin/search-page/configure.phtml:75
+#: view/search/admin/search-page/configure.phtml:76
 msgid "Use simple form."
 msgstr ""
 
@@ -197,7 +197,7 @@ msgstr ""
 msgid "Edit search page"
 msgstr ""
 
-#: view/search/facets.phtml:43
+#: view/search/facets.phtml:45
 msgid "Filters"
 msgstr ""
 
@@ -213,41 +213,41 @@ msgstr ""
 msgid "grid"
 msgstr ""
 
-#: Module.php:88
+#: Module.php:85
 msgid "The module jQueryUI is required to customize the search pages."
 msgstr ""
 
-#: Module.php:92
+#: Module.php:89
 msgid ""
 "The module Reference is required to use the facets with the default internal "
 "adapter."
 msgstr ""
 
-#: Module.php:118
-msgid ""
-"The internal search engine is available. Enable it in the main settings (for "
-"admin) and in site settings (for public)."
-msgstr ""
-
-#: Module.php:374
+#: Module.php:345
 #, php-format
 msgid "Unable to delete the search index for resource #%d: %s"
 msgstr ""
 
-#: Module.php:377
+#: Module.php:348
 #, php-format
 msgid ""
 "Unable to delete the search index for the deleted resource #%d: see log."
 msgstr ""
 
-#: Module.php:395
+#: Module.php:366
 #, php-format
 msgid "Unable to index metadata of resource #%d for search: %s"
 msgstr ""
 
-#: Module.php:398
+#: Module.php:369
 #, php-format
 msgid "Unable to update the search index for resource #%d: see log."
+msgstr ""
+
+#: Module.php:488
+msgid ""
+"The internal search engine is available. Enable it in the main settings (for "
+"admin) and in site settings (for public)."
 msgstr ""
 
 #: src/Form/SettingsFieldset.php:21
@@ -284,11 +284,11 @@ msgstr ""
 msgid "Select the page for quick api search…"
 msgstr ""
 
-#: src/Form/ConfigForm.php:15
+#: src/Form/SettingsFieldset.php:88
 msgid "Search batch size for reindexation"
 msgstr ""
 
-#: src/Form/ConfigForm.php:16
+#: src/Form/SettingsFieldset.php:89
 msgid ""
 "Default is 100, but it can be adapted according to your resource average "
 "size, your mapping and your architecture."
@@ -310,35 +310,48 @@ msgstr ""
 msgid "Search resources"
 msgstr ""
 
-#: src/Form/Admin/SearchPageConfigureForm.php:72
-#: src/Form/Admin/SearchPageConfigureSimpleForm.php:45
+#: src/Form/Admin/SearchPageConfigureForm.php:76
+#: src/Form/Admin/SearchPageConfigureSimpleForm.php:47
 msgid "Facets"
 msgstr ""
 
-#: src/Form/Admin/SearchPageConfigureForm.php:103
-#: src/Form/Admin/SearchPageConfigureForm.php:179 config/module.config.php:195
+#: src/Form/Admin/SearchPageConfigureForm.php:107
+#: src/Form/Admin/SearchPageConfigureForm.php:222 config/module.config.php:194
 msgid "Enabled"
 msgstr ""
 
-#: src/Form/Admin/SearchPageConfigureForm.php:111
-#: src/Form/Admin/SearchPageConfigureForm.php:187
+#: src/Form/Admin/SearchPageConfigureForm.php:115
+#: src/Form/Admin/SearchPageConfigureForm.php:230
 msgid "Weight"
 msgstr ""
 
-#: src/Form/Admin/SearchPageConfigureForm.php:131
+#: src/Form/Admin/SearchPageConfigureForm.php:136
 msgid "Facet limit"
 msgstr ""
 
-#: src/Form/Admin/SearchPageConfigureForm.php:132
+#: src/Form/Admin/SearchPageConfigureForm.php:137
 msgid "The maximum number of values fetched for each facet"
 msgstr ""
 
-#: src/Form/Admin/SearchPageConfigureForm.php:149
-#: src/Form/Admin/SearchPageConfigureSimpleForm.php:77
+#: src/Form/Admin/SearchPageConfigureForm.php:155
+msgid "Get facets from specific languages"
+msgstr ""
+
+#: src/Form/Admin/SearchPageConfigureForm.php:156
+msgid ""
+"Generally, facets are translated in the view, but in some cases, facet "
+"values may be translated directly in a multivalued property. Use \"|\" to "
+"separate multiple languages. Use \"||\" for values without language. When "
+"fields with languages (like subjects) and fields without language (like "
+"date) are facets, the empty language must be set to get results."
+msgstr ""
+
+#: src/Form/Admin/SearchPageConfigureForm.php:192
+#: src/Form/Admin/SearchPageConfigureSimpleForm.php:81
 msgid "Sort fields"
 msgstr ""
 
-#: src/Form/Admin/SearchPageConfigureForm.php:220
+#: src/Form/Admin/SearchPageConfigureForm.php:264
 msgid "Form settings"
 msgstr ""
 
@@ -346,31 +359,31 @@ msgstr ""
 msgid "Select an adapter below…"
 msgstr ""
 
-#: src/Form/Admin/SearchPageConfigureSimpleForm.php:46
+#: src/Form/Admin/SearchPageConfigureSimpleForm.php:48
 msgid ""
 "List of facets that will be displayed in the search page. Format is \"term | "
 "Label\"."
 msgstr ""
 
-#: src/Form/Admin/SearchPageConfigureSimpleForm.php:59
+#: src/Form/Admin/SearchPageConfigureSimpleForm.php:61
 msgid "Available facets"
 msgstr ""
 
-#: src/Form/Admin/SearchPageConfigureSimpleForm.php:60
+#: src/Form/Admin/SearchPageConfigureSimpleForm.php:62
 msgid "List of all available facets, among which some can be copied above."
 msgstr ""
 
-#: src/Form/Admin/SearchPageConfigureSimpleForm.php:78
+#: src/Form/Admin/SearchPageConfigureSimpleForm.php:82
 msgid ""
 "List of sort fields that will be displayed in the search page. Format is "
 "\"term dir | Label\"."
 msgstr ""
 
-#: src/Form/Admin/SearchPageConfigureSimpleForm.php:91
+#: src/Form/Admin/SearchPageConfigureSimpleForm.php:95
 msgid "Available sort fields"
 msgstr ""
 
-#: src/Form/Admin/SearchPageConfigureSimpleForm.php:92
+#: src/Form/Admin/SearchPageConfigureSimpleForm.php:96
 msgid ""
 "List of all available sort fields, among which some can be copied above."
 msgstr ""
@@ -479,24 +492,24 @@ msgstr ""
 msgid "Mapping properties to search fields"
 msgstr ""
 
-#: src/Controller/IndexController.php:79
+#: src/Controller/IndexController.php:80
 #, php-format
 msgid "Form adapter \"%s\" not found."
 msgstr ""
 
-#: src/Controller/IndexController.php:97
+#: src/Controller/IndexController.php:98
 msgid "No query."
 msgstr ""
 
-#: src/Controller/IndexController.php:118
-#: src/Controller/Admin/SearchPageController.php:200
-#: src/Controller/Admin/SearchPageController.php:329
+#: src/Controller/IndexController.php:119
+#: src/Controller/Admin/SearchPageController.php:217
+#: src/Controller/Admin/SearchPageController.php:330
 #: src/Controller/Admin/SearchIndexController.php:75
 #: src/Controller/Admin/SearchIndexController.php:124
 msgid "There was an error during validation"
 msgstr ""
 
-#: src/Controller/IndexController.php:213
+#: src/Controller/IndexController.php:220
 #, php-format
 msgid "Query error: %s"
 msgstr ""
@@ -521,46 +534,51 @@ msgstr ""
 
 #: src/Controller/Admin/SearchPageController.php:168
 #, php-format
-msgid "The index adapter \"%s\" is unavailable"
+msgid "The index adapter \"%s\" is unavailable."
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:249
+#: src/Controller/Admin/SearchPageController.php:178
+#, php-format
+msgid "This index adapter \"%s\" has no config form."
+msgstr ""
+
+#: src/Controller/Admin/SearchPageController.php:250
 #, php-format
 msgid "Configuration saved for page \"%s\"."
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:279
+#: src/Controller/Admin/SearchPageController.php:280
 #, php-format
 msgid "Search page \"%s\" successfully deleted"
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:284
+#: src/Controller/Admin/SearchPageController.php:285
 #, php-format
 msgid "Search page \"%s\" could not be deleted"
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:308
-#: src/Controller/Admin/SearchPageController.php:315
+#: src/Controller/Admin/SearchPageController.php:309
+#: src/Controller/Admin/SearchPageController.php:316
 msgid "The path should be unique."
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:576
+#: src/Controller/Admin/SearchPageController.php:581
 msgid "The page has been set by default in admin board."
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:580
+#: src/Controller/Admin/SearchPageController.php:585
 msgid "The page has been unset in admin board."
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:589
+#: src/Controller/Admin/SearchPageController.php:594
 msgid "The page has been disabled in all specified sites."
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:593
+#: src/Controller/Admin/SearchPageController.php:598
 msgid "The page has been made available in all specified sites."
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:597
+#: src/Controller/Admin/SearchPageController.php:602
 msgid "The availability of pages of sites was let unmodified."
 msgstr ""
 
@@ -596,6 +614,11 @@ msgstr ""
 #: src/Controller/Admin/SearchIndexController.php:221
 #, php-format
 msgid "Search index \"%s\" could not be deleted"
+msgstr ""
+
+#: src/Api/Adapter/SearchPageAdapter.php:141
+#, php-format
+msgid "The path \"%s\" is already taken."
 msgstr ""
 
 #: src/FormAdapter/BasicFormAdapter.php:39
@@ -677,27 +700,27 @@ msgstr ""
 msgid "Invalid navigation: browse link missing search page id"
 msgstr ""
 
-#: config/module.config.php:193
+#: config/module.config.php:192
 msgid "Automatic mapping of empty values"
 msgstr ""
 
-#: config/module.config.php:194
+#: config/module.config.php:193
 msgid "Available"
 msgstr ""
 
-#: config/module.config.php:196
+#: config/module.config.php:195
 msgid "Find"
 msgstr ""
 
-#: config/module.config.php:197
+#: config/module.config.php:196
 msgid "Find resources…"
 msgstr ""
 
-#: config/module.config.php:198
+#: config/module.config.php:197
 msgid "Processing…"
 msgstr ""
 
-#: config/module.config.php:199
+#: config/module.config.php:198
 msgid ""
 "Try to map automatically the metadata and the properties that are not mapped "
 "yet with the fields of the index"

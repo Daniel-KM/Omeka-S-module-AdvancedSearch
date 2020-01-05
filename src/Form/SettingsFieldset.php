@@ -91,7 +91,6 @@ class SettingsFieldset extends Fieldset
             'attributes' => [
                 'id' => 'search_batch_size',
                 'min' => 1,
-                'step' => 10,
             ],
         ]);
     }

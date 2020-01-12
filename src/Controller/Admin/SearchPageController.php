@@ -233,6 +233,13 @@ class SearchPageController extends AbstractActionController
             ? array_unique(array_map('trim', explode('|', $params['facet_languages'])))
             : [];
 
+        // Add a warning because it may be a hard to understand issue.
+        if (!empty($params['facet_languages']) && !in_array('', $params['facet_languages'])) {
+            $this->messenger()->addWarning(
+                'Note that you didn‘t set "||", so all values without language will be removed.' // @translate
+            );
+        }
+
         // Sort facets and sort fields to simplify next load.
         foreach (['facets', 'sort_fields'] as $type) {
             if (empty($params[$type])) {

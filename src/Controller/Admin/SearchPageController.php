@@ -603,23 +603,23 @@ class SearchPageController extends AbstractActionController
         }
 
         // Manage site settings.
-        $settings = $this->siteSettings();
+        $siteSettings = $this->siteSettings();
         $sites = $this->api()->search('sites')->getContent();
         foreach ($sites as $site) {
             $siteId = $site->id();
-            $settings->setTargetId($siteId);
-            $searchPages = $settings->get('search_pages', []);
+            $siteSettings->setTargetId($siteId);
+            $searchPages = $siteSettings->get('search_pages', []);
             $current = in_array($siteId, $currentMainSearchPageForSites);
             $new = $allSites || in_array($siteId, $newMainSearchPageForSites);
             if ($current !== $new) {
                 if ($new) {
-                    $settings->set('search_main_page', $siteId);
+                    $siteSettings->set('search_main_page', $searchPageId);
                     $searchPages[] = $searchPageId;
                     $searchPages = array_unique(array_filter($searchPages));
                     sort($searchPages);
-                    $settings->set('search_pages', $searchPages);
+                    $siteSettings->set('search_pages', $searchPages);
                 } else {
-                    $settings->set('search_main_page', null);
+                    $siteSettings->set('search_main_page', null);
                 }
             }
 
@@ -634,7 +634,7 @@ class SearchPageController extends AbstractActionController
                 }
                 unset($searchPages[$key]);
             }
-            $settings->set('search_pages', $searchPages);
+            $siteSettings->set('search_pages', $searchPages);
         }
 
         $this->messenger()->addSuccess($message);

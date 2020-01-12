@@ -43,7 +43,8 @@ $assetUrl = $this->plugin('assetUrl');
 $partial = $this->plugin('partial');
 
 $this->headLink()->appendStylesheet($assetUrl('css/search.css', 'Search'));
-$this->headScript()->appendFile($assetUrl('js/search.js', 'Search'));
+$this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javascript', ['defer' => 'defer']);
+
 $this->htmlElement('body')->appendAttribute('class', 'search-page resource browse');
 ?>
 

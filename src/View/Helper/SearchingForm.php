@@ -8,8 +8,7 @@ class SearchingForm extends AbstractHelper
     /**
      * Display the search form if any, else display the standard form.
      *
-     * @param string $searchFormPartial Allow to use a specific partial for the
-     * search form.
+     * @param string $searchFormPartial Specific partial for the search form.
      * @return string
      */
     public function __invoke($searchFormPartial = null)

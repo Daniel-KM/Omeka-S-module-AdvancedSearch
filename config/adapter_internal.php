@@ -85,7 +85,7 @@ return [
                 'label' => 'Date Asc',
             ],
         ],
-        'dcterms:title desc' => [
+        'dcterms:date desc' => [
             'enabled' => 1,
             'weight' => 5,
             'display' => [

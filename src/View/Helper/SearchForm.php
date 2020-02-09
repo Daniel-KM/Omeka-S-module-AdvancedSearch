@@ -35,13 +35,9 @@ class SearchForm extends AbstractHelper
      */
     public function __invoke(SearchPageRepresentation $searchPage = null, $partial = null)
     {
-        if ($searchPage) {
-            $this->searchPage = $searchPage;
-            $this->form = null;
-        }
-        if ($partial) {
-            $this->partial = $partial;
-        }
+        $this->searchPage = $searchPage;
+        $this->partial = $partial;
+        $this->form = null;
         return $this;
     }
 
@@ -89,7 +85,7 @@ class SearchForm extends AbstractHelper
         if (empty($this->searchPage)) {
             return '';
         }
-        if ($this->partial ) {
+        if ($this->partial) {
             return $this->partial ;
         }
         $formAdapter = $this->searchPage->formAdapter();

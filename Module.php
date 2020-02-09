@@ -250,18 +250,21 @@ class Module extends AbstractModule
         // Public search pages are required to manage them at site level.
         foreach ($pages as $page) {
             $pageId = $page->id();
+            $pageSlug = $page->path();
             $router->addRoute(
                 'search-page-' . $pageId,
                 [
                     'type' => \Zend\Router\Http\Segment::class,
                     'options' => [
-                        'route' => '/s/:site-slug/' . $page->path(),
+                        'route' => '/s/:site-slug/' . $pageSlug,
                         'defaults' => [
                             '__NAMESPACE__' => 'Search\Controller',
                             '__SITE__' => true,
                             'controller' => \Search\Controller\IndexController::class,
                             'action' => 'search',
                             'id' => $pageId,
+                            // Store the page slug to simplify checks.
+                            'page-slug' => $pageSlug,
                         ],
                     ],
                 ]

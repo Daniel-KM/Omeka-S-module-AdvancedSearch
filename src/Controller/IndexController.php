@@ -224,6 +224,7 @@ class IndexController extends AbstractActionController
             if ($jsonQuery) {
                 return new JsonModel(['status' => 'error', 'message' => $message]);
             }
+            $this->logger()->err($message);
             $this->messenger()->addError($message);
             return $view;
         }

@@ -122,7 +122,10 @@ class IndexController extends AbstractActionController
             }
             // Get the filtered request, but keep the pagination and sort params,
             // that are not managed by the form.
-            $request = $form->getData() + $this->filterExtraParams($request);
+            // FIXME Text filters are not filled with the results, so they are temporary took from the original request.
+            $textFilters = isset($request['text']['filters']) ? $request['text']['filters'] : [];
+            $request = ['text' => ['filters' => $textFilters]]
+                + $form->getData() + $this->filterExtraParams($request);
         }
 
         $searchPageSettings = $page->settings();

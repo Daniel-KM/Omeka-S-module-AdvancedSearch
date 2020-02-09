@@ -99,6 +99,15 @@ $this->htmlElement('body')->appendAttribute('class', 'search-page resource brows
 
     <?= $partial('search/facets', ['facets' => $facets]) ?>
 </div>
+
+<?php else: ?>
+
+<div class="search-results-wrapper">
+    <div class="search-results">
+        <div class="noresults"><?= $translate('An error occured and your query returned no results.') ?></div>
+    </div>
+</div>
+
 <?php endif; ?>
 
 <?php if (empty($isPartial)): ?>

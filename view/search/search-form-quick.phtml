@@ -21,6 +21,10 @@ foreach ($form->getElements() as $element):
         $main = $element;
     endif;
 endforeach;
+
+foreach ($form->getFieldsets() as $fieldset):
+    $form->remove($fieldset->getName());
+endforeach;
 ?>
 
 <?= $this->form($form) ?>

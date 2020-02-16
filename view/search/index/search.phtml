@@ -89,6 +89,10 @@ $this->htmlElement('body')->appendAttribute('class', 'search-page resource brows
                 'sortOptions' => $sortOptions,
             ]) ?>
 
+        <?php elseif (empty($query)): ?>
+
+            <div class="noresults"><?= $translate('Fill a query and get results.') ?></div>
+
         <?php else: ?>
 
             <div class="noresults"><?= $translate('Your query returned no results') ?></div>

@@ -34,6 +34,7 @@ use Omeka\Stdlib\Paginator;
 use Search\Api\Representation\SearchIndexRepresentation;
 use Search\Api\Representation\SearchPageRepresentation;
 use Search\Querier\Exception\QuerierException;
+use Search\Response;
 use Zend\EventManager\Event;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
@@ -67,7 +68,12 @@ class IndexController extends AbstractActionController
         }
 
         $view = new ViewModel;
-        $view->setVariable('isPartial', !$isPublic);
+        $view
+            ->setVariable('isPartial', !$isPublic)
+            // Set a default empty response and values to simplify view.
+            ->setVariable('response', new Response)
+            ->setVariable('sortOptions', [])
+            ->setVariable('facets', []);
         $api = $this->api();
         $response = $api->read('search_pages', $pageId);
         $this->page = $response->getContent();

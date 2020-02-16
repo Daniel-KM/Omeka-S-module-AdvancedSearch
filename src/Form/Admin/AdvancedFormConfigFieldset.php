@@ -115,6 +115,14 @@ class AdvancedFormConfigFieldset extends Fieldset
                     'value' => 'resource_template_id_field',
                 ],
             ])
+
+            ->add([
+                'name' => 'filter_value_joiner',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Add the joiner ("and" or "or") to the filters', // @translate
+                ],
+            ])
         ;
     }
 

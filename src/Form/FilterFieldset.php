@@ -41,23 +41,47 @@ class FilterFieldset extends Fieldset
             return;
         }
 
-        $this->setAttributes([
-            'class' => 'filter',
-        ]);
+        $this
+            ->setAttributes([
+                'class' => 'filter',
+            ]);
 
-        // No issue with input filter for select: there are always options.
-        $this->add([
-            'name' => 'field',
-            'type' => Element\Select::class,
-            'options' => [
-                'value_options' => $fieldOptions,
-            ],
-        ]);
+        $searchPage = $this->getOption('search_page');
+        if ($searchPage && @$searchPage->settings()['form']['filter_value_joiner']) {
+            $this
+                ->add([
+                    'name' => 'join',
+                    'type' => Element\Select::class,
+                    'options' => [
+                        'value_options' => [
+                            'and' => 'and', // @translate
+                            'or' => 'or', // @translate
+                        ],
+                        'label_attributes' => [
+                            'class' => 'search-boolean-label',
+                        ],
+                    ],
+                    'attributes' => [
+                        'value' => 'and',
+                        'class' => 'chosen-select',
+                    ],
+                ]);
+        }
 
-        $this->add([
-            'name' => 'value',
-            'type' => Element\Text::class,
-        ]);
+
+        $this
+            // No issue with input filter for select: there are always options.
+            ->add([
+                'name' => 'field',
+                'type' => Element\Select::class,
+                'options' => [
+                    'value_options' => $fieldOptions,
+                ],
+            ])
+            ->add([
+                'name' => 'value',
+                'type' => Element\Text::class,
+            ]);
     }
 
     protected function getFieldOptions()

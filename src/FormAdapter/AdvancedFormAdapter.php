@@ -91,9 +91,18 @@ class AdvancedFormAdapter implements FormAdapterInterface
         // TODO Manage query on owner (only one in core).
 
         if (isset($request['text']['filters'])) {
-            foreach ($request['text']['filters'] as $filter) {
-                if (!empty($filter['value'])) {
-                    $query->addFilter($filter['field'], $filter['value']);
+            if (empty($formSettings['filter_value_joiner'])) {
+                foreach ($request['text']['filters'] as $filter) {
+                    if (!empty($filter['value'])) {
+                        $query->addFilter($filter['field'], $filter['value']);
+                    }
+                }
+            } else {
+                foreach ($request['text']['filters'] as $filter) {
+                    if (!empty($filter['value'])) {
+                        $joiner = @$filter['join'] === 'or' ? 'or' : 'and';
+                        $query->addFilterQuery($filter['field'], $filter['value'], 'in', $joiner);
+                    }
                 }
             }
         }

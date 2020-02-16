@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright Daniel Berthereau 2018-2020
+ * Copyright Daniel Berthereau, 2019-2020
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -31,73 +31,29 @@ namespace Search\FormAdapter;
 
 use Search\Query;
 
-class AdvancedFormAdapter implements FormAdapterInterface
+abstract class AbstractFormAdapter implements FormAdapterInterface
 {
-    public function getLabel()
-    {
-        return 'Advanced'; // @translate
-    }
-
-    public function getFormClass()
-    {
-        return  \Search\Form\AdvancedForm::class;
-    }
-
     public function getFormPartialHeaders()
     {
-        return 'search/search-form-advanced-headers';
+        return null;
     }
 
     public function getFormPartial()
     {
-        return 'search/search-form-advanced';
+        return null;
     }
 
     public function getConfigFormClass()
     {
-        return \Search\Form\Admin\AdvancedFormConfigFieldset::class;
+        return null;
     }
 
     public function toQuery(array $request, array $formSettings)
     {
         $query = new Query();
-
         if (isset($request['q'])) {
             $query->setQuery($request['q']);
         }
-
-        if (isset($formSettings['is_public_field'])) {
-            $query->addFilter($formSettings['is_public_field'], true);
-        }
-
-        if (isset($formSettings['item_set_id_field'])
-            && isset($request['itemSet']['ids'])
-        ) {
-            $query->addFilter($formSettings['item_set_id_field'], $request['itemSet']['ids']);
-        }
-
-        if (isset($formSettings['resource_class_id_field'])
-            && isset($request['resourceClass']['ids'])
-        ) {
-            $query->addFilter($formSettings['resource_class_id_field'], $request['resourceClass']['ids']);
-        }
-
-        if (isset($formSettings['resource_template_id_field'])
-            && isset($request['resourceTemplate']['ids'])
-        ) {
-            $query->addFilter($formSettings['resource_template_id_field'], $request['resourceTemplate']['ids']);
-        }
-
-        // TODO Manage query on owner (only one in core).
-
-        if (isset($request['text']['filters'])) {
-            foreach ($request['text']['filters'] as $filter) {
-                if (!empty($filter['value'])) {
-                    $query->addFilter($filter['field'], $filter['value']);
-                }
-            }
-        }
-
         return $query;
     }
 }

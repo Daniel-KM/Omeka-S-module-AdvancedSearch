@@ -97,7 +97,7 @@ class Module extends AbstractModule
         $sharedEventManager->attach(
             '*',
             'view.layout',
-            [$this, 'addHeadersAdmin']
+            [$this, 'addHeaders']
         );
 
         $sharedEventManager->attach(
@@ -436,27 +436,48 @@ class Module extends AbstractModule
     }
 
     /**
-     * Add the headers for admin management.
+     * Add the headers.
      *
      * @param Event $event
      */
-    public function addHeadersAdmin(Event $event)
+    public function addHeaders(Event $event)
     {
-        // Hacked, because the admin layout doesn't use a partial or a trigger
-        // for the search engine.
+        // The search field is added via a js hack, because the admin layout
+        // doesn't use a partial or a trigger for the sidebar.
         $view = $event->getTarget();
-        // TODO How to attach all admin events only before 1.3?
-        if ($view->params()->fromRoute('__SITE__')) {
+
+        $status = $view->status();
+        if ($status->isAdminRequest()) {
+            $searchMainPage = $view->setting('search_main_page');
+            if (!$searchMainPage) {
+                return;
+            }
+            $assetUrl = $view->plugin('assetUrl');
+            $view->headLink()->appendStylesheet($assetUrl('css/search-admin-search.css', 'Search'));
+            $view->headScript()
+                ->appendScript(sprintf('var searchUrl = %s;', json_encode($searchMainPage, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)))
+                ->appendFile($assetUrl('js/search-admin-search.js', 'Search'), 'text/javascript', ['defer' => 'defer']);
+            $searchPage = $view->api()->searchOne('search_pages', ['path' => $searchMainPage])->getContent();
+        } elseif ($status->isSiteRequest()) {
+            $searchMainPage = $view->siteSetting('search_main_page');
+            if (!$searchMainPage) {
+                return;
+            }
+            $searchPage = $view->api()->searchOne('search_pages', ['id' => $searchMainPage])->getContent();
+        } else {
             return;
         }
-        $settings = $this->getServiceLocator()->get('Omeka\Settings');
-        $adminSearchPage = $settings->get('search_main_page');
-        if (empty($adminSearchPage)) {
+
+        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
+        if (!$searchPage || !($formAdapter = $searchPage->formAdapter())) {
             return;
         }
-        $view->headLink()->appendStylesheet($view->assetUrl('css/search-admin-search.css', 'Search'));
-        $view->headScript()->appendScript(sprintf('var searchUrl = %s;', json_encode($adminSearchPage, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)));
-        $view->headScript()->appendFile($view->assetUrl('js/search-admin-search.js', 'Search'));
+
+        $partialHeaders = $formAdapter->getFormPartialHeaders();
+        if ($partialHeaders) {
+            // No echo: it's just a preload.
+            $view->partial($partialHeaders);
+        }
     }
 
     protected function installResources()

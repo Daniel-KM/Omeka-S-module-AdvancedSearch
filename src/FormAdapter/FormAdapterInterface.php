@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2018
+ * Copyright Daniel Berthereau, 2018-2020
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -43,12 +43,19 @@ interface FormAdapterInterface
     public function getFormClass();
 
     /**
-     * @return string
+     * Optional partial to allow to prepare the rendering of the form.
+     *
+     * @return string|null
+     */
+    public function getFormPartialHeaders();
+
+    /**
+     * @return string|null
      */
     public function getFormPartial();
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getConfigFormClass();
 

@@ -34,6 +34,11 @@ class ApiFormAdapter implements FormAdapterInterface
         return null;
     }
 
+    public function getFormPartialHeaders()
+    {
+        return null;
+    }
+
     public function getFormPartial()
     {
         return null;

@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2018
+ * Copyright Daniel Berthereau, 2018-2020
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -30,9 +30,7 @@
 
 namespace Search\FormAdapter;
 
-use Search\Query;
-
-class BasicFormAdapter implements FormAdapterInterface
+class BasicFormAdapter extends AbstractFormAdapter
 {
     public function getLabel()
     {
@@ -42,26 +40,5 @@ class BasicFormAdapter implements FormAdapterInterface
     public function getFormClass()
     {
         return \Search\Form\BasicForm::class;
-    }
-
-    public function getFormPartial()
-    {
-        return null;
-    }
-
-    public function getConfigFormClass()
-    {
-        return null;
-    }
-
-    public function toQuery(array $request, array $formSettings)
-    {
-        $query = new Query();
-
-        if (isset($request['q'])) {
-            $query->setQuery($request['q']);
-        }
-
-        return $query;
     }
 }

@@ -30,7 +30,7 @@ class InternalAdapter extends AbstractAdapter
     {
         // Use a direct query to avoid a memory overload when there are many
         // vocabularies.
-        /* @var \Doctrine\DBAL\Connection $connection */
+        /** @var \Doctrine\DBAL\Connection $connection */
         $connection = $this->getServiceLocator()->get('Omeka\Connection');
 
         $qb = $connection->createQueryBuilder();

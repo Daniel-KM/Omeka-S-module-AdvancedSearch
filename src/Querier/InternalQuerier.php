@@ -370,7 +370,7 @@ class InternalQuerier extends AbstractQuerier
      */
     protected function listResourceClassIds(array $values)
     {
-        return array_intersect_key($this->getResourceClassIds(), array_fill_keys($values, null));
+        return array_values(array_intersect_key($this->getResourceClassIds(), array_fill_keys($values, null)));
     }
 
     /**
@@ -385,22 +385,21 @@ class InternalQuerier extends AbstractQuerier
         static $resourceClasses;
 
         if (is_null($resourceClasses)) {
-            $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
-            $qb = $entityManager->createQueryBuilder();
+            /** @var \Doctrine\DBAL\Connection $connection */
+            $connection = $this->getServiceLocator()->get('Omeka\Connection');
+            $qb = $connection->createQueryBuilder();
             $qb
                 ->select([
-                    "CONCAT(vocabulary.prefix, ':', resource_class.localName) AS term",
+                    "CONCAT(vocabulary.prefix, ':', resource_class.local_name) AS term",
                     'resource_class.id AS id',
                 ])
-                ->from(\Omeka\Entity\ResourceClass::class, 'resource_class')
-                ->innerJoin(
-                    \Omeka\Entity\Vocabulary::class,
-                    'vocabulary',
-                    \Doctrine\ORM\Query\Expr\Join::WITH,
-                    $qb->expr()->eq('vocabulary.id', 'resource_class.vocabulary')
-                )
+                ->from('resource_class', 'resource_class')
+                ->innerJoin('resource_class', 'vocabulary', 'vocabulary', 'resource_class.vocabulary_id = vocabulary.id')
             ;
-            $resourceClasses = $qb->getQuery()->getScalarResult();
+            $stmt = $connection->executeQuery($qb);
+            // Fetch by key pair is not supported by doctrine 2.0.
+            $resourceClasses = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $resourceClasses = array_column($resourceClasses, 'id', 'term');
         }
 
         return $resourceClasses;
@@ -415,29 +414,33 @@ class InternalQuerier extends AbstractQuerier
      */
     protected function listResourceTemplateIds(array $values)
     {
-        return array_intersect_key($this->getResourceTemplateIds(), array_fill_keys($values, null));
+        return array_values(array_intersect_key($this->getResourceTemplateIds(), array_fill_keys($values, null)));
     }
 
     /**
-     * Get all resource template ids by term.
+     * Get all resource template ids by label.
      *
-     * @return array Associative array of ids by term.
+     * @return array Associative array of ids by label.
      */
     protected function getResourceTemplateIds()
     {
         static $resourceTemplates;
 
         if (is_null($resourceTemplates)) {
-            $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
-            $qb = $entityManager->createQueryBuilder();
+            /** @var \Doctrine\DBAL\Connection $connection */
+            $connection = $this->getServiceLocator()->get('Omeka\Connection');
+            $qb = $connection->createQueryBuilder();
             $qb
                 ->select([
                     'resource_template.label AS label',
                     'resource_template.id AS id',
                 ])
-                ->from(\Omeka\Entity\ResourceTemplate::class, 'resource_template')
+                ->from('resource_template', 'resource_template')
             ;
-            $resourceTemplates = $qb->getQuery()->getScalarResult();
+            $stmt = $connection->executeQuery($qb);
+            // Fetch by key pair is not supported by doctrine 2.0.
+            $resourceTemplates = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $resourceTemplates = array_column($resourceTemplates, 'id', 'label');
         }
 
         return $resourceTemplates;

@@ -236,6 +236,7 @@ class AdvancedForm extends Form
             ->setOptions([
                 'label' => 'Resource templates', // @translate
                 'empty_option' => '',
+                'disable_group_by_owner' => true,
             ])
             ->setAttributes([
                 'id' => 'resource-templates',

@@ -1,6 +1,6 @@
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2017-2019
+ * Copyright Daniel Berthereau, 2017-2020
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -86,6 +86,7 @@ var Search = (function() {
 })();
 
 $(document).ready(function() {
+
     $('.search-results-sort select').on('change', function() {
         Search.sortBy($(this).val());
     });
@@ -112,4 +113,18 @@ $(document).ready(function() {
         view_type = 'list';
     }
     $('.search-view-type-' + view_type).click();
+
+    /**
+     * Chosen default options.
+     *
+     * @see https://harvesthq.github.io/chosen/
+     */
+    var chosenOptions = {
+        allow_single_deselect: true,
+        disable_search_threshold: 10,
+        width: '100%',
+        include_group_label_in_selected: true,
+    };
+    $('.chosen-select').chosen(chosenOptions);
+
 });

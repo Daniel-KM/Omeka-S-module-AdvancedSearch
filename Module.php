@@ -459,11 +459,16 @@ class Module extends AbstractModule
                 ->appendFile($assetUrl('js/search-admin-search.js', 'Search'), 'text/javascript', ['defer' => 'defer']);
             $searchPage = $view->api()->searchOne('search_pages', ['path' => $searchMainPage])->getContent();
         } elseif ($status->isSiteRequest()) {
-            $searchMainPage = $view->siteSetting('search_main_page');
-            if (!$searchMainPage) {
+            $params = $view->params()->fromRoute();
+            if ($params['controller'] = \Search\Controller\IndexController::class) {
+                $searchPage = @$params['id'];
+            } else {
+                $searchPage = $view->siteSetting('search_main_page');
+            }
+            if (!$searchPage) {
                 return;
             }
-            $searchPage = $view->api()->searchOne('search_pages', ['id' => $searchMainPage])->getContent();
+            $searchPage = $view->api()->searchOne('search_pages', ['id' => $searchPage])->getContent();
         } else {
             return;
         }
@@ -472,7 +477,6 @@ class Module extends AbstractModule
         if (!$searchPage || !($formAdapter = $searchPage->formAdapter())) {
             return;
         }
-
         $partialHeaders = $formAdapter->getFormPartialHeaders();
         if ($partialHeaders) {
             // No echo: it's just a preload.

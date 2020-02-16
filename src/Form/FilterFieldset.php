@@ -46,8 +46,11 @@ class FilterFieldset extends Fieldset
                 'class' => 'filter',
             ]);
 
+        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
         $searchPage = $this->getOption('search_page');
-        if ($searchPage && @$searchPage->settings()['form']['filter_value_joiner']) {
+        $searchPageSettings = $searchPage ? $searchPage->settings() : [];
+
+        if (!empty($searchPageSettings['form']['filter_value_joiner'])) {
             $this
                 ->add([
                     'name' => 'join',

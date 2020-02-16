@@ -44,10 +44,19 @@ class AdvancedForm extends Form
      */
     protected $apiManager;
 
+    /**
+     * @var SiteRepresentation
+     */
+    protected $site;
+
     protected $formElementManager;
 
     public function init()
     {
+        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
+        $searchPage = $this->getOption('search_page');
+        $searchPageSettings = $searchPage ? $searchPage->settings() : [];
+
         $this
             ->add([
                 'name' => 'q',
@@ -56,15 +65,29 @@ class AdvancedForm extends Form
                     'label' => 'Search', // @translate
                 ],
                 'attributes' => [
-                    'placeholder' => 'Search', // @translate
+                    'id' => 'q',
+                    'placeholder' => 'Search resources…', // @translate
                 ],
             ])
+        ;
 
-            ->add($this->itemSetFieldset())
-            ->add($this->resourceClassFieldset())
-            ->add($this->resourceTemplateFieldset())
-            ->add($this->textFieldset())
+        if (!empty($searchPageSettings['form']['item_set_id_field'])) {
+            $this
+                ->add($this->itemSetFieldset());
+        }
+        if (!empty($searchPageSettings['form']['resource_class_id_field'])) {
+            $this
+                ->add($this->resourceClassFieldset());
+        }
+        if (!empty($searchPageSettings['form']['resource_template_id_field'])) {
+            $this
+                ->add($this->resourceTemplateFieldset());
+        }
 
+        $this
+            ->add($this->textFieldset());
+
+        $this
             ->add([
                 'name' => 'submit',
                 'type' => Element\Submit::class,
@@ -76,24 +99,30 @@ class AdvancedForm extends Form
         ;
 
         $inputFilter = $this->getInputFilter();
-        $inputFilter
-            ->get('itemSet')
-            ->add([
-                'name' => 'ids',
-                'required' => false,
-            ]);
-        $inputFilter
-            ->get('resourceClass')
-            ->add([
-                'name' => 'ids',
-                'required' => false,
-            ]);
-        $inputFilter
-            ->get('resourceTemplate')
-            ->add([
-                'name' => 'ids',
-                'required' => false,
-            ]);
+        if (!empty($searchPageSettings['form']['item_set_id_field'])) {
+            $inputFilter
+                ->get('itemSet')
+                ->add([
+                    'name' => 'ids',
+                    'required' => false,
+                ]);
+        }
+        if (!empty($searchPageSettings['form']['resource_class_id_field'])) {
+            $inputFilter
+                ->get('resourceClass')
+                ->add([
+                    'name' => 'ids',
+                    'required' => false,
+                ]);
+        }
+        if (!empty($searchPageSettings['form']['resource_template_id_field'])) {
+            $inputFilter
+                ->get('resourceTemplate')
+                ->add([
+                    'name' => 'ids',
+                    'required' => false,
+                ]);
+        }
     }
 
     /**
@@ -158,42 +187,65 @@ class AdvancedForm extends Form
                 'label' => 'Collections', // @translate
                 'value_options' => $this->getItemSetsOptions(),
             ],
+            'attributes' => [
+                'id' => 'item-sets',
+            ],
         ]);
         return $fieldset;
     }
 
     protected function resourceClassFieldset()
     {
+        // For an unknown reason, the ResourceClassSelect can not be added
+        // directly to a fieldset (factory is not used).
+
         $fieldset = new Fieldset('resourceClass');
-        $fieldset->add([
-            'name' => 'ids',
-            'type' => ResourceClassSelect::class,
-            'options' => [
+
+        /** @var \Omeka\Form\Element\ResourceClassSelect $element */
+        $element = $this->getFormElementManager()->get(ResourceClassSelect::class);
+        $element
+            ->setName('ids')
+            ->setOptions([
                 'label' => 'Resource classes', // @translate
                 'term_as_value' => true,
-            ],
-            'attributes' => [
+                'empty_option' => '',
+            ])
+            ->setAttributes([
+                'id' => 'resource-classes',
                 'multiple' => true,
                 'class' => 'chosen-select',
-            ],
-        ]);
+                'data-placeholder' => 'Select resource classes…', // @translate
+            ]);
+
+        $fieldset
+            ->add($element);
         return $fieldset;
     }
 
     protected function resourceTemplateFieldset()
     {
+        // For an unknown reason, the ResourceTemplateSelect can not be added
+        // directly to a fieldset (factory is not used).
+
         $fieldset = new Fieldset('resourceTemplate');
-        $fieldset->add([
-            'name' => 'ids',
-            'type' => ResourceTemplateSelect::class,
-            'options' => [
+
+        /** @var \Omeka\Form\Element\ResourceTemplateSelect $element */
+        $element = $this->getFormElementManager()->get(ResourceTemplateSelect::class);
+        $element
+            ->setName('ids')
+            ->setOptions([
                 'label' => 'Resource templates', // @translate
-            ],
-            'attributes' => [
+                'empty_option' => '',
+            ])
+            ->setAttributes([
+                'id' => 'resource-templates',
                 'multiple' => true,
                 'class' => 'chosen-select',
-            ],
-        ]);
+                'data-placeholder' => 'Select resource templates…', // @translate
+            ]);
+
+        $fieldset
+            ->add($element);
         return $fieldset;
     }
 
@@ -232,8 +284,9 @@ class AdvancedForm extends Form
         }
         // TODO Update for Omeka 2 to avoid to load full resources (title).
         $options = [];
+        /** @var \Omeka\Api\Representation\ItemSetRepresentation[] $itemSets */
         foreach ($itemSets as $itemSet) {
-            $options[$itemSet->id()] = $itemSet->displayTitle();
+            $options[$itemSet->id()] = (string) $itemSet->displayTitle();
         }
         return $options;
     }

@@ -4,8 +4,10 @@
  * @var \Search\Form\AdvancedForm $form
  */
 
-$translate = $this->plugin('translate');
+// Scripts are loaded via an event on view.layout and can be set in in search-form-advanced-header.phtml.
+
 $formCollection = $this->plugin('formCollection');
+$formElement = $this->plugin('formElement');
 $formHelper = $this->plugin('form');
 
 $params = $this->params()->fromQuery() ?: [];
@@ -16,13 +18,21 @@ $form
 
 <?= $formHelper->openTag($form) ?>
 <div id="advanced-search-form-wrapper">
-    <button type="button" class="advanced-new-search"><?= $translate('New search'); ?></button>
     <div id="advanced-search-form">
-        <?= $formCollection($form->get('itemSet'), false) ?>
         <?= $this->formText($form->get('q')) ?>
+        <?php if ($form->has('itemSet')): ?>
+        <?= $formCollection($form->get('itemSet'), false) ?>
+        <?php endif; ?>
+        <?php if ($form->has('resourceClass')): ?>
+        <?= $formCollection($form->get('resourceClass'), false) ?>
+        <?php endif; ?>
+        <?php if ($form->has('resourceTemplate')): ?>
+        <?= $formCollection($form->get('resourceTemplate'), false) ?>
+        <?php endif; ?>
         <div>
             <?php /** @var Zend\Form\Element\Collection $filters */ ?>
-            <?php $textFieldset = $form->get('text'); ?>
+           <?php if ($form->has('text')): ?>
+           <?php $textFieldset = $form->get('text'); ?>
             <?php if ($textFieldset->has('filters')): ?>
             <?php $filters = $textFieldset->get('filters'); ?>
             <div class="filters">
@@ -30,11 +40,15 @@ $form
                     <?= $formCollection($fieldset, true) ?>
                 <?php endforeach; ?>
                 <?= $formCollection()->renderTemplate($filters) ?>
+                <?php /*
+                <button type="button" class="advanced-add-filter"><i class="fa fa-plus"></i></button>
+                */ ?>
             </div>
+            <?php endif; ?>
             <?php endif; ?>
         </div>
         <input type="submit" value="OK"/>
     </div>
 </div>
-<?= $this->formElement($form->get('csrf')) ?>
+<?= $formElement($form->get('csrf')) ?>
 <?= $formHelper->closeTag() ?>

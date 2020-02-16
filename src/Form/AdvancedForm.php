@@ -31,6 +31,8 @@ namespace Search\Form;
 
 use Omeka\Api\Manager;
 use Omeka\Api\Representation\SiteRepresentation;
+use Omeka\Form\Element\ResourceClassSelect;
+use Omeka\Form\Element\ResourceTemplateSelect;
 use Zend\Form\Element;
 use Zend\Form\Fieldset;
 use Zend\Form\Form;
@@ -59,6 +61,8 @@ class AdvancedForm extends Form
             ])
 
             ->add($this->itemSetFieldset())
+            ->add($this->resourceClassFieldset())
+            ->add($this->resourceTemplateFieldset())
             ->add($this->textFieldset())
 
             ->add([
@@ -77,8 +81,19 @@ class AdvancedForm extends Form
             ->add([
                 'name' => 'ids',
                 'required' => false,
-            ])
-        ;
+            ]);
+        $inputFilter
+            ->get('resourceClass')
+            ->add([
+                'name' => 'ids',
+                'required' => false,
+            ]);
+        $inputFilter
+            ->get('resourceTemplate')
+            ->add([
+                'name' => 'ids',
+                'required' => false,
+            ]);
     }
 
     /**
@@ -142,6 +157,41 @@ class AdvancedForm extends Form
                 // For normal users, it is not "item sets", but "collections".
                 'label' => 'Collections', // @translate
                 'value_options' => $this->getItemSetsOptions(),
+            ],
+        ]);
+        return $fieldset;
+    }
+
+    protected function resourceClassFieldset()
+    {
+        $fieldset = new Fieldset('resourceClass');
+        $fieldset->add([
+            'name' => 'ids',
+            'type' => ResourceClassSelect::class,
+            'options' => [
+                'label' => 'Resource classes', // @translate
+                'term_as_value' => true,
+            ],
+            'attributes' => [
+                'multiple' => true,
+                'class' => 'chosen-select',
+            ],
+        ]);
+        return $fieldset;
+    }
+
+    protected function resourceTemplateFieldset()
+    {
+        $fieldset = new Fieldset('resourceTemplate');
+        $fieldset->add([
+            'name' => 'ids',
+            'type' => ResourceTemplateSelect::class,
+            'options' => [
+                'label' => 'Resource templates', // @translate
+            ],
+            'attributes' => [
+                'multiple' => true,
+                'class' => 'chosen-select',
             ],
         ]);
         return $fieldset;

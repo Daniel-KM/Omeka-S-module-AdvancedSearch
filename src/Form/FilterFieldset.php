@@ -71,7 +71,6 @@ class FilterFieldset extends Fieldset
                 ]);
         }
 
-
         $this
             // No issue with input filter for select: there are always options.
             ->add([
@@ -80,7 +79,40 @@ class FilterFieldset extends Fieldset
                 'options' => [
                     'value_options' => $fieldOptions,
                 ],
-            ])
+                'attributes' => [
+                    'value' => 'eq',
+                    'class' => 'chosen-select',
+                ],
+            ]);
+
+        if (!empty($searchPageSettings['form']['filter_value_type'])) {
+            $this
+                ->add([
+                    'name' => 'type',
+                    'type' => Element\Select::class,
+                    'options' => [
+                        'value_options' => [
+                            'eq' => 'is exactly', // @translate
+                            'neq' => 'is not exactly', // @translate
+                            'in' => 'contains', // @translate
+                            'nin' => 'does not contain', // @translate
+                            'res' => 'is resource with ID', // @translate
+                            'nres' => 'is not resource with ID', // @translate
+                            'ex' => 'has any value', // @translate
+                            'nex' => 'has no values', // @translate
+                        ],
+                        'label_attributes' => [
+                            'class' => 'search-type-label',
+                        ],
+                    ],
+                    'attributes' => [
+                        'value' => 'in',
+                        'class' => 'chosen-select',
+                    ],
+                ]);
+        }
+
+        $this
             ->add([
                 'name' => 'value',
                 'type' => Element\Text::class,

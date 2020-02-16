@@ -92,16 +92,40 @@ class AdvancedFormAdapter implements FormAdapterInterface
 
         if (isset($request['text']['filters'])) {
             if (empty($formSettings['filter_value_joiner'])) {
-                foreach ($request['text']['filters'] as $filter) {
-                    if (!empty($filter['value'])) {
-                        $query->addFilter($filter['field'], $filter['value']);
+                if (empty($formSettings['filter_value_type'])) {
+                    foreach ($request['text']['filters'] as $filter) {
+                        if (!empty($filter['value'])) {
+                            $query->addFilter($filter['field'], $filter['value']);
+                        }
+                    }
+                } else {
+                    foreach ($request['text']['filters'] as $filter) {
+                        $type = @$filter['type'] ?: 'in';
+                        if ($type === 'ex' || $type === 'nex') {
+                            $query->addFilterQuery($filter['field'], null, $type);
+                        } elseif (!empty($filter['value'])) {
+                            $query->addFilterQuery($filter['field'], $filter['value'], $type);
+                        }
                     }
                 }
             } else {
-                foreach ($request['text']['filters'] as $filter) {
-                    if (!empty($filter['value'])) {
-                        $joiner = @$filter['join'] === 'or' ? 'or' : 'and';
-                        $query->addFilterQuery($filter['field'], $filter['value'], 'in', $joiner);
+                if (empty($formSettings['filter_value_type'])) {
+                    foreach ($request['text']['filters'] as $filter) {
+                        if (!empty($filter['value'])) {
+                            $joiner = @$filter['join'] === 'or' ? 'or' : 'and';
+                            $query->addFilterQuery($filter['field'], $filter['value'], 'in', $joiner);
+                        }
+                    }
+                } else {
+                    foreach ($request['text']['filters'] as $filter) {
+                        $type = @$filter['type'] ?: 'in';
+                        if ($type === 'ex' || $type === 'nex') {
+                            $joiner = @$filter['join'] === 'or' ? 'or' : 'and';
+                            $query->addFilterQuery($filter['field'], null, $type, $joiner);
+                        } elseif (!empty($filter['value'])) {
+                            $joiner = @$filter['join'] === 'or' ? 'or' : 'and';
+                            $query->addFilterQuery($filter['field'], $filter['value'], 'in', $joiner);
+                        }
                     }
                 }
             }

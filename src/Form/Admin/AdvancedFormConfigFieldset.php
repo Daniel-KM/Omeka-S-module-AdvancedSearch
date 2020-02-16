@@ -123,6 +123,13 @@ class AdvancedFormConfigFieldset extends Fieldset
                     'label' => 'Add the joiner ("and" or "or") to the filters', // @translate
                 ],
             ])
+            ->add([
+                'name' => 'filter_value_type',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Add the type ("equal", "in", etc.) to the filters', // @translate
+                ],
+            ])
         ;
     }
 

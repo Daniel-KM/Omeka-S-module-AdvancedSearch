@@ -37,9 +37,11 @@ class AdvancedFormFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
+        $currentSite = $services->get('ControllerPluginManager')->get('currentSite');
         $form = new AdvancedForm(null, $options);
         return $form
             ->setApiManager($services->get('Omeka\ApiManager'))
+            ->setSite($currentSite())
             ->setFormElementManager($services->get('FormElementManager'));
     }
 }

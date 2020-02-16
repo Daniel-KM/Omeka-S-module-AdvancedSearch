@@ -198,7 +198,7 @@ class SearchPageController extends AbstractActionController
         }
 
         $params = $isSimple
-            ? $this->extractSimpleFields()
+            ? $this->extractSimpleFields($searchPage)
             : $this->extractFullFields();
 
         // TODO Check simple fields.
@@ -421,8 +421,11 @@ class SearchPageController extends AbstractActionController
         return $settings;
     }
 
-    protected function extractSimpleFields()
+    protected function extractSimpleFields(SearchPageRepresentation $searchPage)
     {
+        $index = $searchPage->index();
+        $adapter = $index->adapter();
+
         $params = $this->getRequest()->getPost()->toArray();
 
         unset($params['fieldsets']);
@@ -430,32 +433,40 @@ class SearchPageController extends AbstractActionController
         unset($params['available_facets']);
         unset($params['available_sort_fields']);
 
+        $fields = $adapter->getAvailableFacetFields($index);
+
         $data = $params['facets'] ?: '';
         unset($params['facets']);
         $data = $this->stringToList($data);
         foreach ($data as $key => $value) {
-            list($term, $label) = array_map('trim', explode('|', $value));
-            $params['facets'][$term] = [
-                'enabled' => true,
-                'weight' => $key + 1,
-                'display' => [
-                    'label' => $label,
-                ],
-            ];
+            list($term, $label) = array_map('trim', explode('|', $value . '|'));
+            if (isset($fields[$term])) {
+                $params['facets'][$term] = [
+                    'enabled' => true,
+                    'weight' => $key + 1,
+                    'display' => [
+                        'label' => $label ?: $term,
+                    ],
+                ];
+            }
         }
+
+        $fields = $adapter->getAvailableSortFields($index);
 
         $data = $params['sort_fields'] ?: '';
         unset($params['sort_fields']);
         $data = $this->stringToList($data);
         foreach ($data as $key => $value) {
-            list($term, $label) = array_map('trim', explode('|', $value));
-            $params['sort_fields'][$term] = [
-                'enabled' => true,
-                'weight' => $key + 1,
-                'display' => [
-                    'label' => $label,
-                ],
-            ];
+            list($term, $label) = array_map('trim', explode('|', $value . '|'));
+            if (isset($fields[$term])) {
+                $params['sort_fields'][$term] = [
+                    'enabled' => true,
+                    'weight' => $key + 1,
+                    'display' => [
+                        'label' => $label ?: $term,
+                    ],
+                ];
+            }
         }
 
         return $params;

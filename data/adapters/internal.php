@@ -54,42 +54,42 @@ return [
             'enabled' => 1,
             'weight' => 0,
             'display' => [
-                'label' => 'Title Asc',
+                'label' => 'Title',
             ],
         ],
         'dcterms:title desc' => [
             'enabled' => 1,
             'weight' => 1,
             'display' => [
-                'label' => 'Title Desc',
+                'label' => 'Title (reverted)',
             ],
         ],
         'dcterms:creator asc' => [
             'enabled' => 1,
             'weight' => 2,
             'display' => [
-                'label' => 'Creator Asc',
+                'label' => 'Creator',
             ],
         ],
         'dcterms:creator desc' => [
             'enabled' => 1,
             'weight' => 3,
             'display' => [
-                'label' => 'Creator Desc',
+                'label' => 'Creator (reverted)',
             ],
         ],
         'dcterms:date asc' => [
             'enabled' => 1,
             'weight' => 4,
             'display' => [
-                'label' => 'Date Asc',
+                'label' => 'Date',
             ],
         ],
         'dcterms:date desc' => [
             'enabled' => 1,
             'weight' => 5,
             'display' => [
-                'label' => 'Date Desc',
+                'label' => 'Date (reverted)',
             ],
         ],
     ],

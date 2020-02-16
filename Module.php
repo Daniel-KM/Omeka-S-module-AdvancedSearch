@@ -482,7 +482,7 @@ INSERT INTO `search_page`
 VALUES
 ('1', 'Internal', 'find', 'basic', ?, NOW());
 SQL;
-        $searchPageSettings = require __DIR__ . '/config/adapter_internal.php';
+        $searchPageSettings = require __DIR__ . '/data//adapters/internal.php';
         $connection->executeQuery($sql, [
             json_encode($searchPageSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
         ]);

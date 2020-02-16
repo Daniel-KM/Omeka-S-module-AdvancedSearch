@@ -87,6 +87,8 @@ class AdvancedForm extends Form
         $this
             ->add($this->textFieldset());
 
+        $this->appendSpecificFields();
+
         $this
             ->add([
                 'name' => 'submit',
@@ -271,6 +273,15 @@ class AdvancedForm extends Form
             ;
         }
         return $fieldset;
+    }
+
+    /**
+     * Add specific fields.
+     *
+     * This method is used for forms that extend this form.
+     */
+    protected function appendSpecificFields()
+    {
     }
 
     protected function getItemSetsOptions()

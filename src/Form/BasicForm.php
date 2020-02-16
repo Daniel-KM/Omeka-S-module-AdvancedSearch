@@ -36,16 +36,18 @@ class BasicForm extends Form
 {
     public function init()
     {
-        $this->add([
-            'name' => 'q',
-            'type' => Element\Text::class,
-            'options' => [
-                'label' => 'Search', // @translate
-            ],
-            'attributes' => [
-                'id' => 'q',
-                'placeholder' => 'Search resources', // @translate
-            ],
-        ]);
+        $this
+            ->add([
+                'name' => 'q',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Search', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'q',
+                    'placeholder' => 'Search resources', // @translate
+                ],
+            ])
+        ;
     }
 }

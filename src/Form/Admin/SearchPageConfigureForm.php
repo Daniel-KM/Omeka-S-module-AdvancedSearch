@@ -53,13 +53,18 @@ class SearchPageConfigureForm extends Form
             ->addFormFieldset();
 
         // Allow to manage the simple and visual form differently.
-        $this->add([
-            'name' => 'form_class',
-            'type' => Element\Hidden::class,
-            'attributes' => [
-                'value' => get_class($this),
-            ],
-        ]);
+        $this
+            ->add([
+                'name' => 'form_class',
+                'type' => Element\Hidden::class,
+                'attributes' => [
+                    'value' => get_class($this),
+                ],
+            ]);
+
+        // Input filters should be added after elements.
+        $this
+            ->addFacetLanguagesInputFilter();
     }
 
     protected function addFacets()
@@ -160,7 +165,20 @@ class SearchPageConfigureForm extends Form
                     'placeholder' => 'fra|way|apy||',
                 ],
             ]);
-        // FIXME This filter is not processed and manually applied in controller.
+    }
+
+    public function populateValues($data, $onlyBase = false)
+    {
+        if (empty($data['facet_languages'])) {
+            $data['facet_languages'] = '';
+        } elseif (is_array($data['facet_languages'])) {
+            $data['facet_languages'] = implode('|', $data['facet_languages']);
+        }
+        parent::populateValues($data, $onlyBase);
+    }
+
+    protected function addFacetLanguagesInputFilter()
+    {
         $this
             ->getInputFilter()
             ->add([

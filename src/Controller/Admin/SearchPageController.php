@@ -190,12 +190,6 @@ class SearchPageController extends AbstractActionController
             $settings = $this->prepareSettingsForSimpleForm($searchPage, $settings);
         }
 
-        if (empty($settings['facet_languages'])) {
-            $settings['facet_languages'] = '';
-        } elseif (is_array($settings['facet_languages'])) {
-            $settings['facet_languages'] = implode('|', $settings['facet_languages']);
-        }
-
         $form->setData($settings);
         $view->setVariable('form', $form);
 
@@ -228,7 +222,7 @@ class SearchPageController extends AbstractActionController
         $params['form'] = $formParams;
         unset($params['csrf']);
 
-        // Should be checked in form.
+        // TODO Should be checked in form.
         $params['facet_languages'] = strlen(trim($params['facet_languages']))
             ? array_unique(array_map('trim', explode('|', $params['facet_languages'])))
             : [];
@@ -236,7 +230,7 @@ class SearchPageController extends AbstractActionController
         // Add a warning because it may be a hard to understand issue.
         if (!empty($params['facet_languages']) && !in_array('', $params['facet_languages'])) {
             $this->messenger()->addWarning(
-                'Note that you didn‘t set "||", so all values without language will be removed.' // @translate
+                'Note that you didn’t set "||", so all values without language will be removed.' // @translate
             );
         }
 
@@ -372,9 +366,9 @@ class SearchPageController extends AbstractActionController
             || $forceForm === 'simple';
 
         $form = $isSimple
-            /* @var \Search\Form\Admin\SearchPageConfigureSimpleForm $form */
+            /** @var \Search\Form\Admin\SearchPageConfigureSimpleForm $form */
             ? $this->getForm(SearchPageConfigureSimpleForm::class, ['search_page' => $searchPage])
-            /* @var \Search\Form\Admin\SearchPageConfigureForm $form */
+            /** @var \Search\Form\Admin\SearchPageConfigureForm $form */
             : $this->getForm(SearchPageConfigureForm::class, ['search_page' => $searchPage]);
 
         return $form;

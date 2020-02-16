@@ -70,19 +70,19 @@ class AdvancedFormAdapter implements FormAdapterInterface
             $query->addFilter($formSettings['is_public_field'], true);
         }
 
-        if (isset($formSettings['item_set_id_field'])
+        if (!empty($formSettings['item_set_id_field'])
             && isset($request['itemSet']['ids'])
         ) {
             $query->addFilter($formSettings['item_set_id_field'], $request['itemSet']['ids']);
         }
 
-        if (isset($formSettings['resource_class_id_field'])
+        if (!empty($formSettings['resource_class_id_field'])
             && isset($request['resourceClass']['ids'])
         ) {
             $query->addFilter($formSettings['resource_class_id_field'], $request['resourceClass']['ids']);
         }
 
-        if (isset($formSettings['resource_template_id_field'])
+        if (!empty($formSettings['resource_template_id_field'])
             && isset($request['resourceTemplate']['ids'])
         ) {
             $query->addFilter($formSettings['resource_template_id_field'], $request['resourceTemplate']['ids']);

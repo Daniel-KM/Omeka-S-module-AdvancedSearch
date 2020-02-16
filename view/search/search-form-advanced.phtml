@@ -1,0 +1,40 @@
+<?php
+/**
+ * @var \Zend\View\Renderer\PhpRenderer $this
+ * @var \Search\Form\AdvancedForm $form
+ */
+
+$translate = $this->plugin('translate');
+$formCollection = $this->plugin('formCollection');
+$formHelper = $this->plugin('form');
+
+$params = $this->params()->fromQuery() ?: [];
+$form
+    ->setData($params)
+    ->prepare();
+?>
+
+<?= $formHelper->openTag($form) ?>
+<div id="advanced-search-form-wrapper">
+    <button type="button" class="advanced-new-search"><?= $translate('New search'); ?></button>
+    <div id="advanced-search-form">
+        <?= $formCollection($form->get('itemSet'), false) ?>
+        <?= $this->formText($form->get('q')) ?>
+        <div>
+            <?php /** @var Zend\Form\Element\Collection $filters */ ?>
+            <?php $textFieldset = $form->get('text'); ?>
+            <?php if ($textFieldset->has('filters')): ?>
+            <?php $filters = $textFieldset->get('filters'); ?>
+            <div class="filters">
+                <?php foreach ($filters->getFieldsets() as $fieldset): ?>
+                    <?= $formCollection($fieldset, true) ?>
+                <?php endforeach; ?>
+                <?= $formCollection()->renderTemplate($filters) ?>
+            </div>
+            <?php endif; ?>
+        </div>
+        <input type="submit" value="OK"/>
+    </div>
+</div>
+<?= $this->formElement($form->get('csrf')) ?>
+<?= $formHelper->closeTag() ?>

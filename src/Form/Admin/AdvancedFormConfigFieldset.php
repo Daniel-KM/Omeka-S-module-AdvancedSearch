@@ -36,9 +36,6 @@ class AdvancedFormConfigFieldset extends Fieldset
 {
     public function init()
     {
-        // TODO Currently disabled because the number of fields is too big (do a simple form).
-        // $this->add($this->getAdvancedFieldsFieldset());
-
         $fieldOptions = $this->getFieldsOptions();
 
         // These fields may be overridden by the available fields.
@@ -56,6 +53,50 @@ class AdvancedFormConfigFieldset extends Fieldset
         unset($specialOptions['resource_template_id']);
 
         $this
+            // field (term) | label (order means weight).
+            ->add([
+                'name' => 'filters',
+                'type' => Element\Textarea::class,
+                'options' => [
+                    'label' => 'Filters', // @translate
+                    'info' => 'List of filters that will be displayed in the search form. Format is "term | Label".', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'filters',
+                    'placeholder' => 'dcterms:title | Title',
+                    'rows' => 12,
+                ],
+            ])
+            ->add([
+                'name' => 'available_filters',
+                'type' => Element\Textarea::class,
+                'options' => [
+                    'label' => 'Available filters', // @translate
+                    'info' => 'List of all available filters, among which some can be copied above.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'available_filters',
+                    'value' => $this->getFieldsOptionsAsText(),
+                    'placeholder' => 'dcterms:title | Title',
+                    'rows' => 12,
+                ],
+            ])
+
+            ->add([
+                'name' => 'filter_value_joiner',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Add the joiner ("and" or "or") to the filters', // @translate
+                ],
+            ])
+            ->add([
+                'name' => 'filter_value_type',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Add the type ("equal", "in", etc.) to the filters', // @translate
+                ],
+            ])
+
             ->add([
                 'name' => 'is_public_field',
                 'type' => Element\Select::class,
@@ -115,76 +156,61 @@ class AdvancedFormConfigFieldset extends Fieldset
                     'value' => 'resource_template_id_field',
                 ],
             ])
-
-            ->add([
-                'name' => 'filter_value_joiner',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'label' => 'Add the joiner ("and" or "or") to the filters', // @translate
-                ],
-            ])
-            ->add([
-                'name' => 'filter_value_type',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'label' => 'Add the type ("equal", "in", etc.) to the filters', // @translate
-                ],
-            ])
         ;
     }
 
-    protected function getAdvancedFieldsFieldset()
+    /**
+     * Special method to fix the issue with the filters. See language in form.
+     *
+     * @todo Use a regular input filter.
+     *
+     * @param array $data
+     * @return array
+     */
+    public function processInputFilters($data)
     {
-        $advancedFieldsFieldset = new Fieldset('advanced-fields');
-        $advancedFieldsFieldset->setLabel('Advanced search fields'); // @translate
-        $advancedFieldsFieldset->setAttribute('data-sortable', '1');
-        $advancedFieldsFieldset->setAttribute('data-ordered', '0');
-
-        $fields = $this->getAvailableFields();
-        $weights = range(0, count($fields));
-        $weight_options = array_combine($weights, $weights);
-        $weight = 0;
-        foreach ($fields as $field) {
-            $fieldset = new Fieldset($field['name']);
-            $fieldset->setLabel($this->getFieldLabel($field));
-
-            $displayFieldset = new Fieldset('display');
-            $displayFieldset
-                ->add([
-                    'name' => 'label',
-                    'type' => Element\Text::class,
-                    'options' => [
-                        'label' => 'Label', // @translate
-                    ],
-                ]);
-            $fieldset
-                ->add($displayFieldset)
-
-                ->add([
-                    'name' => 'enabled',
-                    'type' => Element\Checkbox::class,
-                    'options' => [
-                        'label' => 'Enabled', // @translate
-                    ],
-                ])
-
-                ->add([
-                    'name' => 'weight',
-                    'type' => Element\Select::class,
-                    'options' => [
-                        'label' => 'Weight', // @translate
-                        'value_options' => $weight_options,
-                    ],
-                    'attributes' => [
-                        'value' => $weight++,
-                    ],
-                ])
-            ;
-
-            $advancedFieldsFieldset->add($fieldset);
+        if (empty($data['form']['filters'])) {
+            $data['form']['filters'] = [];
+        } elseif (!is_array($data['form']['filters'])) {
+            $fieldOptions = $this->getFieldsOptions();
+            $fields = array_filter(array_map('trim', explode("\n", str_replace(["\r\n", "\n\r", "\r"], ["\n", "\n", "\n"], $data['form']['filters']))));
+            $data['form']['filters'] = [];
+            foreach ($fields as $key => $value) {
+                list($term, $label) = array_map('trim', explode('|', $value . '|'));
+                if (isset($fieldOptions[$term])) {
+                    $data['form']['filters'][$term] = [
+                        'enabled' => true,
+                        'weight' => $key + 1,
+                        'display' => [
+                            'label' => $label ?: $term,
+                        ],
+                    ];
+                }
+            }
         }
 
-        return $advancedFieldsFieldset;
+        unset($data['form']['available_filters']);
+
+        return $data;
+    }
+
+    public function populateValues($data)
+    {
+        $fields = @$data['filters'] ?: [];
+        if (is_array($fields)) {
+            $fieldData = '';
+            foreach ($fields as $name => $field) {
+                if (!empty($field['enabled'])) {
+                    $fieldData .= $name . ' | ' . $field['display']['label'] . "\n";
+                }
+            }
+            $data['filters'] = $fieldData;
+        }
+
+        // Keep default available filters.
+        unset($data['available_filters']);
+
+        parent::populateValues($data);
     }
 
     protected function getAvailableFields()
@@ -207,6 +233,15 @@ class AdvancedFormConfigFieldset extends Fieldset
         return $options;
     }
 
+    protected function getFieldsOptionsAsText()
+    {
+        $data = '';
+        foreach ($this->getAvailableFields() as $name => $field) {
+            $data .= $name . ' | ' . $field['label'] . "\n";
+        }
+        return $data;
+    }
+
     protected function getFieldLabel($field)
     {
         $searchPage = $this->getOption('search_page');
@@ -214,8 +249,8 @@ class AdvancedFormConfigFieldset extends Fieldset
 
         $name = $field['name'];
         $label = isset($field['label']) ? $field['label'] : null;
-        if (isset($settings['form']['advanced-fields'][$name])) {
-            $fieldSettings = $settings['form']['advanced-fields'][$name];
+        if (isset($settings['form']['filters'][$name])) {
+            $fieldSettings = $settings['form']['filters'][$name];
 
             if (isset($fieldSettings['display']['label'])
                 && $fieldSettings['display']['label']

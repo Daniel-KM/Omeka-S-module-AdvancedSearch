@@ -243,6 +243,21 @@ class SearchPageController extends AbstractActionController
             uasort($params[$type], [$this, 'sortByEnabledFirst']);
         }
 
+        // TODO Like languages, fieldset data should be checked in form fieldset.
+        $formAdapter = $searchPage->formAdapter();
+        if ($formAdapter) {
+            $configFormClass = $formAdapter->getConfigFormClass();
+            if (isset($configFormClass)) {
+                $fieldset = $searchPage->getServiceLocator()->get('FormElementManager')
+                    ->get($configFormClass, [
+                        'search_page' => $searchPage,
+                    ]);
+                if (method_exists($fieldset, 'processInputFilters')) {
+                    $params = $fieldset->processInputFilters($params);
+                }
+            }
+        }
+
         $page = $searchPage->getEntity();
         $page->setSettings($params);
         $entityManager->flush();

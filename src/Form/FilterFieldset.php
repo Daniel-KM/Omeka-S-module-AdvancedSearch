@@ -131,12 +131,12 @@ class FilterFieldset extends Fieldset
 
         $availableFields = $adapter->getAvailableFields($searchIndex);
         $settings = $searchPage->settings();
-        if (empty($settings['form']['advanced-fields'])) {
+        if (empty($settings['form']['filters'])) {
             return [];
         }
 
         $options = [];
-        foreach ($settings['form']['advanced-fields'] as $name => $field) {
+        foreach ($settings['form']['filters'] as $name => $field) {
             if ($field['enabled'] && isset($availableFields[$name])) {
                 if (isset($field['display']['label']) && $field['display']['label']) {
                     $label = $field['display']['label'];
@@ -149,7 +149,7 @@ class FilterFieldset extends Fieldset
             }
         }
 
-        return $this->sortByWeight($options, $settings['form']['advanced-fields']);
+        return $this->sortByWeight($options, $settings['form']['filters']);
     }
 
     protected function sortByWeight($fields, $settings)

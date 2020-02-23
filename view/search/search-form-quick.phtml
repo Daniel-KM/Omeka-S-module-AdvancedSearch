@@ -10,7 +10,7 @@ $form->prepare();
 
 $main = null;
 foreach ($form->getElements() as $element):
-    if ($element instanceof \Zend\Form\Element\Csrf || $element instanceof \Zend\Form\Element\Hidden):
+    if ($element instanceof \Zend\Form\Element\Csrf || $element instanceof \Zend\Form\Element\Hidden || $element instanceof \Zend\Form\Element\Submit):
         continue;
     endif;
     if ($main):

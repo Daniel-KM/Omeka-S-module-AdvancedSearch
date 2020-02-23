@@ -33,12 +33,30 @@ class InternalQuerier extends AbstractQuerier
         $q = $query->getQuery();
         $q = trim($q);
         if (strlen($q)) {
-            $data['property'][] = [
-                'joiner' => 'and',
-                'property' => '',
-                'type' => 'in',
-                'text' => $q,
-            ];
+            // Try to support the exact search and the full text search.
+            if (substr($q, 0, 1) === '"' && substr($q, -1) === '"') {
+                $q = trim($q, '" ');
+                $data['property'][] = [
+                    'joiner' => 'and',
+                    'property' => '',
+                    'type' => 'in',
+                    'text' => $q,
+                ];
+            } else {
+                // The fullt text search is not available via standard api, but
+                // only in a special request (see \Omeka\Module::searchFulltext()).
+                $qq = array_filter(array_map('trim', explode(' ', $q)), function ($v) {
+                    return strlen($v);
+                });
+                foreach ($qq as $qw) {
+                    $data['property'][] = [
+                        'joiner' => 'and',
+                        'property' => '',
+                        'type' => 'in',
+                        'text' => $qw,
+                    ];
+                }
+            }
         }
         // "is_public" is automatically managed by the api.
 

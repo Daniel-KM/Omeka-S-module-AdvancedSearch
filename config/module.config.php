@@ -43,6 +43,7 @@ return [
     'form_elements' => [
         'invokables' => [
             Form\Element\OptionalSelect::class => Form\Element\OptionalSelect::class,
+            Form\SearchingFormFieldset::class => Form\SearchingFormFieldset::class,
         ],
         'factories' => [
             Form\Admin\AdvancedFormConfigFieldset::class => Service\Form\AdvancedFormConfigFieldsetFactory::class,
@@ -227,6 +228,8 @@ return [
         ],
         'block_settings' => [
             'searchingForm' => [
+                'heading' => '',
+                'template' => '',
             ],
         ],
     ],

@@ -181,4 +181,15 @@ SET `layout` = "searchingForm"
 WHERE `layout` = "search";
 SQL;
     $connection->exec($sql);
+
+    $siteSettings = $services->get('Omeka\Settings\Site');
+    /** @var \Omeka\Api\Representation\SiteRepresentation[] $sites */
+    $sites = $api->search('sites')->getContent();
+    foreach ($sites as $site) {
+        $siteSettings->setTargetId($site->id());
+        $searchPages = $siteSettings->get('search_pages', []) ?: [];
+        $searchPages = array_unique(array_filter(array_map('intval', $searchPages)));
+        sort($searchPages);
+        $siteSettings->set('search_pages', $searchPages);
+    }
 }

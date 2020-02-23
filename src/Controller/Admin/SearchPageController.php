@@ -601,7 +601,7 @@ class SearchPageController extends AbstractActionController
 
                 $searchPages = $settings->get('search_pages', []);
                 $searchPages[] = $searchPageId;
-                array_unique(array_filter($searchPages));
+                $searchPages = array_unique(array_filter(array_map('intval', $searchPages)));
                 sort($searchPages);
                 $settings->set('search_pages', $searchPages);
 
@@ -642,9 +642,6 @@ class SearchPageController extends AbstractActionController
                 if ($new) {
                     $siteSettings->set('search_main_page', $searchPageId);
                     $searchPages[] = $searchPageId;
-                    $searchPages = array_unique(array_filter($searchPages));
-                    sort($searchPages);
-                    $siteSettings->set('search_pages', $searchPages);
                 } else {
                     $siteSettings->set('search_main_page', null);
                 }
@@ -652,8 +649,6 @@ class SearchPageController extends AbstractActionController
 
             if ($new || $available) {
                 $searchPages[] = $searchPageId;
-                array_unique(array_filter($searchPages));
-                sort($searchPages);
             } else {
                 $key = array_search($searchPageId, $searchPages);
                 if ($key === false) {
@@ -661,6 +656,8 @@ class SearchPageController extends AbstractActionController
                 }
                 unset($searchPages[$key]);
             }
+            $searchPages = array_unique(array_filter(array_map('intval', $searchPages)));
+            sort($searchPages);
             $siteSettings->set('search_pages', $searchPages);
         }
 

@@ -37,7 +37,7 @@ return [
     ],
     'block_layouts' => [
         'invokables' => [
-            'search' => Site\BlockLayout\Search::class,
+            'searchingForm' => Site\BlockLayout\SearchingForm::class,
         ],
     ],
     'form_elements' => [
@@ -224,6 +224,10 @@ return [
         'site_settings' => [
             'search_main_page' => null,
             'search_pages' => [],
+        ],
+        'block_settings' => [
+            'searchingForm' => [
+            ],
         ],
     ],
 ];

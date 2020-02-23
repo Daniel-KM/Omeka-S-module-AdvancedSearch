@@ -7,7 +7,7 @@ use Omeka\Api\Representation\SitePageBlockRepresentation;
 use Omeka\Site\BlockLayout\AbstractBlockLayout;
 use Zend\View\Renderer\PhpRenderer;
 
-class Search extends AbstractBlockLayout
+class SearchingForm extends AbstractBlockLayout
 {
     public function getLabel()
     {
@@ -25,6 +25,6 @@ class Search extends AbstractBlockLayout
 
     public function render(PhpRenderer $view, SitePageBlockRepresentation $block)
     {
-        return $view->partial('common/block-layout/search');
+        return $view->partial('common/block-layout/searching-form');
     }
 }

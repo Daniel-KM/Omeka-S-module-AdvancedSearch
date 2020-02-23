@@ -173,3 +173,12 @@ SQL;
         }
     }
 }
+
+if (version_compare($oldVersion, '3.5.12', '<')) {
+    $sql = <<<SQL
+UPDATE `site_page_block`
+SET `layout` = "searchingForm"
+WHERE `layout` = "search";
+SQL;
+    $connection->exec($sql);
+}

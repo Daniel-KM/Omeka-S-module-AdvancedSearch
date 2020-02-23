@@ -77,12 +77,12 @@ class IndexController extends AbstractActionController
         $api = $this->api();
         $response = $api->read('search_pages', $pageId);
         $this->page = $response->getContent();
-        $page = $this->page;
+        $searchPage = $this->page;
 
         /** @var \Search\FormAdapter\FormAdapterInterface $formAdapter */
-        $formAdapter = $page->formAdapter();
+        $formAdapter = $searchPage->formAdapter();
         if (!$formAdapter) {
-            $formAdapterName = $page->formAdapterName();
+            $formAdapterName = $searchPage->formAdapterName();
             $message = sprintf('Form adapter "%s" not found.', $formAdapterName); // @translate
             $this->messenger()->addError($message);
             $this->logger()->err($message);
@@ -93,7 +93,7 @@ class IndexController extends AbstractActionController
 
         // If the page is empty (json api request), there is no form.
         /** @var \Zend\Form\Form $form */
-        $form = $this->searchForm($page);
+        $form = $this->searchForm($searchPage);
         $jsonQuery = empty($form);
 
         // Here, an empty query is not allowed. To allow it, add a useless arg.
@@ -134,7 +134,7 @@ class IndexController extends AbstractActionController
                 + $form->getData() + $this->filterExtraParams($request);
         }
 
-        $searchPageSettings = $page->settings();
+        $searchPageSettings = $searchPage->settings();
         $searchFormSettings = isset($searchPageSettings['form'])
             ? $searchPageSettings['form']
             : [];
@@ -144,8 +144,8 @@ class IndexController extends AbstractActionController
 
         // Add global parameters.
 
-        $index = $this->index = $page->index();
-        $indexSettings = $index->settings();
+        $searchIndex = $this->index = $searchPage->index();
+        $indexSettings = $searchIndex->settings();
 
         if (!$this->identity()) {
             $query->setIsPublic(true);
@@ -214,7 +214,7 @@ class IndexController extends AbstractActionController
         // TODO Use a generic querier as target for the event?
         $eventManager = $this->getEventManager();
         $eventArgs = $eventManager->prepareArgs([
-            'search_page' => $page,
+            'search_page' => $searchPage,
             'request' => $request,
             'query' => $query,
         ]);
@@ -222,7 +222,7 @@ class IndexController extends AbstractActionController
         $query = $eventArgs['query'];
 
         // Send the query to the search engine.
-        $querier = $index->querier();
+        $querier = $searchIndex->querier();
         try {
             $response = $querier->query($query);
         } catch (QuerierException $e) {

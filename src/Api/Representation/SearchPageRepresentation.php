@@ -84,14 +84,17 @@ class SearchPageRepresentation extends AbstractEntityRepresentation
 
     public function siteUrl($siteSlug = null, $canonical = false)
     {
-        $url = $this->getViewHelper('Url');
+        if (!$siteSlug) {
+            $siteSlug = $this->getServiceLocator()->get('Application')
+                ->getMvcEvent()->getRouteMatch()->getParam('site-slug');
+        }
         $params = [
             'site-slug' => $siteSlug,
         ];
         $options = [
             'force_canonical' => $canonical,
         ];
-
+        $url = $this->getViewHelper('Url');
         return $url('search-page-' . $this->id(), $params, $options);
     }
 

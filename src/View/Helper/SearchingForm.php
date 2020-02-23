@@ -18,6 +18,7 @@ class SearchingForm extends AbstractHelper
         // Check if the current site has a search form.
         $searchMainPage = $view->siteSetting('search_main_page');
         if ($searchMainPage) {
+            /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
             $searchPage = $view->api()->searchOne('search_pages', ['id' => $searchMainPage])->getContent();
             if ($searchPage) {
                 return (string) $view->searchForm($searchPage, $searchFormPartial);

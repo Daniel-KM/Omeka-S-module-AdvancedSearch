@@ -231,6 +231,7 @@ return [
         'site_settings' => [
             'search_main_page' => null,
             'search_pages' => [],
+            'search_redirect_itemset' => false,
         ],
         'block_settings' => [
             'searchingForm' => [

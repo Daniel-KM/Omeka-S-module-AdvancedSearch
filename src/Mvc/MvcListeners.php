@@ -18,7 +18,8 @@ class MvcListeners extends AbstractListenerAggregate
     }
 
     /**
-     * Redirect item set show to the search page with item set set as url query.
+     * Redirect item-set/show to the search page with item set set as url query,
+     * when wanted.
      *
      * @param MvcEvent $event
      */
@@ -32,6 +33,10 @@ class MvcListeners extends AbstractListenerAggregate
 
         $services = $event->getApplication()->getServiceManager();
         $siteSettings = $services->get('Omeka\Settings\Site');
+
+        if (!$siteSettings->get('search_redirect_itemset')) {
+            return;
+        }
 
         $searchMainPage = $siteSettings->get('search_main_page');
         if (empty($searchMainPage)) {

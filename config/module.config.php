@@ -79,7 +79,13 @@ return [
             'totalJobs' => Service\ControllerPlugin\TotalJobsFactory::class,
         ],
     ],
+    'listeners' => [
+        Mvc\MvcListeners::class,
+    ],
     'service_manager' => [
+        'invokables' => [
+            Mvc\MvcListeners::class => Mvc\MvcListeners::class,
+        ],
         'delegators' => [
            'Omeka\ApiManager' => [Service\ApiManagerDelegatorFactory::class],
         ],

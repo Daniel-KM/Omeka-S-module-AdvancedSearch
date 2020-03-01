@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-06 00:00+0100\n"
+"POT-Creation-Date: 2020-03-02 00:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -38,25 +38,26 @@ msgstr ""
 msgid "The site path will be automatically prepended."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:518
+#: src/Generic/AbstractModule.php:542
 #, php-format
 msgid "This module requires the module \"%s\"."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:538
+#: src/Generic/AbstractModule.php:562
 #, php-format
 msgid "This module requires modules \"%s\"."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:606
+#: src/Generic/AbstractModule.php:630
 #, php-format
 msgid ""
 "The module \"%s\" was automatically deactivated because the dependencies are "
 "unavailable."
 msgstr ""
 
-#: src/Site/BlockLayout/Search.php:23
-msgid "Insert a themable search form to use with module Search."
+#: src/Mvc/Controller/Plugin/ApiSearch.php:189
+#, php-format
+msgid "Permission denied for the current user to %s the %s resource."
 msgstr ""
 
 #: view/search/admin/index/browse.phtml:43
@@ -201,8 +202,16 @@ msgstr ""
 msgid "Filters"
 msgstr ""
 
-#: view/search/index/search.phtml:93
+#: view/search/index/search.phtml:94
+msgid "Fill a query and get results."
+msgstr ""
+
+#: view/search/index/search.phtml:98
 msgid "Your query returned no results"
+msgstr ""
+
+#: view/search/index/search.phtml:111
+msgid "An error occured and your query returned no results."
 msgstr ""
 
 #: view/search/results-header.phtml:32
@@ -223,31 +232,77 @@ msgid ""
 "adapter."
 msgstr ""
 
-#: Module.php:345
+#: Module.php:348
 #, php-format
 msgid "Unable to delete the search index for resource #%d: %s"
 msgstr ""
 
-#: Module.php:348
+#: Module.php:351
 #, php-format
 msgid ""
 "Unable to delete the search index for the deleted resource #%d: see log."
 msgstr ""
 
-#: Module.php:366
+#: Module.php:369
 #, php-format
 msgid "Unable to index metadata of resource #%d for search: %s"
 msgstr ""
 
-#: Module.php:369
+#: Module.php:372
 #, php-format
 msgid "Unable to update the search index for resource #%d: see log."
 msgstr ""
 
-#: Module.php:488
+#: Module.php:516
 msgid ""
 "The internal search engine is available. Enable it in the main settings (for "
 "admin) and in site settings (for public)."
+msgstr ""
+
+#: src/Form/AdvancedForm.php:69
+msgid "Search resources…"
+msgstr ""
+
+#: src/Form/AdvancedForm.php:189
+msgid "Collections"
+msgstr ""
+
+#: src/Form/AdvancedForm.php:211
+msgid "Resource classes"
+msgstr ""
+
+#: src/Form/AdvancedForm.php:219
+msgid "Select resource classes…"
+msgstr ""
+
+#: src/Form/AdvancedForm.php:247
+msgid "Select resource templates…"
+msgstr ""
+
+#: src/Form/FilterFieldset.php:60
+msgid "and"
+msgstr ""
+
+#: src/Form/FilterFieldset.php:61
+msgid "or"
+msgstr ""
+
+#: src/Form/SearchingFormFieldset.php:16
+msgid "Block title"
+msgstr ""
+
+#: src/Form/SearchingFormFieldset.php:17
+msgid "Heading for the block, if any."
+msgstr ""
+
+#: src/Form/SearchingFormFieldset.php:27
+msgid "Template to display"
+msgstr ""
+
+#: src/Form/SearchingFormFieldset.php:28
+msgid ""
+"Templates are in folder \"common/block-layout\" of the theme and should "
+"start with \"searching-form\"."
 msgstr ""
 
 #: src/Form/SettingsFieldset.php:21
@@ -298,46 +353,56 @@ msgstr ""
 msgid "Search module"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:37
+#: src/Form/SiteSettingsFieldset.php:38
 msgid "Default search page"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:39
+#: src/Form/SiteSettingsFieldset.php:40
 msgid "Select the default search engine for the site…"
 msgstr ""
 
-#: src/Form/BasicForm.php:47
+#: src/Form/SiteSettingsFieldset.php:62
+msgid "Redirect item set page to search"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:63
+msgid ""
+"By default, item-set/show is redirected to item/browse. This option "
+"redirects it to the search page."
+msgstr ""
+
+#: src/Form/BasicForm.php:48
 msgid "Search resources"
 msgstr ""
 
-#: src/Form/Admin/SearchPageConfigureForm.php:76
+#: src/Form/Admin/SearchPageConfigureForm.php:81
 #: src/Form/Admin/SearchPageConfigureSimpleForm.php:47
 msgid "Facets"
 msgstr ""
 
-#: src/Form/Admin/SearchPageConfigureForm.php:107
-#: src/Form/Admin/SearchPageConfigureForm.php:222 config/module.config.php:194
+#: src/Form/Admin/SearchPageConfigureForm.php:112
+#: src/Form/Admin/SearchPageConfigureForm.php:240 config/module.config.php:204
 msgid "Enabled"
 msgstr ""
 
-#: src/Form/Admin/SearchPageConfigureForm.php:115
-#: src/Form/Admin/SearchPageConfigureForm.php:230
+#: src/Form/Admin/SearchPageConfigureForm.php:120
+#: src/Form/Admin/SearchPageConfigureForm.php:248
 msgid "Weight"
 msgstr ""
 
-#: src/Form/Admin/SearchPageConfigureForm.php:136
+#: src/Form/Admin/SearchPageConfigureForm.php:141
 msgid "Facet limit"
 msgstr ""
 
-#: src/Form/Admin/SearchPageConfigureForm.php:137
+#: src/Form/Admin/SearchPageConfigureForm.php:142
 msgid "The maximum number of values fetched for each facet"
 msgstr ""
 
-#: src/Form/Admin/SearchPageConfigureForm.php:155
+#: src/Form/Admin/SearchPageConfigureForm.php:160
 msgid "Get facets from specific languages"
 msgstr ""
 
-#: src/Form/Admin/SearchPageConfigureForm.php:156
+#: src/Form/Admin/SearchPageConfigureForm.php:161
 msgid ""
 "Generally, facets are translated in the view, but in some cases, facet "
 "values may be translated directly in a multivalued property. Use \"|\" to "
@@ -346,17 +411,74 @@ msgid ""
 "date) are facets, the empty language must be set to get results."
 msgstr ""
 
-#: src/Form/Admin/SearchPageConfigureForm.php:192
+#: src/Form/Admin/SearchPageConfigureForm.php:210
 #: src/Form/Admin/SearchPageConfigureSimpleForm.php:81
 msgid "Sort fields"
 msgstr ""
 
-#: src/Form/Admin/SearchPageConfigureForm.php:264
+#: src/Form/Admin/SearchPageConfigureForm.php:282
 msgid "Form settings"
 msgstr ""
 
 #: src/Form/Admin/SearchIndexForm.php:61
 msgid "Select an adapter below…"
+msgstr ""
+
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:43
+msgid "Is public"
+msgstr ""
+
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:44
+#: src/Form/Admin/ApiFormConfigFieldset.php:157
+msgid "Item set id"
+msgstr ""
+
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:45
+#: src/Form/Admin/ApiFormConfigFieldset.php:129
+msgid "Resource class id"
+msgstr ""
+
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:46
+#: src/Form/Admin/ApiFormConfigFieldset.php:143
+msgid "Resource template id"
+msgstr ""
+
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:62
+msgid ""
+"List of filters that will be displayed in the search form. Format is \"term "
+"| Label\"."
+msgstr ""
+
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:74
+msgid "Available filters"
+msgstr ""
+
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:75
+msgid "List of all available filters, among which some can be copied above."
+msgstr ""
+
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:89
+msgid "Add the joiner (\"and\" or \"or\") to the filters"
+msgstr ""
+
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:96
+msgid "Add the type (\"equal\", \"in\", etc.) to the filters"
+msgstr ""
+
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:104
+msgid "Is public field"
+msgstr ""
+
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:119
+msgid "Item set id field"
+msgstr ""
+
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:134
+msgid "Resource class id field"
+msgstr ""
+
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:149
+msgid "Resource template id field"
 msgstr ""
 
 #: src/Form/Admin/SearchPageConfigureSimpleForm.php:48
@@ -468,18 +590,6 @@ msgstr ""
 msgid "Resource class label"
 msgstr ""
 
-#: src/Form/Admin/ApiFormConfigFieldset.php:129
-msgid "Resource class id"
-msgstr ""
-
-#: src/Form/Admin/ApiFormConfigFieldset.php:143
-msgid "Resource template id"
-msgstr ""
-
-#: src/Form/Admin/ApiFormConfigFieldset.php:157
-msgid "Item set id"
-msgstr ""
-
 #: src/Form/Admin/ApiFormConfigFieldset.php:171
 msgid "Site id"
 msgstr ""
@@ -492,24 +602,24 @@ msgstr ""
 msgid "Mapping properties to search fields"
 msgstr ""
 
-#: src/Controller/IndexController.php:80
+#: src/Controller/IndexController.php:86
 #, php-format
 msgid "Form adapter \"%s\" not found."
 msgstr ""
 
-#: src/Controller/IndexController.php:98
+#: src/Controller/IndexController.php:104
 msgid "No query."
 msgstr ""
 
-#: src/Controller/IndexController.php:119
-#: src/Controller/Admin/SearchPageController.php:217
-#: src/Controller/Admin/SearchPageController.php:330
+#: src/Controller/IndexController.php:125
+#: src/Controller/Admin/SearchPageController.php:211
+#: src/Controller/Admin/SearchPageController.php:346
 #: src/Controller/Admin/SearchIndexController.php:75
 #: src/Controller/Admin/SearchIndexController.php:124
 msgid "There was an error during validation"
 msgstr ""
 
-#: src/Controller/IndexController.php:220
+#: src/Controller/IndexController.php:229
 #, php-format
 msgid "Query error: %s"
 msgstr ""
@@ -542,43 +652,49 @@ msgstr ""
 msgid "This index adapter \"%s\" has no config form."
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:250
+#: src/Controller/Admin/SearchPageController.php:233
+msgid ""
+"Note that you didn’t set \"||\", so all values without language will be "
+"removed."
+msgstr ""
+
+#: src/Controller/Admin/SearchPageController.php:266
 #, php-format
 msgid "Configuration saved for page \"%s\"."
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:280
+#: src/Controller/Admin/SearchPageController.php:296
 #, php-format
 msgid "Search page \"%s\" successfully deleted"
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:285
+#: src/Controller/Admin/SearchPageController.php:301
 #, php-format
 msgid "Search page \"%s\" could not be deleted"
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:309
-#: src/Controller/Admin/SearchPageController.php:316
+#: src/Controller/Admin/SearchPageController.php:325
+#: src/Controller/Admin/SearchPageController.php:332
 msgid "The path should be unique."
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:581
+#: src/Controller/Admin/SearchPageController.php:608
 msgid "The page has been set by default in admin board."
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:585
+#: src/Controller/Admin/SearchPageController.php:612
 msgid "The page has been unset in admin board."
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:594
+#: src/Controller/Admin/SearchPageController.php:621
 msgid "The page has been disabled in all specified sites."
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:598
+#: src/Controller/Admin/SearchPageController.php:625
 msgid "The page has been made available in all specified sites."
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:602
+#: src/Controller/Admin/SearchPageController.php:629
 msgid "The availability of pages of sites was let unmodified."
 msgstr ""
 
@@ -621,7 +737,7 @@ msgstr ""
 msgid "The path \"%s\" is already taken."
 msgstr ""
 
-#: src/FormAdapter/BasicFormAdapter.php:39
+#: src/FormAdapter/BasicFormAdapter.php:37
 msgid "Basic"
 msgstr ""
 
@@ -688,7 +804,7 @@ msgstr ""
 msgid "Internal"
 msgstr ""
 
-#: src/Site/BlockLayout/Search.php:14
+#: src/Site/BlockLayout/SearchingForm.php:19
 msgid "Search form (module Search)"
 msgstr ""
 
@@ -700,27 +816,27 @@ msgstr ""
 msgid "Invalid navigation: browse link missing search page id"
 msgstr ""
 
-#: config/module.config.php:192
+#: config/module.config.php:202
 msgid "Automatic mapping of empty values"
 msgstr ""
 
-#: config/module.config.php:193
+#: config/module.config.php:203
 msgid "Available"
 msgstr ""
 
-#: config/module.config.php:195
+#: config/module.config.php:205
 msgid "Find"
 msgstr ""
 
-#: config/module.config.php:196
+#: config/module.config.php:206
 msgid "Find resources…"
 msgstr ""
 
-#: config/module.config.php:197
+#: config/module.config.php:207
 msgid "Processing…"
 msgstr ""
 
-#: config/module.config.php:198
+#: config/module.config.php:208
 msgid ""
 "Try to map automatically the metadata and the properties that are not mapped "
 "yet with the fields of the index"

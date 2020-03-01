@@ -19,82 +19,103 @@ class SearchForm extends AbstractHelper
     protected $searchPage;
 
     /**
-     * @var string
-     */
-    protected $partial;
-
-    /**
      * @var Form
      */
     protected $form;
 
     /**
+     * @var string
+     */
+    protected $partial;
+
+    /**
      * @param SearchPageRepresentation $searchPage
-     * @param string $partial Specific partial for the search form.
+     * @param string $partial Specific partial for the search form of the page.
      * @return \Search\View\Helper\SearchForm
      */
     public function __invoke(SearchPageRepresentation $searchPage = null, $partial = null)
     {
-        if ($searchPage) {
-            $this->searchPage = $searchPage;
-            $this->form = null;
-        }
-        if ($partial) {
-            $this->partial = $partial;
-        }
+        $this->initSearchForm($searchPage, $partial);
         return $this;
     }
 
-    public function __toString()
+    /**
+     *Prepare default search page, form and partial.
+     *
+     * @param SearchPageRepresentation $searchPage
+     * @param string $partial Specific partial for the search form.
+     */
+    protected function initSearchForm(SearchPageRepresentation $searchPage = null, $partial = null)
     {
-        $formPartial = $this->getFormPartial();
-        if (empty($formPartial)) {
-            return '';
+        $view = $this->getView();
+        $isAdmin = $view->status()->isAdminRequest();
+        if (empty($searchPage)) {
+            $searchPageId = $isAdmin
+                ? $view->setting('search_main_page')
+                : $view->siteSetting('search_main_page');
+            /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
+            $this->searchPage = $view->api()->searchOne('search_pages', ['id' => (int) $searchPageId])->getContent();
+        } else {
+            $this->searchPage = $searchPage;
         }
-        $form = $this->getForm();
-        if (empty($form)) {
-            return '';
+
+        $this->form = null;
+        if ($this->searchPage) {
+            $this->form = $this->searchPage->form();
+            if ($this->form) {
+                $url = $isAdmin
+                    ? $this->searchPage->adminSearchUrl()
+                    : $this->searchPage->url();
+                $this->form->setAttribute('action', $url);
+            }
         }
-        return $this->getView()->partial($formPartial, ['form' => $form]);
+
+        $this->partial = null;
+        if ($this->form) {
+            $this->partial = $partial;
+            if (empty($this->partial)) {
+                $formAdapter = $this->searchPage->formAdapter();
+                $this->partial = $formAdapter && ($formPartial = $formAdapter->getFormPartial())
+                    ? $formPartial
+                    : self::PARTIAL_NAME;
+            }
+        }
     }
 
     /**
+     * Get the specified search page or the default one.
+     *
+     * @return \Search\Api\Representation\SearchPageRepresentation|null
+     */
+    public function getSearchPage()
+    {
+        return $this->searchPage;
+    }
+
+    /**
+     * Get the form of the search page.
+     *
      * @return \Zend\Form\Form|null
      */
     public function getForm()
     {
-        if (empty($this->searchPage)) {
-            return null;
-        }
-        if (empty($this->form)) {
-            $this->form = $this->searchPage->form();
-            if (empty($this->form)) {
-                return null;
-            }
-            $url = $this->getView()->params()->fromRoute('__ADMIN__')
-                ? $this->searchPage->adminSearchUrl()
-                : $this->searchPage->url();
-            $this->form->setAttribute('action', $url);
-        }
         return $this->form;
     }
 
     /**
-     * Get the partial form used for this form.
+     * Get the partial form used for this form of this page.
      *
      * @return string
      */
-    protected function getFormPartial()
+    public function getPartial()
     {
-        if (empty($this->searchPage)) {
-            return '';
-        }
-        if ($this->partial) {
-            return $this->partial;
-        }
-        $formAdapter = $this->searchPage->formAdapter();
-        return $formAdapter && ($formPartial = $formAdapter->getFormPartial())
-            ? $formPartial
-            : self::PARTIAL_NAME;
+        return $this->partial;
+    }
+
+    public function __toString()
+    {
+        return $this->partial
+            ? $this->getView()->partial($this->partial, ['form' => $this->form])
+            : '';
     }
 }

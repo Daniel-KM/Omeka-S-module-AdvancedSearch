@@ -46,6 +46,10 @@ See general end user documentation for [Installing a module].
 - Module [Reference] to display facets in the results with the internal adapter.
   It is not needed for external search engines.
 
+### Fix
+
+- When item sets are used as facets, you may need to use [this patch].
+
 
 Quick start
 -----------
@@ -237,6 +241,7 @@ See commits for full list of contributors.
 [Solr]: https://github.com/biblibre/Omeka-S-module-Solr
 [digital library of PSL]: https://bibnum.explore.univ-psl.fr
 [Installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
+[this patch]: https://github.com/omeka/omeka-s/pull/1519/files
 [jQueryUI]: https://github.com/biblibre/omeka-s-module-jQueryUI
 [Reference]: https://github.com/Daniel-KM/Omeka-S-module-Reference
 [Browse preview]: https://omeka.org/s/docs/user-manual/sites/site_pages/#browse-preview

@@ -1,7 +1,7 @@
 <?php
 /*
  * Copyright BibLibre, 2016
- * Copyright, Daniel Berthereau, 2018
+ * Copyright, Daniel Berthereau, 2018-2020
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -34,28 +34,31 @@
 
 ?>
 
-<?php if (!empty($facets)):
-    $translate = $this->plugin('translate');
-    $facetLabel = $this->plugin('facetLabel');
-    // facetCheckbox can be used instead (may require js).
-    $facetLink = $this->plugin('facetLink');
-    ?>
+<?php if (!empty($facets)): ?>
 
-    <aside class="search-facets">
-        <h2><?= $translate('Filters') ?></h2>
-        <ul>
-            <?php foreach ($facets as $name => $facetValues): ?>
-                <li class="search-facet">
-                    <h3><?= $translate($facetLabel($name)) ?></h3>
-                    <ul class="search-facet-items">
-                        <?php foreach ($facetValues as $facetValue): ?>
-                            <li class="search-facet-item">
-                                <?= $facetLink($name, $facetValue) ?>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
+<?php
+$plugins = $this->getHelperPluginManager();
+$translate = $plugins->get('translate');
+$facetLabel = $plugins->get('facetLabel');
+// facetCheckbox can be used instead (may require js).
+$facetLink = $plugins->get('facetLink');
+?>
+<aside class="search-facets">
+    <h2><?= $translate('Filters') ?></h2>
+    <ul>
+        <?php foreach ($facets as $name => $facetValues): ?>
+        <li class="search-facet">
+            <h3><?= $translate($facetLabel($name)) ?></h3>
+            <ul class="search-facet-items">
+                <?php foreach ($facetValues as $facetValue): ?>
+                <li class="search-facet-item">
+                    <?= $facetLink($name, $facetValue) ?>
                 </li>
-            <?php endforeach; ?>
-        </ul>
-    </aside>
+                <?php endforeach; ?>
+            </ul>
+        </li>
+        <?php endforeach; ?>
+    </ul>
+</aside>
+
 <?php endif; ?>

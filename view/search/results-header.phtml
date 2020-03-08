@@ -15,13 +15,16 @@ $translate = $this->plugin('translate');
     </div>
     <div class="search-results-sort">
         <form>
-            <?php if ($sortOptions):
-                $sortSelect = new Zend\Form\Element\Select('sort');
+            <?php
+            if ($sortOptions):
                 $sortOptions = array_map([$this, 'translate'], $sortOptions);
-                $sortSelect->setValueOptions($sortOptions);
-                $sortSelect->setValue($query->getSort());
-                $sortSelect->setLabel($translate('Sort by'));
-            endif; ?>
+                $sortSelect = new Zend\Form\Element\Select('sort');
+                $sortSelect
+                    ->setValueOptions($sortOptions)
+                    ->setValue($query->getSort())
+                    ->setLabel($translate('Sort by'));
+            endif;
+            ?>
             <?php if (!empty($sortSelect)): ?>
             <?= $this->formLabel($sortSelect) ?>
             <?= $this->formSelect($sortSelect) ?>

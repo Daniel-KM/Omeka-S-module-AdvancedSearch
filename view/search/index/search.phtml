@@ -37,10 +37,11 @@
  * @var bool $isPartial Allow to use this partial in admin board when true.
  */
 
-$translate = $this->plugin('translate');
-$translatePlural = $this->plugin('translatePlural');
-$assetUrl = $this->plugin('assetUrl');
-$partial = $this->plugin('partial');
+$plugins = $this->getHelperPluginManager();
+$translate = $plugins->get('translate');
+$translatePlural = $plugins->get('translatePlural');
+$assetUrl = $plugins->get('assetUrl');
+$partial = $plugins->get('partial');
 
 $this->headLink()->appendStylesheet($assetUrl('css/search.css', 'Search'));
 $this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javascript', ['defer' => 'defer']);

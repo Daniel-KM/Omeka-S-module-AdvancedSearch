@@ -341,6 +341,7 @@ class Query implements \JsonSerializable
     {
         return [
             'query' => $this->getQuery(),
+            'resources' => $this->getResources(),
             'is_public' => $this->getIsPublic(),
             'filters' => $this->getFilters(),
             'date_range_filters' => $this->getDateRangeFilters(),

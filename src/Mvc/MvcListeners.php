@@ -53,6 +53,7 @@ class MvcListeners extends AbstractListenerAggregate
             'action' => 'search',
             'site-slug' => $siteSlug,
             'id' => $searchMainPage,
+            'item-set-id' => $itemSetId,
         ];
         $routeMatch = new RouteMatch($params);
         $routeMatch->setMatchedRouteName('search-page-' . $searchMainPage);

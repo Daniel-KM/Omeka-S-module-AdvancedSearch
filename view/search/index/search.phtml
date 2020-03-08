@@ -1,7 +1,7 @@
 <?php
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2017-2019
+ * Copyright Daniel Berthereau, 2017-2020
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -43,16 +43,37 @@ $translatePlural = $plugins->get('translatePlural');
 $assetUrl = $plugins->get('assetUrl');
 $partial = $plugins->get('partial');
 
+// Used in case of a redirect of item-set/show to search, when used like item/browse.
+$itemSetId = $this->params()->fromRoute('item-set-id');
+
 $this->headLink()->appendStylesheet($assetUrl('css/search.css', 'Search'));
 $this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javascript', ['defer' => 'defer']);
-
-$this->htmlElement('body')->appendAttribute('class', 'search-page resource browse');
 ?>
-
-<?= $this->pageTitle($translate('Search')) ?>
 
 <?php if (empty($isPartial)): ?>
 <div id="content" role="main">
+<?php endif; ?>
+
+<?php if ($itemSetId): ?>
+
+    <?php $itemSet = $this->api()->read('item_sets', ['id' => $itemSetId])->getContent(); ?>
+    <?php $this->vars()->offsetSet('itemSet', $itemSet); ?>
+    <?php $this->vars()->offsetSet('resourceType', 'item_sets'); // TODO Check if really needed. ?>
+    <?php $this->htmlElement('body')->appendAttribute('class', 'search-page item-set resource browse'); ?>
+    <?= $this->pageTitle($itemSet->displayTitle(), 2) ?>
+    <h3><?= $translate('Item set') ?></h3>
+    <div class="metadata">
+        <?= $itemSet->displayValues() ?>
+    </div>
+    <div class="item-set-items">
+        <h3><?= $translate('Items') ?></h3>
+    </div>
+
+<?php else: ?>
+
+    <?php $this->htmlElement('body')->appendAttribute('class', 'search-page resource browse'); ?>
+    <?= $this->pageTitle($translate('Search'), 2) ?>
+
 <?php endif; ?>
 
 <?= $this->searchForm() ?>
@@ -90,9 +111,13 @@ $this->htmlElement('body')->appendAttribute('class', 'search-page resource brows
                 'sortOptions' => $sortOptions,
             ]) ?>
 
-        <?php elseif (empty($query)): ?>
+        <?php elseif (empty($query) && empty($itemSetId)): ?>
 
             <div class="noresults"><?= $translate('Fill a query and get results.') ?></div>
+
+        <?php elseif (empty($query) && $itemSetId): ?>
+
+            <div class="noresults"><?= $translate('This item set has no items.') ?></div>
 
         <?php else: ?>
 

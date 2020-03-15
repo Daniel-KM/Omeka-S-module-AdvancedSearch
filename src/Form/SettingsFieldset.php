@@ -20,6 +20,7 @@ class SettingsFieldset extends Fieldset
         $pages = $this->api->search('search_pages')->getContent();
 
         $valueOptions = [];
+        $apiOptions = [];
         foreach ($pages as $page) {
             $labelSearchPage = sprintf('%s (/%s)', $page->name(), $page->path());
             $valueOptions[$page->id()] = $labelSearchPage;

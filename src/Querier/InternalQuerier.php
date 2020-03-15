@@ -156,7 +156,6 @@ class InternalQuerier extends AbstractQuerier
     protected function mainQuery()
     {
         $q = $this->query->getQuery();
-        $q = trim($q);
         if (!strlen($q)) {
             return;
         }
@@ -167,7 +166,7 @@ class InternalQuerier extends AbstractQuerier
         }
 
         // Try to support the exact search and the full text search.
-        if (substr($q, 0, 1) === '"' && substr($q, -1) === '"') {
+        if (mb_substr($q, 0, 1) === '"' && mb_substr($q, -1) === '"') {
             $q = trim($q, '" ');
             $this->args['property'][] = [
                 'joiner' => 'and',
@@ -180,9 +179,7 @@ class InternalQuerier extends AbstractQuerier
 
         // The fullt text search is not available via standard api, but only
         // in a special request (see \Omeka\Module::searchFulltext()).
-        $qq = array_filter(array_map('trim', explode(' ', $q)), function ($v) {
-            return strlen($v);
-        });
+        $qq = array_filter(array_map('trim', explode(' ', $q)), 'mb_strlen');
         foreach ($qq as $qw) {
             $this->args['property'][] = [
                 'joiner' => 'and',
@@ -203,7 +200,6 @@ class InternalQuerier extends AbstractQuerier
     protected function mainQueryWithExcludedFields()
     {
         $q = $this->query->getQuery();
-        $q = trim($q);
 
         // Currently, the only way to exclude fields is to search in all other
         // fields.
@@ -215,7 +211,7 @@ class InternalQuerier extends AbstractQuerier
         }
 
         // Try to support the exact search and the full text search.
-        if (substr($q, 0, 1) === '"' && substr($q, -1) === '"') {
+        if (mb_substr($q, 0, 1) === '"' && mb_substr($q, -1) === '"') {
             $q = trim($q, '" ');
             foreach ($usedFields as $propertyId) {
                 $this->args['property'][] = [
@@ -230,9 +226,7 @@ class InternalQuerier extends AbstractQuerier
 
         // The fullt text search is not available via standard api, but only
         // in a special request (see \Omeka\Module::searchFulltext()).
-        $qq = array_filter(array_map('trim', explode(' ', $q)), function ($v) {
-            return strlen($v);
-        });
+        $qq = array_filter(array_map('trim', explode(' ', $q)), 'mb_strlen');
         foreach ($qq as $qw) {
             foreach ($usedFields as $propertyId) {
                 $this->args['property'][] = [

@@ -109,11 +109,13 @@ class Query implements \JsonSerializable
     protected $site;
 
     /**
+     * The key is always trimmed.
+     *
      * @param string $query
      */
     public function setQuery($query)
     {
-        $this->query = $query;
+        $this->query = trim($query);
         return $this;
     }
 

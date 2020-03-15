@@ -442,46 +442,57 @@ class Module extends AbstractModule
      */
     public function addHeaders(Event $event)
     {
-        // The search field is added via a js hack, because the admin layout
-        // doesn't use a partial or a trigger for the sidebar.
+        // The admin search field is added via a js hack, because the admin
+        // layout doesn't use a partial or a trigger for the sidebar.
+
         $view = $event->getTarget();
 
         $status = $view->status();
-        if ($status->isAdminRequest()) {
-            $searchMainPage = $view->setting('search_main_page');
-            if (!$searchMainPage) {
-                return;
-            }
-            $assetUrl = $view->plugin('assetUrl');
-            $view->headLink()->appendStylesheet($assetUrl('css/search-admin-search.css', 'Search'));
-            $view->headScript()
-                ->appendScript(sprintf('var searchUrl = %s;', json_encode($searchMainPage, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)))
-                ->appendFile($assetUrl('js/search-admin-search.js', 'Search'), 'text/javascript', ['defer' => 'defer']);
-            $searchPage = $view->api()->searchOne('search_pages', ['path' => $searchMainPage])->getContent();
-        } elseif ($status->isSiteRequest()) {
+        if ($status->isSiteRequest()) {
             $params = $view->params()->fromRoute();
-            if ($params['controller'] = \Search\Controller\IndexController::class) {
+            if ($params['controller'] === \Search\Controller\IndexController::class) {
                 $searchPage = @$params['id'];
             } else {
                 $searchPage = $view->siteSetting('search_main_page');
             }
-            if (!$searchPage) {
-                return;
-            }
-            $searchPage = $view->api()->searchOne('search_pages', ['id' => $searchPage])->getContent();
+        } elseif ($status->isAdminRequest()) {
+            $searchPage = $view->setting('search_main_page');
         } else {
             return;
         }
 
-        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
-        if (!$searchPage || !($formAdapter = $searchPage->formAdapter())) {
+        if (!$searchPage) {
             return;
         }
-        $partialHeaders = $formAdapter->getFormPartialHeaders();
-        if ($partialHeaders) {
-            // No echo: it's just a preload.
-            $view->partial($partialHeaders);
+
+        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
+        $searchPage = $view->api()->searchOne('search_pages', ['id' => $searchPage])->getContent();
+        if (!$searchPage) {
+            return;
         }
+
+        if ($status->isAdminRequest()) {
+            $basePath = $view->plugin('basePath');
+            $assetUrl = $view->plugin('assetUrl');
+            $view->headLink()
+                ->appendStylesheet($assetUrl('css/search-admin-search.css', 'Search'));
+            $view->headScript()
+                ->appendScript(sprintf('var searchUrl = %s;', json_encode($basePath('admin/' . $searchPage->path()), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)))
+                ->appendFile($assetUrl('js/search-admin-search.js', 'Search'), 'text/javascript', ['defer' => 'defer']);
+        }
+
+        $formAdapter = $searchPage->formAdapter();
+        if (!$formAdapter) {
+            return;
+        }
+
+        $partialHeaders = $formAdapter->getFormPartialHeaders();
+        if (!$partialHeaders) {
+            return;
+        }
+
+        // No echo: it should just be a preload.
+        $view->partial($partialHeaders);
     }
 
     protected function installResources()

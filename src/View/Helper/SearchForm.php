@@ -50,10 +50,21 @@ class SearchForm extends AbstractHelper
         $view = $this->getView();
         $isAdmin = $view->status()->isAdminRequest();
         if (empty($searchPage)) {
-            $searchPageId = $isAdmin
-                ? $view->setting('search_main_page')
-                : $view->siteSetting('search_main_page');
-            /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
+            // If it is on a search page route, use the id, else use the setting.
+            $params = $view->params()->fromRoute();
+            $setting = $isAdmin
+                ? $view->getHelperPluginManager()->get('setting')
+                : $view->getHelperPluginManager()->get('siteSetting');
+            if ($params['controller'] === 'Search\Controller\IndexController') {
+                $searchPageId = $params['id'];
+                // Check if this search page is allowed.
+                if (!in_array($searchPageId, $setting('search_pages'))) {
+                    $searchPageId = 0;
+                }
+            }
+            if (empty($searchPageId)) {
+                $searchPageId = $setting('search_main_page');
+            }
             $this->searchPage = $view->api()->searchOne('search_pages', ['id' => (int) $searchPageId])->getContent();
         } else {
             $this->searchPage = $searchPage;

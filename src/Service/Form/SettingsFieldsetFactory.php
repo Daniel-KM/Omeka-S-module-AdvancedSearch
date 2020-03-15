@@ -12,7 +12,6 @@ class SettingsFieldsetFactory implements FactoryInterface
         $fieldset = new SettingsFieldset(null, $options);
         $viewHelpers = $services->get('ViewHelperManager');
         $fieldset->setApi($viewHelpers->get('api'));
-        $fieldset->setBasePath($viewHelpers->get('basePath'));
         return $fieldset;
     }
 }

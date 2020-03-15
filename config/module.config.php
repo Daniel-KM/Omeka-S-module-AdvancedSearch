@@ -223,7 +223,7 @@ return [
     ],
     'search' => [
         'settings' => [
-            'search_main_page' => '',
+            'search_main_page' => null,
             'search_pages' => [],
             'search_api_page' => '',
             'search_batch_size' => 100,

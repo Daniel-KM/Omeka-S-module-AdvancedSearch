@@ -2,7 +2,6 @@
 namespace Search\Form;
 
 use Omeka\View\Helper\Api;
-use Zend\View\Helper\BasePath;
 use Zend\Form\Element;
 use Zend\Form\Fieldset;
 
@@ -13,31 +12,19 @@ class SettingsFieldset extends Fieldset
      */
     protected $api;
 
-    /**
-     * @var BasePath
-     */
-    protected $basePath;
-
     protected $label = 'Search (admin board)'; // @translate
 
     public function init()
     {
-        $api = $this->getApi();
-        $basePath = $this->getBasePath();
-        $adminBasePath = $basePath('admin/');
-
         /** @var \Search\Api\Representation\SearchPageRepresentation[] $pages */
-        $pages = $api->search('search_pages')->getContent();
+        $pages = $this->api->search('search_pages')->getContent();
 
         $valueOptions = [];
-        $pageOptions = [];
-        $apiOptions = [];
         foreach ($pages as $page) {
-            $label = sprintf('%s (/%s)', $page->name(), $page->path());
-            $valueOptions[$adminBasePath . $page->path()] = $label;
-            $pageOptions[$page->id()] = $label;
+            $labelSearchPage = sprintf('%s (/%s)', $page->name(), $page->path());
+            $valueOptions[$page->id()] = $labelSearchPage;
             if ($page->formAdapter() instanceof \Search\FormAdapter\ApiFormAdapter) {
-                $apiOptions[$page->id()] = $label;
+                $apiOptions[$page->id()] = $labelSearchPage;
             }
         }
 
@@ -60,7 +47,7 @@ class SettingsFieldset extends Fieldset
             'type' => Element\MultiCheckbox::class,
             'options' => [
                 'label' => 'Available search pages', // @translate
-                'value_options' => $pageOptions,
+                'value_options' => $valueOptions,
             ],
             'attributes' => [
                 'id' => 'search_pages',
@@ -102,30 +89,5 @@ class SettingsFieldset extends Fieldset
     {
         $this->api = $api;
         return $this;
-    }
-
-    /**
-     * @return \Omeka\View\Helper\Api
-     */
-    public function getApi()
-    {
-        return $this->api;
-    }
-
-    /**
-     * @param BasePath $basePath
-     */
-    public function setBasePath(BasePath $basePath)
-    {
-        $this->basePath = $basePath;
-        return $this;
-    }
-
-    /**
-     * @return \Zend\View\Helper\BasePath
-     */
-    public function getBasePath()
-    {
-        return $this->basePath;
     }
 }

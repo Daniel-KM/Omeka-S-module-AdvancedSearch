@@ -193,3 +193,18 @@ SQL;
         $siteSettings->set('search_pages', $searchPages);
     }
 }
+
+if (version_compare($oldVersion, '3.5.12.2', '<')) {
+    $mainSearchPage = $settings->get('search_main_page');
+    if ($mainSearchPage) {
+        $mainSearchPage = basename($mainSearchPage);
+        // The api for search_pages is not available during upgrade.
+        $sql = <<<SQL
+SELECT id
+FROM search_page
+WHERE path = :search_page;
+SQL;
+        $id = $connection->fetchColumn($sql, ['search_page' => $mainSearchPage], 0);
+        $settings->set('search_main_page', $id ? (string) $id : null);
+    }
+}

@@ -20,10 +20,8 @@ class SiteSettingsFieldset extends Fieldset
 
     public function init()
     {
-        $api = $this->getApi();
-
         /** @var \Search\Api\Representation\SearchPageRepresentation[] $pages */
-        $pages = $api->search('search_pages')->getContent();
+        $pages = $this->api->search('search_pages')->getContent();
 
         $valueOptions = [];
         foreach ($pages as $page) {
@@ -76,13 +74,5 @@ class SiteSettingsFieldset extends Fieldset
     {
         $this->api = $api;
         return $this;
-    }
-
-    /**
-     * @return \Omeka\View\Helper\Api
-     */
-    public function getApi()
-    {
-        return $this->api;
     }
 }

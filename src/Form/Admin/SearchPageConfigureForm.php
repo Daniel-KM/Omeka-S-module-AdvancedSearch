@@ -48,6 +48,7 @@ class SearchPageConfigureForm extends Form
         }
 
         $this
+            ->addRestrictQueryToForm()
             ->addFacets()
             ->addSortFields()
             ->addFormFieldset();
@@ -65,6 +66,22 @@ class SearchPageConfigureForm extends Form
         // Input filters should be added after elements.
         $this
             ->addFacetLanguagesInputFilter();
+    }
+
+    protected function addRestrictQueryToForm()
+    {
+        $this->add([
+            'name' => 'restrict_query_to_form',
+            'type' => Element\Checkbox::class,
+            'options' => [
+                'label' => 'Restrict query to form', // @translate
+                'info' => 'A form may have less fields than the search engine can manage. If set, the search is limited to the fields of the form. Else, all standard fields manageable by the querier are available.', // @translate
+            ],
+            'attributes' => [
+                'id' => 'restrict_query_to_form',
+            ],
+        ]);
+        return $this;
     }
 
     protected function addFacets()

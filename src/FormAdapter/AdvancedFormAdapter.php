@@ -29,10 +29,10 @@
 
 namespace Search\FormAdapter;
 
-use Search\Query;
-
 class AdvancedFormAdapter implements FormAdapterInterface
 {
+    use TraitUnrestrictedQuery;
+
     public function getLabel()
     {
         return 'Advanced'; // @translate
@@ -60,77 +60,8 @@ class AdvancedFormAdapter implements FormAdapterInterface
 
     public function toQuery(array $request, array $formSettings)
     {
-        $query = new Query();
-
-        if (isset($request['q'])) {
-            $query->setQuery($request['q']);
-        }
-
-        if (isset($formSettings['is_public_field'])) {
-            $query->addFilter($formSettings['is_public_field'], true);
-        }
-
-        if (!empty($formSettings['item_set_id_field'])
-            && isset($request['itemSet']['ids'])
-        ) {
-            $query->addFilter($formSettings['item_set_id_field'], $request['itemSet']['ids']);
-        }
-
-        if (!empty($formSettings['resource_class_id_field'])
-            && isset($request['resourceClass']['ids'])
-        ) {
-            $query->addFilter($formSettings['resource_class_id_field'], $request['resourceClass']['ids']);
-        }
-
-        if (!empty($formSettings['resource_template_id_field'])
-            && isset($request['resourceTemplate']['ids'])
-        ) {
-            $query->addFilter($formSettings['resource_template_id_field'], $request['resourceTemplate']['ids']);
-        }
-
-        // TODO Manage query on owner (only one in core).
-
-        if (isset($request['text']['filters'])) {
-            if (empty($formSettings['filter_value_joiner'])) {
-                if (empty($formSettings['filter_value_type'])) {
-                    foreach ($request['text']['filters'] as $filter) {
-                        if (!empty($filter['value'])) {
-                            $query->addFilter($filter['field'], $filter['value']);
-                        }
-                    }
-                } else {
-                    foreach ($request['text']['filters'] as $filter) {
-                        $type = @$filter['type'] ?: 'in';
-                        if ($type === 'ex' || $type === 'nex') {
-                            $query->addFilterQuery($filter['field'], null, $type);
-                        } elseif (!empty($filter['value'])) {
-                            $query->addFilterQuery($filter['field'], $filter['value'], $type);
-                        }
-                    }
-                }
-            } else {
-                if (empty($formSettings['filter_value_type'])) {
-                    foreach ($request['text']['filters'] as $filter) {
-                        if (!empty($filter['value'])) {
-                            $joiner = @$filter['join'] === 'or' ? 'or' : 'and';
-                            $query->addFilterQuery($filter['field'], $filter['value'], 'in', $joiner);
-                        }
-                    }
-                } else {
-                    foreach ($request['text']['filters'] as $filter) {
-                        $type = @$filter['type'] ?: 'in';
-                        if ($type === 'ex' || $type === 'nex') {
-                            $joiner = @$filter['join'] === 'or' ? 'or' : 'and';
-                            $query->addFilterQuery($filter['field'], null, $type, $joiner);
-                        } elseif (!empty($filter['value'])) {
-                            $joiner = @$filter['join'] === 'or' ? 'or' : 'and';
-                            $query->addFilterQuery($filter['field'], $filter['value'], 'in', $joiner);
-                        }
-                    }
-                }
-            }
-        }
-
-        return $query;
+        // Only fields that are present on the form are used.
+        // But the advanced form is the full form.
+        return $this->toUnrestrictedQuery($request, $formSettings);
     }
 }

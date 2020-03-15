@@ -107,8 +107,15 @@ class IndexController extends AbstractActionController
             return $view;
         }
 
-        // TODO Validate api query too.
-        if (!$jsonQuery) {
+        $searchPageSettings = $searchPage->settings();
+        $searchFormSettings = isset($searchPageSettings['form'])
+            ? $searchPageSettings['form']
+            : [];
+
+        $restrictRequestToForm = !empty($searchPageSettings['restrict_query_to_form']);
+
+        // TODO Validate api query too and add a minimal check of unrestricted queries, even if it's only a search in items, and public/private is always managed.
+        if ($restrictRequestToForm && !$jsonQuery) {
             $form->setData($request);
             if (!$form->isValid()) {
                 $messages = $form->getMessages();
@@ -133,11 +140,6 @@ class IndexController extends AbstractActionController
             $request = ['text' => ['filters' => $textFilters]]
                 + $form->getData() + $this->filterExtraParams($request);
         }
-
-        $searchPageSettings = $searchPage->settings();
-        $searchFormSettings = isset($searchPageSettings['form'])
-            ? $searchPageSettings['form']
-            : [];
 
         /** @var \Search\Query $query */
         $query = $formAdapter->toQuery($request, $searchFormSettings);

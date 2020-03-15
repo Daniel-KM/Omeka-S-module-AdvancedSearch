@@ -33,6 +33,8 @@ use Search\Query;
 
 abstract class AbstractFormAdapter implements FormAdapterInterface
 {
+    use TraitUnrestrictedQuery;
+
     public function getFormPartialHeaders()
     {
         return null;
@@ -50,6 +52,11 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
 
     public function toQuery(array $request, array $formSettings)
     {
+        if (empty($formSettings['restrict_query_to_form'])) {
+            return $this->toUnrestrictedQuery($request, $formSettings);
+        }
+
+        // Only fields that are present on the form are used.
         $query = new Query();
         if (isset($request['q'])) {
             $query->setQuery($request['q']);

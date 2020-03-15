@@ -3,12 +3,21 @@
 namespace Search\Querier;
 
 use ArrayObject;
+use Omeka\Mvc\Controller\Plugin\Messenger;
+use Omeka\Stdlib\Message;
 use Search\Querier\Exception\QuerierException;
 use Search\Query;
 use Search\Response;
 
 class InternalQuerier extends AbstractQuerier
 {
+    /**
+     * MariaDB can only use 61 tables in a join and Omeka adds a join for each
+     * property. To manage modules, the number is limited to 50.
+     * So excluded fields can be used only when a small subset of properties is used.
+     */
+    const REQUEST_MAX_ARGS = 50;
+
     /**
      * @var Query
      */
@@ -71,6 +80,29 @@ class InternalQuerier extends AbstractQuerier
 
         $this->filterQuery();
 
+        if (!empty($this->args['property']) && count($this->args['property']) > self::REQUEST_MAX_ARGS) {
+            $params = $services->get('ControllerPluginManager')->get('params');
+            $req = $params->fromQuery();
+            unset($req['csrf']);
+            $req = urldecode(http_build_query(array_filter($req)));
+            $messenger = new Messenger;
+            $logger = $this->getServiceLocator()->get('Omeka\Logger');
+            if ($query->getExcludedFields()) {
+                $message = new Message('The query "%1$s" uses %2$d properties, that is more than the %3$d supported currently. Excluded fields are removed.', // @translate
+                    $req, count($this->args['property']), self::REQUEST_MAX_ARGS);
+                $query->setExcludedFields([]);
+                $messenger->addWarning($message);
+                $logger->warn($message);
+                return $this->query($query);
+            }
+
+            $message = new Message('The query "%1$s" uses %2$d properties, that is more than the %3$d supported currently. Request is troncated.', // @translate
+                $req, count($this->args['property']), self::REQUEST_MAX_ARGS);
+            $messenger->addWarning($message);
+            $logger->warn($message);
+            $this->args['property'] = array_slice($this->args['property'], 0, self::REQUEST_MAX_ARGS);
+        }
+
         // TODO To be removed when the filters will be groupable (see version 3.5.12 where this is after filter).
         // Facets data don't use sort or limit.
         if ($hasReference) {
@@ -129,6 +161,11 @@ class InternalQuerier extends AbstractQuerier
             return;
         }
 
+        if ($this->query->getExcludedFields()) {
+            $this->mainQueryWithExcludedFields();
+            return;
+        }
+
         // Try to support the exact search and the full text search.
         if (substr($q, 0, 1) === '"' && substr($q, -1) === '"') {
             $q = trim($q, '" ');
@@ -157,6 +194,58 @@ class InternalQuerier extends AbstractQuerier
     }
 
     /**
+     * Support of excluded fields is very basic and uses "or" instead of "and".
+     *
+     * Important: MariaDB can only use 61 tables in a join.
+     *
+     * @todo Add support of grouped query (mutliple properties and/or multiple other properties).
+     */
+    protected function mainQueryWithExcludedFields()
+    {
+        $q = $this->query->getQuery();
+        $q = trim($q);
+
+        // Currently, the only way to exclude fields is to search in all other
+        // fields.
+        $usedFields = $this->getUsedPropertyByIds();
+        $excludedFields = $this->query->getExcludedFields();
+        $usedFields = array_diff($usedFields, $excludedFields);
+        if (!count($usedFields)) {
+            return;
+        }
+
+        // Try to support the exact search and the full text search.
+        if (substr($q, 0, 1) === '"' && substr($q, -1) === '"') {
+            $q = trim($q, '" ');
+            foreach ($usedFields as $propertyId) {
+                $this->args['property'][] = [
+                    'joiner' => 'or',
+                    'property' => $propertyId,
+                    'type' => 'in',
+                    'text' => $q,
+                ];
+            }
+            return;
+        }
+
+        // The fullt text search is not available via standard api, but only
+        // in a special request (see \Omeka\Module::searchFulltext()).
+        $qq = array_filter(array_map('trim', explode(' ', $q)), function ($v) {
+            return strlen($v);
+        });
+        foreach ($qq as $qw) {
+            foreach ($usedFields as $propertyId) {
+                $this->args['property'][] = [
+                    'joiner' => 'or',
+                    'property' => $propertyId,
+                    'type' => 'in',
+                    'text' => $qw,
+                ];
+            }
+        }
+    }
+
+    /**
      * Filter the query.
      *
      * @todo FIx the process for facets: all the facets should be displayed, and "or" by group of facets.
@@ -166,7 +255,9 @@ class InternalQuerier extends AbstractQuerier
      */
     protected function filterQuery()
     {
+        // Don't use excluded fields for filters.
         $filters = $this->query->getFilters();
+
         foreach ($filters as $name => $values) {
             // "is_public" is automatically managed by this internal adapter.
             // "creation_date_year_field" should be a property.
@@ -354,6 +445,40 @@ class InternalQuerier extends AbstractQuerier
     }
 
     /**
+     * Get all property terms by id, ordered by descendant total values.
+     *
+     * @return array Associative array of ids by term.
+     */
+    protected function getUsedPropertyByIds()
+    {
+        static $properties;
+
+        if (is_null($properties)) {
+            /** @var \Doctrine\DBAL\Connection $connection */
+            $connection = $this->getServiceLocator()->get('Omeka\Connection');
+            $qb = $connection->createQueryBuilder();
+            $qb
+                ->select([
+                    'DISTINCT property.id AS id',
+                    "CONCAT(vocabulary.prefix, ':', property.local_name) AS term",
+                    // 'COUNT(value.id) AS total',
+                ])
+                ->from('property', 'property')
+                ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
+                ->innerJoin('property', 'value', 'value', 'property.id = value.property_id')
+                ->addGroupBy('id')
+                ->orderBy('COUNT(value.id)', 'DESC')
+            ;
+            $stmt = $connection->executeQuery($qb);
+            // Fetch by key pair is not supported by doctrine 2.0.
+            $properties = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $properties = array_column($properties, 'term', 'id');
+        }
+
+        return $properties;
+    }
+
+    /**
      * Get all property ids by term.
      *
      * @see \Reference\Mvc\Controller\Plugin\Reference::getPropertyIds()
@@ -365,8 +490,10 @@ class InternalQuerier extends AbstractQuerier
         static $properties;
 
         if (is_null($properties)) {
+            /** @var \Doctrine\ORM\EntityManager $entityManager */
             $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
             $qb = $entityManager->createQueryBuilder();
+            $expr = $qb->expr();
             $qb
                 ->select([
                     "CONCAT(vocabulary.prefix, ':', property.localName) AS term",
@@ -377,9 +504,10 @@ class InternalQuerier extends AbstractQuerier
                     \Omeka\Entity\Vocabulary::class,
                     'vocabulary',
                     \Doctrine\ORM\Query\Expr\Join::WITH,
-                    $qb->expr()->eq('vocabulary.id', 'property.vocabulary')
+                    $expr->eq('vocabulary.id', 'property.vocabulary')
                 )
             ;
+
             $properties = $qb->getQuery()->getScalarResult();
         }
 

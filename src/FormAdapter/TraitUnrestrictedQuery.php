@@ -106,6 +106,13 @@ trait TraitUnrestrictedQuery
             }
         }
 
+        if (isset($request['excludedFields'])) {
+            $excludedFields = is_array($request['excludedFields'])
+                ? $request['excludedFields']
+                : [$request['excludedFields']];
+            $query->setExcludedFields($excludedFields);
+        }
+
         return $query;
     }
 }

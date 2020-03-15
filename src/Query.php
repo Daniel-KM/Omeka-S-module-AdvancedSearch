@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2018-2019
+ * Copyright Daniel Berthereau, 2018-2020
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software. You can use, modify and/ or
@@ -92,6 +92,11 @@ class Query implements \JsonSerializable
      * @var array
      */
     protected $facetLanguages = [];
+
+    /**
+     * @var array
+     */
+    protected $excludedFields = [];
 
     /**
      * @var int
@@ -321,6 +326,24 @@ class Query implements \JsonSerializable
     }
 
     /**
+     * @param array $excludedFields
+     * @return \Search\Query
+     */
+    public function setExcludedFields(array $excludedFields)
+    {
+        $this->excludedFields = $excludedFields;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExcludedFields()
+    {
+        return $this->excludedFields;
+    }
+
+    /**
      * @param int $siteId
      */
     public function setSiteId($siteId)
@@ -352,6 +375,7 @@ class Query implements \JsonSerializable
             'facet_fields' => $this->getFacetFields(),
             'facet_limit' => $this->getFacetLimit(),
             'facet_languages' => $this->getFacetLanguages(),
+            'excluded_fields' => $this->getExcludedFields(),
             'site_id' => $this->getSiteId(),
         ];
     }

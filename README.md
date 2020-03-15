@@ -44,7 +44,9 @@ See general end user documentation for [Installing a module].
 ### Optional dependency
 
 - Module [Reference] to display facets in the results with the internal adapter.
-  It is not needed for external search engines.
+  It is not needed for external search engines. It should be at least version
+  3.4.16. Older versions are supported only with Search version 3.5.12.2 or
+  older ones.
 
 ### Fix
 

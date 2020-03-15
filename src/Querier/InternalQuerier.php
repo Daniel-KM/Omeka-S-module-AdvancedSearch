@@ -2,87 +2,171 @@
 
 namespace Search\Querier;
 
+use ArrayObject;
 use Search\Querier\Exception\QuerierException;
 use Search\Query;
 use Search\Response;
 
 class InternalQuerier extends AbstractQuerier
 {
+    /**
+     * @var Query
+     */
+    protected $query;
+
+    /**
+     * @var Response
+     */
+    protected $response;
+
+    /**
+     * @var array
+     */
+    protected $resourceTypes;
+
+    /**
+     * @var \ArrayObject
+     */
+    protected $args;
+
     public function query(Query $query)
     {
+        $this->query = $query;
+        $this->response = new Response;
+
         // TODO Normalize search url arguments. Here, the ones from Solr are taken.
 
+        $indexerResourceTypes = $this->getSetting('resources', []);
+        $this->resourceTypes = $query->getResources() ?: $indexerResourceTypes;
+        $this->resourceTypes = array_intersect($this->resourceTypes, $indexerResourceTypes);
+        if (empty($this->resourceTypes)) {
+            return $this->response;
+        }
+
+        /**
+         * @var \Omeka\Mvc\Controller\Plugin\Api $api
+         */
         $services = $this->getServiceLocator();
         $plugins = $services->get('ControllerPluginManager');
-        /** @var \Omeka\Mvc\Controller\Plugin\Api $api */
         $api = $plugins->get('api');
-        /** @var \Reference\Mvc\Controller\Plugin\References $references */
-        $references = $plugins->has('references') ? $plugins->get('references') : null;
-        // Keep compatibility with old version of module Reference (< 3.4.16).
-        /** @var \Reference\Mvc\Controller\Plugin\Reference $reference */
-        $reference = !$references && $plugins->has('reference') ? $plugins->get('reference') : null;
-        $hasReference = $references || $reference;
+
+        $hasReference = $plugins->has('references');
 
         // The data are the ones used to build the query with the standard api.
         // Queries are multiple (one by resource type and by facet).
         // Note: the query is a scalar one, so final events are not triggered.
         // TODO Do a full api reference search or only scalar ids?
-        $data = [];
-        $facetData = [];
+        $this->args = new ArrayObject;
+        $facetData = null;
 
-        $q = $query->getQuery();
-        $q = trim($q);
-        if (strlen($q)) {
-            // Try to support the exact search and the full text search.
-            if (substr($q, 0, 1) === '"' && substr($q, -1) === '"') {
-                $q = trim($q, '" ');
-                $data['property'][] = [
-                    'joiner' => 'and',
-                    'property' => '',
-                    'type' => 'in',
-                    'text' => $q,
-                ];
-            } else {
-                // The fullt text search is not available via standard api, but
-                // only in a special request (see \Omeka\Module::searchFulltext()).
-                $qq = array_filter(array_map('trim', explode(' ', $q)), function ($v) {
-                    return strlen($v);
-                });
-                foreach ($qq as $qw) {
-                    $data['property'][] = [
-                        'joiner' => 'and',
-                        'property' => '',
-                        'type' => 'in',
-                        'text' => $qw,
-                    ];
-                }
-            }
-        }
+        $this->mainQuery();
+
         // "is_public" is automatically managed by the api.
 
-        $indexerResourceTypes = $this->getSetting('resources', []);
-        $resourceTypes = $query->getResources() ?: $indexerResourceTypes;
-        $resourceTypes = array_intersect($resourceTypes, $indexerResourceTypes);
-        if (empty($resourceTypes)) {
-            return new Response();
+        // The site is a specific filter that can be used as part of main query.
+        $siteId = $this->query->getSiteId();
+        if ($siteId) {
+            $this->args['site_id'] = $siteId;
         }
 
-        $siteId = $query->getSiteId();
-        if ($siteId) {
-            $data['site_id'] = $siteId;
+        $this->filterQuery();
+
+        // TODO To be removed when the filters will be groupable (see version 3.5.12 where this is after filter).
+        // Facets data don't use sort or limit.
+        if ($hasReference) {
+            $facetData = clone $this->args;
+        }
+
+        $sort = $query->getSort();
+        if ($sort) {
+            list($sortField, $sortOrder) = explode(' ', $sort);
+            $this->args['sort_by'] = $sortField;
+            $this->args['sort_order'] = $sortOrder === 'desc' ? 'desc' : 'asc';
+        }
+
+        $limit = $query->getLimit();
+        if ($limit) {
+            $this->args['limit'] = $limit;
+        }
+
+        $offset = $query->getOffset();
+        if ($offset) {
+            $this->args['offset'] = $offset;
+        }
+
+        foreach ($this->resourceTypes as $resourceType) {
+            try {
+                // Return scalar doesn't allow to get the total of results.
+                $apiResponse = $api->search($resourceType, $this->args->getArrayCopy(), ['returnScalar' => 'id']);
+                $totalResults = $api->search($resourceType, $this->args->getArrayCopy())->getTotalResults();
+            } catch (\Omeka\Api\Exception\ExceptionInterface $e) {
+                throw new QuerierException($e->getMessage(), $e->getCode(), $e);
+            }
+            $this->response->setResourceTotalResults($resourceType, $totalResults);
+            $this->response->setTotalResults($this->response->getTotalResults() + $totalResults);
+            if ($totalResults) {
+                $result = array_map(function ($v) {
+                    return ['id' => $v];
+                }, $apiResponse->getContent());
+            } else {
+                $result = [];
+            }
+            $this->response->addResults($resourceType, $result);
         }
 
         if ($hasReference) {
-            $facetData = $data;
-            $facetFields = $query->getFacetFields();
-            $facetLimit = $query->getFacetLimit();
-            $facetLanguages = $query->getFacetLanguages();
+            $this->facetResponse($facetData);
         }
 
-        // TODO FIx the process for facets: all the facets should be displayed, and "or" by group of facets.
-        // TODO Make core search properties groupable ("or" inside a group, "and" between group).
-        // Note: when a facet is selected, it is managed like a filter.
-        $filters = $query->getFilters();
+        return $this->response;
+    }
+
+    protected function mainQuery()
+    {
+        $q = $this->query->getQuery();
+        $q = trim($q);
+        if (!strlen($q)) {
+            return;
+        }
+
+        // Try to support the exact search and the full text search.
+        if (substr($q, 0, 1) === '"' && substr($q, -1) === '"') {
+            $q = trim($q, '" ');
+            $this->args['property'][] = [
+                'joiner' => 'and',
+                'property' => '',
+                'type' => 'in',
+                'text' => $q,
+            ];
+            return;
+        }
+
+        // The fullt text search is not available via standard api, but only
+        // in a special request (see \Omeka\Module::searchFulltext()).
+        $qq = array_filter(array_map('trim', explode(' ', $q)), function ($v) {
+            return strlen($v);
+        });
+        foreach ($qq as $qw) {
+            $this->args['property'][] = [
+                'joiner' => 'and',
+                'property' => '',
+                'type' => 'in',
+                'text' => $qw,
+            ];
+        }
+    }
+
+    /**
+     * Filter the query.
+     *
+     * @todo FIx the process for facets: all the facets should be displayed, and "or" by group of facets.
+     * @todo Make core search properties groupable ("or" inside a group, "and" between group).
+     *
+     * Note: when a facet is selected, it is managed like a filter.
+     */
+    protected function filterQuery()
+    {
+        $filters = $this->query->getFilters();
         foreach ($filters as $name => $values) {
             // "is_public" is automatically managed by this internal adapter.
             // "creation_date_year_field" should be a property.
@@ -99,7 +183,7 @@ class InternalQuerier extends AbstractQuerier
                     } elseif (is_array(reset($values))) {
                         $values = array_merge(...$values);
                     }
-                    $data['item_set_id'] = array_filter(array_map('intval', $values));
+                    $this->args['item_set_id'] = array_filter(array_map('intval', $values));
                     continue 2;
 
                 case 'resource_class_id':
@@ -109,7 +193,7 @@ class InternalQuerier extends AbstractQuerier
                     } elseif (is_array(reset($values))) {
                         $values = array_merge(...$values);
                     }
-                    $data['resource_class_id'] = is_numeric(reset($values))
+                    $this->args['resource_class_id'] = is_numeric(reset($values))
                         ? array_filter(array_map('intval', $values))
                         : $this->listResourceClassIds($values);
                     continue 2;
@@ -121,7 +205,7 @@ class InternalQuerier extends AbstractQuerier
                     } elseif (is_array(reset($values))) {
                         $values = array_merge(...$values);
                     }
-                    $data['resource_template_id'] = is_numeric(reset($values))
+                    $this->args['resource_template_id'] = is_numeric(reset($values))
                         ? array_filter(array_map('intval', $values))
                         : $this->listResourceTemplateIds($values);
                     continue 2;
@@ -131,7 +215,7 @@ class InternalQuerier extends AbstractQuerier
                         // Use "or" when multiple (checkbox), else "and" (radio).
                         if (is_array($value)) {
                             foreach ($value as $val) {
-                                $data['property'][] = [
+                                $this->args['property'][] = [
                                     'joiner' => 'or',
                                     'property' => $name,
                                     'type' => 'eq',
@@ -139,7 +223,7 @@ class InternalQuerier extends AbstractQuerier
                                 ];
                             }
                         } else {
-                            $data['property'][] = [
+                            $this->args['property'][] = [
                                 'joiner' => 'and',
                                 'property' => $name,
                                 'type' => 'eq',
@@ -153,18 +237,18 @@ class InternalQuerier extends AbstractQuerier
 
         // TODO Manage the date range filters (one or two properties?).
         /*
-        $dateRangeFilters = $query->getDateRangeFilters();
+        $dateRangeFilters = $this->query->getDateRangeFilters();
         foreach ($dateRangeFilters as $name => $filterValues) {
             foreach ($filterValues as $filterValue) {
                 $start = $filterValue['start'] ? $filterValue['start'] : '*';
                 $end = $filterValue['end'] ? $filterValue['end'] : '*';
-                $data['property'][] = [
+                $this->args['property'][] = [
                     'joiner' => 'and',
                     'property' => 'dcterms:date',
                     'type' => 'gte',
                     'text' => $start,
                 ];
-                $data['property'][] = [
+                $this->args['property'][] = [
                     'joiner' => 'and',
                     'property' => 'dcterms:date',
                     'type' => 'lte',
@@ -174,10 +258,10 @@ class InternalQuerier extends AbstractQuerier
         }
         */
 
-        $filters = $query->getFilterQueries();
+        $filters = $this->query->getFilterQueries();
         foreach ($filters as $name => $values) {
             foreach ($values as $value) {
-                $data['property'][] = [
+                $this->args['property'][] = [
                     'joiner' => $value['joiner'],
                     'property' => $name,
                     'type' => $value['type'],
@@ -185,146 +269,71 @@ class InternalQuerier extends AbstractQuerier
                 ];
             }
         }
+    }
 
-        // TODO To be removed when the filters will be groupable.
-        if ($hasReference) {
-            $facetData = $data;
+    protected function facetResponse(ArrayObject $facetData)
+    {
+        // FIXME Like in Solr, the facets for items and item sets are mixed, and may be complex to understand. Anyway, it's not a common case.
+        if (!in_array('items', $this->resourceTypes)) {
+            return;
         }
+        $resourceType = 'items';
 
-        $sort = $query->getSort();
-        if ($sort) {
-            list($sortField, $sortOrder) = explode(' ', $sort);
-            $data['sort_by'] = $sortField;
-            $data['sort_order'] = $sortOrder == 'desc' ? 'desc' : 'asc';
-        }
+        /** @var \Reference\Mvc\Controller\Plugin\References $references */
+        $references = $this->getServiceLocator()->get('ControllerPluginManager')->get('references');
 
-        $limit = $query->getLimit();
-        if ($limit) {
-            $data['limit'] = $limit;
-        }
+        $facetFields = $this->query->getFacetFields();
+        $facetLimit = $this->query->getFacetLimit();
+        $facetLanguages = $this->query->getFacetLanguages();
 
-        $offset = $query->getOffset();
-        if ($offset) {
-            $data['offset'] = $offset;
-        }
+        $metadataFieldsToNames = [
+            'is_public' => 'is_public',
+            'is_public_field' => 'is_public',
+            'item_set_id' => 'o:item_set',
+            'item_set_id_field' => 'o:item_set',
+            'resource_class_id' => 'o:resource_class',
+            'resource_class_id_field' => 'o:resource_class',
+            'resource_template_id' => 'o:resource_template',
+            'resource_template_id_field' => 'o:resource_template',
+        ];
 
-        $response = new Response;
+        // For items and item sets.
+        $fields = array_map(function ($v) use ($metadataFieldsToNames) {
+            return isset($metadataFieldsToNames[$v]) ? $metadataFieldsToNames[$v] : $v;
+        }, $facetFields);
 
-        foreach ($resourceTypes as $resourceType) {
-            try {
-                // Return scalar doesn't allow to get the total of results.
-                $apiResponse = $api->search($resourceType, $data, ['returnScalar' => 'id']);
-                $totalResults = $api->search($resourceType, $data)->getTotalResults();
-            } catch (\Omeka\Api\Exception\ExceptionInterface $e) {
-                throw new QuerierException($e->getMessage(), $e->getCode(), $e);
+        $options = [
+            'resource_name' => $resourceType,
+            // Options sql.
+            'per_page' => $facetLimit,
+            'page' => 1,
+            'sort_by' => 'total',
+            'sort_order' => 'DESC',
+            'filters' => [
+                'languages' => $facetLanguages,
+            ],
+            'values' => [],
+            // Output options.
+            'first_id' => false,
+            'initial' => false,
+            'lang' => false,
+            'include_without_meta' => false,
+            'output' => 'associative',
+        ];
+
+        $values = $references
+            ->setMetadata($fields)
+            ->setQuery($facetData->getArrayCopy())
+            ->setOptions($options)
+            ->list();
+
+        $key = 0;
+        foreach ($values as $result) {
+            foreach ($result['o-module-reference:values'] as $value => $count) {
+                $this->response->addFacetCount($facetFields[$key], $value, $count);
             }
-            $response->setResourceTotalResults($resourceType, $totalResults);
-            $response->setTotalResults($response->getTotalResults() + $totalResults);
-            if ($totalResults) {
-                $result = array_map(function ($v) {
-                    return ['id' => $v];
-                }, $apiResponse->getContent());
-            } else {
-                $result = [];
-            }
-            $response->addResults($resourceType, $result);
+            ++$key;
         }
-
-        if ($references) {
-            $metadataFieldsToNames = [
-                'is_public' => 'is_public',
-                'is_public_field' => 'is_public',
-                'item_set_id' => 'o:item_set',
-                'item_set_id_field' => 'o:item_set',
-                'resource_class_id' => 'o:resource_class',
-                'resource_class_id_field' => 'o:resource_class',
-                'resource_template_id' => 'o:resource_template',
-                'resource_template_id_field' => 'o:resource_template',
-            ];
-
-            // For items and item sets.
-            // FIXME Like in Solr, the facets for items and item sets are mixed, and may be complex to understand.
-            foreach ($resourceTypes as $resourceType) {
-                if ($resourceType === 'item_sets') {
-                    continue;
-                }
-
-                $fields = array_map(function ($v) use ($metadataFieldsToNames) {
-                    return isset($metadataFieldsToNames[$v]) ? $metadataFieldsToNames[$v] : $v;
-                }, $facetFields);
-
-                $options = [
-                    'resource_name' => $resourceType,
-                    // Options sql.
-                    'per_page' => $facetLimit,
-                    'page' => 1,
-                    'sort_by' => 'total',
-                    'sort_order' => 'DESC',
-                    'filters' => [
-                        'languages' => $facetLanguages,
-                    ],
-                    'values' => [],
-                    // Output options.
-                    'first_id' => false,
-                    'initial' => false,
-                    'lang' => false,
-                    'include_without_meta' => false,
-                    'output' => 'associative',
-                ];
-
-                $values = $references
-                    ->setMetadata($fields)
-                    ->setQuery($facetData)
-                    ->setOptions($options)
-                    ->list();
-
-                $key = 0;
-                foreach ($values as $result) {
-                    foreach ($result['o-module-reference:values'] as $value => $count) {
-                        $response->addFacetCount($facetFields[$key], $value, $count);
-                    }
-                    ++$key;
-                }
-            }
-        }
-        // Facets with old module Reference.
-        elseif ($reference) {
-            $metadataFieldsToNames = [
-                 'is_public' => 'is_public',
-                 'is_public_field' => 'is_public',
-                 'item_set_id' => 'item_sets',
-                 'item_set_id_field' => 'item_sets',
-                 'resource_class_id' => 'resource_classes',
-                 'resource_class_id_field' => 'resource_classes',
-                 'resource_template_id' => 'resource_templates',
-                 'resource_template_id_field' => 'resource_templates',
-             ];
-
-            // For items and item sets.
-            // FIXME Like in Solr, the facets for items and item sets are mixed, and may be complex to understand.
-            foreach ($resourceTypes as $resourceType) {
-                if ($resourceType === 'item_sets') {
-                    continue;
-                }
-                foreach ($facetFields as $facetField) {
-                    if (isset($metadataFieldsToNames[$facetField])) {
-                        $name = $metadataFieldsToNames[$facetField];
-                        if ($name === 'is_public') {
-                            continue;
-                        }
-                        $values = $reference('', $name, $resourceType, ['count' => 'DESC'], $facetData, $facetLimit, 1);
-                    } else {
-                        $values = $reference($facetField, 'properties', $resourceType, ['count' => 'DESC'], $facetData, $facetLimit, 1);
-                    }
-                    $values = array_filter($values);
-                    foreach ($values as $value => $count) {
-                        $response->addFacetCount($facetField, $value, $count);
-                    }
-                }
-            }
-        }
-
-        return $response;
     }
 
     /**

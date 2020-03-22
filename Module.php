@@ -135,7 +135,7 @@ class Module extends AbstractModule
      */
     public function handleApiSearchQuery(Event $event)
     {
-        $this->isOldOmeka = strtok(\Omeka\Module::VERSION, '.') < 2;
+        $this->isOldOmeka = \Omeka\Module::VERSION < 2;
 
         /** @var \Doctrine\ORM\QueryBuilder $qb */
         $qb = $event->getParam('queryBuilder');

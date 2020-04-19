@@ -51,44 +51,18 @@ class SearchRequestToResponse extends AbstractPlugin
         }
 
         $searchPageSettings = $searchPage->settings();
-        $defaultResults = @$searchPageSettings['default_results'] ?: 'default';
-        switch ($defaultResults) {
-            case 'none':
-                $defaultQuery = '';
-                break;
-            case 'query':
-                $defaultQuery = @$searchPageSettings['default_query'];
-                break;
-            case 'default':
-            default:
-                // "*" means the default query managed by the search engine.
-                $defaultQuery = '*';
-                break;
-        }
 
         list($request, $isEmptyRequest) = $this->cleanRequest($request);
         if ($isEmptyRequest) {
-            if ($defaultQuery === '') {
-                return [
-                    'status' => 'fail',
-                    'data' => [
-                        'query' => new Message('No query.'), // @translate
-                    ],
-                ];
-            }
-            $parsedQuery = [];
-            parse_str($defaultQuery, $parsedQuery);
-            // Keep the other arguments of the request, like facets.
-            $request = $parsedQuery + $request;
+            // Keep the other arguments of the request (mainly pagination, sort,
+            // and facets).
+            $request = ['*' => ''] + $request;
         }
 
         $searchFormSettings = isset($searchPageSettings['form']) ? $searchPageSettings['form'] : [];
 
         /** @var \Search\Query $query */
         $query = $formAdapter->toQuery($request, $searchFormSettings);
-
-        // Some search engine may use a second level default query.
-        $query->setDefaultQuery($defaultQuery);
 
         // Add global parameters.
 
@@ -233,6 +207,7 @@ class SearchRequestToResponse extends AbstractPlugin
             $request,
             [
                 // @see \Omeka\Api\Adapter\AbstractEntityAdapter::limitQuery().
+                // Note: facets use "limit" currently.
                 'page' => null, 'per_page' => null, 'limit' => null, 'offset' => null,
                 // @see \Omeka\Api\Adapter\AbstractEntityAdapter::search().
                 'sort_by' => null, 'sort_order' => null,

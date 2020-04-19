@@ -93,6 +93,7 @@ class SearchPageConfigureForm extends Form
                 'type' => Element\Text::class,
                 'options' => [
                     'label' => 'Default query', // @translate
+                    'default' => 'The format of the query depends on the search form and the search engine.', // @translated
                 ],
                 'attributes' => [
                     'id' => 'default_query',

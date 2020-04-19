@@ -88,6 +88,41 @@ class IndexController extends AbstractActionController
             }
         }
 
+        // Check if the query is empty and use the default query in that case.
+        // So the default query is used only on the search page.
+        list($request, $isEmptyRequest) = $this->cleanRequest($request);
+        if ($isEmptyRequest) {
+            $searchPageSettings = $searchPage->settings();
+            $defaultResults = @$searchPageSettings['default_results'] ?: 'default';
+            switch ($defaultResults) {
+                case 'none':
+                    $defaultQuery = '';
+                    break;
+                case 'query':
+                    $defaultQuery = @$searchPageSettings['default_query'];
+                    break;
+                case 'default':
+                default:
+                    // "*" means the default query managed by the search engine.
+                    $defaultQuery = '*';
+                    break;
+            }
+            if ($defaultQuery === '') {
+                if ($isJsonQuery) {
+                    return new JsonModel([
+                        'status' => 'error',
+                        'message' => 'No query.', // @translate
+                    ]);
+                }
+                return $view;
+            }
+            $parsedQuery = [];
+            parse_str($defaultQuery, $parsedQuery);
+            // Keep the other arguments of the request (mainly pagination, sort,
+            // and facets).
+            $request = $parsedQuery + $request;
+        }
+
         $result = $this->searchRequestToResponse($request, $searchPage, $site);
         if ($result['status'] === 'fail') {
             // Currently only "no query".
@@ -152,5 +187,63 @@ class IndexController extends AbstractActionController
             }
         }
         return $request;
+    }
+
+    /**
+     * Remove all empty values (zero length strings) and check empty request.
+     *
+     * @todo Factorize with \Search\Mvc\Controller\Plugin\SearchRequestToResponse::cleanRequest()
+     *
+     * @param array $request
+     * @return array First key is the cleaned request, the second a bool to
+     * indicate if it is empty.
+     */
+    protected function cleanRequest(array $request)
+    {
+        // They should be already removed.
+        unset($request['csrf'], $request['submit']);
+
+        $this->arrayFilterRecursive($request);
+
+        $checkRequest = array_diff_key(
+            $request,
+            [
+                // @see \Omeka\Api\Adapter\AbstractEntityAdapter::limitQuery().
+                // Note: facets use "limit" currently.
+                'page' => null, 'per_page' => null, 'limit' => null, 'offset' => null,
+                // @see \Omeka\Api\Adapter\AbstractEntityAdapter::search().
+                'sort_by' => null, 'sort_order' => null,
+                // Used by Search.
+                'resource-type' => null, 'sort' => null,
+            ]
+        );
+
+        return [
+            $request,
+            !count($checkRequest),
+        ];
+    }
+
+    /**
+     * Remove zero-length values or an array, recursively.
+     *
+     * @todo Factorize with \Search\Mvc\Controller\Plugin\SearchRequestToResponse::arrayFilterRecursive()
+     *
+     * @param array $array
+     * @return array
+     */
+    protected function arrayFilterRecursive(array &$array)
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $array[$key] = $this->arrayFilterRecursive($value);
+                if (!count($array[$key])) {
+                    unset($array[$key]);
+                }
+            } elseif (!strlen(trim($array[$key]))) {
+                unset($array[$key]);
+            }
+        }
+        return $array;
     }
 }

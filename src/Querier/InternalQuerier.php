@@ -123,12 +123,7 @@ class InternalQuerier extends AbstractQuerier
         }
 
         $isDefaultQuery = $this->defaultQuery();
-        if ($isDefaultQuery) {
-            if ($this->query->getDefaultQuery() === '') {
-                $this->args = null;
-                return $this->args;
-            }
-        } else {
+        if (!$isDefaultQuery) {
             $this->mainQuery();
         }
 
@@ -197,16 +192,7 @@ class InternalQuerier extends AbstractQuerier
             return false;
         }
 
-        $defaultQuery = $this->query->getDefaultQuery();
-        if (strlen($defaultQuery)) {
-            if ($defaultQuery === '*') {
-                $this->args->exchangeArray([]);
-            } else {
-                $parsedQuery = [];
-                parse_str($defaultQuery, $parsedQuery);
-                $this->args->exchangeArray($parsedQuery);
-            }
-        }
+        $this->args->exchangeArray([]);
         return true;
     }
 
@@ -379,7 +365,7 @@ class InternalQuerier extends AbstractQuerier
 
         // TODO Manage the date range filters (one or two properties?).
         /*
-        $dateRangeFilters = $this->query->getDateRangeFilters();
+        $dateRangeFilters = $this->query->getFiltersDateRange();
         foreach ($dateRangeFilters as $name => $filterValues) {
             foreach ($filterValues as $filterValue) {
                 $start = $filterValue['start'] ? $filterValue['start'] : '*';

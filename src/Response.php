@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2018-2019
+ * Copyright Daniel Berthereau, 2018-2020
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -30,7 +30,7 @@
 
 namespace Search;
 
-class Response
+class Response implements \JsonSerializable
 {
     /**
      * @var int
@@ -167,5 +167,15 @@ class Response
     public function getFacetCounts()
     {
         return $this->facetCounts;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'totalResults' => $this->getTotalResults(),
+            'resourceTotalResults' => $this->resourceTotalResults,
+            'results' => $this->results,
+            'facetCounts' => $this->getFacetCounts(),
+        ];
     }
 }

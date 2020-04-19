@@ -96,18 +96,47 @@ class IndexController extends AbstractActionController
         $form = $this->searchForm($searchPage);
         $jsonQuery = empty($form);
 
-        // Here, an empty query is not allowed. To allow it, add a useless arg.
-        if (empty($request)) {
-            if ($jsonQuery) {
-                return new JsonModel([
-                    'status' => 'error',
-                    'message' => 'No query.', // @translate
-                ]);
-            }
-            return $view;
+        $searchPageSettings = $searchPage->settings();
+
+        // This is a quick check of an empty request.
+        $emptyRequest = $request;
+        unset($emptyRequest['csrf'], $emptyRequest['submit']);
+        $checkRequest = $request + ['q' => '', 'search' => '', 'fulltext_search' => ''];
+        $isEmptyRequest = !strlen($checkRequest['q'])
+            && !strlen($checkRequest['search'])
+            && !strlen($checkRequest['fulltext_search']);
+
+        $defaultResults = @$searchPageSettings['default_results'] ?: 'default';
+        switch ($defaultResults) {
+            case 'none':
+                $defaultQuery = '';
+                break;
+            case 'query':
+                $defaultQuery = @$searchPageSettings['default_query'];
+                break;
+            case 'default':
+            default:
+                // "*" means the default query managed by the search engine.
+                $defaultQuery = '*';
+                break;
         }
 
-        $searchPageSettings = $searchPage->settings();
+        if ($isEmptyRequest) {
+            if ($defaultQuery === '') {
+                if ($jsonQuery) {
+                    return new JsonModel([
+                        'status' => 'error',
+                        'message' => 'No query.', // @translate
+                    ]);
+                }
+                return $view;
+            }
+            $parsedQuery = [];
+            parse_str($defaultQuery, $parsedQuery);
+            // Keep the other arguments of the request, like facets.
+            $request = $parsedQuery + $request;
+        }
+
         $searchFormSettings = isset($searchPageSettings['form'])
             ? $searchPageSettings['form']
             : [];
@@ -143,6 +172,9 @@ class IndexController extends AbstractActionController
 
         /** @var \Search\Query $query */
         $query = $formAdapter->toQuery($request, $searchFormSettings);
+
+        // Some search engine may use a second level default query.
+        $query->setDefaultQuery($defaultQuery);
 
         // Add global parameters.
 

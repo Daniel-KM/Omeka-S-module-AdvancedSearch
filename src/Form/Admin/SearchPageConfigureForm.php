@@ -48,7 +48,7 @@ class SearchPageConfigureForm extends Form
         }
 
         $this
-            ->addRestrictQueryToForm()
+            ->addMainSettings()
             ->addFacets()
             ->addSortFields()
             ->addFormFieldset();
@@ -65,22 +65,51 @@ class SearchPageConfigureForm extends Form
 
         // Input filters should be added after elements.
         $this
-            ->addFacetLanguagesInputFilter();
+            ->addInputFilter();
     }
 
-    protected function addRestrictQueryToForm()
+    protected function addMainSettings()
     {
-        $this->add([
-            'name' => 'restrict_query_to_form',
-            'type' => Element\Checkbox::class,
-            'options' => [
-                'label' => 'Restrict query to form', // @translate
-                'info' => 'A form may have less fields than the search engine can manage. If set, the search is limited to the fields of the form. Else, all standard fields manageable by the querier are available.', // @translate
-            ],
-            'attributes' => [
-                'id' => 'restrict_query_to_form',
-            ],
-        ]);
+        $this
+            ->add([
+                'name' => 'default_results',
+                'type' => Element\Radio::class,
+                'options' => [
+                    'label' => 'Default results to display when landing on search page', // @translate
+                    'value_options' => [
+                        'none' => 'Nothing', // @translate
+                        'query' => 'Results of the query below', // @translate
+                        'default' => 'Default results of the search engine', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'default_results',
+                    'required' => false,
+                    'value' => 'default',
+                ],
+            ])
+            ->add([
+                'name' => 'default_query',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Default query', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'default_query',
+                ],
+            ])
+            ->add([
+                'name' => 'restrict_query_to_form',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Restrict query to form', // @translate
+                    'info' => 'A form may have less fields than the search engine can manage. If set, the search is limited to the fields of the form. Else, all standard fields manageable by the querier are available.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'restrict_query_to_form',
+                ],
+            ])
+        ;
         return $this;
     }
 
@@ -192,6 +221,24 @@ class SearchPageConfigureForm extends Form
             $data['facet_languages'] = implode('|', $data['facet_languages']);
         }
         parent::populateValues($data, $onlyBase);
+    }
+
+    protected function addInputFilter()
+    {
+        return $this
+            ->addMainSettingsInputFilter()
+            ->addFacetLanguagesInputFilter();
+    }
+
+    protected function addMainSettingsInputFilter()
+    {
+        $this
+            ->getInputFilter()
+            ->add([
+                'name' => 'default_results',
+                'required' => false,
+            ]);
+        return $this;
     }
 
     protected function addFacetLanguagesInputFilter()

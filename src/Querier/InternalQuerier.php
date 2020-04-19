@@ -68,7 +68,14 @@ class InternalQuerier extends AbstractQuerier
         $this->args = new ArrayObject;
         $facetData = null;
 
-        $this->mainQuery();
+        $isDefaultQuery = $this->defaultQuery();
+        if ($isDefaultQuery) {
+            if ($query->getDefaultQuery() === '') {
+                return $this->response;
+            }
+        } else {
+            $this->mainQuery();
+        }
 
         // "is_public" is automatically managed by the api.
 
@@ -80,7 +87,9 @@ class InternalQuerier extends AbstractQuerier
 
         $this->filterQuery();
 
-        if (!empty($this->args['property']) && count($this->args['property']) > self::REQUEST_MAX_ARGS) {
+        if (!empty($this->args['property'])
+            && count($this->args['property']) > self::REQUEST_MAX_ARGS
+        ) {
             $params = $services->get('ControllerPluginManager')->get('params');
             $req = $params->fromQuery();
             unset($req['csrf']);
@@ -151,6 +160,26 @@ class InternalQuerier extends AbstractQuerier
         }
 
         return $this->response;
+    }
+
+    protected function defaultQuery()
+    {
+        $q = $this->query->getQuery();
+        if (strlen($q)) {
+            return false;
+        }
+
+        $defaultQuery = $this->query->getDefaultQuery();
+        if (strlen($defaultQuery)) {
+            if ($defaultQuery === '*') {
+                $this->args->exchangeArray([]);
+            } else {
+                $parsedQuery = [];
+                parse_str($defaultQuery, $parsedQuery);
+                $this->args->exchangeArray($parsedQuery);
+            }
+        }
+        return true;
     }
 
     protected function mainQuery()

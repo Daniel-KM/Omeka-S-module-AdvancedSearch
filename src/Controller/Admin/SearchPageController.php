@@ -223,6 +223,8 @@ class SearchPageController extends AbstractActionController
         $params['form'] = $formParams;
         unset($params['csrf']);
 
+        $params['default_query'] = trim(ltrim($params['default_query'], '? '));
+
         // TODO Should be checked in form.
         $params['facet_languages'] = strlen(trim($params['facet_languages']))
             ? array_unique(array_map('trim', explode('|', $params['facet_languages'])))

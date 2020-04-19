@@ -39,6 +39,11 @@ class Query implements \JsonSerializable
     protected $query = '';
 
     /**
+     * @var string
+     */
+    protected $defaultQuery = '';
+
+    /**
      * @var string[]
      */
     protected $resources = [];
@@ -126,6 +131,27 @@ class Query implements \JsonSerializable
     public function getQuery()
     {
         return $this->query;
+    }
+
+    /**
+     * The default query when the query is empty. "*" means all results.
+     * The key is always trimmed.
+     *
+     * @param string $defaultQuery
+     * @return self
+     */
+    public function setDefaultQuery($defaultQuery)
+    {
+        $this->defaultQuery = trim($defaultQuery);
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDefaultQuery()
+    {
+        return $this->defaultQuery;
     }
 
     /**
@@ -377,6 +403,7 @@ class Query implements \JsonSerializable
     {
         return [
             'query' => $this->getQuery(),
+            'default_query' => $this->getDefaultQuery(),
             'resources' => $this->getResources(),
             'is_public' => $this->getIsPublic(),
             'filters' => $this->getFilters(),

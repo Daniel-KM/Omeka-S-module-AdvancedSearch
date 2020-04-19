@@ -208,3 +208,29 @@ SQL;
         $settings->set('search_main_page', $id ? (string) $id : null);
     }
 }
+
+if (version_compare($oldVersion, '3.5.14', '<')) {
+    // Add new default options to settings of search pages.
+    $sql = <<<'SQL'
+SELECT id, settings FROM search_page;
+SQL;
+    $stmt = $connection->query($sql);
+    $result = $stmt->fetchAll(\PDO::FETCH_KEY_PAIR);
+    if ($result) {
+        foreach ($result as $id => $params) {
+            $params = json_decode($params, true) ?: [];
+            $params += [
+                'default_results' => 'default',
+                'default_query' => '',
+                'restrict_query_to_form' => '0',
+            ];
+            $params = $connection->quote(json_encode($params, 320));
+            $sql = <<<SQL
+UPDATE search_page
+SET `settings` = $params
+WHERE id = $id;
+SQL;
+            $connection->exec($sql);
+        }
+    }
+}

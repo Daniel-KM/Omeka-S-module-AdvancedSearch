@@ -358,11 +358,18 @@ class InternalQuerier extends AbstractQuerier
 
     protected function facetResponse(ArrayObject $facetData)
     {
-        // FIXME Like in Solr, the facets for items and item sets are mixed, and may be complex to understand. Anyway, it's not a common case.
-        if (!in_array('items', $this->resourceTypes)) {
-            return;
+        // FIXME Like in Solr, the facets may be complex to understand when items and item sets are mixed.
+        if (count($this->resourceTypes) > 1) {
+            if (in_array('items', $this->resourceTypes)) {
+                $resourceType = 'items';
+            } elseif (in_array('item_sets', $this->resourceTypes)) {
+                $resourceType = 'item_sets';
+            } else {
+                return;
+            }
+        } else {
+            $resourceType = reset($this->resourceTypes);
         }
-        $resourceType = 'items';
 
         /** @var \Reference\Mvc\Controller\Plugin\References $references */
         $references = $this->getServiceLocator()->get('ControllerPluginManager')->get('references');

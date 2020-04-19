@@ -165,7 +165,21 @@ class AdvancedFormConfigFieldset extends Fieldset
                 ],
             ])
 
-            // field (term) | label (order means weight).
+            ->add([
+                'name' => 'filter_collection_number',
+                'type' => Element\Number::class,
+                'options' => [
+                    'label' => 'Number of filter groups to display', // @translate
+                    'info' => 'The filters may be managed via js for a better display.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'filter_collection_number',
+                    'required' => false,
+                    'value' => '1',
+                    'min' => '0',
+                    'max' => '99',
+                ],
+            ])
             ->add([
                 'name' => 'filters',
                 'type' => Element\Textarea::class,
@@ -175,6 +189,7 @@ class AdvancedFormConfigFieldset extends Fieldset
                 ],
                 'attributes' => [
                     'id' => 'filters',
+                    // field (term) | label (order means weight).
                     'placeholder' => 'dcterms:title | Title',
                     'rows' => 12,
                 ],
@@ -193,12 +208,14 @@ class AdvancedFormConfigFieldset extends Fieldset
                     'rows' => 12,
                 ],
             ])
-
             ->add([
                 'name' => 'filter_value_joiner',
                 'type' => Element\Checkbox::class,
                 'options' => [
                     'label' => 'Add the joiner ("and" or "or") to the filters', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'filter_value_joiner',
                 ],
             ])
             ->add([
@@ -206,6 +223,9 @@ class AdvancedFormConfigFieldset extends Fieldset
                 'type' => Element\Checkbox::class,
                 'options' => [
                     'label' => 'Add the type ("equal", "in", etc.) to the filters', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'filter_value_type',
                 ],
             ])
         ;

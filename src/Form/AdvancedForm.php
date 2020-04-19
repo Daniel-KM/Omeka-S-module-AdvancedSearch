@@ -90,8 +90,12 @@ class AdvancedForm extends Form
                 ->add($this->resourceTemplateFieldset());
         }
 
-        $this
-            ->add($this->textFieldset());
+        $appendTextFieldset = !empty($searchPageSettings['form']['filter_collection_number'])
+            && !empty($searchPageSettings['form']['filters']);
+        if ($appendTextFieldset) {
+            $this
+                ->add($this->textFieldset($searchPageSettings['form']['filter_collection_number']));
+        }
 
         $this->appendSpecificFields();
 
@@ -268,7 +272,7 @@ class AdvancedForm extends Form
         return $fieldset;
     }
 
-    protected function textFieldset()
+    protected function textFieldset($number = 1)
     {
         $fieldset = new Fieldset('text');
         $filterFieldset = $this->getFilterFieldset();
@@ -279,7 +283,7 @@ class AdvancedForm extends Form
                     'type' => Element\Collection::class,
                     'options' => [
                         'label' => 'Filters', // @translate
-                        'count' => 2,
+                        'count' => $number,
                         'should_create_template' => true,
                         'allow_add' => true,
                         'target_element' => $filterFieldset,

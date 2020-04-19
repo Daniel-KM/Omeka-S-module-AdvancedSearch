@@ -227,6 +227,7 @@ SQL;
             $params['form']['item_set_filter_type'] = 'multi-checkbox';
             $params['form']['resource_class_filter_type'] = 'select';
             $params['form']['resource_template_filter_type'] = 'select';
+            $params['form']['filter_collection_number'] = '1';
             $params = $connection->quote(json_encode($params, 320));
             $sql = <<<SQL
 UPDATE search_page

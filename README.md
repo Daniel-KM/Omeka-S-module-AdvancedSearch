@@ -1,33 +1,35 @@
 Search (module for Omeka S)
 ===========================
 
-[![Build Status](https://travis-ci.org/biblibre/omeka-s-module-Search.svg?branch=master)](https://travis-ci.org/biblibre/omeka-s-module-Search)
-
 [Search] is a module for [Omeka S] that adds search capabilities to the public
 interface of Omeka S, in particular filters and facets. Furthermore, it provides
 a common interface for other modules to extend it (forms, indexers, queriers).
+It can be displayed as a block on any page too.
 
 It can be extended in two ways:
 
-- Forms that will build the search form and construct the query
-- Adapters that will do the real work (indexing and querying)
+- Forms that will build the search form and construct the query.
+- Adapters that will do the real work (indexing and querying).
 
-A basic form is provided, with one single main search field without filters,
-enough in most of the cases for the end uers, especially because the results
-allow facets. An advanced example of a full form is [Psl Search Form], that
-displays filters for item sets, selected properties, range of dates and map
-locations. Note: some features of this advanced form are not managed by the
-internal adapter currently, in particular the queries on a range of dates.
+Two forms are provided by default.
+- The basic form is the simple field _à la_ Google: it contains one single main
+  search field without filters, that is enough in most of the cases for the end
+  users, especially because the results allow facets.
+- The advanced form is the full form that is used in Omeka advanced search, with
+  a full customization from the admin interface: with or without facets, sort
+  fields, collection selector, resource class selector, resource template
+  selector, and properties filters.
+- An advanced example of a full form is [Psl Search Form], that displays the
+  same fields, plus a range of dates and map locations. Note: some features of
+  this advanced form are not managed by the internal adapter currently, in
+  particular the queries on a range of dates.
 
 An internal adapter is provided too. It uses the internal Api of Omeka to search
-resources. There is no indexer currently, and the search engine is the sql one,
-so it is limited strictly to the request like the standard Omeka S search engine
-(no wildcards, no management of singular/plural, etc.). Nevertheless, it
-provides the facets to improve the results. A module is available for [Solr],
-one of the most used search engine.
-
-The Psl search form and the Solr modules were initially built by [BibLibre] and
-are used by the [digital library of PSL], a French university.
+resources. So the search engine is the sql one, without indexer, so it is
+limited strictly to the request like the standard Omeka S search engine (no
+wildcards, no management of singular/plural, etc.). Nevertheless, it provides
+the facets to improve the results (requires the module [Reference]).
+An adapter is available for [Solr], one of the most used search engine.
 
 
 Installation
@@ -177,7 +179,6 @@ TODO
 - Allow to import/export a mapping via json, for example the default one.
 - Add an option to use the search api by default (and an option `'index' => false`).
 - Set one api page by site and a quick set in the pages settings.
-- Option to forbid default search and advanced search in public front-end.
 - Update index when item pool of a site change.
 - Genericize and move the value extractor from module Solr to module Search.
 - Improve the check of presence of an item in sites for real time indexation.
@@ -235,6 +236,10 @@ See commits for full list of contributors.
 
 * Copyright BibLibre, 2016-2017 (see [BibLibre])
 * Copyright Daniel Berthereau, 2017-2020 (see [Daniel-KM])
+
+The Psl search form and the Solr modules were initially built by [BibLibre] and
+are used by the [digital library of PSL], a French university. Next improvements
+were done for various projects.
 
 
 [Search]: https://github.com/BibLibre/Omeka-S-module-Search

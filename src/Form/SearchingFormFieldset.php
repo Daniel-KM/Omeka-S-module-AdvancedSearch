@@ -30,6 +30,18 @@ class SearchingFormFieldset extends Fieldset
                 ],
             ])
             ->add([
+                'name' => 'o:block[__blockIndex__][o:data][search_page]',
+                'type' => Element\Select::class,
+                'options' => [
+                    'label' => 'Search page', // @translate
+                    'value_options' => $searchPages,
+                ],
+                'attributes' => [
+                    'id' => 'searching-form-search-page',
+                    'required' => true,
+                ],
+            ])
+            ->add([
                 'name' => 'o:block[__blockIndex__][o:data][display_results]',
                 'type' => Element\Checkbox::class,
                 'options' => [
@@ -41,15 +53,14 @@ class SearchingFormFieldset extends Fieldset
                 ],
             ])
             ->add([
-                'name' => 'o:block[__blockIndex__][o:data][search_page]',
-                'type' => Element\Select::class,
+                'name' => 'o:block[__blockIndex__][o:data][query]',
+                'type' => Element\Text::class,
                 'options' => [
-                    'label' => 'Search page', // @translate
-                    'value_options' => $searchPages,
+                    'label' => 'Query', // @translate
+                    'info' => 'Display resources using this search query. Important: use the query of the engine you use, not the browse preview one.', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'searching-form-search-page',
-                    'required' => true,
+                    'id' => 'searching-form-query',
                 ],
             ])
         ;

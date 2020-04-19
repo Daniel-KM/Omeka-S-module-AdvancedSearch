@@ -4,7 +4,9 @@ namespace Search\Site\BlockLayout;
 use Omeka\Api\Representation\SitePageBlockRepresentation;
 use Omeka\Api\Representation\SitePageRepresentation;
 use Omeka\Api\Representation\SiteRepresentation;
+use Omeka\Entity\SitePageBlock;
 use Omeka\Site\BlockLayout\AbstractBlockLayout;
+use Omeka\Stdlib\ErrorStore;
 use Search\Api\Representation\SearchPageRepresentation;
 use Search\Response;
 use Zend\View\Renderer\PhpRenderer;
@@ -19,6 +21,13 @@ class SearchingForm extends AbstractBlockLayout
     public function getLabel()
     {
         return 'Search form (module Search)'; // @translate
+    }
+
+    public function onHydrate(SitePageBlock $block, ErrorStore $errorStore)
+    {
+        $data = $block->getData();
+        $data['query'] = ltrim($data['query'], "? \t\n\r\0\x0B");
+        $block->setData($data);
     }
 
     public function form(
@@ -88,14 +97,21 @@ class SearchingForm extends AbstractBlockLayout
         ];
 
         if ($displayResults) {
-            $request = $this->validateSearchRequest($searchPage, $form, $view->params()->fromQuery());
-            if ($request !== false) {
-                $result = $view->searchRequestToResponse($request, $searchPage, $site);
-                if ($result['status'] === 'success') {
-                    $vars = array_replace($vars, $result['data']);
-                } elseif ($result['status'] === 'error') {
-                    $this->messenger()->addError($result['message']);
-                }
+            $query = [];
+            parse_str($block->dataValue('query'), $query);
+
+            $request = $view->params()->fromQuery();
+            if ($request) {
+                $request = $this->validateSearchRequest($searchPage, $form, $request) ?: $query;
+            } else {
+                $request = $query;
+            }
+
+            $result = $view->searchRequestToResponse($request, $searchPage, $site);
+            if ($result['status'] === 'success') {
+                $vars = array_replace($vars, $result['data']);
+            } elseif ($result['status'] === 'error') {
+                $this->messenger()->addError($result['message']);
             }
         }
 

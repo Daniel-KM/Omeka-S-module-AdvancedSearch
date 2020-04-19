@@ -240,8 +240,9 @@ return [
         'block_settings' => [
             'searchingForm' => [
                 'heading' => '',
-                'display_results' => false,
                 'search_page' => null,
+                'display_results' => false,
+                'query' => '',
                 'template' => '',
             ],
         ],

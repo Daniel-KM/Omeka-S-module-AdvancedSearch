@@ -30,6 +30,7 @@
 /**
  * @var \Zend\View\Renderer\PhpRenderer $this
  * @var \Omeka\Api\Representation\SiteRepresentation $site
+ * @var \Search\Api\Representation\SearchPageRepresentation $searchPage
  * @var \Search\Query $query
  * @var \Search\Response $response
  * @var array $sortOptions
@@ -76,7 +77,7 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javas
 
 <?php endif; ?>
 
-<?= $this->searchForm() ?>
+<?= $this->searchForm($searchPage) ?>
 
 <?php if (isset($response)): ?>
 <div class="search-results-wrapper">
@@ -127,7 +128,7 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javas
 
     </div>
 
-    <?= $partial('search/facets', ['query' => $query, 'response' => $response]) ?>
+    <?= $partial('search/facets', ['searchPage' => $searchPage, 'query' => $query, 'response' => $response]) ?>
 </div>
 
 <?php else: ?>

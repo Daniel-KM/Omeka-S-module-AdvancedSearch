@@ -41,6 +41,7 @@ class IndexController extends AbstractActionController
     public function searchAction()
     {
         $pageId = (int) $this->params('id');
+
         $isPublic = $this->status()->isSiteRequest();
         if ($isPublic) {
             $site = $this->currentSite();
@@ -53,8 +54,14 @@ class IndexController extends AbstractActionController
             $site = null;
         }
 
+        // The page is required, else there is no form.
+        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
+        $searchPage = $this->api()->read('search_pages', $pageId)->getContent();
+
         $view = new ViewModel([
-            // The form is not set in the view, but via helper searchingForm().
+            // The form is not set in the view, but via helper searchingForm()
+            // or via searchPage.
+            'searchPage' => $searchPage,
             'site' => $site,
             'query' => null,
             // Set a default empty response and values to simplify view.
@@ -62,14 +69,18 @@ class IndexController extends AbstractActionController
             'sortOptions' => [],
         ]);
 
-        // If the page is empty (json api request), there is no form.
-        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
-        $searchPage = $this->api()->read('search_pages', $pageId)->getContent();
-        $isJsonQuery = !$this->searchForm($searchPage);
+        $request = $this->params()->fromQuery();
 
-        $request = $this->getSearchRequest($searchPage);
-        if ($request === false) {
-            return $view;
+        $form = $this->searchForm($searchPage);
+
+        // The form may be empty for a direct query.
+        $isJsonQuery = !$form;
+
+        if ($form) {
+            $request = $this->validateSearchRequest($searchPage, $form, $request);
+            if ($request === false) {
+                return $view;
+            }
         }
 
         $result = $this->searchRequestToResponse($request, $searchPage, $site);
@@ -102,28 +113,29 @@ class IndexController extends AbstractActionController
         }
 
         return $view
-            ->setVariables($result['data'], true);
+            ->setVariables($result['data'], true)
+            ->setVariable('searchPage', $searchPage);
     }
 
     /**
      * Get the request from the query and check it according to the search page.
      *
      * @param SearchPageRepresentation $searchPage
+     * @param \Zend\Form\Form $searchForm
+     * @param array $request
      * @return array|bool
      */
-    protected function getSearchRequest(SearchPageRepresentation $searchPage)
-    {
-        $form = $this->searchForm($searchPage);
-        $isJsonQuery = empty($form);
-
+    protected function validateSearchRequest(
+        SearchPageRepresentation $searchPage,
+        \Zend\Form\Form $form,
+        array $request
+    ) {
         $searchPageSettings = $searchPage->settings();
         $restrictRequestToForm = !empty($searchPageSettings['restrict_query_to_form']);
 
-        $request = $this->params()->fromQuery();
-
         // TODO Validate api query too and add a minimal check of unrestricted queries, even if it's only a search in items, and public/private is always managed.
         // Note: The default query is not checked.
-        if ($restrictRequestToForm && !$isJsonQuery) {
+        if ($restrictRequestToForm) {
             $form->setData($request);
             if (!$form->isValid()) {
                 $messages = $form->getMessages();

@@ -181,8 +181,18 @@ class IndexController extends AbstractActionController
         $searchIndex = $this->index = $searchPage->index();
         $indexSettings = $searchIndex->settings();
 
-        if (!$this->identity()) {
-            $query->setIsPublic(true);
+        $user = $this->identity();
+        // TODO Manage roles from modules.
+        $omekaRoles = [
+            \Omeka\Permissions\Acl::ROLE_GLOBAL_ADMIN,
+            \Omeka\Permissions\Acl::ROLE_SITE_ADMIN,
+            \Omeka\Permissions\Acl::ROLE_EDITOR,
+            \Omeka\Permissions\Acl::ROLE_REVIEWER,
+            \Omeka\Permissions\Acl::ROLE_AUTHOR,
+            \Omeka\Permissions\Acl::ROLE_RESEARCHER,
+        ];
+        if ($user && in_array($user->getRole(), $omekaRoles)) {
+            $query->setIsPublic(false);
         }
 
         if ($site) {

@@ -51,7 +51,7 @@ class Query implements \JsonSerializable
     /**
      * @var bool
      */
-    protected $isPublic;
+    protected $isPublic = true;
 
     /**
      * @var array

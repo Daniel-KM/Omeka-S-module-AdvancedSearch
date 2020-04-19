@@ -35,14 +35,17 @@ trait TraitUnrestrictedQuery
 {
     public function toUnrestrictedQuery(array $request, array $formSettings)
     {
-        $query = new Query();
+        $query = new Query;
 
         if (isset($request['q'])) {
             $query->setQuery($request['q']);
         }
 
-        if (isset($formSettings['is_public_field'])) {
-            $query->addFilter($formSettings['is_public_field'], true);
+        if (isset($formSettings['is_public_field'])
+            && isset($request['isPublic'])
+            && strlen($request['isPublic'])
+        ) {
+            $query->addFilter($formSettings['is_public_field'], (bool) $request['isPublic']);
         }
 
         if (!empty($formSettings['item_set_id_field'])

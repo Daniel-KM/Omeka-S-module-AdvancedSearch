@@ -132,7 +132,9 @@ class InternalQuerier extends AbstractQuerier
             $this->mainQuery();
         }
 
-        // "is_public" is automatically managed by the api.
+        // "is_public" is automatically managed by the api, but there may be an
+        // option in the form.
+        // TODO Manage an option "is_public".
 
         // The site is a specific filter that can be used as part of main query.
         $siteId = $this->query->getSiteId();

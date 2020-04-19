@@ -59,7 +59,7 @@ $availableFields = $adapter->getAvailableFields($index);
 $form->prepare();
 ?>
 
-<?= $this->pageTitle(sprintf($translate('Configure search page "%s"'), $searchPage->name())) ?>
+<?= $this->pageTitle(sprintf($translate('Configure search page "%1$s" (%2$s)'), $searchPage->name(), $searchPage->path())) ?>
 
 <?= $this->form()->openTag($form) ?>
 <div id="page-actions">

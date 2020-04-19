@@ -33,7 +33,6 @@
  * @var \Search\Query $query
  * @var \Search\Response $response
  * @var array $sortOptions
- * @var array $facets
  */
 
 $plugins = $this->getHelperPluginManager();
@@ -128,7 +127,7 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javas
 
     </div>
 
-    <?= $partial('search/facets', ['facets' => $facets]) ?>
+    <?= $partial('search/facets', ['query' => $query, 'response' => $response]) ?>
 </div>
 
 <?php else: ?>

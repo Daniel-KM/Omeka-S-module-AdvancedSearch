@@ -202,10 +202,9 @@ class SearchRequestToResponse extends AbstractPlugin
         }
 
         if ($hasFacets) {
-            $facets = $response->getFacetCounts();
-            $facets = $this->sortFieldsByWeight($facets, 'facets');
-        } else {
-            $facets = [];
+            $facetCounts = $response->getFacetCounts();
+            $facetCounts = $this->sortFieldsByWeight($facetCounts, 'facets');
+            $response->setFacetCounts($facetCounts);
         }
 
         $totalResults = array_map(function ($resource) use ($response) {
@@ -220,7 +219,6 @@ class SearchRequestToResponse extends AbstractPlugin
                 'query' => $query,
                 'response' => $response,
                 'sortOptions' => $sortOptions,
-                'facets' => $facets,
             ],
         ];
     }

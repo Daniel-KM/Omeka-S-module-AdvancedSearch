@@ -60,7 +60,6 @@ class IndexController extends AbstractActionController
             // Set a default empty response and values to simplify view.
             'response' => new Response,
             'sortOptions' => [],
-            'facets' => [],
         ]);
 
         // If the page is empty (json api request), there is no form.

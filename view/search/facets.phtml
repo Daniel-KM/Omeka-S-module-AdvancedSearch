@@ -29,9 +29,11 @@
 
 /**
  * @var \Zend\View\Renderer\PhpRenderer $this
- * @var array $facets
+ * @var \Search\Query $query
+ * @var \Search\Response $response
  */
 
+$facets = $response->getFacetCounts();
 ?>
 
 <?php if (!empty($facets)): ?>

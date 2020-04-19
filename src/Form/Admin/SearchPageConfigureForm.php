@@ -98,6 +98,7 @@ class SearchPageConfigureForm extends Form
                     'id' => 'default_query',
                 ],
             ])
+            /* // Removed, because hard to manage with redirection of item sets, block, direct queries, etc. Need to managed internal query differently.
             ->add([
                 'name' => 'restrict_query_to_form',
                 'type' => Element\Checkbox::class,
@@ -109,6 +110,7 @@ class SearchPageConfigureForm extends Form
                     'id' => 'restrict_query_to_form',
                 ],
             ])
+            */
         ;
         return $this;
     }

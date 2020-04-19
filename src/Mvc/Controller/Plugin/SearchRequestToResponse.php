@@ -51,15 +51,6 @@ class SearchRequestToResponse extends AbstractPlugin
         }
 
         $searchPageSettings = $searchPage->settings();
-
-        // This is a quick check of an empty request.
-        $emptyRequest = $request;
-        unset($emptyRequest['csrf'], $emptyRequest['submit']);
-        $checkRequest = $request + ['q' => '', 'search' => '', 'fulltext_search' => ''];
-        $isEmptyRequest = !strlen($checkRequest['q'])
-            && !strlen($checkRequest['search'])
-            && !strlen($checkRequest['fulltext_search']);
-
         $defaultResults = @$searchPageSettings['default_results'] ?: 'default';
         switch ($defaultResults) {
             case 'none':
@@ -75,6 +66,7 @@ class SearchRequestToResponse extends AbstractPlugin
                 break;
         }
 
+        list($request, $isEmptyRequest) = $this->cleanRequest($request);
         if ($isEmptyRequest) {
             if ($defaultQuery === '') {
                 return [
@@ -224,9 +216,62 @@ class SearchRequestToResponse extends AbstractPlugin
     }
 
     /**
+     * Remove all empty values (zero length strings) and check empty request.
+     *
+     * @param array $request
+     * @return array First key is the cleaned request, the second a bool to
+     * indicate if it is empty.
+     */
+    protected function cleanRequest(array $request)
+    {
+        // They should be already removed.
+        unset($request['csrf'], $request['submit']);
+
+        $this->arrayFilterRecursive($request);
+
+        $checkRequest = array_diff_key(
+            $request,
+            [
+                // @see \Omeka\Api\Adapter\AbstractEntityAdapter::limitQuery().
+                'page' => null, 'per_page' => null, 'limit' => null, 'offset' => null,
+                // @see \Omeka\Api\Adapter\AbstractEntityAdapter::search().
+                'sort_by' => null, 'sort_order' => null,
+                // Used by Search.
+                'resource-type' => null, 'sort' => null,
+            ]
+        );
+
+        return [
+            $request,
+            !count($checkRequest),
+        ];
+    }
+
+    /**
+     * Remove zero-length values or an array, recursively.
+     *
+     * @param array $array
+     * @return array
+     */
+    protected function arrayFilterRecursive(array &$array)
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $array[$key] = $this->arrayFilterRecursive($value);
+                if (!count($array[$key])) {
+                    unset($array[$key]);
+                }
+            } elseif (!strlen(trim($array[$key]))) {
+                unset($array[$key]);
+            }
+        }
+        return $array;
+    }
+
+    /**
      * Normalize the sort options of the index.
      *
-     * @todo Normalize the sort options when the index or page is hydrated.
+     * @todo Normalize the sort options when the index or page is hydrated. To be save in a hidden setting of the page.
      *
      * @return array
      */

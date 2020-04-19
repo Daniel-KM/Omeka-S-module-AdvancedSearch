@@ -48,22 +48,19 @@ trait TraitUnrestrictedQuery
             $query->addFilter($formSettings['is_public_field'], (bool) $request['isPublic']);
         }
 
-        if (!empty($formSettings['item_set_filter_type'])
-            && !empty($formSettings['item_set_id_field'])
+        if (!empty($formSettings['item_set_id_field'])
             && isset($request['itemSet']['ids'])
         ) {
             $query->addFilter($formSettings['item_set_id_field'], $request['itemSet']['ids']);
         }
 
-        if (!empty($formSettings['resource_class_filter_type'])
-            && !empty($formSettings['resource_class_id_field'])
+        if (!empty($formSettings['resource_class_id_field'])
             && isset($request['resourceClass']['ids'])
         ) {
             $query->addFilter($formSettings['resource_class_id_field'], $request['resourceClass']['ids']);
         }
 
-        if (!empty($formSettings['resource_template_filter_type'])
-            && !empty($formSettings['resource_template_id_field'])
+        if (!empty($formSettings['resource_template_id_field'])
             && isset($request['resourceTemplate']['ids'])
         ) {
             $query->addFilter($formSettings['resource_template_id_field'], $request['resourceTemplate']['ids']);

@@ -31,6 +31,7 @@
 namespace Search\Controller;
 
 use Search\Api\Representation\SearchPageRepresentation;
+use Search\Query;
 use Search\Response;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\JsonModel;
@@ -50,6 +51,12 @@ class IndexController extends AbstractActionController
             if (!in_array($pageId, $siteSearchPages)) {
                 return $this->notFoundAction();
             }
+            // Check if it is an item set redirection.
+            $itemSetId = (int) $this->params('item-set-id');
+            if ($itemSetId) {
+                // May throw an not found exception.
+                $this->api()->read('item_sets', $itemSetId);
+            }
         } else {
             $site = null;
         }
@@ -63,16 +70,14 @@ class IndexController extends AbstractActionController
             // or via searchPage.
             'searchPage' => $searchPage,
             'site' => $site,
-            'query' => null,
+            'query' => new Query,
             // Set a default empty response and values to simplify view.
             'response' => new Response,
             'sortOptions' => [],
         ]);
 
         $request = $this->params()->fromQuery();
-
         $form = $this->searchForm($searchPage);
-
         // The form may be empty for a direct query.
         $isJsonQuery = !$form;
 
@@ -132,74 +137,20 @@ class IndexController extends AbstractActionController
         \Zend\Form\Form $form,
         array $request
     ) {
-        $searchPageSettings = $searchPage->settings();
-        $restrictRequestToForm = !empty($searchPageSettings['restrict_query_to_form']);
-
-        // TODO Validate api query too and add a minimal check of unrestricted queries, even if it's only a search in items, and public/private is always managed.
-        // Note: The default query is not checked.
-        if ($restrictRequestToForm) {
+        // Only validate the csrf.
+        // Note: The search engine is used to display item sets too via the mvc
+        // redirection. In that case, there is no csrf element, so no check to
+        // do.
+        if (array_key_exists('csrf', $request)) {
             $form->setData($request);
             if (!$form->isValid()) {
                 $messages = $form->getMessages();
                 if (isset($messages['csrf'])) {
-                    // The search engine is used to display item sets too via
-                    // the mvc redirection. In that case, there is no csrf
-                    // element, so no check to do.
-                    // TODO Add a csrf check in the mvc redirection of item sets to search page.
-                    if (array_key_exists('csrf', $request)) {
-                        $this->messenger()->addError('Invalid or missing CSRF token'); // @translate
-                        return false;
-                    }
-                } else {
-                    $this->messenger()->addError('There was an error during validation'); // @translate
+                    $this->messenger()->addError('Invalid or missing CSRF token'); // @translate
                     return false;
                 }
             }
-
-            // Get the filtered request, but keep the pagination and sort params,
-            // that are not managed by the form.
-            // FIXME Text filters are not filled with the results, so they are temporary took from the original request.
-            $textFilters = isset($request['text']['filters']) ? $request['text']['filters'] : [];
-            $request = ['text' => ['filters' => $textFilters]]
-                + $form->getData() + $this->filterExtraParams($request);
         }
-
         return $request;
-    }
-
-    /**
-     * Filter the pagination and sort params from the request.
-     *
-     * @todo Warning: "limit" is used as limit (int) of results and as filter for facets (array).
-     * @todo Factorize with \Search\Site\BlockLayout\SearchingForm::filterExtraParams()
-     *
-     * @param array $request
-     * @return array
-     */
-    protected function filterExtraParams(array $request)
-    {
-        $limitFacetRequest = [];
-        if (!empty($request['limit']) && is_array($request['limit'])) {
-            $limitFacetRequest['limit'] = $request['limit'];
-        }
-
-        $paginationRequest = array_map('intval', array_filter(array_intersect_key(
-            $request,
-            // @see \Omeka\Api\Adapter\AbstractEntityAdapter::limitQuery().
-            ['page' => null, 'per_page' => null, 'limit' => null, 'offset' => null]
-        )));
-
-        // No filter neither cast here, but checked after.
-        $sortRequest = array_intersect_key(
-            $request,
-            [
-                // @see \Omeka\Api\Adapter\AbstractEntityAdapter::search().
-                'sort_by' => null, 'sort_order' => null,
-                // Used by Search.
-                'resource-type' => null, 'sort' => null,
-            ]
-        );
-
-        return $limitFacetRequest + $paginationRequest + $sortRequest;
     }
 }

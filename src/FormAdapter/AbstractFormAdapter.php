@@ -52,6 +52,9 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
 
     public function toQuery(array $request, array $formSettings)
     {
+        // Check of restricted is removed currently.
+        return $this->toUnrestrictedQuery($request, $formSettings);
+        /*
         if (empty($formSettings['restrict_query_to_form'])) {
             return $this->toUnrestrictedQuery($request, $formSettings);
         }
@@ -62,5 +65,6 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
             $query->setQuery($request['q']);
         }
         return $query;
+        */
     }
 }

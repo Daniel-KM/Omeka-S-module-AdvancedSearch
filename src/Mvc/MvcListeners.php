@@ -59,7 +59,8 @@ class MvcListeners extends AbstractListenerAggregate
         $routeMatch->setMatchedRouteName('search-page-' . $searchMainPage);
         $event->setRouteMatch($routeMatch);
 
-        $query = $event->getRequest()->getQuery();
-        $query->set('itemSet', ['ids' => [$itemSetId]]);
+        /* @var \Zend\Stdlib\Parameters $query */
+        $event->getRequest()->getQuery()
+            ->set('itemSet', ['ids' => [$itemSetId]]);
     }
 }

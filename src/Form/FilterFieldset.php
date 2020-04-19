@@ -66,7 +66,8 @@ class FilterFieldset extends Fieldset
                     ],
                     'attributes' => [
                         'value' => 'and',
-                        'class' => 'chosen-select',
+                        // TODO Manage width for chosen select (but useless: the number of options is small).
+                        // 'class' => 'chosen-select',
                     ],
                 ]);
         }
@@ -81,7 +82,8 @@ class FilterFieldset extends Fieldset
                 ],
                 'attributes' => [
                     'value' => 'eq',
-                    'class' => 'chosen-select',
+                    // TODO Manage width for chosen select (but useless: the number of options is small).
+                    // 'class' => 'chosen-select',
                 ],
             ]);
 
@@ -107,7 +109,8 @@ class FilterFieldset extends Fieldset
                     ],
                     'attributes' => [
                         'value' => 'in',
-                        'class' => 'chosen-select',
+                        // TODO Manage width for chosen select (but useless: the number of options is small).
+                        // 'class' => 'chosen-select',
                     ],
                 ]);
         }

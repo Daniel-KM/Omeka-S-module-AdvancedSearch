@@ -67,31 +67,6 @@ class Indexing extends AbstractJob
         $searchIndex = $api->read('search_indexes', $searchIndexId)->getContent();
         $indexer = $searchIndex->indexer();
 
-        $timeStart = microtime(true);
-        $this->logger->info(new Message('Search index #%d ("%s"): start of indexing', // @translate
-            $searchIndex->id(), $searchIndex->name()));
-
-        $indexer->setServiceLocator($services);
-        $indexer->setLogger($this->logger);
-
-        $totalJobs = $services->get('ControllerPluginManager')->get('totalJobs');
-        $totalJobs = $totalJobs(self::class, true);
-        if ($totalJobs > 1) {
-            $force = $this->getArg('force');
-            if ($force) {
-                $this->logger->warn(new Message(
-                    'There are already %d other jobs "Indexing". Slowdowns may occur on the site.', // @translate
-                    $totalJobs - 1
-                ));
-            } else {
-                $this->logger->err(new Message(
-                    'Search index #%d ("%s"): end of indexing: there are already %d other jobs "Search Index" and the current one is not forced.', // @translate
-                    $searchIndex->id(), $searchIndex->name(), $totalJobs - 1
-                ));
-                return;
-            }
-        }
-
         $searchIndexSettings = $searchIndex->settings();
         $resourceNames = $searchIndexSettings['resources'];
         $selectedResourceNames = $this->getArg('resource_names', []);
@@ -102,12 +77,35 @@ class Indexing extends AbstractJob
             return $indexer->canIndex($resourceName);
         });
         if (empty($resourceNames)) {
-            $this->logger->warn(new Message(
-                'Search index #%d ("%s"): the indexing ended: there is no resource type to index.', // @translate
+            $this->logger->notice(new Message(
+                'Search index #%d ("%s"): there is no resource type to index or the indexation is not needed.', // @translate
                 $searchIndex->id(), $searchIndex->name()
             ));
             return;
         }
+
+        $totalJobs = $services->get('ControllerPluginManager')->get('totalJobs');
+        $totalJobs = $totalJobs(self::class, true);
+        $force = $this->getArg('force');
+        if ($totalJobs > 1) {
+            if (!$force) {
+                $this->logger->err(new Message(
+                    'Search index #%d ("%s"): There are already %d other jobs "Search Index" and the current one is not forced.', // @translate
+                    $searchIndex->id(), $searchIndex->name(), $totalJobs - 1
+                ));
+                return;
+            }
+
+            $this->logger->warn(new Message(
+                'There are already %d other jobs "Indexing". Slowdowns may occur on the site.', // @translate
+                $totalJobs - 1
+            ));
+        }
+
+        $timeStart = microtime(true);
+
+        $this->logger->info(new Message('Search index #%d ("%s"): start of indexing', // @translate
+            $searchIndex->id(), $searchIndex->name()));
 
         $rNames = $resourceNames;
         sort($rNames);

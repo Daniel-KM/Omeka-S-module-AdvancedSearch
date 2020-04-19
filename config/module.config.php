@@ -33,6 +33,7 @@ return [
             'facetCheckbox' => Service\ViewHelper\FacetCheckboxFactory::class,
             'facetLink' => Service\ViewHelper\FacetLinkFactory::class,
             'searchIndexConfirm' => Service\ViewHelper\SearchIndexConfirmFactory::class,
+            'searchRequestToResponse' => Service\ViewHelper\SearchRequestToResponseFactory::class,
         ],
     ],
     'block_layouts' => [

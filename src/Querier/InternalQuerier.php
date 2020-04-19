@@ -415,19 +415,6 @@ class InternalQuerier extends AbstractQuerier
 
     protected function facetResponse(ArrayObject $facetData)
     {
-        // FIXME Like in Solr, the facets may be complex to understand when items and item sets are mixed.
-        if (count($this->resourceTypes) > 1) {
-            if (in_array('items', $this->resourceTypes)) {
-                $resourceType = 'items';
-            } elseif (in_array('item_sets', $this->resourceTypes)) {
-                $resourceType = 'item_sets';
-            } else {
-                return;
-            }
-        } else {
-            $resourceType = reset($this->resourceTypes);
-        }
-
         /** @var \Reference\Mvc\Controller\Plugin\References $references */
         $references = $this->getServiceLocator()->get('ControllerPluginManager')->get('references');
 
@@ -451,37 +438,39 @@ class InternalQuerier extends AbstractQuerier
             return isset($metadataFieldsToNames[$v]) ? $metadataFieldsToNames[$v] : $v;
         }, $facetFields);
 
-        $options = [
-            'resource_name' => $resourceType,
-            // Options sql.
-            'per_page' => $facetLimit,
-            'page' => 1,
-            'sort_by' => 'total',
-            'sort_order' => 'DESC',
-            'filters' => [
-                'languages' => $facetLanguages,
-            ],
-            'values' => [],
-            // Output options.
-            'first_id' => false,
-            'initial' => false,
-            'lang' => false,
-            'include_without_meta' => false,
-            'output' => 'associative',
-        ];
+        foreach ($this->resourceTypes as $resourceType) {
+            $options = [
+                'resource_name' => $resourceType,
+                // Options sql.
+                'per_page' => $facetLimit,
+                'page' => 1,
+                'sort_by' => 'total',
+                'sort_order' => 'DESC',
+                'filters' => [
+                    'languages' => $facetLanguages,
+                ],
+                'values' => [],
+                // Output options.
+                'first_id' => false,
+                'initial' => false,
+                'lang' => false,
+                'include_without_meta' => false,
+                'output' => 'associative',
+            ];
 
-        $values = $references
-            ->setMetadata($fields)
-            ->setQuery($facetData->getArrayCopy())
-            ->setOptions($options)
-            ->list();
+            $values = $references
+                ->setMetadata($fields)
+                ->setQuery($facetData->getArrayCopy())
+                ->setOptions($options)
+                ->list();
 
-        $key = 0;
-        foreach ($values as $result) {
-            foreach ($result['o-module-reference:values'] as $value => $count) {
-                $this->response->addFacetCount($facetFields[$key], $value, $count);
+            $key = 0;
+            foreach ($values as $result) {
+                foreach ($result['o-module-reference:values'] as $value => $count) {
+                    $this->response->addFacetCount($facetFields[$key], $value, $count);
+                }
+                ++$key;
             }
-            ++$key;
         }
     }
 

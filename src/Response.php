@@ -80,14 +80,29 @@ class Response implements \JsonSerializable
     }
 
     /**
-     * @param string $resourceType The resource type ("items", "item_sets"…).
-     * @return int
+     * @param string|null $resourceType The resource type ("items", "item_sets"…).
+     * @return int|array
      */
-    public function getResourceTotalResults($resourceType)
+    public function getResourceTotalResults($resourceType = null)
     {
+        if (is_null($resourceType)) {
+            return $this->resourceTotalResults;
+        }
         return isset($this->resourceTotalResults[$resourceType])
             ? $this->resourceTotalResults[$resourceType]
             : 0;
+    }
+
+    /**
+     * Store all results for all resources.
+     *
+     * @param array $results Results by resource type ("items", "item_sets"…).
+     * @return self
+     */
+    public function setResults(array $results)
+    {
+        $this->results = $results;
+        return $this;
     }
 
     /**
@@ -117,20 +132,35 @@ class Response implements \JsonSerializable
     }
 
     /**
-     * Get stored results.
+     * Get stored results for a resource type or all resource types.
      *
-     * @param string $resourceType The resource type ("items", "item_sets"…).
+     * @param string|null $resourceType The resource type ("items", "item_sets"…).
      * @return array
      */
-    public function getResults($resourceType)
+    public function getResults($resourceType = null)
     {
+        if (is_null($resourceType)) {
+            return $this->results;
+        }
         return isset($this->results[$resourceType])
             ? $this->results[$resourceType]
             : [];
     }
 
     /**
-     * Store a list of result for a facet.
+     * Store a list of counts for all facets of all resources.
+     *
+     * @param array $facetCounts Counts by facet, with keys "value" and "count".
+     * @return self
+     */
+    public function setFacetCounts(array $facetCounts)
+    {
+        $this->facetCounts = $facetCounts;
+        return $this;
+    }
+
+    /**
+     * Store a list of counts for a facet.
      *
      * @param string $name
      * @param array $counts List of counts with keys "value" and "count".
@@ -144,7 +174,7 @@ class Response implements \JsonSerializable
     }
 
     /**
-     * Store the result for a facet.
+     * Store the count for a facet.
      *
      * @param string $name
      * @param string $value
@@ -160,21 +190,27 @@ class Response implements \JsonSerializable
     }
 
     /**
-     * Get all the facet counts.
+     * Get all the facet counts or a specific one.
      *
+     * @param string|null $name
      * @return array
      */
-    public function getFacetCounts()
+    public function getFacetCounts($name = null)
     {
-        return $this->facetCounts;
+        if (is_null($name)) {
+            return $this->facetCounts;
+        }
+        return isset($this->facetCounts[$name])
+            ? $this->facetCounts[$name]
+            : [];
     }
 
     public function jsonSerialize()
     {
         return [
             'totalResults' => $this->getTotalResults(),
-            'resourceTotalResults' => $this->resourceTotalResults,
-            'results' => $this->results,
+            'resourceTotalResults' => $this->getResourceTotalResults(),
+            'results' => $this->getResults(),
             'facetCounts' => $this->getFacetCounts(),
         ];
     }

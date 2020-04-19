@@ -31,6 +31,7 @@ namespace Search\Job;
 
 use Omeka\Job\AbstractJob;
 use Omeka\Stdlib\Message;
+use Search\Query;
 
 class Indexing extends AbstractJob
 {
@@ -91,15 +92,6 @@ class Indexing extends AbstractJob
             }
         }
 
-        if ($startResourceId > 0) {
-            $this->logger->info(new Message(
-                'Search index is not cleared: search starts at resource #%d.', // @translate
-                $startResourceId
-            ));
-        } else {
-            $indexer->clearIndex();
-        }
-
         $searchIndexSettings = $searchIndex->settings();
         $resourceNames = $searchIndexSettings['resources'];
         $selectedResourceNames = $this->getArg('resource_names', []);
@@ -117,9 +109,28 @@ class Indexing extends AbstractJob
             return;
         }
 
+        $rNames = $resourceNames;
+        sort($rNames);
+        $fullClearIndex = array_values($rNames) === ['item_sets', 'items'];
+
+        if ($startResourceId > 0) {
+            $this->logger->info(new Message(
+                'Search index is not cleared: reindexing starts at resource #%d.', // @translate
+                $startResourceId
+            ));
+        } elseif ($fullClearIndex) {
+            $indexer->clearIndex();
+        }
+
         $resources = [];
         $totals = [];
         foreach ($resourceNames as $resourceName) {
+            if (!$fullClearIndex && $startResourceId <= 0) {
+                $query = new Query();
+                $query->setResources([$resourceName]);
+                $indexer->clearIndex($query);
+            }
+
             $totals[$resourceName] = 0;
             $page = 1;
             $entityClass = $apiAdapters->get($resourceName)->getEntityClass();
@@ -152,6 +163,7 @@ class Indexing extends AbstractJob
                     }
                     return;
                 }
+
                 // TODO Use doctrine large iterable data-processing? See https://www.doctrine-project.org/projects/doctrine-orm/en/latest/reference/batch-processing.html#iterating-large-results-for-data-processing
                 $offset = $batchSize * ($page - 1);
                 $q = $em

@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2018
+ * Copyright Daniel Berthereau, 2018-2020
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -32,6 +32,7 @@ namespace Search\Indexer;
 
 use Omeka\Entity\Resource;
 use Search\Api\Representation\SearchIndexRepresentation;
+use Search\Query;
 use Zend\Log\LoggerAwareInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
@@ -59,8 +60,10 @@ interface IndexerInterface extends LoggerAwareInterface
 
     /**
      * Reset the index.
+     *
+     * @param Query $query Allows to limit clearing to some resources.
      */
-    public function clearIndex();
+    public function clearIndex(Query $query = null);
 
     /**
      * Index a resource.

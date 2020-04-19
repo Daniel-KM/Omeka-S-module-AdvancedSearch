@@ -2,6 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
+ * Copyright Daniel Berthereau, 2020
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -128,18 +129,20 @@ class SearchIndexRepresentation extends AbstractEntityRepresentation
      */
     public function indexer()
     {
-        $serviceLocator = $this->getServiceLocator();
+        $services = $this->getServiceLocator();
         $adapter = $this->adapter();
         if ($adapter) {
             $indexerClass = $adapter->getIndexerClass()?: \Search\Indexer\NoopIndexer::class;
         } else {
             $indexerClass = \Search\Indexer\NoopIndexer::class;
         }
+
+        /** @var \Search\Indexer\IndexerInterface $indexer */
         $indexer = new $indexerClass;
-        $indexer->setServiceLocator($serviceLocator);
-        $indexer->setSearchIndex($this);
-        $indexer->setLogger($serviceLocator->get('Omeka\Logger'));
-        return $indexer;
+        return $indexer
+            ->setServiceLocator($services)
+            ->setSearchIndex($this)
+            ->setLogger($services->get('Omeka\Logger'));
     }
 
     /**
@@ -148,17 +151,19 @@ class SearchIndexRepresentation extends AbstractEntityRepresentation
      */
     public function querier()
     {
-        $serviceLocator = $this->getServiceLocator();
+        $services = $this->getServiceLocator();
         $adapter = $this->adapter();
         if ($adapter) {
             $querierClass = $adapter->getQuerierClass()?: \Search\Querier\NoopQuerier::class;
         } else {
             $querierClass = \Search\Querier\NoopQuerier::class;
         }
+
+        /** @var \Search\Querier\QuerierInterface $querier */
         $querier = new $querierClass;
-        $querier->setServiceLocator($serviceLocator);
-        $querier->setSearchIndex($this);
-        $querier->setLogger($serviceLocator->get('Omeka\Logger'));
-        return $querier;
+        return $querier
+            ->setServiceLocator($services)
+            ->setSearchIndex($this)
+            ->setLogger($services->get('Omeka\Logger'));
     }
 }

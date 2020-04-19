@@ -4,6 +4,7 @@ namespace Search\Test\Indexer;
 
 use Omeka\Entity\Resource;
 use Search\Indexer\AbstractIndexer;
+use Search\Query;
 
 class TestIndexer extends AbstractIndexer
 {
@@ -12,7 +13,7 @@ class TestIndexer extends AbstractIndexer
         return true;
     }
 
-    public function clearIndex()
+    public function clearIndex(Query $query = null)
     {
     }
 

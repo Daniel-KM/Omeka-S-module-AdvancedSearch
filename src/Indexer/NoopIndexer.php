@@ -4,6 +4,7 @@ namespace Search\Indexer;
 
 use Omeka\Entity\Resource;
 use Search\Api\Representation\SearchIndexRepresentation;
+use Search\Query;
 use Zend\Log\LoggerAwareTrait;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
@@ -26,7 +27,7 @@ class NoopIndexer implements IndexerInterface
         return false;
     }
 
-    public function clearIndex()
+    public function clearIndex(Query $query = null)
     {
     }
 

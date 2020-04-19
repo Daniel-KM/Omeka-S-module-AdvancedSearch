@@ -181,6 +181,26 @@ class AdvancedFormConfigFieldset extends Fieldset
                 ],
             ])
             ->add([
+                'name' => 'filter_value_joiner',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Add the joiner ("and" or "or") to the filters', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'filter_value_joiner',
+                ],
+            ])
+            ->add([
+                'name' => 'filter_value_type',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Add the type ("equal", "in", etc.) to the filters', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'filter_value_type',
+                ],
+            ])
+            ->add([
                 'name' => 'filters',
                 'type' => Element\Textarea::class,
                 'options' => [
@@ -206,26 +226,6 @@ class AdvancedFormConfigFieldset extends Fieldset
                     'value' => $this->getFieldsOptionsAsText(),
                     'placeholder' => 'dcterms:title | Title',
                     'rows' => 12,
-                ],
-            ])
-            ->add([
-                'name' => 'filter_value_joiner',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'label' => 'Add the joiner ("and" or "or") to the filters', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'filter_value_joiner',
-                ],
-            ])
-            ->add([
-                'name' => 'filter_value_type',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'label' => 'Add the type ("equal", "in", etc.) to the filters', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'filter_value_type',
                 ],
             ])
         ;

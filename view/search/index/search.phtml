@@ -34,7 +34,6 @@
  * @var \Search\Response $response
  * @var array $sortOptions
  * @var array $facets
- * @var bool $isPartial Allow to use this partial in admin board when true.
  */
 
 $plugins = $this->getHelperPluginManager();
@@ -42,6 +41,8 @@ $translate = $plugins->get('translate');
 $translatePlural = $plugins->get('translatePlural');
 $assetUrl = $plugins->get('assetUrl');
 $partial = $plugins->get('partial');
+
+$isPartial = !$site;
 
 // Used in case of a redirect of item-set/show to search, when used like item/browse.
 $itemSetId = $this->params()->fromRoute('item-set-id');

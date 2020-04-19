@@ -72,6 +72,9 @@ return [
         ],
     ],
     'controller_plugins' => [
+        'invokables' => [
+            'searchRequestToResponse' => Mvc\Controller\Plugin\SearchRequestToResponse::class,
+        ],
         'factories' => [
             'apiSearch' => Service\ControllerPlugin\ApiSearchFactory::class,
             'apiSearchOne' => Service\ControllerPlugin\ApiSearchOneFactory::class,

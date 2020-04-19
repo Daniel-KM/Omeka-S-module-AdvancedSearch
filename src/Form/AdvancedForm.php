@@ -33,6 +33,7 @@ use Omeka\Api\Manager;
 use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Form\Element\ResourceClassSelect;
 use Omeka\Form\Element\ResourceTemplateSelect;
+use Omeka\View\Helper\Setting;
 use Zend\Form\Element;
 use Zend\Form\Fieldset;
 use Zend\Form\Form;
@@ -48,6 +49,11 @@ class AdvancedForm extends Form
      * @var SiteRepresentation
      */
     protected $site;
+
+    /**
+     * @var Setting
+     */
+    protected $siteSetting;
 
     protected $formElementManager;
 
@@ -174,6 +180,24 @@ class AdvancedForm extends Form
     }
 
     /**
+     * @param Setting|null $siteSetting
+     * @return self
+     */
+    public function setSiteSetting(Setting $siteSetting = null)
+    {
+        $this->siteSetting = $siteSetting;
+        return $this;
+    }
+
+    /**
+     * @return \Omeka\View\Helper\Setting|null
+     */
+    public function getSiteSetting()
+    {
+        return $this->siteSetting;
+    }
+
+    /**
      * @param Object $formElementManager
      * @return self
      */
@@ -267,8 +291,40 @@ class AdvancedForm extends Form
                 'data-placeholder' => 'Select resource templates…', // @translate
             ]);
 
-        $fieldset
-            ->add($element);
+        $setting = $this->getSiteSetting();
+        $hasValues = false;
+        if ($setting && $setting('search_restrict_templates', false)) {
+            $values = $setting('search_apply_templates', []);
+            if ($values) {
+                $values = array_intersect_key($element->getValueOptions(), array_flip($values));
+                $hasValues = (bool) $values;
+                if ($hasValues) {
+                    $fieldset
+                        ->add([
+                            'name' => 'ids',
+                            'type' => Element\Select::class,
+                            'options' => [
+                                'label' => 'Resource templates', // @translate
+                                'value_options' => $values,
+                                'empty_option' => '',
+                            ],
+                            'attributes' => [
+                                'id' => 'resource-templates',
+                                'multiple' => true,
+                                'class' => 'chosen-select',
+                                'data-placeholder' => 'Select resource templates…', // @translate
+                            ],
+                        ])
+                    ;
+                }
+            }
+        }
+
+        if (!$hasValues) {
+            $fieldset
+                ->add($element);
+        }
+
         return $fieldset;
     }
 

@@ -29,19 +29,26 @@
 
 namespace Search\Service\Form;
 
-use Search\Form\AdvancedForm;
 use Interop\Container\ContainerInterface;
+use Search\Form\AdvancedForm;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
 class AdvancedFormFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        $currentSite = $services->get('ControllerPluginManager')->get('currentSite');
+        $plugins = $services->get('ControllerPluginManager');
+        $helpers = $plugins->get('viewHelpers');
+        $currentSite = $plugins->get('currentSite');
+        $currentSite = $currentSite();
+        $siteSetting = $currentSite
+            ? $helpers()->get('siteSetting')
+            : null;
         $form = new AdvancedForm(null, $options);
         return $form
             ->setApiManager($services->get('Omeka\ApiManager'))
-            ->setSite($currentSite())
+            ->setSite($currentSite)
+            ->setSiteSetting($siteSetting)
             ->setFormElementManager($services->get('FormElementManager'));
     }
 }

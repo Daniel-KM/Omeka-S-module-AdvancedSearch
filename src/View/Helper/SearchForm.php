@@ -31,11 +31,12 @@ class SearchForm extends AbstractHelper
     /**
      * @param SearchPageRepresentation $searchPage
      * @param string $partial Specific partial for the search form of the page.
+     * @param bool $skipFormAction Don't set form action, so use the current page.
      * @return \Search\View\Helper\SearchForm
      */
-    public function __invoke(SearchPageRepresentation $searchPage = null, $partial = null)
+    public function __invoke(SearchPageRepresentation $searchPage = null, $partial = null, $skipFormAction = false)
     {
-        $this->initSearchForm($searchPage, $partial);
+        $this->initSearchForm($searchPage, $partial, $skipFormAction);
         return $this;
     }
 
@@ -44,8 +45,9 @@ class SearchForm extends AbstractHelper
      *
      * @param SearchPageRepresentation $searchPage
      * @param string $partial Specific partial for the search form.
+     * @param bool $skipFormAction Don't set form action, so use the current page.
      */
-    protected function initSearchForm(SearchPageRepresentation $searchPage = null, $partial = null)
+    protected function initSearchForm(SearchPageRepresentation $searchPage = null, $partial = null, $skipFormAction = false)
     {
         $view = $this->getView();
         $isAdmin = $view->status()->isAdminRequest();
@@ -73,7 +75,7 @@ class SearchForm extends AbstractHelper
         $this->form = null;
         if ($this->searchPage) {
             $this->form = $this->searchPage->form();
-            if ($this->form) {
+            if ($this->form && !$skipFormAction) {
                 $url = $isAdmin
                     ? $this->searchPage->adminSearchUrl()
                     : $this->searchPage->url();

@@ -9,9 +9,10 @@ class SearchingForm extends AbstractHelper
      * Display the search form if any, else display the standard form.
      *
      * @param string $searchFormPartial Specific partial for the search form.
+     * @param bool $skipFormAction
      * @return string
      */
-    public function __invoke($searchFormPartial = null)
+    public function __invoke($searchFormPartial = null, $skipFormAction = false)
     {
         $view = $this->getView();
 
@@ -21,7 +22,7 @@ class SearchingForm extends AbstractHelper
             /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
             $searchPage = $view->api()->searchOne('search_pages', ['id' => $searchMainPage])->getContent();
             if ($searchPage) {
-                return (string) $view->searchForm($searchPage, $searchFormPartial);
+                return (string) $view->searchForm($searchPage, $searchFormPartial, $skipFormAction);
             }
         }
 

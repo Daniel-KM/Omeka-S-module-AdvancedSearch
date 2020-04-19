@@ -31,6 +31,7 @@ $escape = $this->plugin('escapeHtml');
 <?php endif; ?>
 
 <?php $this->vars()->offsetUnset('displayResults') ?>
-<?= $this->partial('search/index/search', $this->vars()) ?>
+<?php $this->vars()->offsetSet('skipFormAction', true) ?>
+<?= $this->partial('search/index/search') ?>
 
 <?php endif; ?>

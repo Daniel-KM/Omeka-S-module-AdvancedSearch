@@ -34,7 +34,9 @@
  * @var \Search\Query $query
  * @var \Search\Response $response
  * @var array $sortOptions
- * @var string $heading Optional for block layout.
+ * For block layout:
+ * @var string $heading Unused in current template.
+ * @var bool $skipFormAction Remove action of the form, so it uses current page.
  */
 
 $plugins = $this->getHelperPluginManager();
@@ -44,6 +46,7 @@ $assetUrl = $plugins->get('assetUrl');
 $partial = $plugins->get('partial');
 
 $isPartial = !$site;
+$skipFormAction = !empty($skipFormAction);
 
 // Used in case of a redirect of item-set/show to search, when used like item/browse.
 $itemSetId = $this->params()->fromRoute('item-set-id');
@@ -78,7 +81,7 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javas
 
 <?php endif; ?>
 
-<?= $this->searchForm($searchPage) ?>
+<?= $this->searchForm($searchPage, $skipFormAction) ?>
 
 <?php if (isset($response)): ?>
 <div class="search-results-wrapper">

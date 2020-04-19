@@ -88,7 +88,6 @@ class SearchingForm extends AbstractBlockLayout
         ];
 
         if ($displayResults) {
-            $form->removeAttribute('action');
             $request = $this->validateSearchRequest($searchPage, $form, $view->params()->fromQuery());
             if ($request !== false) {
                 $result = $view->searchRequestToResponse($request, $searchPage, $site);

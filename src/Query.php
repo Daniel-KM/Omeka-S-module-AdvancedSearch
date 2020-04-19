@@ -112,6 +112,7 @@ class Query implements \JsonSerializable
      * The key is always trimmed.
      *
      * @param string $query
+     * @return self
      */
     public function setQuery($query)
     {
@@ -129,6 +130,7 @@ class Query implements \JsonSerializable
 
     /**
      * @param string[] $resources The resource types are "items" and "item_sets".
+     * @return self
      */
     public function setResources($resources)
     {
@@ -146,6 +148,7 @@ class Query implements \JsonSerializable
 
     /**
      * @param array $isPublic
+     * @return self
      */
     public function setIsPublic($isPublic)
     {
@@ -164,6 +167,7 @@ class Query implements \JsonSerializable
     /**
      * @param string $name
      * @param string $value
+     * @return self
      */
     public function addFilter($name, $value)
     {
@@ -183,6 +187,7 @@ class Query implements \JsonSerializable
      * @param string $name
      * @param string $start
      * @param string $end
+     * @return self
      */
     public function addDateRangeFilter($name, $start, $end)
     {
@@ -210,6 +215,7 @@ class Query implements \JsonSerializable
      * @param string $value
      * @param string $type
      * @param string $joiner
+     * @return self
      */
     public function addFilterQuery($name, $value, $type = 'in', $joiner = 'and')
     {
@@ -228,6 +234,7 @@ class Query implements \JsonSerializable
     /**
      * @param string|null $sort The field and the direction ("asc" or "desc")
      * separated by a space. Null means no sort (default of the search engine).
+     * @return self
      */
     public function setSort($sort)
     {
@@ -263,6 +270,7 @@ class Query implements \JsonSerializable
     /**
      * @param int $page
      * @param int $rowCount
+     * @return self
      */
     public function setLimitPage($page, $rowCount)
     {
@@ -275,6 +283,7 @@ class Query implements \JsonSerializable
 
     /**
      * @param string $field
+     * @return self
      */
     public function addFacetField($field)
     {
@@ -294,6 +303,7 @@ class Query implements \JsonSerializable
 
     /**
      * @param int $facetLimit
+     * @return self
      */
     public function setFacetLimit($facetLimit)
     {
@@ -329,7 +339,7 @@ class Query implements \JsonSerializable
 
     /**
      * @param array $excludedFields
-     * @return \Search\Query
+     * @return self
      */
     public function setExcludedFields(array $excludedFields)
     {
@@ -347,6 +357,7 @@ class Query implements \JsonSerializable
 
     /**
      * @param int $siteId
+     * @return self
      */
     public function setSiteId($siteId)
     {
@@ -385,10 +396,12 @@ class Query implements \JsonSerializable
     /**
      * @deprecated 3.5.8 Use self::setSiteId() instead. Will be removed in 3.6.
      * @param SiteRepresentation $site
+     * @return self
      */
     public function setSite(SiteRepresentation $site)
     {
         $this->site = $site;
+        $this->siteId = $site->id();
         return $this;
     }
 

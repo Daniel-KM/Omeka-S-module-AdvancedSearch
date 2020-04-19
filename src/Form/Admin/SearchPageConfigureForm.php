@@ -362,6 +362,7 @@ class SearchPageConfigureForm extends Form
     public function setFormElementManager($formElementManager)
     {
         $this->formElementManager = $formElementManager;
+        return $this;
     }
 
     public function getFormElementManager()

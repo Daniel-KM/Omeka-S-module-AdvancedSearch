@@ -303,13 +303,14 @@ class ApiSearch extends AbstractPlugin
         // No facets for the api.
 
         // Send the query to the search engine.
-        $index = $this->index;
-        $indexSettings = $index->settings();
+        $indexSettings = $this->index->settings();
 
         /** @var \Search\Querier\QuerierInterface $querier */
-        $querier = $index->querier();
+        $querier = $this->index
+            ->querier()
+            ->setQuery($searchQuery);
         try {
-            $searchResponse = $querier->query($searchQuery);
+            $searchResponse = $querier->query();
         } catch (QuerierException $e) {
             throw new Exception\BadResponseException($e->getMessage(), $e->getCode(), $e);
         }

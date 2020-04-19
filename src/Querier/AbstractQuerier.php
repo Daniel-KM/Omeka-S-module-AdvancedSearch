@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2017-2018
+ * Copyright Daniel Berthereau, 2017-2020
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -45,9 +45,14 @@ abstract class AbstractQuerier implements QuerierInterface
     protected $serviceLocator;
 
     /**
-     * @param SearchIndexRepresentation $index
+     * @var SearchIndexRepresentation $index
      */
     protected $index;
+
+    /**
+     * @var Query
+     */
+    protected $query;
 
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
     {
@@ -105,5 +110,13 @@ abstract class AbstractQuerier implements QuerierInterface
         return $default;
     }
 
-    abstract public function query(Query $query);
+    public function setQuery(Query $query)
+    {
+        $this->query = $query;
+        return $this;
+    }
+
+    abstract public function query();
+
+    abstract public function getPreparedQuery();
 }

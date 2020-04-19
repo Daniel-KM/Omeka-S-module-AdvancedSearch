@@ -27,8 +27,18 @@ class NoopQuerier implements QuerierInterface
         return $this;
     }
 
-    public function query(Query $query)
+    public function setQuery(Query $query)
+    {
+        return $this;
+    }
+
+    public function query()
     {
         return new Response;
+    }
+
+    public function getPreparedQuery()
+    {
+        return null;
     }
 }

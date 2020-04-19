@@ -256,9 +256,11 @@ class IndexController extends AbstractActionController
         $query = $eventArgs['query'];
 
         // Send the query to the search engine.
-        $querier = $searchIndex->querier();
+        $querier = $searchIndex
+            ->querier()
+            ->setQuery($query);
         try {
-            $response = $querier->query($query);
+            $response = $querier->query();
         } catch (QuerierException $e) {
             $message = sprintf('Query error: %s', $e->getMessage()); // @translate
             if ($jsonQuery) {

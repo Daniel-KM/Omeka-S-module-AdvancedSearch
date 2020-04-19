@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2018
+ * Copyright Daniel Berthereau, 2018-2020
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -51,10 +51,25 @@ interface QuerierInterface extends LoggerAwareInterface
     public function setSearchIndex(SearchIndexRepresentation $index);
 
     /**
-     * Process a search query.
+     * Set a search query.
      *
      * @param Query $query
+     * @return self
+     */
+    public function setQuery(Query $query);
+
+    /**
+     * Process a search query.
+     *
      * @return Response
      */
-    public function query(Query $query);
+    public function query();
+
+    /**
+     * Prepare a search query.
+     *
+     * @return mixed|null The query formatted for this specific search engine.
+     * Return null if the query is not processable or without result.
+     */
+    public function getPreparedQuery();
 }

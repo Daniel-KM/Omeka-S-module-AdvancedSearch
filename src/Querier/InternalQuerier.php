@@ -6,7 +6,6 @@ use ArrayObject;
 use Omeka\Mvc\Controller\Plugin\Messenger;
 use Omeka\Stdlib\Message;
 use Search\Querier\Exception\QuerierException;
-use Search\Query;
 use Search\Response;
 
 class InternalQuerier extends AbstractQuerier
@@ -17,11 +16,6 @@ class InternalQuerier extends AbstractQuerier
      * So excluded fields can be used only when a small subset of properties is used.
      */
     const REQUEST_MAX_ARGS = 50;
-
-    /**
-     * @var Query
-     */
-    protected $query;
 
     /**
      * @var Response
@@ -38,102 +32,20 @@ class InternalQuerier extends AbstractQuerier
      */
     protected $args;
 
-    public function query(Query $query)
+    public function query()
     {
-        $this->query = $query;
         $this->response = new Response;
 
-        // TODO Normalize search url arguments. Here, the ones from Solr are taken.
-
-        $indexerResourceTypes = $this->getSetting('resources', []);
-        $this->resourceTypes = $query->getResources() ?: $indexerResourceTypes;
-        $this->resourceTypes = array_intersect($this->resourceTypes, $indexerResourceTypes);
-        if (empty($this->resourceTypes)) {
+        $this->args = $this->getPreparedQuery();
+        if (is_null($this->args)) {
             return $this->response;
         }
 
         /**
          * @var \Omeka\Mvc\Controller\Plugin\Api $api
          */
-        $services = $this->getServiceLocator();
-        $plugins = $services->get('ControllerPluginManager');
+        $plugins = $this->getServiceLocator()->get('ControllerPluginManager');
         $api = $plugins->get('api');
-
-        $hasReference = $plugins->has('references');
-
-        // The data are the ones used to build the query with the standard api.
-        // Queries are multiple (one by resource type and by facet).
-        // Note: the query is a scalar one, so final events are not triggered.
-        // TODO Do a full api reference search or only scalar ids?
-        $this->args = new ArrayObject;
-        $facetData = null;
-
-        $isDefaultQuery = $this->defaultQuery();
-        if ($isDefaultQuery) {
-            if ($query->getDefaultQuery() === '') {
-                return $this->response;
-            }
-        } else {
-            $this->mainQuery();
-        }
-
-        // "is_public" is automatically managed by the api.
-
-        // The site is a specific filter that can be used as part of main query.
-        $siteId = $this->query->getSiteId();
-        if ($siteId) {
-            $this->args['site_id'] = $siteId;
-        }
-
-        $this->filterQuery();
-
-        if (!empty($this->args['property'])
-            && count($this->args['property']) > self::REQUEST_MAX_ARGS
-        ) {
-            $params = $services->get('ControllerPluginManager')->get('params');
-            $req = $params->fromQuery();
-            unset($req['csrf']);
-            $req = urldecode(http_build_query(array_filter($req)));
-            $messenger = new Messenger;
-            $logger = $this->getServiceLocator()->get('Omeka\Logger');
-            if ($query->getExcludedFields()) {
-                $message = new Message('The query "%1$s" uses %2$d properties, that is more than the %3$d supported currently. Excluded fields are removed.', // @translate
-                    $req, count($this->args['property']), self::REQUEST_MAX_ARGS);
-                $query->setExcludedFields([]);
-                $messenger->addWarning($message);
-                $logger->warn($message);
-                return $this->query($query);
-            }
-
-            $message = new Message('The query "%1$s" uses %2$d properties, that is more than the %3$d supported currently. Request is troncated.', // @translate
-                $req, count($this->args['property']), self::REQUEST_MAX_ARGS);
-            $messenger->addWarning($message);
-            $logger->warn($message);
-            $this->args['property'] = array_slice($this->args['property'], 0, self::REQUEST_MAX_ARGS);
-        }
-
-        // TODO To be removed when the filters will be groupable (see version 3.5.12 where this is after filter).
-        // Facets data don't use sort or limit.
-        if ($hasReference) {
-            $facetData = clone $this->args;
-        }
-
-        $sort = $query->getSort();
-        if ($sort) {
-            list($sortField, $sortOrder) = explode(' ', $sort);
-            $this->args['sort_by'] = $sortField;
-            $this->args['sort_order'] = $sortOrder === 'desc' ? 'desc' : 'asc';
-        }
-
-        $limit = $query->getLimit();
-        if ($limit) {
-            $this->args['limit'] = $limit;
-        }
-
-        $offset = $query->getOffset();
-        if ($offset) {
-            $this->args['offset'] = $offset;
-        }
 
         foreach ($this->resourceTypes as $resourceType) {
             try {
@@ -155,11 +67,125 @@ class InternalQuerier extends AbstractQuerier
             $this->response->addResults($resourceType, $result);
         }
 
-        if ($hasReference) {
+        // TODO To be removed when the filters will be groupable (see version 3.5.12 where this is after filter).
+        // Facets data don't use sort or limit.
+        if ($plugins->has('references')) {
+            $facetData = clone $this->args;
+            if (isset($facetData['sort_by'])) {
+                unset($facetData['sort_by']);
+            }
+            if (isset($facetData['sort_order'])) {
+                unset($facetData['sort_order']);
+            }
+            if (isset($facetData['limit'])) {
+                unset($facetData['limit']);
+            }
+            if (isset($facetData['offset'])) {
+                unset($facetData['offset']);
+            }
+
             $this->facetResponse($facetData);
         }
 
         return $this->response;
+    }
+
+    /**
+     * @return array|null Arguments for the Omeka api, or null if unprocessable
+     * or empty results.
+     *
+     * List of resource types is prepared too.
+     *
+     * {@inheritDoc}
+     * @see \Search\Querier\AbstractQuerier::getPreparedQuery()
+     */
+    public function getPreparedQuery()
+    {
+        if (empty($this->query)) {
+            $this->args = null;
+            return $this->args;
+        }
+
+        // The data are the ones used to build the query with the standard api.
+        // Queries are multiple (one by resource type and by facet).
+        // Note: the query is a scalar one, so final events are not triggered.
+        // TODO Do a full api reference search or only scalar ids?
+        $this->args = new ArrayObject;
+
+        // TODO Normalize search url arguments. Here, the ones from default form, adapted from Solr, are taken.
+
+        $indexerResourceTypes = $this->getSetting('resources', []);
+        $this->resourceTypes = $this->query->getResources() ?: $indexerResourceTypes;
+        $this->resourceTypes = array_intersect($this->resourceTypes, $indexerResourceTypes);
+        if (empty($this->resourceTypes)) {
+            $this->args = null;
+            return $this->args;
+        }
+
+        $isDefaultQuery = $this->defaultQuery();
+        if ($isDefaultQuery) {
+            if ($this->query->getDefaultQuery() === '') {
+                $this->args = null;
+                return $this->args;
+            }
+        } else {
+            $this->mainQuery();
+        }
+
+        // "is_public" is automatically managed by the api.
+
+        // The site is a specific filter that can be used as part of main query.
+        $siteId = $this->query->getSiteId();
+        if ($siteId) {
+            $this->args['site_id'] = $siteId;
+        }
+
+        $this->filterQuery();
+
+        if (!empty($this->args['property'])
+            && count($this->args['property']) > self::REQUEST_MAX_ARGS
+        ) {
+            $services = $this->getServiceLocator();
+            $params = $services->get('ControllerPluginManager')->get('params');
+            $req = $params->fromQuery();
+            unset($req['csrf']);
+            $req = urldecode(http_build_query(array_filter($req)));
+            $messenger = new Messenger;
+            $logger = $this->getServiceLocator()->get('Omeka\Logger');
+            if ($this->query->getExcludedFields()) {
+                $message = new Message('The query "%1$s" uses %2$d properties, that is more than the %3$d supported currently. Excluded fields are removed.', // @translate
+                    $req, count($this->args['property']), self::REQUEST_MAX_ARGS);
+                $this->query->setExcludedFields([]);
+                $messenger->addWarning($message);
+                $logger->warn($message);
+                return $this->getPreparedQuery();
+            }
+
+            $message = new Message('The query "%1$s" uses %2$d properties, that is more than the %3$d supported currently. Request is troncated.', // @translate
+                $req, count($this->args['property']), self::REQUEST_MAX_ARGS);
+            $messenger->addWarning($message);
+            $logger->warn($message);
+            $this->args['property'] = array_slice($this->args['property'], 0, self::REQUEST_MAX_ARGS);
+        }
+
+        $sort = $this->query->getSort();
+        if ($sort) {
+            list($sortField, $sortOrder) = explode(' ', $sort);
+            $this->args['sort_by'] = $sortField;
+            $this->args['sort_order'] = $sortOrder === 'desc' ? 'desc' : 'asc';
+        }
+
+        $limit = $this->query->getLimit();
+        if ($limit) {
+            $this->args['limit'] = $limit;
+        }
+
+        $offset = $this->query->getOffset();
+        if ($offset) {
+            $this->args['offset'] = $offset;
+        }
+
+        return $this->args;
     }
 
     protected function defaultQuery()

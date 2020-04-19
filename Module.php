@@ -101,6 +101,17 @@ class Module extends AbstractModule
         );
 
         $sharedEventManager->attach(
+            \Omeka\Api\Adapter\ResourceClassAdapter::class,
+            'api.search.query',
+            [$this, 'apiSearchQueryResourceClass']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Form\Element\ResourceClassSelect::class,
+            'form.vocab_member_select.query',
+            [$this, 'formVocabMemberSelectQuery']
+        );
+
+        $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemAdapter::class,
             'api.create.post',
             [$this, 'updateSearchIndex']
@@ -269,6 +280,49 @@ class Module extends AbstractModule
                     ],
                 ]
             );
+        }
+    }
+
+    public function apiSearchQueryResourceClass(Event $event)
+    {
+        // TODO Check if version >= 3.1.2.8.
+        if ($this->isModuleActive('Next')) {
+            return;
+        }
+
+        $query = $event->getParam('request')->getContent();
+
+        // This key is used by ResourceClassSelect.
+        if (!empty($query['used'])) {
+            $isOldOmeka = \Omeka\Module::VERSION < 2;
+            $alias = $isOldOmeka ? \Omeka\Entity\ResourceClass::class : 'omeka_root';
+
+            $adapter = $event->getTarget();
+            $qb = $event->getParam('queryBuilder');
+            $expr = $qb->expr();
+
+            $resourceAlias = $adapter->createAlias();
+            $qb->innerJoin(
+                $alias . '.resources',
+                $resourceAlias,
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                $expr->eq($resourceAlias . '.resourceClass', $alias . '.id')
+            );
+        }
+    }
+
+    public function formVocabMemberSelectQuery(Event $event)
+    {
+        // TODO Check if version >= 3.1.2.8.
+        if ($this->isModuleActive('Next')) {
+            return;
+        }
+
+        $selectElement = $event->getTarget();
+        if ($selectElement->getOption('used_terms')) {
+            $query = $event->getParam('query', []);
+            $query['used'] = true;
+            $event->setParam('query', $query);
         }
     }
 

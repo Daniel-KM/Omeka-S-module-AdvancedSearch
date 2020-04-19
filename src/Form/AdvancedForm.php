@@ -211,6 +211,8 @@ class AdvancedForm extends Form
                 'label' => 'Resource classes', // @translate
                 'term_as_value' => true,
                 'empty_option' => '',
+                // TODO Manage list of resource classes by site.
+                'used_terms' => true,
             ])
             ->setAttributes([
                 'id' => 'resource-classes',

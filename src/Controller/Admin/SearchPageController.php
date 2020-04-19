@@ -83,6 +83,7 @@ class SearchPageController extends AbstractActionController
         if (!$this->checkPostAndValidForm($form)) {
             return $view;
         }
+
         $formData = $form->getData();
         $response = $this->api()->create('search_pages', $formData);
         $searchPage = $response->getContent();

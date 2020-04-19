@@ -34,12 +34,9 @@ use Omeka\Api\Manager as ApiManager;
 use Omeka\Form\Element\SiteSelect;
 use Zend\Form\Element;
 use Zend\Form\Form;
-use Zend\I18n\Translator\TranslatorAwareTrait;
 
 class SearchPageForm extends Form
 {
-    use TranslatorAwareTrait;
-
     /**
      * @var ApiManager
      */
@@ -49,8 +46,6 @@ class SearchPageForm extends Form
 
     public function init()
     {
-        $translator = $this->getTranslator();
-
         $this
             ->add([
                 'name' => 'o:name',
@@ -68,8 +63,7 @@ class SearchPageForm extends Form
                 'type' => Element\Text::class,
                 'options' => [
                     'label' => 'Path', // @translate
-                    'info' => $translator->translate('The path to the search form.') // @translate
-                        . ' ' . $translator->translate('The site path will be automatically prepended.'), // @translate
+                    'info' => 'The path to the search form. The site path will be automatically prepended.',
                 ],
                 'attributes' => [
                     'required' => true,
@@ -121,7 +115,6 @@ class SearchPageForm extends Form
                     'data-placeholder' => 'Select sites…', // @translate
                 ],
             ])
-
             ->add([
                 'name' => 'manage_page_availability',
                 'type' => Element\Radio::class,
@@ -135,9 +128,11 @@ class SearchPageForm extends Form
                     ],
                 ],
                 'attributes' => [
+                    'id' => 'manage_page_availability',
                     'value' => 'let',
                 ],
-            ]);
+            ])
+        ;
 
         $inputFilter = $this->getInputFilter();
         $inputFilter

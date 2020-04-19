@@ -243,6 +243,7 @@ return [
                 'search_page' => null,
                 'display_results' => false,
                 'query' => '',
+                'query_filter' => '',
                 'template' => '',
             ],
         ],

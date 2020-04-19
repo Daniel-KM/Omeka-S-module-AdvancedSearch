@@ -63,6 +63,17 @@ class SearchingFormFieldset extends Fieldset
                     'id' => 'searching-form-query',
                 ],
             ])
+            ->add([
+                'name' => 'o:block[__blockIndex__][o:data][query_filter]',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Hidden filter query', // @translate
+                    'info' => 'Limit the search to a specific subset of the resources. This query is merged with the default block query and with the user one.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'searching-form-query-filter',
+                ],
+            ])
         ;
 
         if (class_exists('BlockPlus\Form\Element\TemplateSelect')) {

@@ -27,6 +27,7 @@ class SearchingForm extends AbstractBlockLayout
     {
         $data = $block->getData();
         $data['query'] = ltrim($data['query'], "? \t\n\r\0\x0B");
+        $data['query_filter'] = ltrim($data['query_filter'], "? \t\n\r\0\x0B");
         $block->setData($data);
     }
 
@@ -99,9 +100,18 @@ class SearchingForm extends AbstractBlockLayout
         if ($displayResults) {
             $query = [];
             parse_str($block->dataValue('query'), $query);
+            $query = array_filter($query);
+
+            $filterQuery = [];
+            parse_str($block->dataValue('query_filter'), $filterQuery);
+            $filterQuery = array_filter($filterQuery);
+
+            $query += $filterQuery;
 
             $request = $view->params()->fromQuery();
+            $request = array_filter($request);
             if ($request) {
+                $request += $filterQuery;
                 $request = $this->validateSearchRequest($searchPage, $form, $request) ?: $query;
             } else {
                 $request = $query;

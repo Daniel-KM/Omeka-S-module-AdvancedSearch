@@ -120,6 +120,8 @@ class IndexController extends AbstractActionController
     /**
      * Get the request from the query and check it according to the search page.
      *
+     * @todo Factorize with \Search\Site\BlockLayout\SearchingForm::getSearchRequest()
+     *
      * @param SearchPageRepresentation $searchPage
      * @param \Zend\Form\Form $searchForm
      * @param array $request
@@ -169,6 +171,7 @@ class IndexController extends AbstractActionController
      * Filter the pagination and sort params from the request.
      *
      * @todo Warning: "limit" is used as limit (int) of results and as filter for facets (array).
+     * @todo Factorize with \Search\Site\BlockLayout\SearchingForm::filterExtraParams()
      *
      * @param array $request
      * @return array

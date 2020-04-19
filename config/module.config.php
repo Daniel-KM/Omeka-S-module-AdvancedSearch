@@ -44,7 +44,6 @@ return [
     'form_elements' => [
         'invokables' => [
             Form\Element\OptionalSelect::class => Form\Element\OptionalSelect::class,
-            Form\SearchingFormFieldset::class => Form\SearchingFormFieldset::class,
         ],
         'factories' => [
             Form\Admin\AdvancedFormConfigFieldset::class => Service\Form\AdvancedFormConfigFieldsetFactory::class,
@@ -58,6 +57,7 @@ return [
             Form\AdvancedForm::class => Service\Form\AdvancedFormFactory::class,
             Form\BasicForm::class => Service\Form\BasicFormFactory::class,
             Form\FilterFieldset::class => Service\Form\FilterFieldsetFactory::class,
+            Form\SearchingFormFieldset::class => Service\Form\SearchingFormFieldsetFactory::class,
             Form\SettingsFieldset::class => Service\Form\SettingsFieldsetFactory::class,
             Form\SiteSettingsFieldset::class => Service\Form\SiteSettingsFieldsetFactory::class,
         ],
@@ -240,6 +240,8 @@ return [
         'block_settings' => [
             'searchingForm' => [
                 'heading' => '',
+                'display_results' => false,
+                'search_page' => null,
                 'template' => '',
             ],
         ],

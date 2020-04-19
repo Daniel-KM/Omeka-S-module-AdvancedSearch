@@ -101,13 +101,15 @@ class FacetLabel extends AbstractHelper
     protected function getSearchPage()
     {
         if (!isset($this->searchPage)) {
-            $mvcEvent = $this->application->getMvcEvent();
-            $routeMatch = $mvcEvent->getRouteMatch();
-
-            $response = $this->api->read('search_pages', $routeMatch->getParam('id'));
-            $this->searchPage = $response->getContent();
+            $view = $this->getView();
+            if (empty($view->searchPage)) {
+                $this->searchPage = $this->api
+                    ->read('search_pages', $this->application->getMvcEvent()->getRouteMatch()->getParam('id'))
+                    ->getContent();
+            } else {
+                $this->searchPage = $view->searchPage;
+            }
         }
-
         return $this->searchPage;
     }
 }

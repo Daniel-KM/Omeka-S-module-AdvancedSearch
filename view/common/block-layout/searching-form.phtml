@@ -1,12 +1,19 @@
 <?php
 /**
  * @var \Zend\View\Renderer\PhpRenderer $this
- * @var \Search\Site\BlockLayout\SearchingForm $block
+ * @var \Omeka\Api\Representation\SiteRepresentation $site
+ * @var \Search\Api\Representation\SearchPageRepresentation $searchPage
+ * @var bool $displayResults
+ * @var \Search\Query $query
+ * @var \Search\Response $response
+ * @var array $sortOptions
  * @var string $heading
  */
 
 $escape = $this->plugin('escapeHtml');
 ?>
+
+<?php if (empty($displayResults) || empty($searchPage)): ?>
 
 <div class="block-search">
     <?php if (!empty($heading)): ?>
@@ -14,3 +21,16 @@ $escape = $this->plugin('escapeHtml');
     <?php endif; ?>
     <?= $this->searchingForm() ?>
 </div>
+
+<?php else: ?>
+
+<?php if (!empty($heading)): ?>
+<div class="block-search">
+    <h2><?= $this->escapeHtml($heading) ?></h2>
+</div>
+<?php endif; ?>
+
+<?php $this->vars()->offsetUnset('displayResults') ?>
+<?= $this->partial('search/index/search', $this->vars()) ?>
+
+<?php endif; ?>

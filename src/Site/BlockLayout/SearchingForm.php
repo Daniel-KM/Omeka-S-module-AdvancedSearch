@@ -28,7 +28,7 @@ class SearchingForm extends AbstractBlockLayout
         // Factory is not used to make rendering simpler.
         $services = $site->getServiceLocator();
         $formElementManager = $services->get('FormElementManager');
-        $defaultSettings = $services->get('Config')['blockplus']['block_settings']['searchForm'];
+        $defaultSettings = $services->get('Config')['search']['block_settings']['searchingForm'];
         $blockFieldset = \Search\Form\SearchingFormFieldset::class;
 
         $data = $block ? $block->data() + $defaultSettings : $defaultSettings;

@@ -71,15 +71,21 @@ class AdvancedForm extends Form
             ])
         ;
 
-        if (!empty($searchPageSettings['form']['item_set_id_field'])) {
+        $appendItemSetFieldset = !empty($searchPageSettings['form']['item_set_filter_type'])
+            && !empty($searchPageSettings['form']['item_set_id_field']);
+        if ($appendItemSetFieldset) {
             $this
-                ->add($this->itemSetFieldset());
+                ->add($this->itemSetFieldset($searchPageSettings['form']['item_set_filter_type']));
         }
-        if (!empty($searchPageSettings['form']['resource_class_id_field'])) {
+        $appendResourceClassFieldset = !empty($searchPageSettings['form']['resource_class_filter_type'])
+            && !empty($searchPageSettings['form']['resource_class_id_field']);
+        if ($appendResourceClassFieldset) {
             $this
                 ->add($this->resourceClassFieldset());
         }
-        if (!empty($searchPageSettings['form']['resource_template_id_field'])) {
+        $appendResourceTemplateFieldset = !empty($searchPageSettings['form']['resource_template_filter_type'])
+            && !empty($searchPageSettings['form']['resource_template_id_field']);
+        if ($appendResourceTemplateFieldset) {
             $this
                 ->add($this->resourceTemplateFieldset());
         }
@@ -101,7 +107,7 @@ class AdvancedForm extends Form
         ;
 
         $inputFilter = $this->getInputFilter();
-        if (!empty($searchPageSettings['form']['item_set_id_field'])) {
+        if ($appendItemSetFieldset) {
             $inputFilter
                 ->get('itemSet')
                 ->add([
@@ -109,7 +115,7 @@ class AdvancedForm extends Form
                     'required' => false,
                 ]);
         }
-        if (!empty($searchPageSettings['form']['resource_class_id_field'])) {
+        if ($appendResourceClassFieldset) {
             $inputFilter
                 ->get('resourceClass')
                 ->add([
@@ -117,7 +123,7 @@ class AdvancedForm extends Form
                     'required' => false,
                 ]);
         }
-        if (!empty($searchPageSettings['form']['resource_template_id_field'])) {
+        if ($appendResourceTemplateFieldset) {
             $inputFilter
                 ->get('resourceTemplate')
                 ->add([
@@ -178,21 +184,29 @@ class AdvancedForm extends Form
         return $this->formElementManager;
     }
 
-    protected function itemSetFieldset()
+    protected function itemSetFieldset($filterType = 'select')
     {
         $fieldset = new Fieldset('itemSet');
-        $fieldset->add([
-            'name' => 'ids',
-            'type' => Element\MultiCheckbox::class,
-            'options' => [
-                // For normal users, it is not "item sets", but "collections".
-                'label' => 'Collections', // @translate
-                'value_options' => $this->getItemSetsOptions(),
-            ],
-            'attributes' => [
-                'id' => 'item-sets',
-            ],
-        ]);
+        $fieldset
+            ->add([
+                'name' => 'ids',
+                'type' => $filterType === 'multi-checkbox'
+                    ? Element\MultiCheckbox::class
+                    : Element\Select::class,
+                'options' => [
+                    // For normal users, it is not "item sets", but "collections".
+                    'label' => 'Collections', // @translate
+                    'value_options' => $this->getItemSetsOptions(),
+                    'empty_option' => '',
+                ],
+                'attributes' => [
+                    'id' => 'item-sets',
+                    'multiple' => true,
+                    'class' => $filterType === 'multi-checkbox' ? '' : 'chosen-select',
+                    'data-placeholder' => 'Select item sets…', // @translate
+                ],
+            ])
+        ;
         return $fieldset;
     }
 

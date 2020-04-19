@@ -53,6 +53,118 @@ class AdvancedFormConfigFieldset extends Fieldset
         unset($specialOptions['resource_template_id']);
 
         $this
+            ->add([
+                'name' => 'item_set_filter_type',
+                'type' => Element\Radio::class,
+                'options' => [
+                    'label' => 'Display item set filter', // @translate
+                    'value_options' => [
+                        '0' => 'No', // @translate
+                        'select' => 'As select', // @translate
+                        'multi-checkbox' => 'As multi checkbox', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'item_set_filter_type',
+                    'required' => false,
+                    'value' => '0',
+                ],
+            ])
+            ->add([
+                'name' => 'item_set_id_field',
+                'type' => Element\Select::class,
+                'options' => [
+                    'label' => 'Item set id field', // @translate
+                    'value_options' => $specialOptions,
+                    'empty_option' => 'None', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'item_set_id_field',
+                    'required' => false,
+                    'class' => 'chosen-select',
+                    'value' => 'item_set_id_field',
+                ],
+            ])
+
+            ->add([
+                'name' => 'resource_class_filter_type',
+                'type' => Element\Radio::class,
+                'options' => [
+                    'label' => 'Display resource class filter', // @translate
+                    'value_options' => [
+                        '0' => 'No', // @translate
+                        'select' => 'As select', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'resource_class_filter_type',
+                    'required' => false,
+                    'value' => '0',
+                ],
+            ])
+            ->add([
+                'name' => 'resource_class_id_field',
+                'type' => Element\Select::class,
+                'options' => [
+                    'label' => 'Resource class id field', // @translate
+                    'value_options' => $specialOptions,
+                    'empty_option' => 'None', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'resource_class_id_field',
+                    'required' => false,
+                    'class' => 'chosen-select',
+                    'value' => 'resource_class_id_field',
+                ],
+            ])
+
+            ->add([
+                'name' => 'resource_template_filter_type',
+                'type' => Element\Radio::class,
+                'options' => [
+                    'label' => 'Display resource template filter', // @translate
+                    'value_options' => [
+                        '0' => 'No', // @translate
+                        'select' => 'As select', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'resource_template_filter_type',
+                    'required' => false,
+                    'value' => '0',
+                ],
+            ])
+            ->add([
+                'name' => 'resource_template_id_field',
+                'type' => Element\Select::class,
+                'options' => [
+                    'label' => 'Resource template id field', // @translate
+                    'value_options' => $specialOptions,
+                    'empty_option' => 'None', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'resource_template_id_field',
+                    'required' => false,
+                    'class' => 'chosen-select',
+                    'value' => 'resource_template_id_field',
+                ],
+            ])
+
+            ->add([
+                'name' => 'is_public_field',
+                'type' => Element\Select::class,
+                'options' => [
+                    'label' => 'Is public field', // @translate
+                    'value_options' => $specialOptions,
+                    'empty_option' => 'None', // @translate
+                ],
+                'attributes' => [
+                    'required' => false,
+                    'class' => 'chosen-select',
+                    'value' => 'is_public_field',
+                ],
+            ])
+
             // field (term) | label (order means weight).
             ->add([
                 'name' => 'filters',
@@ -94,66 +206,6 @@ class AdvancedFormConfigFieldset extends Fieldset
                 'type' => Element\Checkbox::class,
                 'options' => [
                     'label' => 'Add the type ("equal", "in", etc.) to the filters', // @translate
-                ],
-            ])
-
-            ->add([
-                'name' => 'is_public_field',
-                'type' => Element\Select::class,
-                'options' => [
-                    'label' => 'Is public field', // @translate
-                    'value_options' => $specialOptions,
-                    'empty_option' => 'None', // @translate
-                ],
-                'attributes' => [
-                    'required' => false,
-                    'class' => 'chosen-select',
-                    'value' => 'is_public_field',
-                ],
-            ])
-
-            ->add([
-                'name' => 'item_set_id_field',
-                'type' => Element\Select::class,
-                'options' => [
-                    'label' => 'Item set id field', // @translate
-                    'value_options' => $specialOptions,
-                    'empty_option' => 'None', // @translate
-                ],
-                'attributes' => [
-                    'required' => false,
-                    'class' => 'chosen-select',
-                    'value' => 'item_set_id_field',
-                ],
-            ])
-
-            ->add([
-                'name' => 'resource_class_id_field',
-                'type' => Element\Select::class,
-                'options' => [
-                    'label' => 'Resource class id field', // @translate
-                    'value_options' => $specialOptions,
-                    'empty_option' => 'None', // @translate
-                ],
-                'attributes' => [
-                    'required' => false,
-                    'class' => 'chosen-select',
-                    'value' => 'resource_class_id_field',
-                ],
-            ])
-
-            ->add([
-                'name' => 'resource_template_id_field',
-                'type' => Element\Select::class,
-                'options' => [
-                    'label' => 'Resource template id field', // @translate
-                    'value_options' => $specialOptions,
-                    'empty_option' => 'None', // @translate
-                ],
-                'attributes' => [
-                    'required' => false,
-                    'class' => 'chosen-select',
-                    'value' => 'resource_template_id_field',
                 ],
             ])
         ;

@@ -224,6 +224,9 @@ SQL;
                 'default_query' => '',
                 'restrict_query_to_form' => '0',
             ];
+            $params['form']['item_set_filter_type'] = 'multi-checkbox';
+            $params['form']['resource_class_filter_type'] = 'select';
+            $params['form']['resource_template_filter_type'] = 'select';
             $params = $connection->quote(json_encode($params, 320));
             $sql = <<<SQL
 UPDATE search_page

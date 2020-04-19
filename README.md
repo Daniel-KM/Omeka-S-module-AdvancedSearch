@@ -98,12 +98,18 @@ To create a new search engine, follow these steps.
     3. Edit the name of the label that will be used for facets and sort fields
        in the same page. The string will be automatically translated if it
        exists in Omeka.
+    4. There are options for the default search results. If wanted, the query
+       may be nothing, all, or anything else. This option applies only for the
+       search page, not for blocks.
+
 3. In admin and site settings
     1. To access to the search form, enable it in the main settings (for the
        admin board) and in the site settings (for the front-end sites). So the
        search engine will be available in the specified path: `https://example.com/s/my-site/search`
        or `https://example.com/admin/search` in this example.
-    2. Optionally, add a custom navigation link to the search page in the
+    2. You can specify to redirect the item-set page to the search page, as in
+       the default Omeka (item-set/show is item/browse).
+    3. Optionally, add a custom navigation link to the search page in the
        navigation settings of the site.
 
 The search form should appear. Type some text then submit the form to display

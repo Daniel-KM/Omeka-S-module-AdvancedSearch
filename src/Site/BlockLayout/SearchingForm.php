@@ -121,7 +121,8 @@ class SearchingForm extends AbstractBlockLayout
             if ($result['status'] === 'success') {
                 $vars = array_replace($vars, $result['data']);
             } elseif ($result['status'] === 'error') {
-                $this->messenger()->addError($result['message']);
+                $messenger = new \Omeka\Mvc\Controller\Plugin\Messenger;
+                $messenger->addError($result['message']);
             }
         }
 
@@ -153,7 +154,8 @@ class SearchingForm extends AbstractBlockLayout
             if (!$form->isValid()) {
                 $messages = $form->getMessages();
                 if (isset($messages['csrf'])) {
-                    $this->messenger()->addError('Invalid or missing CSRF token'); // @translate
+                    $messenger = new \Omeka\Mvc\Controller\Plugin\Messenger;
+                    $messenger->addError('Invalid or missing CSRF token'); // @translate
                     return false;
                 }
             }

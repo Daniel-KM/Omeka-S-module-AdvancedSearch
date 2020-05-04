@@ -289,10 +289,16 @@ class AdvancedForm extends Form
     {
         $site = $this->getSite();
         $select = $this->getForm(\Omeka\Form\Element\ItemSetSelect::class, []);
-        $select->setOptions([
-            'query' => ['site_id' => $site ? $site->id() : null],
-            'disable_group_by_owner' => (bool) $site,
-        ]);
+        if ($site) {
+            $select->setOptions([
+                'query' => ['site_id' => $site->id(), 'sort_by' => 'dcterms:title', 'sort_order' => 'asc'],
+                'disable_group_by_owner' => true,
+            ]);
+        } else {
+            $select->setOptions([
+                'query' => ['sort_by' => 'dcterms:title', 'sort_order' => 'asc'],
+            ]);
+        }
         return $select->getValueOptions();
     }
 

@@ -37,6 +37,8 @@ trait TraitUnrestrictedQuery
     {
         $query = new Query;
 
+        // TODO Manage the "browse_attached_items" / "site_attachments_only".
+
         if (isset($request['q'])) {
             $query->setQuery($request['q']);
         }

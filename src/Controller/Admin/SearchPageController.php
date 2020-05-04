@@ -554,13 +554,9 @@ class SearchPageController extends AbstractActionController
         $result = [];
 
         // Check admin.
-        $adminSearchUrl = $this->settings()->get('search_main_page');
-        if ($adminSearchUrl) {
-            $basePath = $this->viewHelpers()->get('basePath');
-            $adminBasePath = $basePath('admin/');
-            if ($adminSearchUrl === ($adminBasePath . $searchPage->path())) {
-                $result[] = 'admin';
-            }
+        $adminSearchId= $this->settings()->get('search_main_page');
+        if ($adminSearchId) {
+            $result[] = 'admin';
         }
 
         // Check all sites.
@@ -598,10 +594,7 @@ class SearchPageController extends AbstractActionController
         if ($current !== $new) {
             $settings = $this->settings();
             if ($new) {
-                $basePath = $this->viewHelpers()->get('basePath');
-                $adminBasePath = $basePath('admin/');
-                $settings->set('search_main_page', $adminBasePath . $searchPage->path());
-
+                $settings->set('search_main_page', $searchPageId);
                 $searchPages = $settings->get('search_pages', []);
                 $searchPages[] = $searchPageId;
                 $searchPages = array_unique(array_filter(array_map('intval', $searchPages)));
@@ -611,7 +604,6 @@ class SearchPageController extends AbstractActionController
                 $message = 'The page has been set by default in admin board.'; // @translate
             } else {
                 $settings->set('search_main_page', null);
-
                 $message = 'The page has been unset in admin board.'; // @translate
             }
             $this->messenger()->addSuccess($message);

@@ -94,6 +94,7 @@ class AdvancedFormConfigFieldset extends Fieldset
                     'value_options' => [
                         '0' => 'No', // @translate
                         'select' => 'As select', // @translate
+                        'select_flat' => 'As flat select', // @translate
                     ],
                 ],
                 'attributes' => [

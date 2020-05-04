@@ -81,7 +81,7 @@ class AdvancedForm extends Form
             && !empty($searchPageSettings['form']['resource_class_id_field']);
         if ($appendResourceClassFieldset) {
             $this
-                ->add($this->resourceClassFieldset());
+                ->add($this->resourceClassFieldset($searchPageSettings['form']['resource_class_filter_type']));
         }
         $appendResourceTemplateFieldset = !empty($searchPageSettings['form']['resource_template_filter_type'])
             && !empty($searchPageSettings['form']['resource_template_id_field']);
@@ -166,7 +166,7 @@ class AdvancedForm extends Form
         return $fieldset;
     }
 
-    protected function resourceClassFieldset()
+    protected function resourceClassFieldset($filterType = 'select')
     {
         // For an unknown reason, the ResourceClassSelect can not be added
         // directly to a fieldset (factory is not used).
@@ -179,14 +179,34 @@ class AdvancedForm extends Form
         /** @var \Omeka\Form\Element\ResourceClassSelect $element */
         $element = $this->getFormElementManager()->get(ResourceClassSelect::class);
         $element
-            ->setName('ids')
             ->setOptions([
                 'label' => 'Resource classes', // @translate
                 'term_as_value' => true,
                 'empty_option' => '',
                 // TODO Manage list of resource classes by site.
                 'used_terms' => true,
-            ])
+            ]);
+
+        if ($filterType === 'select_flat') {
+            $valueOptions = $element->getValueOptions();
+            $result = [];
+            foreach ($valueOptions as $vocabulary) {
+                foreach ($vocabulary['options'] as $term) {
+                    $result[$term['value']] = $term['label'];
+                }
+            }
+            natcasesort($result);
+            $element = new Element\Select;
+            $element
+                ->setOptions([
+                    'label' => 'Resource classes', // @translate
+                    'empty_option' => '',
+                    'value_options' => $result,
+                ]);
+        }
+
+        $element
+            ->setName('ids')
             ->setAttributes([
                 'id' => 'resource-classes-ids',
                 'multiple' => true,

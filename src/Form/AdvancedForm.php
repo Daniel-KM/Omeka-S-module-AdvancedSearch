@@ -141,6 +141,9 @@ class AdvancedForm extends Form
     {
         $fieldset = new Fieldset('itemSet');
         $fieldset
+            ->setAttributes([
+                'id' => 'search-item-sets',
+            ])
             ->add([
                 'name' => 'ids',
                 'type' => $filterType === 'multi-checkbox'
@@ -153,7 +156,7 @@ class AdvancedForm extends Form
                     'empty_option' => '',
                 ],
                 'attributes' => [
-                    'id' => 'item-sets',
+                    'id' => 'item-sets-ids',
                     'multiple' => true,
                     'class' => $filterType === 'multi-checkbox' ? '' : 'chosen-select',
                     'data-placeholder' => 'Select item sets…', // @translate
@@ -169,6 +172,9 @@ class AdvancedForm extends Form
         // directly to a fieldset (factory is not used).
 
         $fieldset = new Fieldset('resourceClass');
+        $fieldset->setAttributes([
+            'id' => 'search-resource-classes',
+        ]);
 
         /** @var \Omeka\Form\Element\ResourceClassSelect $element */
         $element = $this->getFormElementManager()->get(ResourceClassSelect::class);
@@ -182,7 +188,7 @@ class AdvancedForm extends Form
                 'used_terms' => true,
             ])
             ->setAttributes([
-                'id' => 'resource-classes',
+                'id' => 'resource-classes-ids',
                 'multiple' => true,
                 'class' => 'chosen-select',
                 'data-placeholder' => 'Select resource classes…', // @translate
@@ -199,6 +205,9 @@ class AdvancedForm extends Form
         // directly to a fieldset (factory is not used).
 
         $fieldset = new Fieldset('resourceTemplate');
+        $fieldset->setAttributes([
+            'id' => 'search-resource-templates',
+        ]);
 
         /** @var \Omeka\Form\Element\ResourceTemplateSelect $element */
         $element = $this->getFormElementManager()->get(ResourceTemplateSelect::class);
@@ -210,7 +219,7 @@ class AdvancedForm extends Form
                 'disable_group_by_owner' => true,
             ])
             ->setAttributes([
-                'id' => 'resource-templates',
+                'id' => 'resource-templates-ids',
                 'multiple' => true,
                 'class' => 'chosen-select',
                 'data-placeholder' => 'Select resource templates…', // @translate
@@ -256,6 +265,10 @@ class AdvancedForm extends Form
     protected function textFieldset($number = 1)
     {
         $fieldset = new Fieldset('text');
+        $fieldset->setAttributes([
+            'id' => 'search-text-filters',
+        ]);
+
         $filterFieldset = $this->getFilterFieldset();
         if ($filterFieldset->count()) {
             $fieldset
@@ -269,6 +282,9 @@ class AdvancedForm extends Form
                         'allow_add' => true,
                         'target_element' => $filterFieldset,
                         'required' => false,
+                    ],
+                    'attributes' => [
+                        'id' => 'search-filters',
                     ],
                 ])
             ;

@@ -46,7 +46,6 @@ class AdvancedFormFactory implements FactoryInterface
             : null;
         $form = new AdvancedForm(null, $options);
         return $form
-            ->setApiManager($services->get('Omeka\ApiManager'))
             ->setSite($currentSite)
             ->setSiteSetting($siteSetting)
             ->setFormElementManager($services->get('FormElementManager'));

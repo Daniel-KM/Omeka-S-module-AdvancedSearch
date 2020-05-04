@@ -29,7 +29,6 @@
 
 namespace Search\Form;
 
-use Omeka\Api\Manager;
 use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Form\Element\ResourceClassSelect;
 use Omeka\Form\Element\ResourceTemplateSelect;
@@ -40,11 +39,6 @@ use Zend\Form\Form;
 
 class AdvancedForm extends Form
 {
-    /**
-     * @var Manager
-     */
-    protected $apiManager;
-
     /**
      * @var SiteRepresentation
      */
@@ -141,75 +135,6 @@ class AdvancedForm extends Form
                     'required' => false,
                 ]);
         }
-    }
-
-    /**
-     * @param Manager $apiManager
-     * @return self
-     */
-    public function setApiManager(Manager $apiManager)
-    {
-        $this->apiManager = $apiManager;
-        return $this;
-    }
-
-    /**
-     * @return \Omeka\Api\Manager
-     */
-    public function getApiManager()
-    {
-        return $this->apiManager;
-    }
-
-    /**
-     * @param SiteRepresentation $site
-     * @return self
-     */
-    public function setSite(SiteRepresentation $site = null)
-    {
-        $this->site = $site;
-        return $this;
-    }
-
-    /**
-     * @return \Omeka\Api\Representation\SiteRepresentation
-     */
-    public function getSite()
-    {
-        return $this->site;
-    }
-
-    /**
-     * @param Setting|null $siteSetting
-     * @return self
-     */
-    public function setSiteSetting(Setting $siteSetting = null)
-    {
-        $this->siteSetting = $siteSetting;
-        return $this;
-    }
-
-    /**
-     * @return \Omeka\View\Helper\Setting|null
-     */
-    public function getSiteSetting()
-    {
-        return $this->siteSetting;
-    }
-
-    /**
-     * @param Object $formElementManager
-     * @return self
-     */
-    public function setFormElementManager($formElementManager)
-    {
-        $this->formElementManager = $formElementManager;
-        return $this;
-    }
-
-    public function getFormElementManager()
-    {
-        return $this->formElementManager;
     }
 
     protected function itemSetFieldset($filterType = 'select')
@@ -363,20 +288,12 @@ class AdvancedForm extends Form
     protected function getItemSetsOptions()
     {
         $site = $this->getSite();
-        if (empty($site)) {
-            $itemSets = $this->getApiManager()->search('item_sets')->getContent();
-        } else {
-            // The site item sets may be public of private in Omeka 2.0, so it's
-            // not possible currently to use $site->siteItemSets().
-            $itemSets = $this->getApiManager()->search('item_sets', ['site_id' => $site->id()])->getContent();
-        }
-        // TODO Update for Omeka 2 to avoid to load full resources (title).
-        $options = [];
-        /** @var \Omeka\Api\Representation\ItemSetRepresentation[] $itemSets */
-        foreach ($itemSets as $itemSet) {
-            $options[$itemSet->id()] = (string) $itemSet->displayTitle();
-        }
-        return $options;
+        $select = $this->getForm(\Omeka\Form\Element\ItemSetSelect::class, []);
+        $select->setOptions([
+            'query' => ['site_id' => $site ? $site->id() : null],
+            'disable_group_by_owner' => (bool) $site,
+        ]);
+        return $select->getValueOptions();
     }
 
     protected function getFilterFieldset()
@@ -389,5 +306,56 @@ class AdvancedForm extends Form
     {
         return $this->getFormElementManager()
             ->get($name, $options);
+    }
+
+    /**
+     * @param SiteRepresentation $site
+     * @return self
+     */
+    public function setSite(SiteRepresentation $site = null)
+    {
+        $this->site = $site;
+        return $this;
+    }
+
+    /**
+     * @return \Omeka\Api\Representation\SiteRepresentation
+     */
+    public function getSite()
+    {
+        return $this->site;
+    }
+
+    /**
+     * @param Setting|null $siteSetting
+     * @return self
+     */
+    public function setSiteSetting(Setting $siteSetting = null)
+    {
+        $this->siteSetting = $siteSetting;
+        return $this;
+    }
+
+    /**
+     * @return \Omeka\View\Helper\Setting|null
+     */
+    public function getSiteSetting()
+    {
+        return $this->siteSetting;
+    }
+
+    /**
+     * @param Object $formElementManager
+     * @return self
+     */
+    public function setFormElementManager($formElementManager)
+    {
+        $this->formElementManager = $formElementManager;
+        return $this;
+    }
+
+    public function getFormElementManager()
+    {
+        return $this->formElementManager;
     }
 }

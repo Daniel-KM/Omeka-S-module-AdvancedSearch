@@ -294,12 +294,16 @@ class AdvancedForm extends Form
                 'query' => ['site_id' => $site->id(), 'sort_by' => 'dcterms:title', 'sort_order' => 'asc'],
                 'disable_group_by_owner' => true,
             ]);
+            // By default, sort is case sensitive. So use a case insensitive sort.
+            $valueOptions = $select->getValueOptions();
+            natcasesort($valueOptions);
         } else {
             $select->setOptions([
                 'query' => ['sort_by' => 'dcterms:title', 'sort_order' => 'asc'],
             ]);
+            $valueOptions = $select->getValueOptions();
         }
-        return $select->getValueOptions();
+        return $valueOptions;
     }
 
     protected function getFilterFieldset()

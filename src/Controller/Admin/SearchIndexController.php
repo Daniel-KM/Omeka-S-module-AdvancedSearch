@@ -114,7 +114,9 @@ class SearchIndexController extends AbstractActionController
                 ->setLabel('Adapter settings'); // @translate
             $form->add($adapterFieldset);
         }
-        $form->setData($searchIndex->getSettings() ?: []);
+        $data = $searchIndex->getSettings() ?: [];
+        $data['o:name'] = $searchIndex->getName();
+        $form->setData($data);
 
         $view = new ViewModel;
         $view->setVariable('form', $form);
@@ -126,8 +128,11 @@ class SearchIndexController extends AbstractActionController
                 return $view;
             }
             $formData = $form->getData();
-            unset($formData['csrf']);
-            $searchIndex->setSettings($formData);
+            $name = $formData['o:name'];
+            unset($formData['csrf'], $formData['o:name']);
+            $searchIndex
+                ->setName($name)
+                ->setSettings($formData);
             $entityManager->flush();
             $this->messenger()->addSuccess(new Message(
                 'Search index "%s" successfully configured.',  // @translate

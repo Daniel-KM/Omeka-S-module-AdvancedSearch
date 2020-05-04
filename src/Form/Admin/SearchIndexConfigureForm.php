@@ -45,6 +45,17 @@ class SearchIndexConfigureForm extends Form implements TranslatorAwareInterface
     {
         $this
             ->add([
+                'name' => 'o:name',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Name', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'o-name',
+                    'required' => true,
+                ],
+            ])
+            ->add([
                 'name' => 'resources',
                 'type' => Element\MultiCheckbox::class,
                 'options' => [

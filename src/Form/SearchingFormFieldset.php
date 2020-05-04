@@ -34,6 +34,7 @@ class SearchingFormFieldset extends Fieldset
                 'type' => Element\Select::class,
                 'options' => [
                     'label' => 'Search page', // @translate
+                    'info' => 'The request below will be checked against the matching form below. Keys unknown by the form will be removed.', // @translate
                     'value_options' => $searchPages,
                 ],
                 'attributes' => [

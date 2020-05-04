@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016-2017
- * Copyright Daniel Berthereau, 2017-2018
+ * Copyright Daniel Berthereau, 2017-2020
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -30,8 +30,7 @@
 
 namespace Search\Form\Admin;
 
-use Zend\Form\Element\Select;
-use Zend\Form\Element\Text;
+use Zend\Form\Element;
 use Zend\Form\Form;
 
 class SearchIndexForm extends Form
@@ -40,42 +39,31 @@ class SearchIndexForm extends Form
 
     public function init()
     {
-        $this->add([
-            'name' => 'o:name',
-            'type' => Text::class,
-            'options' => [
-                'label' => 'Name', // @translate
-            ],
-            'attributes' => [
-                'id' => 'name',
-                'required' => true,
-            ],
-        ]);
-
-        $this->add([
-            'name' => 'o:adapter',
-            'type' => Select::class,
-            'options' => [
-                'label' => 'Adapter', // @translate
-                'value_options' => $this->getAdaptersOptions(),
-                'empty_option' => 'Select an adapter below…', // @translate
-            ],
-            'attributes' => [
-                'id' => 'name',
-                'required' => true,
-            ],
-        ]);
-    }
-
-    public function setSearchAdapterManager($searchAdapterManager)
-    {
-        $this->searchAdapterManager = $searchAdapterManager;
-        return $this;
-    }
-
-    public function getSearchAdapterManager()
-    {
-        return $this->searchAdapterManager;
+        $this
+            ->add([
+                'name' => 'o:name',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Name', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'o-name',
+                    'required' => true,
+                ],
+            ])
+            ->add([
+                'name' => 'o:adapter',
+                'type' => Element\Select::class,
+                'options' => [
+                    'label' => 'Adapter', // @translate
+                    'value_options' => $this->getAdaptersOptions(),
+                    'empty_option' => 'Select an adapter below…', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'o-adapter',
+                    'required' => true,
+                ],
+            ]);
     }
 
     protected function getAdaptersOptions()
@@ -91,5 +79,16 @@ class SearchIndexForm extends Form
         }
 
         return $options;
+    }
+
+    public function setSearchAdapterManager($searchAdapterManager)
+    {
+        $this->searchAdapterManager = $searchAdapterManager;
+        return $this;
+    }
+
+    public function getSearchAdapterManager()
+    {
+        return $this->searchAdapterManager;
     }
 }

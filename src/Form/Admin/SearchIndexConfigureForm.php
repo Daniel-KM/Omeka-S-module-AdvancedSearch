@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2017-2018
+ * Copyright Daniel Berthereau, 2017-2020
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -43,28 +43,19 @@ class SearchIndexConfigureForm extends Form implements TranslatorAwareInterface
 
     public function init()
     {
-        $this->add([
-            'name' => 'resources',
-            'type' => Element\MultiCheckbox::class,
-            'options' => [
-                'label' => 'Resources indexed', // @translate
-                'value_options' => $this->getResourcesOptions(),
-            ],
-            'attributes' => [
-                'value' => ['items'],
-            ],
-        ]);
-    }
-
-    public function setApiManager($apiManager)
-    {
-        $this->apiManager = $apiManager;
-        return $this;
-    }
-
-    public function getApiManager()
-    {
-        return $this->apiManager;
+        $this
+            ->add([
+                'name' => 'resources',
+                'type' => Element\MultiCheckbox::class,
+                'options' => [
+                    'label' => 'Resources indexed', // @translate
+                    'value_options' => $this->getResourcesOptions(),
+                ],
+                'attributes' => [
+                    'id' => 'resources',
+                    'value' => ['items'],
+                ],
+            ]);
     }
 
     /**
@@ -84,5 +75,16 @@ class SearchIndexConfigureForm extends Form implements TranslatorAwareInterface
         ];
 
         return $options;
+    }
+
+    public function setApiManager($apiManager)
+    {
+        $this->apiManager = $apiManager;
+        return $this;
+    }
+
+    public function getApiManager()
+    {
+        return $this->apiManager;
     }
 }

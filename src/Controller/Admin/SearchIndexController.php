@@ -109,8 +109,9 @@ class SearchIndexController extends AbstractActionController
         ]);
         $adapterFieldset = $adapter->getConfigFieldset();
         if ($adapterFieldset) {
-            $adapterFieldset->setName('adapter');
-            $adapterFieldset->setLabel('Adapter settings'); // @translate
+            $adapterFieldset
+                ->setName('adapter')
+                ->setLabel('Adapter settings'); // @translate
             $form->add($adapterFieldset);
         }
         $form->setData($searchIndex->getSettings() ?: []);

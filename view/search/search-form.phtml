@@ -4,7 +4,10 @@
  * @var \Zend\Form\Form $form
  */
 
-$form->prepare();
+$params = $this->params()->fromQuery() ?: [];
+$form
+    ->setData($params)
+    ->prepare();
 ?>
 
 <?= $this->form($form) ?>

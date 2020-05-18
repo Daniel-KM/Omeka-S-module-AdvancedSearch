@@ -229,6 +229,7 @@ class Module extends AbstractModule
         }
 
         $api = $services->get('Omeka\ApiManager');
+        /** @var \Search\Api\Representation\SearchPageRepresentation[] $api */
         $pages = $api->search('search_pages')->getContent();
 
         $isAdminRequest = $status->isAdminRequest();
@@ -466,8 +467,7 @@ class Module extends AbstractModule
 
     public function handleMainSettingsFilters(Event $event)
     {
-        $inputFilter = $event->getParam('inputFilter');
-        $inputFilter->get('search')
+        $event->getParam('inputFilter')->get('search')
             ->add([
                 'name' => 'search_pages',
                 'required' => false,
@@ -484,9 +484,8 @@ class Module extends AbstractModule
 
     public function handleSiteSettingsFilters(Event $event)
     {
-        $inputFilter = $event->getParam('inputFilter');
         // Key "search_module" is used to avoid to override core site settings.
-        $inputFilter->get('search_module')
+        $event->getParam('inputFilter')->get('search_module')
             ->add([
                 'name' => 'search_pages',
                 'required' => false,

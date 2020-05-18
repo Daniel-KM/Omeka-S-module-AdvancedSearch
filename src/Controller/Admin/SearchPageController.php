@@ -337,6 +337,11 @@ class SearchPageController extends AbstractActionController
             }
         }
 
+        if (strpos($path, 'https:') === 0 || strpos($path, 'http:') === 0) {
+            $this->messenger()->addError('The path should be relative to the root of the site, like "search".'); // @translate
+            return false;
+        }
+
         $form->setData($params);
         if ($form->isValid()) {
             return true;

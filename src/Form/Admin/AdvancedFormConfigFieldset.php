@@ -206,7 +206,7 @@ class AdvancedFormConfigFieldset extends Fieldset
                 'type' => Element\Textarea::class,
                 'options' => [
                     'label' => 'Filters', // @translate
-                    'info' => 'List of filters that will be displayed in the search form. Format is "term | Label".', // @translate
+                    'info' => 'List of filters that will be displayed in the search form. Format is "term | Label". The field should exist in all resources fields.', // @translate
                 ],
                 'attributes' => [
                     'id' => 'filters',

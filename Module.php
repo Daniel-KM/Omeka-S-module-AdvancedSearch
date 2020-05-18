@@ -399,11 +399,15 @@ class Module extends AbstractModule
         } catch (\Exception $e) {
             $services = $this->getServiceLocator();
             $logger = $services->get('Omeka\Logger');
-            $logger->err(new Message('Unable to delete the search index for resource #%d: %s', // @translate
-                $id, $e->getMessage()));
+            $logger->err(new Message(
+                'Unable to delete the search index for resource #%d: %s', // @translate
+                $id, $e->getMessage()
+            ));
             $messenger = $services->get('ControllerPluginManager')->get('messenger');
-            $messenger->addWarning(new Message('Unable to delete the search index for the deleted resource #%d: see log.', // @translate
-                $id));
+            $messenger->addWarning(new Message(
+                'Unable to delete the search index for the deleted resource #%d: see log.', // @translate
+                $id
+            ));
         }
     }
 
@@ -420,11 +424,15 @@ class Module extends AbstractModule
         } catch (\Exception $e) {
             $services = $this->getServiceLocator();
             $logger = $services->get('Omeka\Logger');
-            $logger->err(new Message('Unable to index metadata of resource #%d for search: %s', // @translate
-                $resource->getId(), $e->getMessage()));
+            $logger->err(new Message(
+                'Unable to index metadata of resource #%d for search: %s', // @translate
+                $resource->getId(), $e->getMessage()
+            ));
             $messenger = $services->get('ControllerPluginManager')->get('messenger');
-            $messenger->addWarning(new Message('Unable to update the search index for resource #%d: see log.', // @translate
-                $resource->getId()));
+            $messenger->addWarning(new Message(
+                'Unable to update the search index for resource #%d: see log.', // @translate
+                $resource->getId()
+            ));
         }
     }
 

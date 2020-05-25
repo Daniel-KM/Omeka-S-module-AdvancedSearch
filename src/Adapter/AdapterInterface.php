@@ -50,7 +50,7 @@ interface AdapterInterface
     /**
      * Return the form used to managed the config of the adapter, if any.
      *
-     * @çeturn \Zend\Form\Fieldset|null
+     * @return \Zend\Form\Fieldset|null
      */
     public function getConfigFieldset();
 

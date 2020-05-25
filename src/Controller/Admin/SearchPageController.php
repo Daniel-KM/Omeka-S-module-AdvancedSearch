@@ -559,7 +559,7 @@ class SearchPageController extends AbstractActionController
         $result = [];
 
         // Check admin.
-        $adminSearchId= $this->settings()->get('search_main_page');
+        $adminSearchId = $this->settings()->get('search_main_page');
         if ($adminSearchId) {
             $result[] = 'admin';
         }

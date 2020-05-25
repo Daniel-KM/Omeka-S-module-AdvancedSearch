@@ -508,7 +508,8 @@ class Module extends AbstractModule
 
         $view = $event->getTarget();
 
-        $status = $view->status();
+        /** @var \Omeka\Mvc\Status $status */
+        $status = $this->getServiceLocator()->get('Omeka\Status');
         if ($status->isSiteRequest()) {
             $params = $view->params()->fromRoute();
             if ($params['controller'] === \Search\Controller\IndexController::class) {

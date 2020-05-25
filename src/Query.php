@@ -166,7 +166,7 @@ class Query implements \JsonSerializable
 
     /**
      * @param string $name
-     * @param string $value
+     * @param array|string $value
      * @return self
      */
     public function addFilter($name, $value)
@@ -192,8 +192,8 @@ class Query implements \JsonSerializable
     public function addDateRangeFilter($name, $start, $end)
     {
         $this->dateRangeFilters[$name][] = [
-            'start' => $start,
-            'end' => $end,
+            'start' => trim($start),
+            'end' => trim($end),
         ];
         return $this;
     }
@@ -219,7 +219,7 @@ class Query implements \JsonSerializable
      */
     public function addFilterQuery($name, $value, $type = 'in', $joiner = 'and')
     {
-        $this->filterQueries[$name][] = ['value' => $value, 'type' => $type, 'joiner' => $joiner];
+        $this->filterQueries[$name][] = ['value' => trim($value), 'type' => trim($type), 'joiner' => trim($joiner)];
         return $this;
     }
 
@@ -338,6 +338,8 @@ class Query implements \JsonSerializable
     }
 
     /**
+     * Exclude fields from main search query, for example to exclude full text.
+     *
      * @param array $excludedFields
      * @return self
      */

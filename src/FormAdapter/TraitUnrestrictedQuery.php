@@ -74,7 +74,7 @@ trait TraitUnrestrictedQuery
             if (empty($formSettings['filter_value_joiner'])) {
                 if (empty($formSettings['filter_value_type'])) {
                     foreach ($request['text']['filters'] as $filter) {
-                        if (!empty($filter['value'])) {
+                        if (isset($filter['value']) && trim($filter['value']) !== '') {
                             $query->addFilter($filter['field'], $filter['value']);
                         }
                     }
@@ -83,7 +83,7 @@ trait TraitUnrestrictedQuery
                         $type = isset($filter['type']) && $filter['type'] ? $filter['type'] : 'in';
                         if ($type === 'ex' || $type === 'nex') {
                             $query->addFilterQuery($filter['field'], null, $type);
-                        } elseif (!empty($filter['value'])) {
+                        } elseif (isset($filter['value']) && trim($filter['value']) !== '') {
                             $query->addFilterQuery($filter['field'], $filter['value'], $type);
                         }
                     }
@@ -91,9 +91,9 @@ trait TraitUnrestrictedQuery
             } else {
                 if (empty($formSettings['filter_value_type'])) {
                     foreach ($request['text']['filters'] as $filter) {
-                        if (!empty($filter['value'])) {
+                        if (isset($filter['value']) && trim($filter['value']) !== '') {
                             $joiner = isset($filter['join']) && $filter['join'] === 'or' ? 'or' : 'and';
-                            $query->addFilterQuery($filter['field'], $filter['value'], 'in', $joiner);
+                            $query->addFilterQuery($filter['field'], $filter['value'], $type, $joiner);
                         }
                     }
                 } else {
@@ -102,9 +102,9 @@ trait TraitUnrestrictedQuery
                         if ($type === 'ex' || $type === 'nex') {
                             $joiner = isset($filter['join']) && $filter['join'] === 'or' ? 'or' : 'and';
                             $query->addFilterQuery($filter['field'], null, $type, $joiner);
-                        } elseif (!empty($filter['value'])) {
+                        } elseif (isset($filter['value']) && trim($filter['value']) !== '') {
                             $joiner = isset($filter['join']) && $filter['join'] === 'or' ? 'or' : 'and';
-                            $query->addFilterQuery($filter['field'], $filter['value'], 'in', $joiner);
+                            $query->addFilterQuery($filter['field'], $filter['value'], $type, $joiner);
                         }
                     }
                 }

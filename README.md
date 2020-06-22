@@ -29,6 +29,7 @@ resources. So the search engine is the sql one, without indexer, so it is
 limited strictly to the request like the standard Omeka S search engine (no
 wildcards, no management of singular/plural, etc.). Nevertheless, it provides
 the facets to improve the results (requires the module [Reference]).
+
 An adapter is available for [Solr], one of the most used search engine.
 
 
@@ -49,6 +50,8 @@ See general end user documentation for [Installing a module].
   It is not needed for external search engines. It should be at least version
   3.4.16. Older versions are supported only with Search version 3.5.12.2 or
   older ones.
+- Module [Solr]. Note that this is not the module [Solr of Biblibre], but the
+  module named [SearchSolr].
 
 ### Fix
 
@@ -251,12 +254,14 @@ were done for various projects.
 [Search]: https://github.com/BibLibre/Omeka-S-module-Search
 [Omeka S]: https://omeka.org/s
 [Psl Search Form]: https://github.com/BibLibre/Omeka-S-module-PslSearchForm
-[Solr]: https://github.com/biblibre/Omeka-S-module-Solr
+[Solr]: https://github.com/Daniel-KM/Omeka-S-module-SearchSolr
+[SearchSolr]: https://github.com/Daniel-KM/Omeka-S-module-SearchSolr
 [digital library of PSL]: https://bibnum.explore.univ-psl.fr
 [Installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
 [this patch]: https://github.com/omeka/omeka-s/pull/1519/files
 [jQueryUI]: https://github.com/biblibre/omeka-s-module-jQueryUI
 [Reference]: https://github.com/Daniel-KM/Omeka-S-module-Reference
+[Solr of Biblibre]: https://github.com/BibLibre/Omeka-S-module-Solr
 [Browse preview]: https://omeka.org/s/docs/user-manual/sites/site_pages/#browse-preview
 [module issues]: https://github.com/BibLibre/Omeka-S-module-Search/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html

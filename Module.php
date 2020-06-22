@@ -376,16 +376,27 @@ class Module extends AbstractModule
      * but only when the module NumericDataTypes is used. The new ResourceTemplateProperty
      * is visible via the method \Omeka\Api\Adapter\AbstractEntityAdapter::detachAllNewEntities()
      * after the first update.
+     * This issue doesn't occurs in background batch edit all (see \Omeka\Controller\Admin\itemController::batchEditAllAction()
+     * and \Omeka\Job\BatchUpdate::perform()). But, conversely, when this option
+     * is set, it doesn't work any more for a background process, so a check is
+     * done to check if this is a background event.
+     * @todo Find where the resource template property is created. This issue may disappear de facto in a future version.
      *
      * @param Event $event
      */
     public function preBatchUpdateSearchIndex(Event $event)
     {
-        $this->isBatchUpdate = true;
+        // This is a background job if there is no route match.
+        $routeMatch = $this->getServiceLocator()->get('application')->getMvcEvent()->getRouteMatch();
+        $this->isBatchUpdate = !empty($routeMatch);
     }
 
     public function postBatchUpdateSearchIndex(Event $event)
     {
+        if (!$this->isBatchUpdate) {
+            return;
+        }
+
         $serviceLocator = $this->getServiceLocator();
         $api = $serviceLocator->get('Omeka\ApiManager');
 

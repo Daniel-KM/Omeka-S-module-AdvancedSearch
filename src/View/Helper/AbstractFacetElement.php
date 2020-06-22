@@ -130,6 +130,20 @@ class AbstractFacetElement extends AbstractHelper
 
         // TODO Simplify the list of field names (for historical reasons).
         switch ($name) {
+            case 'resource':
+                $data = ['id' => $facetValue];
+                // The site id is required in public.
+                if ($this->siteId) {
+                    $data['site_id'] = $this->siteId;
+                }
+                /** @var \Omeka\Api\Representation\ItemSetRepresentation $resource */
+                $resource = $this->api->searchOne('resources', $data)->getContent();
+                return $resource
+                    ? $resource->displayTitle()
+                    // Manage the case where a resource was indexed but removed.
+                    // In public side, the item set should belong to a site too.
+                    : null;
+
             case 'item_sets':
             case 'itemSet':
             case 'item_set_id':

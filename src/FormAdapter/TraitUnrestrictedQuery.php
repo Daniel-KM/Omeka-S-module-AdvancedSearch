@@ -50,6 +50,10 @@ trait TraitUnrestrictedQuery
             $query->addFilter($formSettings['is_public_field'], (bool) $request['isPublic']);
         }
 
+        if (isset($request['resource']['ids'])) {
+            $query->addFilter('id', $request['resource']['ids']);
+        }
+
         if (!empty($formSettings['item_set_id_field'])
             && isset($request['itemSet']['ids'])
         ) {

@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016-2017
- * Copyright Daniel Berthereau, 2017-2019
+ * Copyright Daniel Berthereau, 2017-2020
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -49,6 +49,11 @@ use Zend\Mvc\MvcEvent;
 class Module extends AbstractModule
 {
     const NAMESPACE = __NAMESPACE__;
+
+    /**
+     * @var bool
+     */
+    protected $isBatchUpdate;
 
     public function init(ModuleManager $moduleManager)
     {
@@ -118,6 +123,16 @@ class Module extends AbstractModule
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemAdapter::class,
+            'api.batch_update.pre',
+            [$this, 'preBatchUpdateSearchIndex']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\ItemAdapter::class,
+            'api.batch_update.post',
+            [$this, 'postBatchUpdateSearchIndex']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\ItemAdapter::class,
             'api.update.post',
             [$this, 'updateSearchIndex']
         );
@@ -134,6 +149,16 @@ class Module extends AbstractModule
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemSetAdapter::class,
+            'api.batch_update.pre',
+            [$this, 'preBatchUpdateSearchIndex']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\ItemSetAdapter::class,
+            'api.batch_update.post',
+            [$this, 'postBatchUpdateSearchIndex']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\ItemSetAdapter::class,
             'api.update.post',
             [$this, 'updateSearchIndex']
         );
@@ -147,6 +172,16 @@ class Module extends AbstractModule
             \Omeka\Api\Adapter\MediaAdapter::class,
             'api.update.post',
             [$this, 'updateSearchIndexMedia']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\MediaAdapter::class,
+            'api.batch_update.pre',
+            [$this, 'preBatchUpdateSearchIndex']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\MediaAdapter::class,
+            'api.batch_update.post',
+            [$this, 'postBatchUpdateSearchIndex']
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\MediaAdapter::class,
@@ -327,6 +362,65 @@ class Module extends AbstractModule
         }
     }
 
+    /**
+     * Prepare a batch update to process it one time only for performance.
+     *
+     * This process avoids a bug too.
+     * When there is a batch update, with modules SearchSolr and NumericDataTypes,
+     * a bug occurs on the second call to update when the process is done in
+     * admin ui via batch edit selected resources and when one of the selected
+     * resources has a resource template: a resource template property is
+     * created, but it must not exist, since the event is not related to the
+     * resource templates (only read them). The issue occurs when SearchSolr
+     * tries to read values from the representation (item values extraction),
+     * but only when the module NumericDataTypes is used. The new ResourceTemplateProperty
+     * is visible via the method \Omeka\Api\Adapter\AbstractEntityAdapter::detachAllNewEntities()
+     * after the first update.
+     *
+     * @param Event $event
+     */
+    public function preBatchUpdateSearchIndex(Event $event)
+    {
+        $this->isBatchUpdate = true;
+    }
+
+    public function postBatchUpdateSearchIndex(Event $event)
+    {
+        $serviceLocator = $this->getServiceLocator();
+        $api = $serviceLocator->get('Omeka\ApiManager');
+
+        $request = $event->getParam('request');
+        $requestResource = $request->getResource();
+        $response = $event->getParam('response');
+        $resources = $response->getContent();
+
+        /** @var \Search\Api\Representation\SearchIndexRepresentation[] $searchIndexes */
+        $searchIndexes = $api->search('search_indexes')->getContent();
+        foreach ($searchIndexes as $searchIndex) {
+            $searchIndexSettings = $searchIndex->settings();
+            if (in_array($requestResource, $searchIndexSettings['resources'])) {
+                $indexer = $searchIndex->indexer();
+                try {
+                    $indexer->indexResources($resources);
+                } catch (\Exception $e) {
+                    $services = $this->getServiceLocator();
+                    $logger = $services->get('Omeka\Logger');
+                    $logger->err(new Message(
+                        'Unable to batch index metadata for search index "%s": %s', // @translate
+                        $searchIndex->name(), $e->getMessage()
+                    ));
+                    $messenger = $services->get('ControllerPluginManager')->get('messenger');
+                    $messenger->addWarning(new Message(
+                        'Unable to batch update the search index "%s": see log.', // @translate
+                        $searchIndex->name()
+                    ));
+                }
+            }
+        }
+
+        $this->isBatchUpdate = false;
+    }
+
     public function preUpdateSearchIndexMedia(Event $event)
     {
         $api = $this->getServiceLocator()->get('Omeka\ApiManager');
@@ -339,6 +433,9 @@ class Module extends AbstractModule
 
     public function updateSearchIndex(Event $event)
     {
+        if ($this->isBatchUpdate) {
+            return;
+        }
         $serviceLocator = $this->getServiceLocator();
         $api = $serviceLocator->get('Omeka\ApiManager');
 

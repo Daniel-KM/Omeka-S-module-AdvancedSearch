@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-28 00:00+0100\n"
+"POT-Creation-Date: 2020-07-06 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,92 +17,96 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: Module.php:200 view/common/advanced-search/date-time.phtml:77
+#: Module.php:208 view/common/advanced-search/date-time.phtml:78
 msgid "after"
 msgstr ""
 
-#: Module.php:201 view/common/advanced-search/date-time.phtml:78
+#: Module.php:209 view/common/advanced-search/date-time.phtml:79
 msgid "after or on"
 msgstr ""
 
-#: Module.php:202 view/common/advanced-search/date-time.phtml:79
+#: Module.php:210 view/common/advanced-search/date-time.phtml:80
 msgid "on"
 msgstr ""
 
-#: Module.php:203 view/common/advanced-search/date-time.phtml:80
+#: Module.php:211 view/common/advanced-search/date-time.phtml:81
 msgid "not on"
 msgstr ""
 
-#: Module.php:204 view/common/advanced-search/date-time.phtml:81
+#: Module.php:212 view/common/advanced-search/date-time.phtml:82
 msgid "before or on"
 msgstr ""
 
-#: Module.php:205 view/common/advanced-search/date-time.phtml:82
+#: Module.php:213 view/common/advanced-search/date-time.phtml:83
 msgid "before"
 msgstr ""
 
-#: Module.php:206 view/common/advanced-search/date-time.phtml:83
+#: Module.php:214 view/common/advanced-search/date-time.phtml:84
 msgid "has any date / time"
 msgstr ""
 
-#: Module.php:207 view/common/advanced-search/date-time.phtml:84
+#: Module.php:215 view/common/advanced-search/date-time.phtml:85
 msgid "has no date / time"
 msgstr ""
 
-#: Module.php:218
+#: Module.php:226
 msgid "Modified"
 msgstr ""
 
-#: Module.php:240 Module.php:243 view/common/advanced-search/has-media.phtml:6
-#: view/common/advanced-search/has-media.phtml:21
+#: Module.php:248 Module.php:251 view/common/advanced-search/has-media.phtml:12
+#: view/common/advanced-search/has-media.phtml:27
 msgid "Has media"
 msgstr ""
 
-#: Module.php:253 view/common/advanced-search/media-type.phtml:11
+#: Module.php:261 view/common/advanced-search/media-type.phtml:12
 msgid "Media type"
 msgstr ""
 
-#: view/common/advanced-search/date-time.phtml:37
+#: view/common/advanced-search/date-time.phtml:38
 msgid "Date / time"
 msgstr ""
 
-#: view/common/advanced-search/date-time.phtml:43
+#: view/common/advanced-search/date-time.phtml:44
 msgid "Search by date / time"
 msgstr ""
 
-#: view/common/advanced-search/date-time.phtml:47
+#: view/common/advanced-search/date-time.phtml:48
 msgid ""
 "Date / time can be full like \"2018-01-23 12:34:56\", or partial like "
 "\"2018-12-25\" or \"2017-11\"."
 msgstr ""
 
-#: view/common/advanced-search/date-time.phtml:59
+#: view/common/advanced-search/date-time.phtml:60
 msgid "And"
 msgstr ""
 
-#: view/common/advanced-search/date-time.phtml:60
+#: view/common/advanced-search/date-time.phtml:61
 msgid "Or"
 msgstr ""
 
-#: view/common/advanced-search/date-time.phtml:72
+#: view/common/advanced-search/date-time.phtml:73
 msgid "Creation or modification date / time"
 msgstr ""
 
-#: view/common/advanced-search/date-time.phtml:87
+#: view/common/advanced-search/date-time.phtml:88
 msgid "Remove date / time"
 msgstr ""
 
-#: view/common/advanced-search/date-time.phtml:93
+#: view/common/advanced-search/date-time.phtml:94
 msgid "Add new date / time"
 msgstr ""
 
 #: view/common/advanced-search/media-type.phtml:27
-msgid "Select media type"
+msgid "Select media types…"
 msgstr ""
 
-#: view/common/advanced-search/visibility.phtml:16
-#: view/common/advanced-search/has-media.phtml:16
+#: view/common/advanced-search/visibility.phtml:22
+#: view/common/advanced-search/has-media.phtml:22
 msgid "Any"
+msgstr ""
+
+#: view/common/advanced-search/media-item-sets.phtml:27
+msgid "Select item sets…"
 msgstr ""
 
 #: src/View/Helper/MediaTypeSelect.php:39

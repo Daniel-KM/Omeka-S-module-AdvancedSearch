@@ -146,7 +146,10 @@ class Module extends AbstractModule
             $this->searchHasMedia($qb, $adapter, $query);
             $this->searchItemByMediaType($qb, $adapter, $query);
         } elseif ($adapter instanceof MediaAdapter) {
-            $this->searchMediaType($qb, $adapter, $query);
+            if ($this->isOldOmeka) {
+                $this->searchMediaType($qb, $adapter, $query);
+            }
+            $this->searchMediaByItemSet($qb, $adapter, $query);
         }
     }
 
@@ -163,8 +166,13 @@ class Module extends AbstractModule
         $resourceType = $event->getParam('resourceType');
 
         if ($resourceType === 'media') {
-            $query['media_type'] = isset($query['media_type']) ? (array) $query['media_type'] : [];
-            $partials[] = 'common/advanced-search/media-type';
+            $this->isOldOmeka = \Omeka\Module::VERSION < 2;
+            if ($this->isOldOmeka) {
+                $query['media_type'] = isset($query['media_type']) ? (array) $query['media_type'] : [];
+                $partials[] = 'common/advanced-search/media-type';
+            }
+            $query['item_set_id'] = isset($query['item_set_id']) ? (array) $query['item_set_id'] : [];
+            $partials[] = 'common/advanced-search/media-item-sets';
         }
 
         $query['datetime'] = isset($query['datetime']) ? $query['datetime'] : '';
@@ -254,6 +262,8 @@ class Module extends AbstractModule
                 $filters[$filterLabel][] = $subValue;
             }
         }
+
+        // The query "item_set_id" is already managed by the main search filter.
 
         $event->setParam('filters', $filters);
     }
@@ -589,5 +599,46 @@ class Module extends AbstractModule
             $alias . '.mediaType',
             $adapter->createNamedParameter($qb, $values)
         ));
+    }
+
+    /**
+     * Build query to search media by item set.
+     *
+     * @param QueryBuilder $qb
+     * @param AbstractResourceEntityAdapter $adapter
+     * @param array $query
+     */
+    protected function searchMediaByItemSet(
+        QueryBuilder $qb,
+        MediaAdapter $adapter,
+        array $query
+    ) {
+        if (!isset($query['item_set_id'])) {
+            return;
+        }
+
+        $itemSets = $query['item_set_id'];
+        if (!is_array($itemSets)) {
+            $itemSets = [$itemSets];
+        }
+        $itemSets = array_filter($itemSets, 'is_numeric');
+
+        if ($itemSets) {
+            $alias = $this->isOldOmeka ? $adapter->getEntityClass() : 'omeka_root';
+            $expr = $qb->expr();
+            $itemAlias = $adapter->createAlias();
+            $itemSetAlias = $adapter->createAlias();
+            $qb
+                ->leftJoin(
+                    $alias . '.item',
+                    $itemAlias, 'WITH',
+                    $expr->eq("$itemAlias.id", $alias . '.item')
+                )
+                ->innerJoin(
+                    $itemAlias . '.itemSets',
+                    $itemSetAlias, 'WITH',
+                    $expr->in("$itemSetAlias.id", $adapter->createNamedParameter($qb, $itemSets))
+                );
+        }
     }
 }

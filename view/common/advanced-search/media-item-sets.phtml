@@ -1,0 +1,32 @@
+<?php
+/**
+ * @var \Zend\View\Renderer\PhpRenderer $this
+ * @var array $query
+ */
+
+$translate = $this->plugin('translate');
+?>
+
+<div id="media-item-set-queries" class="field" role="group" aria-labelledby="by-item-set-label">
+    <div class="field-meta">
+        <span id="by-item-set-label" class="label"><?= $translate('Item set') ?></span>
+    </div>
+    <div class="inputs">
+        <div class="value">
+            <?= $this->itemSetSelect([
+                'name' => 'item_set_id',
+                'options' => [
+                    'empty_option' => '',
+                ],
+                'attributes' => [
+                    'id' => 'item_set_id',
+                    'value' => empty($query['item_set_id']) ? [] : (array) $query['item_set_id'],
+                    'class' => 'chosen-select query-media-itemset',
+                    'multiple' => true,
+                    'aria-labelledby' => 'by-item-set-label',
+                    'data-placeholder' => 'Select item sets…', // @translate
+                ],
+            ]) ?>
+        </div>
+    </div>
+</div>

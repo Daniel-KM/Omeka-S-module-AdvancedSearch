@@ -289,7 +289,7 @@ class Module extends AbstractModule
 
             // Clean query and manage default values.
             if (is_array($queryRow)) {
-                $queryRow = array_map('strtolower', array_map('trim', $queryRow));
+                $queryRow = array_map('mb_strtolower', array_map('trim', $queryRow));
                 if (empty($queryRow['joiner'])) {
                     $queryRow['joiner'] = 'and';
                 } else {

@@ -1,9 +1,15 @@
 <?php
+/**
+ * @var \Zend\View\Renderer\PhpRenderer $this
+ * @var array $query
+ */
+
 $translate = $this->plugin('translate');
 ?>
+
 <div id="visibility-queries" class="field" role="group" aria-labelledby="by-visibility-label">
     <div class="field-meta">
-        <span id="by-visibility-label" class="label"><?php echo $translate('Visibility'); ?></span>
+        <span id="by-visibility-label" class="label"><?= $translate('Visibility') ?></span>
     </div>
     <div class="inputs">
         <div class="value">

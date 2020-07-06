@@ -1,9 +1,15 @@
 <?php
+/**
+ * @var \Zend\View\Renderer\PhpRenderer $this
+ * @var array $query
+ */
+
 $translate = $this->plugin('translate');
 ?>
+
 <div id="hasmedia-queries" class="field" role="group" aria-labelledby="by-has-media-label">
     <div class="field-meta">
-        <span id="by-has-media-label" class="label"><?php echo $translate('Has media'); ?></span>
+        <span id="by-has-media-label" class="label"><?= $translate('Has media') ?></span>
     </div>
     <div class="inputs">
         <div class="value">
@@ -18,7 +24,7 @@ $translate = $this->plugin('translate');
                 ->setAttributes([
                     'class' => 'query-datetime',
                     'value' => isset($query['has_media']) ? $query['has_media'] : '',
-                    'aria-label' => $translate('Has media'),
+                    'aria-label' => $translate('Has media'), // @translate
                 ]);
             echo $this->formRadio($select);
             ?>

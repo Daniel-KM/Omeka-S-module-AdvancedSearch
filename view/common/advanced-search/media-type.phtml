@@ -6,14 +6,14 @@
 
 $translate = $this->plugin('translate');
 ?>
+
 <div id="mediatype-queries" class="field" role="group" aria-labelledby="by-media-type-label">
     <div class="field-meta">
-        <span id="by-media-type-label" class="label"><?php echo $translate('Media type'); ?></span>
+        <span id="by-media-type-label" class="label"><?= $translate('Media type') ?></span>
     </div>
     <div class="inputs">
         <div class="value">
-            <?php
-            echo $this->mediaTypeSelect([
+            <?= $this->mediaTypeSelect([
                 'name' => 'media_type',
                 'options' => [
                     'empty_option' => '',
@@ -23,11 +23,10 @@ $translate = $this->plugin('translate');
                     'value' => empty($query['media_type']) ? [] : (array) $query['media_type'],
                     'class' => 'chosen-select query-mediatype',
                     'multiple' => true,
-                    'aria-labelledby' =>  'by-media-type-label',
-                    'data-placeholder' => 'Select media type', // @translate
+                    'aria-labelledby' => 'by-media-type-label',
+                    'data-placeholder' => 'Select media types…', // @translate
                 ],
-            ]);
-            ?>
+            ]) ?>
         </div>
     </div>
 </div>

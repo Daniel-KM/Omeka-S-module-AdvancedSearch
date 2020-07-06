@@ -5,7 +5,7 @@
  * Add some fields to the advanced search form (before/after creation date, has
  * media, etc.).
  *
- * @copyright Daniel Berthereau, 2018-2019
+ * @copyright Daniel Berthereau, 2018-2020
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
  *
  * This software is governed by the CeCILL license under French law and abiding

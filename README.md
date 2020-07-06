@@ -10,6 +10,7 @@ Added fields are:
 - has media (for item)
 - media type (included in Omeka S > 2.0.2)
 - visibility public/private
+- media by item set
 
 
 Installation
@@ -70,7 +71,7 @@ of the CeCILL license and that you accept its terms.
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2018-2019, (see [Daniel-KM] on GitHub)
+* Copyright Daniel Berthereau, 2018-2020, (see [Daniel-KM] on GitHub)
 
 
 [Advanced Search Plus]: https://github.com/Daniel-KM/Omeka-S-module-AdvancedSearchPlus

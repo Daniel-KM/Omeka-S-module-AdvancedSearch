@@ -191,6 +191,7 @@ TODO
 - Update index when item pool of a site change.
 - Genericize and move the value extractor from module Solr to module Search.
 - Improve the check of presence of an item in sites for real time indexation.
+- Updated index in batch, not one by one.
 
 
 Warning

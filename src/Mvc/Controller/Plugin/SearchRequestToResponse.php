@@ -159,7 +159,7 @@ class SearchRequestToResponse extends AbstractPlugin
         try {
             $response = $querier->query();
         } catch (QuerierException $e) {
-            $message = new Message('Query error: %s', $e->getMessage()); // @translate
+            $message = new Message("Query error: %s\nQuery:%s", $e->getMessage(), json_encode($query->jsonSerialize(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)); // @translate
             $controller->logger()->err($message);
             return [
                 'status' => 'error',

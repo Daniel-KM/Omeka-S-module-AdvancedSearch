@@ -140,7 +140,7 @@ class AdvancedForm extends Form
     protected function itemSetFieldset($filterType = 'select')
     {
         $fieldset = new Fieldset('itemSet');
-        $fieldset
+        return $fieldset
             ->setAttributes([
                 'id' => 'search-item-sets',
             ])
@@ -152,7 +152,7 @@ class AdvancedForm extends Form
                 'options' => [
                     // For normal users, it is not "item sets", but "collections".
                     'label' => 'Collections', // @translate
-                    'value_options' => $this->getItemSetsOptions(),
+                    'value_options' => $this->getItemSetsOptions($filterType !== 'multi-checkbox'),
                     'empty_option' => '',
                 ],
                 'attributes' => [
@@ -163,7 +163,6 @@ class AdvancedForm extends Form
                 ],
             ])
         ;
-        return $fieldset;
     }
 
     protected function resourceClassFieldset($filterType = 'select')
@@ -321,7 +320,7 @@ class AdvancedForm extends Form
     {
     }
 
-    protected function getItemSetsOptions()
+    protected function getItemSetsOptions($byOwner = false)
     {
         $site = $this->getSite();
         $select = $this->getForm(\Omeka\Form\Element\ItemSetSelect::class, []);
@@ -336,6 +335,7 @@ class AdvancedForm extends Form
         } else {
             $select->setOptions([
                 'query' => ['sort_by' => 'dcterms:title', 'sort_order' => 'asc'],
+                'disable_group_by_owner' => !$byOwner,
             ]);
             $valueOptions = $select->getValueOptions();
         }

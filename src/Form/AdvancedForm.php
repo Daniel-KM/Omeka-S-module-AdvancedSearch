@@ -35,9 +35,8 @@ use Omeka\Form\Element\ResourceTemplateSelect;
 use Omeka\View\Helper\Setting;
 use Zend\Form\Element;
 use Zend\Form\Fieldset;
-use Zend\Form\Form;
 
-class AdvancedForm extends Form
+class AdvancedForm extends BasicForm
 {
     /**
      * @var SiteRepresentation
@@ -53,23 +52,11 @@ class AdvancedForm extends Form
 
     public function init()
     {
+        parent::init();
+
         /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
         $searchPage = $this->getOption('search_page');
         $searchPageSettings = $searchPage ? $searchPage->settings() : [];
-
-        $this
-            ->add([
-                'name' => 'q',
-                'type' => Element\Text::class,
-                'options' => [
-                    'label' => 'Search', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'q',
-                    'placeholder' => 'Search resources…', // @translate
-                ],
-            ])
-        ;
 
         $appendItemSetFieldset = !empty($searchPageSettings['form']['item_set_filter_type'])
             && !empty($searchPageSettings['form']['item_set_id_field']);

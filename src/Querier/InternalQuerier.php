@@ -445,14 +445,18 @@ class InternalQuerier extends AbstractQuerier
                 'sort_order' => 'DESC',
                 'filters' => [
                     'languages' => $facetLanguages,
+                    'datatypes' => [],
                 ],
                 'values' => [],
                 // Output options.
-                'first_id' => false,
+                'first' => false,
                 'initial' => false,
+                'distinct' => false,
+                'type' => false,
                 'lang' => false,
                 'include_without_meta' => false,
                 'output' => 'associative',
+                'is_api' => true,
             ];
 
             $values = $references
@@ -463,7 +467,7 @@ class InternalQuerier extends AbstractQuerier
 
             $key = 0;
             foreach ($values as $result) {
-                foreach ($result['o-module-reference:values'] as $value => $count) {
+                foreach ($result['o:references'] as $value => $count) {
                     $this->response->addFacetCount($facetFields[$key], $value, $count);
                 }
                 ++$key;

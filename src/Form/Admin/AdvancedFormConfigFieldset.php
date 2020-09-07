@@ -41,9 +41,10 @@ class AdvancedFormConfigFieldset extends Fieldset
         // These fields may be overridden by the available fields.
         $specialOptions = [
             'is_public_field' => 'Is public', // @translate
-            'item_set_id_field' => 'Item set id', // @translate
-            'resource_class_id_field' => 'Resource class id', // @translate
-            'resource_template_id_field' => 'Resource template id', // @translate
+            // TODO Create a default fields for item set, resource class and resource template for Solr.
+            'item_set_id_field' => 'Item set id (if available in fields)', // @translate
+            'resource_class_id_field' => 'Resource class id (if available in fields)', // @translate
+            'resource_template_id_field' => 'Resource template id (if available in fields)', // @translate
         ] + $fieldOptions;
 
         // Remove some of the available fields used by the internal adapter,

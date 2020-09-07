@@ -66,7 +66,14 @@ class SearchPage implements LinkInterface
     public function toZend(array $data, SiteRepresentation $site)
     {
         $api = $site->getServiceLocator()->get('Omeka\ApiManager');
-        $page = $api->read('search_pages', ['id' => $data['search_page_id']])->getContent();
+        try {
+            $page = $api->read('search_pages', ['id' => $data['search_page_id']])->getContent();
+        } catch (\Omeka\Api\Exception\NotFoundException $e) {
+            return [
+                'type' => 'uri',
+                'uri' => null,
+            ];
+        }
         return [
             'label' => $data['label'],
             'route' => 'search-page-' . $page->id(),

@@ -25,7 +25,7 @@ class SearchingForm extends AbstractBlockLayout
 
     public function onHydrate(SitePageBlock $block, ErrorStore $errorStore)
     {
-        $data = $block->getData();
+        $data = $block->getData() + ['query' => '', 'query_filter' => ''];
         $data['query'] = ltrim($data['query'], "? \t\n\r\0\x0B");
         $data['query_filter'] = ltrim($data['query_filter'], "? \t\n\r\0\x0B");
         $block->setData($data);

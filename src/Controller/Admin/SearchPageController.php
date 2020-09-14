@@ -226,9 +226,13 @@ class SearchPageController extends AbstractActionController
         $params['default_query'] = trim($params['default_query'], "? \t\n\r\0\x0B");
 
         // TODO Should be checked in form.
-        $params['facet_languages'] = strlen(trim($params['facet_languages']))
-            ? array_unique(array_map('trim', explode('|', $params['facet_languages'])))
-            : [];
+        if (empty($params['facet_languages'])) {
+            $params['facet_languages'] = [];
+        } elseif (!is_array($params['facet_languages'])) {
+            $params['facet_languages'] = strlen(trim($params['facet_languages']))
+                ? array_unique(array_map('trim', explode('|', $params['facet_languages'])))
+                : [];
+        }
 
         // Add a warning because it may be a hard to understand issue.
         if (!empty($params['facet_languages']) && !in_array('', $params['facet_languages'])) {

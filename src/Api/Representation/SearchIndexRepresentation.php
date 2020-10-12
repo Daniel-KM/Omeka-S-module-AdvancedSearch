@@ -83,6 +83,20 @@ class SearchIndexRepresentation extends AbstractEntityRepresentation
     }
 
     /**
+     * Get unique short name of this index.
+     *
+     * The short name is used in Solr module to create a unique id, that should
+     * be 32 letters max in order to be sorted (39rhjw-Z-item_sets/7654321:fr_FR),
+     * it should be less than two letters, so don't create too much indexes.
+     *
+     * @return string
+     */
+    public function shortName()
+    {
+        return base_convert($this->id(), 10, 36);
+    }
+
+    /**
      * @return \Search\Adapter\AdapterInterface|null
      */
     public function adapter()

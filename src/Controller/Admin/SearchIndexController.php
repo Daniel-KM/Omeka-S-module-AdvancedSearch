@@ -101,6 +101,8 @@ class SearchIndexController extends AbstractActionController
             ));
             return $this->redirect()->toRoute('admin/search', ['action' => 'browse'], true);
         }
+
+        /** @var \Search\Adapter\AdapterInterface $adapter */
         $adapter = $adapterManager->get($searchIndexAdapterName);
 
         $form = $this->getForm(SearchIndexConfigureForm::class, [
@@ -109,8 +111,10 @@ class SearchIndexController extends AbstractActionController
         $adapterFieldset = $adapter->getConfigFieldset();
         if ($adapterFieldset) {
             $adapterFieldset
+                ->setOption('search_index_id', $id)
                 ->setName('adapter')
-                ->setLabel('Adapter settings'); // @translate
+                ->setLabel('Adapter settings') // @translate
+                ->init();
             $form->add($adapterFieldset);
         }
         $data = $searchIndex->getSettings() ?: [];
@@ -236,6 +240,9 @@ class SearchIndexController extends AbstractActionController
         return $this->entityManager;
     }
 
+    /**
+     * @return \Search\Adapter\Manager
+     */
     protected function getSearchAdapterManager()
     {
         return $this->searchAdapterManager;

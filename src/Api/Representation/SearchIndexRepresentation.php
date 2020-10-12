@@ -104,6 +104,17 @@ class SearchIndexRepresentation extends AbstractEntityRepresentation
     }
 
     /**
+     * @param string $name
+     * @param mixed $default
+     * @return mixed
+     */
+    public function settingAdapter($name, $default = null)
+    {
+        $settings = $this->resource->getSettings();
+        return $settings['adapter'][$name] ?? $default;
+    }
+
+    /**
      * @return \DateTime
      */
     public function created()

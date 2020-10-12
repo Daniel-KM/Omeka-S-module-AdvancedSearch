@@ -73,6 +73,16 @@ class SearchIndexRepresentation extends AbstractEntityRepresentation
     }
 
     /**
+     * @return string
+     */
+    public function cleanName()
+    {
+        return strtolower(str_replace('__', '_',
+            preg_replace('/[^a-zA-Z0-9]/', '_', $this->resource->getName())
+        ));
+    }
+
+    /**
      * @return \Search\Adapter\AdapterInterface|null
      */
     public function adapter()

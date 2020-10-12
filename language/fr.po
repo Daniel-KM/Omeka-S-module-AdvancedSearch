@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Search\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-20 00:00+0200\n"
-"PO-Revision-Date: 2020-04-20 00:00+0200\n"
+"POT-Creation-Date: 2020-10-12 00:00+0000\n"
+"PO-Revision-Date: 2020-10-12 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: French\n"
 "Language: fr\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 2.3\n"
+"X-Generator: Poedit 2.4.1\n"
 
 #: src/Adapter/InternalAdapter.php:88
 msgid "Asc"
@@ -26,22 +26,22 @@ msgstr "Asc"
 msgid "Desc"
 msgstr "Desc"
 
-#: src/Api/Representation/SearchIndexRepresentation.php:119
+#: src/Api/Representation/SearchIndexRepresentation.php:165
 #, php-format
 msgid "[Missing adapter \"%s\"]"
 msgstr "[Adaptateur \"%s\" manquant]"
 
-#: src/Generic/AbstractModule.php:598
+#: src/Generic/AbstractModule.php:601
 #, php-format
 msgid "This module requires the module \"%s\"."
 msgstr "Ce module requiert le module \"%s\"."
 
-#: src/Generic/AbstractModule.php:618
+#: src/Generic/AbstractModule.php:621
 #, php-format
 msgid "This module requires modules \"%s\"."
 msgstr "Ce module requiert les modules \"%s\"."
 
-#: src/Generic/AbstractModule.php:686
+#: src/Generic/AbstractModule.php:689
 #, php-format
 msgid ""
 "The module \"%s\" was automatically deactivated because the dependencies are "
@@ -50,7 +50,7 @@ msgstr ""
 "Le module %s\" a été automatiquement désactivé car ses dépendances ne sont "
 "plus disponibles."
 
-#: src/Mvc/Controller/Plugin/ApiSearch.php:189
+#: src/Mvc/Controller/Plugin/ApiSearch.php:188
 #, php-format
 msgid "Permission denied for the current user to %s the %s resource."
 msgstr ""
@@ -113,54 +113,58 @@ msgstr "Ajouter et configurer"
 msgid "Edit search index"
 msgstr "Modifier l’index de recherche"
 
-#: view/search/admin/search-index/index-confirm.phtml:14
+#: view/search/admin/search-index/index-confirm.phtml:16
 msgid "Confirm reindex"
 msgstr "Confirmer la réindexation"
 
-#: view/search/admin/search-index/index-confirm.phtml:22
+#: view/search/admin/search-index/index-confirm.phtml:25
 #, php-format
 msgid "Reindex \"%s\""
 msgstr "Réindexer \"%s\""
 
-#: view/search/admin/search-index/index-confirm.phtml:23
+#: view/search/admin/search-index/index-confirm.phtml:26
 msgid "Are you sure you would like to reindex this index?"
 msgstr ""
 
-#: view/search/admin/search-index/index-confirm.phtml:25
+#: view/search/admin/search-index/index-confirm.phtml:28
 msgid ""
 "All the indexes will be cleared first, so the search will be unavailable for "
 "a while."
 msgstr ""
 
-#: view/search/admin/search-index/index-confirm.phtml:26
+#: view/search/admin/search-index/index-confirm.phtml:29
 msgid "You may redirect the users on a clone of the current index temporary."
 msgstr ""
 
-#: view/search/admin/search-index/index-confirm.phtml:29
+#: view/search/admin/search-index/index-confirm.phtml:32
 msgid ""
 "You may prefer to keep existing indexes and to start the indexing at the "
 "following resource id."
 msgstr ""
 
-#: view/search/admin/search-index/index-confirm.phtml:30
+#: view/search/admin/search-index/index-confirm.phtml:33
 msgid "Set \"1\" to reindex all resources without clearing the current index."
 msgstr ""
 
-#: view/search/admin/search-index/index-confirm.phtml:34
+#: view/search/admin/search-index/index-confirm.phtml:37
 msgid "You may want to limit the reindexing to a resource type."
 msgstr ""
 
-#: view/search/admin/search-index/index-confirm.phtml:41
+#: view/search/admin/search-index/index-confirm.phtml:44
 #, php-format
 msgid "%d running indexings."
 msgstr "%d indexations en cours."
 
-#: view/search/admin/search-index/index-confirm.phtml:42
+#: view/search/admin/search-index/index-confirm.phtml:45
 msgid "Force indexing"
 msgstr "Forcer la réindexation"
 
-#: view/search/admin/search-index/index-confirm.phtml:44
+#: view/search/admin/search-index/index-confirm.phtml:47
 msgid "No running indexing: process can be launched."
+msgstr ""
+
+#: view/search/admin/search-index/index-confirm.phtml:53
+msgid "This index has no resource type to index."
 msgstr ""
 
 #: view/search/admin/search-page/add.phtml:39
@@ -224,64 +228,70 @@ msgstr "liste"
 msgid "grid"
 msgstr "grille"
 
-#: Module.php:85
+#: Module.php:90
 msgid "The module jQueryUI is required to customize the search pages."
 msgstr ""
 
-#: Module.php:89
+#: Module.php:94
 msgid ""
 "The module Reference is required to use the facets with the default internal "
 "adapter."
 msgstr ""
 
-#: Module.php:402
+#: Module.php:419
+#, php-format
+msgid "Unable to batch index metadata for search index \"%s\": %s"
+msgstr ""
+
+#: Module.php:424
+#, php-format
+msgid "Unable to batch update the search index \"%s\": see log."
+msgstr ""
+
+#: Module.php:509
 #, php-format
 msgid "Unable to delete the search index for resource #%d: %s"
 msgstr ""
 
-#: Module.php:405
+#: Module.php:514
 #, php-format
 msgid ""
 "Unable to delete the search index for the deleted resource #%d: see log."
 msgstr ""
 
-#: Module.php:423
+#: Module.php:534
 #, php-format
 msgid "Unable to index metadata of resource #%d for search: %s"
 msgstr ""
 
-#: Module.php:426
+#: Module.php:539
 #, php-format
 msgid "Unable to update the search index for resource #%d: see log."
 msgstr ""
 
-#: Module.php:581
+#: Module.php:694
 msgid ""
 "The internal search engine is available. Enable it in the main settings (for "
 "admin) and in site settings (for public)."
 msgstr ""
 
-#: src/Form/AdvancedForm.php:75
-msgid "Search resources…"
-msgstr "Rechercher des ressources…"
-
-#: src/Form/AdvancedForm.php:226
+#: src/Form/AdvancedForm.php:141
 msgid "Collections"
 msgstr "Collections"
 
-#: src/Form/AdvancedForm.php:234
+#: src/Form/AdvancedForm.php:149
 msgid "Select item sets…"
 msgstr "Choisir des collections…"
 
-#: src/Form/AdvancedForm.php:253
+#: src/Form/AdvancedForm.php:169 src/Form/AdvancedForm.php:188
 msgid "Resource classes"
 msgstr "Classes de ressource"
 
-#: src/Form/AdvancedForm.php:263
+#: src/Form/AdvancedForm.php:200
 msgid "Select resource classes…"
 msgstr "Sélectionner des classes de ressources…"
 
-#: src/Form/AdvancedForm.php:291 src/Form/AdvancedForm.php:315
+#: src/Form/AdvancedForm.php:231 src/Form/AdvancedForm.php:255
 msgid "Select resource templates…"
 msgstr "Sélectionner des modèles de ressources…"
 
@@ -305,35 +315,41 @@ msgstr "Entête du bloc."
 msgid "Search page"
 msgstr "Page de recherche"
 
-#: src/Form/SearchingFormFieldset.php:48
+#: src/Form/SearchingFormFieldset.php:37
+msgid ""
+"The request below will be checked against the matching form below. Keys "
+"unknown by the form will be removed."
+msgstr ""
+
+#: src/Form/SearchingFormFieldset.php:49
 msgid "Display results"
 msgstr "Afficher les résultats"
 
-#: src/Form/SearchingFormFieldset.php:49
+#: src/Form/SearchingFormFieldset.php:50
 msgid "If not set, display only the search form."
 msgstr ""
 
-#: src/Form/SearchingFormFieldset.php:60
+#: src/Form/SearchingFormFieldset.php:61
 msgid ""
 "Display resources using this search query. Important: use the query of the "
 "engine you use, not the browse preview one."
 msgstr ""
 
-#: src/Form/SearchingFormFieldset.php:70
+#: src/Form/SearchingFormFieldset.php:71
 msgid "Hidden filter query"
 msgstr "Requête pour le filtre caché"
 
-#: src/Form/SearchingFormFieldset.php:71
+#: src/Form/SearchingFormFieldset.php:72
 msgid ""
 "Limit the search to a specific subset of the resources. This query is merged "
 "with the default block query and with the user one."
 msgstr ""
 
-#: src/Form/SearchingFormFieldset.php:85
+#: src/Form/SearchingFormFieldset.php:86
 msgid "Template to display"
 msgstr "Gabarit à afficher"
 
-#: src/Form/SearchingFormFieldset.php:86
+#: src/Form/SearchingFormFieldset.php:87
 msgid ""
 "Templates are in folder \"common/block-layout\" of the theme and should "
 "start with \"searching-form\"."
@@ -405,7 +421,7 @@ msgid ""
 "redirects it to the search page."
 msgstr ""
 
-#: src/Form/BasicForm.php:48
+#: src/Form/BasicForm.php:60
 msgid "Search resources"
 msgstr "Chercher des ressources"
 
@@ -436,7 +452,7 @@ msgstr ""
 
 #: src/Form/Admin/SearchPageConfigureForm.php:99
 msgid "default_query"
-msgstr ""
+msgstr "Requête par défaut"
 
 #: src/Form/Admin/SearchPageConfigureForm.php:130
 #: src/Form/Admin/SearchPageConfigureSimpleForm.php:47
@@ -444,7 +460,7 @@ msgid "Facets"
 msgstr "Facettes"
 
 #: src/Form/Admin/SearchPageConfigureForm.php:161
-#: src/Form/Admin/SearchPageConfigureForm.php:307 config/module.config.php:208
+#: src/Form/Admin/SearchPageConfigureForm.php:307 config/module.config.php:209
 msgid "Enabled"
 msgstr "Activé"
 
@@ -483,7 +499,7 @@ msgstr "Champs de tri"
 msgid "Form settings"
 msgstr "Paramètres du formulaire"
 
-#: src/Form/Admin/SearchIndexForm.php:61
+#: src/Form/Admin/SearchIndexForm.php:60
 msgid "Select an adapter below…"
 msgstr ""
 
@@ -491,86 +507,87 @@ msgstr ""
 msgid "Is public"
 msgstr "Est public"
 
-#: src/Form/Admin/AdvancedFormConfigFieldset.php:44
-#: src/Form/Admin/ApiFormConfigFieldset.php:157
-msgid "Item set id"
-msgstr "Id de collection"
-
 #: src/Form/Admin/AdvancedFormConfigFieldset.php:45
-#: src/Form/Admin/ApiFormConfigFieldset.php:129
-msgid "Resource class id"
-msgstr "Id de classe de ressource"
+msgid "Item set id (if available in fields)"
+msgstr "Id de collection (si disponible dans les champs))"
 
 #: src/Form/Admin/AdvancedFormConfigFieldset.php:46
-#: src/Form/Admin/ApiFormConfigFieldset.php:143
-msgid "Resource template id"
-msgstr "Id de modèle de ressource"
+msgid "Resource class id (if available in fields)"
+msgstr "Id de classe de ressource (si disponible dans les champs)"
 
-#: src/Form/Admin/AdvancedFormConfigFieldset.php:60
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:47
+msgid "Resource template id (if available in fields)"
+msgstr "Id de modèle de ressource (si disponible dans les champs)"
+
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:61
 msgid "Display item set filter"
 msgstr ""
 
-#: src/Form/Admin/AdvancedFormConfigFieldset.php:63
-#: src/Form/Admin/AdvancedFormConfigFieldset.php:96
-#: src/Form/Admin/AdvancedFormConfigFieldset.php:128
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:64
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:97
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:130
 msgid "As select"
 msgstr "Comme liste d’options"
 
-#: src/Form/Admin/AdvancedFormConfigFieldset.php:64
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:65
 msgid "As multi checkbox"
 msgstr "Comme case à cocher"
 
-#: src/Form/Admin/AdvancedFormConfigFieldset.php:77
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:78
 msgid "Item set id field"
 msgstr "Champ de collection"
 
-#: src/Form/Admin/AdvancedFormConfigFieldset.php:93
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:94
 msgid "Display resource class filter"
 msgstr "Afficher le filtre pour les classes de ressource"
 
-#: src/Form/Admin/AdvancedFormConfigFieldset.php:109
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:98
+msgid "As flat select"
+msgstr "Comme liste plate"
+
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:111
 msgid "Resource class id field"
 msgstr "Champ de classe de ressource"
 
-#: src/Form/Admin/AdvancedFormConfigFieldset.php:125
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:127
 msgid "Display resource template filter"
 msgstr "Afficher le filtre pour les modèles de ressource"
 
-#: src/Form/Admin/AdvancedFormConfigFieldset.php:141
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:143
 msgid "Resource template id field"
 msgstr "Champ de modèle de ressource"
 
-#: src/Form/Admin/AdvancedFormConfigFieldset.php:157
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:159
 msgid "Is public field"
 msgstr "Champ Est public"
 
-#: src/Form/Admin/AdvancedFormConfigFieldset.php:172
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:174
 msgid "Number of filter groups to display"
 msgstr ""
 
-#: src/Form/Admin/AdvancedFormConfigFieldset.php:173
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:175
 msgid "The filters may be managed via js for a better display."
 msgstr ""
 
-#: src/Form/Admin/AdvancedFormConfigFieldset.php:187
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:189
 msgid "Add the joiner (\"and\" or \"or\") to the filters"
 msgstr ""
 
-#: src/Form/Admin/AdvancedFormConfigFieldset.php:197
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:199
 msgid "Add the type (\"equal\", \"in\", etc.) to the filters"
 msgstr ""
 
-#: src/Form/Admin/AdvancedFormConfigFieldset.php:208
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:210
 msgid ""
 "List of filters that will be displayed in the search form. Format is \"term "
-"| Label\"."
+"| Label\". The field should exist in all resources fields."
 msgstr ""
 
-#: src/Form/Admin/AdvancedFormConfigFieldset.php:221
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:223
 msgid "Available filters"
 msgstr "Champs de filtre disponibles"
 
-#: src/Form/Admin/AdvancedFormConfigFieldset.php:222
+#: src/Form/Admin/AdvancedFormConfigFieldset.php:224
 msgid "List of all available filters, among which some can be copied above."
 msgstr ""
 
@@ -603,7 +620,7 @@ msgid ""
 "List of all available sort fields, among which some can be copied above."
 msgstr ""
 
-#: src/Form/Admin/SearchIndexConfigureForm.php:50
+#: src/Form/Admin/SearchIndexConfigureForm.php:62
 msgid "Resources indexed"
 msgstr "Ressources indexées"
 
@@ -673,7 +690,7 @@ msgstr "Est public"
 
 #: src/Form/Admin/ApiFormConfigFieldset.php:73
 msgid "Owner id"
-msgstr ""
+msgstr "Id du propriétaire"
 
 #: src/Form/Admin/ApiFormConfigFieldset.php:101
 msgid "Modified"
@@ -682,6 +699,18 @@ msgstr "Modifié"
 #: src/Form/Admin/ApiFormConfigFieldset.php:115
 msgid "Resource class label"
 msgstr "Étiquette de la classe de ressource"
+
+#: src/Form/Admin/ApiFormConfigFieldset.php:129
+msgid "Resource class id"
+msgstr "Id de classe de ressource"
+
+#: src/Form/Admin/ApiFormConfigFieldset.php:143
+msgid "Resource template id"
+msgstr "Id de modèle de ressource"
+
+#: src/Form/Admin/ApiFormConfigFieldset.php:157
+msgid "Item set id"
+msgstr "Id de collection"
 
 #: src/Form/Admin/ApiFormConfigFieldset.php:171
 msgid "Site id"
@@ -695,45 +724,24 @@ msgstr "Est ouvert"
 msgid "Mapping properties to search fields"
 msgstr ""
 
-#: src/Querier/InternalQuerier.php:153 src/Querier/InternalQuerier.ori.php:100
+#: src/Querier/InternalQuerier.php:153
 #, php-format
 msgid ""
 "The query \"%1$s\" uses %2$d properties, that is more than the %3$d "
 "supported currently. Excluded fields are removed."
 msgstr ""
 
-#: src/Querier/InternalQuerier.php:161 src/Querier/InternalQuerier.ori.php:108
+#: src/Querier/InternalQuerier.php:161
 #, php-format
 msgid ""
 "The query \"%1$s\" uses %2$d properties, that is more than the %3$d "
 "supported currently. Request is troncated."
 msgstr ""
 
-#: src/Controller/IndexController.php:114
-#: src/Controller/IndexController.php:132
-#: src/Controller/IndexController.ori.php:129
+#: src/Controller/IndexController.php:113
+#: src/Controller/IndexController.php:131
 msgid "No query."
 msgstr "Pas de requête."
-
-#: src/Controller/IndexController.ori.php:86
-#: src/Mvc/Controller/Plugin/SearchRequestToResponse.php:45
-#, php-format
-msgid "Form adapter \"%s\" not found."
-msgstr "Adaptateur de formulaire \"%s\" non trouvé."
-
-#: src/Controller/IndexController.ori.php:161
-#: src/Controller/Admin/SearchPageController.php:212
-#: src/Controller/Admin/SearchPageController.php:349
-#: src/Controller/Admin/SearchIndexController.php:75
-#: src/Controller/Admin/SearchIndexController.php:124
-msgid "There was an error during validation"
-msgstr ""
-
-#: src/Controller/IndexController.ori.php:275
-#: src/Mvc/Controller/Plugin/SearchRequestToResponse.php:162
-#, php-format
-msgid "Query error: %s"
-msgstr "Erreur dans la requête : %s"
 
 #: src/Controller/Admin/SearchPageController.php:92
 #, php-format
@@ -763,49 +771,60 @@ msgstr ""
 msgid "This index adapter \"%s\" has no config form."
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:236
+#: src/Controller/Admin/SearchPageController.php:212
+#: src/Controller/Admin/SearchPageController.php:358
+#: src/Controller/Admin/SearchIndexController.php:75
+#: src/Controller/Admin/SearchIndexController.php:130
+msgid "There was an error during validation"
+msgstr ""
+
+#: src/Controller/Admin/SearchPageController.php:240
 msgid ""
 "Note that you didn’t set \"||\", so all values without language will be "
 "removed."
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:269
+#: src/Controller/Admin/SearchPageController.php:273
 #, php-format
 msgid "Configuration saved for page \"%s\"."
 msgstr "Configuration enregistrée pour la page de recherche \"%s\"."
 
-#: src/Controller/Admin/SearchPageController.php:299
+#: src/Controller/Admin/SearchPageController.php:303
 #, php-format
 msgid "Search page \"%s\" successfully deleted"
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:304
+#: src/Controller/Admin/SearchPageController.php:308
 #, php-format
 msgid "Search page \"%s\" could not be deleted"
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:328
-#: src/Controller/Admin/SearchPageController.php:335
+#: src/Controller/Admin/SearchPageController.php:332
+#: src/Controller/Admin/SearchPageController.php:339
 msgid "The path should be unique."
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:611
+#: src/Controller/Admin/SearchPageController.php:345
+msgid "The path should be relative to the root of the site, like \"search\"."
+msgstr ""
+
+#: src/Controller/Admin/SearchPageController.php:613
 msgid "The page has been set by default in admin board."
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:615
+#: src/Controller/Admin/SearchPageController.php:616
 msgid "The page has been unset in admin board."
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:624
+#: src/Controller/Admin/SearchPageController.php:625
 msgid "The page has been disabled in all specified sites."
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:628
+#: src/Controller/Admin/SearchPageController.php:629
 msgid "The page has been made available in all specified sites."
 msgstr ""
 
-#: src/Controller/Admin/SearchPageController.php:632
+#: src/Controller/Admin/SearchPageController.php:633
 msgid "The availability of pages of sites was let unmodified."
 msgstr ""
 
@@ -814,31 +833,37 @@ msgstr ""
 msgid "Search index \"%s\" created."
 msgstr "Index de recherche \"%s\" créé."
 
-#: src/Controller/Admin/SearchIndexController.php:100
+#: src/Controller/Admin/SearchIndexController.php:99
 #, php-format
 msgid "The adapter \"%s\" is not available."
 msgstr ""
 
-#: src/Controller/Admin/SearchIndexController.php:113
+#: src/Controller/Admin/SearchIndexController.php:116
 msgid "Adapter settings"
 msgstr "Paramètres de l’adaptateur"
 
-#: src/Controller/Admin/SearchIndexController.php:132
+#: src/Controller/Admin/SearchIndexController.php:141
 #, php-format
 msgid "Search index \"%s\" successfully configured."
 msgstr ""
 
-#: src/Controller/Admin/SearchIndexController.php:179
-#, php-format
-msgid "Indexing of \"%s\" started in %sjob %s%s"
-msgstr "L'indexation de \"%s\" a commencé dans %sla tâche %s%s"
+#: src/Controller/Admin/SearchIndexController.php:144
+msgid "Don’t forget to run the indexation of the core."
+msgstr ""
 
-#: src/Controller/Admin/SearchIndexController.php:216
+#: src/Controller/Admin/SearchIndexController.php:184
+#, php-format
+msgid "Indexing of \"%1$s\" started in job %2$s#%3$d%4$s (%5$slogs%4$s)"
+msgstr ""
+"L'indexation de \"%1$s\" a commencé dans la tâche %2$s#%3$d%4$s (%5$slogs"
+"%4$s)"
+
+#: src/Controller/Admin/SearchIndexController.php:221
 #, php-format
 msgid "Search index \"%s\" successfully deleted"
 msgstr ""
 
-#: src/Controller/Admin/SearchIndexController.php:221
+#: src/Controller/Admin/SearchIndexController.php:226
 #, php-format
 msgid "Search index \"%s\" could not be deleted"
 msgstr ""
@@ -856,33 +881,33 @@ msgstr ""
 msgid "Api"
 msgstr "Api"
 
-#: src/Job/Indexing.php:81
+#: src/Job/Indexing.php:80
 #, php-format
 msgid ""
 "Search index #%d (\"%s\"): there is no resource type to index or the "
 "indexation is not needed."
 msgstr ""
 
-#: src/Job/Indexing.php:93
+#: src/Job/Indexing.php:92
 #, php-format
 msgid ""
 "Search index #%d (\"%s\"): There are already %d other jobs \"Search Index\" "
 "and the current one is not forced."
 msgstr ""
 
-#: src/Job/Indexing.php:100
+#: src/Job/Indexing.php:99
 #, php-format
 msgid ""
 "There are already %d other jobs \"Indexing\". Slowdowns may occur on the "
 "site."
 msgstr ""
 
-#: src/Job/Indexing.php:107
+#: src/Job/Indexing.php:106
 #, php-format
 msgid "Search index #%d (\"%s\"): start of indexing"
 msgstr ""
 
-#: src/Job/Indexing.php:116
+#: src/Job/Indexing.php:118
 #, php-format
 msgid "Search index is not cleared: reindexing starts at resource #%d."
 msgstr ""
@@ -908,7 +933,8 @@ msgstr ""
 #: src/Job/Indexing.php:186
 #, php-format
 msgid ""
-"Search index #%d (\"%s\"): end of indexing. %s. Execution time: %s seconds."
+"Search index #%d (\"%s\"): end of indexing. %s. Execution time: %s seconds. "
+"Failed indexed resources should be checked manually."
 msgstr ""
 
 #: src/Adapter/InternalAdapter.php:11
@@ -932,31 +958,48 @@ msgstr ""
 msgid "Invalid navigation: browse link missing search page id"
 msgstr ""
 
-#: config/module.config.php:206
+#: src/Mvc/Controller/Plugin/SearchRequestToResponse.php:45
+#, php-format
+msgid "Form adapter \"%s\" not found."
+msgstr "Adaptateur de formulaire \"%s\" non trouvé."
+
+#: src/Mvc/Controller/Plugin/SearchRequestToResponse.php:162
+#, php-format
+msgid ""
+"Query error: %s\n"
+"Query:%s"
+msgstr ""
+"Erreur dans la requête : %s\n"
+"Requête : %s"
+
+#: config/module.config.php:207
 msgid "Automatic mapping of empty values"
 msgstr ""
 
-#: config/module.config.php:207
+#: config/module.config.php:208
 msgid "Available"
 msgstr "Disponibles"
 
-#: config/module.config.php:209
+#: config/module.config.php:210
 msgid "Find"
 msgstr "Trouver"
 
-#: config/module.config.php:210
+#: config/module.config.php:211
 msgid "Find resources…"
 msgstr "Trouver des ressources…"
 
-#: config/module.config.php:211
+#: config/module.config.php:212
 msgid "Processing…"
 msgstr "En traitement…"
 
-#: config/module.config.php:212
+#: config/module.config.php:213
 msgid ""
 "Try to map automatically the metadata and the properties that are not mapped "
 "yet with the fields of the index"
 msgstr ""
+
+#~ msgid "Search resources…"
+#~ msgstr "Rechercher des ressources…"
 
 #, fuzzy
 #~| msgid "Search"

@@ -29,17 +29,21 @@ class NoopIndexer implements IndexerInterface
 
     public function clearIndex(Query $query = null)
     {
+        return $this;
     }
 
     public function indexResource(Resource $resource)
     {
+        return $this;
     }
 
     public function indexResources(array $resources)
     {
+        return $this;
     }
 
     public function deleteResource($resourceName, $id)
     {
+        return $this;
     }
 }

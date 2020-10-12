@@ -62,6 +62,7 @@ interface IndexerInterface extends LoggerAwareInterface
      * Reset the index.
      *
      * @param Query $query Allows to limit clearing to some resources.
+     * @return self
      */
     public function clearIndex(Query $query = null);
 
@@ -69,6 +70,7 @@ interface IndexerInterface extends LoggerAwareInterface
      * Index a resource.
      *
      * @param Resource $resource
+     * @return self
      */
     public function indexResource(Resource $resource);
 
@@ -76,6 +78,7 @@ interface IndexerInterface extends LoggerAwareInterface
      * Index multiple resources.
      *
      * @param Resource[] $resources
+     * @return self
      */
     public function indexResources(array $resources);
 
@@ -84,6 +87,7 @@ interface IndexerInterface extends LoggerAwareInterface
      *
      * @param string $resourceName The resource type ("items", "item_sets"…).
      * @param int $id
+     * @return self
      */
     public function deleteResource($resourceName, $id);
 }

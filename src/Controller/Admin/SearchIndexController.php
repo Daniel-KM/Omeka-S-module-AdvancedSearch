@@ -88,13 +88,12 @@ class SearchIndexController extends AbstractActionController
 
     public function editAction()
     {
-        $entityManager = $this->getEntityManager();
         $adapterManager = $this->getSearchAdapterManager();
 
         $id = $this->params('id');
 
         /** @var \Search\Entity\SearchIndex $searchIndex */
-        $searchIndex = $entityManager->find(\Search\Entity\SearchIndex::class, $id);
+        $searchIndex = $this->getEntityManager()->find(\Search\Entity\SearchIndex::class, $id);
         $searchIndexAdapterName = $searchIndex->getAdapter();
         if (!$adapterManager->has($searchIndexAdapterName)) {
             $this->messenger()->addError(new Message('The adapter "%s" is not available.', // @translate
@@ -133,7 +132,7 @@ class SearchIndexController extends AbstractActionController
             $searchIndex
                 ->setName($name)
                 ->setSettings($formData);
-            $entityManager->flush();
+            $this->getEntityManager()->flush($searchIndex);
             $this->messenger()->addSuccess(new Message(
                 'Search index "%s" successfully configured.',  // @translate
                 $searchIndex->getName()

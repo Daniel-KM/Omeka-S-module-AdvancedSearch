@@ -178,20 +178,15 @@ class SearchIndexController extends AbstractActionController
         $jobArgs['force'] = $force;
         $job = $this->jobDispatcher()->dispatch(\Search\Job\Indexing::class, $jobArgs);
 
-        $jobUrl = $this->url()->fromRoute('admin/id', [
-            'controller' => 'job',
-            'action' => 'show',
-            'id' => $job->getId(),
-        ]);
-
+        $urlHelper = $this->viewHelpers()->get('url');
         $message = new Message(
-            'Indexing of "%s" started in %sjob %s%s', // @translate
+            'Indexing of "%1$s" started in job %2$s#%3$d%4$s (%5$slogs%4$s)', // @translate
             $searchIndex->name(),
-            sprintf('<a href="%s">', htmlspecialchars($jobUrl)),
+            sprintf('<a href="%1$s">', $urlHelper('admin/id', ['controller' => 'job', 'id' => $job->getId()])),
             $job->getId(),
-            '</a>'
+            '</a>',
+            sprintf('<a href="%1$s">', class_exists('Log\Stdlib\PsrMessage') ? $urlHelper('admin/default', ['controller' => 'log'], ['query' => ['job_id' => $job->getId()]]) :  $urlHelper('admin/id', ['controller' => 'job', 'action' => 'log', 'id' => $job->getId()]))
         );
-
         $message->setEscapeHtml(false);
         $this->messenger()->addSuccess($message);
 

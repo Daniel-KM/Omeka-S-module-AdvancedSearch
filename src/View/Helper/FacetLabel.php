@@ -65,16 +65,15 @@ class FacetLabel extends AbstractHelper
 
     public function __invoke($name)
     {
-        $searchPage = $this->getSearchPage();
-        $settings = $searchPage->settings();
+        $settings = $this->getSearchPage()->settings();
 
         if (!empty($settings['facets'][$name]['display']['label'])) {
             return $settings['facets'][$name]['display']['label'];
         }
 
-        $availableFacetFields = $this->getAvailableFacetFields();
-        if (!empty($availableFacetFields[$name]['label'])) {
-            return $availableFacetFields[$name]['label'];
+        $availables = $this->getAvailableFacetFields();
+        if (!empty($availables[$name]['label'])) {
+            return $availables[$name]['label'];
         }
 
         return $name;
@@ -86,12 +85,9 @@ class FacetLabel extends AbstractHelper
     protected function getAvailableFacetFields()
     {
         if (!isset($this->availableFacetFields)) {
-            $searchPage = $this->getSearchPage();
-            $searchAdapter = $searchPage->index()->adapter();
-
-            $this->availableFacetFields = $searchAdapter->getAvailableFacetFields($searchPage->index());
+            $index = $this->getSearchPage()->index();
+            $this->availableFacetFields = $index->adapter()->getAvailableFacetFields($index);
         }
-
         return $this->availableFacetFields;
     }
 

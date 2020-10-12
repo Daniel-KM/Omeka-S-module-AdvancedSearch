@@ -359,6 +359,7 @@ class SearchPageConfigureForm extends Form
      */
     protected function sortFields(array $fields, $type)
     {
+        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
         $searchPage = $this->getOption('search_page');
         $settings = $searchPage->settings();
         if (empty($settings) || empty($settings[$type])) {
@@ -377,6 +378,7 @@ class SearchPageConfigureForm extends Form
      */
     protected function getFieldLabel($field, $settingsKey)
     {
+        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
         $searchPage = $this->getOption('search_page');
         $settings = $searchPage->settings();
 

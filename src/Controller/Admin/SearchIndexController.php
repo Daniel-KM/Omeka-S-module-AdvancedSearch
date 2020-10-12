@@ -141,6 +141,7 @@ class SearchIndexController extends AbstractActionController
                 'Search index "%s" successfully configured.',  // @translate
                 $searchIndex->getName()
             ));
+            $this->messenger()->addWarning('Don’t forget to run the indexation of the core.'); // @translate
             return $this->redirect()->toRoute('admin/search', ['action' => 'browse'], true);
         }
 

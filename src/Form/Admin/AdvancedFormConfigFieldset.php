@@ -318,6 +318,7 @@ class AdvancedFormConfigFieldset extends Fieldset
 
     protected function getFieldLabel($field)
     {
+        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
         $searchPage = $this->getOption('search_page');
         $settings = $searchPage->settings();
 
@@ -325,7 +326,6 @@ class AdvancedFormConfigFieldset extends Fieldset
         $label = isset($field['label']) ? $field['label'] : null;
         if (isset($settings['form']['filters'][$name])) {
             $fieldSettings = $settings['form']['filters'][$name];
-
             if (isset($fieldSettings['display']['label'])
                 && $fieldSettings['display']['label']
             ) {

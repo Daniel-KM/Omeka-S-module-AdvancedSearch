@@ -408,8 +408,7 @@ class Module extends AbstractModule
         /** @var \Search\Api\Representation\SearchIndexRepresentation[] $searchIndexes */
         $searchIndexes = $api->search('search_indexes')->getContent();
         foreach ($searchIndexes as $searchIndex) {
-            $searchIndexSettings = $searchIndex->settings();
-            if (in_array($requestResource, $searchIndexSettings['resources'])) {
+            if (in_array($requestResource, $searchIndex->setting('resources', []))) {
                 $indexer = $searchIndex->indexer();
                 try {
                     $indexer->indexResources($resources);
@@ -457,8 +456,7 @@ class Module extends AbstractModule
         /** @var \Search\Api\Representation\SearchIndexRepresentation[] $searchIndexes */
         $searchIndexes = $api->search('search_indexes')->getContent();
         foreach ($searchIndexes as $searchIndex) {
-            $searchIndexSettings = $searchIndex->settings();
-            if (in_array($requestResource, $searchIndexSettings['resources'])) {
+            if (in_array($requestResource, $searchIndex->setting('resources', []))) {
                 $indexer = $searchIndex->indexer();
                 if ($request->getOperation() == 'delete') {
                     $id = $request->getId();
@@ -486,8 +484,7 @@ class Module extends AbstractModule
         /** @var \Search\Api\Representation\SearchIndexRepresentation[] $searchIndexes */
         $searchIndexes = $api->search('search_indexes')->getContent();
         foreach ($searchIndexes as $searchIndex) {
-            $searchIndexSettings = $searchIndex->settings();
-            if (in_array('items', $searchIndexSettings['resources'])) {
+            if (in_array('items', $searchIndex->setting('resources', []))) {
                 $indexer = $searchIndex->indexer();
                 $this->updateIndexResource($indexer, $item);
             }

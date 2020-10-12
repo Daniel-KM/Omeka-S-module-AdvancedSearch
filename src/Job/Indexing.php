@@ -67,8 +67,7 @@ class Indexing extends AbstractJob
         $searchIndex = $api->read('search_indexes', $searchIndexId)->getContent();
         $indexer = $searchIndex->indexer();
 
-        $searchIndexSettings = $searchIndex->settings();
-        $resourceNames = $searchIndexSettings['resources'];
+        $resourceNames = $searchIndex->setting('resources', []);
         $selectedResourceNames = $this->getArg('resource_names', []);
         if ($selectedResourceNames) {
             $resourceNames = array_intersect($resourceNames, $selectedResourceNames);
@@ -184,7 +183,7 @@ class Indexing extends AbstractJob
         foreach ($resourceNames as $resourceName) {
             $totalResults[] = new Message('%s: %d indexed', $resourceName, $totals[$resourceName]); // @translate
         }
-        $this->logger->info(new Message('Search index #%d ("%s"): end of indexing. %s. Execution time: %s seconds.', // @translate
+        $this->logger->info(new Message('Search index #%d ("%s"): end of indexing. %s. Execution time: %s seconds. Failed indexed resources should be checked manually.', // @translate
             $searchIndex->id(), $searchIndex->name(), implode('; ', $totalResults), (int) (microtime(true) - $timeStart)
         ));
     }

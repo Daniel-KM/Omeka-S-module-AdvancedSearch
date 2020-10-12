@@ -254,8 +254,8 @@ class SearchRequestToResponse extends AbstractPlugin
     {
         $sortOptions = [];
 
-        $settings = $this->page->settings();
-        if (empty($settings['sort_fields'])) {
+        $sortFieldsSettings = $this->page->setting('sort_fields', []);
+        if (empty($sortFieldsSettings)) {
             return [];
         }
 
@@ -263,8 +263,9 @@ class SearchRequestToResponse extends AbstractPlugin
         if (empty($indexAdapter)) {
             return [];
         }
+
         $sortFields = $this->index->adapter()->getAvailableSortFields($this->index);
-        foreach ($settings['sort_fields'] as $name => $sortField) {
+        foreach ($sortFieldsSettings as $name => $sortField) {
             if (!$sortField['enabled']) {
                 // A break is possible, because now, the sort fields are ordered
                 // when they are saved.
@@ -293,7 +294,7 @@ class SearchRequestToResponse extends AbstractPlugin
      */
     protected function sortFieldsByWeight(array $fields, $settingName)
     {
-        $settings = $this->page->settings()[$settingName];
+        $settings = $this->page->setting($settingName, []);
         uksort($fields, function ($a, $b) use ($settings) {
             $aWeight = $settings[$a]['weight'];
             $bWeight = $settings[$b]['weight'];

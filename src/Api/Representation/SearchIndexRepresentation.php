@@ -178,7 +178,7 @@ class SearchIndexRepresentation extends AbstractEntityRepresentation
         $services = $this->getServiceLocator();
         $adapter = $this->adapter();
         if ($adapter) {
-            $indexerClass = $adapter->getIndexerClass()?: \Search\Indexer\NoopIndexer::class;
+            $indexerClass = $adapter->getIndexerClass() ?: \Search\Indexer\NoopIndexer::class;
         } else {
             $indexerClass = \Search\Indexer\NoopIndexer::class;
         }
@@ -193,14 +193,14 @@ class SearchIndexRepresentation extends AbstractEntityRepresentation
 
     /**
      * @return \Search\Querier\QuerierInterface NoopQuerier is returned when
-     * the indexer is not available.
+     * the querier is not available.
      */
     public function querier()
     {
         $services = $this->getServiceLocator();
         $adapter = $this->adapter();
         if ($adapter) {
-            $querierClass = $adapter->getQuerierClass()?: \Search\Querier\NoopQuerier::class;
+            $querierClass = $adapter->getQuerierClass() ?: \Search\Querier\NoopQuerier::class;
         } else {
             $querierClass = \Search\Querier\NoopQuerier::class;
         }

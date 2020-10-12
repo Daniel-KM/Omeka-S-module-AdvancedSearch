@@ -33,7 +33,6 @@ class ApiSearch extends AbstractHelper
      */
     public function __invoke($resource, array $data = [])
     {
-        $apiSearch = $this->apiSearch;
-        return $apiSearch($resource, $data);
+        return $this->apiSearch->__invoke($resource, $data);
     }
 }

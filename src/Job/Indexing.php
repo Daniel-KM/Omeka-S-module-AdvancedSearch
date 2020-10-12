@@ -109,15 +109,16 @@ class Indexing extends AbstractJob
 
         $rNames = $resourceNames;
         sort($rNames);
-        $fullClearIndex = array_values($rNames) === ['item_sets', 'items'];
+        $fullClearIndex = $startResourceId <= 0
+            && array_values($rNames) === ['item_sets', 'items'];
 
-        if ($startResourceId > 0) {
+        if ($fullClearIndex) {
+            $indexer->clearIndex();
+        } elseif ($startResourceId > 0) {
             $this->logger->info(new Message(
                 'Search index is not cleared: reindexing starts at resource #%d.', // @translate
                 $startResourceId
             ));
-        } elseif ($fullClearIndex) {
-            $indexer->clearIndex();
         }
 
         $resources = [];

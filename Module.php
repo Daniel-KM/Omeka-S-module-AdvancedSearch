@@ -177,6 +177,13 @@ class Module extends AbstractModule
      */
     public function displayAdvancedSearch(Event $event): void
     {
+        // Adapted from the advanced-search/properties.phtml template.
+        $view = $event->getTarget();
+        $view->headLink()
+            ->appendStylesheet($view->assetUrl('css/advanced-search-plus-admin.css', 'AdvancedSearchPlus'));
+        $view->headScript()
+            ->appendFile($view->assetUrl('js/advanced-search-plus-admin.js', 'AdvancedSearchPlus'), 'text/javascript', ['defer' => 'defer']);
+
         $query = $event->getParam('query', []);
 
         $partials = $event->getParam('partials', []);

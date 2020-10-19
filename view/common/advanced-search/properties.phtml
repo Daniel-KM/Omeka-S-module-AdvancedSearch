@@ -59,14 +59,14 @@ $queryText = function(array $search, $index) use ($escape, $translate) {
             $stem = "property[$index]";
         ?>
         <div class="value">
-            <select class="joiner" name="<?php echo $escape($stem . '[joiner]'); ?>">
+            <select class="joiner chosen-select" name="<?php echo $escape($stem . '[joiner]'); ?>">
                 <?php echo $queryOption('and', $property, 'joiner', $translate('AND')); ?>
                 <?php echo $queryOption('or', $property, 'joiner', $translate('OR')); ?>
             </select>
             <?php echo $propertySelect([
                 'name' => $stem . '[property]',
                 'attributes' => [
-                    'class' => 'query-property',
+                    'class' => 'query-property chosen-select',
                     'value' => isset($property['property']) ? $property['property'] : null,
                     'aria-label' => $translate('Property'),
                 ],

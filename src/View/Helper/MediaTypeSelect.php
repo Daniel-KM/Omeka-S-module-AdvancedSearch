@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 namespace AdvancedSearchPlus\View\Helper;
 
 use AdvancedSearchPlus\Form\Element\MediaTypeSelect as Select;
 use Laminas\Form\Factory;
-use Laminas\View\Helper\AbstractHelper;
 use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\View\Helper\AbstractHelper;
 
 /**
  * View helper for rendering a select menu containing all used media types.

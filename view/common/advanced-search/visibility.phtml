@@ -23,7 +23,7 @@ $translate = $this->plugin('translate');
                 ])
                 ->setAttributes([
                     'class' => 'query-visibility',
-                    'value' => isset($query['is_public']) ? $query['is_public'] : '',
+                    'value' => $query['is_public'] ?? '',
                     'aria-label' => $translate('Visibility'),
                 ]);
             echo $this->formRadio($select);

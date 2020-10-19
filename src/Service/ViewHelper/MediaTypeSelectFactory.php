@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace AdvancedSearchPlus\Service\ViewHelper;
 
 use AdvancedSearchPlus\View\Helper\MediaTypeSelect;
-use Laminas\ServiceManager\Factory\FactoryInterface;
 use Interop\Container\ContainerInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class MediaTypeSelectFactory implements FactoryInterface
 {

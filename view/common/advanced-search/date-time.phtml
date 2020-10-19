@@ -31,7 +31,7 @@ $querySelectOption = function($value, array $search, $key, $text) {
 
 // TODO Use a widget or a validator (but allow partial date/time: year only, date only, etc.).
 $queryInputText = function(array $search, $index) use ($translate, $escape) {
-    $value = isset($search['value']) ? $search['value'] : null;
+    $value = $search['value'] ?? null;
     return sprintf('<input type="text" class="query-datetime query-text" name="%s" value="%s" aria-label="%s" placeholder="2017-11-07 17:21:17">',
         $escape("datetime[$index][value]"),
         $escape($value),
@@ -69,7 +69,7 @@ $queryInputText = function(array $search, $index) use ($translate, $escape) {
                 ])
                 ->setAttributes([
                     'class' => 'query-datetime',
-                    'value' => isset($datetime['field']) ? $datetime['field'] : null,
+                    'value' => $datetime['field'] ?? null,
                     'aria-label' => $translate('Creation or modification date / time'),
                 ]);
             echo $this->formSelect($select);

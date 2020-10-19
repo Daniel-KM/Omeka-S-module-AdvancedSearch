@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /**
  * AdvancedSearchPlus
  *
@@ -33,14 +33,14 @@
  */
 namespace AdvancedSearchPlus;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\QueryBuilder;
+use Laminas\EventManager\Event;
+use Laminas\EventManager\SharedEventManagerInterface;
 use Omeka\Api\Adapter\AbstractResourceEntityAdapter;
 use Omeka\Api\Adapter\ItemAdapter;
 use Omeka\Api\Adapter\MediaAdapter;
 use Omeka\Module\AbstractModule;
-use Laminas\EventManager\Event;
-use Laminas\EventManager\SharedEventManagerInterface;
 
 class Module extends AbstractModule
 {
@@ -49,7 +49,7 @@ class Module extends AbstractModule
         return include __DIR__ . '/config/module.config.php';
     }
 
-    public function attachListeners(SharedEventManagerInterface $sharedEventManager)
+    public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
     {
         // Adjust resource search by visibility.
         $sharedEventManager->attach(
@@ -117,7 +117,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function handleApiSearchPre(Event $event)
+    public function handleApiSearchPre(Event $event): void
     {
         $query = $event->getParam('request')->getContent();
         if (isset($query['is_public'])) {
@@ -133,7 +133,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function handleApiSearchQuery(Event $event)
+    public function handleApiSearchQuery(Event $event): void
     {
         $this->isOldOmeka = \Omeka\Module::VERSION < 2;
 
@@ -158,7 +158,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function displayAdvancedSearch(Event $event)
+    public function displayAdvancedSearch(Event $event): void
     {
         $query = $event->getParam('query', []);
 
@@ -196,7 +196,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function filterSearchFilters(Event $event)
+    public function filterSearchFilters(Event $event): void
     {
         $translate = $event->getTarget()->plugin('translate');
         $query = $event->getParam('query', []);
@@ -379,7 +379,7 @@ class Module extends AbstractModule
         QueryBuilder $qb,
         AbstractResourceEntityAdapter $adapter,
         array $query
-    ) {
+    ): void {
         $query = $this->normalizeDateTime($query);
         if (empty($query['datetime'])) {
             return;
@@ -491,7 +491,7 @@ class Module extends AbstractModule
         QueryBuilder $qb,
         ItemAdapter $adapter,
         array $query
-    ) {
+    ): void {
         if (!isset($query['has_media'])) {
             return;
         }
@@ -537,7 +537,7 @@ class Module extends AbstractModule
         QueryBuilder $qb,
         ItemAdapter $adapter,
         array $query
-    ) {
+    ): void {
         if (!isset($query['media_type'])) {
             return;
         }
@@ -579,7 +579,7 @@ class Module extends AbstractModule
         QueryBuilder $qb,
         MediaAdapter $adapter,
         array $query
-    ) {
+    ): void {
         if (!isset($query['media_type'])) {
             return;
         }
@@ -612,7 +612,7 @@ class Module extends AbstractModule
         QueryBuilder $qb,
         MediaAdapter $adapter,
         array $query
-    ) {
+    ): void {
         if (!isset($query['item_set_id'])) {
             return;
         }

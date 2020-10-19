@@ -22,8 +22,8 @@ $translate = $this->plugin('translate');
                     '' => 'Any', // @translate
                 ])
                 ->setAttributes([
-                    'class' => 'query-datetime',
-                    'value' => isset($query['has_media']) ? $query['has_media'] : '',
+                    'class' => 'query-has-media',
+                    'value' => $query['has_media'] ?? '',
                     'aria-label' => $translate('Has media'), // @translate
                 ]);
             echo $this->formRadio($select);

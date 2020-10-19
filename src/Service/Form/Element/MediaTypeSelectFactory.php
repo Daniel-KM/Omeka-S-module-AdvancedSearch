@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace AdvancedSearchPlus\Service\Form\Element;
 
 use AdvancedSearchPlus\Form\Element\MediaTypeSelect;

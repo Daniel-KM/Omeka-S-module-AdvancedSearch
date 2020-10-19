@@ -135,8 +135,6 @@ class Module extends AbstractModule
      */
     public function handleApiSearchQuery(Event $event): void
     {
-        $this->isOldOmeka = \Omeka\Module::VERSION < 2;
-
         /** @var \Doctrine\ORM\QueryBuilder $qb */
         $qb = $event->getParam('queryBuilder');
         $adapter = $event->getTarget();
@@ -146,9 +144,6 @@ class Module extends AbstractModule
             $this->searchHasMedia($qb, $adapter, $query);
             $this->searchItemByMediaType($qb, $adapter, $query);
         } elseif ($adapter instanceof MediaAdapter) {
-            if ($this->isOldOmeka) {
-                $this->searchMediaType($qb, $adapter, $query);
-            }
             $this->searchMediaByItemSet($qb, $adapter, $query);
         }
     }
@@ -166,11 +161,6 @@ class Module extends AbstractModule
         $resourceType = $event->getParam('resourceType');
 
         if ($resourceType === 'media') {
-            $this->isOldOmeka = \Omeka\Module::VERSION < 2;
-            if ($this->isOldOmeka) {
-                $query['media_type'] = isset($query['media_type']) ? (array) $query['media_type'] : [];
-                $partials[] = 'common/advanced-search/media-type';
-            }
             $query['item_set_id'] = isset($query['item_set_id']) ? (array) $query['item_set_id'] : [];
             $partials[] = 'common/advanced-search/media-item-sets';
         }
@@ -388,8 +378,6 @@ class Module extends AbstractModule
         $where = '';
         $expr = $qb->expr();
 
-        $alias = $this->isOldOmeka ? $adapter->getEntityClass() : 'omeka_root';
-
         foreach ($query['datetime'] as $queryRow) {
             $joiner = $queryRow['joiner'];
             $field = $queryRow['field'];
@@ -404,14 +392,14 @@ class Module extends AbstractModule
                         $value = substr_replace('9999-12-31 23:59:59', $value, 0, strlen($value) - 19);
                     }
                     $param = $adapter->createNamedParameter($qb, $value);
-                    $predicateExpr = $expr->gt($alias . '.' . $field, $param);
+                    $predicateExpr = $expr->gt('omeka_root.' . $field, $param);
                     break;
                 case 'gte':
                     if (strlen($value) < 19) {
                         $value = substr_replace('0000-01-01 00:00:00', $value, 0, strlen($value) - 19);
                     }
                     $param = $adapter->createNamedParameter($qb, $value);
-                    $predicateExpr = $expr->gte($alias . '.' . $field, $param);
+                    $predicateExpr = $expr->gte('omeka_root.' . $field, $param);
                     break;
                 case 'eq':
                     if (strlen($value) < 19) {
@@ -419,10 +407,10 @@ class Module extends AbstractModule
                         $valueTo = substr_replace('9999-12-31 23:59:59', $value, 0, strlen($value) - 19);
                         $paramFrom = $adapter->createNamedParameter($qb, $valueFrom);
                         $paramTo = $adapter->createNamedParameter($qb, $valueTo);
-                        $predicateExpr = $expr->between($alias . '.' . $field, $paramFrom, $paramTo);
+                        $predicateExpr = $expr->between('omeka_root.' . $field, $paramFrom, $paramTo);
                     } else {
                         $param = $adapter->createNamedParameter($qb, $value);
-                        $predicateExpr = $expr->eq($alias . '.' . $field, $param);
+                        $predicateExpr = $expr->eq('omeka_root.' . $field, $param);
                     }
                     break;
                 case 'neq':
@@ -432,11 +420,11 @@ class Module extends AbstractModule
                         $paramFrom = $adapter->createNamedParameter($qb, $valueFrom);
                         $paramTo = $adapter->createNamedParameter($qb, $valueTo);
                         $predicateExpr = $expr->not(
-                            $expr->between($alias . '.' . $field, $paramFrom, $paramTo)
+                            $expr->between('omeka_root.' . $field, $paramFrom, $paramTo)
                         );
                     } else {
                         $param = $adapter->createNamedParameter($qb, $value);
-                        $predicateExpr = $expr->neq($alias . '.' . $field, $param);
+                        $predicateExpr = $expr->neq('omeka_root.' . $field, $param);
                     }
                     break;
                 case 'lte':
@@ -444,20 +432,20 @@ class Module extends AbstractModule
                         $value = substr_replace('9999-12-31 23:59:59', $value, 0, strlen($value) - 19);
                     }
                     $param = $adapter->createNamedParameter($qb, $value);
-                    $predicateExpr = $expr->lte($alias . '.' . $field, $param);
+                    $predicateExpr = $expr->lte('omeka_root.' . $field, $param);
                     break;
                 case 'lt':
                     if (strlen($value) < 19) {
                         $value = substr_replace('0000-01-01 00:00:00', $value, 0, strlen($value) - 19);
                     }
                     $param = $adapter->createNamedParameter($qb, $value);
-                    $predicateExpr = $expr->lt($alias . '.' . $field, $param);
+                    $predicateExpr = $expr->lt('omeka_root.' . $field, $param);
                     break;
                 case 'ex':
-                    $predicateExpr = $expr->isNotNull($alias . '.' . $field);
+                    $predicateExpr = $expr->isNotNull('omeka_root.' . $field);
                     break;
                 case 'nex':
-                    $predicateExpr = $expr->isNull($alias . '.' . $field);
+                    $predicateExpr = $expr->isNull('omeka_root.' . $field);
                     break;
                 default:
                     continue 2;
@@ -501,7 +489,6 @@ class Module extends AbstractModule
             return;
         }
 
-        $alias = $this->isOldOmeka ? $adapter->getEntityClass() : 'omeka_root';
         $expr = $qb->expr();
 
         // With media.
@@ -511,7 +498,7 @@ class Module extends AbstractModule
                 \Omeka\Entity\Media::class,
                 $mediaAlias,
                 Join::WITH,
-                $expr->eq($mediaAlias . '.item', $alias . '.id')
+                $expr->eq($mediaAlias . '.item', 'omeka_root.id')
             );
         }
         // Without media.
@@ -520,7 +507,7 @@ class Module extends AbstractModule
                 \Omeka\Entity\Media::class,
                 $mediaAlias,
                 Join::WITH,
-                $expr->eq($mediaAlias . '.item', $alias . '.id')
+                $expr->eq($mediaAlias . '.item', 'omeka_root.id')
             );
             $qb->andWhere($expr->isNull($mediaAlias . '.id'));
         }
@@ -551,7 +538,6 @@ class Module extends AbstractModule
         }
 
         $mediaAlias = $adapter->createAlias();
-        $alias = $this->isOldOmeka ? $adapter->getEntityClass() : 'omeka_root';
         $expr = $qb->expr();
 
         $qb->innerJoin(
@@ -559,46 +545,13 @@ class Module extends AbstractModule
             $mediaAlias,
             Join::WITH,
             $expr->andX(
-                $expr->eq($mediaAlias . '.item', $alias . '.id'),
+                $expr->eq($mediaAlias . '.item', 'omeka_root.id'),
                 $expr->in(
                     $mediaAlias . '.mediaType',
                     $adapter->createNamedParameter($qb, $values)
                 )
             )
         );
-    }
-
-    /**
-     * Build query to check if media types.
-     *
-     * @param QueryBuilder $qb
-     * @param AbstractResourceEntityAdapter $adapter
-     * @param array $query
-     */
-    protected function searchMediaType(
-        QueryBuilder $qb,
-        MediaAdapter $adapter,
-        array $query
-    ): void {
-        if (!isset($query['media_type'])) {
-            return;
-        }
-
-        $values = is_array($query['media_type'])
-            ? $query['media_type']
-            : [$query['media_type']];
-        $values = array_filter(array_map('trim', $values));
-        if (empty($values)) {
-            return;
-        }
-
-        $alias = $this->isOldOmeka ? $adapter->getEntityClass() : 'omeka_root';
-        $expr = $qb->expr();
-
-        $qb->andWhere($expr->in(
-            $alias . '.mediaType',
-            $adapter->createNamedParameter($qb, $values)
-        ));
     }
 
     /**
@@ -624,15 +577,14 @@ class Module extends AbstractModule
         $itemSets = array_filter($itemSets, 'is_numeric');
 
         if ($itemSets) {
-            $alias = $this->isOldOmeka ? $adapter->getEntityClass() : 'omeka_root';
             $expr = $qb->expr();
             $itemAlias = $adapter->createAlias();
             $itemSetAlias = $adapter->createAlias();
             $qb
                 ->leftJoin(
-                    $alias . '.item',
+                    'omeka_root.item',
                     $itemAlias, 'WITH',
-                    $expr->eq("$itemAlias.id", $alias . '.item')
+                    $expr->eq("$itemAlias.id", 'omeka_root.item')
                 )
                 ->innerJoin(
                     $itemAlias . '.itemSets',

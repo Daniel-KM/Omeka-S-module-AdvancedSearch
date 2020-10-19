@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 /**
  * AdvancedSearchPlus
  *
@@ -37,6 +38,7 @@ use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 use Omeka\Api\Adapter\AbstractResourceEntityAdapter;
 use Omeka\Api\Adapter\ItemAdapter;
 use Omeka\Api\Adapter\MediaAdapter;
@@ -47,6 +49,42 @@ class Module extends AbstractModule
     public function getConfig()
     {
         return include __DIR__ . '/config/module.config.php';
+    }
+
+    public function install(ServiceLocatorInterface $services)
+    {
+        $this->initSettings($services);
+    }
+
+    public function uninstall(ServiceLocatorInterface $services)
+    {
+        $settings = $services->get('Omeka\Settings');
+        $settings->delete('advancedsearchplus_restrict_used_terms');
+
+        $connection = $this->getServiceLocator()->get('Omeka\Connection');
+        $sql = 'DELETE FROM `site_setting` WHERE `id` = "advancedsearchplus_restrict_used_terms";';
+        $connection->exec($sql);
+    }
+
+    public function upgrade($oldVersion, $newVersion, ServiceLocatorInterface $services)
+    {
+        if (version_compare($oldVersion, '3.3', '<')) {
+            $this->initSettings($services);
+        }
+    }
+
+    protected function initSettings(ServiceLocatorInterface $services)
+    {
+        $settings = $services->get('Omeka\Settings');
+        $settings->set('advancedsearchplus_restrict_used_terms', true);
+
+        $siteSettings = $services->get('Omeka\Settings\Site');
+        /** @var int[] $siteIds */
+        $siteIds = $services->get('Omeka\ApiManager')->search('sites', [], ['initialize' => false, 'returnScalar' => 'id'])->getContent();
+        foreach ($siteIds as $siteId) {
+            $siteSettings->setTargetId($siteId);
+            $siteSettings->set('advancedsearchplus_restrict_used_terms', true);
+        }
     }
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
@@ -119,6 +157,75 @@ class Module extends AbstractModule
                 [$this, 'filterSearchFilters']
             );
         }
+
+        $sharedEventManager->attach(
+            \Omeka\Form\SettingForm::class,
+            'form.add_elements',
+            [$this, 'handleMainSettings']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Form\SiteSettingsForm::class,
+            'form.add_elements',
+            [$this, 'handleSiteSettings']
+        );
+    }
+
+    public function handleMainSettings(Event $event)
+    {
+        $services = $this->getServiceLocator();
+        $settings = $services->get('Omeka\Settings');
+
+        /** @var \Omeka\Form\SettingForm $form */
+        $form = $event->getTarget();
+        $selectAllTerms = $settings->get('advancedsearchplus_restrict_used_terms', false);
+        $form
+            ->add([
+                'name' => 'advancedsearchplus',
+                'type' => \Laminas\Form\Fieldset::class,
+                'options' => [
+                    'label' => 'Advanced Search Plus', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearchplus',
+                ],
+            ])
+            ->get('advancedsearchplus')
+            ->add([
+                'name' => 'advancedsearchplus_restrict_used_terms',
+                'type' => \Laminas\Form\Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Restrict to used properties and resources classes', // @translate
+                    'info' => 'If checked, restrict the list of properties and resources classes to the used ones in advanced search form.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearchplus_restrict_used_terms',
+                    'value' => $selectAllTerms,
+                ],
+            ]);
+    }
+
+    public function handleSiteSettings(Event $event)
+    {
+        $services = $this->getServiceLocator();
+        $settings = $services->get('Omeka\Settings\Site');
+
+        /** @var \Omeka\Form\SettingForm $form */
+        $form = $event->getTarget();
+        $selectAllTerms = $settings->get('advancedsearchplus_restrict_used_terms', false);
+        $form
+            ->get('search')
+            ->add([
+                'name' => 'advancedsearchplus_restrict_used_terms',
+                'type' => \Laminas\Form\Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Restrict to used properties and resources classes', // @translate
+                    'info' => 'If checked, restrict the list of properties and resources classes to the used ones in advanced search form.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearchplus_restrict_used_terms',
+                    'value' => $selectAllTerms,
+                ],
+            ]);
     }
 
     /**

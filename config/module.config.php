@@ -28,4 +28,12 @@ return [
             ],
         ],
     ],
+    'advancedsearchplus' => [
+        'settings' => [
+            'advancedsearchplus_restrict_used_terms' => true,
+        ],
+        'site_settings' => [
+            'advancedsearchplus_restrict_used_terms' => true,
+        ],
+    ],
 ];

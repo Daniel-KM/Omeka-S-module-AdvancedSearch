@@ -4,11 +4,14 @@
  * @var array $query
  */
 
-$translate = $this->plugin('translate');
-$resourceClassSelect = $this->plugin('resourceClassSelect');
-$siteSetting = $this->plugin('siteSetting');
+$plugins = $this->getHelperPluginManager();
+$translate = $plugins->get('translate');
+$resourceClassSelect = $plugins->get('resourceClassSelect');
+$setting = $plugins->get('setting');
+$siteSetting = $plugins->get('siteSetting');
 
 $isSiteRequest = $this->status()->isSiteRequest();
+$usedTerms = $isSiteRequest ? $siteSetting('advancedsearchplus_restrict_used_terms', true) : $setting('advancedsearchplus_restrict_used_terms', true);
 
 // Prepare the resource class query.
 $ids = isset($query['resource_class_id']) ? $query['resource_class_id'] : [];
@@ -39,6 +42,9 @@ if (!$ids) {
                     'value' => $id,
                     'aria-labelledby' => 'by-resource-class-label',
                     'class' => 'chosen-select',
+                ],
+                'options' => [
+                    'used_terms' => $usedTerms,
                 ],
             ]); ?>
             <button type="button" class="o-icon-delete remove-value button" aria-label="<?php echo $translate('Remove value'); ?>" title="<?php echo $translate('Remove value'); ?>"></button>

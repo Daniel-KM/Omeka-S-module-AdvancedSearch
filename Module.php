@@ -51,12 +51,12 @@ class Module extends AbstractModule
         return include __DIR__ . '/config/module.config.php';
     }
 
-    public function install(ServiceLocatorInterface $services)
+    public function install(ServiceLocatorInterface $services): void
     {
         $this->initSettings($services);
     }
 
-    public function uninstall(ServiceLocatorInterface $services)
+    public function uninstall(ServiceLocatorInterface $services): void
     {
         $settings = $services->get('Omeka\Settings');
         $settings->delete('advancedsearchplus_restrict_used_terms');
@@ -66,24 +66,27 @@ class Module extends AbstractModule
         $connection->exec($sql);
     }
 
-    public function upgrade($oldVersion, $newVersion, ServiceLocatorInterface $services)
+    public function upgrade($oldVersion, $newVersion, ServiceLocatorInterface $services): void
     {
         if (version_compare($oldVersion, '3.3', '<')) {
             $this->initSettings($services);
         }
     }
 
-    protected function initSettings(ServiceLocatorInterface $services)
+    protected function initSettings(ServiceLocatorInterface $services): void
     {
         $settings = $services->get('Omeka\Settings');
         $settings->set('advancedsearchplus_restrict_used_terms', true);
 
         $siteSettings = $services->get('Omeka\Settings\Site');
+        $defaultSearchFields = include __DIR__ . '/config/module.config.php';
+        $defaultSearchFields = $defaultSearchFields['advancedsearchplus']['site_settings']['advancedsearchplus_search_fields'];
         /** @var int[] $siteIds */
         $siteIds = $services->get('Omeka\ApiManager')->search('sites', [], ['initialize' => false, 'returnScalar' => 'id'])->getContent();
         foreach ($siteIds as $siteId) {
             $siteSettings->setTargetId($siteId);
             $siteSettings->set('advancedsearchplus_restrict_used_terms', true);
+            $siteSettings->set('advancedsearchplus_search_fields', $defaultSearchFields);
         }
     }
 
@@ -157,6 +160,20 @@ class Module extends AbstractModule
                 [$this, 'filterSearchFilters']
             );
         }
+        $controllers = [
+            'Omeka\Controller\Site\Item',
+            'Omeka\Controller\Site\ItemSet',
+            'Omeka\Controller\Site\Media',
+        ];
+        foreach ($controllers as $controller) {
+            // Specify fields to add to the advanced search form.
+            $sharedEventManager->attach(
+                $controller,
+                'view.advanced_search',
+                [$this, 'displayAdvancedSearchPost'],
+                -100
+            );
+        }
 
         $sharedEventManager->attach(
             \Omeka\Form\SettingForm::class,
@@ -170,7 +187,7 @@ class Module extends AbstractModule
         );
     }
 
-    public function handleMainSettings(Event $event)
+    public function handleMainSettings(Event $event): void
     {
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings');
@@ -204,14 +221,25 @@ class Module extends AbstractModule
             ]);
     }
 
-    public function handleSiteSettings(Event $event)
+    public function handleSiteSettings(Event $event): void
     {
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings\Site');
 
+        $defaultSearchFields = $this->getDefaultSearchFields();
+        $defaultSelectedFields = [];
+        foreach ($defaultSearchFields as $key => $defaultSearchField) {
+            if (!array_key_exists('default', $defaultSearchField) || $defaultSearchField['default'] === true) {
+                $defaultSelectedFields[] = $key;
+            }
+            $defaultSearchFields[$key] = $defaultSearchField['label'] ?? $key;
+        }
+
+        $selectAllTerms = $settings->get('advancedsearchplus_restrict_used_terms', false);
+        $searchFields = $settings->get('advancedsearchplus_search_fields', $defaultSelectedFields) ?: [];
+
         /** @var \Omeka\Form\SettingForm $form */
         $form = $event->getTarget();
-        $selectAllTerms = $settings->get('advancedsearchplus_restrict_used_terms', false);
         $form
             ->get('search')
             ->add([
@@ -224,6 +252,19 @@ class Module extends AbstractModule
                 'attributes' => [
                     'id' => 'advancedsearchplus_restrict_used_terms',
                     'value' => $selectAllTerms,
+                ],
+            ])
+            ->add([
+                'name' => 'advancedsearchplus_search_fields',
+                'type' => 'OptionalMultiCheckbox',
+                'options' => [
+                    'label' => 'Display only following fields', // @translate
+                    'value_options' => $defaultSearchFields,
+                    'use_hidden_element' => true,
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearchplus_search_fields',
+                    'value' => $searchFields,
                 ],
             ]);
     }
@@ -285,11 +326,17 @@ class Module extends AbstractModule
     public function displayAdvancedSearch(Event $event): void
     {
         // Adapted from the advanced-search/properties.phtml template.
-        $view = $event->getTarget();
-        $view->headLink()
-            ->appendStylesheet($view->assetUrl('css/advanced-search-plus-admin.css', 'AdvancedSearchPlus'));
-        $view->headScript()
-            ->appendFile($view->assetUrl('js/advanced-search-plus-admin.js', 'AdvancedSearchPlus'), 'text/javascript', ['defer' => 'defer']);
+
+        if ($this->getServiceLocator()->get('Omeka\Status')->isAdminRequest()) {
+            $view = $event->getTarget();
+            $assetUrl = $view->plugin('assetUrl');
+            $view->headLink()
+                ->appendStylesheet($assetUrl('vendor/chosen-js/chosen.css', 'Omeka'))
+                ->appendStylesheet($assetUrl('css/advanced-search-plus.css', 'AdvancedSearchPlus'));
+            $view->headScript()
+                ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.js', 'Omeka'), 'text/javascript', ['defer' => 'defer'])
+                ->appendFile($assetUrl('js/advanced-search-plus.js', 'AdvancedSearchPlus'), 'text/javascript', ['defer' => 'defer']);
+        }
 
         $query = $event->getParam('query', []);
 
@@ -315,6 +362,32 @@ class Module extends AbstractModule
 
         $event->setParam('query', $query);
         $event->setParam('partials', $partials);
+    }
+
+    /**
+     * Display the advanced search form via partial.
+     *
+     * @param Event $event
+     */
+    public function displayAdvancedSearchPost(Event $event): void
+    {
+        $view = $event->getTarget();
+        $partials = $event->getParam('partials', []);
+        $defaultSearchFields = $this->getDefaultSearchFields();
+        $searchFields = $view->siteSetting('advancedsearchplus_search_fields', $defaultSearchFields) ?: [];
+        foreach ($partials as $key => $partial) {
+            if (isset($defaultSearchFields[$partial]) && !in_array($partial, $searchFields)) {
+                unset($partials[$key]);
+            }
+        }
+
+        $event->setParam('partials', $partials);
+    }
+
+    protected function getDefaultSearchFields()
+    {
+        $config = $this->getServiceLocator()->get('Config');
+        return $config['advancedsearchplus']['search_fields'];
     }
 
     /**

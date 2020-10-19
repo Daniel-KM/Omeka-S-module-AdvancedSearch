@@ -1,6 +1,6 @@
 <?php
 /**
- * @var \Zend\View\Renderer\PhpRenderer $this
+ * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var array $query
  */
 
@@ -14,7 +14,7 @@ $translate = $this->plugin('translate');
     <div class="inputs">
         <div class="value">
             <?php
-            $select = (new \Zend\Form\Element\Radio())
+            $select = (new \Laminas\Form\Element\Radio())
                 ->setName('is_public')
                 ->setValueOptions([
                     '1' => 'Public', // @translate

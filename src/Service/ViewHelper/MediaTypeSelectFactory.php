@@ -3,7 +3,7 @@
 namespace AdvancedSearchPlus\Service\ViewHelper;
 
 use AdvancedSearchPlus\View\Helper\MediaTypeSelect;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 use Interop\Container\ContainerInterface;
 
 class MediaTypeSelectFactory implements FactoryInterface

@@ -11,19 +11,37 @@ Added fields are:
 
 - before/on/after creation/modification date/time of any resource
 - has media (for item)
-- media type (included in Omeka S > 2.0.2)
+- has original
+- has thumbnail
+- multiple media types (for item)
+- multiple media types for media (included in core since Omeka S 2.0.2 for a
+  single value)
 - visibility public/private
 - media by item set
+
+Furthermore, it adds new search query type for properties:
+- start with
+- end with
+- in list (via api only).
+
+Finally, an option allows to display only the used properties and classes in the
+advanced search form, with chosen-select.
 
 
 Installation
 ------------
 
-Uncompress files and rename module folder `AdvancedSearchPlus`.
-
-Then install it like any other Omeka module and follow the config instructions.
-
 See general end user documentation for [installing a module].
+
+* From the zip
+
+Download the last release [AdvancedSearchPlus.zip] from the list of releases, and
+uncompress it in the `modules` directory.
+
+* From the source and for development
+
+If the module was installed from the source, rename the name of the folder of
+the module to `AdvancedSearchPlus`.
 
 
 Warning

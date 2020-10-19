@@ -89,9 +89,9 @@ class Module extends AbstractModule
             'Omeka\Controller\Admin\Item',
             'Omeka\Controller\Admin\ItemSet',
             'Omeka\Controller\Admin\Media',
-            // 'Omeka\Controller\Site\Item',
-            // 'Omeka\Controller\Site\ItemSet',
-            // 'Omeka\Controller\Site\Media',
+            'Omeka\Controller\Site\Item',
+            'Omeka\Controller\Site\ItemSet',
+            'Omeka\Controller\Site\Media',
             // TODO Add user.
         ];
         foreach ($controllers as $controller) {

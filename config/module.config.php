@@ -54,19 +54,21 @@ return [
         // config/local.config.php) are not managed by this module.
         'search_fields' => [
             // From view/common/advanced-search'.
-            'common/advanced-search/fulltext' => ['label' => 'Full text'],
-            'common/advanced-search/properties' => ['label' => 'Properties'],
-            'common/advanced-search/resource-class' => ['label' => 'Classes'],
-            'common/advanced-search/resource-template' => ['label' => 'Templates', 'default' => false],
-            'common/advanced-search/item-sets' => ['label' => 'Item sets'],
+            'common/advanced-search/fulltext' => ['label' => 'Full text'], // @translate
+            'common/advanced-search/properties' => ['label' => 'Properties'], // @translate
+            'common/advanced-search/resource-class' => ['label' => 'Classes'], // @translate
+            'common/advanced-search/resource-template' => ['label' => 'Templates', 'default' => false], // @translate
+            'common/advanced-search/item-sets' => ['label' => 'Item sets'], // @translate
             'common/advanced-search/owner' => ['label' => 'Owner', 'default' => false],
             // This partial is managed separately by a core option.
             // 'common/advanced-search/resource-template-restrict' => ['label' => 'Resource template restrict'],
             // From module advanced search plus.
-            'common/advanced-search/date-time' => ['label' => 'Date time'],
-            'common/advanced-search/has-media' => ['label' => 'Has media'],
-            'common/advanced-search/media-type' => ['label' => 'Media types'],
-            'common/advanced-search/visibility' => ['label' => 'Visibility', 'default' => false],
+            'common/advanced-search/date-time' => ['label' => 'Date time'], // @translate
+            'common/advanced-search/has-media' => ['label' => 'Has media'], // @translate
+            'common/advanced-search/has-original' => ['label' => 'Has original file', 'default' => false], // @translate
+            'common/advanced-search/has-thumbnails' => ['label' => 'Has thumbnails', 'default' => false], // @translate
+            'common/advanced-search/media-type' => ['label' => 'Media types'], // @translate
+            'common/advanced-search/visibility' => ['label' => 'Visibility', 'default' => false], // @translate
             // From module data type geometry.
             'common/advanced-search/data-type-geography' => ['module' => 'DataTypeGeometry', 'label' => 'Geography', 'default' => false], // @translate
             // From module numeric data type.

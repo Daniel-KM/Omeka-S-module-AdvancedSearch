@@ -302,9 +302,13 @@ class Module extends AbstractModule
         $this->buildPropertyQuery($qb, $query, $adapter);
         if ($adapter instanceof ItemAdapter) {
             $this->searchHasMedia($qb, $adapter, $query);
+            $this->searchHasMediaOriginal($qb, $adapter, $query);
+            $this->searchHasMediaThumbnails($qb, $adapter, $query);
             $this->searchItemByMediaType($qb, $adapter, $query);
         } elseif ($adapter instanceof MediaAdapter) {
             $this->searchMediaByItemSet($qb, $adapter, $query);
+            $this->searchHasOriginal($qb, $adapter, $query);
+            $this->searchHasThumbnails($qb, $adapter, $query);
         }
     }
 
@@ -348,17 +352,27 @@ class Module extends AbstractModule
             $partials[] = 'common/advanced-search/media-item-sets';
         }
 
-        $query['datetime'] = isset($query['datetime']) ? $query['datetime'] : '';
+        $query['datetime'] = $query['datetime'] ?? '';
         $partials[] = 'common/advanced-search/date-time';
 
+        $partials[] = 'common/advanced-search/visibility';
+
         if ($resourceType === 'item') {
-            $query['has_media'] = isset($query['has_media']) ? $query['has_media'] : '';
+            $query['has_media'] = $query['has_media'] ?? '';
             $partials[] = 'common/advanced-search/has-media';
+        }
+
+        if ($resourceType === 'item' || $resourceType === 'media') {
+            $query['has_original'] = $query['has_original'] ?? '';
+            $partials[] = 'common/advanced-search/has-original';
+            $query['has_thumbnails'] = $query['has_thumbnails'] ?? '';
+            $partials[] = 'common/advanced-search/has-thumbnails';
+        }
+
+        if ($resourceType === 'item') {
             $query['media_types'] = isset($query['media_types']) ? (array) $query['media_types'] : [];
             $partials[] = 'common/advanced-search/media-type';
         }
-
-        $partials[] = 'common/advanced-search/visibility';
 
         $event->setParam('query', $query);
         $event->setParam('partials', $partials);
@@ -448,6 +462,28 @@ class Module extends AbstractModule
                 $filters[$filterLabel][] = $translate('yes'); // @translate
             } elseif ($value !== '') {
                 $filterLabel = $translate('Has media'); // @translate
+                $filters[$filterLabel][] = $translate('no'); // @translate
+            }
+        }
+
+        if (isset($query['has_original'])) {
+            $value = $query['has_original'];
+            if ($value) {
+                $filterLabel = $translate('Has original'); // @translate
+                $filters[$filterLabel][] = $translate('yes'); // @translate
+            } elseif ($value !== '') {
+                $filterLabel = $translate('Has original'); // @translate
+                $filters[$filterLabel][] = $translate('no'); // @translate
+            }
+        }
+
+        if (isset($query['has_thumbnails'])) {
+            $value = $query['has_thumbnails'];
+            if ($value) {
+                $filterLabel = $translate('Has thumbnails'); // @translate
+                $filters[$filterLabel][] = $translate('yes'); // @translate
+            } elseif ($value !== '') {
+                $filterLabel = $translate('Has thumbnails'); // @translate
                 $filters[$filterLabel][] = $translate('no'); // @translate
             }
         }
@@ -677,7 +713,6 @@ class Module extends AbstractModule
                     continue 2;
             }
 
-
             // Avoid to get results with some incorrect query.
             if ($incorrectValue) {
                 $param = $adapter->createNamedParameter($qb, 'incorrect value: ' . $queryRow['value']);
@@ -706,7 +741,7 @@ class Module extends AbstractModule
      * The argument uses "has_media", with value "1" or "0".
      *
      * @param QueryBuilder $qb
-     * @param AbstractResourceEntityAdapter $adapter
+     * @param ItemAdapter $adapter
      * @param array $query
      */
     protected function searchHasMedia(
@@ -737,13 +772,106 @@ class Module extends AbstractModule
         }
         // Without media.
         else {
-            $qb->leftJoin(
+            $qb
+                ->leftJoin(
+                    \Omeka\Entity\Media::class,
+                    $mediaAlias,
+                    Join::WITH,
+                    $expr->eq($mediaAlias . '.item', 'omeka_root.id')
+                )
+                ->andWhere($expr->isNull($mediaAlias . '.id'));
+        }
+    }
+
+   /**
+    * Build query to check if an item has an original file or not.
+    *
+    * The argument uses "has_original", with value "1" or "0".
+    *
+    * @param QueryBuilder $qb
+     * @param ItemAdapter $adapter
+    * @param array $query
+    */
+    protected function searchHasMediaOriginal(
+        QueryBuilder $qb,
+        ItemAdapter $adapter,
+        array $query
+    ): void {
+        $this->searchHasMediaSpecific($qb, $adapter, $query, 'has_original');
+    }
+
+    /**
+     * Build query to check if an item has thumbnails or not.
+     *
+     * The argument uses "has_thumbnails", with value "1" or "0".
+     *
+     * @param QueryBuilder $qb
+     * @param ItemAdapter $adapter
+     * @param array $query
+     */
+    protected function searchHasMediaThumbnails(
+        QueryBuilder $qb,
+        ItemAdapter $adapter,
+        array $query
+    ): void {
+        $this->searchHasMediaSpecific($qb, $adapter, $query, 'has_thumbnails');
+    }
+
+    /**
+     * Build query to check if an item has an original file or thumbnails or not.
+     *
+     * @param QueryBuilder $qb
+     * @param ItemAdapter $adapter
+     * @param array $query
+     * @param string $field "has_original" or "has_thumbnails".
+     */
+    protected function searchHasMediaSpecific(
+        QueryBuilder $qb,
+        ItemAdapter $adapter,
+        array $query,
+        $field
+    ): void {
+        if (!isset($query[$field])) {
+            return;
+        }
+
+        $value = (string) $query[$field];
+        if ($value === '') {
+            return;
+        }
+
+        $expr = $qb->expr();
+        $fields = [
+            'has_original' => 'hasOriginal',
+            'has_thumbnails' => 'hasThumbnails',
+        ];
+
+        // With original media.
+        $mediaAlias = $adapter->createAlias();
+        if ($value) {
+            $qb->innerJoin(
                 \Omeka\Entity\Media::class,
                 $mediaAlias,
                 Join::WITH,
-                $expr->eq($mediaAlias . '.item', 'omeka_root.id')
+                $expr->andX(
+                    $expr->eq($mediaAlias . '.item', 'omeka_root.id'),
+                    $expr->eq($mediaAlias . '.' . $fields[$field], 1)
+                )
             );
-            $qb->andWhere($expr->isNull($mediaAlias . '.id'));
+        }
+        // Without original media.
+        else {
+            $qb
+                ->leftJoin(
+                    \Omeka\Entity\Media::class,
+                    $mediaAlias,
+                    Join::WITH,
+                    $expr->eq($mediaAlias . '.item', 'omeka_root.id')
+                )
+                ->andWhere($expr->orX(
+                    $expr->isNull($mediaAlias . '.id'),
+                    $expr->eq($mediaAlias . '.' . $fields[$field], 0)
+                ));
         }
     }
 
@@ -751,7 +879,7 @@ class Module extends AbstractModule
      * Build query to check if media types.
      *
      * @param QueryBuilder $qb
-     * @param AbstractResourceEntityAdapter $adapter
+     * @param ItemAdapter $adapter
      * @param array $query
      */
     protected function searchItemByMediaType(
@@ -789,10 +917,75 @@ class Module extends AbstractModule
     }
 
     /**
+     * Build query to check if a media has an original file or not.
+     *
+     * The argument uses "has_original", with value "1" or "0".
+     *
+     * @param QueryBuilder $qb
+     * @param MediaAdapter $adapter
+     * @param array $query
+     */
+    protected function searchHasOriginal(
+        QueryBuilder $qb,
+        MediaAdapter $adapter,
+        array $query
+    ): void {
+        $this->searchMediaSpecific($qb, $adapter, $query, 'has_original');
+    }
+
+    /**
+     * Build query to check if a media has thumbnails or not.
+     *
+     * The argument uses "has_thumbnails", with value "1" or "0".
+     *
+     * @param QueryBuilder $qb
+     * @param MediaAdapter $adapter
+     * @param array $query
+     */
+    protected function searchHasThumbnails(
+        QueryBuilder $qb,
+        MediaAdapter $adapter,
+        array $query
+    ): void {
+        $this->searchMediaSpecific($qb, $adapter, $query, 'has_thumbnails');
+    }
+
+    /**
+     * Build query to check if a media has an original file or thumbnails or not.
+     *
+     * @param QueryBuilder $qb
+     * @param MediaAdapter $adapter
+     * @param array $query
+     * @param string $field "has_original" or "has_thumbnails".
+     */
+    protected function searchMediaSpecific(
+        QueryBuilder $qb,
+        MediaAdapter $adapter,
+        array $query,
+        $field
+    ): void {
+        if (!isset($query[$field])) {
+            return;
+        }
+
+        $value = (string) $query[$field];
+        if ($value === '') {
+            return;
+        }
+
+        $fields = [
+            'has_original' => 'hasOriginal',
+            'has_thumbnails' => 'hasThumbnails',
+        ];
+        $qb
+            ->andWhere($qb->expr()->eq('omeka_root.' . $fields[$field], (int) (bool) $value));
+    }
+
+    /**
      * Build query to search media by item set.
      *
      * @param QueryBuilder $qb
-     * @param AbstractResourceEntityAdapter $adapter
+     * @param MediaAdapter $adapter
      * @param array $query
      */
     protected function searchMediaByItemSet(
@@ -862,7 +1055,7 @@ class Module extends AbstractModule
      * @param array $query
      * @param AbstractResourceEntityAdapter $adapter
      */
-    protected function buildPropertyQuery(QueryBuilder $qb, array $query, AbstractResourceEntityAdapter $adapter)
+    protected function buildPropertyQuery(QueryBuilder $qb, array $query, AbstractResourceEntityAdapter $adapter): void
     {
         if (!isset($query['property']) || !is_array($query['property'])) {
             return;
@@ -886,8 +1079,8 @@ class Module extends AbstractModule
             }
             $propertyId = $queryRow['property'];
             $queryType = $queryRow['type'];
-            $joiner = isset($queryRow['joiner']) ? $queryRow['joiner'] : null;
-            $value = isset($queryRow['text']) ? $queryRow['text'] : null;
+            $joiner = $queryRow['joiner'] ?? '';
+            $value = $queryRow['text'] ?? '';
 
             if (!strlen($value) && $queryType !== 'nex' && $queryType !== 'ex') {
                 continue;

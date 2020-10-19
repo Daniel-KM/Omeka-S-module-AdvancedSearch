@@ -200,7 +200,7 @@ class Module extends AbstractModule
         if ($resourceType === 'item') {
             $query['has_media'] = isset($query['has_media']) ? $query['has_media'] : '';
             $partials[] = 'common/advanced-search/has-media';
-            $query['media_type'] = isset($query['media_type']) ? (array) $query['media_type'] : [];
+            $query['media_types'] = isset($query['media_types']) ? (array) $query['media_types'] : [];
             $partials[] = 'common/advanced-search/media-type';
         }
 
@@ -272,12 +272,12 @@ class Module extends AbstractModule
             }
         }
 
-        if (!empty($query['media_type'])) {
-            $value = is_array($query['media_type'])
-                ? $query['media_type']
-                : [$query['media_type']];
+        if (!empty($query['media_types'])) {
+            $value = is_array($query['media_types'])
+                ? $query['media_types']
+                : [$query['media_types']];
             foreach ($value as $subValue) {
-                $filterLabel = $translate('Media type');
+                $filterLabel = $translate('Media types'); // @translate
                 $filters[$filterLabel][] = $subValue;
             }
         }
@@ -579,13 +579,13 @@ class Module extends AbstractModule
         ItemAdapter $adapter,
         array $query
     ): void {
-        if (!isset($query['media_type'])) {
+        if (!isset($query['media_types'])) {
             return;
         }
 
-        $values = is_array($query['media_type'])
-            ? $query['media_type']
-            : [$query['media_type']];
+        $values = is_array($query['media_types'])
+            ? $query['media_types']
+            : [$query['media_types']];
         $values = array_filter(array_map('trim', $values));
         if (empty($values)) {
             return;

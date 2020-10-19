@@ -85,6 +85,17 @@ class Module extends AbstractModule
             [$this, 'handleApiSearchQuery']
         );
 
+        $sharedEventManager->attach(
+            \Omeka\Form\Element\PropertySelect::class,
+            'form.vocab_member_select.query',
+            [$this, 'formVocabMemberSelectQuery']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Form\Element\ResourceClassSelect::class,
+            'form.vocab_member_select.query',
+            [$this, 'formVocabMemberSelectQuery']
+        );
+
         $controllers = [
             'Omeka\Controller\Admin\Item',
             'Omeka\Controller\Admin\ItemSet',
@@ -146,6 +157,16 @@ class Module extends AbstractModule
             $this->searchItemByMediaType($qb, $adapter, $query);
         } elseif ($adapter instanceof MediaAdapter) {
             $this->searchMediaByItemSet($qb, $adapter, $query);
+        }
+    }
+
+    public function formVocabMemberSelectQuery(Event $event): void
+    {
+        $selectElement = $event->getTarget();
+        if ($selectElement->getOption('used_terms')) {
+            $query = $event->getParam('query', []);
+            $query['used'] = true;
+            $event->setParam('query', $query);
         }
     }
 

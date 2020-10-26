@@ -1,9 +1,12 @@
 <?php declare(strict_types=1);
+
 namespace Search\Form;
 
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Omeka\View\Helper\Api;
+use Search\Form\Element\OptionalMultiCheckbox;
+use Search\Form\Element\OptionalSelect;
 
 class SettingsFieldset extends Fieldset
 {
@@ -31,7 +34,7 @@ class SettingsFieldset extends Fieldset
 
         $this->add([
             'name' => 'search_main_page',
-            'type' => Element\Select::class,
+            'type' => OptionalSelect::class,
             'options' => [
                 'label' => 'Default search page (admin)', // @translate
                 'info' => 'This search engine is used in the admin bar.', // @translate
@@ -45,7 +48,7 @@ class SettingsFieldset extends Fieldset
 
         $this->add([
             'name' => 'search_pages',
-            'type' => Element\MultiCheckbox::class,
+            'type' => OptionalMultiCheckbox::class,
             'options' => [
                 'label' => 'Available search pages', // @translate
                 'value_options' => $valueOptions,
@@ -57,7 +60,7 @@ class SettingsFieldset extends Fieldset
 
         $this->add([
             'name' => 'search_api_page',
-            'type' => Element\Select::class,
+            'type' => OptionalSelect::class,
             'options' => [
                 'label' => 'Page used for quick api search', // @translate
                 'info' => 'The method apiSearch() allows to do a quick search in some cases. It requires a mapping done with the Omeka api and the selected index.', // @translate

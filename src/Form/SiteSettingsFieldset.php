@@ -1,9 +1,12 @@
 <?php declare(strict_types=1);
+
 namespace Search\Form;
 
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Omeka\View\Helper\Api;
+use Search\Form\Element\OptionalMultiCheckbox;
+use Search\Form\Element\OptionalSelect;
 
 class SiteSettingsFieldset extends Fieldset
 {
@@ -31,7 +34,7 @@ class SiteSettingsFieldset extends Fieldset
         $this
             ->add([
                 'name' => 'search_main_page',
-                'type' => Element\Select::class,
+                'type' => OptionalSelect::class,
                 'options' => [
                     'label' => 'Default search page', // @translate
                     'value_options' => $valueOptions,
@@ -43,7 +46,7 @@ class SiteSettingsFieldset extends Fieldset
             ])
             ->add([
                 'name' => 'search_pages',
-                'type' => Element\MultiCheckbox::class,
+                'type' => OptionalMultiCheckbox::class,
                 'options' => [
                     'label' => 'Available search pages', // @translate
                     'value_options' => $valueOptions,

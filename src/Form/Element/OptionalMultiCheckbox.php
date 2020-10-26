@@ -2,9 +2,9 @@
 
 namespace Search\Form\Element;
 
-use Laminas\Form\Element\Select;
+use Laminas\Form\Element\MultiCheckbox;
 
-class OptionalSelect extends Select
+class OptionalMultiCheckbox extends MultiCheckbox
 {
     /**
      * @see https://github.com/zendframework/zendframework/issues/2761#issuecomment-14488216

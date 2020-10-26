@@ -44,7 +44,8 @@ return [
     ],
     'form_elements' => [
         'invokables' => [
-            Form\Element\OptionalSelect::class => Form\Element\OptionalSelect::class,
+            'OptionalMultiCheckbox' => Form\Element\OptionalMultiCheckbox::class,
+            'OptionalSelect' => Form\Element\OptionalSelect::class,
         ],
         'factories' => [
             Form\Admin\AdvancedFormConfigFieldset::class => Service\Form\AdvancedFormConfigFieldsetFactory::class,

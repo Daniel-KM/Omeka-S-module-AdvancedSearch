@@ -195,19 +195,9 @@ class Module extends AbstractModule
             [$this, 'handleMainSettings']
         );
         $sharedEventManager->attach(
-            \Omeka\Form\SettingForm::class,
-            'form.add_input_filters',
-            [$this, 'handleMainSettingsFilters']
-        );
-        $sharedEventManager->attach(
             \Omeka\Form\SiteSettingsForm::class,
             'form.add_elements',
             [$this, 'handleSiteSettings']
-        );
-        $sharedEventManager->attach(
-            \Omeka\Form\SiteSettingsForm::class,
-            'form.add_input_filters',
-            [$this, 'handleSiteSettingsFilters']
         );
     }
 
@@ -525,7 +515,7 @@ class Module extends AbstractModule
 
         $data = $this->prepareDataToPopulate($settings, $settingsType);
         if (is_null($data)) {
-            return;
+            return null;
         }
 
         $space = 'search_module';
@@ -535,37 +525,7 @@ class Module extends AbstractModule
         $form = $event->getTarget();
         $form->add($fieldset);
         $form->get($space)->populateValues($data);
-    }
-
-    public function handleMainSettingsFilters(Event $event): void
-    {
-        $event->getParam('inputFilter')->get('search')
-            ->add([
-                'name' => 'search_pages',
-                'required' => false,
-            ])
-            ->add([
-                'name' => 'search_main_page',
-                'required' => false,
-            ])
-            ->add([
-                'name' => 'search_api_page',
-                'required' => false,
-            ]);
-    }
-
-    public function handleSiteSettingsFilters(Event $event): void
-    {
-        // Key "search_module" is used to avoid to override core site settings.
-        $event->getParam('inputFilter')->get('search_module')
-            ->add([
-                'name' => 'search_pages',
-                'required' => false,
-            ])
-            ->add([
-                'name' => 'search_main_page',
-                'required' => false,
-            ]);
+        return $form;
     }
 
     /**

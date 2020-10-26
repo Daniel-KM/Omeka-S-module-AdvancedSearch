@@ -1,6 +1,9 @@
 Search (module for Omeka S)
 ===========================
 
+> __New versions of this module and support for Omeka S version 3.0 and above
+> are available on [GitLab], which seems to respect users and privacy better.__
+
 [Search] is a module for [Omeka S] that adds search capabilities to the public
 interface of Omeka S, in particular filters and facets. Furthermore, it provides
 a common interface for other modules to extend it (forms, indexers, queriers).
@@ -270,4 +273,5 @@ were done for various projects.
 [FSF]: https://www.fsf.org
 [OSI]: http://opensource.org
 [BibLibre]: https://github.com/biblibre
+[GitLab]: https://gitlab.com/Daniel-KM
 [Daniel-KM]: https://github.com/Daniel-KM "Daniel Berthereau"

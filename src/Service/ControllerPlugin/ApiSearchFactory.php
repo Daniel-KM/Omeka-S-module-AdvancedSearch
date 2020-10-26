@@ -3,7 +3,7 @@ namespace Search\Service\ControllerPlugin;
 
 use Interop\Container\ContainerInterface;
 use Search\Mvc\Controller\Plugin\ApiSearch;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ApiSearchFactory implements FactoryInterface
 {

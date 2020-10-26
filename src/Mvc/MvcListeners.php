@@ -1,10 +1,10 @@
 <?php
 namespace Search\Mvc;
 
-use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\AbstractListenerAggregate;
-use Zend\Mvc\MvcEvent;
-use Zend\Router\Http\RouteMatch;
+use Laminas\EventManager\EventManagerInterface;
+use Laminas\EventManager\AbstractListenerAggregate;
+use Laminas\Mvc\MvcEvent;
+use Laminas\Router\Http\RouteMatch;
 
 class MvcListeners extends AbstractListenerAggregate
 {
@@ -59,7 +59,7 @@ class MvcListeners extends AbstractListenerAggregate
         $routeMatch->setMatchedRouteName('search-page-' . $searchMainPage);
         $event->setRouteMatch($routeMatch);
 
-        /* @var \Zend\Stdlib\Parameters $query */
+        /* @var \Laminas\Stdlib\Parameters $query */
         $event->getRequest()->getQuery()
             ->set('itemSet', ['ids' => [$itemSetId]]);
     }

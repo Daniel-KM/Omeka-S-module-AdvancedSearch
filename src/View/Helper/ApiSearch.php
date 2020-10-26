@@ -2,7 +2,7 @@
 namespace Search\View\Helper;
 
 use Search\Mvc\Controller\Plugin\ApiSearch as ApiSearchPlugin;
-use Zend\View\Helper\AbstractHelper;
+use Laminas\View\Helper\AbstractHelper;
 
 class ApiSearch extends AbstractHelper
 {

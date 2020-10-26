@@ -5,8 +5,8 @@ namespace Search\Querier;
 use Search\Api\Representation\SearchIndexRepresentation;
 use Search\Query;
 use Search\Response;
-use Zend\Log\LoggerAwareTrait;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\Log\LoggerAwareTrait;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 /**
  * Querier that doesn't answer anything.

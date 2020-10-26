@@ -30,12 +30,12 @@
 namespace Search\Adapter;
 
 use Search\Api\Representation\SearchIndexRepresentation;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 abstract class AbstractAdapter implements AdapterInterface
 {
     /**
-     * @var \Zend\ServiceManager\ServiceLocatorInterface
+     * @var \Laminas\ServiceManager\ServiceLocatorInterface
      */
     protected $serviceLocator;
 
@@ -60,7 +60,7 @@ abstract class AbstractAdapter implements AdapterInterface
     }
 
     /**
-     * @return \Zend\ServiceManager\ServiceLocatorInterface
+     * @return \Laminas\ServiceManager\ServiceLocatorInterface
      */
     protected function getServiceLocator()
     {

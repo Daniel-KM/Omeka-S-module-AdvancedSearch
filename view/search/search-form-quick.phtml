@@ -1,7 +1,7 @@
 <?php
 /**
- * @var \Zend\View\Renderer\PhpRenderer $this
- * @var \Zend\Form\Form $form
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Laminas\Form\Form $form
  */
 
 // This quick form displays only the first field (the main one) and the required or hidden elements.
@@ -13,7 +13,7 @@ $form
 
 $main = null;
 foreach ($form->getElements() as $element):
-    if ($element instanceof \Zend\Form\Element\Csrf || $element instanceof \Zend\Form\Element\Hidden || $element instanceof \Zend\Form\Element\Submit):
+    if ($element instanceof \Laminas\Form\Element\Csrf || $element instanceof \Laminas\Form\Element\Hidden || $element instanceof \Laminas\Form\Element\Submit):
         continue;
     endif;
     if ($main):

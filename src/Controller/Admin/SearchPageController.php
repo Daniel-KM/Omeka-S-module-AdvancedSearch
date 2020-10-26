@@ -39,8 +39,8 @@ use Search\Form\Admin\SearchPageForm;
 use Search\Form\Admin\SearchPageConfigureForm;
 use Search\Form\Admin\SearchPageConfigureSimpleForm;
 use Search\FormAdapter\Manager as SearchFormAdapterManager;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\ViewModel;
 
 class SearchPageController extends AbstractActionController
 {

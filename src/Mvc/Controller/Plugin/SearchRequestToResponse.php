@@ -7,8 +7,8 @@ use Omeka\Stdlib\Paginator;
 use Search\Api\Representation\SearchIndexRepresentation;
 use Search\Api\Representation\SearchPageRepresentation;
 use Search\Querier\Exception\QuerierException;
-use Zend\EventManager\Event;
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
+use Laminas\EventManager\Event;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class SearchRequestToResponse extends AbstractPlugin
 {

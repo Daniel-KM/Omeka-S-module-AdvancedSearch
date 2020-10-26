@@ -3,7 +3,7 @@ namespace Search\Service;
 
 use Interop\Container\ContainerInterface;
 use Search\Api\ManagerDelegator;
-use Zend\ServiceManager\Factory\DelegatorFactoryInterface;
+use Laminas\ServiceManager\Factory\DelegatorFactoryInterface;
 
 class ApiManagerDelegatorFactory implements DelegatorFactoryInterface
 {

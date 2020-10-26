@@ -29,7 +29,7 @@
 
 namespace Search\Form\Admin;
 
-use Zend\Form\Element;
+use Laminas\Form\Element;
 
 class SearchPageConfigureSimpleForm extends SearchPageConfigureForm
 {

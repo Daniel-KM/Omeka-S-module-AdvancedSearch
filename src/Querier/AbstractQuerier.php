@@ -32,8 +32,8 @@ namespace Search\Querier;
 
 use Search\Api\Representation\SearchIndexRepresentation;
 use Search\Query;
-use Zend\Log\LoggerAwareTrait;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\Log\LoggerAwareTrait;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 abstract class AbstractQuerier implements QuerierInterface
 {
@@ -61,7 +61,7 @@ abstract class AbstractQuerier implements QuerierInterface
     }
 
     /**
-     * @return \Zend\ServiceManager\ServiceLocatorInterface
+     * @return \Laminas\ServiceManager\ServiceLocatorInterface
      */
     protected function getServiceLocator()
     {

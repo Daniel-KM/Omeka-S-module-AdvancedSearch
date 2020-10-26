@@ -33,8 +33,8 @@ namespace Search\Querier;
 use Search\Api\Representation\SearchIndexRepresentation;
 use Search\Query;
 use Search\Response;
-use Zend\Log\LoggerAwareInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\Log\LoggerAwareInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 interface QuerierInterface extends LoggerAwareInterface
 {

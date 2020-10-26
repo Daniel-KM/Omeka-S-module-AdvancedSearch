@@ -32,7 +32,7 @@ namespace Search\Service\ViewHelper;
 
 use Interop\Container\ContainerInterface;
 use Search\View\Helper\FacetCheckbox;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class FacetCheckboxFactory implements FactoryInterface
 {

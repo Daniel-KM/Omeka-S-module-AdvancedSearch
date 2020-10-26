@@ -3,7 +3,7 @@ namespace Search\Service\Form;
 
 use Interop\Container\ContainerInterface;
 use Search\Form\SiteSettingsFieldset;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class SiteSettingsFieldsetFactory implements FactoryInterface
 {

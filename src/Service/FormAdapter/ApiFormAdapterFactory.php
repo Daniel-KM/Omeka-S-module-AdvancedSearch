@@ -3,7 +3,7 @@ namespace Search\Service\FormAdapter;
 
 use Interop\Container\ContainerInterface;
 use Search\FormAdapter\ApiFormAdapter;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ApiFormAdapterFactory implements FactoryInterface
 {

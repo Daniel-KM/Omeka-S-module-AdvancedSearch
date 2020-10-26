@@ -31,7 +31,7 @@
 namespace Search\Adapter;
 
 use Search\Api\Representation\SearchIndexRepresentation;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 interface AdapterInterface
 {
@@ -50,7 +50,7 @@ interface AdapterInterface
     /**
      * Return the form used to managed the config of the adapter, if any.
      *
-     * @return \Zend\Form\Fieldset|null
+     * @return \Laminas\Form\Fieldset|null
      */
     public function getConfigFieldset();
 

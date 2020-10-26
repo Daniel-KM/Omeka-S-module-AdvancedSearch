@@ -33,9 +33,9 @@ namespace Search\Controller;
 use Search\Api\Representation\SearchPageRepresentation;
 use Search\Query;
 use Search\Response;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\JsonModel;
-use Zend\View\Model\ViewModel;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\JsonModel;
+use Laminas\View\Model\ViewModel;
 
 class IndexController extends AbstractActionController
 {
@@ -162,13 +162,13 @@ class IndexController extends AbstractActionController
      * @todo Factorize with \Search\Site\BlockLayout\SearchingForm::getSearchRequest()
      *
      * @param SearchPageRepresentation $searchPage
-     * @param \Zend\Form\Form $searchForm
+     * @param \Laminas\Form\Form $searchForm
      * @param array $request
      * @return array|bool
      */
     protected function validateSearchRequest(
         SearchPageRepresentation $searchPage,
-        \Zend\Form\Form $form,
+        \Laminas\Form\Form $form,
         array $request
     ) {
         // Only validate the csrf.

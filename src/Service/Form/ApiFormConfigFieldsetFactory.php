@@ -3,7 +3,7 @@ namespace Search\Service\Form;
 
 use Search\Form\Admin\ApiFormConfigFieldset;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ApiFormConfigFieldsetFactory implements FactoryInterface
 {

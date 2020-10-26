@@ -41,10 +41,10 @@ use Omeka\Entity\Resource;
 use Omeka\Mvc\Controller\Plugin\Messenger;
 use Omeka\Stdlib\Message;
 use Search\Indexer\IndexerInterface;
-use Zend\EventManager\Event;
-use Zend\EventManager\SharedEventManagerInterface;
-use Zend\ModuleManager\ModuleManager;
-use Zend\Mvc\MvcEvent;
+use Laminas\EventManager\Event;
+use Laminas\EventManager\SharedEventManagerInterface;
+use Laminas\ModuleManager\ModuleManager;
+use Laminas\Mvc\MvcEvent;
 
 class Module extends AbstractModule
 {
@@ -57,7 +57,7 @@ class Module extends AbstractModule
 
     public function init(ModuleManager $moduleManager)
     {
-        /** @var \Zend\ModuleManager\Listener\ServiceListenerInterface $serviceListerner */
+        /** @var \Laminas\ModuleManager\Listener\ServiceListenerInterface $serviceListerner */
         $serviceListener = $moduleManager->getEvent()->getParam('ServiceManager')
             ->get('ServiceListener');
 
@@ -259,7 +259,7 @@ class Module extends AbstractModule
         }
 
         $router = $services->get('Router');
-        if (!$router instanceof \Zend\Router\Http\TreeRouteStack) {
+        if (!$router instanceof \Laminas\Router\Http\TreeRouteStack) {
             return;
         }
 
@@ -277,7 +277,7 @@ class Module extends AbstractModule
                     $router->addRoute(
                         'search-admin-page-' . $pageId,
                         [
-                            'type' => \Zend\Router\Http\Segment::class,
+                            'type' => \Laminas\Router\Http\Segment::class,
                             'options' => [
                                 'route' => '/admin/' . $page->path(),
                                 'defaults' => [
@@ -301,7 +301,7 @@ class Module extends AbstractModule
             $router->addRoute(
                 'search-page-' . $pageId,
                 [
-                    'type' => \Zend\Router\Http\Segment::class,
+                    'type' => \Laminas\Router\Http\Segment::class,
                     'options' => [
                         'route' => '/s/:site-slug/' . $pageSlug,
                         'defaults' => [

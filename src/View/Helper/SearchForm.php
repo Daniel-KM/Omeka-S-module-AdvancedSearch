@@ -3,8 +3,8 @@
 namespace Search\View\Helper;
 
 use Search\Api\Representation\SearchPageRepresentation;
-use Zend\Form\Form;
-use Zend\View\Helper\AbstractHelper;
+use Laminas\Form\Form;
+use Laminas\View\Helper\AbstractHelper;
 
 class SearchForm extends AbstractHelper
 {
@@ -108,7 +108,7 @@ class SearchForm extends AbstractHelper
     /**
      * Get the form of the search page.
      *
-     * @return \Zend\Form\Form|null
+     * @return \Laminas\Form\Form|null
      */
     public function getForm()
     {

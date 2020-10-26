@@ -2,8 +2,8 @@
 namespace Search\Form;
 
 use Omeka\View\Helper\Api;
-use Zend\Form\Element;
-use Zend\Form\Fieldset;
+use Laminas\Form\Element;
+use Laminas\Form\Fieldset;
 
 class SiteSettingsFieldset extends Fieldset
 {

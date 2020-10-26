@@ -30,8 +30,8 @@
 
 namespace Search\Form\Admin;
 
-use Zend\Form\Element;
-use Zend\Form\Form;
+use Laminas\Form\Element;
+use Laminas\Form\Form;
 
 class SearchIndexForm extends Form
 {

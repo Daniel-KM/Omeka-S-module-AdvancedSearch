@@ -2,7 +2,7 @@
 namespace Search\Api;
 
 // use Search\Mvc\Controller\Plugin\ApiSearch;
-use Zend\Mvc\Controller\PluginManager as ControllerPluginManager;
+use Laminas\Mvc\Controller\PluginManager as ControllerPluginManager;
 
 /**
  * API manager service (delegator).

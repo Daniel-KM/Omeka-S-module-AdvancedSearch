@@ -4,7 +4,7 @@ namespace Search\View\Helper;
 use Omeka\Api\Representation\SiteRepresentation;
 use Search\Api\Representation\SearchPageRepresentation;
 use Search\Mvc\Controller\Plugin\SearchRequestToResponse as SearchRequestToResponsePlugin;
-use Zend\View\Helper\AbstractHelper;
+use Laminas\View\Helper\AbstractHelper;
 
 class SearchRequestToResponse extends AbstractHelper
 {

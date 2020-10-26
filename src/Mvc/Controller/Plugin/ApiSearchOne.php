@@ -2,7 +2,7 @@
 namespace Search\Mvc\Controller\Plugin;
 
 use Search\Mvc\Controller\Plugin\ApiSearch as ApiSearchPlugin;
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class ApiSearchOne extends AbstractPlugin
 {

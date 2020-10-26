@@ -3,7 +3,7 @@ namespace Search\Service\Form;
 
 use Interop\Container\ContainerInterface;
 use Search\Form\FilterFieldset;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class FilterFieldsetFactory implements FactoryInterface
 {

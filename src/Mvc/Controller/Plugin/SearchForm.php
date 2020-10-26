@@ -3,7 +3,7 @@ namespace Search\Mvc\Controller\Plugin;
 
 use Search\Api\Representation\SearchPageRepresentation;
 use Search\View\Helper\SearchForm as SearchFormHelper;
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class SearchForm extends AbstractPlugin
 {
@@ -22,7 +22,7 @@ class SearchForm extends AbstractPlugin
 
     /**
      * @param SearchPageRepresentation|null $searchPage
-     * @return \Zend\Form\Form;
+     * @return \Laminas\Form\Form;
      */
     public function __invoke(SearchPageRepresentation $searchPage = null)
     {

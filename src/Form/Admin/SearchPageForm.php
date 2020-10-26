@@ -32,8 +32,8 @@ namespace Search\Form\Admin;
 
 use Omeka\Api\Manager as ApiManager;
 use Omeka\Form\Element\SiteSelect;
-use Zend\Form\Element;
-use Zend\Form\Form;
+use Laminas\Form\Element;
+use Laminas\Form\Form;
 
 class SearchPageForm extends Form
 {

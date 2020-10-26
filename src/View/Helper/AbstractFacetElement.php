@@ -2,8 +2,8 @@
 
 namespace Search\View\Helper;
 
-use Zend\Mvc\Application;
-use Zend\View\Helper\AbstractHelper;
+use Laminas\Mvc\Application;
+use Laminas\View\Helper\AbstractHelper;
 
 class AbstractFacetElement extends AbstractHelper
 {
@@ -23,7 +23,7 @@ class AbstractFacetElement extends AbstractHelper
     protected $api;
 
     /**
-     * @var \Zend\I18n\View\Helper\Translate}
+     * @var \Laminas\I18n\View\Helper\Translate}
      */
     protected $translate;
 
@@ -80,7 +80,7 @@ class AbstractFacetElement extends AbstractHelper
 
             if ($plugins->get('status')->isSiteRequest()) {
                 $this->siteId = $plugins
-                    ->get('Zend\View\Helper\ViewModel')
+                    ->get('Laminas\View\Helper\ViewModel')
                     ->getRoot()
                     ->getVariable('site')
                     ->id();

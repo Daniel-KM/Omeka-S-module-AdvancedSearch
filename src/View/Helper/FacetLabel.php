@@ -32,8 +32,8 @@ namespace Search\View\Helper;
 
 use Omeka\Api\Manager as ApiManager;
 use Search\Api\Representation\SearchPageRepresentation;
-use Zend\Mvc\Application;
-use Zend\View\Helper\AbstractHelper;
+use Laminas\Mvc\Application;
+use Laminas\View\Helper\AbstractHelper;
 
 class FacetLabel extends AbstractHelper
 {

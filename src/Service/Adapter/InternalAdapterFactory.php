@@ -3,7 +3,7 @@ namespace Search\Service\Adapter;
 
 use Interop\Container\ContainerInterface;
 use Search\Adapter\InternalAdapter;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class InternalAdapterFactory implements FactoryInterface
 {

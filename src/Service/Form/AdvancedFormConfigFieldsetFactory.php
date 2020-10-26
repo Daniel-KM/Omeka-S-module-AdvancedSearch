@@ -31,7 +31,7 @@ namespace Search\Service\Form;
 
 use Interop\Container\ContainerInterface;
 use Search\Form\Admin\AdvancedFormConfigFieldset;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class AdvancedFormConfigFieldsetFactory implements FactoryInterface
 {

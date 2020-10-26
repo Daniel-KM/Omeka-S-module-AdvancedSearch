@@ -9,7 +9,7 @@ use Omeka\Site\BlockLayout\AbstractBlockLayout;
 use Omeka\Stdlib\ErrorStore;
 use Search\Api\Representation\SearchPageRepresentation;
 use Search\Response;
-use Zend\View\Renderer\PhpRenderer;
+use Laminas\View\Renderer\PhpRenderer;
 
 class SearchingForm extends AbstractBlockLayout
 {
@@ -78,7 +78,7 @@ class SearchingForm extends AbstractBlockLayout
             }
         }
 
-        /** @var \Zend\Form\Form $form */
+        /** @var \Laminas\Form\Form $form */
         $form = $view->searchForm($searchPage)->getForm();
         if (!$form) {
             return '';
@@ -138,13 +138,13 @@ class SearchingForm extends AbstractBlockLayout
      * @todo Factorize with \Search\Controller\IndexController::getSearchRequest()
      *
      * @param SearchPageRepresentation $searchPage
-     * @param \Zend\Form\Form $searchForm
+     * @param \Laminas\Form\Form $searchForm
      * @param array $request
      * @return array|bool
      */
     protected function validateSearchRequest(
         SearchPageRepresentation $searchPage,
-        \Zend\Form\Form $form,
+        \Laminas\Form\Form $form,
         array $request
     ) {
         // Only validate the csrf.

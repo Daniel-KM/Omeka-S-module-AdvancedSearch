@@ -3,8 +3,8 @@ namespace Search\Form\Admin;
 
 use Omeka\Api\Manager as ApiManager;
 use Search\Form\Element\OptionalSelect;
-use Zend\Form\Element;
-use Zend\Form\Fieldset;
+use Laminas\Form\Element;
+use Laminas\Form\Fieldset;
 
 class ApiFormConfigFieldset extends Fieldset
 {

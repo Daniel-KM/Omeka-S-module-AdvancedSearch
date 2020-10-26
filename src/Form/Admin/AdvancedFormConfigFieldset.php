@@ -29,8 +29,8 @@
 
 namespace Search\Form\Admin;
 
-use Zend\Form\Element;
-use Zend\Form\Fieldset;
+use Laminas\Form\Element;
+use Laminas\Form\Fieldset;
 
 class AdvancedFormConfigFieldset extends Fieldset
 {

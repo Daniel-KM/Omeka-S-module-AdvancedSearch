@@ -32,7 +32,7 @@ namespace Search\Service\ViewHelper;
 
 use Interop\Container\ContainerInterface;
 use Search\View\Helper\FacetLink;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class FacetLinkFactory implements FactoryInterface
 {

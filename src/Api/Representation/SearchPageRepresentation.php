@@ -149,7 +149,7 @@ class SearchPageRepresentation extends AbstractEntityRepresentation
     }
 
     /**
-     * @return \Zend\Form\Form|null
+     * @return \Laminas\Form\Form|null
      */
     public function form()
     {

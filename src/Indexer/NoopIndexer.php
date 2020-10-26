@@ -5,8 +5,8 @@ namespace Search\Indexer;
 use Omeka\Entity\Resource;
 use Search\Api\Representation\SearchIndexRepresentation;
 use Search\Query;
-use Zend\Log\LoggerAwareTrait;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\Log\LoggerAwareTrait;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 class NoopIndexer implements IndexerInterface
 {

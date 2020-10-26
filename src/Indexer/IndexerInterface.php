@@ -33,8 +33,8 @@ namespace Search\Indexer;
 use Omeka\Entity\Resource;
 use Search\Api\Representation\SearchIndexRepresentation;
 use Search\Query;
-use Zend\Log\LoggerAwareInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Laminas\Log\LoggerAwareInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 interface IndexerInterface extends LoggerAwareInterface
 {

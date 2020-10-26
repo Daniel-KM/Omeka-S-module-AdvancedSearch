@@ -3,7 +3,7 @@ namespace Search\Service\ViewHelper;
 
 use Interop\Container\ContainerInterface;
 use Search\View\Helper\ApiSearch;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ApiSearchFactory implements FactoryInterface
 {

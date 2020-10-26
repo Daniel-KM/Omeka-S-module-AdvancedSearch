@@ -16,10 +16,10 @@ use Search\FormAdapter\ApiFormAdapter;
 use Search\Querier\Exception\QuerierException;
 use Search\Query;
 use Search\Response as SearchResponse;
-use Zend\I18n\Translator\TranslatorInterface;
-use Zend\Log\LoggerInterface;
-use Zend\Mvc\Controller\Plugin\AbstractPlugin;
-use Zend\ServiceManager\Exception\ServiceNotFoundException;
+use Laminas\I18n\Translator\TranslatorInterface;
+use Laminas\Log\LoggerInterface;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
 
 /**
  * Do an api search via the default search index.

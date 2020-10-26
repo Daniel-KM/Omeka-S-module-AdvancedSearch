@@ -1066,7 +1066,7 @@ class Module extends AbstractModule
         $expr = $qb->expr();
 
         $escape = function ($string) {
-            return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $string);
+            return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], (string) $string);
         };
 
         foreach ($query['property'] as $queryRow) {
@@ -1082,7 +1082,7 @@ class Module extends AbstractModule
             $joiner = $queryRow['joiner'] ?? '';
             $value = $queryRow['text'] ?? '';
 
-            if (!strlen($value) && $queryType !== 'nex' && $queryType !== 'ex') {
+            if (!strlen((string) $value) && $queryType !== 'nex' && $queryType !== 'ex') {
                 continue;
             }
 
@@ -1131,7 +1131,7 @@ class Module extends AbstractModule
                     // no break.
                 case 'list':
                     $list = is_array($value) ? $value : explode("\n", $value);
-                    $list = array_filter(array_map('trim', $list), 'strlen');
+                    $list = array_filter(array_map('trim', array_map('strval', $list)), 'strlen');
                     if (empty($list)) {
                         continue 2;
                     }

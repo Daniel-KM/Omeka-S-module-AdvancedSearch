@@ -20,6 +20,7 @@ Added fields are:
 - media by item set
 
 Furthermore, it adds new search query type for properties:
+
 - start with
 - end with
 - in list (via api only).
@@ -97,6 +98,7 @@ Copyright
 
 [Advanced Search Plus]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearchPlus
 [Omeka S]: https://omeka.org/s
+[AdvancedSearchPlus.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearchPlus/-/releases
 [installing a module]: http://omeka.org/s/docs/user-manual/modules/#installing-modules
 [module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearchPlus/-/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html

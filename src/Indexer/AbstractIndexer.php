@@ -78,12 +78,7 @@ abstract class AbstractIndexer implements IndexerInterface
     protected function getSetting($name, $default = null)
     {
         $settings = $this->index->settings();
-
-        if (isset($settings[$name])) {
-            return $settings[$name];
-        }
-
-        return $default;
+        return $settings[$name] ?? $default;
     }
 
     /**
@@ -96,11 +91,6 @@ abstract class AbstractIndexer implements IndexerInterface
     protected function getAdapterSetting($name, $default = null)
     {
         $adapterSettings = $this->getSetting('adapter', []);
-
-        if (isset($adapterSettings[$name])) {
-            return $adapterSettings[$name];
-        }
-
-        return $default;
+        return $adapterSettings[$name] ?? $default;
     }
 }

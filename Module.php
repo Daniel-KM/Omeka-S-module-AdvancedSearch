@@ -515,7 +515,7 @@ class Module extends AbstractModule
 
         $data = $this->prepareDataToPopulate($settings, $settingsType);
         if (is_null($data)) {
-            return null;
+            return;
         }
 
         $space = 'search_module';
@@ -525,7 +525,6 @@ class Module extends AbstractModule
         $form = $event->getTarget();
         $form->add($fieldset);
         $form->get($space)->populateValues($data);
-        return $form;
     }
 
     /**

@@ -209,7 +209,7 @@ your archives regularly so you can roll back if needed.
 Troubleshooting
 ---------------
 
-See online issues on the [module issues] page on GitHub.
+See online issues on the [module issues] page on GitLab.
 
 
 License
@@ -258,13 +258,13 @@ were done for various projects.
 [Search]: https://github.com/BibLibre/Omeka-S-module-Search
 [Omeka S]: https://omeka.org/s
 [Psl Search Form]: https://github.com/BibLibre/Omeka-S-module-PslSearchForm
-[Solr]: https://github.com/Daniel-KM/Omeka-S-module-SearchSolr
-[SearchSolr]: https://github.com/Daniel-KM/Omeka-S-module-SearchSolr
+[Solr]: https://gitlab.com/Daniel-KM/Omeka-S-module-SearchSolr
+[SearchSolr]: https://gitlab.com/Daniel-KM/Omeka-S-module-SearchSolr
 [digital library of PSL]: https://bibnum.explore.univ-psl.fr
 [Installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
 [this patch]: https://github.com/omeka/omeka-s/pull/1519/files
 [jQueryUI]: https://github.com/biblibre/omeka-s-module-jQueryUI
-[Reference]: https://github.com/Daniel-KM/Omeka-S-module-Reference
+[Reference]: https://gitlab.com/Daniel-KM/Omeka-S-module-Reference
 [Solr of Biblibre]: https://github.com/BibLibre/Omeka-S-module-Solr
 [Browse preview]: https://omeka.org/s/docs/user-manual/sites/site_pages/#browse-preview
 [module issues]: https://github.com/BibLibre/Omeka-S-module-Search/issues
@@ -274,4 +274,4 @@ were done for various projects.
 [OSI]: http://opensource.org
 [BibLibre]: https://github.com/biblibre
 [GitLab]: https://gitlab.com/Daniel-KM
-[Daniel-KM]: https://github.com/Daniel-KM "Daniel Berthereau"
+[Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"

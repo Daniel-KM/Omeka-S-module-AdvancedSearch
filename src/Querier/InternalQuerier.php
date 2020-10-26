@@ -456,7 +456,6 @@ class InternalQuerier extends AbstractQuerier
                 'lang' => false,
                 'include_without_meta' => false,
                 'output' => 'associative',
-                'is_api' => true,
             ];
 
             $values = $references

@@ -45,6 +45,7 @@ class ApiFormConfigFieldset extends Fieldset
                 'label' => 'Internal identifier', // @translate
                 'value_options' => $fieldOptions,
                 'empty_option' => 'None', // @translate
+                'use_hidden_element' => true,
             ],
             'attributes' => [
                 'required' => false,
@@ -59,6 +60,7 @@ class ApiFormConfigFieldset extends Fieldset
                 'label' => 'Is Public', // @translate
                 'value_options' => $fieldOptions,
                 'empty_option' => 'None', // @translate
+                'use_hidden_element' => true,
             ],
             'attributes' => [
                 'required' => false,
@@ -73,6 +75,7 @@ class ApiFormConfigFieldset extends Fieldset
                 'label' => 'Owner id', // @translate
                 'value_options' => $fieldOptions,
                 'empty_option' => 'None', // @translate
+                'use_hidden_element' => true,
             ],
             'attributes' => [
                 'required' => false,
@@ -87,6 +90,7 @@ class ApiFormConfigFieldset extends Fieldset
                 'label' => 'Created', // @translate
                 'value_options' => $fieldOptions,
                 'empty_option' => 'None', // @translate
+                'use_hidden_element' => true,
             ],
             'attributes' => [
                 'required' => false,
@@ -101,6 +105,7 @@ class ApiFormConfigFieldset extends Fieldset
                 'label' => 'Modified', // @translate
                 'value_options' => $fieldOptions,
                 'empty_option' => 'None', // @translate
+                'use_hidden_element' => true,
             ],
             'attributes' => [
                 'required' => false,
@@ -115,6 +120,7 @@ class ApiFormConfigFieldset extends Fieldset
                 'label' => 'Resource class label', // @translate
                 'value_options' => $fieldOptions,
                 'empty_option' => 'None', // @translate
+                'use_hidden_element' => true,
             ],
             'attributes' => [
                 'required' => false,
@@ -129,6 +135,7 @@ class ApiFormConfigFieldset extends Fieldset
                 'label' => 'Resource class id', // @translate
                 'value_options' => $fieldOptions,
                 'empty_option' => 'None', // @translate
+                'use_hidden_element' => true,
             ],
             'attributes' => [
                 'required' => false,
@@ -143,6 +150,7 @@ class ApiFormConfigFieldset extends Fieldset
                 'label' => 'Resource template id', // @translate
                 'value_options' => $fieldOptions,
                 'empty_option' => 'None', // @translate
+                'use_hidden_element' => true,
             ],
             'attributes' => [
                 'required' => false,
@@ -157,6 +165,7 @@ class ApiFormConfigFieldset extends Fieldset
                 'label' => 'Item set id', // @translate
                 'value_options' => $fieldOptions,
                 'empty_option' => 'None', // @translate
+                'use_hidden_element' => true,
             ],
             'attributes' => [
                 'required' => false,
@@ -171,6 +180,7 @@ class ApiFormConfigFieldset extends Fieldset
                 'label' => 'Site id', // @translate
                 'value_options' => $fieldOptions,
                 'empty_option' => 'None', // @translate
+                'use_hidden_element' => true,
             ],
             'attributes' => [
                 'required' => false,
@@ -185,6 +195,7 @@ class ApiFormConfigFieldset extends Fieldset
                 'label' => 'Is open', // @translate
                 'value_options' => $fieldOptions,
                 'empty_option' => 'None', // @translate
+                'use_hidden_element' => true,
             ],
             'attributes' => [
                 'required' => false,
@@ -212,6 +223,7 @@ class ApiFormConfigFieldset extends Fieldset
                     'label' => $property->term(),
                     'value_options' => $fieldOptions,
                     'empty_option' => 'None', // @translate
+                    'use_hidden_element' => true,
                 ],
                 'attributes' => [
                     'required' => false,

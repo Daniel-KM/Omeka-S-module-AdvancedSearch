@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Search\Api;
 
 // use Search\Mvc\Controller\Plugin\ApiSearch;
@@ -43,7 +43,7 @@ class ManagerDelegator extends \Omeka\Api\Manager
     /**
      * @param ControllerPluginManager $controllerPlugins
      */
-    public function setControllerPlugins(ControllerPluginManager $controllerPlugins)
+    public function setControllerPlugins(ControllerPluginManager $controllerPlugins): void
     {
         $this->controllerPlugins = $controllerPlugins;
     }

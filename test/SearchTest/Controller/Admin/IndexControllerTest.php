@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace SearchTest\Controller\Admin;
 
@@ -8,7 +8,7 @@ use SearchTest\Controller\SearchControllerTestCase;
 
 class IndexControllerTest extends SearchControllerTestCase
 {
-    public function testIndexAction()
+    public function testIndexAction(): void
     {
         $this->dispatch('/admin/search-manager');
         $this->assertResponseStatusCode(200);

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * Copyright Daniel Berthereau 2018-2020
@@ -29,12 +29,12 @@
 
 namespace Search\Form;
 
+use Laminas\Form\Element;
+use Laminas\Form\Fieldset;
 use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Form\Element\ResourceClassSelect;
 use Omeka\Form\Element\ResourceTemplateSelect;
 use Omeka\View\Helper\Setting;
-use Laminas\Form\Element;
-use Laminas\Form\Fieldset;
 
 class AdvancedForm extends BasicForm
 {
@@ -50,7 +50,7 @@ class AdvancedForm extends BasicForm
 
     protected $formElementManager;
 
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -303,7 +303,7 @@ class AdvancedForm extends BasicForm
      *
      * This method is used for forms that extend this form.
      */
-    protected function appendSpecificFields()
+    protected function appendSpecificFields(): void
     {
     }
 

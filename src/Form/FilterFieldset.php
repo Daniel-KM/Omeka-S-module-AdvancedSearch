@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * Copyright Daniel Berthereau 2018-2020
@@ -34,7 +34,7 @@ use Laminas\Form\Fieldset;
 
 class FilterFieldset extends Fieldset
 {
-    public function init()
+    public function init(): void
     {
         $fieldOptions = $this->getFieldOptions();
         if (empty($fieldOptions)) {

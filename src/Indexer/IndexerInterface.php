@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * Copyright BibLibre, 2016
@@ -30,11 +30,11 @@
 
 namespace Search\Indexer;
 
+use Laminas\Log\LoggerAwareInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 use Omeka\Entity\Resource;
 use Search\Api\Representation\SearchIndexRepresentation;
 use Search\Query;
-use Laminas\Log\LoggerAwareInterface;
-use Laminas\ServiceManager\ServiceLocatorInterface;
 
 interface IndexerInterface extends LoggerAwareInterface
 {

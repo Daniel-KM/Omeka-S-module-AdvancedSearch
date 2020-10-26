@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 namespace Search\Service;
 
 use Interop\Container\ContainerInterface;
-use Search\Api\ManagerDelegator;
 use Laminas\ServiceManager\Factory\DelegatorFactoryInterface;
+use Search\Api\ManagerDelegator;
 
 class ApiManagerDelegatorFactory implements DelegatorFactoryInterface
 {

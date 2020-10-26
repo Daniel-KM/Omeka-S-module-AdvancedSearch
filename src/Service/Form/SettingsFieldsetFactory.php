@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 namespace Search\Service\Form;
 
 use Interop\Container\ContainerInterface;
-use Search\Form\SettingsFieldset;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Search\Form\SettingsFieldset;
 
 class SettingsFieldsetFactory implements FactoryInterface
 {

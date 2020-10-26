@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Search\Test\Indexer;
 
@@ -13,19 +13,19 @@ class TestIndexer extends AbstractIndexer
         return true;
     }
 
-    public function clearIndex(Query $query = null)
+    public function clearIndex(Query $query = null): void
     {
     }
 
-    public function indexResource(Resource $resource)
+    public function indexResource(Resource $resource): void
     {
     }
 
-    public function indexResources(array $resources)
+    public function indexResources(array $resources): void
     {
     }
 
-    public function deleteResource($resourceName, $id)
+    public function deleteResource($resourceName, $id): void
     {
     }
 }

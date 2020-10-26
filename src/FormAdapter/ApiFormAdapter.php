@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 namespace Search\FormAdapter;
 
 use Doctrine\DBAL\Connection;
@@ -79,7 +79,7 @@ class ApiFormAdapter implements FormAdapterInterface
      * @param array $request
      * @param array $formSettings
      */
-    protected function buildMetadataQuery(Query $query, array $request, array $formSettings)
+    protected function buildMetadataQuery(Query $query, array $request, array $formSettings): void
     {
         if (empty($formSettings['metadata'])) {
             return;
@@ -144,7 +144,7 @@ class ApiFormAdapter implements FormAdapterInterface
      * @param array $request
      * @param array $formSettings
      */
-    protected function buildPropertyQuery(Query $query, array $request, array $formSettings)
+    protected function buildPropertyQuery(Query $query, array $request, array $formSettings): void
     {
         if (!isset($request['property']) || !is_array($request['property']) || empty($formSettings['properties'])) {
             return;
@@ -259,7 +259,7 @@ SQL;
      * @param string $filterName
      * @param string|array|int $value
      */
-    protected function addTextFilterToQuery(Query $query, $filterName, $value)
+    protected function addTextFilterToQuery(Query $query, $filterName, $value): void
     {
         $dataValues = trim(is_array($value) ? array_shift($value) : $value);
         if (strlen($dataValues)) {
@@ -274,7 +274,7 @@ SQL;
      * @param string $filterName
      * @param string|array|int $value
      */
-    protected function addIntegerFilterToQuery(Query $query, $filterName, $value)
+    protected function addIntegerFilterToQuery(Query $query, $filterName, $value): void
     {
         $dataValues = (int) (is_array($value) ? array_shift($value) : $value);
         if ($dataValues) {
@@ -289,7 +289,7 @@ SQL;
      * @param string $filterName
      * @param string|array|int $value
      */
-    protected function addTextsFilterToQuery(Query $query, $filterName, $value)
+    protected function addTextsFilterToQuery(Query $query, $filterName, $value): void
     {
         $dataValues = is_array($value) ? $value : [$value];
         $dataValues = array_filter(array_map('trim', $dataValues), 'strlen');
@@ -305,7 +305,7 @@ SQL;
      * @param string $filterName
      * @param string|array|int $value
      */
-    protected function addIntegersFilterToQuery(Query $query, $filterName, $value)
+    protected function addIntegersFilterToQuery(Query $query, $filterName, $value): void
     {
         $dataValues = is_array($value) ? $value : [$value];
         $dataValues = array_filter(array_map('intval', $dataValues));

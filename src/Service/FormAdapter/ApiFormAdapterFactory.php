@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 namespace Search\Service\FormAdapter;
 
 use Interop\Container\ContainerInterface;
-use Search\FormAdapter\ApiFormAdapter;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Search\FormAdapter\ApiFormAdapter;
 
 class ApiFormAdapterFactory implements FactoryInterface
 {

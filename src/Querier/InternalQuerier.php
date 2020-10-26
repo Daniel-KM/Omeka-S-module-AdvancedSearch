@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Search\Querier;
 
@@ -196,7 +196,7 @@ class InternalQuerier extends AbstractQuerier
         return true;
     }
 
-    protected function mainQuery()
+    protected function mainQuery(): void
     {
         $q = $this->query->getQuery();
         if (!strlen($q)) {
@@ -240,7 +240,7 @@ class InternalQuerier extends AbstractQuerier
      *
      * @todo Add support of grouped query (mutliple properties and/or multiple other properties).
      */
-    protected function mainQueryWithExcludedFields()
+    protected function mainQueryWithExcludedFields(): void
     {
         $q = $this->query->getQuery();
 
@@ -290,7 +290,7 @@ class InternalQuerier extends AbstractQuerier
      *
      * Note: when a facet is selected, it is managed like a filter.
      */
-    protected function filterQuery()
+    protected function filterQuery(): void
     {
         // Don't use excluded fields for filters.
         $filters = $this->query->getFilters();
@@ -410,7 +410,7 @@ class InternalQuerier extends AbstractQuerier
         }
     }
 
-    protected function facetResponse(ArrayObject $facetData)
+    protected function facetResponse(ArrayObject $facetData): void
     {
         /** @var \Reference\Mvc\Controller\Plugin\References $references */
         $references = $this->getServiceLocator()->get('ControllerPluginManager')->get('references');

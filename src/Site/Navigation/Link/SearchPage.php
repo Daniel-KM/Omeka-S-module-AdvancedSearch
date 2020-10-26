@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * Copyright BibLibre, 2016
  * Copyright Daniel Berthereau, 2018

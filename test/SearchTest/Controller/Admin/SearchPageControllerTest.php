@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace SearchTest\Controller\Admin;
 
@@ -8,7 +8,7 @@ use SearchTest\Controller\SearchControllerTestCase;
 
 class SearchPageControllerTest extends SearchControllerTestCase
 {
-    public function testAddGetAction()
+    public function testAddGetAction(): void
     {
         $this->dispatch('/admin/search-manager/page/add');
         $this->assertResponseStatusCode(200);
@@ -19,7 +19,7 @@ class SearchPageControllerTest extends SearchControllerTestCase
         $this->assertQuery('select[name="o:form"]');
     }
 
-    public function testAddPostAction()
+    public function testAddPostAction(): void
     {
         $forms = $this->getServiceLocator()->get('FormElementManager');
         $form = $forms->get(\Search\Form\Admin\SearchPageForm::class);
@@ -43,7 +43,7 @@ class SearchPageControllerTest extends SearchControllerTestCase
         $this->assertRedirectTo($searchPage->adminUrl('configure'));
     }
 
-    public function testConfigureGetAction()
+    public function testConfigureGetAction(): void
     {
         $this->dispatch($this->searchPage->adminUrl('configure'));
         $this->assertResponseStatusCode(200);
@@ -52,7 +52,7 @@ class SearchPageControllerTest extends SearchControllerTestCase
         $this->assertQueryContentContains('h2', 'Sort fields');
     }
 
-    public function testConfigurePostAction()
+    public function testConfigurePostAction(): void
     {
         $forms = $this->getServiceLocator()->get('FormElementManager');
         $form = $forms->get(\Search\Form\Admin\SearchPageConfigureForm::class, [

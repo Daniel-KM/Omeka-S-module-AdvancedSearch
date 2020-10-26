@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 namespace Search\Service\Adapter;
 
 use Interop\Container\ContainerInterface;
-use Search\Adapter\InternalAdapter;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Search\Adapter\InternalAdapter;
 
 class InternalAdapterFactory implements FactoryInterface
 {

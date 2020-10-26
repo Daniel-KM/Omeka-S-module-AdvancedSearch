@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * Copyright BibLibre, 2016-2017
@@ -30,10 +30,10 @@
 
 namespace Search\View\Helper;
 
-use Omeka\Api\Manager as ApiManager;
-use Search\Api\Representation\SearchPageRepresentation;
 use Laminas\Mvc\Application;
 use Laminas\View\Helper\AbstractHelper;
+use Omeka\Api\Manager as ApiManager;
+use Search\Api\Representation\SearchPageRepresentation;
 
 class FacetLabel extends AbstractHelper
 {

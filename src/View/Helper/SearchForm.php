@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Search\View\Helper;
 
-use Search\Api\Representation\SearchPageRepresentation;
 use Laminas\Form\Form;
 use Laminas\View\Helper\AbstractHelper;
+use Search\Api\Representation\SearchPageRepresentation;
 
 class SearchForm extends AbstractHelper
 {
@@ -47,7 +47,7 @@ class SearchForm extends AbstractHelper
      * @param string $partial Specific partial for the search form.
      * @param bool $skipFormAction Don't set form action, so use the current page.
      */
-    protected function initSearchForm(SearchPageRepresentation $searchPage = null, $partial = null, $skipFormAction = false)
+    protected function initSearchForm(SearchPageRepresentation $searchPage = null, $partial = null, $skipFormAction = false): void
     {
         $view = $this->getView();
         $isAdmin = $view->status()->isAdminRequest();

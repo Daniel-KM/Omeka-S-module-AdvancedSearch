@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 namespace Search\Service\ControllerPlugin;
 
 use Interop\Container\ContainerInterface;
-use Search\Mvc\Controller\Plugin\TotalJobs;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Search\Mvc\Controller\Plugin\TotalJobs;
 
 class TotalJobsFactory implements FactoryInterface
 {

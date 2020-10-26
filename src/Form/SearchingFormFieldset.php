@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 namespace Search\Form;
 
-use Omeka\View\Helper\Api;
-use Omeka\View\Helper\Setting as SiteSetting;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
+use Omeka\View\Helper\Api;
+use Omeka\View\Helper\Setting as SiteSetting;
 
 class SearchingFormFieldset extends Fieldset
 {
@@ -13,7 +13,7 @@ class SearchingFormFieldset extends Fieldset
      */
     protected $api;
 
-    public function init()
+    public function init(): void
     {
         $searchPages = $this->searchPages();
 

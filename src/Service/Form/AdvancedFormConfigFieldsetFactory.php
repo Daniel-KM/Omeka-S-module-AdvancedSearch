@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * Copyright Daniel Berthereau 2018-2020
@@ -30,8 +30,8 @@
 namespace Search\Service\Form;
 
 use Interop\Container\ContainerInterface;
-use Search\Form\Admin\AdvancedFormConfigFieldset;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Search\Form\Admin\AdvancedFormConfigFieldset;
 
 class AdvancedFormConfigFieldsetFactory implements FactoryInterface
 {

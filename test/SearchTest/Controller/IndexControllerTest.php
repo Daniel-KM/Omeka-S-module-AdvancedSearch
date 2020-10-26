@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace SearchTest\Controller;
 
@@ -6,7 +6,7 @@ require_once __DIR__ . '/SearchControllerTestCase.php';
 
 class IndexControllerTest extends SearchControllerTestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -24,14 +24,14 @@ class IndexControllerTest extends SearchControllerTestCase
         $this->resetApplication();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 
         $this->api()->delete('sites', $this->site->id());
     }
 
-    public function testSearchAction()
+    public function testSearchAction(): void
     {
         $this->dispatch('/s/test/test/search');
         $this->assertResponseStatusCode(200);
@@ -40,7 +40,7 @@ class IndexControllerTest extends SearchControllerTestCase
         $this->assertNotQuery('.search-results');
     }
 
-    public function testSearchWithParamsAction()
+    public function testSearchWithParamsAction(): void
     {
         $this->dispatch('/s/test/test/search', 'GET', ['q' => 'test']);
         $this->assertResponseStatusCode(200);

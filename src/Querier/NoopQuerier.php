@@ -1,12 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Search\Querier;
 
+use Laminas\Log\LoggerAwareTrait;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 use Search\Api\Representation\SearchIndexRepresentation;
 use Search\Query;
 use Search\Response;
-use Laminas\Log\LoggerAwareTrait;
-use Laminas\ServiceManager\ServiceLocatorInterface;
 
 /**
  * Querier that doesn't answer anything.

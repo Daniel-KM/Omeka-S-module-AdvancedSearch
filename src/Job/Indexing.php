@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * Copyright BibLibre, 2016
  * Copyright Daniel Berthereau, 2018
@@ -42,7 +42,7 @@ class Indexing extends AbstractJob
      */
     protected $logger;
 
-    public function perform()
+    public function perform(): void
     {
         /**
          * @var \Omeka\Api\Manager $api

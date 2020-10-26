@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 namespace Search\Service\Form;
 
-use Search\Form\Admin\ApiFormConfigFieldset;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Search\Form\Admin\ApiFormConfigFieldset;
 
 class ApiFormConfigFieldsetFactory implements FactoryInterface
 {

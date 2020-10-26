@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * Copyright BibLibre, 2016-2017
@@ -30,8 +30,8 @@
 
 namespace Search\Adapter;
 
-use Search\Api\Representation\SearchIndexRepresentation;
 use Laminas\ServiceManager\ServiceLocatorInterface;
+use Search\Api\Representation\SearchIndexRepresentation;
 
 interface AdapterInterface
 {

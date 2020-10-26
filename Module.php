@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * Copyright BibLibre, 2016-2017
@@ -37,14 +37,14 @@ if (!class_exists(\Generic\AbstractModule::class)) {
 }
 
 use Generic\AbstractModule;
-use Omeka\Entity\Resource;
-use Omeka\Mvc\Controller\Plugin\Messenger;
-use Omeka\Stdlib\Message;
-use Search\Indexer\IndexerInterface;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
 use Laminas\ModuleManager\ModuleManager;
 use Laminas\Mvc\MvcEvent;
+use Omeka\Entity\Resource;
+use Omeka\Mvc\Controller\Plugin\Messenger;
+use Omeka\Stdlib\Message;
+use Search\Indexer\IndexerInterface;
 
 class Module extends AbstractModule
 {
@@ -55,7 +55,7 @@ class Module extends AbstractModule
      */
     protected $isBatchUpdate;
 
-    public function init(ModuleManager $moduleManager)
+    public function init(ModuleManager $moduleManager): void
     {
         /** @var \Laminas\ModuleManager\Listener\ServiceListenerInterface $serviceListerner */
         $serviceListener = $moduleManager->getEvent()->getParam('ServiceManager')
@@ -75,14 +75,14 @@ class Module extends AbstractModule
         );
     }
 
-    public function onBootstrap(MvcEvent $event)
+    public function onBootstrap(MvcEvent $event): void
     {
         parent::onBootstrap($event);
         $this->addAclRules();
         $this->addRoutes();
     }
 
-    protected function postInstall()
+    protected function postInstall(): void
     {
         $messenger = new Messenger;
         $optionalModule = 'jQueryUI';
@@ -97,7 +97,7 @@ class Module extends AbstractModule
         $this->installResources();
     }
 
-    public function attachListeners(SharedEventManagerInterface $sharedEventManager)
+    public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
     {
         $sharedEventManager->attach(
             '*',
@@ -216,7 +216,7 @@ class Module extends AbstractModule
         );
     }
 
-    protected function addAclRules()
+    protected function addAclRules(): void
     {
         $acl = $this->getServiceLocator()->get('Omeka\Acl');
         $acl
@@ -248,7 +248,7 @@ class Module extends AbstractModule
             );
     }
 
-    protected function addRoutes()
+    protected function addRoutes(): void
     {
         $services = $this->getServiceLocator();
 
@@ -319,7 +319,7 @@ class Module extends AbstractModule
         }
     }
 
-    public function apiSearchQueryResourceClass(Event $event)
+    public function apiSearchQueryResourceClass(Event $event): void
     {
         // TODO Check if version >= 3.1.2.8.
         if ($this->isModuleActive('Next')) {
@@ -347,7 +347,7 @@ class Module extends AbstractModule
         }
     }
 
-    public function formVocabMemberSelectQuery(Event $event)
+    public function formVocabMemberSelectQuery(Event $event): void
     {
         // TODO Check if version >= 3.1.2.8.
         if ($this->isModuleActive('Next')) {
@@ -384,14 +384,14 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function preBatchUpdateSearchIndex(Event $event)
+    public function preBatchUpdateSearchIndex(Event $event): void
     {
         // This is a background job if there is no route match.
         $routeMatch = $this->getServiceLocator()->get('application')->getMvcEvent()->getRouteMatch();
         $this->isBatchUpdate = !empty($routeMatch);
     }
 
-    public function postBatchUpdateSearchIndex(Event $event)
+    public function postBatchUpdateSearchIndex(Event $event): void
     {
         if (!$this->isBatchUpdate) {
             return;
@@ -431,7 +431,7 @@ class Module extends AbstractModule
         $this->isBatchUpdate = false;
     }
 
-    public function preUpdateSearchIndexMedia(Event $event)
+    public function preUpdateSearchIndexMedia(Event $event): void
     {
         $api = $this->getServiceLocator()->get('Omeka\ApiManager');
         $request = $event->getParam('request');
@@ -441,7 +441,7 @@ class Module extends AbstractModule
         $request->setContent($data);
     }
 
-    public function updateSearchIndex(Event $event)
+    public function updateSearchIndex(Event $event): void
     {
         if ($this->isBatchUpdate) {
             return;
@@ -469,7 +469,7 @@ class Module extends AbstractModule
         }
     }
 
-    public function updateSearchIndexMedia(Event $event)
+    public function updateSearchIndexMedia(Event $event): void
     {
         $serviceLocator = $this->getServiceLocator();
         $api = $serviceLocator->get('Omeka\ApiManager');
@@ -498,7 +498,7 @@ class Module extends AbstractModule
      * @param string $resourceName
      * @param int $id
      */
-    protected function deleteIndexResource(IndexerInterface $indexer, $resourceName, $id)
+    protected function deleteIndexResource(IndexerInterface $indexer, $resourceName, $id): void
     {
         try {
             $indexer->deleteResource($resourceName, $id);
@@ -523,7 +523,7 @@ class Module extends AbstractModule
      * @param IndexerInterface $indexer
      * @param Resource $resource
      */
-    protected function updateIndexResource(IndexerInterface $indexer, Resource $resource)
+    protected function updateIndexResource(IndexerInterface $indexer, Resource $resource): void
     {
         try {
             $indexer->indexResource($resource);
@@ -542,7 +542,7 @@ class Module extends AbstractModule
         }
     }
 
-    public function handleSiteSettings(Event $event)
+    public function handleSiteSettings(Event $event): void
     {
         // This is an exception, because there is already a fieldset named
         // "search" in the core, so it should be named "search_module".
@@ -570,7 +570,7 @@ class Module extends AbstractModule
         $form->get($space)->populateValues($data);
     }
 
-    public function handleMainSettingsFilters(Event $event)
+    public function handleMainSettingsFilters(Event $event): void
     {
         $event->getParam('inputFilter')->get('search')
             ->add([
@@ -587,7 +587,7 @@ class Module extends AbstractModule
             ]);
     }
 
-    public function handleSiteSettingsFilters(Event $event)
+    public function handleSiteSettingsFilters(Event $event): void
     {
         // Key "search_module" is used to avoid to override core site settings.
         $event->getParam('inputFilter')->get('search_module')
@@ -606,7 +606,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function addHeaders(Event $event)
+    public function addHeaders(Event $event): void
     {
         // The admin search field is added via a js hack, because the admin
         // layout doesn't use a partial or a trigger for the sidebar.
@@ -662,7 +662,7 @@ class Module extends AbstractModule
         $view->partial($partialHeaders);
     }
 
-    protected function installResources()
+    protected function installResources(): void
     {
         $services = $this->getServiceLocator();
 

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * Copyright BibLibre, 2016
@@ -31,13 +31,13 @@
 namespace Search\Controller\Admin;
 
 use Doctrine\ORM\EntityManager;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\ViewModel;
 use Omeka\Form\ConfirmForm;
 use Omeka\Stdlib\Message;
 use Search\Adapter\Manager as SearchAdapterManager;
-use Search\Form\Admin\SearchIndexForm;
 use Search\Form\Admin\SearchIndexConfigureForm;
-use Laminas\Mvc\Controller\AbstractActionController;
-use Laminas\View\Model\ViewModel;
+use Search\Form\Admin\SearchIndexForm;
 
 class SearchIndexController extends AbstractActionController
 {

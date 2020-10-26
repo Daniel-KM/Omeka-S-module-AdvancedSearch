@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 namespace Search\Form;
 
-use Omeka\View\Helper\Api;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
+use Omeka\View\Helper\Api;
 
 class SettingsFieldset extends Fieldset
 {
@@ -14,7 +14,7 @@ class SettingsFieldset extends Fieldset
 
     protected $label = 'Search (admin board)'; // @translate
 
-    public function init()
+    public function init(): void
     {
         /** @var \Search\Api\Representation\SearchPageRepresentation[] $pages */
         $pages = $this->api->search('search_pages')->getContent();

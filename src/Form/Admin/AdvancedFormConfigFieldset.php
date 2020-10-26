@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * Copyright Daniel Berthereau 2018-2020
@@ -34,7 +34,7 @@ use Laminas\Form\Fieldset;
 
 class AdvancedFormConfigFieldset extends Fieldset
 {
-    public function init()
+    public function init(): void
     {
         $fieldOptions = $this->getFieldsOptions();
 
@@ -268,7 +268,7 @@ class AdvancedFormConfigFieldset extends Fieldset
         return $data;
     }
 
-    public function populateValues($data)
+    public function populateValues($data): void
     {
         $fields = @$data['filters'] ?: [];
         if (is_array($fields)) {

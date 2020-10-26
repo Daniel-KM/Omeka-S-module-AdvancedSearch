@@ -1,10 +1,10 @@
-<?php
+<?php declare(strict_types=1);
 namespace Search\Form\Admin;
 
-use Omeka\Api\Manager as ApiManager;
-use Search\Form\Element\OptionalSelect;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
+use Omeka\Api\Manager as ApiManager;
+use Search\Form\Element\OptionalSelect;
 
 class ApiFormConfigFieldset extends Fieldset
 {
@@ -13,7 +13,7 @@ class ApiFormConfigFieldset extends Fieldset
      */
     protected $api;
 
-    public function init()
+    public function init(): void
     {
         $fieldOptions = $this->getFieldsOptions();
 

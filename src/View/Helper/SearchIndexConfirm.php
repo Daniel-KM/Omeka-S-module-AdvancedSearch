@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 namespace Search\View\Helper;
 
-use Omeka\Form\ConfirmForm;
-use Laminas\View\Helper\AbstractHelper;
 use Laminas\ServiceManager\ServiceLocatorInterface;
+use Laminas\View\Helper\AbstractHelper;
+use Omeka\Form\ConfirmForm;
 
 /**
  * View helper for rendering a confirm partial.

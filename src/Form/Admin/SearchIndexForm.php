@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * Copyright BibLibre, 2016-2017
@@ -37,7 +37,7 @@ class SearchIndexForm extends Form
 {
     protected $searchAdapterManager;
 
-    public function init()
+    public function init(): void
     {
         $this
             ->add([

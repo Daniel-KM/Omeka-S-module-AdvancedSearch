@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace SearchTest\Controller\Admin;
 
@@ -11,7 +11,7 @@ use SearchTest\Controller\SearchControllerTestCase;
 
 class SearchIndexControllerTest extends SearchControllerTestCase
 {
-    public function testAddGetAction()
+    public function testAddGetAction(): void
     {
         $this->dispatch('/admin/search-manager/index/add');
         $this->assertResponseStatusCode(200);
@@ -20,7 +20,7 @@ class SearchIndexControllerTest extends SearchControllerTestCase
         $this->assertQuery('select[name="o:adapter"]');
     }
 
-    public function testAddPostAction()
+    public function testAddPostAction(): void
     {
         $forms = $this->getServiceLocator()->get('FormElementManager');
         $form = $forms->get(\Search\Form\Admin\SearchIndexForm::class);
@@ -38,7 +38,7 @@ class SearchIndexControllerTest extends SearchControllerTestCase
         $this->assertRedirectTo($searchIndex->adminUrl('edit'));
     }
 
-    public function testConfigureGetAction()
+    public function testConfigureGetAction(): void
     {
         $this->dispatch($this->searchIndex->adminUrl('edit'));
         $this->assertResponseStatusCode(200);
@@ -46,7 +46,7 @@ class SearchIndexControllerTest extends SearchControllerTestCase
         $this->assertQuery('input[name="resources[]"]');
     }
 
-    public function testConfigurePostAction()
+    public function testConfigurePostAction(): void
     {
         $forms = $this->getServiceLocator()->get('FormElementManager');
         $form = $forms->get(SearchIndexConfigureForm::class, [
@@ -60,7 +60,7 @@ class SearchIndexControllerTest extends SearchControllerTestCase
         $this->assertRedirectTo('/admin/search-manager');
     }
 
-    public function testIndexAction()
+    public function testIndexAction(): void
     {
         $this->dispatch($this->searchIndex->adminUrl('index'));
 

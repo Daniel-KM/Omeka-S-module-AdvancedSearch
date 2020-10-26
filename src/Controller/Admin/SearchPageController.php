@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * Copyright BibLibre, 2016-2017
@@ -31,16 +31,16 @@
 namespace Search\Controller\Admin;
 
 use Doctrine\ORM\EntityManager;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\ViewModel;
 use Omeka\Form\ConfirmForm;
 use Omeka\Stdlib\Message;
 use Search\Adapter\Manager as SearchAdapterManager;
 use Search\Api\Representation\SearchPageRepresentation;
-use Search\Form\Admin\SearchPageForm;
 use Search\Form\Admin\SearchPageConfigureForm;
 use Search\Form\Admin\SearchPageConfigureSimpleForm;
+use Search\Form\Admin\SearchPageForm;
 use Search\FormAdapter\Manager as SearchFormAdapterManager;
-use Laminas\Mvc\Controller\AbstractActionController;
-use Laminas\View\Model\ViewModel;
 
 class SearchPageController extends AbstractActionController
 {
@@ -393,9 +393,9 @@ class SearchPageController extends AbstractActionController
             || $forceForm === 'simple';
 
         $form = $isSimple
-            /** @var \Search\Form\Admin\SearchPageConfigureSimpleForm $form */
+            /* @var \Search\Form\Admin\SearchPageConfigureSimpleForm $form */
             ? $this->getForm(SearchPageConfigureSimpleForm::class, ['search_page' => $searchPage])
-            /** @var \Search\Form\Admin\SearchPageConfigureForm $form */
+            /* @var \Search\Form\Admin\SearchPageConfigureForm $form */
             : $this->getForm(SearchPageConfigureForm::class, ['search_page' => $searchPage]);
 
         return $form;
@@ -593,7 +593,7 @@ class SearchPageController extends AbstractActionController
         SearchPageRepresentation $searchPage,
         array $newMainSearchPageForSites,
         $availability
-    ) {
+    ): void {
         $searchPageId = $searchPage->id();
         $currentMainSearchPageForSites = $this->sitesWithSearchPage($searchPage);
 

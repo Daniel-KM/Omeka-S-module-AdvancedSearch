@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * Copyright BibLibre, 2016
@@ -35,7 +35,7 @@ use Laminas\Form\Form;
 
 class BasicForm extends Form
 {
-    public function init()
+    public function init(): void
     {
         // Omeka adds a csrf automatically in \Omeka\Form\Initializer\Csrf.
         // Remove the csrf, because it is useless for a search form and the url

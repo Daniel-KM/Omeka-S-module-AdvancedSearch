@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * Copyright BibLibre, 2016
@@ -30,10 +30,10 @@
 
 namespace Search\Querier;
 
-use Search\Api\Representation\SearchIndexRepresentation;
-use Search\Query;
 use Laminas\Log\LoggerAwareTrait;
 use Laminas\ServiceManager\ServiceLocatorInterface;
+use Search\Api\Representation\SearchIndexRepresentation;
+use Search\Query;
 
 abstract class AbstractQuerier implements QuerierInterface
 {

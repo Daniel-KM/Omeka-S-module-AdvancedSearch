@@ -1,14 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 namespace Search\Mvc;
 
-use Laminas\EventManager\EventManagerInterface;
 use Laminas\EventManager\AbstractListenerAggregate;
+use Laminas\EventManager\EventManagerInterface;
 use Laminas\Mvc\MvcEvent;
 use Laminas\Router\Http\RouteMatch;
 
 class MvcListeners extends AbstractListenerAggregate
 {
-    public function attach(EventManagerInterface $events, $priority = 1)
+    public function attach(EventManagerInterface $events, $priority = 1): void
     {
         $this->listeners[] = $events->attach(
             MvcEvent::EVENT_ROUTE,
@@ -23,7 +23,7 @@ class MvcListeners extends AbstractListenerAggregate
      *
      * @param MvcEvent $event
      */
-    public function redirectItemSetToSearch(MvcEvent $event)
+    public function redirectItemSetToSearch(MvcEvent $event): void
     {
         $routeMatch = $event->getRouteMatch();
         $matchedRouteName = $routeMatch->getMatchedRouteName();

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * Copyright BibLibre, 2016-2017
@@ -38,7 +38,7 @@ class SearchPageConfigureForm extends Form
 {
     protected $formElementManager;
 
-    public function init()
+    public function init(): void
     {
         /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
         $searchPage = $this->getOption('search_page');
@@ -199,7 +199,7 @@ class SearchPageConfigureForm extends Form
         return $this;
     }
 
-    protected function addFacetLanguages()
+    protected function addFacetLanguages(): void
     {
         $this
             ->add([
@@ -216,7 +216,7 @@ class SearchPageConfigureForm extends Form
             ]);
     }
 
-    public function populateValues($data, $onlyBase = false)
+    public function populateValues($data, $onlyBase = false): void
     {
         if (empty($data['facet_languages'])) {
             $data['facet_languages'] = '';

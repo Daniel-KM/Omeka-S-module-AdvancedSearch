@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * Copyright BibLibre, 2016
@@ -41,7 +41,7 @@ class SearchIndexConfigureForm extends Form implements TranslatorAwareInterface
 
     protected $apiManager;
 
-    public function init()
+    public function init(): void
     {
         $this
             ->add([

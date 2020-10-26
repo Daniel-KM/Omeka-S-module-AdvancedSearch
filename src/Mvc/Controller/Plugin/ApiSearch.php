@@ -1,25 +1,25 @@
-<?php
+<?php declare(strict_types=1);
 namespace Search\Mvc\Controller\Plugin;
 
 use Doctrine\ORM\EntityManager;
+use Laminas\I18n\Translator\TranslatorInterface;
+use Laminas\Log\LoggerInterface;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
 use Omeka\Api\Adapter\Manager as AdapterManager;
 use Omeka\Api\Exception;
 use Omeka\Api\Manager;
 use Omeka\Api\Request;
-use Omeka\Api\Response;
 use Omeka\Api\ResourceInterface;
-use Omeka\Stdlib\Paginator;
+use Omeka\Api\Response;
 use Omeka\Permissions\Acl;
+use Omeka\Stdlib\Paginator;
 use Search\Api\Representation\SearchIndexRepresentation;
 use Search\Api\Representation\SearchPageRepresentation;
 use Search\FormAdapter\ApiFormAdapter;
 use Search\Querier\Exception\QuerierException;
 use Search\Query;
 use Search\Response as SearchResponse;
-use Laminas\I18n\Translator\TranslatorInterface;
-use Laminas\Log\LoggerInterface;
-use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
-use Laminas\ServiceManager\Exception\ServiceNotFoundException;
 
 /**
  * Do an api search via the default search index.
@@ -210,7 +210,7 @@ class ApiSearch extends AbstractPlugin
         //     return $response;
         // }
 
-        $validateContent = function ($value) {
+        $validateContent = function ($value): void {
             if (!$value instanceof ResourceInterface) {
                 throw new Exception\BadResponseException('API response content must implement Omeka\Api\ResourceInterface.');
             }
@@ -351,7 +351,7 @@ class ApiSearch extends AbstractPlugin
      * @param array $metadata
      * @param array $sortFields
      */
-    protected function sortQuery(Query $searchQuery, array $query, array $metadata, array $sortFields)
+    protected function sortQuery(Query $searchQuery, array $query, array $metadata, array $sortFields): void
     {
         if (empty($metadata) || empty($sortFields)) {
             return;
@@ -404,7 +404,7 @@ class ApiSearch extends AbstractPlugin
      * @param array $query
      * @param array $options
      */
-    protected function limitQuery(Query $searchQuery, array $query, array $options)
+    protected function limitQuery(Query $searchQuery, array $query, array $options): void
     {
         if (is_numeric($query['page'])) {
             $page = $query['page'] > 0 ? (int) $query['page'] : 1;

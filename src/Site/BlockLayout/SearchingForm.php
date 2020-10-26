@@ -1,6 +1,7 @@
-<?php
+<?php declare(strict_types=1);
 namespace Search\Site\BlockLayout;
 
+use Laminas\View\Renderer\PhpRenderer;
 use Omeka\Api\Representation\SitePageBlockRepresentation;
 use Omeka\Api\Representation\SitePageRepresentation;
 use Omeka\Api\Representation\SiteRepresentation;
@@ -9,7 +10,6 @@ use Omeka\Site\BlockLayout\AbstractBlockLayout;
 use Omeka\Stdlib\ErrorStore;
 use Search\Api\Representation\SearchPageRepresentation;
 use Search\Response;
-use Laminas\View\Renderer\PhpRenderer;
 
 class SearchingForm extends AbstractBlockLayout
 {
@@ -23,7 +23,7 @@ class SearchingForm extends AbstractBlockLayout
         return 'Search form (module Search)'; // @translate
     }
 
-    public function onHydrate(SitePageBlock $block, ErrorStore $errorStore)
+    public function onHydrate(SitePageBlock $block, ErrorStore $errorStore): void
     {
         $data = $block->getData() + ['query' => '', 'query_filter' => ''];
         $data['query'] = ltrim($data['query'], "? \t\n\r\0\x0B");
@@ -60,7 +60,7 @@ class SearchingForm extends AbstractBlockLayout
     {
         $searchPage = $block->dataValue('search_page');
         if ($searchPage) {
-            /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
+            /* @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
             try {
                 $searchPage = $view->api()->read('search_pages', ['id' => $searchPage])->getContent();
             } catch (\Omeka\Api\Exception\NotFoundException $e) {

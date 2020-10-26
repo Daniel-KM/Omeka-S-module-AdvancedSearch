@@ -1,14 +1,14 @@
-<?php
+<?php declare(strict_types=1);
 namespace Search\Mvc\Controller\Plugin;
 
+use Laminas\EventManager\Event;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Stdlib\Message;
 use Omeka\Stdlib\Paginator;
 use Search\Api\Representation\SearchIndexRepresentation;
 use Search\Api\Representation\SearchPageRepresentation;
 use Search\Querier\Exception\QuerierException;
-use Laminas\EventManager\Event;
-use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class SearchRequestToResponse extends AbstractPlugin
 {

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * Copyright BibLibre, 2016
@@ -61,7 +61,7 @@ class SearchPageAdapter extends AbstractEntityAdapter
         return \Search\Entity\SearchPage::class;
     }
 
-    public function buildQuery(QueryBuilder $qb, array $query)
+    public function buildQuery(QueryBuilder $qb, array $query): void
     {
         $isOldOmeka = \Omeka\Module::VERSION < 2;
         $alias = $isOldOmeka ? $this->getEntityClass() : 'omeka_root';
@@ -111,7 +111,7 @@ class SearchPageAdapter extends AbstractEntityAdapter
 
     public function hydrate(Request $request, EntityInterface $entity,
         ErrorStore $errorStore
-    ) {
+    ): void {
         if ($this->shouldHydrate($request, 'o:name')) {
             $entity->setName($request->getValue('o:name'));
         }
@@ -130,7 +130,7 @@ class SearchPageAdapter extends AbstractEntityAdapter
         }
     }
 
-    public function validateEntity(EntityInterface $entity, ErrorStore $errorStore)
+    public function validateEntity(EntityInterface $entity, ErrorStore $errorStore): void
     {
         if (false == $entity->getName()) {
             $errorStore->addError('o:name', 'The name cannot be empty.'); // @translate

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * Copyright BibLibre, 2016-2017
@@ -29,8 +29,8 @@
 
 namespace Search\Adapter;
 
-use Search\Api\Representation\SearchIndexRepresentation;
 use Laminas\ServiceManager\ServiceLocatorInterface;
+use Search\Api\Representation\SearchIndexRepresentation;
 
 abstract class AbstractAdapter implements AdapterInterface
 {
@@ -39,7 +39,7 @@ abstract class AbstractAdapter implements AdapterInterface
      */
     protected $serviceLocator;
 
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): void
     {
         $this->serviceLocator = $serviceLocator;
     }

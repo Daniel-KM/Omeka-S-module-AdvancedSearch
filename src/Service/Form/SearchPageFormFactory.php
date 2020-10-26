@@ -1,9 +1,9 @@
-<?php
+<?php declare(strict_types=1);
 namespace Search\Service\Form;
 
 use Interop\Container\ContainerInterface;
-use Search\Form\Admin\SearchPageForm;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Search\Form\Admin\SearchPageForm;
 
 class SearchPageFormFactory implements FactoryInterface
 {

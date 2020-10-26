@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * Copyright BibLibre, 2016-2017
@@ -30,10 +30,10 @@
 
 namespace Search\Form\Admin;
 
-use Omeka\Api\Manager as ApiManager;
-use Omeka\Form\Element\SiteSelect;
 use Laminas\Form\Element;
 use Laminas\Form\Form;
+use Omeka\Api\Manager as ApiManager;
+use Omeka\Form\Element\SiteSelect;
 
 class SearchPageForm extends Form
 {
@@ -44,7 +44,7 @@ class SearchPageForm extends Form
 
     protected $formAdapterManager;
 
-    public function init()
+    public function init(): void
     {
         $this
             ->add([

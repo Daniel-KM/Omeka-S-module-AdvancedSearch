@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * Copyright BibLibre, 2016
@@ -30,11 +30,11 @@
 
 namespace Search\Querier;
 
+use Laminas\Log\LoggerAwareInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 use Search\Api\Representation\SearchIndexRepresentation;
 use Search\Query;
 use Search\Response;
-use Laminas\Log\LoggerAwareInterface;
-use Laminas\ServiceManager\ServiceLocatorInterface;
 
 interface QuerierInterface extends LoggerAwareInterface
 {

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 // Example of a generic page with the internal adapter and the basic form.
 // When created, it can be modified in the admin board.
 

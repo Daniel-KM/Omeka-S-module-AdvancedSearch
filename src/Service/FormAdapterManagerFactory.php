@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * Copyright BibLibre, 2016-2017
@@ -29,8 +29,8 @@
 
 namespace Search\Service;
 
-use Search\FormAdapter\Manager;
 use Laminas\Mvc\Service\AbstractPluginManagerFactory;
+use Search\FormAdapter\Manager;
 
 class FormAdapterManagerFactory extends AbstractPluginManagerFactory
 {

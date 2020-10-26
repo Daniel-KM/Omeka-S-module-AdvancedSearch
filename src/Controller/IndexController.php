@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * Copyright BibLibre, 2016-2017
@@ -30,12 +30,12 @@
 
 namespace Search\Controller;
 
-use Search\Api\Representation\SearchPageRepresentation;
-use Search\Query;
-use Search\Response;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
+use Search\Api\Representation\SearchPageRepresentation;
+use Search\Query;
+use Search\Response;
 
 class IndexController extends AbstractActionController
 {

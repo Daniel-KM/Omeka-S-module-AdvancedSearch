@@ -1360,7 +1360,8 @@ class Module extends AbstractModule
         // consistency, use Coordinated Universal Time (UTC) if no offset is
         // provided. This avoids automatic adjustments based on the server's
         // default timezone.
-        $dateTime['date'] = new \DateTime('', new \DateTimeZone($dateTime['offset_normalized']));
+        // With strict type, "now" is required.
+        $dateTime['date'] = new \DateTime('now', new \DateTimeZone($dateTime['offset_normalized']));
         $dateTime['date']
             ->setDate(
                 $dateTime['year'],

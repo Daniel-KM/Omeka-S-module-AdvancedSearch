@@ -49,9 +49,14 @@ class InternalQuerier extends AbstractQuerier
 
         foreach ($this->resourceTypes as $resourceType) {
             try {
+                $dataQuery = $this->args->getArrayCopy();
                 // Return scalar doesn't allow to get the total of results.
-                $apiResponse = $api->search($resourceType, $this->args->getArrayCopy(), ['returnScalar' => 'id']);
-                $totalResults = $api->search($resourceType, $this->args->getArrayCopy())->getTotalResults();
+                $apiResponse = $api->search($resourceType, $dataQuery, ['returnScalar' => 'id']);
+                // Don't load entities if the only information needed is total.
+                if (empty($dataQuery['limit'])) {
+                    $dataQuery['limit'] = 0;
+                }
+                $totalResults = $api->search($resourceType, $dataQuery)->getTotalResults();
             } catch (\Omeka\Api\Exception\ExceptionInterface $e) {
                 throw new QuerierException($e->getMessage(), $e->getCode(), $e);
             }

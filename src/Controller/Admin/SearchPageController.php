@@ -535,20 +535,20 @@ class SearchPageController extends AbstractActionController
         $fieldsData = [];
         foreach ($fields as $type => $typeFields) {
             foreach ($typeFields as $fieldData) {
-                $type = strtok($fieldData['name'], '[]');
+                $type = strtok((string) $fieldData['name'], '[]');
                 $two = strtok('[]');
-                if (!strlen($two)) {
+                if ($two === false) {
                     $fieldsData[$type] = $fieldData['value'];
                 } else {
                     $three = strtok('[]');
-                    if (!strlen($three)) {
+                    if ($three === false) {
                         $fieldsData[$type][$two] = $fieldData['value'];
                     } else {
                         $four = strtok('[]');
-                        if (!strlen($four)) {
-                            $fieldsData[$type][$two][$three] = $fieldData['value'];
+                        if ($four === false) {
+                            $fieldsData[$type][$two][$three] = (string) $fieldData['value'];
                         } else {
-                            $fieldsData[$type][$two][$three][$four] = $fieldData['value'];
+                            $fieldsData[$type][$two][$three][$four] = (string) $fieldData['value'];
                         }
                     }
                 }

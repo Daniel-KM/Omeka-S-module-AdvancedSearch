@@ -1,7 +1,7 @@
 <?php
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2019
+ * Copyright Daniel Berthereau, 2019-2020
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -35,20 +35,15 @@
  * @var string $title
  */
 
-$partial = $this->plugin('partial');
-$api = $this->api();
+// Filter resources existing on search index, but not in Omeka, and prepare the loop.
+$ids = array_map(function ($v) { return $v['id']; }, $response->getResults($resourceName));
+$results = $this->api()->search($resourceName, ['id' => $ids])->getContent();
 ?>
 
-<?php $results = $response->getResults($resourceName); ?>
 <?php if (count($results)): ?>
 <h3><?= $title ?></h3>
 <div class="resource-list">
-    <?php foreach ($results as $result): ?>
-        <?php $resource = $api->read($resourceName, $result['id'])->getContent(); ?>
-        <?= $partial('search/resource', [
-            'resource' => $resource,
-            'tag' => 'div',
-        ]) ?>
-    <?php endforeach; ?>
+    <?php $resources = array_map(function ($v) { return ['resource' => $v,'tag' => 'div']; }, $results); ?>
+    <?= $this->partialLoop('search/resource', $resources) ?>
 </div>
 <?php endif; ?>

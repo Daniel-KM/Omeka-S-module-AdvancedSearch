@@ -99,11 +99,11 @@ class SearchingForm extends AbstractBlockLayout
 
         if ($displayResults) {
             $query = [];
-            parse_str($block->dataValue('query'), $query);
+            parse_str((string) $block->dataValue('query'), $query);
             $query = array_filter($query);
 
             $filterQuery = [];
-            parse_str($block->dataValue('query_filter'), $filterQuery);
+            parse_str((string) $block->dataValue('query_filter'), $filterQuery);
             $filterQuery = array_filter($filterQuery);
 
             $query += $filterQuery;

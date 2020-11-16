@@ -81,7 +81,7 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javas
 
 <?php endif; ?>
 
-<?= $this->searchForm($searchPage, $skipFormAction) ?>
+<?= $this->searchForm($searchPage, null, $skipFormAction) ?>
 
 <?php if (isset($response)): ?>
 <div class="search-results-wrapper">

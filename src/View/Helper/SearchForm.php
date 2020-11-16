@@ -26,7 +26,7 @@ class SearchForm extends AbstractHelper
     /**
      * @var string
      */
-    protected $partial;
+    protected $partial = '';
 
     /**
      * @param SearchPageRepresentation $searchPage
@@ -34,7 +34,7 @@ class SearchForm extends AbstractHelper
      * @param bool $skipFormAction Don't set form action, so use the current page.
      * @return \Search\View\Helper\SearchForm
      */
-    public function __invoke(SearchPageRepresentation $searchPage = null, $partial = null, $skipFormAction = false)
+    public function __invoke(SearchPageRepresentation $searchPage = null, $partial = null, $skipFormAction = false): self
     {
         $this->initSearchForm($searchPage, $partial, $skipFormAction);
         return $this;
@@ -83,9 +83,11 @@ class SearchForm extends AbstractHelper
             }
         }
 
-        $this->partial = null;
+        // Reset the partial.
+        $this->partial = '';
+
         if ($this->form) {
-            $this->partial = $partial;
+            $this->partial = $partial ?? '';
             if (empty($this->partial)) {
                 $formAdapter = $this->searchPage->formAdapter();
                 $this->partial = $formAdapter && ($formPartial = $formAdapter->getFormPartial())
@@ -100,7 +102,7 @@ class SearchForm extends AbstractHelper
      *
      * @return \Search\Api\Representation\SearchPageRepresentation|null
      */
-    public function getSearchPage()
+    public function getSearchPage(): ?SearchPageRepresentation
     {
         return $this->searchPage;
     }
@@ -110,7 +112,7 @@ class SearchForm extends AbstractHelper
      *
      * @return \Laminas\Form\Form|null
      */
-    public function getForm()
+    public function getForm(): ?Form
     {
         return $this->form;
     }
@@ -120,12 +122,12 @@ class SearchForm extends AbstractHelper
      *
      * @return string
      */
-    public function getPartial()
+    public function getPartial(): string
     {
         return $this->partial;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->partial
             ? $this->getView()->partial($this->partial, ['form' => $this->form])

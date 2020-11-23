@@ -239,7 +239,7 @@ class IndexController extends AbstractActionController
                 if (!count($array[$key])) {
                     unset($array[$key]);
                 }
-            } elseif (!strlen(trim($array[$key]))) {
+            } elseif (!strlen(trim((string) $array[$key]))) {
                 unset($array[$key]);
             }
         }

@@ -261,9 +261,9 @@ class ApiSearch extends AbstractPlugin
             $query['sort_by'] = null;
         }
         if (isset($query['sort_order'])
-            && in_array(strtolower($query['sort_order']), ['asc', 'desc'])
+            && in_array(strtolower((string) $query['sort_order']), ['asc', 'desc'])
         ) {
-            $query['sort_order'] = strtolower($query['sort_order']);
+            $query['sort_order'] = strtolower((string) $query['sort_order']);
         } else {
             // Sort order is not forced because it may be the inverse for score.
             $query['sort_order'] = null;
@@ -365,7 +365,7 @@ class ApiSearch extends AbstractPlugin
         $sortBy = $metadata[$query['sort_by']];
 
         if (isset($query['sort_order'])) {
-            $sortOrder = strtolower($query['sort_order']);
+            $sortOrder = strtolower((string) $query['sort_order']);
             $sortOrder = $sortOrder === 'desc' ? 'desc' : 'asc';
         } else {
             $sortOrder = null;

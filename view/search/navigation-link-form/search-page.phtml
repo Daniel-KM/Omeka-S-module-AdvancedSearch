@@ -33,12 +33,11 @@
  * @var \Omeka\Site\Navigation\Link\LinkInterface $link
  * @var array $data
  */
-
 $translate = $this->plugin('translate');
 $escape = $this->plugin('escapeHtml');
 
-$label = isset($data['label']) ? $data['label'] : null;
-$searchPageId = isset($data['search_page_id']) ? $data['search_page_id'] : null;
+$label = $data['label'] ?? null;
+$searchPageId = $data['search_page_id'] ?? null;
 
 $searchPages = $this->api()->search('search_pages')->getContent();
 ?>

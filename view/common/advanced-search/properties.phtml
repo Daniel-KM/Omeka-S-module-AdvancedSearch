@@ -16,7 +16,7 @@ $applyTemplates = $isSiteRequest ? $siteSetting('search_apply_templates') : fals
 $usedTerms = $isSiteRequest ? $siteSetting('advancedsearchplus_restrict_used_terms', true) : $setting('advancedsearchplus_restrict_used_terms', true);
 
 // Prepare the property queries.
-$properties = isset($query['property']) ? $query['property'] : [];
+$properties = $query['property'] ?? [];
 $properties = array_filter($properties, function ($value) {
     return isset($value['text']) ? '' !== trim($value['text']) : true;
 });
@@ -33,15 +33,15 @@ if (isset($query['search'])) {
     ]);
 }
 
-$queryOption = function($value, array $search, $key, $text) {
+$queryOption = function ($value, array $search, $key, $text) {
     $selected = null;
     if (isset($search[$key]) && $value === $search[$key]) {
         $selected = ' selected';
     }
     return sprintf('<option value="%s"%s>%s</option>', $value, $selected, $text);
 };
-$queryText = function(array $search, $index) use ($escape, $translate) {
-    $text = isset($search['text']) ? $search['text'] : null;
+$queryText = function (array $search, $index) use ($escape, $translate) {
+    $text = $search['text'] ?? null;
     return sprintf('<input type="text" class="query-text" name="%s" value="%s" aria-label="%s">',
         $escape("property[$index][text]"),
         $escape($text),
@@ -69,7 +69,7 @@ $queryText = function(array $search, $index) use ($escape, $translate) {
                 'name' => $stem . '[property]',
                 'attributes' => [
                     'class' => 'query-property chosen-select',
-                    'value' => isset($property['property']) ? $property['property'] : null,
+                    'value' => $property['property'] ?? null,
                     'aria-label' => $translate('Property'),
                 ],
                 'options' => [

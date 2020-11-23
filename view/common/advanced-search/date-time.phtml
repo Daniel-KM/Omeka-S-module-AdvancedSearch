@@ -15,7 +15,7 @@ $datetimes = array_filter($datetimes, function ($v) {
 // Allows to display one empty field.
 if (empty($datetimes)) $datetimes = [[]];
 
-$querySelectOption = function($value, array $search, $key, $text) {
+$querySelectOption = function ($value, array $search, $key, $text) {
     $selected = null;
     if (isset($search[$key]) && $value === $search[$key]) {
         $selected = ' selected';
@@ -24,7 +24,7 @@ $querySelectOption = function($value, array $search, $key, $text) {
 };
 
 // TODO Use a widget or a validator (but allow partial date/time: year only, date only, etc.).
-$queryInputText = function(array $search, $index) use ($translate, $escape) {
+$queryInputText = function (array $search, $index) use ($translate, $escape) {
     $value = $search['value'] ?? null;
     return sprintf('<input type="text" class="query-datetime query-text" name="%s" value="%s" aria-label="%s" placeholder="2017-11-07 17:21:17">',
         $escape("datetime[$index][value]"),

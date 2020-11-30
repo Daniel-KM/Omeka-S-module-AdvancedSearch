@@ -437,7 +437,7 @@ class InternalQuerier extends AbstractQuerier
 
         // For items and item sets.
         $fields = array_map(function ($v) use ($metadataFieldsToNames) {
-            return isset($metadataFieldsToNames[$v]) ? $metadataFieldsToNames[$v] : $v;
+            return $metadataFieldsToNames[$v] ?? $v;
         }, $facetFields);
 
         foreach ($this->resourceTypes as $resourceType) {

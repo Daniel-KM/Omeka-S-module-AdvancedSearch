@@ -149,7 +149,7 @@ class SearchPageConfigureForm extends Form
                     'label' => 'Label', // @translate
                 ],
                 'attributes' => [
-                    'value' => isset($field['label']) ? $field['label'] : '',
+                    'value' => $field['label'] ?? '',
                 ],
             ]);
             $fieldset->add($displayFieldset);
@@ -295,7 +295,7 @@ class SearchPageConfigureForm extends Form
                     'label' => 'Label', // @translate
                 ],
                 'attributes' => [
-                    'value' => isset($field['label']) ? $field['label'] : '',
+                    'value' => $field['label'] ?? '',
                 ],
             ]);
             $fieldset->add($displayFieldset);
@@ -383,7 +383,7 @@ class SearchPageConfigureForm extends Form
         $settings = $searchPage->settings();
 
         $name = $field['name'];
-        $label = isset($field['label']) ? $field['label'] : null;
+        $label = $field['label'] ?? null;
         if (isset($settings[$settingsKey][$name])) {
             $fieldSettings = $settings[$settingsKey][$name];
             if (isset($fieldSettings['display']['label'])) {

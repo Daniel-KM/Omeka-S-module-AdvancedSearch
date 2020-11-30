@@ -215,7 +215,7 @@ class SearchPageController extends AbstractActionController
         }
 
         // TODO Why the fieldset "form" is removed from the params? Add an intermediate fieldset? Check if it is still the case.
-        $formParams = isset($params['form']) ? $params['form'] : [];
+        $formParams = $params['form'] ?? [];
         // TODO Check simple fields.
         if (!$isSimple) {
             $params = $form->getData();
@@ -503,7 +503,7 @@ class SearchPageController extends AbstractActionController
     {
         $params = $this->getRequest()->getPost()->toArray();
 
-        $fields = isset($params['fieldsets']) ? $params['fieldsets'] : [];
+        $fields = $params['fieldsets'] ?? [];
         unset($params['fieldsets']);
         $fieldsData = $this->extractJsonEncodedFields($fields);
         $params = array_merge($fieldsData, $params);

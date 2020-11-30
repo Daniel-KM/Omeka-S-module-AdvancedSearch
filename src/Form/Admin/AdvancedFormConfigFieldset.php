@@ -323,7 +323,7 @@ class AdvancedFormConfigFieldset extends Fieldset
         $settings = $searchPage->settings();
 
         $name = $field['name'];
-        $label = isset($field['label']) ? $field['label'] : null;
+        $label = $field['label'] ?? null;
         if (isset($settings['form']['filters'][$name])) {
             $fieldSettings = $settings['form']['filters'][$name];
             if (isset($fieldSettings['display']['label'])

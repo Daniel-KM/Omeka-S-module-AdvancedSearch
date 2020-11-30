@@ -59,7 +59,7 @@ class SearchRequestToResponse extends AbstractPlugin
             $request = ['*' => ''] + $request;
         }
 
-        $searchFormSettings = isset($searchPageSettings['form']) ? $searchPageSettings['form'] : [];
+        $searchFormSettings = $searchPageSettings['form'] ?? [];
 
         /** @var \Search\Query $query */
         $query = $formAdapter->toQuery($request, $searchFormSettings);

@@ -462,7 +462,7 @@ SQL;
         }
         if (is_numeric($property)) {
             $property = (int) $property;
-            return isset($properties[$property]) ? $properties[$property] : '';
+            return $properties[$property] ?? '';
         }
         $property = (string) $property;
         return in_array($property, $properties) ? $property : '';

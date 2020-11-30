@@ -165,7 +165,7 @@ class ApiFormAdapter implements FormAdapterInterface
             $property = $queryRow['property'];
             $queryType = $queryRow['type'];
             // $joiner = isset($queryRow['joiner']) ? $queryRow['joiner'] : null;
-            $value = isset($queryRow['text']) ? $queryRow['text'] : null;
+            $value = $queryRow['text'] ?? null;
 
             if (!$value && $queryType !== 'nex' && $queryType !== 'ex') {
                 continue;
@@ -246,7 +246,7 @@ SQL;
         }
         if (is_numeric($property)) {
             $property = (int) $property;
-            return isset($properties[$property]) ? $properties[$property] : '';
+            return $properties[$property] ?? '';
         }
         $property = (string) $property;
         return in_array($property, $properties) ? $property : '';

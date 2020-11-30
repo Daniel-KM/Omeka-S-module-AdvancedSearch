@@ -35,8 +35,10 @@
  * @var string $title
  */
 
-// Filter resources existing on search index, but not in Omeka, and prepare the loop.
 $ids = array_map(function ($v) { return $v['id']; }, $response->getResults($resourceName));
+if (!count($ids)) return;
+
+// Filter resources existing on search index, but not in Omeka, and prepare the loop.
 $results = $this->api()->search($resourceName, ['id' => $ids])->getContent();
 ?>
 

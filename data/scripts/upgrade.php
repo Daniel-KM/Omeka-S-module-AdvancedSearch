@@ -238,3 +238,19 @@ SQL;
         }
     }
 }
+
+if (version_compare($oldVersion, '3.5.16.3', '<')) {
+    // @link https://www.doctrine-project.org/projects/doctrine-dbal/en/2.6/reference/types.html#array-types
+    $sql = <<<'SQL'
+ALTER TABLE `search_index`
+CHANGE `settings` `settings` LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json)',
+CHANGE `modified` `modified` DATETIME DEFAULT NULL;
+SQL;
+    $connection->exec($sql);
+    $sql = <<<'SQL'
+ALTER TABLE `search_page`
+CHANGE `settings` `settings` LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json)',
+CHANGE `modified` `modified` DATETIME DEFAULT NULL;
+SQL;
+    $connection->exec($sql);
+}

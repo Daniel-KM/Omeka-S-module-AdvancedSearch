@@ -2,7 +2,7 @@ CREATE TABLE `search_index` (
     `id` INT AUTO_INCREMENT NOT NULL,
     `name` VARCHAR(190) NOT NULL,
     `adapter` VARCHAR(190) NOT NULL,
-    `settings` LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json_array)',
+    `settings` LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json)',
     `created` DATETIME NOT NULL,
     `modified` DATETIME DEFAULT NULL,
     PRIMARY KEY(`id`)
@@ -13,7 +13,7 @@ CREATE TABLE `search_page` (
     `name` VARCHAR(190) NOT NULL,
     `path` VARCHAR(190) NOT NULL,
     `form_adapter` VARCHAR(190) NOT NULL,
-    `settings` LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json_array)',
+    `settings` LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json)',
     `created` DATETIME NOT NULL,
     `modified` DATETIME DEFAULT NULL,
     INDEX IDX_4F10A34984337261 (`index_id`),

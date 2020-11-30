@@ -67,7 +67,7 @@ class SearchIndex extends AbstractEntity
     /**
      * @var array
      *
-     * @Column(type="json_array", nullable=true)
+     * @Column(type="json", nullable=true)
      */
     protected $settings;
 

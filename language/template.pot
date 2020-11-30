@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-12 00:00+0000\n"
+"POT-Creation-Date: 2020-11-30 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,17 +30,21 @@ msgstr ""
 msgid "[Missing adapter \"%s\"]"
 msgstr ""
 
-#: src/Generic/AbstractModule.php:601
+#: src/Generic/AbstractModule.php:66
 #, php-format
 msgid "This module requires the module \"%s\"."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:621
+#: src/Generic/AbstractModule.php:73
 #, php-format
 msgid "This module requires modules \"%s\"."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:689
+#: src/Generic/AbstractModule.php:80
+msgid "This module has resources that connot be installed."
+msgstr ""
+
+#: src/Generic/AbstractModule.php:710
 #, php-format
 msgid ""
 "The module \"%s\" was automatically deactivated because the dependencies are "
@@ -232,38 +236,38 @@ msgid ""
 "adapter."
 msgstr ""
 
-#: Module.php:419
+#: Module.php:376
 #, php-format
 msgid "Unable to batch index metadata for search index \"%s\": %s"
 msgstr ""
 
-#: Module.php:424
+#: Module.php:381
 #, php-format
 msgid "Unable to batch update the search index \"%s\": see log."
 msgstr ""
 
-#: Module.php:509
+#: Module.php:466
 #, php-format
 msgid "Unable to delete the search index for resource #%d: %s"
 msgstr ""
 
-#: Module.php:514
+#: Module.php:471
 #, php-format
 msgid ""
 "Unable to delete the search index for the deleted resource #%d: see log."
 msgstr ""
 
-#: Module.php:534
+#: Module.php:491
 #, php-format
 msgid "Unable to index metadata of resource #%d for search: %s"
 msgstr ""
 
-#: Module.php:539
+#: Module.php:496
 #, php-format
 msgid "Unable to update the search index for resource #%d: see log."
 msgstr ""
 
-#: Module.php:694
+#: Module.php:620
 msgid ""
 "The internal search engine is available. Enable it in the main settings (for "
 "admin) and in site settings (for public)."
@@ -349,74 +353,70 @@ msgid ""
 "start with \"searching-form\"."
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:15
+#: src/Form/SettingsFieldset.php:18
 msgid "Search (admin board)"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:36
+#: src/Form/SettingsFieldset.php:39
 msgid "Default search page (admin)"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:37
+#: src/Form/SettingsFieldset.php:40
 msgid "This search engine is used in the admin bar."
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:39
+#: src/Form/SettingsFieldset.php:42
 msgid "Select the search engine for the admin bar…"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:50 src/Form/SiteSettingsFieldset.php:48
+#: src/Form/SettingsFieldset.php:53 src/Form/SiteSettingsFieldset.php:51
 msgid "Available search pages"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:62
+#: src/Form/SettingsFieldset.php:65
 msgid "Page used for quick api search"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:63
+#: src/Form/SettingsFieldset.php:66
 msgid ""
 "The method apiSearch() allows to do a quick search in some cases. It "
 "requires a mapping done with the Omeka api and the selected index."
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:65
+#: src/Form/SettingsFieldset.php:68
 msgid "Select the page for quick api search…"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:76
+#: src/Form/SettingsFieldset.php:79
 msgid "Search batch size for reindexation"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:77
+#: src/Form/SettingsFieldset.php:80
 msgid ""
 "Default is 100, but it can be adapted according to your resource average "
 "size, your mapping and your architecture."
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:19
+#: src/Form/SiteSettingsFieldset.php:22
 msgid "Search module"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:36
+#: src/Form/SiteSettingsFieldset.php:39
 msgid "Default search page"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:38
+#: src/Form/SiteSettingsFieldset.php:41
 msgid "Select the default search engine for the site…"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:60
+#: src/Form/SiteSettingsFieldset.php:63
 msgid "Redirect item set page to search"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:61
+#: src/Form/SiteSettingsFieldset.php:64
 msgid ""
 "By default, item-set/show is redirected to item/browse. This option "
 "redirects it to the search page."
-msgstr ""
-
-#: src/Form/BasicForm.php:60
-msgid "Search resources"
 msgstr ""
 
 #: src/Form/Admin/SearchPageConfigureForm.php:78
@@ -454,7 +454,7 @@ msgid "Facets"
 msgstr ""
 
 #: src/Form/Admin/SearchPageConfigureForm.php:161
-#: src/Form/Admin/SearchPageConfigureForm.php:307 config/module.config.php:209
+#: src/Form/Admin/SearchPageConfigureForm.php:307 config/module.config.php:210
 msgid "Enabled"
 msgstr ""
 
@@ -678,54 +678,50 @@ msgstr ""
 msgid "Internal identifier"
 msgstr ""
 
-#: src/Form/Admin/ApiFormConfigFieldset.php:59
+#: src/Form/Admin/ApiFormConfigFieldset.php:60
 msgid "Is Public"
 msgstr ""
 
-#: src/Form/Admin/ApiFormConfigFieldset.php:73
+#: src/Form/Admin/ApiFormConfigFieldset.php:75
 msgid "Owner id"
 msgstr ""
 
-#: src/Form/Admin/ApiFormConfigFieldset.php:101
-msgid "Modified"
-msgstr ""
-
-#: src/Form/Admin/ApiFormConfigFieldset.php:115
+#: src/Form/Admin/ApiFormConfigFieldset.php:120
 msgid "Resource class label"
 msgstr ""
 
-#: src/Form/Admin/ApiFormConfigFieldset.php:129
+#: src/Form/Admin/ApiFormConfigFieldset.php:135
 msgid "Resource class id"
 msgstr ""
 
-#: src/Form/Admin/ApiFormConfigFieldset.php:143
+#: src/Form/Admin/ApiFormConfigFieldset.php:150
 msgid "Resource template id"
 msgstr ""
 
-#: src/Form/Admin/ApiFormConfigFieldset.php:157
+#: src/Form/Admin/ApiFormConfigFieldset.php:165
 msgid "Item set id"
 msgstr ""
 
-#: src/Form/Admin/ApiFormConfigFieldset.php:171
+#: src/Form/Admin/ApiFormConfigFieldset.php:180
 msgid "Site id"
 msgstr ""
 
-#: src/Form/Admin/ApiFormConfigFieldset.php:185
+#: src/Form/Admin/ApiFormConfigFieldset.php:195
 msgid "Is open"
 msgstr ""
 
-#: src/Form/Admin/ApiFormConfigFieldset.php:198
+#: src/Form/Admin/ApiFormConfigFieldset.php:209
 msgid "Mapping properties to search fields"
 msgstr ""
 
-#: src/Querier/InternalQuerier.php:153
+#: src/Querier/InternalQuerier.php:158
 #, php-format
 msgid ""
 "The query \"%1$s\" uses %2$d properties, that is more than the %3$d "
 "supported currently. Excluded fields are removed."
 msgstr ""
 
-#: src/Querier/InternalQuerier.php:161
+#: src/Querier/InternalQuerier.php:166
 #, php-format
 msgid ""
 "The query \"%1$s\" uses %2$d properties, that is more than the %3$d "
@@ -860,7 +856,7 @@ msgstr ""
 msgid "Search index \"%s\" could not be deleted"
 msgstr ""
 
-#: src/Api/Adapter/SearchPageAdapter.php:141
+#: src/Api/Adapter/SearchPageAdapter.php:133
 #, php-format
 msgid "The path \"%s\" is already taken."
 msgstr ""
@@ -962,27 +958,27 @@ msgid ""
 "Query:%s"
 msgstr ""
 
-#: config/module.config.php:207
+#: config/module.config.php:208
 msgid "Automatic mapping of empty values"
 msgstr ""
 
-#: config/module.config.php:208
+#: config/module.config.php:209
 msgid "Available"
 msgstr ""
 
-#: config/module.config.php:210
+#: config/module.config.php:211
 msgid "Find"
 msgstr ""
 
-#: config/module.config.php:211
+#: config/module.config.php:212
 msgid "Find resources…"
 msgstr ""
 
-#: config/module.config.php:212
+#: config/module.config.php:213
 msgid "Processing…"
 msgstr ""
 
-#: config/module.config.php:213
+#: config/module.config.php:214
 msgid ""
 "Try to map automatically the metadata and the properties that are not mapped "
 "yet with the fields of the index"

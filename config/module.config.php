@@ -3,6 +3,16 @@
 namespace AdvancedSearchPlus;
 
 return [
+    // Waiting for fix https://github.com/omeka/omeka-s/pull/1671.
+    // May use a service delegator for api manager like module Search.
+    'listeners' => [
+        Mvc\MvcListeners::class,
+    ],
+    'service_manager' => [
+        'invokables' => [
+            Mvc\MvcListeners::class => Mvc\MvcListeners::class,
+        ],
+    ],
     'view_manager' => [
         'template_path_stack' => [
             dirname(__DIR__) . '/view',

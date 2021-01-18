@@ -114,12 +114,6 @@ class Module extends AbstractModule
             \Generateur\Api\Adapter\GenerationAdapter::class,
         ];
         foreach ($adapters as $adapter) {
-            // Adjust resource search by visibility.
-            $sharedEventManager->attach(
-                $adapter,
-                'api.search.pre',
-                [$this, 'handleApiSearchPre']
-            );
             // Add the search query filters for resources.
             $sharedEventManager->attach(
                 $adapter,
@@ -269,26 +263,6 @@ class Module extends AbstractModule
                     'value' => $searchFields,
                 ],
             ]);
-    }
-
-    /**
-     * Removes is_public from the query if the value is '', before
-     * passing it to AbstractResourceEntityAdapter, as it would
-     * coerce it to boolean false for the query builder.
-     *
-     * Waiting for fix in https://github.com/omeka/omeka-s/pull/1671
-     *
-     * @param Event $event
-     */
-    public function handleApiSearchPre(Event $event): void
-    {
-        $query = $event->getParam('request')->getContent();
-        if (isset($query['is_public'])) {
-            if ($query['is_public'] === '') {
-                unset($query['is_public']);
-                $event->getParam('request')->setContent($query);
-            }
-        }
     }
 
     /**

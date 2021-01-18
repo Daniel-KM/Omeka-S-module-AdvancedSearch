@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Search\Api;
 
 // use Search\Mvc\Controller\Plugin\ApiSearch;
@@ -31,20 +32,27 @@ class ManagerDelegator extends \Omeka\Api\Manager
         // ApiSearch is set static to avoid a loop during init of Api Manager.
         /** @var \Search\Mvc\Controller\Plugin\ApiSearch $apiSearch */
         static $apiSearch;
+
+        // Waiting for fix https://github.com/omeka/omeka-s/pull/1671.
+        // The same in module AdvancedSearchPlus.
+        if (isset($data['is_public']) && $data['is_public'] === '') {
+            $data['is_public'] = null;
+        }
+
         if (empty($options['index']) && empty($data['index'])) {
             return parent::search($resource, $data, $options);
         }
+
         if (is_null($apiSearch)) {
             $apiSearch = $this->controllerPlugins->get('apiSearch');
         }
+
         return $apiSearch($resource, $data, $options);
     }
 
-    /**
-     * @param ControllerPluginManager $controllerPlugins
-     */
-    public function setControllerPlugins(ControllerPluginManager $controllerPlugins): void
+    public function setControllerPlugins(ControllerPluginManager $controllerPlugins)
     {
         $this->controllerPlugins = $controllerPlugins;
+        return $this;
     }
 }

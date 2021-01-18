@@ -12,6 +12,9 @@ return [
         'invokables' => [
             Mvc\MvcListeners::class => Mvc\MvcListeners::class,
         ],
+        'delegators' => [
+            'Omeka\ApiManager' => [Service\ApiManagerDelegatorFactory::class],
+        ],
     ],
     'view_manager' => [
         'template_path_stack' => [

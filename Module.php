@@ -114,11 +114,26 @@ class Module extends AbstractModule
             \Generateur\Api\Adapter\GenerationAdapter::class,
         ];
         foreach ($adapters as $adapter) {
+            // Improve search by property: remove properties from query, process
+            // normally, then process properties normally in api.search.query.
+            // This process is required because it is not possible to override
+            // the method buildPropertyQuery() in AbstractResourceEntityAdapter.
+            // Because this event does not apply when initialize = false, the
+            // api manager has a delegator that does the same.
+            $sharedEventManager->attach(
+                $adapter,
+                'api.search.pre',
+                [$this, 'handlePropertiesPreBefore'],
+                // Let any other module, except core, to search properties.
+                -100
+            );
             // Add the search query filters for resources.
             $sharedEventManager->attach(
                 $adapter,
                 'api.search.query',
-                [$this, 'handleApiSearchQuery']
+                [$this, 'handleApiSearchQuery'],
+                // Process before any other module in order to reset query.
+                +100
             );
         };
 
@@ -266,16 +281,49 @@ class Module extends AbstractModule
     }
 
     /**
+     * Save key "property" of the original query to process it one time only.
+     *
+     * @param Event $event
+     */
+    public function handlePropertiesPreBefore(Event $event): void
+    {
+        /** @var \Omeka\Api\Request $request */
+        $request = $event->getParam('request');
+        $query = $request->getContent();
+        if (empty($query['property'])) {
+            return;
+        }
+        $request->setOption('override', ['property' => $query['property']]);
+        unset($query['property']);
+        $request->setContent($query);
+    }
+
+    /**
      * Helper to filter search queries.
      *
      * @param Event $event
      */
     public function handleApiSearchQuery(Event $event): void
     {
-        /** @var \Doctrine\ORM\QueryBuilder $qb */
+        /**
+         * @var \Doctrine\ORM\QueryBuilder $qb
+         * @var \Omeka\Api\Adapter\AbstractResourceEntityAdapter $adapter
+         * @var \Omeka\Api\Request $request
+         */
         $qb = $event->getParam('queryBuilder');
         $adapter = $event->getTarget();
-        $query = $event->getParam('request')->getContent();
+        $request = $event->getParam('request');
+        $query = $request->getContent();
+
+        // Reset the query for properties.
+        $override = $request->getOption('override', []);
+        if (!empty($override['property'])) {
+            $query['property'] = $override['property'];
+            $request->setContent($query);
+            $request->setOption('override', null);
+        }
+
+        // Process advanced search plus keys.
         $this->searchDateTime($qb, $adapter, $query);
         $this->buildPropertyQuery($qb, $query, $adapter);
         if ($adapter instanceof ItemAdapter) {
@@ -1002,11 +1050,8 @@ class Module extends AbstractModule
     /**
      * Build query on value.
      *
-     * Complete \Omeka\Api\Adapter\AbstractResourceEntityAdapter::buildPropertyQuery()
-     *
-     * Note: because this filter is separate from the core one, all the
-     * properties are rechecked to avoid a issue with the joiner (or/and).
-     * @todo Find a way to not recheck all arguments used to search properties as long as it's not in the core.
+     * Pseudo-override \Omeka\Api\Adapter\AbstractResourceEntityAdapter::buildPropertyQuery()
+     * via the api manager delegator.
      *
      * Query format:
      *
@@ -1014,12 +1059,12 @@ class Module extends AbstractModule
      * - property[{index}][property]: property ID
      * - property[{index}][text]: search text
      * - property[{index}][type]: search type
-     *   - eq: is exactly
-     *   - neq: is not exactly
-     *   - in: contains
-     *   - nin: does not contain
-     *   - ex: has any value
-     *   - nex: has no value
+     *   - eq: is exactly (core)
+     *   - neq: is not exactly (core)
+     *   - in: contains (core)
+     *   - nin: does not contain (core)
+     *   - ex: has any value (core)
+     *   - nex: has no value (core)
      *   - list: is in list
      *   - nlist: is not in list
      *   - sw: starts with

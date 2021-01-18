@@ -25,6 +25,7 @@ Furthermore, it adds new search query type for properties:
 - start with
 - end with
 - in list (via api only).
+- exclude one or multiple properties (except title)
 
 Finally, an option allows to display only the used properties and classes in the
 advanced search form, with chosen-select.
@@ -44,6 +45,43 @@ uncompress it in the `modules` directory.
 
 If the module was installed from the source, rename the name of the folder of
 the module to `AdvancedSearchPlus`.
+
+
+Notes
+-----
+
+### Exclude properties
+
+To exclude properties to search in, use key `except`. For example, to search
+anywhere except in "bibo:content", that may contains ocr or full text, use this
+api query `https://example.org/api/items?property[0][except]=bibo:content&property[0][type]=in&property[0][text]=text to search`, or in internal api:
+
+```php
+$query['property'][] = [
+    'joiner' => 'and',
+    'property' => '',
+    'except' => $excludedFields,
+    'type' => 'in',
+    'text' => "text to search",
+];
+```
+
+The excluded fields may be one or multiple property ids or terms.
+
+The title cannot be excluded currently, because it is automatically added by
+the core.
+
+### Visibility
+
+The visibility check may not working if the api url contains `&is_public=&`:
+`is_public` must not be a empty string. See the patch in https://github.com/omeka/omeka-s/pull/1671.
+This patch is integrated in module only for url, and for call to internal api.
+
+
+TODO
+----
+
+- [x] The override of a search query with "property" should be called even with "initialize = false" in the api.
 
 
 Warning
@@ -94,7 +132,7 @@ of the CeCILL license and that you accept its terms.
 Copyright
 ---------
 
-* Copyright Daniel Berthereau, 2018-2020, (see [Daniel-KM] on GitLab)
+* Copyright Daniel Berthereau, 2018-2021, (see [Daniel-KM] on GitLab)
 
 
 [Advanced Search Plus]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearchPlus

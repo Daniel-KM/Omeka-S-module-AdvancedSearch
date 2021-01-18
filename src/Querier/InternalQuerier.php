@@ -13,7 +13,6 @@ class InternalQuerier extends AbstractQuerier
     /**
      * MariaDB can only use 61 tables in a join and Omeka adds a join for each
      * property. To manage modules, the number is limited to 50.
-     * So excluded fields can be used only when a small subset of properties is used.
      */
     const REQUEST_MAX_ARGS = 50;
 
@@ -225,8 +224,8 @@ class InternalQuerier extends AbstractQuerier
             return;
         }
 
-        // The fullt text search is not available via standard api, but only
-        // in a special request (see \Omeka\Module::searchFulltext()).
+        // The full text search is not available via standard api, but only in a
+        // special request (see \Omeka\Module::searchFulltext()).
         $qq = array_filter(array_map('trim', explode(' ', $q)), 'mb_strlen');
         foreach ($qq as $qw) {
             $this->args['property'][] = [
@@ -239,51 +238,42 @@ class InternalQuerier extends AbstractQuerier
     }
 
     /**
-     * Support of excluded fields is very basic and uses "or" instead of "and".
+     * Prepare the main query with excluded fields.
      *
-     * Important: MariaDB can only use 61 tables in a join.
+     * Require module AdvancedSearchPlus.
      *
+     * @todo Add support of exclude item set.
      * @todo Add support of grouped query (mutliple properties and/or multiple other properties).
      */
     protected function mainQueryWithExcludedFields(): void
     {
         $q = $this->query->getQuery();
-
-        // Currently, the only way to exclude fields is to search in all other
-        // fields.
-        $usedFields = $this->getUsedPropertyByIds();
         $excludedFields = $this->query->getExcludedFields();
-        $usedFields = array_diff($usedFields, $excludedFields);
-        if (!count($usedFields)) {
-            return;
-        }
 
         // Try to support the exact search and the full text search.
         if (mb_substr($q, 0, 1) === '"' && mb_substr($q, -1) === '"') {
             $q = trim($q, '" ');
-            foreach ($usedFields as $propertyId) {
-                $this->args['property'][] = [
-                    'joiner' => 'or',
-                    'property' => $propertyId,
-                    'type' => 'in',
-                    'text' => $q,
-                ];
-            }
+            $this->args['property'][] = [
+                'joiner' => 'and',
+                'property' => '',
+                'except' => $excludedFields,
+                'type' => 'in',
+                'text' => $q,
+            ];
             return;
         }
 
-        // The fullt text search is not available via standard api, but only
-        // in a special request (see \Omeka\Module::searchFulltext()).
+        // The full text search is not available via standard api, but only in a
+        // special request (see \Omeka\Module::searchFulltext()).
         $qq = array_filter(array_map('trim', explode(' ', $q)), 'mb_strlen');
         foreach ($qq as $qw) {
-            foreach ($usedFields as $propertyId) {
-                $this->args['property'][] = [
-                    'joiner' => 'or',
-                    'property' => $propertyId,
-                    'type' => 'in',
-                    'text' => $qw,
-                ];
-            }
+            $this->args['property'][] = [
+                'joiner' => 'and',
+                'property' => '',
+                'except' => $excludedFields,
+                'type' => 'in',
+                'text' => $qw,
+            ];
         }
     }
 
@@ -480,7 +470,7 @@ class InternalQuerier extends AbstractQuerier
     /**
      * Convert a list of terms into a list of property ids.
      *
-     * @see \Reference\Mvc\Controller\Plugin\Reference::listPropertyIds()
+     * @see \Reference\Mvc\Controller\Plugin\References::listPropertyIds()
      *
      * @param array $values
      * @return array Only values that are terms are converted into ids, the
@@ -531,7 +521,7 @@ class InternalQuerier extends AbstractQuerier
     /**
      * Get all property ids by term.
      *
-     * @see \Reference\Mvc\Controller\Plugin\Reference::getPropertyIds()
+     * @see \Reference\Mvc\Controller\Plugin\References::getPropertyIds()
      *
      * @return array Associative array of ids by term.
      */
@@ -567,7 +557,7 @@ class InternalQuerier extends AbstractQuerier
     /**
      * Convert a list of terms into a list of resource class ids.
      *
-     * @see \Reference\Mvc\Controller\Plugin\Reference::listResourceClassIds()
+     * @see \Reference\Mvc\Controller\Plugin\References::listResourceClassIds()
      *
      * @param array $values
      * @return array Only values that are terms are converted into ids, the
@@ -581,7 +571,7 @@ class InternalQuerier extends AbstractQuerier
     /**
      * Get all resource class ids by term.
      *
-     * @see \Reference\Mvc\Controller\Plugin\Reference::getResourceClassIds()
+     * @see \Reference\Mvc\Controller\Plugin\References::getResourceClassIds()
      *
      * @return array Associative array of ids by term.
      */

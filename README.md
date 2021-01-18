@@ -44,11 +44,7 @@ Uncompress the zip inside the folder `modules` and rename it `Search`.
 
 See general end user documentation for [Installing a module].
 
-### Requirements
-
-- Module [jQueryUI] for admin interface, to manage the fields used by the form.
-
-### Optional dependency
+### Optional dependencies
 
 - Module [Reference] to display facets in the results with the internal adapter.
   It is not needed for external search engines. It should be at least version

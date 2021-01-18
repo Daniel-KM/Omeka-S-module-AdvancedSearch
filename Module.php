@@ -106,39 +106,27 @@ class Module extends AbstractModule
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
     {
-        // Adjust resource search by visibility.
-        $sharedEventManager->attach(
+        $adapters = [
             \Omeka\Api\Adapter\ItemAdapter::class,
-            'api.search.pre',
-            [$this, 'handleApiSearchPre']
-        );
-        $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemSetAdapter::class,
-            'api.search.pre',
-            [$this, 'handleApiSearchPre']
-        );
-        $sharedEventManager->attach(
             \Omeka\Api\Adapter\MediaAdapter::class,
-            'api.search.pre',
-            [$this, 'handleApiSearchPre']
-        );
-
-        // Add the search query filters for resources.
-        $sharedEventManager->attach(
-            \Omeka\Api\Adapter\ItemAdapter::class,
-            'api.search.query',
-            [$this, 'handleApiSearchQuery']
-        );
-        $sharedEventManager->attach(
-            \Omeka\Api\Adapter\ItemSetAdapter::class,
-            'api.search.query',
-            [$this, 'handleApiSearchQuery']
-        );
-        $sharedEventManager->attach(
-            \Omeka\Api\Adapter\MediaAdapter::class,
-            'api.search.query',
-            [$this, 'handleApiSearchQuery']
-        );
+            \Annotate\Api\Adapter\AnnotationAdapter::class,
+            \Generateur\Api\Adapter\GenerationAdapter::class,
+        ];
+        foreach ($adapters as $adapter) {
+            // Adjust resource search by visibility.
+            $sharedEventManager->attach(
+                $adapter,
+                'api.search.pre',
+                [$this, 'handleApiSearchPre']
+            );
+            // Add the search query filters for resources.
+            $sharedEventManager->attach(
+                $adapter,
+                'api.search.query',
+                [$this, 'handleApiSearchQuery']
+            );
+        };
 
         $sharedEventManager->attach(
             \Omeka\Form\Element\PropertySelect::class,
@@ -287,6 +275,8 @@ class Module extends AbstractModule
      * Removes is_public from the query if the value is '', before
      * passing it to AbstractResourceEntityAdapter, as it would
      * coerce it to boolean false for the query builder.
+     *
+     * Waiting for fix in https://github.com/omeka/omeka-s/pull/1671
      *
      * @param Event $event
      */

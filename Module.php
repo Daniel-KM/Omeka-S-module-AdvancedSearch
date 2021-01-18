@@ -46,6 +46,20 @@ use Omeka\Module\AbstractModule;
 
 class Module extends AbstractModule
 {
+    /**
+     * List of property ids by term.
+     *
+     * @var array
+     */
+    protected $properties;
+
+    /**
+     * List of used property ids by term.
+     *
+     * @var array
+     */
+    protected $usedProperties;
+
     public function getConfig()
     {
         return include __DIR__ . '/config/module.config.php';
@@ -1069,6 +1083,8 @@ class Module extends AbstractModule
             return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], (string) $string);
         };
 
+        $entityManager = $adapter->getEntityManager();
+
         foreach ($query['property'] as $queryRow) {
             if (!(
                 is_array($queryRow)
@@ -1078,6 +1094,7 @@ class Module extends AbstractModule
                 continue;
             }
             $propertyId = $queryRow['property'];
+            $excludePropertyIds = $propertyId || empty($queryRow['except']) ? false : $queryRow['except'];
             $queryType = $queryRow['type'];
             $joiner = $queryRow['joiner'] ?? '';
             $value = $queryRow['text'] ?? '';
@@ -1096,7 +1113,7 @@ class Module extends AbstractModule
                 case 'eq':
                     $param = $adapter->createNamedParameter($qb, $value);
                     $subqueryAlias = $adapter->createAlias();
-                    $subquery = $adapter->getEntityManager()
+                    $subquery = $entityManager
                         ->createQueryBuilder()
                         ->select("$subqueryAlias.id")
                         ->from('Omeka\Entity\Resource', $subqueryAlias)
@@ -1114,7 +1131,7 @@ class Module extends AbstractModule
                 case 'in':
                     $param = $adapter->createNamedParameter($qb, '%' . $escape($value) . '%');
                     $subqueryAlias = $adapter->createAlias();
-                    $subquery = $adapter->getEntityManager()
+                    $subquery = $entityManager
                         ->createQueryBuilder()
                         ->select("$subqueryAlias.id")
                         ->from('Omeka\Entity\Resource', $subqueryAlias)
@@ -1137,7 +1154,7 @@ class Module extends AbstractModule
                     }
                     $param = $adapter->createNamedParameter($qb, $list);
                     $subqueryAlias = $adapter->createAlias();
-                    $subquery = $adapter->getEntityManager()
+                    $subquery = $entityManager
                         ->createQueryBuilder()
                         ->select("$subqueryAlias.id")
                         ->from('Omeka\Entity\Resource', $subqueryAlias)
@@ -1155,7 +1172,7 @@ class Module extends AbstractModule
                 case 'sw':
                     $param = $adapter->createNamedParameter($qb, $escape($value) . '%');
                     $subqueryAlias = $adapter->createAlias();
-                    $subquery = $adapter->getEntityManager()
+                    $subquery = $entityManager
                         ->createQueryBuilder()
                         ->select("$subqueryAlias.id")
                         ->from('Omeka\Entity\Resource', $subqueryAlias)
@@ -1173,7 +1190,7 @@ class Module extends AbstractModule
                 case 'ew':
                     $param = $adapter->createNamedParameter($qb, '%' . $escape($value));
                     $subqueryAlias = $adapter->createAlias();
-                    $subquery = $adapter->getEntityManager()
+                    $subquery = $entityManager
                         ->createQueryBuilder()
                         ->select("$subqueryAlias.id")
                         ->from('Omeka\Entity\Resource', $subqueryAlias)
@@ -1209,17 +1226,20 @@ class Module extends AbstractModule
             $joinConditions = [];
             // Narrow to specific property, if one is selected
             if ($propertyId) {
-                if (is_numeric($propertyId)) {
-                    $propertyId = (int) $propertyId;
-                } else {
-                    $property = $adapter->getPropertyByTerm($propertyId);
-                    if ($property) {
-                        $propertyId = $property->getId();
-                    } else {
-                        $propertyId = 0;
-                    }
+                $propertyId = $this->getPropertyId($propertyId);
+                $joinConditions[] = $expr->eq("$valuesAlias.property", $propertyId);
+            } elseif ($excludePropertyIds) {
+                $excludePropertyIds = is_array($excludePropertyIds)
+                    ? array_map([$this, 'getPropertyId'], $excludePropertyIds)
+                    : [$this->getPropertyId($excludePropertyIds)];
+                $excludePropertyIds = array_filter($excludePropertyIds);
+                // Use standard query if nothing to exclude, else limit search.
+                if (count($excludePropertyIds)) {
+                    // The aim is to search anywhere except ocr content.
+                    // Use not positive + in() or notIn()? A full list is simpler.
+                    $otherIds = array_diff($this->usedProperties, $excludePropertyIds);
+                    $joinConditions[] = $expr->in("$valuesAlias.property", $otherIds);
                 }
-                $joinConditions[] = $expr->eq("$valuesAlias.property", (int) $propertyId);
             }
 
             if ($positive) {
@@ -1403,5 +1423,48 @@ class Module extends AbstractModule
                 // January, March, May, July, August, October, December
                 return 31;
         }
+    }
+
+    /**
+     * Get a property id by JSON-LD term or by numeric id.
+     *
+     * Prepare the list of properties and used properties too.
+     */
+    public function getPropertyId($termOrId): int
+    {
+        if (is_null($this->properties)) {
+            $connection = $this->getServiceLocator()->get('Omeka\Connection');
+            $qb = $connection->createQueryBuilder();
+            $qb
+                ->select([
+                    'DISTINCT property.id AS id',
+                    'CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
+                    // Only the two first selects are needed, but some databases
+                    // require "order by" or "group by" value to be in the select.
+                    'vocabulary.id',
+                    'property.id',
+                ])
+                ->from('property', 'property')
+                ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
+                ->orderBy('vocabulary.id', 'asc')
+                ->addOrderBy('property.id', 'asc')
+                ->addGroupBy('property.id')
+            ;
+            $stmt = $connection->executeQuery($qb);
+            // Fetch by key pair is not supported by doctrine 2.0.
+            $this->properties = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $this->properties = array_map('intval', array_column($this->properties, 'id', 'term'));
+
+            $qb->innerJoin('property', 'value', 'value', 'property.id = value.property_id');
+            $stmt = $connection->executeQuery($qb);
+            // Fetch by key pair is not supported by doctrine 2.0.
+            $this->usedProperties = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $this->usedProperties = array_map('intval', array_column($this->usedProperties, 'id', 'term'));
+        }
+
+        if (is_numeric($termOrId)) {
+            return in_array($termOrId, $this->properties) ? (int) $termOrId : 0;
+        }
+        return $this->properties[$termOrId] ?? 0;
     }
 }

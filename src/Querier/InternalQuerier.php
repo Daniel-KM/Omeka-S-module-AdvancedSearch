@@ -315,9 +315,7 @@ class InternalQuerier extends AbstractQuerier
                     } elseif (is_array(reset($values))) {
                         $values = array_merge(...$values);
                     }
-                    // TODO Manage any resource type ids (items or item sets).
-                    // $this->args['id'] = array_filter(array_map('intval', $values));
-                    $this->args['item_set_id'] = array_filter(array_map('intval', $values));
+                    $this->args['id'] = array_filter(array_map('intval', $values));
                     continue 2;
 
                 case 'item_set_id':

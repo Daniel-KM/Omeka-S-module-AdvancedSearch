@@ -50,10 +50,12 @@ See general end user documentation for [Installing a module].
   It is not needed for external search engines. It should be at least version
   3.4.16. Older versions are supported only with Search version 3.5.12.2 or
   older ones.
+- Module [Advanced Search Plus] (from version 3.3.5.4) to be able to exclude
+  fields from the main query with the internal adapter.
 - Module [Solr]. Note that this is not the module [Solr of Biblibre], but the
   module named [SearchSolr].
 
-### Fix
+### Fix for Omeka before version 3
 
 - When item sets are used as facets, you may need to use [this patch].
 
@@ -71,7 +73,7 @@ An index and a page for the internal adapter are automatically prepared during
 install. This search engine can be enabled in main settings and site settings.
 It can be removed too.
 
-To create a new search engine, follow these steps.
+To create a page with a search engine, follow these steps.
 
 1. Create an index
     1. Add a new index with name `Internal` or whatever you want, using the
@@ -96,8 +98,6 @@ To create a new search engine, follow these steps.
        `dcterms:creator`, `dcterms:date`, `dcterms:spatial`, `dcterms:language`
        and `dcterms:rights` as facets, and `dcterms:title`, `dcterms:date`, and
        `dcterms:creator` as sort fields.
-       **Important**: with the internal adapter, the facets work only if the
-       module [Reference] is enabled.
     3. Edit the name of the label that will be used for facets and sort fields
        in the same page. The string will be automatically translated if it
        exists in Omeka.
@@ -122,6 +122,16 @@ the results as grid or as list. The page can be themed.
 
 The Search module  does not replace the default search page neither the default
 search engine. So the theme should be updated.
+
+
+Internal engine (mysql)
+-----------------------
+
+The module is provided with an adapter for mysql. In order to get all features,
+you need two other modules.
+
+- The facets work only if the module [Reference] is enabled.
+- The excluded fields work only if the module [Advanced Search Plus] is enabled.
 
 
 Search api
@@ -262,6 +272,7 @@ were done for various projects.
 [this patch]: https://github.com/omeka/omeka-s/pull/1519/files
 [jQueryUI]: https://github.com/biblibre/omeka-s-module-jQueryUI
 [Reference]: https://gitlab.com/Daniel-KM/Omeka-S-module-Reference
+[Advanced Search Plus]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearchPlus
 [Solr of Biblibre]: https://github.com/BibLibre/Omeka-S-module-Solr
 [Browse preview]: https://omeka.org/s/docs/user-manual/sites/site_pages/#browse-preview
 [module issues]: https://github.com/BibLibre/Omeka-S-module-Search/issues

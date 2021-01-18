@@ -16,6 +16,11 @@ class ManagerDelegator extends \Omeka\Api\Manager
     protected $controllerPlugins;
 
     /**
+     * @var bool
+     */
+    protected $hasAdvancedSearchPlus;
+
+    /**
      * Execute a search API request with an option to do a quick search.
      *
      * The quick search is enabled when the argument "index" is true in the
@@ -23,6 +28,7 @@ class ManagerDelegator extends \Omeka\Api\Manager
      * but it is not available in the admin user interface, for example in block
      * layouts, neither in the view helper api().
      * @todo Remove "index" from the display if any.
+     * @todo Use a true delegator (with the delegate) to avoid the fix for AdvancedSearchPlus.
      *
      * {@inheritDoc}
      * @see \Omeka\Api\Manager::search()
@@ -40,6 +46,23 @@ class ManagerDelegator extends \Omeka\Api\Manager
         }
 
         if (empty($options['index']) && empty($data['index'])) {
+            // @see \AdvancedSearchPlus\Api\ManagerDelegator::search()
+            if ($this->hasAdvancedSearchPlus
+                // Use the standard process when possible.
+                && array_key_exists('initialize', $options)
+                && !$options['initialize']
+                && in_array($resource, [
+                    'items',
+                    'media',
+                    'item_sets',
+                    'annotations',
+                    'generations',
+                ])
+                && !empty($data['property'])
+            ) {
+                $options['override'] = ['property' => $data['property']];
+                unset($data['property']);
+            }
             return parent::search($resource, $data, $options);
         }
 
@@ -53,6 +76,12 @@ class ManagerDelegator extends \Omeka\Api\Manager
     public function setControllerPlugins(ControllerPluginManager $controllerPlugins)
     {
         $this->controllerPlugins = $controllerPlugins;
+        return $this;
+    }
+
+    public function setHasAdvancedSearchPlus(bool $hasAdvancedSearchPlus)
+    {
+        $this->hasAdvancedSearchPlus = $hasAdvancedSearchPlus;
         return $this;
     }
 }

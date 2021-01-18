@@ -212,29 +212,17 @@ class InternalQuerier extends AbstractQuerier
             return;
         }
 
-        // Try to support the exact search and the full text search.
+        // TODO Try to support the exact search and the full text search (removed in previous version).
         if (mb_substr($q, 0, 1) === '"' && mb_substr($q, -1) === '"') {
             $q = trim($q, '" ');
-            $this->args['property'][] = [
-                'joiner' => 'and',
-                'property' => '',
-                'type' => 'in',
-                'text' => $q,
-            ];
-            return;
         }
 
-        // The full text search is not available via standard api, but only in a
-        // special request (see \Omeka\Module::searchFulltext()).
-        $qq = array_filter(array_map('trim', explode(' ', $q)), 'mb_strlen');
-        foreach ($qq as $qw) {
-            $this->args['property'][] = [
-                'joiner' => 'and',
-                'property' => '',
-                'type' => 'in',
-                'text' => $qw,
-            ];
-        }
+        $this->args['property'][] = [
+            'joiner' => 'and',
+            'property' => '',
+            'type' => 'in',
+            'text' => $q,
+        ];
     }
 
     /**
@@ -250,31 +238,18 @@ class InternalQuerier extends AbstractQuerier
         $q = $this->query->getQuery();
         $excludedFields = $this->query->getExcludedFields();
 
-        // Try to support the exact search and the full text search.
+        // TODO Try to support the exact search and the full text search (removed in previous version).
         if (mb_substr($q, 0, 1) === '"' && mb_substr($q, -1) === '"') {
             $q = trim($q, '" ');
-            $this->args['property'][] = [
-                'joiner' => 'and',
-                'property' => '',
-                'except' => $excludedFields,
-                'type' => 'in',
-                'text' => $q,
-            ];
-            return;
         }
 
-        // The full text search is not available via standard api, but only in a
-        // special request (see \Omeka\Module::searchFulltext()).
-        $qq = array_filter(array_map('trim', explode(' ', $q)), 'mb_strlen');
-        foreach ($qq as $qw) {
-            $this->args['property'][] = [
-                'joiner' => 'and',
-                'property' => '',
-                'except' => $excludedFields,
-                'type' => 'in',
-                'text' => $qw,
-            ];
-        }
+        $this->args['property'][] = [
+            'joiner' => 'and',
+            'property' => '',
+            'except' => $excludedFields,
+            'type' => 'in',
+            'text' => $q,
+        ];
     }
 
     /**

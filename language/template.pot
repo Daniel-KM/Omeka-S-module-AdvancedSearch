@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-30 00:00+0000\n"
+"POT-Creation-Date: 2021-01-18 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -227,47 +227,43 @@ msgid "grid"
 msgstr ""
 
 #: Module.php:90
-msgid "The module jQueryUI is required to customize the search pages."
-msgstr ""
-
-#: Module.php:94
 msgid ""
 "The module Reference is required to use the facets with the default internal "
-"adapter."
+"adapter, but not for the Solr adapter."
 msgstr ""
 
-#: Module.php:376
+#: Module.php:372
 #, php-format
 msgid "Unable to batch index metadata for search index \"%s\": %s"
 msgstr ""
 
-#: Module.php:381
+#: Module.php:377
 #, php-format
 msgid "Unable to batch update the search index \"%s\": see log."
 msgstr ""
 
-#: Module.php:466
+#: Module.php:462
 #, php-format
 msgid "Unable to delete the search index for resource #%d: %s"
 msgstr ""
 
-#: Module.php:471
+#: Module.php:467
 #, php-format
 msgid ""
 "Unable to delete the search index for the deleted resource #%d: see log."
 msgstr ""
 
-#: Module.php:491
+#: Module.php:487
 #, php-format
 msgid "Unable to index metadata of resource #%d for search: %s"
 msgstr ""
 
-#: Module.php:496
+#: Module.php:492
 #, php-format
 msgid "Unable to update the search index for resource #%d: see log."
 msgstr ""
 
-#: Module.php:620
+#: Module.php:616
 msgid ""
 "The internal search engine is available. Enable it in the main settings (for "
 "admin) and in site settings (for public)."
@@ -714,14 +710,14 @@ msgstr ""
 msgid "Mapping properties to search fields"
 msgstr ""
 
-#: src/Querier/InternalQuerier.php:158
+#: src/Querier/InternalQuerier.php:157
 #, php-format
 msgid ""
 "The query \"%1$s\" uses %2$d properties, that is more than the %3$d "
 "supported currently. Excluded fields are removed."
 msgstr ""
 
-#: src/Querier/InternalQuerier.php:166
+#: src/Querier/InternalQuerier.php:165
 #, php-format
 msgid ""
 "The query \"%1$s\" uses %2$d properties, that is more than the %3$d "

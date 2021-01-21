@@ -85,13 +85,9 @@ class Module extends AbstractModule
     protected function postInstall(): void
     {
         $messenger = new Messenger;
-        $optionalModule = 'jQueryUI';
-        if (!$this->isModuleActive($optionalModule)) {
-            $messenger->addWarning('The module jQueryUI is required to customize the search pages.'); // @translate
-        }
         $optionalModule = 'Reference';
         if (!$this->isModuleActive($optionalModule)) {
-            $messenger->addWarning('The module Reference is required to use the facets with the default internal adapter.'); // @translate
+            $messenger->addWarning('The module Reference is required to use the facets with the default internal adapter, but not for the Solr adapter.'); // @translate
         }
 
         $this->installResources();

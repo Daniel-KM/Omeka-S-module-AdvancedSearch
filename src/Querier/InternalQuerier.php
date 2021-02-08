@@ -524,6 +524,7 @@ class InternalQuerier extends AbstractQuerier
             ;
 
             $properties = $qb->getQuery()->getScalarResult();
+            $properties = array_map('intval', $properties);
         }
 
         return $properties;
@@ -569,7 +570,7 @@ class InternalQuerier extends AbstractQuerier
             $stmt = $connection->executeQuery($qb);
             // Fetch by key pair is not supported by doctrine 2.0.
             $resourceClasses = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            $resourceClasses = array_column($resourceClasses, 'id', 'term');
+            $resourceClasses = array_map('intval', array_column($resourceClasses, 'id', 'term'));
         }
 
         return $resourceClasses;
@@ -610,7 +611,7 @@ class InternalQuerier extends AbstractQuerier
             $stmt = $connection->executeQuery($qb);
             // Fetch by key pair is not supported by doctrine 2.0.
             $resourceTemplates = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            $resourceTemplates = array_column($resourceTemplates, 'id', 'label');
+            $resourceTemplates = array_map('intval', array_column($resourceTemplates, 'id', 'label'));
         }
 
         return $resourceTemplates;

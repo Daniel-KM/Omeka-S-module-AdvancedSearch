@@ -1,7 +1,7 @@
 <?php
 /*
  * Copyright BibLibre, 2016-2017
- * Copyright Daniel Berthereau, 2017-2019
+ * Copyright Daniel Berthereau, 2017-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -36,15 +36,15 @@
 $translate = $this->plugin('translate');
 $formCollection = $this->plugin('formCollection');
 $formRow = $this->plugin('formRow');
+$assetUrl = $this->plugin('assetUrl');
 
 $isSimple = $form instanceof \Search\Form\Admin\SearchPageConfigureSimpleForm;
 
-$assetUrl = $this->plugin('assetUrl');
 $this->headLink()
-    ->appendStylesheet('https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css')
+    ->appendStylesheet($assetUrl('vendor/jqueryui/themes/base/jquery-ui.min.css', 'Search'))
     ->appendStylesheet($assetUrl('css/search-page-configure.css', 'Search'));
 $this->headScript()
-    ->appendFile('https://code.jquery.com/ui/1.12.1/jquery-ui.min.js', 'text/javascript', ['integrity' => 'sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=', 'crossorigin' => 'anonymous', 'defer' => 'defer'])
+    ->appendFile($assetUrl('vendor/jqueryui/jquery-ui.min.js', 'Search'), 'text/javascript', ['defer' => 'defer'])
     ->appendFile($assetUrl('js/search-admin.js', 'Search'), 'text/javascript', ['defer' => 'defer']);
 ;
 

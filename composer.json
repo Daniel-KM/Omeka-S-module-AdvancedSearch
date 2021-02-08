@@ -6,5 +6,18 @@
         "psr-4": {
             "SearchTest\\": "test/SearchTest/"
         }
+    },
+    "require": {
+        "components/jqueryui": "^1.12"
+    },
+    "replace": {
+        "components/jquery": "*"
+    },
+    "scripts": {
+        "post-install-cmd": "@build",
+        "post-update-cmd": "@build",
+        "build": [
+            "mkdir --parents asset/vendor/jqueryui && cp --recursive vendor/components/jqueryui asset/vendor"
+        ]
     }
 }

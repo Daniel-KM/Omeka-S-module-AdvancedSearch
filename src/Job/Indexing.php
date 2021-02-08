@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2018
+ * Copyright Daniel Berthereau, 2018-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -29,6 +29,7 @@
 
 namespace Search\Job;
 
+use Doctrine\ORM\EntityManager;
 use Omeka\Job\AbstractJob;
 use Omeka\Stdlib\Message;
 use Search\Query;
@@ -46,12 +47,19 @@ class Indexing extends AbstractJob
     {
         /**
          * @var \Omeka\Api\Manager $api
-         * @var \Doctrine\ORM\EntityManager $em
+         * @var \Doctrine\ORM\EntityManager $entityManager
          */
         $services = $this->getServiceLocator();
+
+        // Because this is an indexer that is used in background, another entity
+        // manager is used to avoid conflicts with the main entity manager, for
+        // example when the job is run in foreground or multiple resources are
+        // imported in bulk, so a flush() or a clear() will not be applied on
+        // the imported resources but only on the indexed resources.
+        $entityManager = $this->getNewEntityManager($services->get('Omeka\EntityManager'));
+
         $apiAdapters = $services->get('Omeka\ApiAdapterManager');
         $api = $services->get('Omeka\ApiManager');
-        $em = $services->get('Omeka\EntityManager');
         $settings = $services->get('Omeka\Settings');
         $this->logger = $services->get('Omeka\Logger');
 
@@ -164,7 +172,7 @@ class Indexing extends AbstractJob
 
                 // TODO Use doctrine large iterable data-processing? See https://www.doctrine-project.org/projects/doctrine-orm/en/latest/reference/batch-processing.html#iterating-large-results-for-data-processing
                 $offset = $batchSize * ($page - 1);
-                $q = $em
+                $q = $entityManager
                     ->createQuery($dql)
                     ->setFirstResult($offset)
                     ->setMaxResults($batchSize);
@@ -175,7 +183,7 @@ class Indexing extends AbstractJob
 
                 ++$page;
                 $totals[$resourceName] += count($resources);
-                $em->clear();
+                $entityManager->clear();
             } while (count($resources) == $batchSize);
         }
 
@@ -186,5 +194,17 @@ class Indexing extends AbstractJob
         $this->logger->info(new Message('Search index #%d ("%s"): end of indexing. %s. Execution time: %s seconds. Failed indexed resources should be checked manually.', // @translate
             $searchIndex->id(), $searchIndex->name(), implode('; ', $totalResults), (int) (microtime(true) - $timeStart)
         ));
+    }
+
+    /**
+     * Create a new EntityManager with the same config.
+     */
+    private function getNewEntityManager(EntityManager $entityManager): EntityManager
+    {
+        return EntityManager::create(
+            $entityManager->getConnection(),
+            $entityManager->getConfiguration(),
+            $entityManager->getEventManager()
+        );
     }
 }

@@ -40,7 +40,22 @@ An adapter is available for [Solr], one of the most used search engine.
 Installation
 ------------
 
-Uncompress the zip inside the folder `modules` and rename it `Search`.
+The module uses an external library [jQueryUI], so use the release zip to
+install it, or use and init the source.
+
+* From the zip
+
+Download the last release [Search.zip] from the list of releases (the master
+does not contain the dependency), and uncompress it in the `modules` directory.
+
+* From the source and for development:
+
+If the module was installed from the source, rename the name of the folder of
+the module to `Search`, and go to the root module, and run:
+
+```sh
+composer install --no-dev
+```
 
 See general end user documentation for [Installing a module].
 
@@ -184,24 +199,24 @@ be some minutes with Solr, according to your configuration).
 TODO
 ----
 
-- Normalize the url query with a true standard (or the Omeka S one, or at the
+- [ ] Normalize the url query with a true standard (or the Omeka S one, or at the 
   choice of the admin, or the developer of the forms and queriers).
-- Make the search arguments groupable to allow smart facets: always display all
+- [ ] Make the search arguments groupable to allow smart facets: always display all
   facets from the original queries, with "or" between facets of the same group,
   and "and" between groups. Require that the core api allows groups.
-- Use the standard view with tabs and property selector for the page creation,
-  in order not to limit it to Dublin Core terms. It will avoid the dependency to
-  the module [jQueryUI] too. The tabs may be "Filters", "Facets", and "Sort".
-- Create an internal index (see Omeka Classic) and move all related code into
+- [ ] Use the standard view with tabs and property selector for the page creation,
+  in order not to limit it to Dublin Core terms. The tabs may be "Filters",
+  "Facets", and "Sort".
+- [ ] Create an internal index (see Omeka Classic) and move all related code into
   another module.
-- Allow to remove an index without removing pages.
-- Allow to import/export a mapping via json, for example the default one.
-- Add an option to use the search api by default (and an option `'index' => false`).
-- Set one api page by site and a quick set in the pages settings.
-- Update index when item pool of a site change.
-- Genericize and move the value extractor from module Solr to module Search.
-- Improve the check of presence of an item in sites for real time indexation.
-- Updated index in batch, not one by one.
+- [ ] Allow to remove an index without removing pages.
+- [ ] Allow to import/export a mapping via json, for example the default one.
+- [ ] Add an option to use the search api by default (and an option `'index' => false`).
+- [ ] Set one api page by site and a quick set in the pages settings.
+- [ ] Update index when item pool of a site change.
+- [ ] Genericize and move the value extractor from module Solr to module Search.
+- [ ] Improve the check of presence of an item in sites for real time indexation.
+- [ ] Updated index in batch, not one by one.
 
 
 Warning
@@ -255,7 +270,7 @@ Copyright
 See commits for full list of contributors.
 
 * Copyright BibLibre, 2016-2017 (see [BibLibre])
-* Copyright Daniel Berthereau, 2017-2020 (see [Daniel-KM])
+* Copyright Daniel Berthereau, 2017-2021 (see [Daniel-KM])
 
 The Psl search form and the Solr modules were initially built by [BibLibre] and
 are used by the [digital library of PSL], a French university. Next improvements
@@ -270,7 +285,7 @@ were done for various projects.
 [digital library of PSL]: https://bibnum.explore.univ-psl.fr
 [Installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
 [this patch]: https://github.com/omeka/omeka-s/pull/1519/files
-[jQueryUI]: https://github.com/biblibre/omeka-s-module-jQueryUI
+[jQueryUI]: https://jqueryui.com/
 [Reference]: https://gitlab.com/Daniel-KM/Omeka-S-module-Reference
 [Advanced Search Plus]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearchPlus
 [Solr of Biblibre]: https://github.com/BibLibre/Omeka-S-module-Solr

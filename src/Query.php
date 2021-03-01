@@ -116,7 +116,7 @@ class Query implements \JsonSerializable
      */
     public function setQuery($query)
     {
-        $this->query = trim($query);
+        $this->query = trim((string) $query);
         return $this;
     }
 
@@ -219,7 +219,11 @@ class Query implements \JsonSerializable
      */
     public function addFilterQuery($name, $value, $type = 'in', $joiner = 'and')
     {
-        $this->filterQueries[$name][] = ['value' => trim($value), 'type' => trim($type), 'joiner' => trim($joiner)];
+        $this->filterQueries[$name][] = [
+            'value' => trim((string) $value),
+            'type' => trim((string) $type),
+            'joiner' => trim((string) $joiner),
+        ];
         return $this;
     }
 

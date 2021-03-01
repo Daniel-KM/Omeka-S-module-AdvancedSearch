@@ -229,8 +229,8 @@ return [
     ],
     'search' => [
         'settings' => [
-            'search_main_page' => null,
-            'search_pages' => [],
+            'search_main_page' => 1,
+            'search_pages' => [1],
             'search_api_page' => '',
             'search_batch_size' => 100,
         ],

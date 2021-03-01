@@ -273,7 +273,7 @@ class ApiSearch extends AbstractPlugin
 
         // Begin building the search query.
         $resource = $request->getResource();
-        $searchPageSettings = $this->page->setting();
+        $searchPageSettings = $this->page->settings();
         $searchFormSettings = $searchPageSettings['form'] ?? ['options' => [], 'metadata' => [], 'properties' => [], 'sort_fields' => []];
         $searchFormSettings['resource'] = $resource;
         $searchQuery = $this->apiFormAdapter->toQuery($query, $searchFormSettings);

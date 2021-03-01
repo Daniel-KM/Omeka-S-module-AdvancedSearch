@@ -46,16 +46,27 @@ class InternalQuerier extends AbstractQuerier
         $plugins = $this->getServiceLocator()->get('ControllerPluginManager');
         $api = $plugins->get('api');
 
+        // The standard api way implies a double query, because scalar doesn't
+        // set the full total and doesn't use paginator.
+        // So get all ids, then slice it here.
+        $dataQuery = $this->args->getArrayCopy();
+        $limit = empty($dataQuery['limit']) ? null : (int) $dataQuery['limit'];
+        $offset = empty($dataQuery['offset']) ? 0 : (int) $dataQuery['offset'];
+        unset($dataQuery['limit'], $dataQuery['offset']);
+
         foreach ($this->resourceTypes as $resourceType) {
             try {
-                $dataQuery = $this->args->getArrayCopy();
                 // Return scalar doesn't allow to get the total of results.
+                // So skip offset and limit, then apply them in order to avoid
+                // the double query.
+                // TODO Check if this internal api paginator is quicker in all cases (small/long results) than previous double query.
                 $apiResponse = $api->search($resourceType, $dataQuery, ['returnScalar' => 'id']);
-                // Don't load entities if the only information needed is total.
-                if (empty($dataQuery['limit'])) {
-                    $dataQuery['limit'] = 0;
+                $totalResults = $apiResponse->getTotalResults();
+                $result = $apiResponse->getContent();
+                if ($result && ($offset || $limit)) {
+                    $result = array_slice($result, $offset, $limit ?: null);
+                    // $apiResponse->setContent($result);
                 }
-                $totalResults = $api->search($resourceType, $dataQuery)->getTotalResults();
             } catch (\Omeka\Api\Exception\ExceptionInterface $e) {
                 throw new QuerierException($e->getMessage(), $e->getCode(), $e);
             }
@@ -64,7 +75,7 @@ class InternalQuerier extends AbstractQuerier
             if ($totalResults) {
                 $result = array_map(function ($v) {
                     return ['id' => $v];
-                }, $apiResponse->getContent());
+                }, $result);
             } else {
                 $result = [];
             }

@@ -1,7 +1,7 @@
 <?php
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2019-2020
+ * Copyright Daniel Berthereau, 2019-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -35,17 +35,23 @@
  * @var string $title
  */
 
-$ids = array_map(function ($v) { return $v['id']; }, $response->getResults($resourceName));
+// Extract results as a whole to avoid subquery for each resource.
+$ids = array_column($response->getResults($resourceName), 'id', 'id');
 if (!count($ids)) return;
 
 // Filter resources existing on search index, but not in Omeka, and prepare the loop.
-$results = $this->api()->search($resourceName, ['id' => $ids])->getContent();
+// The sort order is unknown, so in order to keep order of results, use the id as key
+// and use array_replace(). This process avoids to do a single read() for each result.
+$results = [];
+foreach ($this->api()->search($resourceName, ['id' => $ids])->getContent() as $resource):
+    $results[$resource->id()] = $resource;
+endforeach;
+if (!count($results)) return;
+$results = array_replace(array_intersect_key($ids, $results), $results);
 ?>
 
-<?php if (count($results)): ?>
 <h3><?= $title ?></h3>
 <div class="resource-list">
     <?php $resources = array_map(function ($v) { return ['resource' => $v,'tag' => 'div']; }, $results); ?>
     <?= $this->partialLoop('search/resource', $resources) ?>
 </div>
-<?php endif; ?>

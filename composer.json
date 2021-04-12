@@ -1,23 +1,65 @@
 {
+    "name": "daniel-km/omeka-s-module-search",
+    "description": "Add improved search capabilities to Omeka S.",
+    "type": "library",
+    "license": "CECILL-2.1",
+    "authors": [
+        {
+            "name": "BibLibre"
+        },
+        {
+            "name": "Daniel Berthereau",
+            "email": "Daniel.git@Berthereau.net"
+        }
+    ],
+    "homepage": "https://gitlab.com/Daniel-KM/Omeka-S-module-Search",
+    "support": {
+        "issues": "https://gitlab.com/Daniel-KM/Omeka-S-module-Search/-/issues",
+        "forum": "https://forum.omeka.org/"
+    },
+    "keywords": [
+        "Omeka S",
+        "Omeka S module",
+        "search",
+        "facet",
+        "solr"
+    ],
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "components/jqueryui",
+                "version": "1.12.1",
+                "type": "omeka-addon-asset",
+                "dist": {
+                    "type": "tar",
+                    "url": "https://github.com/components/jqueryui/archive/refs/tags/1.12.1.tar.gz",
+                    "reference": "1.12.1"
+                }
+            }
+        }
+    ],
+    "require": {
+        "oomphinc/composer-installers-extender": "^2.0",
+        "components/jqueryui": "1.12.1"
+    },
+    "replace": {
+        "components/jquery": "*"
+    },
     "require-dev": {
         "biblibre/omeka-s-test-helper": "dev-master"
+    },
+    "extra": {
+        "installer-types": ["omeka-addon-asset"],
+        "installer-paths": {
+            "asset/vendor/{$name}/": [
+                "type:omeka-addon-asset"
+            ]
+        }
     },
     "autoload-dev": {
         "psr-4": {
             "SearchTest\\": "test/SearchTest/"
         }
-    },
-    "require": {
-        "components/jqueryui": "^1.12"
-    },
-    "replace": {
-        "components/jquery": "*"
-    },
-    "scripts": {
-        "post-install-cmd": "@build",
-        "post-update-cmd": "@build",
-        "build": [
-            "mkdir --parents asset/vendor/jqueryui && cp --recursive vendor/components/jqueryui asset/vendor"
-        ]
     }
 }

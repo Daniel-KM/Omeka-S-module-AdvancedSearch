@@ -227,6 +227,7 @@ class InternalQuerier extends AbstractQuerier
             $q = trim($q, '" ');
         }
 
+        // TODO Use fulltext_search, but when more than 50% results, no results, not understandable by end user.
         $this->args['property'][] = [
             'joiner' => 'and',
             'property' => '',
@@ -379,7 +380,7 @@ class InternalQuerier extends AbstractQuerier
         foreach ($filters as $name => $values) {
             foreach ($values as $value) {
                 $this->args['property'][] = [
-                    'joiner' => $value['joiner'],
+                    'joiner' => $value['join'],
                     'property' => $name,
                     'type' => $value['type'],
                     'text' => $value['value'],

@@ -214,15 +214,15 @@ class Query implements \JsonSerializable
      * @param string $name
      * @param string $value
      * @param string $type
-     * @param string $joiner
+     * @param string $join
      * @return self
      */
-    public function addFilterQuery($name, $value, $type = 'in', $joiner = 'and')
+    public function addFilterQuery($name, $value, $type = 'in', $join = 'and')
     {
         $this->filterQueries[$name][] = [
             'value' => trim((string) $value),
             'type' => trim((string) $type),
-            'joiner' => trim((string) $joiner),
+            'join' => trim((string) $join),
         ];
         return $this;
     }

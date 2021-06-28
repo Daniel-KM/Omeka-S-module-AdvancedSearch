@@ -190,7 +190,9 @@ class AdvancedFormConfigFieldset extends Fieldset
                     'required' => false,
                     'value' => '1',
                     'min' => '0',
-                    'max' => '99',
+                    // A mysql query supports 61 arguments maximum.
+                    'max' => '49',
+                    'step' => '1',
                 ],
             ])
             ->add([

@@ -164,7 +164,7 @@ class ApiFormAdapter implements FormAdapterInterface
             }
             $property = $queryRow['property'];
             $queryType = $queryRow['type'];
-            // $joiner = isset($queryRow['joiner']) ? $queryRow['joiner'] : null;
+            // $joiner = $queryRow['joiner']) ?? null;
             $value = $queryRow['text'] ?? null;
 
             if (!$value && $queryType !== 'nex' && $queryType !== 'ex') {

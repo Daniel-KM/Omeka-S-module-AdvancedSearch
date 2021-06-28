@@ -55,7 +55,7 @@ abstract class AbstractQuerier implements QuerierInterface
      */
     protected $query;
 
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): self
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): QuerierInterface
     {
         $this->serviceLocator = $serviceLocator;
         return $this;
@@ -66,13 +66,13 @@ abstract class AbstractQuerier implements QuerierInterface
         return $this->serviceLocator;
     }
 
-    public function setSearchIndex(SearchIndexRepresentation $index): self
+    public function setSearchIndex(SearchIndexRepresentation $index): QuerierInterface
     {
         $this->index = $index;
         return $this;
     }
 
-    public function setQuery(Query $query): self
+    public function setQuery(Query $query): QuerierInterface
     {
         $this->query = $query;
         return $this;

@@ -17,17 +17,17 @@ class NoopQuerier implements QuerierInterface
 {
     use LoggerAwareTrait;
 
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): self
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): QuerierInterface
     {
         return $this;
     }
 
-    public function setSearchIndex(SearchIndexRepresentation $index): self
+    public function setSearchIndex(SearchIndexRepresentation $index): QuerierInterface
     {
         return $this;
     }
 
-    public function setQuery(Query $query): self
+    public function setQuery(Query $query): QuerierInterface
     {
         return $this;
     }

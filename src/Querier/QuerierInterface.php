@@ -36,13 +36,16 @@ use Search\Api\Representation\SearchIndexRepresentation;
 use Search\Query;
 use Search\Response;
 
+/**
+ * The signature uses "QuerierInterface" instead of "self" for compatibility with php < 7.4.
+ */
 interface QuerierInterface extends LoggerAwareInterface
 {
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): self;
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): QuerierInterface;
 
-    public function setSearchIndex(SearchIndexRepresentation $index): self;
+    public function setSearchIndex(SearchIndexRepresentation $index): QuerierInterface;
 
-    public function setQuery(Query $query): self;
+    public function setQuery(Query $query): QuerierInterface;
 
     /**
      * Process a search query.

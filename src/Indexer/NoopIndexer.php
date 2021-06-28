@@ -12,12 +12,12 @@ class NoopIndexer implements IndexerInterface
 {
     use LoggerAwareTrait;
 
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): self
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): IndexerInterface
     {
         return $this;
     }
 
-    public function setSearchIndex(SearchIndexRepresentation $index): self
+    public function setSearchIndex(SearchIndexRepresentation $index): IndexerInterface
     {
         return $this;
     }
@@ -27,22 +27,22 @@ class NoopIndexer implements IndexerInterface
         return false;
     }
 
-    public function clearIndex(?Query $query = null): self
+    public function clearIndex(?Query $query = null): IndexerInterface
     {
         return $this;
     }
 
-    public function indexResource(Resource $resource): self
+    public function indexResource(Resource $resource): IndexerInterface
     {
         return $this;
     }
 
-    public function indexResources(array $resources): self
+    public function indexResources(array $resources): IndexerInterface
     {
         return $this;
     }
 
-    public function deleteResource(string $resourceName, $id): self
+    public function deleteResource(string $resourceName, $id): IndexerInterface
     {
         return $this;
     }

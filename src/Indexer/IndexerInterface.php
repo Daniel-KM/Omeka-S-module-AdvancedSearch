@@ -36,11 +36,14 @@ use Omeka\Entity\Resource;
 use Search\Api\Representation\SearchIndexRepresentation;
 use Search\Query;
 
+/**
+ * The signature uses "IndexerInterface" instead of "self" for compatibility with php < 7.4.
+ */
 interface IndexerInterface extends LoggerAwareInterface
 {
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): self;
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): IndexerInterface;
 
-    public function setSearchIndex(SearchIndexRepresentation $index): self;
+    public function setSearchIndex(SearchIndexRepresentation $index): IndexerInterface;
 
     /**
      * Inidicate if the resource can be indexed.
@@ -56,19 +59,19 @@ interface IndexerInterface extends LoggerAwareInterface
      * @param Query $query Allows to limit clearing to some resources.
      * @return self
      */
-    public function clearIndex(?Query $query = null): self;
+    public function clearIndex(?Query $query = null): IndexerInterface;
 
     /**
      * Index a resource.
      */
-    public function indexResource(Resource $resource): self;
+    public function indexResource(Resource $resource): IndexerInterface;
 
     /**
      * Index multiple resources.
      *
      * @param Resource[] $resources
      */
-    public function indexResources(array $resources): self;
+    public function indexResources(array $resources): IndexerInterface;
 
     /**
      * Unindex a deleted resource.
@@ -77,5 +80,5 @@ interface IndexerInterface extends LoggerAwareInterface
      * @param int $id
      * @return self
      */
-    public function deleteResource(string $resourceName, $id): self;
+    public function deleteResource(string $resourceName, $id): IndexerInterface;
 }

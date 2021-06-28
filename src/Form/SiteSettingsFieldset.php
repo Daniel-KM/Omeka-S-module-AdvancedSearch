@@ -17,6 +17,7 @@ class SiteSettingsFieldset extends Fieldset
 
     /**
      * Warning: there is a core fieldset "Search".
+     *
      * @var string
      */
     protected $label = 'Search module'; // @translate
@@ -55,7 +56,7 @@ class SiteSettingsFieldset extends Fieldset
                     'id' => 'search_pages',
                 ],
             ])
-            // TODO Move the option to redirect item set to search page a search page setting?
+            // TODO Move the option to redirect item set to search page or a search page setting?
             ->add([
                 'name' => 'search_redirect_itemset',
                 'type' => Element\Checkbox::class,
@@ -65,15 +66,13 @@ class SiteSettingsFieldset extends Fieldset
                 ],
                 'attributes' => [
                     'id' => 'search_redirect_itemset',
+                    'value' => true,
                 ],
             ])
         ;
     }
 
-    /**
-     * @param Api $api
-     */
-    public function setApi(Api $api)
+    public function setApi(Api $api): Fieldset
     {
         $this->api = $api;
         return $this;

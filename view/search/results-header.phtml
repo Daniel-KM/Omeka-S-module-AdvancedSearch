@@ -13,22 +13,7 @@ $translate = $this->plugin('translate');
     <div class="search-results-count">
         <?= $this->pagination() ?>
     </div>
-    <?php
-    if ($sortOptions):
-        $sortOptions = array_map($translate, $sortOptions);
-        $sortSelect = new \Laminas\Form\Element\Select('sort');
-        $sortSelect
-            ->setValueOptions($sortOptions)
-            ->setValue($query->getSort())
-            ->setLabel($translate('Sort by'));
-        ?>
-    <div class="search-results-sort">
-        <form>
-            <?= $this->formLabel($sortSelect) ?>
-            <?= $this->formSelect($sortSelect) ?>
-        </form>
-    </div>
-    <?php endif; ?>
+    <?= $this->searchSortSelector($query, $sortOptions) ?>
     <div>
         <a class="search-view-type search-view-type-list" href="#"><?= $translate('list') ?></a>
         |

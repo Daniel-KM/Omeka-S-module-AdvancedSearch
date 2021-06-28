@@ -26,6 +26,7 @@ return [
             'searchForm' => View\Helper\SearchForm::class,
             'searchingForm' => View\Helper\SearchingForm::class,
             'searchingUrl' => View\Helper\SearchingUrl::class,
+            'searchSortSelector' => View\Helper\SearchSortSelector::class,
         ],
         'factories' => [
             'apiSearch' => Service\ViewHelper\ApiSearchFactory::class,

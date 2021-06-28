@@ -109,7 +109,7 @@ $(document).ready(function() {
     });
 
     /* Sort selector links */
-    $('.sort-by-order').on('change', function(e) {
+    $('.sort-by-order-urls').on('change', function(e) {
         e.preventDefault();
         window.location.href = $(this).val();
     });

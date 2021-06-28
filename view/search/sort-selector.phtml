@@ -1,0 +1,16 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Search\Query $query
+ * @var array $sortOptions
+ * @var ?\Laminas\Form\Element\Select $sortSelect
+ * @var bool $asSortUrls
+ */
+
+if (empty($sortSelect)) return;
+?>
+
+<div class="sort-by-order<?= $asSortUrls ? ' sort-by-order-urls' : '' ?>">
+    <?= $this->formLabel($sortSelect) ?>
+    <?= $this->formSelect($sortSelect) ?>
+</div>

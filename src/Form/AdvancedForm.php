@@ -112,9 +112,11 @@ class AdvancedForm extends BasicForm
         $this
             ->add([
                 'name' => 'submit',
-                'type' => Element\Submit::class,
+                'type' => Element\Button::class,
+                'options' => [
+                    'label' => 'Submit', // @translate
+                ],
                 'attributes' => [
-                    'value' => 'Submit', // @translate
                     'type' => 'submit',
                 ],
             ])

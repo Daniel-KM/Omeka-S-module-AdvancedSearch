@@ -43,6 +43,10 @@ $translate = $plugins->get('translate');
 
 $facets = $response->getFacetCounts();
 $activeFacets = $response->getActiveFacets();
+
+// Don't display facet groups without facet elements.
+$facets = array_filter($facets);
+
 $isFacetModeButton = $searchPage->subSetting('facet', 'mode') !== 'link';
 
 $facetActive = $plugins->get('facetActive');

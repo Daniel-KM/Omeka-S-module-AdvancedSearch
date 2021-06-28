@@ -459,9 +459,14 @@ class InternalQuerier extends AbstractQuerier
         ];
 
         // Normalize search query keys as omeka keys for items and item sets.
-        $fields = array_map(function ($v) use ($metadataFieldsToNames) {
+        $fields = array_combine($facetFields, array_map(function ($v) use ($metadataFieldsToNames) {
             return $metadataFieldsToNames[$v] ?? $v;
-        }, $facetFields);
+        }, $facetFields));
+
+        // Facet counts don't make a distinction by resource type, so they
+        // should be merged here. This is needed as long as there is no single
+        // query for resource (items and item sets together).
+        $facetCountsByField = array_fill_keys($facetFields, []);
 
         foreach ($this->resourceTypes as $resourceType) {
             $options = [
@@ -487,19 +492,26 @@ class InternalQuerier extends AbstractQuerier
             ];
 
             $values = $references
-                ->setMetadata($fields)
+                ->setMetadata(array_values($fields))
                 ->setQuery($facetData)
                 ->setOptions($options)
                 ->list();
 
-            $key = 0;
-            foreach ($values as $result) {
-                foreach ($result['o:references'] as $value => $count) {
-                    $this->response->addFacetCount($facetFields[$key], $value, $count);
+            foreach ($facetFields as $facetField) {
+                foreach ($values[$fields[$facetField]]['o:references'] ?? [] as $value => $count) {
+                    empty($facetCountsByField[$facetField][$value])
+                        ? $facetCountsByField[$facetField][$value] = [
+                            'value' => $value,
+                            'count' => $count,
+                        ]
+                        : $facetCountsByField[$facetField][$value] = [
+                            'value' => $value,
+                            'count' => $count + $facetCountsByField[$facetField][$value]['count'],
+                        ];
                 }
-                ++$key;
             }
         }
+        $this->response->setFacetCounts(array_map('array_values', $facetCountsByField));
     }
 
     /**

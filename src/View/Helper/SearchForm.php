@@ -41,7 +41,7 @@ class SearchForm extends AbstractHelper
     }
 
     /**
-     *Prepare default search page, form and partial.
+     * Prepare default search page, form and partial.
      *
      * @param SearchPageRepresentation $searchPage
      * @param string $partial Specific partial for the search form.
@@ -49,14 +49,12 @@ class SearchForm extends AbstractHelper
      */
     protected function initSearchForm(SearchPageRepresentation $searchPage = null, $partial = null, $skipFormAction = false): void
     {
-        $view = $this->getView();
-        $isAdmin = $view->status()->isAdminRequest();
+        $plugins = $this->getView()->getHelperPluginManager();
+        $isAdmin = $plugins->get('status')->isAdminRequest();
         if (empty($searchPage)) {
             // If it is on a search page route, use the id, else use the setting.
-            $params = $view->params()->fromRoute();
-            $setting = $isAdmin
-                ? $view->getHelperPluginManager()->get('setting')
-                : $view->getHelperPluginManager()->get('siteSetting');
+            $params = $plugins->get('params')->fromRoute();
+            $setting = $plugins->get($isAdmin ? 'setting' : 'siteSetting');
             if ($params['controller'] === 'Search\Controller\IndexController') {
                 $searchPageId = $params['id'];
                 // Check if this search page is allowed.
@@ -67,7 +65,7 @@ class SearchForm extends AbstractHelper
             if (empty($searchPageId)) {
                 $searchPageId = $setting('search_main_page');
             }
-            $this->searchPage = $view->api()->searchOne('search_pages', ['id' => (int) $searchPageId])->getContent();
+            $this->searchPage = $plugins->get('api')->searchOne('search_pages', ['id' => (int) $searchPageId])->getContent();
         } else {
             $this->searchPage = $searchPage;
         }
@@ -78,7 +76,7 @@ class SearchForm extends AbstractHelper
             if ($this->form && !$skipFormAction) {
                 $url = $isAdmin
                     ? $this->searchPage->adminSearchUrl()
-                    : $this->searchPage->url();
+                    : $this->searchPage->siteUrl();
                 $this->form->setAttribute('action', $url);
             }
         }

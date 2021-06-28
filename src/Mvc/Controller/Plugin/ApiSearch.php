@@ -282,6 +282,7 @@ class ApiSearch extends AbstractPlugin
         // Note: the event search.query is not triggered.
 
         // Nevertheless, the "is public" is automatically forced for visitors.
+        // TODO Improve the visibility check (owner). Store all specific rights datas (by role or owner or something else (module access resource))?
         if (!$this->acl->getAuthenticationService()->hasIdentity()) {
             $searchQuery->setIsPublic(true);
         }

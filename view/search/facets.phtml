@@ -55,6 +55,9 @@ if (!empty($itemSet)) {
     unset($facets['item_set_id']);
     unset($activeFacets['item_set_id']);
 }
+
+$options = $searchPage->setting('facet', []);
+unset($options['facets']);
 ?>
 
 <aside class="search-facets">
@@ -63,7 +66,7 @@ if (!empty($itemSet)) {
     <h4><?= $translate('Active filters') ?></h4>
     <ul class="search-facets-active">
         <?php foreach ($activeFacets as $name => $facetValues) foreach ($facetValues as $facetValue): ?>
-        <li><?= $facetActive($name, ['value' => $facetValue, 'count' => null]) ?></li>
+        <li><?= $facetActive($name, ['value' => $facetValue, 'count' => null], $options) ?></li>
         <?php endforeach; ?>
     </ul>
     <?php endif; ?>
@@ -78,7 +81,7 @@ if (!empty($itemSet)) {
                 <ul class="search-facet-items">
                     <?php foreach ($facetValues as $facetValue): ?>
                     <li class="search-facet-item">
-                        <?= $facetElement($name, $facetValue) ?>
+                        <?= $facetElement($name, $facetValue, $options) ?>
                     </li>
                     <?php endforeach; ?>
                 </ul>

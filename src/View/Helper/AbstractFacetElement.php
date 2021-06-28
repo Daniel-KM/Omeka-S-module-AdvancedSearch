@@ -46,9 +46,10 @@ class AbstractFacetElement extends AbstractHelper
      * @param array $facet A facet has two keys: value and count.
      * @return string|array
      */
-    public function __invoke(string $name, array $facet, bool $asData = false)
+    public function __invoke(string $name, array $facet, array $options = [], bool $asData = false)
     {
-        // Variables are static to speed up process.
+        // Variables are static to speed up process for all facets.
+        // TODO Share the list between active and facet helpers.
         static $urlHelper;
         static $partialHelper;
         static $escapeHtml;
@@ -86,7 +87,8 @@ class AbstractFacetElement extends AbstractHelper
             $params = $routeMatch->getParams();
             $queryBase = $request->getQuery()->toArray();
 
-            if ($plugins->get('status')->isSiteRequest()) {
+            $isSiteRequest = $plugins->get('status')->isSiteRequest();
+            if ($isSiteRequest) {
                 $this->siteId = $plugins
                     ->get('Laminas\View\Helper\ViewModel')
                     ->getRoot()
@@ -128,6 +130,7 @@ class AbstractFacetElement extends AbstractHelper
                 'count' => $facet['count'],
                 'active' => $active,
                 'url' => $url,
+                'options' => $options,
                 // To speed up process.
                 'escapeHtml' => $escapeHtml,
                 'escapeHtmlAttr' => $escapeHtmlAttr,

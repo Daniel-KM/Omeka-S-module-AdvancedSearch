@@ -468,6 +468,17 @@ class SearchPageConfigureForm extends Form
                 ],
             ])
             ->add([
+                'name' => 'display_count',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Display the count of each facet', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'display_count',
+                    'value' => true,
+                ],
+            ])
+            ->add([
                 'name' => 'mode',
                 'type' => Element\Radio::class,
                 'options' => [

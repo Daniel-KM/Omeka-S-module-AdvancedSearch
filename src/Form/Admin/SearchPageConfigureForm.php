@@ -31,7 +31,10 @@
 namespace Search\Form\Admin;
 
 use Laminas\Form\Element;
+use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
+use Omeka\Form\Element\ArrayTextarea;
+use Search\Form\Element\ArrayText;
 
 class SearchPageConfigureForm extends Form
 {
@@ -46,20 +49,49 @@ class SearchPageConfigureForm extends Form
             return;
         }
 
-        $this
-            ->addMainSettings()
-            ->addFacets()
-            ->addSortFields()
-            ->addFormFieldset();
+        // This is the search page settings, not the search form one.
 
-        // Input filters should be added after elements.
-        $this
-            ->addInputFilter();
-    }
+        // TODO Simplify the form with js, storing the whole form one time. See UserProfile and https://docs.laminas.dev/laminas-form/v3/form-creation/creation-via-factory/
 
-    protected function addMainSettings()
-    {
+        // These fields may be overridden by the available fields.
+        $fieldOptions = $this->getAvailableFields();
+        $specialOptions = [
+            'is_public_field' => 'Is public', // @translate
+            // TODO Create a default field for item set, resource class and resource template for Solr.
+            'item_set_id_field' => 'Item set id (if available in fields)', // @translate
+            'resource_class_id_field' => 'Resource class id (if available in fields)', // @translate
+            'resource_template_id_field' => 'Resource template id (if available in fields)', // @translate
+        ] + $fieldOptions;
+
+        // Remove some of the available fields used by the internal adapter,
+        // because here, it's about special options and for any adapter.
+        unset($specialOptions['item_set_id']);
+        unset($specialOptions['resource_class_id']);
+        unset($specialOptions['resource_template_id']);
+
+        $orderElements = [
+            'q',
+            'itemSet',
+            'resourceClass',
+            'resourceTemplate',
+            'filters',
+            'submit',
+        ];
+
         $this
+            ->setAttribute('id', 'search-form-configure');
+
+        // Settings for the search engine.
+
+        $this
+            ->add([
+                'name' => 'search',
+                'type' => Fieldset::class,
+                'options' => [
+                    'label' => 'Search settings', // @translate
+                ],
+            ])
+            ->get('search')
             ->add([
                 'name' => 'default_results',
                 'type' => Element\Radio::class,
@@ -88,100 +120,355 @@ class SearchPageConfigureForm extends Form
                     'id' => 'default_query',
                 ],
             ])
-            /* // Removed, because hard to manage with redirection of item sets, block, direct queries, etc. Need to managed internal query differently.
+        ;
+
+        // Settings for the form querier (advanced form and filters).
+
+        $this
             ->add([
-                'name' => 'restrict_query_to_form',
-                'type' => Element\Checkbox::class,
+                'name' => 'form',
+                'type' => Fieldset::class,
                 'options' => [
-                    'label' => 'Restrict query to form', // @translate
-                    'info' => 'A form may have less fields than the search engine can manage. If set, the search is limited to the fields of the form. Else, all standard fields manageable by the querier are available.', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'restrict_query_to_form',
+                    'label' => 'Form', // @translate
                 ],
             ])
-            */
-        ;
-        return $this;
-    }
+            ->get('form')
 
-    protected function addFacets(): SearchPageConfigureForm
-    {
-        $this
-            ->addFacetLimit()
-            ->addFacetLanguages()
-            ->addFacetMode()
-        // field (term) | label (order means weight).
-        ->add([
-                'name' => 'facets',
-                'type' => Element\Textarea::class,
+            ->add([
+                'name' => 'item_set_filter_type',
+                'type' => Element\Radio::class,
                 'options' => [
-                    'label' => 'Facets', // @translate
-                    'info' => 'List of facets that will be displayed in the search page. Format is "term | Label".', // @translate
+                    'label' => 'Display item set filter', // @translate
+                    'value_options' => [
+                        '0' => 'No', // @translate
+                        'select' => 'As select', // @translate
+                        'multi-checkbox' => 'As multi checkbox', // @translate
+                    ],
                 ],
                 'attributes' => [
-                    'id' => 'facets',
+                    'id' => 'item_set_filter_type',
+                    'required' => false,
+                    'value' => '0',
+                ],
+            ])
+            ->add([
+                'name' => 'item_set_id_field',
+                'type' => Element\Select::class,
+                'options' => [
+                    'label' => 'Item set id field', // @translate
+                    'value_options' => $specialOptions,
+                    'empty_option' => 'None', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'item_set_id_field',
+                    'required' => false,
+                    'class' => 'chosen-select',
+                    'value' => 'item_set_id_field',
+                ],
+            ])
+
+            ->add([
+                'name' => 'resource_class_filter_type',
+                'type' => Element\Radio::class,
+                'options' => [
+                    'label' => 'Display resource class filter', // @translate
+                    'value_options' => [
+                        '0' => 'No', // @translate
+                        'select' => 'As select', // @translate
+                        'select_flat' => 'As flat select', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'resource_class_filter_type',
+                    'required' => false,
+                    'value' => '0',
+                ],
+            ])
+            ->add([
+                'name' => 'resource_class_id_field',
+                'type' => Element\Select::class,
+                'options' => [
+                    'label' => 'Resource class id field', // @translate
+                    'value_options' => $specialOptions,
+                    'empty_option' => 'None', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'resource_class_id_field',
+                    'required' => false,
+                    'class' => 'chosen-select',
+                    'value' => 'resource_class_id_field',
+                ],
+            ])
+
+            ->add([
+                'name' => 'resource_template_filter_type',
+                'type' => Element\Radio::class,
+                'options' => [
+                    'label' => 'Display resource template filter', // @translate
+                    'value_options' => [
+                        '0' => 'No', // @translate
+                        'select' => 'As select', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'resource_template_filter_type',
+                    'required' => false,
+                    'value' => '0',
+                ],
+            ])
+            ->add([
+                'name' => 'resource_template_id_field',
+                'type' => Element\Select::class,
+                'options' => [
+                    'label' => 'Resource template id field', // @translate
+                    'value_options' => $specialOptions,
+                    'empty_option' => 'None', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'resource_template_id_field',
+                    'required' => false,
+                    'class' => 'chosen-select',
+                    'value' => 'resource_template_id_field',
+                ],
+            ])
+
+            ->add([
+                'name' => 'is_public_field',
+                'type' => Element\Select::class,
+                'options' => [
+                    'label' => 'Is public field', // @translate
+                    'value_options' => $specialOptions,
+                    'empty_option' => 'None', // @translate
+                ],
+                'attributes' => [
+                    'required' => false,
+                    'class' => 'chosen-select',
+                    'value' => 'is_public_field',
+                ],
+            ])
+
+            ->add([
+                'name' => 'filters',
+                'type' => ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Filters', // @translate
+                    'info' => 'List of filters that will be displayed in the search form. Format is "term | Label". The field should exist in all resources fields.', // @translate
+                    'as_key_value' => true,
+                    'key_value_separator' => '|',
+                ],
+                'attributes' => [
+                    'id' => 'filters',
+                    // field (term) | label (order means weight).
+                    'placeholder' => 'dcterms:title | Title',
+                    'rows' => 12,
+                ],
+            ])
+            ->add([
+                'name' => 'available_filters',
+                'type' => ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Available filters', // @translate
+                    'info' => 'List of all available filters, among which some can be copied above.', // @translate
+                    'as_key_value' => true,
+                    'key_value_separator' => '|',
+                ],
+                'attributes' => [
+                    'id' => 'available_filters',
+                    'value' => $fieldOptions,
+                    'placeholder' => 'dcterms:title | Title',
+                    'rows' => 12,
+                ],
+            ])
+            ->add([
+                'name' => 'filters_max_number',
+                'type' => Element\Number::class,
+                'options' => [
+                    'label' => 'Number of filter groups to display', // @translate
+                    'info' => 'The filters may be managed via js for a better display.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'filters_max_number',
+                    'required' => false,
+                    'value' => '5',
+                    'min' => '0',
+                    // A mysql query supports 61 arguments maximum.
+                    'max' => '49',
+                    'step' => '1',
+                ],
+            ])
+            ->add([
+                'name' => 'filter_value_joiner',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Add the joiner ("and" or "or") to the filters', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'filter_value_joiner',
+                ],
+            ])
+            // TODO List value type (rename/remove).
+            ->add([
+                'name' => 'filter_value_type',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Add the type ("equal", "in", etc.) to the filters', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'filter_value_type',
+                ],
+            ])
+
+            ->add([
+                'name' => 'fields_order',
+                'type' => ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Order of fields', // @translate
+                    'info' => 'List of elements that will be displayed in the search form. Only existing fields will be used.', // @translate
+                    'as_key_value' => false,
+                ],
+                'attributes' => [
+                    'id' => 'fields_order',
+                    'placeholder' => implode("\n", $orderElements) . "\n",
+                    'rows' => 6,
+                ],
+            ])
+            ->add([
+                'name' => 'available_fields_order',
+                'type' => ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Available fields to order on the form', // @translate
+                    'info' => 'List of all available elements, among which some can be copied above.', // @translate
+                    'as_key_value' => false,
+                ],
+                'attributes' => [
+                    'id' => 'available_fields_order',
+                    'value' => $orderElements,
+                    'placeholder' => implode("\n", $orderElements) . "\n",
+                    'rows' => 6,
+                ],
+            ])
+        ;
+
+        // Settings for the results (sorting).
+
+        // TODO Add the style of pagination.
+
+        $this
+            ->add([
+                'name' => 'sort',
+                'type' => Fieldset::class,
+                'options' => [
+                    'label' => 'Sorting', // @translate
+                ],
+            ])
+            ->get('sort')
+            // field (term + asc/desc) | label (+ asc/desc) (order means weight).
+            ->add([
+                'name' => 'fields',
+                'type' => ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Sort fields', // @translate
+                    'info' => 'List of sort fields that will be displayed in the search page. Format is "term dir | Label".', // @translate
+                    'as_key_value' => true,
+                    'key_value_separator' => '|',
+                ],
+                'attributes' => [
+                    'id' => 'sorting_fields',
+                    'placeholder' => 'dcterms:subject asc | Subject (asc)',
+                    'rows' => 12,
+                ],
+            ])
+            ->add([
+                'name' => 'available_sort_fields',
+                'type' => ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Available sort fields', // @translate
+                    'info' => 'List of all available sort fields, among which some can be copied above.', // @translate
+                    'as_key_value' => true,
+                    'key_value_separator' => '|',
+                ],
+                'attributes' => [
+                    'id' => 'sorting_available_sort_fields',
+                    'value' => $this->getAvailableSortFields(),
+                    'placeholder' => 'dcterms:subject asc | Subject (asc)',
+                    'rows' => 12,
+                ],
+            ]);
+        ;
+
+        // Settings for the results (facets).
+        // TODO Add the count or not.
+
+        $this
+            ->add([
+                'name' => 'facet',
+                'type' => Fieldset::class,
+                'options' => [
+                    'label' => 'Facets', // @translate
+                ],
+            ])
+            ->get('facet')
+            // field (term) | label (order means weight).
+            ->add([
+                'name' => 'facets',
+                'type' => ArrayTextarea::class,
+                'options' => [
+                    'label' => 'List of facets', // @translate
+                    'info' => 'List of facets that will be displayed in the search page. Format is "field | Label".', // @translate
+                    'as_key_value' => true,
+                    'key_value_separator' => '|',
+                ],
+                'attributes' => [
+                    'id' => 'facetting_facets',
                     'placeholder' => 'dcterms:subject | Subjects',
                     'rows' => 12,
                 ],
             ])
             ->add([
                 'name' => 'available_facets',
-                'type' => Element\Textarea::class,
+                'type' => ArrayTextarea::class,
                 'options' => [
                     'label' => 'Available facets', // @translate
                     'info' => 'List of all available facets, among which some can be copied above.', // @translate
+                    'as_key_value' => true,
+                    'key_value_separator' => '|',
                 ],
                 'attributes' => [
-                    'id' => 'available_facets',
+                    'id' => 'facetting_available_facets',
+                    'value' => $this->getAvailableFacetFields(),
                     'placeholder' => 'dcterms:subject | Subjects',
                     'rows' => 12,
                 ],
-            ]);
-        return $this;
-    }
-
-    protected function addFacetLimit(): self
-    {
-        $this->add([
-            'name' => 'facet_limit',
-            'type' => Element\Number::class,
-            'options' => [
-                'label' => 'Facet limit', // @translate
-                'info' => 'The maximum number of values fetched for each facet', // @translate
-            ],
-            'attributes' => [
-                'value' => 10,
-                'min' => 1,
-                'required' => true,
-            ],
-        ]);
-        return $this;
-    }
-
-    protected function addFacetLanguages(): self
-    {
-        $this
+            ])
             ->add([
-                'name' => 'facet_languages',
-                'type' => Element\Text::class,
+                'name' => 'limit',
+                'type' => Element\Number::class,
+                'options' => [
+                    'label' => 'Maximum number of facet by field', // @translate
+                    'info' => 'The maximum number of values fetched for each facet', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'facetting_limit',
+                    'value' => 10,
+                    'min' => 1,
+                    'required' => false,
+                ],
+            ])
+            ->add([
+                'name' => 'languages',
+                'type' => ArrayText::class,
                 'options' => [
                     'label' => 'Get facets from specific languages', // @translate
                     'info' => 'Generally, facets are translated in the view, but in some cases, facet values may be translated directly in a multivalued property. Use "|" to separate multiple languages. Use "||" for values without language. When fields with languages (like subjects) and fields without language (like date) are facets, the empty language must be set to get results.', // @translate
+                    'value_separator' => '|',
                 ],
                 'attributes' => [
-                    'id' => 'facet_languages',
+                    'id' => 'facetting_languages',
                     'placeholder' => 'fra|way|apy||',
                 ],
-            ]);
-        return $this;
-    }
-
-    protected function addFacetMode(): self
-    {
-        $this
+            ])
             ->add([
-                'name' => 'facet_mode',
+                'name' => 'mode',
                 'type' => Element\Radio::class,
                 'options' => [
                     'label' => 'Facet mode', // @translate
@@ -191,108 +478,40 @@ class SearchPageConfigureForm extends Form
                     ],
                 ],
                 'attributes' => [
-                    'id' => 'facet_mode',
+                    'id' => 'facetting_mode',
                     'required' => false,
                     'value' => 'button',
                 ],
             ]);
-        return $this;
-    }
+        ;
 
-    public function populateValues($data, $onlyBase = false): void
-    {
-        if (empty($data['facet_languages'])) {
-            $data['facet_languages'] = '';
-        } elseif (is_array($data['facet_languages'])) {
-            $data['facet_languages'] = implode('|', $data['facet_languages']);
-        }
-        parent::populateValues($data, $onlyBase);
-    }
-
-    protected function addInputFilter(): self
-    {
-        return $this
-            ->addMainSettingsInputFilter()
-            ->addFacetLanguagesInputFilter()
-            ->addFacetModeInputFilter();
-    }
-
-    protected function addMainSettingsInputFilter(): self
-    {
         $this
-            ->getInputFilter()
+            ->addFormFieldset();
+
+        // Input filters should be added after elements.
+        $inputFilter = $this->getInputFilter();
+        $inputFilter
+            ->get('form')
             ->add([
-                'name' => 'default_results',
+                'name' => 'filters_max_number',
                 'required' => false,
-            ]);
-        return $this;
-    }
-
-    protected function addFacetLanguagesInputFilter(): self
-    {
-        $this
-            ->getInputFilter()
+            ])
+        ;
+        $inputFilter
+            ->get('facet')
             ->add([
-                'name' => 'facet_languages',
+                'name' => 'limit',
                 'required' => false,
-                'filters' => [
-                    [
-                        'name' => \Laminas\Filter\Callback::class,
-                        'options' => [
-                            'callback' => function ($string) {
-                                return strlen(trim($string))
-                                    ? array_unique(array_map('trim', explode('|', $string)))
-                                    : [];
-                            },
-                        ],
-                    ],
-                ],
-            ]);
-        return $this;
-    }
-
-    protected function addFacetModeInputFilter(): self
-    {
-        $this
-            ->getInputFilter()
-            ->add([
-                'name' => 'facet_mode',
-                'required' => false,
-            ]);
-        return $this;
-    }
-
-    protected function addSortFields(): SearchPageConfigureForm
-    {
-        // field (term + asc/desc) | label (+ asc/desc) (order means weight).
-        $this
-            ->add([
-                'name' => 'sort_fields',
-                'type' => Element\Textarea::class,
-                'options' => [
-                    'label' => 'Sort fields', // @translate
-                    'info' => 'List of sort fields that will be displayed in the search page. Format is "term dir | Label".', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'sort_fields',
-                    'placeholder' => 'dcterms:subject asc | Subject (asc)',
-                    'rows' => 12,
-                ],
             ])
             ->add([
-                'name' => 'available_sort_fields',
-                'type' => Element\Textarea::class,
-                'options' => [
-                    'label' => 'Available sort fields', // @translate
-                    'info' => 'List of all available sort fields, among which some can be copied above.', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'available_sort_fields',
-                    'placeholder' => 'dcterms:subject asc | Subject (asc)',
-                    'rows' => 12,
-                ],
-            ]);
-        return $this;
+                'name' => 'languages',
+                'required' => false,
+            ])
+            ->add([
+                'name' => 'mode',
+                'required' => false,
+            ])
+        ;
     }
 
     protected function addFormFieldset(): self
@@ -309,61 +528,66 @@ class SearchPageConfigureForm extends Form
             return $this;
         }
 
+        /** @var \Laminas\Form\Fieldset $fieldset */
         $fieldset = $this->getFormElementManager()
             ->get($formAdapter->getConfigFormClass(), [
                 'search_page' => $searchPage,
             ]);
-        $fieldset->setName('form');
-        $fieldset->setLabel('Form settings'); // @translate
+
+        $fieldset
+            ->setName('form')
+            ->setLabel('Form settings'); // @translate
 
         $this->add($fieldset);
         return $this;
     }
 
-    protected function sortFields(array $fields, string $type): array
+    protected function getAvailableFields(): array
     {
-        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
+        $options = [];
         $searchPage = $this->getOption('search_page');
-        $settings = $searchPage->settings();
-        if (empty($settings) || empty($settings[$type])) {
-            return $fields;
+        $searchIndex = $searchPage->index();
+        $searchAdapter = $searchIndex->adapter();
+        if (empty($searchAdapter)) {
+            return [];
         }
-        // Remove the keys that exists in settings, but not in fields to sort.
-        $order = array_intersect_key($settings[$type], $fields);
-        // Order the fields.
-        return array_replace($order, $fields);
+        $fields = $searchAdapter->getAvailableFields($searchIndex);
+        foreach ($fields as $name => $field) {
+            $options[$name] = $field['label'] ?? $name;
+        }
+        return $options;
     }
 
-    /**
-     * @param array $field
-     * @param string $settingsKey
-     * @return string
-     */
-    protected function getFieldLabel(array $field, string $settingsKey)
+    protected function getAvailableSortFields(): array
     {
-        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
+        $options = [];
         $searchPage = $this->getOption('search_page');
-        $settings = $searchPage->settings();
-
-        $name = $field['name'];
-        $label = $field['label'] ?? null;
-        if (isset($settings[$settingsKey][$name])) {
-            $fieldSettings = $settings[$settingsKey][$name];
-            if (isset($fieldSettings['display']['label'])) {
-                $label = $fieldSettings['display']['label'];
-            }
+        $searchIndex = $searchPage->index();
+        $searchAdapter = $searchIndex->adapter();
+        if (empty($searchAdapter)) {
+            return [];
         }
-        return $label ? sprintf('%s (%s)', $label, $name) : $name;
+        $fields = $searchAdapter->getAvailableSortFields($searchIndex);
+        foreach ($fields as $name => $field) {
+            $options[$name] = $field['label'] ?? $name;
+        }
+        return $options;
     }
 
-    protected function getFacetFieldLabel(?array $field): ?string
+    protected function getAvailableFacetFields(): array
     {
-        return $this->getFieldLabel($field, 'facets');
-    }
-
-    protected function getSortFieldLabel(?array $field): ?string
-    {
-        return $this->getFieldLabel($field, 'sort_fields');
+        $options = [];
+        $searchPage = $this->getOption('search_page');
+        $searchIndex = $searchPage->index();
+        $searchAdapter = $searchIndex->adapter();
+        if (empty($searchAdapter)) {
+            return [];
+        }
+        $fields = $searchAdapter->getAvailableFacetFields($searchIndex);
+        foreach ($fields as $name => $field) {
+            $options[$name] = $field['label'] ?? $name;
+        }
+        return $options;
     }
 
     public function setFormElementManager($formElementManager): self

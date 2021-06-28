@@ -52,16 +52,14 @@ return [
             Form\Element\OptionalSelect::class => Form\Element\OptionalSelect::class,
         ],
         'factories' => [
-            Form\Admin\AdvancedFormConfigFieldset::class => Service\Form\AdvancedFormConfigFieldsetFactory::class,
             Form\Admin\ApiFormConfigFieldset::class => Service\Form\ApiFormConfigFieldsetFactory::class,
             Form\Admin\SearchIndexConfigureForm::class => Service\Form\SearchIndexConfigureFormFactory::class,
             Form\Admin\SearchIndexForm::class => Service\Form\SearchIndexFormFactory::class,
             Form\Admin\SearchPageConfigureForm::class => Service\Form\SearchPageConfigureFormFactory::class,
             Form\Admin\SearchPageForm::class => Service\Form\SearchPageFormFactory::class,
             Form\Element\SearchPageSelect::class => Service\Form\Element\SearchPageSelectFactory::class,
-            Form\AdvancedForm::class => Service\Form\AdvancedFormFactory::class,
-            Form\BasicForm::class => Service\Form\BasicFormFactory::class,
             Form\FilterFieldset::class => Service\Form\FilterFieldsetFactory::class,
+            Form\MainSearchForm::class => Service\Form\MainSearchFormFactory::class,
             Form\SearchingFormFieldset::class => Service\Form\SearchingFormFieldsetFactory::class,
             Form\SettingsFieldset::class => Service\Form\SettingsFieldsetFactory::class,
             Form\SiteSettingsFieldset::class => Service\Form\SiteSettingsFieldsetFactory::class,
@@ -223,8 +221,7 @@ return [
     ],
     'search_form_adapters' => [
         'invokables' => [
-            'advanced' => FormAdapter\AdvancedFormAdapter::class,
-            'basic' => FormAdapter\BasicFormAdapter::class,
+            'main' => FormAdapter\MainFormAdapter::class,
         ],
         'factories' => [
             'api' => Service\FormAdapter\ApiFormAdapterFactory::class,

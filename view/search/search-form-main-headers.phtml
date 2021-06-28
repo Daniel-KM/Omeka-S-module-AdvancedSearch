@@ -4,11 +4,11 @@
  */
 
 // Add headers (css or scripts) to be included for the form.
-// The form itself is managed by search-form-advanced.
+// The form itself is managed by search-form-main.
 
 $assetUrl = $this->plugin('assetUrl');
 
 $this->headLink()
-    ->appendStylesheet($this->assetUrl('vendor/chosen-js/chosen.min.css', 'Omeka'));
+    ->appendStylesheet($assetUrl('vendor/chosen-js/chosen.min.css', 'Omeka'));
 $this->headScript()
     ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.min.js', 'Omeka'), 'text/javascript', ['defer' => 'defer']);

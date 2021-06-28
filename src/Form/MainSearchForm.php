@@ -31,15 +31,13 @@ namespace Search\Form;
 
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
+use Laminas\Form\Form;
 use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Form\Element\ResourceClassSelect;
 use Omeka\Form\Element\ResourceTemplateSelect;
 use Omeka\View\Helper\Setting;
 
-/**
- * @todo Remove distinction between advanced and basic form: they are just a list of elements.
- */
-class AdvancedForm extends BasicForm
+class MainSearchForm extends Form
 {
     /**
      * @var SiteRepresentation
@@ -55,7 +53,16 @@ class AdvancedForm extends BasicForm
 
     public function init(): void
     {
-        parent::init();
+        // Omeka adds a csrf automatically in \Omeka\Form\Initializer\Csrf.
+        // Remove the csrf, because it is useless for a search form and the url
+        // is not copiable (see the core search form that doesn't use it).
+        foreach ($this->getElements() as $element) {
+            $name = $element->getName();
+            if (substr($name, -4) === 'csrf') {
+                $this->remove($name);
+                break;
+            }
+        }
 
         /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
         $searchPage = $this->getOption('search_page');
@@ -81,18 +88,33 @@ class AdvancedForm extends BasicForm
             }
         }
 
+        $this
+            ->add([
+                'name' => 'q',
+                'type' => Element\Search::class,
+                'options' => [
+                    'label' => 'Search', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'q',
+                ],
+            ])
+        ;
+
         $appendItemSetFieldset = !empty($searchPageSettings['form']['item_set_filter_type'])
             && !empty($searchPageSettings['form']['item_set_id_field']);
         if ($appendItemSetFieldset) {
             $this
                 ->add($this->itemSetFieldset($searchPageSettings['form']['item_set_filter_type']));
         }
+
         $appendResourceClassFieldset = !empty($searchPageSettings['form']['resource_class_filter_type'])
             && !empty($searchPageSettings['form']['resource_class_id_field']);
         if ($appendResourceClassFieldset) {
             $this
                 ->add($this->resourceClassFieldset($searchPageSettings['form']['resource_class_filter_type']));
         }
+
         $appendResourceTemplateFieldset = !empty($searchPageSettings['form']['resource_template_filter_type'])
             && !empty($searchPageSettings['form']['resource_template_id_field']);
         if ($appendResourceTemplateFieldset) {
@@ -100,11 +122,11 @@ class AdvancedForm extends BasicForm
                 ->add($this->resourceTemplateFieldset());
         }
 
-        $appendTextFieldset = !empty($searchPageSettings['form']['filter_collection_number'])
+        $appendTextFieldset = !empty($searchPageSettings['form']['filters_max_number'])
             && !empty($searchPageSettings['form']['filters']);
         if ($appendTextFieldset) {
             $this
-                ->add($this->textFieldset($searchPageSettings['form']['filter_collection_number']));
+                ->add($this->textFieldset($searchPageSettings['form']['filters_max_number']));
         }
 
         $this->appendSpecificFields();
@@ -114,9 +136,10 @@ class AdvancedForm extends BasicForm
                 'name' => 'submit',
                 'type' => Element\Button::class,
                 'options' => [
-                    'label' => 'Submit', // @translate
+                    'label' => 'Search', // @translate
                 ],
                 'attributes' => [
+                    'id' => 'submit',
                     'type' => 'submit',
                 ],
             ])
@@ -157,7 +180,7 @@ class AdvancedForm extends BasicForm
         }
     }
 
-    protected function itemSetFieldset($filterType = 'select')
+    protected function itemSetFieldset($filterType = 'select'): Fieldset
     {
         $fieldset = new Fieldset('itemSet');
         return $fieldset
@@ -185,7 +208,7 @@ class AdvancedForm extends BasicForm
         ;
     }
 
-    protected function resourceClassFieldset($filterType = 'select')
+    protected function resourceClassFieldset($filterType = 'select'): Fieldset
     {
         // For an unknown reason, the ResourceClassSelect can not be added
         // directly to a fieldset (factory is not used).
@@ -196,7 +219,7 @@ class AdvancedForm extends BasicForm
         ]);
 
         /** @var \Omeka\Form\Element\ResourceClassSelect $element */
-        $element = $this->getFormElementManager()->get(ResourceClassSelect::class);
+        $element = $this->formElementManager->get(ResourceClassSelect::class);
         $element
             ->setOptions([
                 'label' => 'Resource classes', // @translate
@@ -251,7 +274,7 @@ class AdvancedForm extends BasicForm
         return $fieldset;
     }
 
-    protected function resourceTemplateFieldset()
+    protected function resourceTemplateFieldset(): Fieldset
     {
         // For an unknown reason, the ResourceTemplateSelect can not be added
         // directly to a fieldset (factory is not used).
@@ -262,7 +285,7 @@ class AdvancedForm extends BasicForm
         ]);
 
         /** @var \Omeka\Form\Element\ResourceTemplateSelect $element */
-        $element = $this->getFormElementManager()->get(ResourceTemplateSelect::class);
+        $element = $this->formElementManager->get(ResourceTemplateSelect::class);
         $element
             ->setName('ids')
             ->setOptions([
@@ -279,10 +302,9 @@ class AdvancedForm extends BasicForm
                 'data-placeholder' => 'Select resource templates…', // @translate
             ]);
 
-        $setting = $this->getSiteSetting();
         $hasValues = false;
-        if ($setting && $setting('search_restrict_templates', false)) {
-            $values = $setting('search_apply_templates', []);
+        if ($this->siteSetting && $this->siteSetting->__invoke('search_restrict_templates', false)) {
+            $values = $this->siteSetting->__invoke('search_apply_templates', []);
             if ($values) {
                 $values = array_intersect_key($element->getValueOptions(), array_flip($values));
                 $hasValues = (bool) $values;
@@ -316,7 +338,7 @@ class AdvancedForm extends BasicForm
         return $fieldset;
     }
 
-    protected function textFieldset($number = 1)
+    protected function textFieldset($number = 1): Fieldset
     {
         $fieldset = new Fieldset('text');
         $fieldset->setAttributes([
@@ -350,18 +372,19 @@ class AdvancedForm extends BasicForm
      * Add specific fields.
      *
      * This method is used for forms that extend this form.
+     * It should include the specific input filters.
      */
-    protected function appendSpecificFields(): void
+    protected function appendSpecificFields(): Form
     {
+        return $this;
     }
 
-    protected function getItemSetsOptions($byOwner = false)
+    protected function getItemSetsOptions($byOwner = false): array
     {
-        $site = $this->getSite();
         $select = $this->getForm(\Omeka\Form\Element\ItemSetSelect::class, []);
-        if ($site) {
+        if ($this->site) {
             $select->setOptions([
-                'query' => ['site_id' => $site->id(), 'sort_by' => 'dcterms:title', 'sort_order' => 'asc'],
+                'query' => ['site_id' => $this->site->id(), 'sort_by' => 'dcterms:title', 'sort_order' => 'asc'],
                 'disable_group_by_owner' => true,
             ]);
             // By default, sort is case sensitive. So use a case insensitive sort.
@@ -377,66 +400,32 @@ class AdvancedForm extends BasicForm
         return $valueOptions;
     }
 
-    protected function getFilterFieldset()
+    protected function getFilterFieldset(): FilterFieldset
     {
         $options = $this->getOptions();
         return $this->getForm(FilterFieldset::class, $options);
     }
 
-    protected function getForm($name, $options)
+    protected function getForm(string $name, ?array $options = null): \Laminas\Form\ElementInterface
     {
-        return $this->getFormElementManager()
-            ->get($name, $options);
+        return $this->formElementManager->get($name, $options);
     }
 
-    /**
-     * @param SiteRepresentation $site
-     * @return self
-     */
-    public function setSite(SiteRepresentation $site = null)
+    public function setSite(?SiteRepresentation $site): Form
     {
         $this->site = $site;
         return $this;
     }
 
-    /**
-     * @return \Omeka\Api\Representation\SiteRepresentation
-     */
-    public function getSite()
-    {
-        return $this->site;
-    }
-
-    /**
-     * @param Setting|null $siteSetting
-     * @return self
-     */
-    public function setSiteSetting(Setting $siteSetting = null)
+    public function setSiteSetting(?Setting $siteSetting = null): Form
     {
         $this->siteSetting = $siteSetting;
         return $this;
     }
 
-    /**
-     * @return \Omeka\View\Helper\Setting|null
-     */
-    public function getSiteSetting()
-    {
-        return $this->siteSetting;
-    }
-
-    /**
-     * @param Object $formElementManager
-     * @return self
-     */
-    public function setFormElementManager($formElementManager)
+    public function setFormElementManager($formElementManager): Form
     {
         $this->formElementManager = $formElementManager;
         return $this;
-    }
-
-    public function getFormElementManager()
-    {
-        return $this->formElementManager;
     }
 }

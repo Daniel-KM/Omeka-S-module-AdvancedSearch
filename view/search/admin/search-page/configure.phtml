@@ -34,8 +34,6 @@
  */
 
 $translate = $this->plugin('translate');
-$formCollection = $this->plugin('formCollection');
-$formRow = $this->plugin('formRow');
 $assetUrl = $this->plugin('assetUrl');
 
 $this->headLink()
@@ -53,29 +51,10 @@ if (empty($adapter)) {
 $form->prepare();
 ?>
 
-<?= $this->pageTitle(sprintf($translate('Configure search page "%1$s" (%2$s)'), $searchPage->name(), $searchPage->path())) ?>
+<?= $this->pageTitle(sprintf($translate('Search page "%1$s" (%2$s)'), $searchPage->name(), $searchPage->path())) ?>
 
-<?= $this->form()->openTag($form) ?>
 <div id="page-actions">
-    <button><?= $translate('Save configuration') ?></button>
+    <button form="search-form-configure"><?= $translate('Save configuration') ?></button>
 </div>
 
-<p>
-<?php foreach ($form->getElements() as $element): ?>
-    <?= $formRow($element); ?>
-<?php endforeach; ?>
-
-<?php foreach ($form->getFieldsets() as $fieldset): ?>
-    <div data-sortable="<?= $fieldset->getAttribute('data-sortable') ?>">
-        <h2><?= $fieldset->getLabel() ?></h2>
-        <?php foreach ($fieldset->getFieldsets() as $subfieldset): ?>
-            <?= $formCollection($subfieldset) ?>
-        <?php endforeach; ?>
-
-        <?php foreach ($fieldset->getElements() as $element): ?>
-            <?= $formRow($element) ?>
-        <?php endforeach; ?>
-    </div>
-<?php endforeach; ?>
-
-<?= $this->form()->closeTag() ?>
+<?= $this->form($form) ?>

@@ -125,18 +125,14 @@ class SearchRequestToResponse extends AbstractPlugin
         }
         $query->setLimitPage($pageNumber, $perPage);
 
-        $hasFacets = !empty($searchPageSettings['facets']);
+        $hasFacets = !empty($searchPageSettings['facet']['facets']);
         if ($hasFacets) {
-            foreach ($searchPageSettings['facets'] as $name => $facet) {
-                if ($facet['enabled']) {
-                    $query->addFacetField($name);
-                }
+            $query->addFacetFields(array_keys($searchPageSettings['facet']['facets']));
+            if (!empty($searchPageSettings['facet']['limit'])) {
+                $query->setFacetLimit((int) $searchPageSettings['facet']['limit']);
             }
-            if (isset($searchPageSettings['facet_limit'])) {
-                $query->setFacetLimit((int) $searchPageSettings['facet_limit']);
-            }
-            if (isset($searchPageSettings['facet_languages'])) {
-                $query->setFacetLanguages($searchPageSettings['facet_languages']);
+            if (!empty($searchPageSettings['facet']['languages'])) {
+                $query->setFacetLanguages($searchPageSettings['facet']['languages']);
             }
             // FIXME Rename "limit" by "facet" or something else.
             // A facet is added as a standard filter, but named differently in
@@ -178,7 +174,8 @@ class SearchRequestToResponse extends AbstractPlugin
 
         if ($hasFacets) {
             $facetCounts = $response->getFacetCounts();
-            $facetCounts = $this->sortFieldsByWeight($facetCounts, 'facets');
+            // Order facet according to settings of the search page.
+            $facetCounts = array_intersect_key($facetCounts, $searchPageSettings['facet']['facets']);
             $response->setFacetCounts($facetCounts);
         }
 
@@ -258,14 +255,10 @@ class SearchRequestToResponse extends AbstractPlugin
 
     /**
      * Normalize the sort options of the index.
-     *
-     * @todo Normalize the sort options when the index or page is hydrated. To be save in a hidden setting of the page.
      */
     protected function getSortOptions(): array
     {
-        $sortOptions = [];
-
-        $sortFieldsSettings = $this->searchPage->setting('sort_fields', []);
+        $sortFieldsSettings = $this->searchPage->subSetting('sort', 'fields', []);
         if (empty($sortFieldsSettings)) {
             return [];
         }
@@ -273,39 +266,7 @@ class SearchRequestToResponse extends AbstractPlugin
         if (empty($indexAdapter)) {
             return [];
         }
-
-        $sortFields = $this->index->adapter()->getAvailableSortFields($this->index);
-        foreach ($sortFieldsSettings as $name => $sortField) {
-            if (!$sortField['enabled']) {
-                // A break is possible, because now, the sort fields are ordered
-                // when they are saved.
-                break;
-            }
-            if (!empty($sortField['display']['label'])) {
-                $label = $sortField['display']['label'];
-            } elseif (!empty($sortFields[$name]['label'])) {
-                $label = $sortFields[$name]['label'];
-            } else {
-                $label = $name;
-            }
-            $sortOptions[$name] = $label;
-        }
-        // The sort options are sorted one time only, when saved.
-
-        return $sortOptions;
-    }
-
-    /**
-     * Order the field by weigth.
-     */
-    protected function sortFieldsByWeight(array $fields, string $settingName): array
-    {
-        $settings = $this->page->setting($settingName, []);
-        uksort($fields, function ($a, $b) use ($settings) {
-            $aWeight = $settings[$a]['weight'];
-            $bWeight = $settings[$b]['weight'];
-            return $aWeight - $bWeight;
-        });
-        return $fields;
+        $availableSortFields = $indexAdapter->getAvailableSortFields($this->searchIndex);
+        return array_intersect_key($sortFieldsSettings, $availableSortFields);
     }
 }

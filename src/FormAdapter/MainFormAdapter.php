@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * Copyright Daniel Berthereau, 2018-2020
+ * Copyright Daniel Berthereau 2018-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -27,27 +27,27 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\Service\Form;
+namespace Search\FormAdapter;
 
-use Interop\Container\ContainerInterface;
-use Laminas\ServiceManager\Factory\FactoryInterface;
-use Search\Form\AdvancedForm;
-
-class AdvancedFormFactory implements FactoryInterface
+class MainFormAdapter extends AbstractFormAdapter implements FormAdapterInterface
 {
-    public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
+    public function getLabel(): string
     {
-        $plugins = $services->get('ControllerPluginManager');
-        $helpers = $plugins->get('viewHelpers');
-        $currentSite = $plugins->get('currentSite');
-        $currentSite = $currentSite();
-        $siteSetting = $currentSite
-            ? $helpers()->get('siteSetting')
-            : null;
-        $form = new AdvancedForm(null, $options);
-        return $form
-            ->setSite($currentSite)
-            ->setSiteSetting($siteSetting)
-            ->setFormElementManager($services->get('FormElementManager'));
+        return 'Main'; // @translate
+    }
+
+    public function getFormClass(): ?string
+    {
+        return  \Search\Form\MainSearchForm::class;
+    }
+
+    public function getFormPartialHeaders(): ?string
+    {
+        return 'search/search-form-main-headers';
+    }
+
+    public function getFormPartial(): ?string
+    {
+        return 'search/search-form-main';
     }
 }

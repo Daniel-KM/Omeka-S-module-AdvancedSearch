@@ -181,17 +181,23 @@ class SearchPageController extends AbstractActionController
             return $view;
         }
 
-        $settings = $searchPage->settings() ?: [];
-        $settings = $this->prepareSettingsForSimpleForm($searchPage, $settings);
+        $searchPageSettings = $searchPage->settings() ?: [];
 
-        $form->setData($settings);
+        $form->setData($searchPageSettings);
         $view->setVariable('form', $form);
 
         if (!$this->getRequest()->isPost()) {
             return $view;
         }
 
-        $params = $this->extractSimpleFields($searchPage);
+        $params = $this->getRequest()->getPost()->toArray();
+
+        unset(
+            $params['form']['available_filters'],
+            $params['form']['available_fields_order'],
+            $params['sort']['available_sort_fields'],
+            $params['facet']['available_facets']
+        );
 
         // TODO Check simple fields with normal way.
         $form->setData($params);
@@ -202,62 +208,26 @@ class SearchPageController extends AbstractActionController
             } else {
                 $this->messenger()->addError('There was an error during validation'); // @translate
             }
-            // return $view;
+            return $view;
         }
 
-        // TODO Why the fieldset "form" is removed from the params? Add an intermediate fieldset? Check if it is still the case.
-        $formParams = $params['form'] ?? [];
-        // TODO Check simple fields.
-        $checkedParams = $form->getData();
-        $formParams['fields_order'] = $checkedParams['form']['fields_order'] ?? null;
-        $params['form'] = $formParams;
+        $params = $form->getData();
+        unset(
+            $params['csrf'],
+            $params['form']['available_filters'],
+            $params['form']['available_fields_order'],
+            $params['sort']['available_sort_fields'],
+            $params['facet']['available_facets']
+        );
 
-        unset($params['csrf']);
-        unset($params['available_filters']);
-        unset($params['available_fields_order']);
-        unset($params['form']['available_filters']);
-        unset($params['form']['available_fields_order']);
-
-        $params['default_query'] = trim($params['default_query'], "? \t\n\r\0\x0B");
-
-        // TODO Should be checked in form.
-        if (empty($params['facet_languages'])) {
-            $params['facet_languages'] = [];
-        } elseif (!is_array($params['facet_languages'])) {
-            $params['facet_languages'] = strlen(trim($params['facet_languages']))
-                ? array_unique(array_map('trim', explode('|', $params['facet_languages'])))
-                : [];
-        }
+        $params['search']['default_query'] = trim($params['search']['default_query'], "? \t\n\r\0\x0B");
 
         // Add a warning because it may be a hard to understand issue.
-        if (!empty($params['facet_languages']) && !in_array('', $params['facet_languages'])) {
+        $params['facet']['languages'] = array_unique(array_map('trim', $params['facet']['languages'] ?? []));
+        if (!empty($params['facet']['languages']) && !in_array('', $params['facet']['languages'])) {
             $this->messenger()->addWarning(
                 'Note that you didn’t set "||", so all values without language will be removed.' // @translate
             );
-        }
-
-        // Sort facets and sort fields to simplify next load.
-        foreach (['facets', 'sort_fields'] as $type) {
-            if (empty($params[$type])) {
-                continue;
-            }
-            // Sort enabled first, then available, else sort by weight.
-            uasort($params[$type], [$this, 'sortByEnabledFirst']);
-        }
-
-        // TODO Like languages, fieldset data should be checked in form fieldset.
-        $formAdapter = $searchPage->formAdapter();
-        if ($formAdapter) {
-            $configFormClass = $formAdapter->getConfigFormClass();
-            if (isset($configFormClass)) {
-                $fieldset = $searchPage->getServiceLocator()->get('FormElementManager')
-                    ->get($configFormClass, [
-                        'search_page' => $searchPage,
-                    ]);
-                if (method_exists($fieldset, 'processInputFilters')) {
-                    $params = $fieldset->processInputFilters($params);
-                }
-            }
         }
 
         $page = $searchPage->getEntity();
@@ -366,99 +336,6 @@ class SearchPageController extends AbstractActionController
             : null;
     }
 
-    /**
-     * Convert settings into strings in ordeer to manage many fields inside form.
-     */
-    protected function prepareSettingsForSimpleForm(SearchPageRepresentation $searchPage, $settings): array
-    {
-        $index = $searchPage->index();
-        $adapter = $index->adapter();
-
-        $data = '';
-        $fields = empty($settings['facets']) ? [] : $settings['facets'];
-        foreach ($fields as $name => $field) {
-            if (!empty($field['enabled'])) {
-                $data .= $name . ' | ' . $field['display']['label'] . "\n";
-            }
-        }
-        $settings['facets'] = $data;
-
-        $data = '';
-        $fields = $adapter->getAvailableFacetFields($index);
-        foreach ($fields as $name => $field) {
-            $data .= $name . ' | ' . $field['label'] . "\n";
-        }
-        $settings['available_facets'] = $data;
-
-        $data = '';
-        $fields = empty($settings['sort_fields']) ? [] : $settings['sort_fields'];
-        foreach ($fields as $name => $field) {
-            if (!empty($field['enabled'])) {
-                $data .= $name . ' | ' . $field['display']['label'] . "\n";
-            }
-        }
-        $settings['sort_fields'] = $data;
-
-        $data = '';
-        $fields = $adapter->getAvailableSortFields($index);
-        foreach ($fields as $name => $field) {
-            $data .= $name . ' | ' . $field['label'] . "\n";
-        }
-        $settings['available_sort_fields'] = $data;
-
-        return $settings;
-    }
-
-    protected function extractSimpleFields(SearchPageRepresentation $searchPage): array
-    {
-        $index = $searchPage->index();
-        $adapter = $index->adapter();
-
-        $params = $this->getRequest()->getPost()->toArray();
-        unset($params['fieldsets']);
-        unset($params['form_class']);
-        unset($params['available_facets']);
-        unset($params['available_sort_fields']);
-
-        $fields = $adapter->getAvailableFacetFields($index);
-
-        $data = $params['facets'] ?: '';
-        unset($params['facets']);
-        $data = $this->stringToList($data);
-        foreach ($data as $key => $value) {
-            list($term, $label) = array_map('trim', explode('|', $value . '|'));
-            if (isset($fields[$term])) {
-                $params['facets'][$term] = [
-                    'enabled' => true,
-                    'weight' => $key + 1,
-                    'display' => [
-                        'label' => $label ?: $term,
-                    ],
-                ];
-            }
-        }
-
-        $fields = $adapter->getAvailableSortFields($index);
-
-        $data = $params['sort_fields'] ?: '';
-        unset($params['sort_fields']);
-        $data = $this->stringToList($data);
-        foreach ($data as $key => $value) {
-            list($term, $label) = array_map('trim', explode('|', $value . '|'));
-            if (isset($fields[$term])) {
-                $params['sort_fields'][$term] = [
-                    'enabled' => true,
-                    'weight' => $key + 1,
-                    'display' => [
-                        'label' => $label ?: $term,
-                    ],
-                ];
-            }
-        }
-
-        return $params;
-    }
-
     protected function sitesWithSearchPage(SearchPageRepresentation $searchPage): array
     {
         $result = [];
@@ -563,59 +440,6 @@ class SearchPageController extends AbstractActionController
         }
 
         $this->messenger()->addSuccess($message);
-    }
-
-    /**
-     * Compare fields to be sorted, with enabled fields first, and by weight.
-     *
-     * @param array $a First value
-     * @param array $b Second value
-     * @return int -1, 0, 1.
-     */
-    protected function sortByEnabledFirst($a, $b): int
-    {
-        // Sort by availability.
-        if (isset($a['enabled']) && isset($b['enabled'])) {
-            if ($a['enabled'] > $b['enabled']) {
-                return -1;
-            } elseif ($a['enabled'] < $b['enabled']) {
-                return 1;
-            }
-        } elseif (isset($a['enabled'])) {
-            return -1;
-        } elseif (isset($b['enabled'])) {
-            return 1;
-        }
-
-        // In other cases, sort by weight.
-        if (isset($a['weight']) && isset($b['weight'])) {
-            return $a['weight'] == $b['weight']
-                ? 0
-                : ($a['weight'] < $b['weight'] ? -1 : 1);
-        } elseif (isset($a['weight'])) {
-            return -1;
-        } elseif (isset($b['weight'])) {
-            return 1;
-        }
-        return 0;
-    }
-
-    /**
-     * Get each line of a string separately.
-     */
-    protected function stringToList($string): array
-    {
-        return array_filter(array_map('trim', explode("\n", $this->fixEndOfLine($string))));
-    }
-
-    /**
-     * Clean the text area from end of lines.
-     *
-     * This method fixes Windows and Apple copy/paste from a textarea input.
-     */
-    protected function fixEndOfLine($string): string
-    {
-        return str_replace(["\r\n", "\n\r", "\r"], ["\n", "\n", "\n"], (string) $string);
     }
 
     protected function getEntityManager(): EntityManager

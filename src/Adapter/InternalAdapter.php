@@ -28,6 +28,12 @@ class InternalAdapter extends AbstractAdapter
 
     public function getAvailableFields(SearchIndexRepresentation $index): array
     {
+        static $availableFields;
+
+        if (isset($availableFields)) {
+            return $availableFields;
+        }
+
         // Use a direct query to avoid a memory overload when there are many
         // vocabularies.
         /** @var \Doctrine\DBAL\Connection $connection */
@@ -72,11 +78,17 @@ class InternalAdapter extends AbstractAdapter
             $fields[$field['name']] = $field;
         }
 
-        return $fields;
+        return $availableFields = $fields;
     }
 
     public function getAvailableSortFields(SearchIndexRepresentation $index): array
     {
+        static $sortFields;
+
+        if (isset($sortFields)) {
+            return $sortFields;
+        }
+
         $availableFields = $this->getAvailableFields($index);
 
         // There is no default score sort.

@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * Copyright Daniel Berthereau 2018-2020
+ * Copyright Daniel Berthereau 2018-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -36,8 +36,8 @@ class FilterFieldset extends Fieldset
 {
     public function init(): void
     {
-        $fieldOptions = $this->getFieldOptions();
-        if (empty($fieldOptions)) {
+        $filterFields = $this->getFilterFields();
+        if (empty($filterFields)) {
             return;
         }
 
@@ -78,10 +78,10 @@ class FilterFieldset extends Fieldset
                 'name' => 'field',
                 'type' => Element\Select::class,
                 'options' => [
-                    'value_options' => $fieldOptions,
+                    'value_options' => $filterFields,
                 ],
                 'attributes' => [
-                    'value' => 'eq',
+                    'value' => '',
                     // TODO Manage width for chosen select (but useless: the number of options is small).
                     // 'class' => 'chosen-select',
                 ],
@@ -122,44 +122,20 @@ class FilterFieldset extends Fieldset
             ]);
     }
 
-    protected function getFieldOptions()
+    protected function getFilterFields()
     {
         /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
         $searchPage = $this->getOption('search_page');
         $searchIndex = $searchPage->index();
-        $adapter = $searchIndex->adapter();
-        if (empty($adapter)) {
+        $searchAdapter = $searchIndex->adapter();
+        if (empty($searchAdapter)) {
             return [];
         }
-
-        $availableFields = $adapter->getAvailableFields($searchIndex);
+        $availableFields = $searchAdapter->getAvailableFields($searchIndex);
         $settings = $searchPage->settings();
-        if (empty($settings['form']['filters'])) {
+        if (empty($availableFields) || empty($settings['form']['filters'])) {
             return [];
         }
-
-        $options = [];
-        foreach ($settings['form']['filters'] as $name => $field) {
-            if ($field['enabled'] && isset($availableFields[$name])) {
-                if (isset($field['display']['label']) && $field['display']['label']) {
-                    $label = $field['display']['label'];
-                } elseif (isset($availableFields[$name]['label']) && $availableFields[$name]['label']) {
-                    $label = $availableFields[$name]['label'];
-                } else {
-                    $label = $name;
-                }
-                $options[$name] = $label;
-            }
-        }
-
-        return $this->sortByWeight($options, $settings['form']['filters']);
-    }
-
-    protected function sortByWeight($fields, $settings)
-    {
-        uksort($fields, function ($a, $b) use ($settings) {
-            return $settings[$a]['weight'] - $settings[$b]['weight'];
-        });
-        return $fields;
+        return array_intersect_key($settings['form']['filters'], $availableFields);
     }
 }

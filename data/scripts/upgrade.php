@@ -254,3 +254,98 @@ CHANGE `modified` `modified` DATETIME DEFAULT NULL;
 SQL;
     $connection->exec($sql);
 }
+
+if (version_compare($oldVersion, '3.5.21.3', '<')) {
+    $sql = <<<'SQL'
+SELECT `id`, `form_adapter`, `settings` FROM `search_page`;
+SQL;
+    $stmt = $connection->query($sql);
+    $results = $stmt->fetchAll();
+    foreach ($results as $result) {
+        $id = $result['id'];
+        // $formAdapter = $result['form_adapter'];
+        $searchPageSettings = $result['settings'];
+        $searchPageSettings = json_decode($searchPageSettings, true) ?: [];
+        if (empty($searchPageSettings['search'])) {
+            $searchPageSettings['search'] = [];
+        }
+
+        // For simplicity, keep old params as they are, and merge them with the
+        // new one. It will be cleaned once the config form will be saved.
+
+        // Move search main settings from root to [search].
+        $searchPageSettings['search']['default_results'] = $searchPageSettings['default_results'] ?? 'default';
+        $searchPageSettings['search']['default_query'] = $searchPageSettings['default_query'] ?? '';
+
+        $searchPageSettings['form']['filters_max_number'] = $searchPageSettings['form']['filter_collection_number'] ?? 5;
+
+        $searchPageSettings['form']['filters'] = $searchPageSettings['form']['filters'] ?? [];
+        $searchPageSettings['form']['fields_order'] = $searchPageSettings['form']['fields_order'] ?? [];
+
+        foreach ($searchPageSettings['form']['filters'] as $name => &$field) {
+            if (empty($field['enabled'])) {
+                unset($searchPageSettings['form']['filters'][$name]);
+            } else {
+                $field = $field['display']['label'];
+            }
+        }
+        unset($field);
+
+        $searchPageSettings['sort'] = [
+            'fields' => $searchPageSettings['sort_fields'] ?? [],
+        ];
+
+        foreach ($searchPageSettings['sort']['fields'] as $name => &$field) {
+            if (empty($field['enabled'])) {
+                unset($searchPageSettings['sort']['fields'][$name]);
+            } else {
+                $field = $field['display']['label'];
+            }
+        }
+        unset($field);
+
+        $searchPageSettings['facet'] = [
+            'facets' => $searchPageSettings['facets'] ?? [],
+            'limit' => $searchPageSettings['facet_limit'] ?? 10,
+            'languages' => $searchPageSettings['facet_languages'] ?? [],
+            'mode' => $searchPageSettings['facet_mode'] ?? 'button',
+        ];
+
+        foreach ($searchPageSettings['facet']['facets'] as $name => &$field) {
+            if (empty($field['enabled'])) {
+                unset($searchPageSettings['facet']['facets'][$name]);
+            } else {
+                $field = $field['display']['label'];
+            }
+        }
+        unset($field);
+
+        unset(
+            $searchPageSettings['form_class'],
+            $searchPageSettings['default_results'],
+            $searchPageSettings['default_query'],
+            $searchPageSettings['facet_limit'],
+            $searchPageSettings['facet_languages'],
+            $searchPageSettings['facet_mode'],
+            $searchPageSettings['facets'],
+            $searchPageSettings['sort_fields'],
+            $searchPageSettings['restrict_query_to_form']
+        );
+
+        $searchPageSettings = $connection->quote(json_encode($searchPageSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        $sql = <<<SQL
+UPDATE `search_page`
+SET `settings` = $searchPageSettings
+WHERE `id` = $id;
+SQL;
+        $connection->exec($sql);
+    }
+
+    // Replace forms "Basic" and "Advanced" by "Main".
+    $sql = <<<'SQL'
+UPDATE `search_page`
+SET `form_adapter` = "main"
+WHERE `form_adapter` IN ("basic", "advanced");
+SQL;
+    $connection->exec($sql);
+}

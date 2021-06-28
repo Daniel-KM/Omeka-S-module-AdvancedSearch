@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016-2017
- * Copyright Daniel Berthereau, 2017-2020
+ * Copyright Daniel Berthereau, 2017-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -66,7 +66,7 @@ class SearchIndexForm extends Form
             ]);
     }
 
-    protected function getAdaptersOptions()
+    protected function getAdaptersOptions(): array
     {
         $adapterManager = $this->getSearchAdapterManager();
         $adapterNames = $adapterManager->getRegisteredNames();

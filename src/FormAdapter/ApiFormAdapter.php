@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Search\FormAdapter;
 
 use Doctrine\DBAL\Connection;
@@ -24,32 +25,32 @@ class ApiFormAdapter implements FormAdapterInterface
         $this->connection = $connection;
     }
 
-    public function getLabel()
+    public function getLabel(): string
     {
         return 'Api'; // @translate
     }
 
-    public function getFormClass()
+    public function getFormClass(): ?string
     {
         return null;
     }
 
-    public function getFormPartialHeaders()
+    public function getFormPartialHeaders(): ?string
     {
         return null;
     }
 
-    public function getFormPartial()
+    public function getFormPartial(): ?string
     {
         return null;
     }
 
-    public function getConfigFormClass()
+    public function getConfigFormClass(): ?string
     {
         return \Search\Form\Admin\ApiFormConfigFieldset::class;
     }
 
-    public function toQuery(array $request, array $formSettings)
+    public function toQuery(array $request, array $formSettings): \Search\Query
     {
         $query = new Query();
 
@@ -74,10 +75,6 @@ class ApiFormAdapter implements FormAdapterInterface
      * @see \Omeka\Api\Adapter\AbstractResourceEntityAdapter::buildQuery()
      *
      * @todo Manage negative search and missing parameters.
-     *
-     * @param Query $query
-     * @param array $request
-     * @param array $formSettings
      */
     protected function buildMetadataQuery(Query $query, array $request, array $formSettings): void
     {

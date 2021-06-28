@@ -1,8 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2020
+ * Copyright Daniel Berthereau, 2018-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -28,38 +27,25 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\Form;
+namespace Search\Service\Form;
 
-use Laminas\Form\Element;
-use Laminas\Form\Form;
+use Interop\Container\ContainerInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
+use Search\Form\MainSearchForm;
 
-class BasicForm extends Form
+class MainSearchFormFactory implements FactoryInterface
 {
-    public function init(): void
+    public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        // Omeka adds a csrf automatically in \Omeka\Form\Initializer\Csrf.
-        // Remove the csrf, because it is useless for a search form and the url
-        // is not copiable (see the default search form that doesn't use it).
-        foreach ($this->getElements() as $element) {
-            $name = $element->getName();
-            if (substr($name, -4) === 'csrf') {
-                $this->remove($name);
-                break;
-            }
-        }
-
-        $this
-            ->add([
-                'name' => 'q',
-                'type' => Element\Search::class,
-                'options' => [
-                    'label' => 'Search', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'q',
-                    'placeholder' => 'Search resources', // @translate
-                ],
-            ])
-        ;
+        $plugins = $services->get('ControllerPluginManager');
+        $helpers = $services->get('ViewHelperManager');
+        $currentSite = $plugins->get('currentSite')();
+        $siteSetting = $currentSite
+            ? $helpers->get('siteSetting')
+            : null;
+        return (new MainSearchForm(null, $options))
+            ->setSite($currentSite)
+            ->setSiteSetting($siteSetting)
+            ->setFormElementManager($services->get('FormElementManager'));
     }
 }

@@ -232,9 +232,15 @@ class Query implements \JsonSerializable
         return $this;
     }
 
-    public function addFacetField(string $field): self
+    public function addFacetFields(array $facetFields): self
     {
-        $this->facetFields[] = $field;
+        $this->facetFields = $facetFields;
+        return $this;
+    }
+
+    public function addFacetField(string $facetField): self
+    {
+        $this->facetFields[] = $facetField;
         return $this;
     }
 

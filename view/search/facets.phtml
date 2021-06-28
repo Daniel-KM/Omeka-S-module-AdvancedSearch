@@ -36,14 +36,14 @@
  * @var ?\Omeka\Api\Representation\ItemSetRepresentation $itemSet
  */
 
-if (!isset($response) || empty($searchPage->setting('facets'))) return;
+if (!isset($response) || empty($searchPage->subSetting('facet', 'facets'))) return;
 
 $plugins = $this->getHelperPluginManager();
 $translate = $plugins->get('translate');
 
 $facets = $response->getFacetCounts();
 $activeFacets = $response->getActiveFacets();
-$isFacetModeButton = $searchPage->setting('facet_mode') !== 'link';
+$isFacetModeButton = $searchPage->subSetting('facet', 'mode') !== 'link';
 
 $facetActive = $plugins->get('facetActive');
 $facetLabel = $plugins->get('facetLabel');

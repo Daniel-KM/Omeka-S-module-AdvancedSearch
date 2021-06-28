@@ -92,13 +92,13 @@ class IndexController extends AbstractActionController
         // So the default query is used only on the search page.
         list($request, $isEmptyRequest) = $this->cleanRequest($request);
         if ($isEmptyRequest) {
-            $defaultResults = $searchPage->setting('default_results') ?: 'default';
+            $defaultResults = $searchPage->subSetting('search', 'default_results') ?: 'default';
             switch ($defaultResults) {
                 case 'none':
                     $defaultQuery = '';
                     break;
                 case 'query':
-                    $defaultQuery = $searchPage->setting('default_query') ?: '';
+                    $defaultQuery = $searchPage->subSetting('search', 'default_query') ?: '';
                     break;
                 case 'default':
                 default:

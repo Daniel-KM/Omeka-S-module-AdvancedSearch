@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016-2017
- * Copyright Daniel Berthereau 2017-2018
+ * Copyright Daniel Berthereau 2017-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -134,8 +134,8 @@ class SearchPageForm extends Form
             ])
         ;
 
-        $inputFilter = $this->getInputFilter();
-        $inputFilter
+        $this
+            ->getInputFilter()
             ->add([
                 'name' => 'manage_page_default',
                 'required' => false,
@@ -147,21 +147,18 @@ class SearchPageForm extends Form
         ;
     }
 
-    /**
-     * @param ApiManager $apiManager
-     */
-    public function setApiManager(ApiManager $apiManager)
+    public function setApiManager(ApiManager $apiManager): self
     {
         $this->apiManager = $apiManager;
         return $this;
     }
 
-    public function getApiManager()
+    public function getApiManager(): \Omeka\Api\Manager
     {
         return $this->apiManager;
     }
 
-    public function setFormAdapterManager($formAdapterManager)
+    public function setFormAdapterManager($formAdapterManager): self
     {
         $this->formAdapterManager = $formAdapterManager;
         return $this;
@@ -172,7 +169,7 @@ class SearchPageForm extends Form
         return $this->formAdapterManager;
     }
 
-    protected function getIndexesOptions()
+    protected function getIndexesOptions(): array
     {
         $options = [];
 
@@ -187,7 +184,7 @@ class SearchPageForm extends Form
         return $options;
     }
 
-    protected function getFormsOptions()
+    protected function getFormsOptions(): array
     {
         $options = [];
 

@@ -33,7 +33,7 @@ use Search\Query;
 
 trait TraitUnrestrictedQuery
 {
-    public function toUnrestrictedQuery(array $request, array $formSettings)
+    protected function toUnrestrictedQuery(array $request, array $formSettings)
     {
         $query = new Query;
 
@@ -43,7 +43,7 @@ trait TraitUnrestrictedQuery
             $query->setQuery($request['q']);
         }
 
-        if (isset($formSettings['is_public_field'])
+        if (!empty($formSettings['is_public_field'])
             && isset($request['isPublic'])
             && strlen($request['isPublic'])
         ) {

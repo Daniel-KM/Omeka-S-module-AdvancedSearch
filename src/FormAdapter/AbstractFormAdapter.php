@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * Copyright Daniel Berthereau, 2019-2020
+ * Copyright Daniel Berthereau, 2019-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -35,22 +35,22 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
 {
     use TraitUnrestrictedQuery;
 
-    public function getFormPartialHeaders()
+    public function getFormPartialHeaders(): ?string
     {
         return null;
     }
 
-    public function getFormPartial()
+    public function getFormPartial(): ?string
     {
         return null;
     }
 
-    public function getConfigFormClass()
+    public function getConfigFormClass(): ?string
     {
         return null;
     }
 
-    public function toQuery(array $request, array $formSettings)
+    public function toQuery(array $request, array $formSettings): \Search\Query
     {
         // Check of restricted is removed currently.
         return $this->toUnrestrictedQuery($request, $formSettings);

@@ -76,25 +76,21 @@ class SearchIndexConfigureForm extends Form implements TranslatorAwareInterface
      *
      * @return array
      */
-    protected function getResourcesOptions()
+    protected function getResourcesOptions(): array
     {
-        $translator = $this->getTranslator();
-
-        $options = [
-            'items' => $translator->translate('Items'),
-            'item_sets' => $translator->translate('Item sets'),
+        return [
+            'items' => 'Items',
+            'item_sets' => 'Item sets',
         ];
-
-        return $options;
     }
 
-    public function setApiManager($apiManager)
+    public function setApiManager($apiManager): self
     {
         $this->apiManager = $apiManager;
         return $this;
     }
 
-    public function getApiManager()
+    public function getApiManager(): \Omeka\Api\Manager
     {
         return $this->apiManager;
     }

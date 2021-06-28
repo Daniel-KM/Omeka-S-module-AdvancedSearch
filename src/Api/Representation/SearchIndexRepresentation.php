@@ -101,13 +101,19 @@ class SearchIndexRepresentation extends AbstractEntityRepresentation
 
     public function settings(): array
     {
-        return $this->resource->getSettings();
+        return $this->resource->getSettings() ?? [];
     }
 
     public function setting(string $name, $default = null)
     {
         $settings = $this->resource->getSettings();
         return $settings[$name] ?? $default;
+    }
+
+    public function subSetting(string $mainName, string $name, $default = null)
+    {
+        $settings = $this->resource->getSettings();
+        return $settings[$mainName][$name] ?? $default;
     }
 
     public function settingAdapter(string $name, $default = null)

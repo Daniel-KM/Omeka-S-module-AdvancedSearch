@@ -2,7 +2,6 @@
 
 namespace Search\Querier;
 
-use ArrayObject;
 use Omeka\Mvc\Controller\Plugin\Messenger;
 use Omeka\Stdlib\Message;
 use Search\Querier\Exception\QuerierException;
@@ -27,7 +26,7 @@ class InternalQuerier extends AbstractQuerier
     protected $resourceTypes;
 
     /**
-     * @var \ArrayObject
+     * @var array
      */
     protected $args;
 
@@ -49,7 +48,7 @@ class InternalQuerier extends AbstractQuerier
         // The standard api way implies a double query, because scalar doesn't
         // set the full total and doesn't use paginator.
         // So get all ids, then slice it here.
-        $dataQuery = $this->args->getArrayCopy();
+        $dataQuery = $this->args;
         $limit = empty($dataQuery['limit']) ? null : (int) $dataQuery['limit'];
         $offset = empty($dataQuery['offset']) ? 0 : (int) $dataQuery['offset'];
         unset($dataQuery['limit'], $dataQuery['offset']);
@@ -85,7 +84,7 @@ class InternalQuerier extends AbstractQuerier
         // TODO To be removed when the filters will be groupable (see version 3.5.12 where this is after filter).
         // Facets data don't use sort or limit.
         if ($plugins->has('references')) {
-            $facetData = clone $this->args;
+            $facetData = $this->args;
             if (isset($facetData['sort_by'])) {
                 unset($facetData['sort_by']);
             }
@@ -125,7 +124,7 @@ class InternalQuerier extends AbstractQuerier
         // Queries are multiple (one by resource type and by facet).
         // Note: the query is a scalar one, so final events are not triggered.
         // TODO Do a full api reference search or only scalar ids?
-        $this->args = new ArrayObject;
+        $this->args = [];
 
         // TODO Normalize search url arguments. Here, the ones from default form, adapted from Solr, are taken.
 
@@ -200,14 +199,14 @@ class InternalQuerier extends AbstractQuerier
         return $this->args;
     }
 
-    protected function defaultQuery()
+    protected function defaultQuery(): bool
     {
         $q = $this->query->getQuery();
         if (strlen($q)) {
             return false;
         }
 
-        $this->args->exchangeArray([]);
+        $this->args = [];
         return true;
     }
 
@@ -389,7 +388,7 @@ class InternalQuerier extends AbstractQuerier
         }
     }
 
-    protected function facetResponse(ArrayObject $facetData): void
+    protected function facetResponse(array $facetData): void
     {
         /** @var \Reference\Mvc\Controller\Plugin\References $references */
         $references = $this->getServiceLocator()->get('ControllerPluginManager')->get('references');
@@ -439,7 +438,7 @@ class InternalQuerier extends AbstractQuerier
 
             $values = $references
                 ->setMetadata($fields)
-                ->setQuery($facetData->getArrayCopy())
+                ->setQuery($facetData)
                 ->setOptions($options)
                 ->list();
 

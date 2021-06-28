@@ -30,7 +30,7 @@ class InternalQuerier extends AbstractQuerier
      */
     protected $args;
 
-    public function query()
+    public function query(): Response
     {
         $this->response = new Response;
 
@@ -539,7 +539,7 @@ class InternalQuerier extends AbstractQuerier
      * @return array Only values that are terms are converted into ids, the
      * other are removed.
      */
-    protected function listPropertyIds(array $values)
+    protected function listPropertyIds(array $values): array
     {
         $values = array_filter(array_map(function ($term) {
             return $this->isTerm($term) ? $term : null;
@@ -552,7 +552,7 @@ class InternalQuerier extends AbstractQuerier
      *
      * @return array Associative array of ids by term.
      */
-    protected function getUsedPropertyByIds()
+    protected function getUsedPropertyByIds(): array
     {
         static $properties;
 
@@ -589,7 +589,7 @@ class InternalQuerier extends AbstractQuerier
      *
      * @return array Associative array of used term by terms with "_".
      */
-    protected function getUnderscoredUsedProperties()
+    protected function getUnderscoredUsedProperties(): array
     {
         static $properties;
 
@@ -622,7 +622,7 @@ class InternalQuerier extends AbstractQuerier
      *
      * @return array Associative array of ids by term.
      */
-    protected function getPropertyIds()
+    protected function getPropertyIds(): array
     {
         static $properties;
 
@@ -661,7 +661,7 @@ class InternalQuerier extends AbstractQuerier
      * @return array Only values that are terms are converted into ids, the
      * other are removed.
      */
-    protected function listResourceClassIds(array $values)
+    protected function listResourceClassIds(array $values): array
     {
         return array_values(array_intersect_key($this->getResourceClassIds(), array_fill_keys($values, null)));
     }
@@ -673,7 +673,7 @@ class InternalQuerier extends AbstractQuerier
      *
      * @return array Associative array of ids by term.
      */
-    protected function getResourceClassIds()
+    protected function getResourceClassIds(): array
     {
         static $resourceClasses;
 
@@ -705,7 +705,7 @@ class InternalQuerier extends AbstractQuerier
      * @return array Only values that are labels are converted into ids, the
      * other are removed.
      */
-    protected function listResourceTemplateIds(array $values)
+    protected function listResourceTemplateIds(array $values): array
     {
         return array_values(array_intersect_key($this->getResourceTemplateIds(), array_fill_keys($values, null)));
     }
@@ -715,7 +715,7 @@ class InternalQuerier extends AbstractQuerier
      *
      * @return array Associative array of ids by label.
      */
-    protected function getResourceTemplateIds()
+    protected function getResourceTemplateIds(): array
     {
         static $resourceTemplates;
 

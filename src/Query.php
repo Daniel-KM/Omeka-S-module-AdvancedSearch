@@ -109,9 +109,9 @@ class Query implements \JsonSerializable
     protected $site;
 
     /**
-     * The key is always trimmed.
+     * The key is always trimmed and it is always a stringed.
      */
-    public function setQuery(string $query): self
+    public function setQuery($query): self
     {
         $this->query = trim((string) $query);
         return $this;

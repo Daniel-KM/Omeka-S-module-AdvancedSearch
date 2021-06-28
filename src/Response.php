@@ -188,11 +188,11 @@ class Response implements \JsonSerializable
     /**
      * Store a list of counts for all facets of all resources.
      *
-     * @param array $facetCountsByName Counts by facet, with keys "value" and "count".
+     * @param array $facetCountsByField Counts by facet, with keys "value" and "count".
      */
-    public function setFacetCounts(array $facetCountsByName): self
+    public function setFacetCounts(array $facetCountsByField): self
     {
-        $this->facetCounts = $facetCountsByName;
+        $this->facetCounts = $facetCountsByField;
         return $this;
     }
 

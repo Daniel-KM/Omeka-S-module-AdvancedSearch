@@ -161,9 +161,6 @@ class IndexController extends AbstractActionController
      *
      * @todo Factorize with \Search\Site\BlockLayout\SearchingForm::getSearchRequest()
      *
-     * @param SearchPageRepresentation $searchPage
-     * @param \Laminas\Form\Form $searchForm
-     * @param array $request
      * @return array|bool
      */
     protected function validateSearchRequest(
@@ -193,11 +190,10 @@ class IndexController extends AbstractActionController
      *
      * @todo Factorize with \Search\Mvc\Controller\Plugin\SearchRequestToResponse::cleanRequest()
      *
-     * @param array $request
      * @return array First key is the cleaned request, the second a bool to
      * indicate if it is empty.
      */
-    protected function cleanRequest(array $request)
+    protected function cleanRequest(array $request): array
     {
         // They should be already removed.
         unset($request['csrf'], $request['submit']);
@@ -209,11 +205,16 @@ class IndexController extends AbstractActionController
             [
                 // @see \Omeka\Api\Adapter\AbstractEntityAdapter::limitQuery().
                 // Note: facets use "limit" currently.
-                'page' => null, 'per_page' => null, 'limit' => null, 'offset' => null,
+                'page' => null,
+                'per_page' => null,
+                'limit' => null,
+                'offset' => null,
                 // @see \Omeka\Api\Adapter\AbstractEntityAdapter::search().
-                'sort_by' => null, 'sort_order' => null,
+                'sort_by' => null,
+                'sort_order' => null,
                 // Used by Search.
-                'resource-type' => null, 'sort' => null,
+                'resource-type' => null,
+                'sort' => null,
             ]
         );
 
@@ -227,11 +228,8 @@ class IndexController extends AbstractActionController
      * Remove zero-length values or an array, recursively.
      *
      * @todo Factorize with \Search\Mvc\Controller\Plugin\SearchRequestToResponse::arrayFilterRecursive()
-     *
-     * @param array $array
-     * @return array
      */
-    protected function arrayFilterRecursive(array &$array)
+    protected function arrayFilterRecursive(array &$array): array
     {
         foreach ($array as $key => $value) {
             if (is_array($value)) {

@@ -58,11 +58,6 @@ class SearchPageController extends AbstractActionController
      */
     protected $searchFormAdapterManager;
 
-    /**
-     * @param EntityManager $entityManager
-     * @param SearchAdapterManager $searchAdapterManager
-     * @param SearchFormAdapterManager $searchFormAdapterManager
-     */
     public function __construct(
         EntityManager $entityManager,
         SearchAdapterManager $searchAdapterManager,
@@ -158,11 +153,12 @@ class SearchPageController extends AbstractActionController
 
         $id = $this->params('id');
 
-        $view = new ViewModel;
-
         /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
         $searchPage = $this->api()->read('search_pages', $id)->getContent();
-        $view->setVariable('searchPage', $searchPage);
+
+        $view = new ViewModel([
+            'searchPage' => $searchPage,
+        ]);
 
         $index = $searchPage->index();
         $adapter = $index ? $index->adapter() : null;
@@ -279,14 +275,15 @@ class SearchPageController extends AbstractActionController
     public function deleteConfirmAction()
     {
         $id = $this->params('id');
-        $page = $this->api()->read('search_pages', $id)->getContent();
+        $searchPage = $this->api()->read('search_pages', $id)->getContent();
 
-        $view = new ViewModel;
-        $view->setTerminal(true);
-        $view->setTemplate('common/delete-confirm-details');
-        $view->setVariable('resourceLabel', 'search page');
-        $view->setVariable('resource', $page);
-        return $view;
+        $view = new ViewModel([
+            'resourceLabel' => 'search page',
+            'resource' => $searchPage,
+        ]);
+        return $view
+            ->setTerminal(true)
+            ->setTemplate('common/delete-confirm-details');
     }
 
     public function deleteAction()
@@ -312,7 +309,7 @@ class SearchPageController extends AbstractActionController
         return $this->redirect()->toRoute('admin/search');
     }
 
-    protected function checkPostAndValidForm($form)
+    protected function checkPostAndValidForm($form): bool
     {
         if (!$this->getRequest()->isPost()) {
             return false;
@@ -371,12 +368,8 @@ class SearchPageController extends AbstractActionController
 
     /**
      * Convert settings into strings in ordeer to manage many fields inside form.
-     *
-     * @param SearchPageRepresentation $searchPage
-     * @param array $settings
-     * @return array
      */
-    protected function prepareSettingsForSimpleForm(SearchPageRepresentation $searchPage, $settings)
+    protected function prepareSettingsForSimpleForm(SearchPageRepresentation $searchPage, $settings): array
     {
         $index = $searchPage->index();
         $adapter = $index->adapter();
@@ -416,7 +409,7 @@ class SearchPageController extends AbstractActionController
         return $settings;
     }
 
-    protected function extractSimpleFields(SearchPageRepresentation $searchPage)
+    protected function extractSimpleFields(SearchPageRepresentation $searchPage): array
     {
         $index = $searchPage->index();
         $adapter = $index->adapter();
@@ -466,7 +459,7 @@ class SearchPageController extends AbstractActionController
         return $params;
     }
 
-    protected function sitesWithSearchPage(SearchPageRepresentation $searchPage)
+    protected function sitesWithSearchPage(SearchPageRepresentation $searchPage): array
     {
         $result = [];
 
@@ -492,10 +485,6 @@ class SearchPageController extends AbstractActionController
 
     /**
      * Config the page for all sites.
-     *
-     * @param SearchPageRepresentation $searchPage
-     * @param array $mainSearchPageForSites
-     * @param string $availability
      */
     protected function manageSearchPageOnSites(
         SearchPageRepresentation $searchPage,
@@ -583,7 +572,7 @@ class SearchPageController extends AbstractActionController
      * @param array $b Second value
      * @return int -1, 0, 1.
      */
-    protected function sortByEnabledFirst($a, $b)
+    protected function sortByEnabledFirst($a, $b): int
     {
         // Sort by availability.
         if (isset($a['enabled']) && isset($b['enabled'])) {
@@ -613,11 +602,8 @@ class SearchPageController extends AbstractActionController
 
     /**
      * Get each line of a string separately.
-     *
-     * @param string $string
-     * @return array
      */
-    protected function stringToList($string)
+    protected function stringToList($string): array
     {
         return array_filter(array_map('trim', explode("\n", $this->fixEndOfLine($string))));
     }
@@ -626,26 +612,23 @@ class SearchPageController extends AbstractActionController
      * Clean the text area from end of lines.
      *
      * This method fixes Windows and Apple copy/paste from a textarea input.
-     *
-     * @param string $string
-     * @return string
      */
-    protected function fixEndOfLine($string)
+    protected function fixEndOfLine($string): string
     {
-        return str_replace(["\r\n", "\n\r", "\r"], ["\n", "\n", "\n"], $string);
+        return str_replace(["\r\n", "\n\r", "\r"], ["\n", "\n", "\n"], (string) $string);
     }
 
-    protected function getEntityManager()
+    protected function getEntityManager(): EntityManager
     {
         return $this->entityManager;
     }
 
-    protected function getSearchAdapterManager()
+    protected function getSearchAdapterManager(): SearchAdapterManager
     {
         return $this->searchAdapterManager;
     }
 
-    protected function getSearchFormAdapterManager()
+    protected function getSearchFormAdapterManager(): SearchFormAdapterManager
     {
         return $this->searchFormAdapterManager;
     }

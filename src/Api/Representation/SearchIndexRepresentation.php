@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2020
+ * Copyright Daniel Berthereau, 2020-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -31,6 +31,8 @@
 namespace Search\Api\Representation;
 
 use Omeka\Api\Representation\AbstractEntityRepresentation;
+use Search\Indexer\NoopIndexer;
+use Search\Querier\NoopQuerier;
 
 class SearchIndexRepresentation extends AbstractEntityRepresentation
 {
@@ -50,7 +52,7 @@ class SearchIndexRepresentation extends AbstractEntityRepresentation
         ];
     }
 
-    public function adminUrl($action = null, $canonical = false)
+    public function adminUrl($action = null, $canonical = false): string
     {
         $url = $this->getViewHelper('Url');
         $params = [
@@ -64,18 +66,12 @@ class SearchIndexRepresentation extends AbstractEntityRepresentation
         return $url('admin/search/index-id', $params, $options);
     }
 
-    /**
-     * @return string
-     */
-    public function name()
+    public function name(): string
     {
         return $this->resource->getName();
     }
 
-    /**
-     * @return string
-     */
-    public function cleanName()
+    public function cleanName(): string
     {
         return strtolower(str_replace('__', '_',
             preg_replace('/[^a-zA-Z0-9]/', '_', $this->resource->getName())
@@ -88,18 +84,13 @@ class SearchIndexRepresentation extends AbstractEntityRepresentation
      * The short name is used in Solr module to create a unique id, that should
      * be 32 letters max in order to be sorted (39rhjw-Z-item_sets/7654321:fr_FR),
      * it should be less than two letters, so don't create too much indexes.
-     *
-     * @return string
      */
-    public function shortName()
+    public function shortName(): string
     {
-        return base_convert($this->id(), 10, 36);
+        return base_convert((string) $this->id(), 10, 36);
     }
 
-    /**
-     * @return \Search\Adapter\AdapterInterface|null
-     */
-    public function adapter()
+    public function adapter(): ?\Search\Adapter\AdapterInterface
     {
         $name = $this->resource->getAdapter();
         $adapterManager = $this->getServiceLocator()->get('Search\AdapterManager');
@@ -108,56 +99,34 @@ class SearchIndexRepresentation extends AbstractEntityRepresentation
             : null;
     }
 
-    /**
-     * @return array
-     */
-    public function settings()
+    public function settings(): array
     {
         return $this->resource->getSettings();
     }
 
-    /**
-     * @param string $name
-     * @param mixed $default
-     * @return mixed
-     */
-    public function setting($name, $default = null)
+    public function setting(string $name, $default = null)
     {
         $settings = $this->resource->getSettings();
         return $settings[$name] ?? $default;
     }
 
-    /**
-     * @param string $name
-     * @param mixed $default
-     * @return mixed
-     */
-    public function settingAdapter($name, $default = null)
+    public function settingAdapter(string $name, $default = null)
     {
         $settings = $this->resource->getSettings();
         return $settings['adapter'][$name] ?? $default;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function created()
+    public function created(): \DateTime
     {
         return $this->resource->getCreated();
     }
 
-    /**
-     * @return \Search\Entity\SearchIndex
-     */
-    public function getEntity()
+    public function getEntity(): \Search\Entity\SearchIndex
     {
         return $this->resource;
     }
 
-    /**
-     * @return string
-     */
-    public function adapterLabel()
+    public function adapterLabel(): string
     {
         $adapter = $this->adapter();
         if (!$adapter) {
@@ -170,17 +139,16 @@ class SearchIndexRepresentation extends AbstractEntityRepresentation
     }
 
     /**
-     * @return \Search\Indexer\IndexerInterface NoopIndexer is returned when
-     * the indexer is not available.
+     * @return NoopIndexer is returned when the indexer is not available.
      */
-    public function indexer()
+    public function indexer(): \Search\Indexer\IndexerInterface
     {
         $services = $this->getServiceLocator();
         $adapter = $this->adapter();
         if ($adapter) {
-            $indexerClass = $adapter->getIndexerClass() ?: \Search\Indexer\NoopIndexer::class;
+            $indexerClass = $adapter->getIndexerClass() ?: NoopIndexer::class;
         } else {
-            $indexerClass = \Search\Indexer\NoopIndexer::class;
+            $indexerClass = NoopIndexer::class;
         }
 
         /** @var \Search\Indexer\IndexerInterface $indexer */
@@ -192,10 +160,9 @@ class SearchIndexRepresentation extends AbstractEntityRepresentation
     }
 
     /**
-     * @return \Search\Querier\QuerierInterface NoopQuerier is returned when
-     * the querier is not available.
+     * @return NoopQuerier is returned when the querier is not available.
      */
-    public function querier()
+    public function querier(): \Search\Querier\QuerierInterface
     {
         $services = $this->getServiceLocator();
         $adapter = $this->adapter();

@@ -20,28 +20,26 @@ class SearchRequestToResponse extends AbstractPlugin
     /**
      * @var SearchPageRepresentation
      */
-    protected $page;
+    protected $searchPage;
 
     /**
      * @var SearchIndexRepresentation
      */
-    protected $index;
+    protected $searchIndex;
 
     /**
      * Get response from a search request.
      *
      * @param array $request Validated request.
-     * @param SearchPageRepresentation $searchPage
-     * @param SiteRepresentation $site
      * @return array Result with a status, data, and message if error.
      */
     public function __invoke(
         array $request,
         SearchPageRepresentation $searchPage,
         SiteRepresentation $site = null
-    ) {
+    ): array {
         $controller = $this->getController();
-        $this->page = $searchPage;
+        $this->searchPage = $searchPage;
 
         /** @var \Search\FormAdapter\FormAdapterInterface $formAdapter */
         $formAdapter = $searchPage->formAdapter();
@@ -71,11 +69,11 @@ class SearchRequestToResponse extends AbstractPlugin
 
         // Add global parameters.
 
-        $searchIndex = $this->index = $searchPage->index();
-        $indexSettings = $searchIndex->settings();
+        $this->searchIndex = $searchPage->index();
+        $indexSettings = $this->searchIndex->settings();
 
         $user = $controller->identity();
-        // TODO Manage roles from modules.
+        // TODO Manage roles from modules and visibility from modules (access resources).
         $omekaRoles = [
             \Omeka\Permissions\Acl::ROLE_GLOBAL_ADMIN,
             \Omeka\Permissions\Acl::ROLE_SITE_ADMIN,
@@ -162,7 +160,9 @@ class SearchRequestToResponse extends AbstractPlugin
         $query = $eventArgs['query'];
 
         // Send the query to the search engine.
-        $querier = $searchIndex
+
+        /** @var \Search\Querier\QuerierInterface $querier */
+        $querier = $this->searchIndex
             ->querier()
             ->setQuery($query);
         try {
@@ -201,14 +201,16 @@ class SearchRequestToResponse extends AbstractPlugin
     /**
      * Remove all empty values (zero length strings) and check empty request.
      *
-     * @param array $request
      * @return array First key is the cleaned request, the second a bool to
      * indicate if it is empty.
      */
-    protected function cleanRequest(array $request)
+    protected function cleanRequest(array $request): array
     {
         // They should be already removed.
-        unset($request['csrf'], $request['submit']);
+        unset(
+            $request['csrf'],
+            $request['submit']
+        );
 
         $this->arrayFilterRecursive($request);
 
@@ -217,11 +219,16 @@ class SearchRequestToResponse extends AbstractPlugin
             [
                 // @see \Omeka\Api\Adapter\AbstractEntityAdapter::limitQuery().
                 // Note: facets use "limit" currently.
-                'page' => null, 'per_page' => null, 'limit' => null, 'offset' => null,
+                'page' => null,
+                'per_page' => null,
+                'limit' => null,
+                'offset' => null,
                 // @see \Omeka\Api\Adapter\AbstractEntityAdapter::search().
-                'sort_by' => null, 'sort_order' => null,
+                'sort_by' => null,
+                'sort_order' => null,
                 // Used by Search.
-                'resource-type' => null, 'sort' => null,
+                'resource-type' => null,
+                'sort' => null,
             ]
         );
 
@@ -233,11 +240,8 @@ class SearchRequestToResponse extends AbstractPlugin
 
     /**
      * Remove zero-length values or an array, recursively.
-     *
-     * @param array $array
-     * @return array
      */
-    protected function arrayFilterRecursive(array &$array)
+    protected function arrayFilterRecursive(array &$array): array
     {
         foreach ($array as $key => $value) {
             if (is_array($value)) {
@@ -256,19 +260,16 @@ class SearchRequestToResponse extends AbstractPlugin
      * Normalize the sort options of the index.
      *
      * @todo Normalize the sort options when the index or page is hydrated. To be save in a hidden setting of the page.
-     *
-     * @return array
      */
-    protected function getSortOptions()
+    protected function getSortOptions(): array
     {
         $sortOptions = [];
 
-        $sortFieldsSettings = $this->page->setting('sort_fields', []);
+        $sortFieldsSettings = $this->searchPage->setting('sort_fields', []);
         if (empty($sortFieldsSettings)) {
             return [];
         }
-
-        $indexAdapter = $this->index->adapter();
+        $indexAdapter = $this->searchIndex->adapter();
         if (empty($indexAdapter)) {
             return [];
         }
@@ -296,12 +297,8 @@ class SearchRequestToResponse extends AbstractPlugin
 
     /**
      * Order the field by weigth.
-     *
-     * @param array $fields
-     * @param string $settingName
-     * @return array
      */
-    protected function sortFieldsByWeight(array $fields, $settingName)
+    protected function sortFieldsByWeight(array $fields, string $settingName): array
     {
         $settings = $this->page->setting($settingName, []);
         uksort($fields, function ($a, $b) use ($settings) {

@@ -6,27 +6,27 @@ use Search\Api\Representation\SearchIndexRepresentation;
 
 class InternalAdapter extends AbstractAdapter
 {
-    public function getLabel()
+    public function getLabel(): string
     {
         return 'Internal'; // @translate
     }
 
-    public function getConfigFieldset()
+    public function getConfigFieldset(): ?\Laminas\Form\Fieldset
     {
         return null;
     }
 
-    public function getIndexerClass()
+    public function getIndexerClass(): string
     {
         return \Search\Indexer\InternalIndexer::class;
     }
 
-    public function getQuerierClass()
+    public function getQuerierClass(): string
     {
         return \Search\Querier\InternalQuerier::class;
     }
 
-    public function getAvailableFields(SearchIndexRepresentation $index)
+    public function getAvailableFields(SearchIndexRepresentation $index): array
     {
         // Use a direct query to avoid a memory overload when there are many
         // vocabularies.
@@ -75,7 +75,7 @@ class InternalAdapter extends AbstractAdapter
         return $fields;
     }
 
-    public function getAvailableSortFields(SearchIndexRepresentation $index)
+    public function getAvailableSortFields(SearchIndexRepresentation $index): array
     {
         $availableFields = $this->getAvailableFields($index);
 
@@ -104,7 +104,7 @@ class InternalAdapter extends AbstractAdapter
         return $sortFields;
     }
 
-    public function getAvailableFacetFields(SearchIndexRepresentation $index)
+    public function getAvailableFacetFields(SearchIndexRepresentation $index): array
     {
         return $this->getAvailableFields($index);
     }

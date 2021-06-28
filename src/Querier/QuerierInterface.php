@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2018-2020
+ * Copyright Daniel Berthereau, 2018-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -38,32 +38,16 @@ use Search\Response;
 
 interface QuerierInterface extends LoggerAwareInterface
 {
-    /**
-     * @param ServiceLocatorInterface $serviceLocator
-     * @return self
-     */
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator);
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): self;
 
-    /**
-     * @param SearchIndexRepresentation $index
-     * @return self
-     */
-    public function setSearchIndex(SearchIndexRepresentation $index);
+    public function setSearchIndex(SearchIndexRepresentation $index): self;
 
-    /**
-     * Set a search query.
-     *
-     * @param Query $query
-     * @return self
-     */
-    public function setQuery(Query $query);
+    public function setQuery(Query $query): self;
 
     /**
      * Process a search query.
-     *
-     * @return Response
      */
-    public function query();
+    public function query(): Response;
 
     /**
      * Prepare a search query.

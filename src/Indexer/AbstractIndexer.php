@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2018
+ * Copyright Daniel Berthereau, 2018-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -48,21 +48,18 @@ abstract class AbstractIndexer implements IndexerInterface
      */
     protected $index;
 
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator)
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): self
     {
         $this->serviceLocator = $serviceLocator;
         return $this;
     }
 
-    /**
-     * @return ServiceLocatorInterface
-     */
-    public function getServiceLocator()
+    protected function getServiceLocator(): ServiceLocatorInterface
     {
         return $this->serviceLocator;
     }
 
-    public function setSearchIndex(SearchIndexRepresentation $index)
+    public function setSearchIndex(SearchIndexRepresentation $index): self
     {
         $this->index = $index;
         return $this;
@@ -75,7 +72,7 @@ abstract class AbstractIndexer implements IndexerInterface
      * @param mixed $default
      * @return mixed
      */
-    protected function getSetting($name, $default = null)
+    protected function getSetting(string $name, $default = null)
     {
         $settings = $this->index->settings();
         return $settings[$name] ?? $default;
@@ -88,7 +85,7 @@ abstract class AbstractIndexer implements IndexerInterface
      * @param mixed $default
      * @return mixed
      */
-    protected function getAdapterSetting($name, $default = null)
+    protected function getAdapterSetting(string $name, $default = null)
     {
         $adapterSettings = $this->getSetting('adapter', []);
         return $adapterSettings[$name] ?? $default;

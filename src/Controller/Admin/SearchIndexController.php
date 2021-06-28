@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2018
+ * Copyright Daniel Berthereau, 2018-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -51,10 +51,6 @@ class SearchIndexController extends AbstractActionController
      */
     protected $searchAdapterManager;
 
-    /**
-     * @param EntityManager $entityManager
-     * @param SearchAdapterManager $searchAdapterManager
-     */
     public function __construct(
         EntityManager $entityManager,
         SearchAdapterManager $searchAdapterManager
@@ -66,8 +62,9 @@ class SearchIndexController extends AbstractActionController
     public function addAction()
     {
         $form = $this->getForm(SearchIndexForm::class);
-        $view = new ViewModel;
-        $view->setVariable('form', $form);
+        $view = new ViewModel([
+            'form' => $form,
+        ]);
 
         if ($this->getRequest()->isPost()) {
             $form->setData($this->params()->fromPost());
@@ -121,8 +118,9 @@ class SearchIndexController extends AbstractActionController
         $data['o:name'] = $searchIndex->getName();
         $form->setData($data);
 
-        $view = new ViewModel;
-        $view->setVariable('form', $form);
+        $view = new ViewModel([
+            'form' => $form,
+        ]);
 
         if ($this->getRequest()->isPost()) {
             $form->setData($this->params()->fromPost());
@@ -154,13 +152,14 @@ class SearchIndexController extends AbstractActionController
 
         $totalJobs = $this->totalJobs(\Search\Job\Indexing::class, true);
 
-        $view = new ViewModel;
-        $view->setTerminal(true);
-        $view->setTemplate('search/admin/search-index/index-confirm-details');
-        $view->setVariable('resourceLabel', 'search index');
-        $view->setVariable('resource', $index);
-        $view->setVariable('totalJobs', $totalJobs);
-        return $view;
+        $view = new ViewModel([
+            'resourceLabel' => 'search index',
+            'resource' => $index,
+            'totalJobs' => $totalJobs,
+        ]);
+        return $view
+            ->setTerminal(true)
+            ->setTemplate('search/admin/search-index/index-confirm-details');
     }
 
     public function indexAction()
@@ -200,12 +199,14 @@ class SearchIndexController extends AbstractActionController
         $index = $response->getContent();
 
         // TODO Add a warning about the related pages, that will be deleted.
-        $view = new ViewModel;
-        $view->setTerminal(true);
-        $view->setTemplate('common/delete-confirm-details');
-        $view->setVariable('resourceLabel', 'search index');
-        $view->setVariable('resource', $index);
-        return $view;
+
+        $view = new ViewModel([
+            'resourceLabel' => 'search index',
+            'resource' => $index,
+        ]);
+        return $view
+            ->setTerminal(true)
+            ->setTemplate('common/delete-confirm-details');
     }
 
     public function deleteAction()
@@ -231,15 +232,12 @@ class SearchIndexController extends AbstractActionController
         return $this->redirect()->toRoute('admin/search');
     }
 
-    protected function getEntityManager()
+    protected function getEntityManager(): EntityManager
     {
         return $this->entityManager;
     }
 
-    /**
-     * @return \Search\Adapter\Manager
-     */
-    protected function getSearchAdapterManager()
+    protected function getSearchAdapterManager(): SearchAdapterManager
     {
         return $this->searchAdapterManager;
     }

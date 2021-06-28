@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2018-2020
+ * Copyright Daniel Berthereau, 2018-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -38,17 +38,9 @@ use Search\Query;
 
 interface IndexerInterface extends LoggerAwareInterface
 {
-    /**
-     * @param ServiceLocatorInterface $serviceLocator
-     * @return self
-     */
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator);
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): self;
 
-    /**
-     * @param SearchIndexRepresentation $index
-     * @return self
-     */
-    public function setSearchIndex(SearchIndexRepresentation $index);
+    public function setSearchIndex(SearchIndexRepresentation $index): self;
 
     /**
      * Inidicate if the resource can be indexed.
@@ -56,7 +48,7 @@ interface IndexerInterface extends LoggerAwareInterface
      * @param string $resourceName The resource type ("items", "item_sets"…).
      * @return bool
      */
-    public function canIndex($resourceName);
+    public function canIndex($resourceName): bool;
 
     /**
      * Reset the index.
@@ -64,23 +56,19 @@ interface IndexerInterface extends LoggerAwareInterface
      * @param Query $query Allows to limit clearing to some resources.
      * @return self
      */
-    public function clearIndex(Query $query = null);
+    public function clearIndex(?Query $query = null): self;
 
     /**
      * Index a resource.
-     *
-     * @param Resource $resource
-     * @return self
      */
-    public function indexResource(Resource $resource);
+    public function indexResource(Resource $resource): self;
 
     /**
      * Index multiple resources.
      *
      * @param Resource[] $resources
-     * @return self
      */
-    public function indexResources(array $resources);
+    public function indexResources(array $resources): self;
 
     /**
      * Unindex a deleted resource.
@@ -89,5 +77,5 @@ interface IndexerInterface extends LoggerAwareInterface
      * @param int $id
      * @return self
      */
-    public function deleteResource($resourceName, $id);
+    public function deleteResource(string $resourceName, $id): self;
 }

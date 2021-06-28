@@ -2,6 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016-2017
+ * Copyright Daniel Berthereau, 2018-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -39,30 +40,28 @@ abstract class AbstractAdapter implements AdapterInterface
      */
     protected $serviceLocator;
 
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): void
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): AdapterInterface
     {
         $this->serviceLocator = $serviceLocator;
+        return $this;
     }
 
-    public function getAvailableFields(SearchIndexRepresentation $index)
+    public function getAvailableFields(SearchIndexRepresentation $index): array
     {
         return [];
     }
 
-    public function getAvailableFacetFields(SearchIndexRepresentation $index)
+    public function getAvailableFacetFields(SearchIndexRepresentation $index): array
     {
         return [];
     }
 
-    public function getAvailableSortFields(SearchIndexRepresentation $index)
+    public function getAvailableSortFields(SearchIndexRepresentation $index): array
     {
         return [];
     }
 
-    /**
-     * @return \Laminas\ServiceManager\ServiceLocatorInterface
-     */
-    protected function getServiceLocator()
+    protected function getServiceLocator(): ServiceLocatorInterface
     {
         return $this->serviceLocator;
     }

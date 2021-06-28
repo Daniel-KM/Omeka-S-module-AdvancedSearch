@@ -41,10 +41,9 @@ class IndexController extends AbstractActionController
         $search_indexes = $api->search('search_indexes', ['sort_by' => 'name'])->getContent();
         $search_pages = $api->search('search_pages', ['sort_by' => 'name'])->getContent();
 
-        $view = new ViewModel;
-        $view
-            ->setVariable('search_indexes', $search_indexes)
-            ->setVariable('search_pages', $search_pages);
-        return $view;
+        return new ViewModel([
+            'search_indexes' => $search_indexes,
+            'search_pages' => $search_pages,
+        ]);
     }
 }

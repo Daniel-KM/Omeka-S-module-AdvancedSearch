@@ -1,0 +1,39 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\SiteRepresentation $site
+ * @var \Search\Api\Representation\SearchPageRepresentation $searchPage
+ * @var \Search\Query $query
+ * @var \Search\Response $response
+ * @var array $sortOptions
+ */
+
+if (empty($sortOptions)) return;
+
+$plugins = $this->getHelperPluginManager();
+$translate = $plugins->get('translate');
+
+// Prepare urls directly as values to avoid a click. Use current url for a quick build.
+$currentUrl = strtok($this->serverUrl(true), '?');
+$currentQuery = $this->params()->fromQuery();
+$currentSort = $query->getSort();
+$sorts = $sortOptions;
+$sortOptions = [];
+$currentSortUrl = null;
+foreach ($sorts as $key => $value) {
+    $sortKey = $currentUrl . '?' . http_build_query(['sort' => $key] + $currentQuery);
+    if ($key === $currentSort) $currentSortUrl = $sortKey;
+    $sortOptions[$sortKey] = $translate($value);
+}
+
+$sortSelect = new \Laminas\Form\Element\Select('sort');
+$sortSelect
+    ->setValueOptions($sortOptions)
+    ->setValue($query->getSort())
+    ->setLabel($translate('Sort by'));
+?>
+
+<div class="sort-by-order">
+    <?= $this->formLabel($sortSelect) ?>
+    <?= $this->formSelect($sortSelect) ?>
+</div>

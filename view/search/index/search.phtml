@@ -50,6 +50,7 @@ $skipFormAction = !empty($skipFormAction);
 
 // Used in case of a redirect of item-set/show to search, when used like item/browse.
 $itemSetId = $this->params()->fromRoute('item-set-id');
+$isItemSetShow = (bool) $itemSetId;
 
 $this->headLink()->appendStylesheet($assetUrl('css/search.css', 'Search'));
 $this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javascript', ['defer' => 'defer']);
@@ -59,7 +60,7 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javas
 <div id="content" role="main">
 <?php endif; ?>
 
-<?php if ($itemSetId): ?>
+<?php if ($isItemSetShow): ?>
 
     <?php $itemSet = $this->api()->read('item_sets', ['id' => $itemSetId])->getContent(); ?>
     <?php $this->vars()->offsetSet('itemSet', $itemSet); ?>
@@ -116,7 +117,7 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javas
                 'sortOptions' => $sortOptions,
             ]) ?>
 
-        <?php elseif (empty($query) && empty($itemSetId)): ?>
+        <?php elseif (empty($query) && !$isItemSetShow): ?>
 
             <div class="noresults"><?= $translate('Fill a query and get results.') ?></div>
 

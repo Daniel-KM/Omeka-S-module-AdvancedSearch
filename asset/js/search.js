@@ -108,6 +108,12 @@ $(document).ready(function() {
         $(this).addClass('active');
     });
 
+    /* Sort selector links */
+    $('.sort-by-order').on('change', function(e) {
+        e.preventDefault();
+        window.location.href = $(this).val();
+    });
+
     var view_type = localStorage.getItem('search_view_type');
     if (!view_type) {
         view_type = 'list';

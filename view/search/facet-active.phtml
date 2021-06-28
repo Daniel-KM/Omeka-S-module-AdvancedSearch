@@ -19,4 +19,4 @@
 if (!$active) return;
 ?>
 
-<a href="<?= $escapeHtmlAttr($url) ?>" data-facet-name="limit[<?= $escapeHtmlAttr($name) ?>][]" data-facet-value="<?= $escapeHtmlAttr($value) ?>"><?= $escapeHtml(sprintf('%s : %s', $translate($facetLabel($name)), $label)) ?></a>
+<a class="facet-active" href="<?= $escapeHtmlAttr($url) ?>" data-facet-name="limit[<?= $escapeHtmlAttr($name) ?>][]" data-facet-value="<?= $escapeHtmlAttr($value) ?>"><?= $escapeHtml(sprintf('%s : %s', $translate($facetLabel($name)), $label)) ?></a>

@@ -31,10 +31,10 @@ return [
         'factories' => [
             'apiSearch' => Service\ViewHelper\ApiSearchFactory::class,
             'apiSearchOne' => Service\ViewHelper\ApiSearchOneFactory::class,
+            'facetActive' => Service\ViewHelper\FacetActiveFactory::class,
             'facetCheckbox' => Service\ViewHelper\FacetCheckboxFactory::class,
             'facetLabel' => Service\ViewHelper\FacetLabelFactory::class,
             'facetLink' => Service\ViewHelper\FacetLinkFactory::class,
-            'facetSelected' => Service\ViewHelper\FacetSelectedFactory::class,
             'searchIndexConfirm' => Service\ViewHelper\SearchIndexConfirmFactory::class,
             'searchRequestToResponse' => Service\ViewHelper\SearchRequestToResponseFactory::class,
         ],

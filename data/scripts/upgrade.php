@@ -1,5 +1,9 @@
 <?php declare(strict_types=1);
+
 namespace Search;
+
+use Omeka\Mvc\Controller\Plugin\Messenger;
+use Omeka\Stdlib\Message;
 
 /**
  * @var Module $this
@@ -121,21 +125,21 @@ if (version_compare($oldVersion, '3.5.8', '<')) {
     // Reorder the search pages by weight to avoid to do it each time.
     // The api is not available for search pages during upgrade, so use sql.
     $sql = <<<'SQL'
-SELECT id, settings FROM search_page;
+SELECT `id`, `settings` FROM `search_page`;
 SQL;
     $stmt = $connection->query($sql);
     $result = $stmt->fetchAll(\PDO::FETCH_KEY_PAIR);
     if ($result) {
-        foreach ($result as $id => $params) {
-            $params = json_decode($params, true) ?: [];
-            if ($params) {
+        foreach ($result as $id => $searchPageSettings) {
+            $searchPageSettings = json_decode($searchPageSettings, true) ?: [];
+            if ($searchPageSettings) {
                 foreach (['facets', 'sort_fields'] as $type) {
-                    if (!isset($params[$type])) {
-                        $params[$type] = [];
+                    if (!isset($searchPageSettings[$type])) {
+                        $searchPageSettings[$type] = [];
                     } else {
                         // @see \Search\Controller\Admin\SearchPageController::configureAction()
                         // Sort enabled first, then available, else sort by weigth.
-                        uasort($params[$type], function ($a, $b) {
+                        uasort($searchPageSettings[$type], function ($a, $b) {
                             // Sort by availability.
                             if (isset($a['enabled']) && isset($b['enabled'])) {
                                 if ($a['enabled'] > $b['enabled']) {
@@ -163,11 +167,11 @@ SQL;
                     }
                 }
             }
-            $params = $connection->quote(json_encode($params, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            $searchPageSettings = $connection->quote(json_encode($searchPageSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
             $sql = <<<SQL
-UPDATE search_page
-SET `settings` = $params
-WHERE id = $id;
+UPDATE `search_page`
+SET `settings` = $searchPageSettings
+WHERE `id` = $id;
 SQL;
             $connection->exec($sql);
         }
@@ -200,9 +204,9 @@ if (version_compare($oldVersion, '3.5.12.2', '<')) {
         $mainSearchPage = basename($mainSearchPage);
         // The api for search_pages is not available during upgrade.
         $sql = <<<SQL
-SELECT id
-FROM search_page
-WHERE path = :search_page;
+SELECT `id`
+FROM `search_page`
+WHERE `path` = :search_page;
 SQL;
         $id = $connection->fetchColumn($sql, ['search_page' => $mainSearchPage], 0);
         $settings->set('search_main_page', $id ? (string) $id : null);
@@ -212,27 +216,27 @@ SQL;
 if (version_compare($oldVersion, '3.5.14', '<')) {
     // Add new default options to settings of search pages.
     $sql = <<<'SQL'
-SELECT id, settings FROM search_page;
+SELECT `id`, `settings` FROM `search_page`;
 SQL;
     $stmt = $connection->query($sql);
     $result = $stmt->fetchAll(\PDO::FETCH_KEY_PAIR);
     if ($result) {
-        foreach ($result as $id => $params) {
-            $params = json_decode($params, true) ?: [];
-            $params += [
+        foreach ($result as $id => $searchPageSettings) {
+            $searchPageSettings = json_decode($searchPageSettings, true) ?: [];
+            $searchPageSettings += [
                 'default_results' => 'default',
                 'default_query' => '',
                 'restrict_query_to_form' => '0',
             ];
-            $params['form']['item_set_filter_type'] = 'multi-checkbox';
-            $params['form']['resource_class_filter_type'] = 'select';
-            $params['form']['resource_template_filter_type'] = 'select';
-            $params['form']['filter_collection_number'] = '1';
-            $params = $connection->quote(json_encode($params, 320));
+            $searchPageSettings['form']['item_set_filter_type'] = 'multi-checkbox';
+            $searchPageSettings['form']['resource_class_filter_type'] = 'select';
+            $searchPageSettings['form']['resource_template_filter_type'] = 'select';
+            $searchPageSettings['form']['filter_collection_number'] = '1';
+            $searchPageSettings = $connection->quote(json_encode($searchPageSettings, 320));
             $sql = <<<SQL
-UPDATE search_page
-SET `settings` = $params
-WHERE id = $id;
+UPDATE `search_page`
+SET `settings` = $searchPageSettings
+WHERE `id` = $id;
 SQL;
             $connection->exec($sql);
         }
@@ -355,4 +359,17 @@ SET `name` = "Internal (sql)"
 WHERE `name` = "Internal";
 SQL;
     $connection->exec($sql);
+
+    $messenger = new Messenger();
+    $message = new Message(
+        'The default search forms "Basic" and "Advanced" have been removed and replaced by a "Main" form. It is recommended to check it and to rename templates if they are customized in a theme.' // @translate
+    );
+    $messenger->addWarning($message);
+    $message = new Message(
+        'The default input type for main search form field "q" is now "search" instead of "text". Check your css or use $this->formText() in your theme.' // @translate
+    );
+    $messenger->addWarning($message);
+    $message = new Message(
+        'The search page form defines new keys and use sub settings, in particular for facets. Check your theme if it was customized.' // @translate
+    );
 }

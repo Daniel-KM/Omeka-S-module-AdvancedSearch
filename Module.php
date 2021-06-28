@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016-2017
- * Copyright Daniel Berthereau, 2017-2020
+ * Copyright Daniel Berthereau, 2017-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -99,12 +99,6 @@ class Module extends AbstractModule
             '*',
             'view.layout',
             [$this, 'addHeaders']
-        );
-
-        $sharedEventManager->attach(
-            \Omeka\Form\Element\ResourceClassSelect::class,
-            'form.vocab_member_select.query',
-            [$this, 'formVocabMemberSelectQuery']
         );
 
         $sharedEventManager->attach(
@@ -300,21 +294,6 @@ class Module extends AbstractModule
         }
     }
 
-    public function formVocabMemberSelectQuery(Event $event): void
-    {
-        // TODO Check if version >= 3.1.2.8.
-        if ($this->isModuleActive('Next')) {
-            return;
-        }
-
-        $selectElement = $event->getTarget();
-        if ($selectElement->getOption('used_terms')) {
-            $query = $event->getParam('query', []);
-            $query['used'] = true;
-            $event->setParam('query', $query);
-        }
-    }
-
     /**
      * Prepare a batch update to process it one time only for performance.
      *
@@ -334,6 +313,8 @@ class Module extends AbstractModule
      * is set, it doesn't work any more for a background process, so a check is
      * done to check if this is a background event.
      * @todo Find where the resource template property is created. This issue may disappear de facto in a future version.
+     *
+     * @todo Clean the process with the fix in Omeka 3.1.
      *
      * @param Event $event
      */

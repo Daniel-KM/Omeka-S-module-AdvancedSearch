@@ -204,6 +204,7 @@ class AdvancedForm extends BasicForm
                 'empty_option' => '',
                 // TODO Manage list of resource classes by site.
                 'used_terms' => true,
+                'query' => ['used' => true],
                 'disable_group_by_vocabulary' => $filterType === 'select_flat',
             ]);
 
@@ -268,6 +269,8 @@ class AdvancedForm extends BasicForm
                 'label' => 'Resource templates', // @translate
                 'empty_option' => '',
                 'disable_group_by_owner' => true,
+                'used' => true,
+                'query' => ['used' => true],
             ])
             ->setAttributes([
                 'id' => 'resource-templates-ids',

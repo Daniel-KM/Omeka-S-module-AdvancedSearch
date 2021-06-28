@@ -41,18 +41,18 @@ class AbstractFacetElement extends AbstractHelper
     }
 
     /**
-     * Create one facet link.
+     * Create one facet as link, checkbox or button.
      *
-     * @param string $name
-     * @param array $facet
-     * @return string
+     * @return string|array
      */
-    public function __invoke($name, $facet)
+    public function __invoke(string $name, array $facet, bool $asData = false)
     {
         // Variables are static to speed up process.
         static $urlHelper;
         static $partialHelper;
         static $escapeHtml;
+        static $translate;
+        static $facetLabel;
 
         static $mvcEvent;
         static $routeMatch;
@@ -62,13 +62,18 @@ class AbstractFacetElement extends AbstractHelper
         static $params;
         static $queryBase;
 
+        static $facetsData = [];
+
         if (is_null($mvcEvent)) {
             $plugins = $this->getView()->getHelperPluginManager();
             $urlHelper = $plugins->get('url');
             $partialHelper = $plugins->get('partial');
             $escapeHtml = $plugins->get('escapeHtml');
+            $translate = $plugins->get('translate');
+            $facetLabel = $plugins->get('facetLabel');
+
             $this->api = $plugins->get('api');
-            $this->translate = $plugins->get('translate');
+            $this->translate = $translate;
 
             $mvcEvent = $this->application->getMvcEvent();
             $routeMatch = $mvcEvent->getRouteMatch();
@@ -89,40 +94,54 @@ class AbstractFacetElement extends AbstractHelper
             unset($queryBase['page']);
         }
 
-        $query = $queryBase;
-
-        // The facet value is compared against a string (the query args).
         $facetValue = (string) $facet['value'];
-        $facetValueLabel = $this->facetValueLabel($name, $facetValue);
-        if (!strlen($facetValueLabel)) {
-            return '';
+        if (!isset($facetsData[$name][$facetValue])) {
+            $query = $queryBase;
+
+            // The facet value is compared against a string (the query args).
+            $facetValueLabel = $this->facetValueLabel($name, $facetValue);
+            if (strlen($facetValueLabel)) {
+                if (isset($query['limit'][$name]) && array_search($facetValue, $query['limit'][$name]) !== false) {
+                    $values = $query['limit'][$name];
+                    $values = array_filter($values, function ($v) use ($facetValue) {
+                        return $v !== $facetValue;
+                    });
+                        $query['limit'][$name] = $values;
+                        $active = true;
+                } else {
+                    $query['limit'][$name][] = $facetValue;
+                    $active = false;
+                }
+                $url = $urlHelper($route, $params, ['query' => $query]);
+            } else {
+                $active = false;
+                $url = '';
+            }
+
+            $facetsData[$name][$facetValue] = [
+                'name' => $name,
+                'value' => $facetValue,
+                'label' => $facetValueLabel,
+                'count' => $facet['count'],
+                'active' => $active,
+                'url' => $url,
+                // To speed up process.
+                'escapeHtml' => $escapeHtml,
+                'translate' => $translate,
+                'facetLabel' => $facetLabel,
+            ];
         }
 
-        if (isset($query['limit'][$name]) && array_search($facetValue, $query['limit'][$name]) !== false) {
-            $values = $query['limit'][$name];
-            $values = array_filter($values, function ($v) use ($facetValue) {
-                return $v !== $facetValue;
-            });
-            $query['limit'][$name] = $values;
-            $active = true;
-        } else {
-            $query['limit'][$name][] = $facetValue;
-            $active = false;
+        if ($asData) {
+            return $facetsData[$name][$facetValue];
         }
 
-        return $partialHelper($this->partial, [
-            'name' => $name,
-            'value' => $facetValue,
-            'label' => $facetValueLabel,
-            'count' => $facet['count'],
-            'active' => $active,
-            'url' => $urlHelper($route, $params, ['query' => $query]),
-            // To speed up process.
-            'escapeHtml' => $escapeHtml,
-        ]);
+        return strlen($facetsData[$name][$facetValue]['label'])
+            ? $partialHelper($this->partial, $facetsData[$name][$facetValue])
+            : '';
     }
 
-    protected function facetValueLabel($name, $facetValue)
+    protected function facetValueLabel(string $name, string $facetValue): ?string
     {
         if (!strlen($facetValue)) {
             return null;
@@ -139,7 +158,7 @@ class AbstractFacetElement extends AbstractHelper
                 /** @var \Omeka\Api\Representation\ItemSetRepresentation $resource */
                 $resource = $this->api->searchOne('resources', $data)->getContent();
                 return $resource
-                    ? $resource->displayTitle()
+                    ? (string) $resource->displayTitle()
                     // Manage the case where a resource was indexed but removed.
                     // In public side, the item set should belong to a site too.
                     : null;
@@ -156,7 +175,7 @@ class AbstractFacetElement extends AbstractHelper
                 /** @var \Omeka\Api\Representation\ItemSetRepresentation $resource */
                 $resource = $this->api->searchOne('item_sets', $data)->getContent();
                 return $resource
-                    ? $resource->displayTitle()
+                    ? (string) $resource->displayTitle()
                     // Manage the case where a resource was indexed but removed.
                     // In public side, the item set should belong to a site too.
                     : null;

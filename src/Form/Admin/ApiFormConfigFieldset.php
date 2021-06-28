@@ -1,227 +1,75 @@
 <?php declare(strict_types=1);
+
 namespace Search\Form\Admin;
 
+use Doctrine\DBAL\Connection;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
-use Omeka\Api\Manager as ApiManager;
+use Omeka\Form\Element\ArrayTextarea;
 use Search\Form\Element\OptionalSelect;
 
 class ApiFormConfigFieldset extends Fieldset
 {
     /**
-     * @var ApiManager
+     * @var Connection
      */
-    protected $api;
+    protected $connection;
 
     public function init(): void
     {
-        $fieldOptions = $this->getFieldsOptions();
+        // Mapping between omeka api and search engine.
 
-        $generalFieldset = new Fieldset('options');
-        $generalFieldset->setLabel('Main options'); // @translate
-        $generalFieldset->setAttribute('id', 'options');
+        $this
+            ->setName('form')
+            ->setLabel('Specific settings'); // @translate
 
-        $generalFieldset->add([
-            'name' => 'max_results',
-            'type' => Element\Number::class,
-            'options' => [
-                'label' => 'Maximum number of results by response', // @translate
-                'info' => 'It is recommended to keep the value low (under 100 or 1000) to avoid overload of the server, or to use a paginator.', // @translate
-            ],
-            'attributes' => [
-                'required' => true,
-            ],
-        ]);
-        $this->add($generalFieldset);
+        $availableFields = $this->getAvailableFields();
 
-        $metadataFieldset = new Fieldset('metadata');
-        $metadataFieldset->setLabel('Mapping metadata to search fields'); // @translate
-        $metadataFieldset->setAttribute('id', 'metadata');
+        $this
+            ->add([
+                'name' => 'options',
+                'type' => Fieldset::class,
+                'options' => [
+                    'label' => 'All options should be updated when the search engine is updated', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'options',
+                ],
+            ])
+            ->get('options')
+            ->add([
+                'name' => 'max_results',
+                'type' => Element\Number::class,
+                'options' => [
+                    'label' => 'Maximum number of results by response', // @translate
+                    'info' => 'It is recommended to keep the value low (under 100 or 1000) to avoid overload of the server, or to use a paginator.', // @translate
+                ],
+                'attributes' => [
+                    'required' => true,
+                    'min' => 1,
+                    'value' => 100,
+                ],
+            ])
+        ;
 
-        $metadataFieldset->add([
-            'name' => 'id',
-            'type' => OptionalSelect::class,
-            'options' => [
-                'label' => 'Internal identifier', // @translate
-                'value_options' => $fieldOptions,
-                'empty_option' => 'None', // @translate
-                'use_hidden_element' => true,
-            ],
-            'attributes' => [
-                'required' => false,
-                'class' => 'chosen-select',
-            ],
-        ]);
-
-        $metadataFieldset->add([
-            'name' => 'is_public',
-            'type' => OptionalSelect::class,
-            'options' => [
-                'label' => 'Is Public', // @translate
-                'value_options' => $fieldOptions,
-                'empty_option' => 'None', // @translate
-                'use_hidden_element' => true,
-            ],
-            'attributes' => [
-                'required' => false,
-                'class' => 'chosen-select',
-            ],
-        ]);
-
-        $metadataFieldset->add([
-            'name' => 'owner_id',
-            'type' => OptionalSelect::class,
-            'options' => [
-                'label' => 'Owner id', // @translate
-                'value_options' => $fieldOptions,
-                'empty_option' => 'None', // @translate
-                'use_hidden_element' => true,
-            ],
-            'attributes' => [
-                'required' => false,
-                'class' => 'chosen-select',
-            ],
-        ]);
-
-        $metadataFieldset->add([
-            'name' => 'created',
-            'type' => OptionalSelect::class,
-            'options' => [
-                'label' => 'Created', // @translate
-                'value_options' => $fieldOptions,
-                'empty_option' => 'None', // @translate
-                'use_hidden_element' => true,
-            ],
-            'attributes' => [
-                'required' => false,
-                'class' => 'chosen-select',
-            ],
-        ]);
-
-        $metadataFieldset->add([
-            'name' => 'modified',
-            'type' => OptionalSelect::class,
-            'options' => [
-                'label' => 'Modified', // @translate
-                'value_options' => $fieldOptions,
-                'empty_option' => 'None', // @translate
-                'use_hidden_element' => true,
-            ],
-            'attributes' => [
-                'required' => false,
-                'class' => 'chosen-select',
-            ],
-        ]);
-
-        $metadataFieldset->add([
-            'name' => 'resource_class_label',
-            'type' => OptionalSelect::class,
-            'options' => [
-                'label' => 'Resource class label', // @translate
-                'value_options' => $fieldOptions,
-                'empty_option' => 'None', // @translate
-                'use_hidden_element' => true,
-            ],
-            'attributes' => [
-                'required' => false,
-                'class' => 'chosen-select',
-            ],
-        ]);
-
-        $metadataFieldset->add([
-            'name' => 'resource_class_id',
-            'type' => OptionalSelect::class,
-            'options' => [
-                'label' => 'Resource class id', // @translate
-                'value_options' => $fieldOptions,
-                'empty_option' => 'None', // @translate
-                'use_hidden_element' => true,
-            ],
-            'attributes' => [
-                'required' => false,
-                'class' => 'chosen-select',
-            ],
-        ]);
-
-        $metadataFieldset->add([
-            'name' => 'resource_template_id',
-            'type' => OptionalSelect::class,
-            'options' => [
-                'label' => 'Resource template id', // @translate
-                'value_options' => $fieldOptions,
-                'empty_option' => 'None', // @translate
-                'use_hidden_element' => true,
-            ],
-            'attributes' => [
-                'required' => false,
-                'class' => 'chosen-select',
-            ],
-        ]);
-
-        $metadataFieldset->add([
-            'name' => 'item_set_id',
-            'type' => OptionalSelect::class,
-            'options' => [
-                'label' => 'Item set id', // @translate
-                'value_options' => $fieldOptions,
-                'empty_option' => 'None', // @translate
-                'use_hidden_element' => true,
-            ],
-            'attributes' => [
-                'required' => false,
-                'class' => 'chosen-select',
-            ],
-        ]);
-
-        $metadataFieldset->add([
-            'name' => 'site_id',
-            'type' => OptionalSelect::class,
-            'options' => [
-                'label' => 'Site id', // @translate
-                'value_options' => $fieldOptions,
-                'empty_option' => 'None', // @translate
-                'use_hidden_element' => true,
-            ],
-            'attributes' => [
-                'required' => false,
-                'class' => 'chosen-select',
-            ],
-        ]);
-
-        $metadataFieldset->add([
-            'name' => 'is_open',
-            'type' => OptionalSelect::class,
-            'options' => [
-                'label' => 'Is open', // @translate
-                'value_options' => $fieldOptions,
-                'empty_option' => 'None', // @translate
-                'use_hidden_element' => true,
-            ],
-            'attributes' => [
-                'required' => false,
-                'class' => 'chosen-select',
-            ],
-        ]);
-
-        $this->add($metadataFieldset);
-
-        $propertiesFieldset = new Fieldset('properties');
-        $propertiesFieldset->setLabel('Mapping properties to search fields'); // @translate
-        $propertiesFieldset->setAttribute('id', 'properties');
-
-        /** @var \Omeka\Api\Representation\PropertyRepresentation[] $properties */
-        $properties = $this->getApiManager()->search('properties')->getContent();
-
-        foreach ($properties as $property) {
-            $propertiesFieldset->add([
-                'name' => $property->term(),
-                // Input filter is available only by the form, not the fieldset.
-                // It creates validation issues, so use an optional select.
-                // 'type' => Element\Select::class,
+        $this
+            ->add([
+                'name' => 'metadata',
+                'type' => Fieldset::class,
+                'options' => [
+                    'label' => 'Mapping metadata to search fields', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'metadata',
+                ],
+            ])
+            ->get('metadata')
+            ->add([
+                'name' => 'id',
                 'type' => OptionalSelect::class,
                 'options' => [
-                    'label' => $property->term(),
-                    'value_options' => $fieldOptions,
+                    'label' => 'Internal identifier', // @translate
+                    'value_options' => $availableFields,
                     'empty_option' => 'None', // @translate
                     'use_hidden_element' => true,
                 ],
@@ -229,64 +77,331 @@ class ApiFormConfigFieldset extends Fieldset
                     'required' => false,
                     'class' => 'chosen-select',
                 ],
-            ]);
+            ])
+            ->add([
+                'name' => 'is_public',
+                'type' => OptionalSelect::class,
+                'options' => [
+                    'label' => 'Is Public', // @translate
+                    'value_options' => $availableFields,
+                    'empty_option' => 'None', // @translate
+                    'use_hidden_element' => true,
+                ],
+                'attributes' => [
+                    'required' => false,
+                    'class' => 'chosen-select',
+                ],
+            ])
+            ->add([
+                'name' => 'owner_id',
+                'type' => OptionalSelect::class,
+                'options' => [
+                    'label' => 'Owner id', // @translate
+                    'value_options' => $availableFields,
+                    'empty_option' => 'None', // @translate
+                    'use_hidden_element' => true,
+                ],
+                'attributes' => [
+                    'required' => false,
+                    'class' => 'chosen-select',
+                ],
+            ])
+            ->add([
+                'name' => 'created',
+                'type' => OptionalSelect::class,
+                'options' => [
+                    'label' => 'Created', // @translate
+                    'value_options' => $availableFields,
+                    'empty_option' => 'None', // @translate
+                    'use_hidden_element' => true,
+                ],
+                'attributes' => [
+                    'required' => false,
+                    'class' => 'chosen-select',
+                ],
+            ])
+            ->add([
+                'name' => 'modified',
+                'type' => OptionalSelect::class,
+                'options' => [
+                    'label' => 'Modified', // @translate
+                    'value_options' => $availableFields,
+                    'empty_option' => 'None', // @translate
+                    'use_hidden_element' => true,
+                ],
+                'attributes' => [
+                    'required' => false,
+                    'class' => 'chosen-select',
+                ],
+            ])
+            ->add([
+                'name' => 'resource_class_label',
+                'type' => OptionalSelect::class,
+                'options' => [
+                    'label' => 'Resource class label', // @translate
+                    'value_options' => $availableFields,
+                    'empty_option' => 'None', // @translate
+                    'use_hidden_element' => true,
+                ],
+                'attributes' => [
+                    'required' => false,
+                    'class' => 'chosen-select',
+                ],
+            ])
+            ->add([
+                'name' => 'resource_class_id',
+                'type' => OptionalSelect::class,
+                'options' => [
+                    'label' => 'Resource class id', // @translate
+                    'value_options' => $availableFields,
+                    'empty_option' => 'None', // @translate
+                    'use_hidden_element' => true,
+                ],
+                'attributes' => [
+                    'required' => false,
+                    'class' => 'chosen-select',
+                ],
+            ])
+            ->add([
+                'name' => 'resource_template_id',
+                'type' => OptionalSelect::class,
+                'options' => [
+                    'label' => 'Resource template id', // @translate
+                    'value_options' => $availableFields,
+                    'empty_option' => 'None', // @translate
+                    'use_hidden_element' => true,
+                ],
+                'attributes' => [
+                    'required' => false,
+                    'class' => 'chosen-select',
+                ],
+            ])
+            ->add([
+                'name' => 'item_set_id',
+                'type' => OptionalSelect::class,
+                'options' => [
+                    'label' => 'Item set id', // @translate
+                    'value_options' => $availableFields,
+                    'empty_option' => 'None', // @translate
+                    'use_hidden_element' => true,
+                ],
+                'attributes' => [
+                    'required' => false,
+                    'class' => 'chosen-select',
+                ],
+            ])
+            ->add([
+                'name' => 'site_id',
+                'type' => OptionalSelect::class,
+                'options' => [
+                    'label' => 'Site id', // @translate
+                    'value_options' => $availableFields,
+                    'empty_option' => 'None', // @translate
+                    'use_hidden_element' => true,
+                ],
+                'attributes' => [
+                    'required' => false,
+                    'class' => 'chosen-select',
+                ],
+            ])
+            ->add([
+                'name' => 'is_open',
+                'type' => OptionalSelect::class,
+                'options' => [
+                    'label' => 'Is open', // @translate
+                    'value_options' => $availableFields,
+                    'empty_option' => 'None', // @translate
+                    'use_hidden_element' => true,
+                ],
+                'attributes' => [
+                    'required' => false,
+                    'class' => 'chosen-select',
+                ],
+            ])
+        ;
+
+        // Prefill the mapping (the specific metadata are mapped above).
+        $sourceFields = $this->getPropertyIds();
+        $prefill = [];
+        foreach (array_keys($sourceFields) as $sourceField) {
+            if (isset($availableFields[$sourceField])) {
+                $prefill[$sourceField] = $sourceField;
+                continue;
+            }
+            $sourceFieldU = str_replace(':', '_', $sourceField);
+            if (isset($availableFields[$sourceFieldU])) {
+                $prefill[$sourceField] = $sourceFieldU;
+                continue;
+            }
+            foreach (array_keys($availableFields) as $availableField) {
+                if (strpos($availableField, $sourceField) === 0
+                    || strpos($availableField, $sourceFieldU) === 0
+                ) {
+                    $prefill[$sourceField] = $availableField;
+                    continue 2;
+                }
+                // Separated in order to check full path first.
+                if (strpos($availableField, $sourceField) !== false
+                    || strpos($availableField, $sourceFieldU) !== false
+                ) {
+                    $prefill[$sourceField] = $availableField;
+                    continue 2;
+                }
+            }
+            $prefill[$sourceField] = '';
         }
 
-        $this->add($propertiesFieldset);
+        $this
+            // Mapping between source field (term) = field destination (search engine).
+            ->add([
+                'name' => 'properties',
+                'type' => ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Mapping between source (omeka) and destination (search engine)', // @translate
+                    'as_key_value' => true,
+                    'key_value_separator' => '=',
+                ],
+                'attributes' => [
+                    'id' => 'properties',
+                    'value' => $prefill,
+                    'placeholder' => 'dcterms:subject = dcterms_subjects_ss',
+                    'rows' => 12,
+                ],
+            ])
+            ->add([
+                'name' => 'available_properties',
+                'type' => ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Available source fields for mapping', // @translate
+                    'info' => 'List of all available properties to use above.', // @translate
+                    'as_key_value' => false,
+                ],
+                'attributes' => [
+                    'id' => 'form_available_properies',
+                    'value' => array_keys($this->getPropertyIds()),
+                    'placeholder' => 'dcterms_subjects_ss',
+                    'rows' => 12,
+                ],
+            ])
+            ->add([
+                'name' => 'available_fields',
+                'type' => ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Available destination fields for mapping', // @translate
+                    'info' => 'List of all available fields to use above.', // @translate
+                    'as_key_value' => false,
+                ],
+                'attributes' => [
+                    'id' => 'form_available_fields',
+                    'value' => array_keys($availableFields),
+                    'placeholder' => 'dcterms_subjects_ss',
+                    'rows' => 12,
+                ],
+            ])
+        ;
 
         // Quick hack to get the available sort fields inside the form settings
         // The sort fields may be different from the indexed fields in some
         // search engine, so they should be checked when the api is used, since
         // there is no user form validation.
-        $sortFieldset = new Fieldset('sort_fields');
-        $sortFields = $this->getAvailableSortFields();
-        foreach (array_keys($sortFields) as $key => $sortField) {
-            $sortFieldset->add([
-                'name' => $key,
-                'type' => Element\Hidden::class,
-                'attributes' => [
-                    'value' => $sortField,
+        $this
+            ->add([
+                'name' => 'sort_fields',
+                'type' => ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Sort (for internal use only, don’t modify it)', // @translate
+                    'as_key_value' => false,
                 ],
-            ]);
-        }
-        $this->add($sortFieldset);
+                'attributes' => [
+                    'id' => 'sort_fields',
+                    'value' => array_keys($this->getAvailableSortFields()),
+                    'rows' => 1,
+                ],
+            ])
+        ;
     }
 
-    protected function getAvailableFields()
+    /**
+     * Remove elements or fieldsets not managed by the api.
+     */
+    public function skipDefaultElementsOrFieldsets(): array
     {
-        $searchPage = $this->getOption('search_page');
-        $searchIndex = $searchPage->index();
-        $searchAdapter = $searchIndex->adapter();
-        return $searchAdapter->getAvailableFields($searchIndex);
+        return [
+            'search',
+            // The form is overwritten.
+            // 'form',
+            'sort',
+            'facet',
+        ];
     }
 
-    protected function getAvailableSortFields()
-    {
-        $searchPage = $this->getOption('search_page');
-        $searchIndex = $searchPage->index();
-        $searchAdapter = $searchIndex->adapter();
-        return $searchAdapter->getAvailableSortFields($searchIndex);
-    }
-
-    protected function getFieldsOptions()
+    protected function getAvailableFields(): array
     {
         $options = [];
-        foreach ($this->getAvailableFields() as $name => $field) {
-            $options[$name] = isset($field['label'])
-                ? sprintf('%s (%s)', $field['label'], $name)
-                : $name;
+        $searchPage = $this->getOption('search_page');
+        $searchIndex = $searchPage->index();
+        $searchAdapter = $searchIndex->adapter();
+        if (empty($searchAdapter)) {
+            return [];
+        }
+        $fields = $searchAdapter->getAvailableFields($searchIndex);
+        foreach ($fields as $name => $field) {
+            $options[$name] = $field['label'] ?? $name;
         }
         return $options;
     }
 
-    public function setApiManager(ApiManager $api)
+    protected function getAvailableSortFields(): array
     {
-        $this->api = $api;
-        return $this;
+        $options = [];
+        $searchPage = $this->getOption('search_page');
+        $searchIndex = $searchPage->index();
+        $searchAdapter = $searchIndex->adapter();
+        if (empty($searchAdapter)) {
+            return [];
+        }
+        $fields = $searchAdapter->getAvailableSortFields($searchIndex);
+        foreach ($fields as $name => $field) {
+            $options[$name] = $field['label'] ?? $name;
+        }
+        return $options;
     }
 
-    public function getApiManager()
+    /**
+     * Get all property ids by term.
+     *
+     * @see \BulkImport\Mvc\Controller\Plugin\Bulk::getPropertyIds()
+     *
+     * @return array Associative array of ids by term.
+     */
+    public function getPropertyIds(): array
     {
-        return $this->api;
+        static $properties;
+
+        if (isset($properties)) {
+            return $properties;
+        }
+
+        $qb = $this->connection->createQueryBuilder();
+        $qb
+            ->select([
+                'CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
+                'property.id AS id',
+            ])
+            ->from('property', 'property')
+            ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
+            ->orderBy('vocabulary.id', 'asc')
+            ->addOrderBy('property.id', 'asc')
+            ->addGroupBy('property.id')
+        ;
+        $stmt = $this->connection->executeQuery($qb);
+        $properties = $stmt->fetchAll(\PDO::FETCH_KEY_PAIR);
+        return $properties;
+    }
+
+    public function setConnection(Connection $connection): self
+    {
+        $this->connection = $connection;
+        return $this;
     }
 }

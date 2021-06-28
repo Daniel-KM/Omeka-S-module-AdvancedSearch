@@ -81,7 +81,7 @@ class SearchPageConfigureForm extends Form
         $this
             ->setAttribute('id', 'search-form-configure');
 
-        // Settings for the search engine.
+        // Settings for the search engine. Can be overwritten by a specific form.
 
         $this
             ->add([
@@ -129,7 +129,7 @@ class SearchPageConfigureForm extends Form
                 'name' => 'form',
                 'type' => Fieldset::class,
                 'options' => [
-                    'label' => 'Form', // @translate
+                    'label' => 'Advanced form', // @translate
                 ],
             ])
             ->get('form')
@@ -486,32 +486,45 @@ class SearchPageConfigureForm extends Form
         ;
 
         $this
-            ->addFormFieldset();
+            ->addFormFieldset()
+            ->prepareInputFilters();
+    }
 
+    protected function prepareInputFilters(): Form
+    {
         // Input filters should be added after elements.
         $inputFilter = $this->getInputFilter();
-        $inputFilter
-            ->get('form')
-            ->add([
-                'name' => 'filters_max_number',
-                'required' => false,
-            ])
-        ;
-        $inputFilter
-            ->get('facet')
-            ->add([
-                'name' => 'limit',
-                'required' => false,
-            ])
-            ->add([
-                'name' => 'languages',
-                'required' => false,
-            ])
-            ->add([
-                'name' => 'mode',
-                'required' => false,
-            ])
-        ;
+
+        // A check is done because the specific form may remove them.
+        if ($inputFilter->has('form')) {
+            $inputFilter
+                ->get('form')
+                ->add([
+                    'name' => 'filters_max_number',
+                    'required' => false,
+                ])
+            ;
+        }
+
+        if ($inputFilter->has('facet')) {
+            $inputFilter
+                ->get('facet')
+                ->add([
+                    'name' => 'limit',
+                    'required' => false,
+                ])
+                ->add([
+                    'name' => 'languages',
+                    'required' => false,
+                ])
+                ->add([
+                    'name' => 'mode',
+                    'required' => false,
+                ])
+            ;
+        }
+
+        return $this;
     }
 
     protected function addFormFieldset(): self
@@ -519,26 +532,27 @@ class SearchPageConfigureForm extends Form
         $searchPage = $this->getOption('search_page');
 
         $formAdapter = $searchPage->formAdapter();
-        if (!isset($formAdapter)) {
+        if (!$formAdapter) {
             return $this;
         }
 
         $configFormClass = $formAdapter->getConfigFormClass();
-        if (!isset($configFormClass)) {
+        if (!$configFormClass) {
             return $this;
         }
 
         /** @var \Laminas\Form\Fieldset $fieldset */
         $fieldset = $this->getFormElementManager()
-            ->get($formAdapter->getConfigFormClass(), [
-                'search_page' => $searchPage,
-            ]);
+            ->get($configFormClass, ['search_page' => $searchPage]);
 
-        $fieldset
-            ->setName('form')
-            ->setLabel('Form settings'); // @translate
+        if (method_exists($fieldset, 'skipDefaultElementsOrFieldsets')) {
+            foreach ($fieldset->skipDefaultElementsOrFieldsets() as $skip) {
+                $this->remove($skip);
+            }
+        }
 
         $this->add($fieldset);
+
         return $this;
     }
 

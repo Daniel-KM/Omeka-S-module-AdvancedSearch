@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Search\Service\Form;
 
 use Interop\Container\ContainerInterface;
@@ -9,8 +10,7 @@ class ApiFormConfigFieldsetFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        $form = new ApiFormConfigFieldset(null, $options);
-        return $form
-            ->setApiManager($services->get('Omeka\ApiManager'));
+        return (new ApiFormConfigFieldset(null, $options))
+            ->setConnection($services->get('Omeka\Connection'));
     }
 }

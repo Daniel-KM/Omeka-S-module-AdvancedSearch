@@ -191,13 +191,7 @@ class SearchPageController extends AbstractActionController
         }
 
         $params = $this->getRequest()->getPost()->toArray();
-
-        unset(
-            $params['form']['available_filters'],
-            $params['form']['available_fields_order'],
-            $params['sort']['available_sort_fields'],
-            $params['facet']['available_facets']
-        );
+        $params = $this->removeAvailableFields($params);
 
         // TODO Check simple fields with normal way.
         $form->setData($params);
@@ -212,15 +206,11 @@ class SearchPageController extends AbstractActionController
         }
 
         $params = $form->getData();
-        unset(
-            $params['csrf'],
-            $params['form']['available_filters'],
-            $params['form']['available_fields_order'],
-            $params['sort']['available_sort_fields'],
-            $params['facet']['available_facets']
-        );
-
-        $params['search']['default_query'] = trim($params['search']['default_query'], "? \t\n\r\0\x0B");
+        $params = $this->removeAvailableFields($params);
+        unset($params['csrf']);
+        if (isset($params['search']['default_query'])) {
+            $params['search']['default_query'] = trim($params['search']['default_query'] ?? '', "? \t\n\r\0\x0B");
+        }
 
         // Add a warning because it may be a hard to understand issue.
         if (isset($params['facet']['languages'])) {
@@ -360,6 +350,25 @@ class SearchPageController extends AbstractActionController
         }
 
         return $result;
+    }
+
+    /**
+     * Remove all params starting with "available_".
+     */
+    protected function removeAvailableFields(array $params): array
+    {
+        foreach ($params as $name => $values) {
+            if (substr($name, 0, 10) === 'available_') {
+                unset($params[$name]);
+            } elseif (is_array($values)) {
+                foreach (array_keys($values) as $subName) {
+                    if (substr($subName, 0, 10) === 'available_') {
+                        unset($params[$name][$subName]);
+                    }
+                }
+            }
+        }
+        return $params;
     }
 
     /**

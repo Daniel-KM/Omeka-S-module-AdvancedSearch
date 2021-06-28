@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Search\Mvc\Controller\Plugin;
 
 use Laminas\EventManager\Event;
@@ -10,6 +11,10 @@ use Search\Api\Representation\SearchIndexRepresentation;
 use Search\Api\Representation\SearchPageRepresentation;
 use Search\Querier\Exception\QuerierException;
 
+/**
+ * FIXME Remove or simplify this class or use it to convert the query directly to a omeka (or sql) or a solarium query.
+ * TODO Remove the useless view helpers.
+ */
 class SearchRequestToResponse extends AbstractPlugin
 {
     /**
@@ -116,9 +121,9 @@ class SearchRequestToResponse extends AbstractPlugin
             $perPage = (int) $request['per_page'];
         } elseif ($site) {
             $siteSettings = $controller->siteSettings();
-            $perPage = $siteSettings->get('pagination_per_page') ?: $controller->settings()->get('pagination_per_page', Paginator::PER_PAGE);
+            $perPage = (int) $siteSettings->get('pagination_per_page') ?: (int) $controller->settings()->get('pagination_per_page', Paginator::PER_PAGE);
         } else {
-            $perPage = $controller->settings()->get('pagination_per_page', Paginator::PER_PAGE);
+            $perPage = (int) $controller->settings()->get('pagination_per_page', Paginator::PER_PAGE);
         }
         $query->setLimitPage($pageNumber, $perPage);
 
@@ -130,11 +135,15 @@ class SearchRequestToResponse extends AbstractPlugin
                 }
             }
             if (isset($searchPageSettings['facet_limit'])) {
-                $query->setFacetLimit($searchPageSettings['facet_limit']);
+                $query->setFacetLimit((int) $searchPageSettings['facet_limit']);
             }
             if (isset($searchPageSettings['facet_languages'])) {
                 $query->setFacetLanguages($searchPageSettings['facet_languages']);
             }
+            // FIXME Rename "limit" by "facet" or something else.
+            // A facet is added as a standard filter, but named differently in
+            // real query. It allows to do a query with and without limit in
+            // order to get all the facets from the initial query.
             if (!empty($request['limit']) && is_array($request['limit'])) {
                 foreach ($request['limit'] as $name => $values) {
                     foreach ($values as $value) {

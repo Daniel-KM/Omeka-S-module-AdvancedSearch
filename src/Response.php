@@ -50,6 +50,11 @@ class Response implements \JsonSerializable
     /**
      * @var array
      */
+    protected $activeFacets = [];
+
+    /**
+     * @var array
+     */
     protected $facetCounts = [];
 
     /**
@@ -145,6 +150,51 @@ class Response implements \JsonSerializable
         return isset($this->results[$resourceType])
             ? $this->results[$resourceType]
             : [];
+    }
+
+    /**
+     * Store a list of active facets.
+     *
+     * The active facets are the query filters ("filters" is used in solr).
+     */
+    public function setActiveFacets(array $activeFacetsByName): self
+    {
+        $this->activeFacets = array_map(function ($v) {
+            return array_values(array_unique($v));
+        }, $activeFacetsByName);
+        return $this;
+    }
+
+    /**
+     * Store a list of active facets for a name.
+     */
+    public function addActiveFacets(string $name, array $activeFacets): self
+    {
+        $this->activeFacets[$name] = isset($this->activeFacets[$name])
+            ? array_merge($this->activeFacets[$name], array_values($activeFacets))
+            : array_values($activeFacets);
+        $this->activeFacets[$name] = array_values(array_unique($this->activeFacets[$name]));
+        return $this;
+    }
+
+    /**
+     * Add an active facet for a name.
+     */
+    public function addActiveFacet(string $name, string $activeFacet): self
+    {
+        $this->activeFacets[$name][] = $activeFacet;
+        $this->activeFacets[$name] = array_values(array_unique($this->activeFacets[$name]));
+        return $this;
+    }
+
+    /**
+     * Get the list of active facets.
+     */
+    public function getActiveFacets(?string $name = null): array
+    {
+        return is_null($name)
+            ? $this->activeFacets
+            : $this->activeFacets[$name] ?? [];
     }
 
     /**

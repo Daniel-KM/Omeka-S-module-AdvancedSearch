@@ -8,13 +8,14 @@
  * @var bool $active
  * @var string $url
  * @var \Laminas\View\Helper\EscapeHtml $escapeHtml
+ * @var \Laminas\View\Helper\EscapeHtmlAttr $escapeHtmlAttr
  * @var \Laminas\View\Helper\TranslatorAwareTrait $translate
  * @var \Search\View\Helper\FacetLabel $facetLabel
  */
 
-$escapedValue = $escapeHtml($value);
+$escapedValue = $escapeHtmlAttr($value);
 $escapedId = $name . '[]' . $escapedValue;
 ?>
 
-<input type="checkbox" name="<?= $name ?>[]" id="<?= $escapedId ?>" value="<?= $escapedValue ?>" data-url="<?= $url ?>" <?php if ($active) echo ' checked="checked"'; ?>/>
+<input type="checkbox" name="limit[<?= $name ?>][]" id="<?= $escapedId ?>" value="<?= $escapedValue ?>" data-url="<?= $escapeHtmlAttr($url) ?>" <?php if ($active) echo ' checked="checked"'; ?>/>
 <label for="<?= $escapedId ?>"><?= $escapeHtml($label) ?> (<span class="count"><?= $count ?></span>)</label>

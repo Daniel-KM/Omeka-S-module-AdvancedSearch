@@ -18,7 +18,7 @@
   padding: 0 0.5em;
   min-width: 240px;
 }
-.search-facets > ul {
+.search-facets .search-facets-list {
   padding-left: 0;
 }
 .search-facet {
@@ -41,6 +41,10 @@
 }
 .search-facet-item .active a::before {
   content: "\f14a";
+}
+
+.search-facets-active {
+  list-style: square;
 }
 
 .resource-list {

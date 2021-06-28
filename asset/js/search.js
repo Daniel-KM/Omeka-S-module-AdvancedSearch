@@ -59,8 +59,28 @@ $(document).ready(function() {
         }
     });
 
+    $('.search-facets-active a').on('click', function(e) {
+        // Reload with the link when there is no button to apply facets.
+        if (!$('.apply-facets').length) {
+            return true;
+        }
+        e.preventDefault();
+        $(this).closest('li').hide();
+        var facetName = $(this).data('facetName');
+        var facetValue = $(this).data('facetValue');
+        $('.search-facet-item input').each(function() {
+            if ($(this).prop('name') === facetName
+                && $(this).prop('value') === String(facetValue)
+            ) {
+                $(this).prop('checked', false);
+            }
+        });
+    });
+
     $('.search-facets').on('change', 'input[type=checkbox]', function() {
-        window.location = $(this).data('url');
+        if (!$('.apply-facets').length) {
+            window.location = $(this).data('url');
+        }
     });
 
     $('.search-view-type-list').on('click', function(e) {

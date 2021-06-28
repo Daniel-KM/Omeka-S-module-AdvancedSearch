@@ -85,19 +85,10 @@ class InternalQuerier extends AbstractQuerier
         // Facets data don't use sort or limit.
         if ($plugins->has('references')) {
             $facetData = $this->args;
-            if (isset($facetData['sort_by'])) {
-                unset($facetData['sort_by']);
-            }
-            if (isset($facetData['sort_order'])) {
-                unset($facetData['sort_order']);
-            }
-            if (isset($facetData['limit'])) {
-                unset($facetData['limit']);
-            }
-            if (isset($facetData['offset'])) {
-                unset($facetData['offset']);
-            }
-
+            unset($facetData['sort_by']);
+            unset($facetData['sort_order']);
+            unset($facetData['limit']);
+            unset($facetData['offset']);
             $this->facetResponse($facetData);
         }
 
@@ -438,6 +429,17 @@ class InternalQuerier extends AbstractQuerier
 
     protected function facetResponse(array $facetData): void
     {
+        // Use the filters as facets, except the special fields.
+        // TODO Remove all non-facetable from the page settings (or simplify somewhere else).
+        $filters = $this->query->getFilters();
+        unset(
+            $filters['item_set_id_field'],
+            $filters['resource_class_id_field'],
+            $filters['resource_template_id_field'],
+            $filters['is_public_field']
+        );
+        $this->response->setActiveFacets($filters);
+
         /** @var \Reference\Mvc\Controller\Plugin\References $references */
         $references = $this->getServiceLocator()->get('ControllerPluginManager')->get('references');
 
@@ -456,7 +458,7 @@ class InternalQuerier extends AbstractQuerier
             'resource_template_id_field' => 'o:resource_template',
         ];
 
-        // For items and item sets.
+        // Normalize search query keys as omeka keys for items and item sets.
         $fields = array_map(function ($v) use ($metadataFieldsToNames) {
             return $metadataFieldsToNames[$v] ?? $v;
         }, $facetFields);

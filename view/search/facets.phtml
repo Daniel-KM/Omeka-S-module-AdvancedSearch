@@ -1,7 +1,7 @@
 <?php
 /*
  * Copyright BibLibre, 2016
- * Copyright, Daniel Berthereau, 2018-2020
+ * Copyright, Daniel Berthereau, 2018-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -32,47 +32,64 @@
  * @var \Search\Api\Representation\SearchPageRepresentation $searchPage
  * @var \Search\Query $query
  * @var \Search\Response $response
+ * Options:
+ * @var ?\Omeka\Api\Representation\ItemSetRepresentation $itemSet
  */
 
-if (!isset($response)) return;
+if (!isset($response) || empty($searchPage->setting('facets'))) return;
 
-$facets = $response->getFacetCounts();
-?>
-
-<?php if (!empty($facets)): ?>
-
-<?php
 $plugins = $this->getHelperPluginManager();
 $translate = $plugins->get('translate');
-$facetLabel = $plugins->get('facetLabel');
-// facetCheckbox can be used instead (may require js).
-$facetLink = $plugins->get('facetLink');
-?>
-<aside class="search-facets">
-    <h2><?= $translate('Filters') ?></h2>
-    <?php /* $facetSelected = $plugins->get('facetSelected'); ?>
-    <ul class="search-results-selected-facets">
-        <?php $statusFacets = array_fill_keys(array_keys($facets), false); ?>
-        <?php foreach ($facets as $name => $facetValues) foreach ($facetValues as $facetValue): ?>
-        <?php $statusFacets[$name] = $statusFacets[$name] || $facetSelected($name, $facetValue, true)['active'] ?>
-        <li><?= $facetSelected($name, $facetValue) ?></li>
-        <?php endforeach; ?>
-    </ul>
-    */ ?>
-    <ul>
-        <?php foreach ($facets as $name => $facetValues): ?>
-        <li class="search-facet">
-            <h3><?= $translate($facetLabel($name)) ?></h3>
-            <ul class="search-facet-items">
-                <?php foreach ($facetValues as $facetValue): ?>
-                <li class="search-facet-item">
-                    <?= $facetLink($name, $facetValue) ?>
-                </li>
-                <?php endforeach; ?>
-            </ul>
-        </li>
-        <?php endforeach; ?>
-    </ul>
-</aside>
 
-<?php endif; ?>
+$facets = $response->getFacetCounts();
+$activeFacets = $response->getActiveFacets();
+$isFacetModeButton = $searchPage->setting('facet_mode') !== 'link';
+
+$facetSelected = $plugins->get('facetSelected');
+$facetLabel = $plugins->get('facetLabel');
+// Facet checkbox can be used in any case anyway, the js checks it.
+$facetElement = $isFacetModeButton ? $plugins->get('facetCheckbox') : $plugins->get('facetLink');
+
+// Don't display facets for item sets when browsing an item set.
+if (!empty($itemSet)) {
+    unset($facets['item_set_id']);
+    unset($activeFacets['item_set_id']);
+}
+?>
+
+<aside class="search-facets">
+    <h3><?= $translate('Filters') ?></h3>
+    <?php if (count($activeFacets)): ?>
+    <h4><?= $translate('Active filters') ?></h4>
+    <ul class="search-facets-active">
+        <?php foreach ($activeFacets as $name => $facetValues) foreach ($facetValues as $facetValue): ?>
+        <li><?= $facetSelected($name, ['value' => $facetValue, 'count' => null]) ?></li>
+        <?php endforeach; ?>
+    </ul>
+    <?php endif; ?>
+    <form id="form-facets">
+        <?php if (empty($facets) && empty($activeFacets)): ?>
+        <p><?= $translate('No filters.') ?></p>
+        <?php else: ?>
+        <ul class="search-facets-list">
+            <?php foreach ($facets as $name => $facetValues): ?>
+            <li class="search-facet">
+                <h4><?= $translate($facetLabel($name)) ?></h4>
+                <ul class="search-facet-items">
+                    <?php foreach ($facetValues as $facetValue): ?>
+                    <li class="search-facet-item">
+                        <?= $facetElement($name, $facetValue) ?>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+            </li>
+            <?php endforeach; ?>
+        </ul>
+        <?php endif; ?>
+        <?php if ($isFacetModeButton && !empty($facets)): ?>
+        <div class="apply-facets">
+            <input type="submit" value="<?= $translate('Apply filters') ?>"/>
+        </div>
+    <?php endif; ?>
+    </form>
+</aside>

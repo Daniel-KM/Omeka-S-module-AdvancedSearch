@@ -43,6 +43,7 @@ class AbstractFacetElement extends AbstractHelper
     /**
      * Create one facet as link, checkbox or button.
      *
+     * @param array $facet A facet has two keys: value and count.
      * @return string|array
      */
     public function __invoke(string $name, array $facet, bool $asData = false)
@@ -51,6 +52,7 @@ class AbstractFacetElement extends AbstractHelper
         static $urlHelper;
         static $partialHelper;
         static $escapeHtml;
+        static $escapeHtmlAttr;
         static $translate;
         static $facetLabel;
 
@@ -69,6 +71,7 @@ class AbstractFacetElement extends AbstractHelper
             $urlHelper = $plugins->get('url');
             $partialHelper = $plugins->get('partial');
             $escapeHtml = $plugins->get('escapeHtml');
+            $escapeHtmlAttr = $plugins->get('escapeHtmlAttr');
             $translate = $plugins->get('translate');
             $facetLabel = $plugins->get('facetLabel');
 
@@ -99,15 +102,15 @@ class AbstractFacetElement extends AbstractHelper
             $query = $queryBase;
 
             // The facet value is compared against a string (the query args).
-            $facetValueLabel = $this->facetValueLabel($name, $facetValue);
+            $facetValueLabel = (string) $this->facetValueLabel($name, $facetValue);
             if (strlen($facetValueLabel)) {
                 if (isset($query['limit'][$name]) && array_search($facetValue, $query['limit'][$name]) !== false) {
                     $values = $query['limit'][$name];
                     $values = array_filter($values, function ($v) use ($facetValue) {
                         return $v !== $facetValue;
                     });
-                        $query['limit'][$name] = $values;
-                        $active = true;
+                    $query['limit'][$name] = $values;
+                    $active = true;
                 } else {
                     $query['limit'][$name][] = $facetValue;
                     $active = false;
@@ -127,9 +130,14 @@ class AbstractFacetElement extends AbstractHelper
                 'url' => $url,
                 // To speed up process.
                 'escapeHtml' => $escapeHtml,
+                'escapeHtmlAttr' => $escapeHtmlAttr,
                 'translate' => $translate,
                 'facetLabel' => $facetLabel,
             ];
+        } elseif (isset($facet['count'])) {
+            // When facet selected is used, the count is null, so it should be
+            // updated when possible.
+            $facetsData[$name][$facetValue]['count'] = $facet['count'];
         }
 
         if ($asData) {

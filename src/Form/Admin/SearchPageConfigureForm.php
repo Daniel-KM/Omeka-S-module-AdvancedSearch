@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016-2017
- * Copyright Daniel Berthereau, 2018
+ * Copyright Daniel Berthereau, 2018-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -116,11 +116,12 @@ class SearchPageConfigureForm extends Form
         return $this;
     }
 
-    protected function addFacets()
+    protected function addFacets(): self
     {
         $this
             ->addFacetLimit()
-            ->addFacetLanguages();
+            ->addFacetLanguages()
+            ->addFacetMode();
 
         /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
         $searchPage = $this->getOption('search_page');
@@ -181,7 +182,7 @@ class SearchPageConfigureForm extends Form
         return $this;
     }
 
-    protected function addFacetLimit()
+    protected function addFacetLimit(): self
     {
         $this->add([
             'name' => 'facet_limit',
@@ -199,7 +200,7 @@ class SearchPageConfigureForm extends Form
         return $this;
     }
 
-    protected function addFacetLanguages(): void
+    protected function addFacetLanguages(): self
     {
         $this
             ->add([
@@ -214,6 +215,29 @@ class SearchPageConfigureForm extends Form
                     'placeholder' => 'fra|way|apy||',
                 ],
             ]);
+        return $this;
+    }
+
+    protected function addFacetMode(): self
+    {
+        $this
+            ->add([
+                'name' => 'facet_mode',
+                'type' => Element\Radio::class,
+                'options' => [
+                    'label' => 'Facet mode', // @translate
+                    'value_options' => [
+                        'button' => 'Send request with a button', // @translate
+                        'link' => 'Send request directly', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'facet_mode',
+                    'required' => false,
+                    'value' => 'button',
+                ],
+            ]);
+        return $this;
     }
 
     public function populateValues($data, $onlyBase = false): void
@@ -226,14 +250,15 @@ class SearchPageConfigureForm extends Form
         parent::populateValues($data, $onlyBase);
     }
 
-    protected function addInputFilter()
+    protected function addInputFilter(): self
     {
         return $this
             ->addMainSettingsInputFilter()
-            ->addFacetLanguagesInputFilter();
+            ->addFacetLanguagesInputFilter()
+            ->addFacetModeInputFilter();
     }
 
-    protected function addMainSettingsInputFilter()
+    protected function addMainSettingsInputFilter(): self
     {
         $this
             ->getInputFilter()
@@ -244,7 +269,7 @@ class SearchPageConfigureForm extends Form
         return $this;
     }
 
-    protected function addFacetLanguagesInputFilter()
+    protected function addFacetLanguagesInputFilter(): self
     {
         $this
             ->getInputFilter()
@@ -267,7 +292,18 @@ class SearchPageConfigureForm extends Form
         return $this;
     }
 
-    protected function addSortFields()
+    protected function addFacetModeInputFilter(): self
+    {
+        $this
+            ->getInputFilter()
+            ->add([
+                'name' => 'facet_mode',
+                'required' => false,
+            ]);
+        return $this;
+    }
+
+    protected function addSortFields(): self
     {
         /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
         $searchPage = $this->getOption('search_page');
@@ -327,7 +363,7 @@ class SearchPageConfigureForm extends Form
         return $this;
     }
 
-    protected function addFormFieldset()
+    protected function addFormFieldset(): self
     {
         $formElementManager = $this->getFormElementManager();
         $searchPage = $this->getOption('search_page');
@@ -352,12 +388,7 @@ class SearchPageConfigureForm extends Form
         return $this;
     }
 
-    /**
-     * @param array $fields
-     * @param string $type
-     * @return array
-     */
-    protected function sortFields(array $fields, $type)
+    protected function sortFields(array $fields, string $type): array
     {
         /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
         $searchPage = $this->getOption('search_page');
@@ -393,25 +424,17 @@ class SearchPageConfigureForm extends Form
         return $label ? sprintf('%s (%s)', $label, $field['name']) : $field['name'];
     }
 
-    /**
-     * @param string $field
-     * @return string
-     */
-    protected function getFacetFieldLabel($field)
+    protected function getFacetFieldLabel(?string $field): ?string
     {
         return $this->getFieldLabel($field, 'facets');
     }
 
-    /**
-     * @param string $field
-     * @return string
-     */
-    protected function getSortFieldLabel($field)
+    protected function getSortFieldLabel(?string $field): ?string
     {
         return $this->getFieldLabel($field, 'sort_fields');
     }
 
-    public function setFormElementManager($formElementManager)
+    public function setFormElementManager($formElementManager): self
     {
         $this->formElementManager = $formElementManager;
         return $this;

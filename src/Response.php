@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2018-2020
+ * Copyright Daniel Berthereau, 2018-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -60,16 +60,13 @@ class Response implements \JsonSerializable
     /**
      * @param int $totalResults
      */
-    public function setTotalResults($totalResults)
+    public function setTotalResults(?int $totalResults): self
     {
         $this->totalResults = (int) $totalResults;
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getTotalResults()
+    public function getTotalResults(): int
     {
         return $this->totalResults;
     }
@@ -78,7 +75,7 @@ class Response implements \JsonSerializable
      * @param string $resourceType The resource type ("items", "item_sets"…).
      * @param int $totalResults
      */
-    public function setResourceTotalResults($resourceType, $totalResults)
+    public function setResourceTotalResults(string $resourceType, ?int $totalResults): self
     {
         $this->resourceTotalResults[$resourceType] = (int) $totalResults;
         return $this;
@@ -88,23 +85,19 @@ class Response implements \JsonSerializable
      * @param string|null $resourceType The resource type ("items", "item_sets"…).
      * @return int|array
      */
-    public function getResourceTotalResults($resourceType = null)
+    public function getResourceTotalResults(?string $resourceType = null)
     {
-        if (is_null($resourceType)) {
-            return $this->resourceTotalResults;
-        }
-        return isset($this->resourceTotalResults[$resourceType])
-            ? $this->resourceTotalResults[$resourceType]
-            : 0;
+        return is_null($resourceType)
+            ? $this->resourceTotalResults
+            : $this->resourceTotalResults[$resourceType] ?? 0;
     }
 
     /**
      * Store all results for all resources.
      *
      * @param array $results Results by resource type ("items", "item_sets"…).
-     * @return self
      */
-    public function setResults(array $results)
+    public function setResults(array $results): self
     {
         $this->results = $results;
         return $this;
@@ -116,7 +109,7 @@ class Response implements \JsonSerializable
      * @param string $resourceType The resource type ("items", "item_sets"…).
      * @param array $results Each result is an array with "id" as key.
      */
-    public function addResults($resourceType, $results)
+    public function addResults(string $resourceType, array $results): self
     {
         $this->results[$resourceType] = isset($this->results[$resourceType])
             ? array_merge($this->results[$resourceType], array_values($results))
@@ -128,9 +121,8 @@ class Response implements \JsonSerializable
      * Store a result.
      *
      * @param string $resourceType The resource type ("items", "item_sets"…).
-     * @param array $result
      */
-    public function addResult($resourceType, $result)
+    public function addResult(string $resourceType, array $result): self
     {
         $this->results[$resourceType][] = $result;
         return $this;
@@ -140,16 +132,12 @@ class Response implements \JsonSerializable
      * Get stored results for a resource type or all resource types.
      *
      * @param string|null $resourceType The resource type ("items", "item_sets"…).
-     * @return array
      */
-    public function getResults($resourceType = null)
+    public function getResults(string $resourceType = null): array
     {
-        if (is_null($resourceType)) {
-            return $this->results;
-        }
-        return isset($this->results[$resourceType])
-            ? $this->results[$resourceType]
-            : [];
+        return is_null($resourceType)
+            ? $this->results
+            : $this->results[$resourceType] ?? [];
     }
 
     /**
@@ -200,12 +188,11 @@ class Response implements \JsonSerializable
     /**
      * Store a list of counts for all facets of all resources.
      *
-     * @param array $facetCounts Counts by facet, with keys "value" and "count".
-     * @return self
+     * @param array $facetCountsByName Counts by facet, with keys "value" and "count".
      */
-    public function setFacetCounts(array $facetCounts)
+    public function setFacetCounts(array $facetCountsByName): self
     {
-        $this->facetCounts = $facetCounts;
+        $this->facetCounts = $facetCountsByName;
         return $this;
     }
 
@@ -215,7 +202,7 @@ class Response implements \JsonSerializable
      * @param string $name
      * @param array $counts List of counts with keys "value" and "count".
      */
-    public function addFacetCounts($name, $counts)
+    public function addFacetCounts(string $name, array $counts): self
     {
         $this->facetCounts[$name] = isset($this->facetCounts[$name])
             ? array_merge($this->facetCounts[$name], array_values($counts))
@@ -225,12 +212,8 @@ class Response implements \JsonSerializable
 
     /**
      * Store the count for a facet.
-     *
-     * @param string $name
-     * @param string $value
-     * @param int $count
      */
-    public function addFacetCount($name, $value, $count)
+    public function addFacetCount(string $name, $value, int $count): self
     {
         $this->facetCounts[$name][] = [
             'value' => $value,
@@ -241,21 +224,15 @@ class Response implements \JsonSerializable
 
     /**
      * Get all the facet counts or a specific one.
-     *
-     * @param string|null $name
-     * @return array
      */
-    public function getFacetCounts($name = null)
+    public function getFacetCounts(?string $name = null): array
     {
-        if (is_null($name)) {
-            return $this->facetCounts;
-        }
-        return isset($this->facetCounts[$name])
-            ? $this->facetCounts[$name]
-            : [];
+        return is_null($name)
+            ? $this->facetCounts
+            : $this->facetCounts[$name] ?? [];
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'totalResults' => $this->getTotalResults(),

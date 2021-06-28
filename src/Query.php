@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2018-2020
+ * Copyright Daniel Berthereau, 2018-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software. You can use, modify and/ or
@@ -110,29 +110,22 @@ class Query implements \JsonSerializable
 
     /**
      * The key is always trimmed.
-     *
-     * @param string $query
-     * @return self
      */
-    public function setQuery($query)
+    public function setQuery(string $query): self
     {
         $this->query = trim((string) $query);
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getQuery()
+    public function getQuery(): string
     {
         return $this->query;
     }
 
     /**
-     * @param string[] $resources The resource types are "items" and "item_sets".
-     * @return self
+     * @param string[] $resources The types are generally "items" and "item_sets".
      */
-    public function setResources($resources)
+    public function setResources($resources): self
     {
         $this->resources = $resources;
         return $this;
@@ -141,55 +134,37 @@ class Query implements \JsonSerializable
     /**
      * @return string[]
      */
-    public function getResources()
+    public function getResources(): array
     {
         return $this->resources;
     }
 
-    /**
-     * @param array $isPublic
-     * @return self
-     */
-    public function setIsPublic($isPublic)
+    public function setIsPublic($isPublic): self
     {
-        $this->isPublic = $isPublic;
+        $this->isPublic = (bool) $isPublic;
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function getIsPublic()
+    public function getIsPublic(): bool
     {
         return $this->isPublic;
     }
 
     /**
-     * @param string $name
      * @param array|string $value
-     * @return self
      */
-    public function addFilter($name, $value)
+    public function addFilter(string $name, $value): self
     {
         $this->filters[$name][] = $value;
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getFilters()
+    public function getFilters(): array
     {
         return $this->filters;
     }
 
-    /**
-     * @param string $name
-     * @param string $start
-     * @param string $end
-     * @return self
-     */
-    public function addDateRangeFilter($name, $start, $end)
+    public function addDateRangeFilter(string $name, string $start, string $end): self
     {
         $this->dateRangeFilters[$name][] = [
             'start' => trim($start),
@@ -198,10 +173,7 @@ class Query implements \JsonSerializable
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getDateRangeFilters()
+    public function getDateRangeFilters(): array
     {
         return $this->dateRangeFilters;
     }
@@ -210,14 +182,8 @@ class Query implements \JsonSerializable
      * Add advanced filters, that work similarly to Omeka ones.
      *
      * Note: Some types and joiners may not be managed by the querier.
-     *
-     * @param string $name
-     * @param string $value
-     * @param string $type
-     * @param string $join
-     * @return self
      */
-    public function addFilterQuery($name, $value, $type = 'in', $join = 'and')
+    public function addFilterQuery(string $name, $value, ?string $type = 'in', ?string $join = 'and'): self
     {
         $this->filterQueries[$name][] = [
             'value' => trim((string) $value),
@@ -227,10 +193,7 @@ class Query implements \JsonSerializable
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getFilterQueries()
+    public function getFilterQueries(): array
     {
         return $this->filterQueries;
     }
@@ -238,45 +201,29 @@ class Query implements \JsonSerializable
     /**
      * @param string|null $sort The field and the direction ("asc" or "desc")
      * separated by a space. Null means no sort (default of the search engine).
-     * @return self
      */
-    public function setSort($sort)
+    public function setSort(?string $sort): self
     {
         $this->sort = $sort;
         return $this;
     }
 
-    /**
-     * @return string|null The field and the direction ("asc" or "desc")
-     * separated by a space. Null means no sort (default of the search engine).
-     */
-    public function getSort()
+    public function getSort(): ?string
     {
         return $this->sort;
     }
 
-    /**
-     * @return int
-     */
-    public function getOffset()
+    public function getOffset(): int
     {
         return $this->offset;
     }
 
-    /**
-     * @return int
-     */
-    public function getLimit()
+    public function getLimit(): int
     {
         return $this->limit;
     }
 
-    /**
-     * @param int $page
-     * @param int $rowCount
-     * @return self
-     */
-    public function setLimitPage($page, $rowCount)
+    public function setLimitPage(?int $page, ?int $rowCount): self
     {
         $page = ($page > 0) ? $page : 1;
         $rowCount = ($rowCount > 0) ? $rowCount : 1;
@@ -285,11 +232,7 @@ class Query implements \JsonSerializable
         return $this;
     }
 
-    /**
-     * @param string $field
-     * @return self
-     */
-    public function addFacetField($field)
+    public function addFacetField(string $field): self
     {
         $this->facetFields[] = $field;
         return $this;
@@ -297,89 +240,60 @@ class Query implements \JsonSerializable
 
     /**
      * Get the flat list of fields to use as facet.
-     *
-     * @return array
      */
-    public function getFacetFields()
+    public function getFacetFields(): array
     {
         return $this->facetFields;
     }
 
-    /**
-     * @param int $facetLimit
-     * @return self
-     */
-    public function setFacetLimit($facetLimit)
+    public function setFacetLimit(?int $facetLimit): self
     {
         $this->facetLimit = (int) $facetLimit;
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getFacetLimit()
+    public function getFacetLimit(): int
     {
         return $this->facetLimit;
     }
 
-    /**
-     * @param array $facetLanguages
-     * @return \Search\Query
-     */
-    public function setFacetLanguages(array $facetLanguages)
+    public function setFacetLanguages(array $facetLanguages): self
     {
         $this->facetLanguages = $facetLanguages;
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getFacetLanguages()
+    public function getFacetLanguages(): array
     {
         return $this->facetLanguages;
     }
 
     /**
      * Exclude fields from main search query, for example to exclude full text.
-     *
-     * @param array $excludedFields
-     * @return self
      */
-    public function setExcludedFields(array $excludedFields)
+    public function setExcludedFields(array $excludedFields): self
     {
         $this->excludedFields = $excludedFields;
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getExcludedFields()
+    public function getExcludedFields(): array
     {
         return $this->excludedFields;
     }
 
-    /**
-     * @param int $siteId
-     * @return self
-     */
-    public function setSiteId($siteId)
+    public function setSiteId(?int $siteId): self
     {
         $this->siteId = $siteId;
         return $this;
     }
 
-    /**
-     * @return int
-     */
-    public function getSiteId()
+    public function getSiteId(): ?int
     {
         return $this->siteId;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'query' => $this->getQuery(),
@@ -401,10 +315,8 @@ class Query implements \JsonSerializable
 
     /**
      * @deprecated 3.5.8 Use self::setSiteId() instead. Will be removed in 3.6.
-     * @param SiteRepresentation $site
-     * @return self
      */
-    public function setSite(SiteRepresentation $site)
+    public function setSite(SiteRepresentation $site): self
     {
         $this->site = $site;
         $this->siteId = $site->id();
@@ -413,9 +325,8 @@ class Query implements \JsonSerializable
 
     /**
      * @deprecated 3.5.8 Use self::getSiteId() instead. Will be removed in 3.6.
-     * @return \Omeka\Api\Representation\SiteRepresentation
      */
-    public function getSite()
+    public function getSite(): SiteRepresentation
     {
         return $this->site;
     }

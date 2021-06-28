@@ -161,7 +161,7 @@ class InternalQuerier extends AbstractQuerier
             $params = $services->get('ControllerPluginManager')->get('params');
             $req = $params->fromQuery();
             unset($req['csrf']);
-            $req = urldecode(http_build_query(array_filter($req)));
+            $req = urldecode(http_build_query(array_filter($req), '', '&', PHP_QUERY_RFC3986));
             $messenger = new Messenger;
             $logger = $this->getServiceLocator()->get('Omeka\Logger');
             if ($this->query->getExcludedFields()) {

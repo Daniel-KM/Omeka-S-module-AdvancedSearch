@@ -65,7 +65,7 @@ class SearchSortSelector extends AbstractHelper
         $sortOptions = [];
         $currentSortUrl = null;
         foreach ($sorts as $key => $value) {
-            $sortKey = $currentUrl . '?' . http_build_query(['sort' => $key] + $currentQuery);
+            $sortKey = $currentUrl . '?' . http_build_query(['sort' => $key] + $currentQuery, '', '&', PHP_QUERY_RFC3986);
             if ($key === $currentSort) {
                 $currentSortUrl = $sortKey;
             }

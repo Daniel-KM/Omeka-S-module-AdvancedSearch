@@ -1,6 +1,6 @@
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2017-2020
+ * Copyright Daniel Berthereau, 2017-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -29,50 +29,6 @@
 var Search = (function() {
     var self = {};
 
-    self.objectFromQueryString = function(str) {
-        var params = {};
-        str
-            .replace(/(^\?)/, '')
-            .split("&")
-            .filter(function(element) { return element !== '' })
-            .forEach(function(n) {
-                n = n.split('=');
-                var name = decodeURIComponent(n[0]);
-                if (!params.hasOwnProperty(name)) {
-                    params[name] = decodeURIComponent(n[1]);
-                } else {
-                    if (!Array.isArray(params[name])) {
-                        params[name] = [params[name]];
-                    }
-                    params[name].push(decodeURIComponent(n[1]));
-                }
-            });
-
-        return params;
-    };
-
-    self.queryStringFromObject = function(obj) {
-        return Object.keys(obj).map(function(name) {
-            if (Array.isArray(obj[name])) {
-                return obj[name].map(function(value) {
-                    return name + '=' + value;
-                }).join('&');
-            } else {
-                return name + '=' + obj[name];
-            }
-        }).join('&');
-    };
-
-    self.sortBy = function(sort) {
-        var params = Search.objectFromQueryString(document.location.search);
-        params['sort'] = sort;
-        window.location.search = '?' + Search.queryStringFromObject(params);
-    };
-
-    self.facetFor = function(url) {
-        window.location = url;
-    };
-
     self.setViewType = function(viewType) {
         var resourceLists = document.querySelectorAll('div.resource-list');
         for (var i = 0; i < resourceLists.length; i++) {
@@ -87,12 +43,24 @@ var Search = (function() {
 
 $(document).ready(function() {
 
-    $('.search-results-sort select').on('change', function() {
-        Search.sortBy($(this).val());
+    /* Sort selector links (depending if server of client build) */
+    $('.search-sort select').on('change', function(e) {
+        // Sort fields don't look like a url.
+        e.preventDefault();
+        var sort = $(this).val();
+        if (sort.substring(0, 6) === 'https:' || sort.substring(0, 5) === 'http:') {
+            window.location = sort;
+        } else if (sort.substring(0, 1) === '/') {
+            window.location = window.location.origin + sort;
+        } else {
+            var searchParams = new URLSearchParams(window.location.search);
+            searchParams.set('sort', $(this).val());
+            window.location.search = searchParams.toString();
+        }
     });
 
     $('.search-facets').on('change', 'input[type=checkbox]', function() {
-        Search.facetFor($(this).data('url'));
+        window.location = $(this).data('url');
     });
 
     $('.search-view-type-list').on('click', function(e) {
@@ -106,12 +74,6 @@ $(document).ready(function() {
         Search.setViewType('grid');
         $('.search-view-type').removeClass('active');
         $(this).addClass('active');
-    });
-
-    /* Sort selector links */
-    $('.sort-by-order-urls').on('change', function(e) {
-        e.preventDefault();
-        window.location.href = $(this).val();
     });
 
     var view_type = localStorage.getItem('search_view_type');

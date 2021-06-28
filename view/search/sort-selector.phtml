@@ -10,7 +10,7 @@
 if (empty($sortSelect)) return;
 ?>
 
-<div class="sort-by-order<?= $asSortUrls ? ' sort-by-order-urls' : '' ?>">
+<div class="search-sort<?= $asSortUrls ? ' search-sort-urls' : '' ?>">
     <?= $this->formLabel($sortSelect) ?>
     <?= $this->formSelect($sortSelect) ?>
 </div>

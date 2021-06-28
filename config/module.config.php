@@ -47,6 +47,7 @@ return [
     ],
     'form_elements' => [
         'invokables' => [
+            Form\Element\ArrayText::class => Form\Element\ArrayText::class,
             Form\Element\OptionalMultiCheckbox::class => Form\Element\OptionalMultiCheckbox::class,
             Form\Element\OptionalSelect::class => Form\Element\OptionalSelect::class,
         ],

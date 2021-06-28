@@ -101,6 +101,8 @@ class Module extends AbstractModule
             [$this, 'addHeaders']
         );
 
+        // Listeners for the indexing for items, item sets and media.
+
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemAdapter::class,
             'api.create.post',
@@ -177,6 +179,14 @@ class Module extends AbstractModule
             \Omeka\Api\Adapter\MediaAdapter::class,
             'api.delete.post',
             [$this, 'updateSearchIndexMedia']
+        );
+
+        // Listeners for sites.
+
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\SiteAdapter::class,
+            'api.create.post',
+            [$this, 'addSearchPageToSite']
         );
 
         $sharedEventManager->attach(
@@ -565,35 +575,134 @@ class Module extends AbstractModule
         $view->partial($partialHeaders);
     }
 
+    public function addSearchPageToSite(Event $event): void
+    {
+        /**
+         * @var \Omeka\Settings\Settings $settings
+         * @var \Omeka\Settings\SiteSettings $siteSettings
+         * @var \Omeka\Mvc\Controller\Plugin\Api $api
+         *
+         * @var \Omeka\Api\Representation\SiteRepresentation $site
+         * @var \Search\Api\Representation\SearchPageRepresentation $searchPage
+         */
+        $services = $this->getServiceLocator();
+        $settings = $services->get('Omeka\Settings');
+        $siteSettings = $services->get('Omeka\Settings\Site');
+        $api = $services->get('ControllerPluginManager')->get('api');
+        $site = null;
+        $searchPage = null;
+
+        // Take the search page of the default site or the first site, else the
+        // default search page.
+        $defaultSite = (int) $settings->get('default_site');
+        if ($defaultSite) {
+            $site = $api->searchOne('sites', ['id' => $defaultSite])->getContent();
+        }
+        if ($site) {
+            $siteSettings->setTargetId($site->id());
+            $searchPageId = (int) $siteSettings->get('search_main_page');
+        } else {
+            $searchPageId = (int) $settings->get('search_main_page');
+        }
+        if ($searchPageId) {
+            $searchPage = $api->searchOne('search_pages', ['id' => $searchPageId])->getContent();
+        }
+        if (!$searchPage) {
+            $searchPage = $api->searchOne('search_pages')->getContent();
+        }
+        if (!$searchPage) {
+            $searchPageId = $this->createDefaultSearchPage();
+            $searchPage = $api->searchOne('search_pages', ['id' => $searchPageId])->getContent();
+        }
+
+        /** @var \Omeka\Entity\Site $site */
+        $site = $event->getParam('response')->getContent();
+
+        $siteSettings->setTargetId($site->getId());
+        $siteSettings->set('search_main_page', $searchPage->id());
+        $siteSettings->set('search_pages', [$searchPage->id()]);
+        $siteSettings->set('search_redirect_itemset', true);
+    }
+
     protected function installResources(): void
     {
+        $this->createDefaultSearchPage();
+    }
+
+    protected function createDefaultSearchPage(): int
+    {
+        // Note: during installation or upgrade, the api may not be available
+        // for the search api adapters, so use direct sql queries.
+
         $services = $this->getServiceLocator();
 
-        // TODO Move internal adapter in another module.
-        // Create the internal adapter.
+        $urlHelper = $services->get('ViewHelperManager')->get('url');
+        $messenger = new Messenger;
+
+        /** @var \Doctrine\DBAL\Connection $connection */
         $connection = $services->get('Omeka\Connection');
-        $sql = <<<'SQL'
+
+        // Check if the internal index exists.
+        $sqlSearchIndexId = <<<'SQL'
+SELECT `id`
+FROM `search_index`
+WHERE `adapter` = "internal"
+ORDER BY `id`;
+SQL;
+        $searchIndexId = (int) $connection->fetchColumn($sqlSearchIndexId);
+
+        if (!$searchIndexId) {
+            // Create the internal adapter.
+            $sql = <<<'SQL'
 INSERT INTO `search_index`
 (`name`, `adapter`, `settings`, `created`)
 VALUES
-('Internal', 'internal', ?, NOW());
+('Internal (sql)', 'internal', ?, NOW());
 SQL;
-        $searchIndexSettings = ['resources' => ['items', 'item_sets']];
-        $connection->executeQuery($sql, [
-            json_encode($searchIndexSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
-        ]);
-        $sql = <<<'SQL'
+            $searchIndexSettings = ['resources' => ['items', 'item_sets']];
+            $connection->executeQuery($sql, [
+                json_encode($searchIndexSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            ]);
+            $searchIndexId = $connection->fetchColumn($sqlSearchIndexId);
+            $message = new Message(
+                'The internal search engine (sql) is available. Configure it in the %ssearch manager%s.', // @translate
+                sprintf('<a href="%s">', $urlHelper('admin/search')),
+                '</a>'
+            );
+            $message->setEscapeHtml(false);
+            $messenger->addSuccess($message);
+        }
+
+        // Check if the default search page exists.
+        $sqlSearchPageId = <<<SQL
+SELECT `id`
+FROM `search_page`
+WHERE `index_id` = $searchIndexId
+ORDER BY `id`;
+SQL;
+        $searchPageId = (int) $connection->fetchColumn($sqlSearchPageId);
+
+        if (!$searchPageId) {
+            $sql = <<<SQL
 INSERT INTO `search_page`
 (`index_id`, `name`, `path`, `form_adapter`, `settings`, `created`)
 VALUES
-('1', 'Internal', 'find', 'basic', ?, NOW());
+($searchIndexId, 'Default', 'find', 'main', ?, NOW());
 SQL;
-        $searchPageSettings = require __DIR__ . '/data//adapters/internal.php';
-        $connection->executeQuery($sql, [
-            json_encode($searchPageSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
-        ]);
+            $searchPageSettings = require __DIR__ . '/data//search_pages/main.php';
+            $connection->executeQuery($sql, [
+                json_encode($searchPageSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            ]);
 
-        $messenger = new Messenger;
-        $messenger->addNotice('The internal search engine is available. Enable it in the main settings (for admin) and in site settings (for public).'); // @translate
+            $message = new Message(
+                'The default search page is available. Configure it in the %ssearch manager%s, in the main settings (for admin) and in site settings (for public).', // @translate
+                sprintf('<a href="%s">', $urlHelper('admin/search')),
+                '</a>'
+            );
+            $message->setEscapeHtml(false);
+            $messenger->addSuccess($message);
+        }
+
+        return $searchPageId;
     }
 }

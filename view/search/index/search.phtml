@@ -44,13 +44,16 @@ $translate = $plugins->get('translate');
 $translatePlural = $plugins->get('translatePlural');
 $assetUrl = $plugins->get('assetUrl');
 $partial = $plugins->get('partial');
+$api = $plugins->get('api');
+$vars = $this->vars();
 
 $isPartial = !$site;
 $skipFormAction = !empty($skipFormAction);
 
 // Used in case of a redirect of item-set/show to search, when used like item/browse.
 $itemSetId = $this->params()->fromRoute('item-set-id');
-$isItemSetShow = (bool) $itemSetId;
+// TODO Use site item set ?
+$itemSet = $itemSetId ? $api->searchOne('item_sets', ['id' => $itemSetId])->getContent() : null;
 
 $this->headLink()->appendStylesheet($assetUrl('css/search.css', 'Search'));
 $this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javascript', ['defer' => 'defer']);
@@ -60,12 +63,13 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javas
 <div id="search-page">
 <?php endif; ?>
 
-<?php if ($isItemSetShow): ?>
+<?php if ($itemSet): ?>
 
-    <?php $itemSet = $this->api()->read('item_sets', ['id' => $itemSetId])->getContent(); ?>
-    <?php $this->vars()->offsetSet('itemSet', $itemSet); ?>
-    <?php $this->vars()->offsetSet('resourceType', 'item_sets'); // TODO Check if really needed. ?>
-    <?php $this->htmlElement('body')->appendAttribute('class', 'search-page item-set resource browse'); ?>
+    <?php
+    $vars->offsetSet('itemSet', $itemSet);
+    $vars->offsetSet('resourceType', 'item_sets'); // TODO Check if really needed.
+    $this->htmlElement('body')->appendAttribute('class', 'search-page item-set resource browse');
+    ?>
     <?= $this->pageTitle($itemSet->displayTitle(), 2) ?>
     <h3><?= $translate('Item set') ?></h3>
     <div class="metadata">
@@ -117,7 +121,7 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javas
                 'sortOptions' => $sortOptions,
             ]) ?>
 
-        <?php elseif (empty($query) && !$isItemSetShow): ?>
+        <?php elseif (empty($query) && !$itemSet): ?>
 
             <div class="noresults"><?= $translate('Fill a query and get results.') ?></div>
 
@@ -133,7 +137,12 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javas
 
     </div>
 
-    <?= $partial('search/facets', ['searchPage' => $searchPage, 'query' => $query, 'response' => $response]) ?>
+    <?= $partial('search/facets', [
+        'searchPage' => $searchPage,
+        'query' => $query,
+        'response' => $response,
+        'itemSet' => $itemSet,
+    ]) ?>
 </div>
 
 <?php else: ?>

@@ -50,6 +50,15 @@ $facetLink = $plugins->get('facetLink');
 ?>
 <aside class="search-facets">
     <h2><?= $translate('Filters') ?></h2>
+    <?php /* $facetSelected = $plugins->get('facetSelected'); ?>
+    <ul class="search-results-selected-facets">
+        <?php $statusFacets = array_fill_keys(array_keys($facets), false); ?>
+        <?php foreach ($facets as $name => $facetValues) foreach ($facetValues as $facetValue): ?>
+        <?php $statusFacets[$name] = $statusFacets[$name] || $facetSelected($name, $facetValue, true)['active'] ?>
+        <li><?= $facetSelected($name, $facetValue) ?></li>
+        <?php endforeach; ?>
+    </ul>
+    */ ?>
     <ul>
         <?php foreach ($facets as $name => $facetValues): ?>
         <li class="search-facet">

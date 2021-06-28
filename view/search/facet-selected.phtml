@@ -1,0 +1,17 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var string $name
+ * @var string $value
+ * @var string $label
+ * @var int $count
+ * @var bool $active
+ * @var string $url
+ * @var \Laminas\View\Helper\EscapeHtml $escapeHtml
+ * @var \Laminas\View\Helper\TranslatorAwareTrait $translate
+ * @var \Search\View\Helper\FacetLabel $facetLabel
+ */
+
+?>
+
+<a <?php if ($active): ?>class="active"<?php else: ?>style="display:none;"<?php endif; ?> href="<?= $escapeHtml($url) ?>"><?= $escapeHtml(sprintf('%s : %s', $translate($facetLabel($name)), $label)) ?></a>

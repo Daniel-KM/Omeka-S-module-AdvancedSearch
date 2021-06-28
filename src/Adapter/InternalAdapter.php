@@ -8,7 +8,7 @@ class InternalAdapter extends AbstractAdapter
 {
     public function getLabel(): string
     {
-        return 'Internal'; // @translate
+        return 'Internal [sql]'; // @translate
     }
 
     public function getConfigFieldset(): ?\Laminas\Form\Fieldset

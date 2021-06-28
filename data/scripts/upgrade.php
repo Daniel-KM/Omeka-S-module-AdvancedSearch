@@ -348,4 +348,11 @@ SET `form_adapter` = "main"
 WHERE `form_adapter` IN ("basic", "advanced");
 SQL;
     $connection->exec($sql);
+
+    $sql = <<<'SQL'
+UPDATE `search_index`
+SET `name` = "Internal (sql)"
+WHERE `name` = "Internal";
+SQL;
+    $connection->exec($sql);
 }

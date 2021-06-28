@@ -1,96 +1,66 @@
 <?php declare(strict_types=1);
-// Example of a generic page with the internal adapter and the basic form.
+
+// Example of a generic page with the internal adapter and the main form.
 // When created, it can be modified in the admin board.
 
+// This config is used for new sites too.
+
 return [
-    'facet_limit' => 10,
-    'facet_languages' => [],
-    'facets' => [
-        'dcterms:title' => [
-            'enabled' => 0,
-            'weight' => 0,
-            'display' => [
-                'label' => 'Title',
-            ],
+    'search' => [
+        'default_results' => 'default',
+        'default_query' => '',
+    ],
+
+    'form' => [
+        'item_set_filter_type' => 'select',
+        'item_set_id_field' => 'item_set_id_field',
+        'resource_class_filter_type' => 'select_flat',
+        'resource_class_id_field' => 'resource_class_id_field',
+        'resource_template_filter_type' => '0',
+        'resource_template_id_field' => 'resource_template_id_field',
+        'is_public_field' => 'is_public_field',
+
+        'filters' => [
+            ['dcterms:title' => 'Title'],
+            ['dcterms:subject' => 'Subject'],
+            ['dcterms:creator' => 'Creator'],
+            ['dcterms:date' => 'Date'],
+            ['dcterms:description' => 'Description'],
         ],
-        'dcterms:subject' => [
-            'enabled' => 1,
-            'weight' => 0,
-            'display' => [
-                'label' => 'Subject',
-            ],
-        ],
-        'dcterms:type' => [
-            'enabled' => 1,
-            'weight' => 1,
-            'display' => [
-                'label' => 'Type',
-            ],
-        ],
-        'dcterms:creator' => [
-            'enabled' => 1,
-            'weight' => 2,
-            'display' => [
-                'label' => 'Creator',
-            ],
-        ],
-        'dcterms:date' => [
-            'enabled' => 1,
-            'weight' => 3,
-            'display' => [
-                'label' => 'Date',
-            ],
-        ],
-        'dcterms:language' => [
-            'enabled' => 1,
-            'weight' => 4,
-            'display' => [
-                'label' => 'Language',
-            ],
+        'filters_max_number' => '5',
+        'filter_value_joiner' => true,
+        'filter_value_type' => true,
+
+        'fields_order' => [
+            'q',
+            'itemSet',
+            'resourceClass',
+            'filters',
+            'submit',
         ],
     ],
-    'sort_fields' => [
-        'dcterms:title asc' => [
-            'enabled' => 1,
-            'weight' => 0,
-            'display' => [
-                'label' => 'Title',
-            ],
+
+    'sort' => [
+        'fields' => [
+            ['dcterms:title asc' => 'Title'],
+            ['dcterms:title desc' => 'Title (reverted)'],
+            ['dcterms:date asc' => 'Date'],
+            ['dcterms:date desc' => 'Date (reverted)'],
         ],
-        'dcterms:title desc' => [
-            'enabled' => 1,
-            'weight' => 1,
-            'display' => [
-                'label' => 'Title (reverted)',
-            ],
+    ],
+
+    'facet' => [
+        'facets' => [
+            ['item_set_id' => 'Collections'],
+            ['resource_class_id' => 'Classes'],
+            ['dcterms:subject' => 'Subject'],
+            ['dcterms:type' => 'Type'],
+            ['dcterms:creator' => 'Creator'],
+            ['dcterms:date' => 'Date'],
+            ['dcterms:language' => 'Language'],
         ],
-        'dcterms:creator asc' => [
-            'enabled' => 1,
-            'weight' => 2,
-            'display' => [
-                'label' => 'Creator',
-            ],
-        ],
-        'dcterms:creator desc' => [
-            'enabled' => 1,
-            'weight' => 3,
-            'display' => [
-                'label' => 'Creator (reverted)',
-            ],
-        ],
-        'dcterms:date asc' => [
-            'enabled' => 1,
-            'weight' => 4,
-            'display' => [
-                'label' => 'Date',
-            ],
-        ],
-        'dcterms:date desc' => [
-            'enabled' => 1,
-            'weight' => 5,
-            'display' => [
-                'label' => 'Date (reverted)',
-            ],
-        ],
+        'limit' => 10,
+        'languages' => [],
+        'mode' => 'button',
     ],
 ];

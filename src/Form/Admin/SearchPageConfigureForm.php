@@ -31,7 +31,6 @@
 namespace Search\Form\Admin;
 
 use Laminas\Form\Element;
-use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
 
 class SearchPageConfigureForm extends Form
@@ -52,16 +51,6 @@ class SearchPageConfigureForm extends Form
             ->addFacets()
             ->addSortFields()
             ->addFormFieldset();
-
-        // Allow to manage the simple and visual form differently.
-        $this
-            ->add([
-                'name' => 'form_class',
-                'type' => Element\Hidden::class,
-                'attributes' => [
-                    'value' => get_class($this),
-                ],
-            ]);
 
         // Input filters should be added after elements.
         $this
@@ -116,69 +105,39 @@ class SearchPageConfigureForm extends Form
         return $this;
     }
 
-    protected function addFacets(): self
+    protected function addFacets(): SearchPageConfigureForm
     {
         $this
             ->addFacetLimit()
             ->addFacetLanguages()
-            ->addFacetMode();
-
-        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
-        $searchPage = $this->getOption('search_page');
-        $adapter = $searchPage->index()->adapter();
-
-        $facets = new Fieldset('facets');
-        $facets->setLabel('Facets'); // @translate
-        $facets->setAttribute('data-sortable', '1');
-        // TODO This attribute of the fieldset is not output for an unknown reason.
-        $facets->setAttribute('data-ordered', '1');
-
-        $facetFields = $adapter->getAvailableFacetFields($searchPage->index());
-        $facetFields = $this->sortFields($facetFields, 'facets');
-        $weights = range(0, count($facetFields));
-        $weightOptions = array_combine($weights, $weights);
-        $weight = 0;
-        foreach ($facetFields as $field) {
-            $fieldset = new Fieldset($field['name']);
-            $fieldset->setLabel($this->getFacetFieldLabel($field));
-
-            $displayFieldset = new Fieldset('display');
-            $displayFieldset->add([
-                'name' => 'label',
-                'type' => Element\Text::class,
+            ->addFacetMode()
+        // field (term) | label (order means weight).
+        ->add([
+                'name' => 'facets',
+                'type' => Element\Textarea::class,
                 'options' => [
-                    'label' => 'Label', // @translate
+                    'label' => 'Facets', // @translate
+                    'info' => 'List of facets that will be displayed in the search page. Format is "term | Label".', // @translate
                 ],
                 'attributes' => [
-                    'value' => $field['label'] ?? '',
+                    'id' => 'facets',
+                    'placeholder' => 'dcterms:subject | Subjects',
+                    'rows' => 12,
                 ],
-            ]);
-            $fieldset->add($displayFieldset);
-
-            $fieldset->add([
-                'name' => 'enabled',
-                'type' => Element\Checkbox::class,
+            ])
+            ->add([
+                'name' => 'available_facets',
+                'type' => Element\Textarea::class,
                 'options' => [
-                    'label' => 'Enabled', // @translate
-                ],
-            ]);
-
-            $fieldset->add([
-                'name' => 'weight',
-                'type' => Element\Select::class,
-                'options' => [
-                    'label' => 'Weight', // @translate
-                    'value_options' => $weightOptions,
+                    'label' => 'Available facets', // @translate
+                    'info' => 'List of all available facets, among which some can be copied above.', // @translate
                 ],
                 'attributes' => [
-                    'value' => ++$weight,
+                    'id' => 'available_facets',
+                    'placeholder' => 'dcterms:subject | Subjects',
+                    'rows' => 12,
                 ],
             ]);
-
-            $facets->add($fieldset);
-        }
-
-        $this->add($facets);
         return $this;
     }
 
@@ -303,69 +262,41 @@ class SearchPageConfigureForm extends Form
         return $this;
     }
 
-    protected function addSortFields(): self
+    protected function addSortFields(): SearchPageConfigureForm
     {
-        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
-        $searchPage = $this->getOption('search_page');
-        $adapter = $searchPage->index()->adapter();
-
-        $sortFieldsFieldset = new Fieldset('sort_fields');
-        $sortFieldsFieldset->setLabel('Sort fields'); // @translate
-        $sortFieldsFieldset->setAttribute('data-sortable', '1');
-        $sortFieldsFieldset->setAttribute('data-ordered', '1');
-
-        $sortFields = $adapter->getAvailableSortFields($searchPage->index());
-        $sortFields = $this->sortFields($sortFields, 'sort_fields');
-        $weights = range(0, count($sortFields));
-        $weightOptions = array_combine($weights, $weights);
-        $weight = 0;
-        foreach ($sortFields as $field) {
-            $fieldset = new Fieldset($field['name']);
-            $fieldset->setLabel($this->getSortFieldLabel($field));
-
-            $displayFieldset = new Fieldset('display');
-            $displayFieldset->add([
-                'name' => 'label',
-                'type' => Element\Text::class,
+        // field (term + asc/desc) | label (+ asc/desc) (order means weight).
+        $this
+            ->add([
+                'name' => 'sort_fields',
+                'type' => Element\Textarea::class,
                 'options' => [
-                    'label' => 'Label', // @translate
+                    'label' => 'Sort fields', // @translate
+                    'info' => 'List of sort fields that will be displayed in the search page. Format is "term dir | Label".', // @translate
                 ],
                 'attributes' => [
-                    'value' => $field['label'] ?? '',
+                    'id' => 'sort_fields',
+                    'placeholder' => 'dcterms:subject asc | Subject (asc)',
+                    'rows' => 12,
                 ],
-            ]);
-            $fieldset->add($displayFieldset);
-
-            $fieldset->add([
-                'name' => 'enabled',
-                'type' => Element\Checkbox::class,
+            ])
+            ->add([
+                'name' => 'available_sort_fields',
+                'type' => Element\Textarea::class,
                 'options' => [
-                    'label' => 'Enabled', // @translate
-                ],
-            ]);
-
-            $fieldset->add([
-                'name' => 'weight',
-                'type' => Element\Select::class,
-                'options' => [
-                    'label' => 'Weight', // @translate
-                    'value_options' => $weightOptions,
+                    'label' => 'Available sort fields', // @translate
+                    'info' => 'List of all available sort fields, among which some can be copied above.', // @translate
                 ],
                 'attributes' => [
-                    'value' => ++$weight,
+                    'id' => 'available_sort_fields',
+                    'placeholder' => 'dcterms:subject asc | Subject (asc)',
+                    'rows' => 12,
                 ],
             ]);
-
-            $sortFieldsFieldset->add($fieldset);
-        }
-
-        $this->add($sortFieldsFieldset);
         return $this;
     }
 
     protected function addFormFieldset(): self
     {
-        $formElementManager = $this->getFormElementManager();
         $searchPage = $this->getOption('search_page');
 
         $formAdapter = $searchPage->formAdapter();
@@ -378,9 +309,10 @@ class SearchPageConfigureForm extends Form
             return $this;
         }
 
-        $fieldset = $formElementManager->get($formAdapter->getConfigFormClass(), [
-            'search_page' => $searchPage,
-        ]);
+        $fieldset = $this->getFormElementManager()
+            ->get($formAdapter->getConfigFormClass(), [
+                'search_page' => $searchPage,
+            ]);
         $fieldset->setName('form');
         $fieldset->setLabel('Form settings'); // @translate
 
@@ -403,11 +335,11 @@ class SearchPageConfigureForm extends Form
     }
 
     /**
-     * @param string $field
+     * @param array $field
      * @param string $settingsKey
      * @return string
      */
-    protected function getFieldLabel($field, $settingsKey)
+    protected function getFieldLabel(array $field, string $settingsKey)
     {
         /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
         $searchPage = $this->getOption('search_page');
@@ -421,15 +353,15 @@ class SearchPageConfigureForm extends Form
                 $label = $fieldSettings['display']['label'];
             }
         }
-        return $label ? sprintf('%s (%s)', $label, $field['name']) : $field['name'];
+        return $label ? sprintf('%s (%s)', $label, $name) : $name;
     }
 
-    protected function getFacetFieldLabel(?string $field): ?string
+    protected function getFacetFieldLabel(?array $field): ?string
     {
         return $this->getFieldLabel($field, 'facets');
     }
 
-    protected function getSortFieldLabel(?string $field): ?string
+    protected function getSortFieldLabel(?array $field): ?string
     {
         return $this->getFieldLabel($field, 'sort_fields');
     }

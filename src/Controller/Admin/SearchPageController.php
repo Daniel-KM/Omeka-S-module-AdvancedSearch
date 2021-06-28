@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016-2017
- * Copyright Daniel Berthereau, 2018-2020
+ * Copyright Daniel Berthereau, 2018-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -38,7 +38,6 @@ use Omeka\Stdlib\Message;
 use Search\Adapter\Manager as SearchAdapterManager;
 use Search\Api\Representation\SearchPageRepresentation;
 use Search\Form\Admin\SearchPageConfigureForm;
-use Search\Form\Admin\SearchPageConfigureSimpleForm;
 use Search\Form\Admin\SearchPageForm;
 use Search\FormAdapter\Manager as SearchFormAdapterManager;
 
@@ -186,13 +185,8 @@ class SearchPageController extends AbstractActionController
             return $view;
         }
 
-        $isSimple = $form instanceof SearchPageConfigureSimpleForm;
-
         $settings = $searchPage->settings() ?: [];
-
-        if ($isSimple) {
-            $settings = $this->prepareSettingsForSimpleForm($searchPage, $settings);
-        }
+        $settings = $this->prepareSettingsForSimpleForm($searchPage, $settings);
 
         $form->setData($settings);
         $view->setVariable('form', $form);
@@ -201,32 +195,25 @@ class SearchPageController extends AbstractActionController
             return $view;
         }
 
-        $params = $isSimple
-            ? $this->extractSimpleFields($searchPage)
-            : $this->extractFullFields();
+        $params = $this->extractSimpleFields($searchPage);
 
         // TODO Check simple fields with normal way.
         $form->setData($params);
-        // The validation should occurs in all cases.
-        if (!$form->isValid() && !$isSimple) {
+        if (!$form->isValid()) {
             $messages = $form->getMessages();
             if (isset($messages['csrf'])) {
                 $this->messenger()->addError('Invalid or missing CSRF token'); // @translate
             } else {
                 $this->messenger()->addError('There was an error during validation'); // @translate
             }
-            return $view;
+            // return $view;
         }
 
         // TODO Why the fieldset "form" is removed from the params? Add an intermediate fieldset? Check if it is still the case.
         $formParams = $params['form'] ?? [];
         // TODO Check simple fields.
-        if ($isSimple) {
-            $checkedParams = $form->getData();
-            $formParams['fields_order'] = $checkedParams['form']['fields_order'] ?? null;
-        } else {
-            $params = $form->getData();
-        }
+        $checkedParams = $form->getData();
+        $formParams['fields_order'] = $checkedParams['form']['fields_order'] ?? null;
         $params['form'] = $formParams;
 
         unset($params['csrf']);
@@ -374,43 +361,12 @@ class SearchPageController extends AbstractActionController
 
     /**
      * Check if the configuration should use simple or visual form and get it.
-     *
-     * The form is different when the number of fields is too big. This is
-     * generally needed for the internal adapter when there are many specific
-     * vocabularies. Unlike other adapters, it uses all properties by default.
-     * So the number of properties may be greater than 200, so a memory overload
-     * may occur (memory_limit = 128MB).
-     * For the full form, the issue about the limit for the for number of fields
-     * by request (max_input_vars = 1000) is fixed via js. Each property has 3
-     * fields, and as facet and sort in 2 directions, so the limit to use the
-     * full form or the simple form is set to 200.
-     *
-     * @param SearchPageRepresentation $searchPage
-     * @return \Search\Form\Admin\SearchPageConfigureForm|\Search\Form\Admin\SearchPageConfigureSimpleForm|null
      */
-    protected function getConfigureForm(SearchPageRepresentation $searchPage)
+    protected function getConfigureForm(SearchPageRepresentation $searchPage): ?\Search\Form\Admin\SearchPageConfigureForm
     {
-        $index = $searchPage->index();
-        if (!$index) {
-            return null;
-        }
-        $adapter = $index->adapter();
-        $availableFields = $adapter->getAvailableFields($index);
-
-        $isPostSimple = $this->getRequest()->isPost()
-            && $this->params()->fromPost('form_class') === SearchPageConfigureSimpleForm::class;
-        $forceForm = $this->params()->fromQuery('form');
-        $isSimple = $isPostSimple
-            || (count($availableFields) > 200 && $forceForm !== 'visual')
-            || $forceForm === 'simple';
-
-        $form = $isSimple
-            /* @var \Search\Form\Admin\SearchPageConfigureSimpleForm $form */
-            ? $this->getForm(SearchPageConfigureSimpleForm::class, ['search_page' => $searchPage])
-            /* @var \Search\Form\Admin\SearchPageConfigureForm $form */
-            : $this->getForm(SearchPageConfigureForm::class, ['search_page' => $searchPage]);
-
-        return $form;
+        return $searchPage->index()
+            ? $this->getForm(SearchPageConfigureForm::class, ['search_page' => $searchPage])
+            : null;
     }
 
     /**
@@ -508,65 +464,6 @@ class SearchPageController extends AbstractActionController
         }
 
         return $params;
-    }
-
-    protected function extractFullFields()
-    {
-        $params = $this->getRequest()->getPost()->toArray();
-
-        $fields = $params['fieldsets'] ?? [];
-        unset($params['fieldsets']);
-        $fieldsData = $this->extractJsonEncodedFields($fields);
-        $params = array_merge($fieldsData, $params);
-        unset($fields);
-
-        unset($params['form_class']);
-
-        return $params;
-    }
-
-    /**
-     * To bypass the limit to 1000 fields posted, post is json encoded, so it
-     * should be decoded.
-     *
-     * @param string $jsonEncodedFields
-     * @return array
-     */
-    protected function extractJsonEncodedFields($jsonEncodedFields)
-    {
-        if (empty($jsonEncodedFields)) {
-            return [];
-        }
-        $fields = json_decode($jsonEncodedFields, true);
-        if (empty($jsonEncodedFields)) {
-            return [];
-        }
-
-        // Recreate the array that was json encoded via js.
-        $fieldsData = [];
-        foreach ($fields as $type => $typeFields) {
-            foreach ($typeFields as $fieldData) {
-                $type = strtok((string) $fieldData['name'], '[]');
-                $two = strtok('[]');
-                if ($two === false) {
-                    $fieldsData[$type] = $fieldData['value'];
-                } else {
-                    $three = strtok('[]');
-                    if ($three === false) {
-                        $fieldsData[$type][$two] = $fieldData['value'];
-                    } else {
-                        $four = strtok('[]');
-                        if ($four === false) {
-                            $fieldsData[$type][$two][$three] = (string) $fieldData['value'];
-                        } else {
-                            $fieldsData[$type][$two][$three][$four] = (string) $fieldData['value'];
-                        }
-                    }
-                }
-            }
-        }
-
-        return $fieldsData;
     }
 
     protected function sitesWithSearchPage(SearchPageRepresentation $searchPage)

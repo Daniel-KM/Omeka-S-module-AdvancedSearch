@@ -30,7 +30,7 @@
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var \Search\Api\Representation\SearchPageRepresentation $searchPage
- * @var \Search\Form\Admin\SearchPageConfigureForm|\Search\Form\Admin\SearchPageConfigureSimpleForm $form
+ * @var \Search\Form\Admin\SearchPageConfigureForm $form
  */
 
 $translate = $this->plugin('translate');
@@ -38,13 +38,9 @@ $formCollection = $this->plugin('formCollection');
 $formRow = $this->plugin('formRow');
 $assetUrl = $this->plugin('assetUrl');
 
-$isSimple = $form instanceof \Search\Form\Admin\SearchPageConfigureSimpleForm;
-
 $this->headLink()
-    ->appendStylesheet($assetUrl('vendor/jqueryui/themes/base/jquery-ui.min.css', 'Search'))
     ->appendStylesheet($assetUrl('css/search-page-configure.css', 'Search'));
 $this->headScript()
-    ->appendFile($assetUrl('vendor/jqueryui/jquery-ui.min.js', 'Search'), 'text/javascript', ['defer' => 'defer'])
     ->appendFile($assetUrl('js/search-admin.js', 'Search'), 'text/javascript', ['defer' => 'defer']);
 ;
 
@@ -53,8 +49,6 @@ $adapter = $index ? $index->adapter() : null;
 if (empty($adapter)) {
     return;
 }
-
-$availableFields = $adapter->getAvailableFields($index);
 
 $form->prepare();
 ?>
@@ -67,16 +61,6 @@ $form->prepare();
 </div>
 
 <p>
-<?php if ($isSimple): ?>
-    <?= $this->hyperlink($translate('Use visual form.'), $this->url('admin/search/page-id', [], ['query' => ['form' => 'visual']], true)) ?>
-    <?php if (count($availableFields) > 200): ?>
-    <?= $translate('Warning: you have more than 200 properties, the form will be slow to load.') ?>
-    <?php endif; ?>
-<?php else: ?>
-    <?= $this->hyperlink($translate('Use simple form.'), $this->url('admin/search/page-id', [], ['query' => ['form' => 'simple']], true)) ?>
-<?php endif; ?>
-</p>
-
 <?php foreach ($form->getElements() as $element): ?>
     <?= $formRow($element); ?>
 <?php endforeach; ?>

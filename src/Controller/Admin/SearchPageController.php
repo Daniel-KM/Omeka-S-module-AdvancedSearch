@@ -223,11 +223,13 @@ class SearchPageController extends AbstractActionController
         $params['search']['default_query'] = trim($params['search']['default_query'], "? \t\n\r\0\x0B");
 
         // Add a warning because it may be a hard to understand issue.
-        $params['facet']['languages'] = array_unique(array_map('trim', $params['facet']['languages'] ?? []));
-        if (!empty($params['facet']['languages']) && !in_array('', $params['facet']['languages'])) {
-            $this->messenger()->addWarning(
-                'Note that you didn’t set "||", so all values without language will be removed.' // @translate
-            );
+        if (isset($params['facet']['languages'])) {
+            $params['facet']['languages'] = array_unique(array_map('trim', $params['facet']['languages']));
+            if (!empty($params['facet']['languages']) && !in_array('', $params['facet']['languages'])) {
+                $this->messenger()->addWarning(
+                    'Note that you didn’t set a trailing "|", so all values without language will be removed.' // @translate
+                );
+            }
         }
 
         $page = $searchPage->getEntity();

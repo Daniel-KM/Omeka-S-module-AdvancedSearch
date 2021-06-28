@@ -54,14 +54,14 @@ class SearchPageConfigureForm extends Form
         // TODO Simplify the form with js, storing the whole form one time. See UserProfile and https://docs.laminas.dev/laminas-form/v3/form-creation/creation-via-factory/
 
         // These fields may be overridden by the available fields.
-        $fieldOptions = $this->getAvailableFields();
+        $availableFields = $this->getAvailableFields();
         $specialOptions = [
             'is_public_field' => 'Is public', // @translate
             // TODO Create a default field for item set, resource class and resource template for Solr.
             'item_set_id_field' => 'Item set id (if available in fields)', // @translate
             'resource_class_id_field' => 'Resource class id (if available in fields)', // @translate
             'resource_template_id_field' => 'Resource template id (if available in fields)', // @translate
-        ] + $fieldOptions;
+        ] + $availableFields;
 
         // Remove some of the available fields used by the internal adapter,
         // because here, it's about special options and for any adapter.
@@ -252,14 +252,14 @@ class SearchPageConfigureForm extends Form
                 'type' => ArrayTextarea::class,
                 'options' => [
                     'label' => 'Filters', // @translate
-                    'info' => 'List of filters that will be displayed in the search form. Format is "term | Label". The field should exist in all resources fields.', // @translate
+                    'info' => 'List of filters that will be displayed in the search form. Format is "term = Label". The field should exist in all resources fields.', // @translate
                     'as_key_value' => true,
-                    'key_value_separator' => '|',
+                    'key_value_separator' => '=',
                 ],
                 'attributes' => [
                     'id' => 'filters',
-                    // field (term) | label (order means weight).
-                    'placeholder' => 'dcterms:title | Title',
+                    // field (term) = label (order means weight).
+                    'placeholder' => 'dcterms:title = Title',
                     'rows' => 12,
                 ],
             ])
@@ -270,12 +270,12 @@ class SearchPageConfigureForm extends Form
                     'label' => 'Available filters', // @translate
                     'info' => 'List of all available filters, among which some can be copied above.', // @translate
                     'as_key_value' => true,
-                    'key_value_separator' => '|',
+                    'key_value_separator' => '=',
                 ],
                 'attributes' => [
                     'id' => 'available_filters',
-                    'value' => $fieldOptions,
-                    'placeholder' => 'dcterms:title | Title',
+                    'value' => $availableFields,
+                    'placeholder' => 'dcterms:title = Title',
                     'rows' => 12,
                 ],
             ])
@@ -362,19 +362,19 @@ class SearchPageConfigureForm extends Form
                 ],
             ])
             ->get('sort')
-            // field (term + asc/desc) | label (+ asc/desc) (order means weight).
+            // field (term + asc/desc) = label (+ asc/desc) (order means weight).
             ->add([
                 'name' => 'fields',
                 'type' => ArrayTextarea::class,
                 'options' => [
                     'label' => 'Sort fields', // @translate
-                    'info' => 'List of sort fields that will be displayed in the search page. Format is "term dir | Label".', // @translate
+                    'info' => 'List of sort fields that will be displayed in the search page. Format is "term dir = Label".', // @translate
                     'as_key_value' => true,
-                    'key_value_separator' => '|',
+                    'key_value_separator' => '=',
                 ],
                 'attributes' => [
                     'id' => 'sorting_fields',
-                    'placeholder' => 'dcterms:subject asc | Subject (asc)',
+                    'placeholder' => 'dcterms:subject asc = Subject (asc)',
                     'rows' => 12,
                 ],
             ])
@@ -385,12 +385,12 @@ class SearchPageConfigureForm extends Form
                     'label' => 'Available sort fields', // @translate
                     'info' => 'List of all available sort fields, among which some can be copied above.', // @translate
                     'as_key_value' => true,
-                    'key_value_separator' => '|',
+                    'key_value_separator' => '=',
                 ],
                 'attributes' => [
                     'id' => 'sorting_available_sort_fields',
                     'value' => $this->getAvailableSortFields(),
-                    'placeholder' => 'dcterms:subject asc | Subject (asc)',
+                    'placeholder' => 'dcterms:subject asc = Subject (asc)',
                     'rows' => 12,
                 ],
             ]);
@@ -408,19 +408,19 @@ class SearchPageConfigureForm extends Form
                 ],
             ])
             ->get('facet')
-            // field (term) | label (order means weight).
+            // field (term) = label (order means weight).
             ->add([
                 'name' => 'facets',
                 'type' => ArrayTextarea::class,
                 'options' => [
                     'label' => 'List of facets', // @translate
-                    'info' => 'List of facets that will be displayed in the search page. Format is "field | Label".', // @translate
+                    'info' => 'List of facets that will be displayed in the search page. Format is "field = Label".', // @translate
                     'as_key_value' => true,
-                    'key_value_separator' => '|',
+                    'key_value_separator' => '=',
                 ],
                 'attributes' => [
                     'id' => 'facetting_facets',
-                    'placeholder' => 'dcterms:subject | Subjects',
+                    'placeholder' => 'dcterms:subject = Subjects',
                     'rows' => 12,
                 ],
             ])
@@ -431,12 +431,12 @@ class SearchPageConfigureForm extends Form
                     'label' => 'Available facets', // @translate
                     'info' => 'List of all available facets, among which some can be copied above.', // @translate
                     'as_key_value' => true,
-                    'key_value_separator' => '|',
+                    'key_value_separator' => '=',
                 ],
                 'attributes' => [
                     'id' => 'facetting_available_facets',
                     'value' => $this->getAvailableFacetFields(),
-                    'placeholder' => 'dcterms:subject | Subjects',
+                    'placeholder' => 'dcterms:subject = Subjects',
                     'rows' => 12,
                 ],
             ])
@@ -459,12 +459,12 @@ class SearchPageConfigureForm extends Form
                 'type' => ArrayText::class,
                 'options' => [
                     'label' => 'Get facets from specific languages', // @translate
-                    'info' => 'Generally, facets are translated in the view, but in some cases, facet values may be translated directly in a multivalued property. Use "|" to separate multiple languages. Use "||" for values without language. When fields with languages (like subjects) and fields without language (like date) are facets, the empty language must be set to get results.', // @translate
+                    'info' => 'Generally, facets are translated in the view, but in some cases, facet values may be translated directly in a multivalued property. Use "|" to separate multiple languages. Use a trailing "|" for values without language. When fields with languages (like subjects) and fields without language (like date) are facets, the empty language must be set to get results.', // @translate
                     'value_separator' => '|',
                 ],
                 'attributes' => [
                     'id' => 'facetting_languages',
-                    'placeholder' => 'fra|way|apy||',
+                    'placeholder' => 'fra|way|apy|',
                 ],
             ])
             ->add([

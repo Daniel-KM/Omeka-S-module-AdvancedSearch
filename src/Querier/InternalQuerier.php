@@ -329,6 +329,10 @@ class InternalQuerier extends AbstractQuerier
                     continue 2;
 
                 default:
+                    $name = $this->underscoredNameToTerm($name);
+                    if (!$name) {
+                        break;
+                    }
                     foreach ($values as $value) {
                         // Use "or" when multiple (checkbox), else "and" (radio).
                         if (is_array($value)) {
@@ -357,6 +361,10 @@ class InternalQuerier extends AbstractQuerier
         /*
         $dateRangeFilters = $this->query->getFiltersDateRange();
         foreach ($dateRangeFilters as $name => $filterValues) {
+            $name = $this->underscoredNameToTerm($name);
+            if (!$name) {
+                continue;
+            }
             foreach ($filterValues as $filterValue) {
                 $start = $filterValue['start'] ? $filterValue['start'] : '*';
                 $end = $filterValue['end'] ? $filterValue['end'] : '*';
@@ -378,6 +386,10 @@ class InternalQuerier extends AbstractQuerier
 
         $filters = $this->query->getFilterQueries();
         foreach ($filters as $name => $values) {
+            $name = $this->underscoredNameToTerm($name);
+            if (!$name) {
+                continue;
+            }
             foreach ($values as $value) {
                 $this->args['property'][] = [
                     'joiner' => $value['join'],
@@ -387,6 +399,41 @@ class InternalQuerier extends AbstractQuerier
                 ];
             }
         }
+    }
+
+    /**
+     * Convert a name with an underscore into a standard term.
+     *
+     * Manage dcterms_subject_ss, ss_dcterms_subject, etc. from specific search
+     * forms, so they can be used with the internal querier without change.
+     *
+     * Note: some properties use "_" in their name.
+     */
+    protected function underscoredNameToTerm($name): ?string
+    {
+        static $underscoredTerms;
+        static $underscoredTermsRegex;
+
+        // Quick check for adapted forms.
+        $name = (string) $name;
+        if (strpos($name, ':') || !strpos($name, '_')) {
+            return $name;
+        }
+
+        // A common name.
+        if ($name === 'title') {
+            return 'dcterms:title';
+        }
+
+        if (is_null($underscoredTerms)) {
+            $underscoredTerms = $this->getUnderscoredUsedProperties();
+            $underscoredTermsRegex = '~(?:' . implode('|', array_keys($underscoredTerms)) . '){1}~';
+        }
+
+        $matches = [];
+        return preg_match($underscoredTermsRegex, $name, $matches, PREG_UNMATCHED_AS_NULL) && count($matches) === 1
+            ? reset($matches)
+            : null;
     }
 
     protected function facetResponse(array $facetData): void
@@ -454,6 +501,34 @@ class InternalQuerier extends AbstractQuerier
     }
 
     /**
+     * Get the list of vocabulary prefixes by vocabulary ids.
+     */
+    protected function getVocabularyPrefixes(): array
+    {
+        static $vocabularies;
+
+        if (is_null($vocabularies)) {
+            /** @var \Doctrine\DBAL\Connection $connection */
+            $connection = $this->getServiceLocator()->get('Omeka\Connection');
+            $qb = $connection->createQueryBuilder();
+            $qb
+                ->select([
+                    'vocabulary.id AS id',
+                    'vocabulary.prefix AS prefix',
+                ])
+                ->from('vocabulary', 'vocabulary')
+                ->orderBy('vocabulary.id)', 'ASC')
+            ;
+            $stmt = $connection->executeQuery($qb);
+            // Fetch by key pair is not supported by doctrine 2.0.
+            $vocabularies = $stmt->fetchAll(\Doctrine\DBAL\FetchMode::COLUMN);
+            $vocabularies = array_column($vocabularies, 'prefix', 'id');
+        }
+
+        return $vocabularies;
+    }
+
+    /**
      * Convert a list of terms into a list of property ids.
      *
      * @see \Reference\Mvc\Controller\Plugin\References::listPropertyIds()
@@ -484,21 +559,55 @@ class InternalQuerier extends AbstractQuerier
             $connection = $this->getServiceLocator()->get('Omeka\Connection');
             $qb = $connection->createQueryBuilder();
             $qb
-                ->select([
-                    'DISTINCT property.id AS id',
-                    "CONCAT(vocabulary.prefix, ':', property.local_name) AS term",
-                    // 'COUNT(value.id) AS total',
-                ])
-                ->from('property', 'property')
-                ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
-                ->innerJoin('property', 'value', 'value', 'property.id = value.property_id')
-                ->addGroupBy('id')
-                ->orderBy('COUNT(value.id)', 'DESC')
+            ->select([
+                'DISTINCT property.id AS id',
+                "CONCAT(vocabulary.prefix, ':', property.local_name) AS term",
+                // 'COUNT(value.id) AS total',
+            ])
+            ->from('property', 'property')
+            ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
+            ->innerJoin('property', 'value', 'value', 'property.id = value.property_id')
+            ->addGroupBy('id')
+            ->orderBy('COUNT(value.id)', 'DESC')
             ;
             $stmt = $connection->executeQuery($qb);
             // Fetch by key pair is not supported by doctrine 2.0.
             $properties = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             $properties = array_column($properties, 'term', 'id');
+        }
+
+        return $properties;
+    }
+
+    /**
+     * Get all property terms as terms with "_".
+     *
+     * This allows to convert some Solr keys like "dcterms_subject_ss" into a
+     * standard term manageable by the standard api.
+     *
+     * @return array Associative array of used term by terms with "_".
+     */
+    protected function getUnderscoredUsedProperties()
+    {
+        static $properties;
+
+        if (is_null($properties)) {
+            /** @var \Doctrine\DBAL\Connection $connection */
+            $connection = $this->getServiceLocator()->get('Omeka\Connection');
+            $qb = $connection->createQueryBuilder();
+            $qb
+                ->select([
+                    "CONCAT(vocabulary.prefix, '_', property.local_name) AS key",
+                    "CONCAT(vocabulary.prefix, ':', property.local_name) AS term",
+                ])
+                ->from('property', 'property')
+                ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
+                ->innerJoin('property', 'value', 'value', 'property.id = value.property_id')
+            ;
+            $stmt = $connection->executeQuery($qb);
+            // Fetch by key pair is not supported by doctrine 2.0.
+            $properties = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $properties = array_column($properties, 'term', 'key');
         }
 
         return $properties;

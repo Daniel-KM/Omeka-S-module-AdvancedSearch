@@ -53,6 +53,14 @@ class MainSearchForm extends Form
 
     public function init(): void
     {
+        // The id is different from the Omeka search to avoid issues in js. The
+        // css should be adapted.
+        $this
+            ->setAttributes([
+                'id' => 'form-search',
+                'class' => 'form-search',
+            ]);
+
         // Omeka adds a csrf automatically in \Omeka\Form\Initializer\Csrf.
         // Remove the csrf, because it is useless for a search form and the url
         // is not copiable (see the core search form that doesn't use it).

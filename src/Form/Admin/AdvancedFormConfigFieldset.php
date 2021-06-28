@@ -188,7 +188,7 @@ class AdvancedFormConfigFieldset extends Fieldset
                 'attributes' => [
                     'id' => 'filter_collection_number',
                     'required' => false,
-                    'value' => '1',
+                    'value' => '5',
                     'min' => '0',
                     // A mysql query supports 61 arguments maximum.
                     'max' => '49',

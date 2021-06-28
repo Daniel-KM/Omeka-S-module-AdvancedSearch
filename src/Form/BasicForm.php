@@ -51,7 +51,7 @@ class BasicForm extends Form
         $this
             ->add([
                 'name' => 'q',
-                'type' => Element\Text::class,
+                'type' => Element\Search::class,
                 'options' => [
                     'label' => 'Search', // @translate
                 ],

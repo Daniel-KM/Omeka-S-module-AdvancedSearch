@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * Copyright Daniel Berthereau 2018-2020
+ * Copyright Daniel Berthereau 2018-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -36,6 +36,9 @@ use Omeka\Form\Element\ResourceClassSelect;
 use Omeka\Form\Element\ResourceTemplateSelect;
 use Omeka\View\Helper\Setting;
 
+/**
+ * @todo Remove distinction between advanced and basic form: they are just a list of elements.
+ */
 class AdvancedForm extends BasicForm
 {
     /**
@@ -57,6 +60,26 @@ class AdvancedForm extends BasicForm
         /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
         $searchPage = $this->getOption('search_page');
         $searchPageSettings = $searchPage ? $searchPage->settings() : [];
+
+        $defaultFieldsOrder = [
+            'q',
+            'itemSet',
+            'resourceClass',
+            'resourceTemplate',
+            'text',
+            'submit',
+        ];
+        if (empty($searchPageSettings['form']['fields_order'])) {
+            $fieldsOrder = $defaultFieldsOrder;
+        } else {
+            // Set the required fields.
+            $fieldsOrder = array_unique(array_merge(array_values($searchPageSettings['form']['fields_order']) + ['q', 'submit']));
+            // Replace "filters" that is a sub-fieldset of "text".
+            $index = array_search('filters', $fieldsOrder);
+            if ($index !== false) {
+                $fieldsOrder[$index] = 'text';
+            }
+        }
 
         $appendItemSetFieldset = !empty($searchPageSettings['form']['item_set_filter_type'])
             && !empty($searchPageSettings['form']['item_set_id_field']);
@@ -96,6 +119,14 @@ class AdvancedForm extends BasicForm
                 ],
             ])
         ;
+
+        // When a priority is set, elements are always first, so reverse the
+        // list and set a high priority.
+        foreach (array_reverse($fieldsOrder) as $index => $elementOrFieldset) {
+            if ($this->has($elementOrFieldset)) {
+                $this->setPriority($elementOrFieldset, $index + 10000);
+            }
+        }
 
         $inputFilter = $this->getInputFilter();
         if ($appendItemSetFieldset) {
@@ -171,12 +202,24 @@ class AdvancedForm extends BasicForm
                 'empty_option' => '',
                 // TODO Manage list of resource classes by site.
                 'used_terms' => true,
+                'disable_group_by_vocabulary' => $filterType === 'select_flat',
             ]);
 
-        if ($filterType === 'select_flat') {
+        /** @deprecated (Omeka v3.1): use option "disable_group_by_vocabulary" */
+        if ($filterType === 'select_flat'
+            && version_compare(\Omeka\Module::VERSION, '3.1', '<')
+        ) {
             $valueOptions = $element->getValueOptions();
             $result = [];
-            foreach ($valueOptions as $vocabulary) {
+            foreach ($valueOptions as $name => $vocabulary) {
+                if (!is_array($vocabulary)) {
+                    $result[$name] = $vocabulary;
+                    continue;
+                }
+                if (empty($vocabulary['options'])) {
+                    $result[$vocabulary['value']] = $vocabulary['label'];
+                    continue;
+                }
                 foreach ($vocabulary['options'] as $term) {
                     $result[$term['value']] = $term['label'];
                 }

@@ -150,6 +150,9 @@ class SearchPageController extends AbstractActionController
         return $this->redirect()->toRoute('admin/search');
     }
 
+    /**
+     * @fixme Simplify to use a normal search config form with integrated elements checks.
+     */
     public function configureAction()
     {
         $entityManager = $this->getEntityManager();
@@ -202,9 +205,10 @@ class SearchPageController extends AbstractActionController
             ? $this->extractSimpleFields($searchPage)
             : $this->extractFullFields();
 
-        // TODO Check simple fields.
+        // TODO Check simple fields with normal way.
         $form->setData($params);
-        if (!$isSimple && !$form->isValid()) {
+        // The validation should occurs in all cases.
+        if (!$form->isValid() && !$isSimple) {
             $messages = $form->getMessages();
             if (isset($messages['csrf'])) {
                 $this->messenger()->addError('Invalid or missing CSRF token'); // @translate
@@ -217,11 +221,19 @@ class SearchPageController extends AbstractActionController
         // TODO Why the fieldset "form" is removed from the params? Add an intermediate fieldset? Check if it is still the case.
         $formParams = $params['form'] ?? [];
         // TODO Check simple fields.
-        if (!$isSimple) {
+        if ($isSimple) {
+            $checkedParams = $form->getData();
+            $formParams['fields_order'] = $checkedParams['form']['fields_order'] ?? null;
+        } else {
             $params = $form->getData();
         }
         $params['form'] = $formParams;
+
         unset($params['csrf']);
+        unset($params['available_filters']);
+        unset($params['available_fields_order']);
+        unset($params['form']['available_filters']);
+        unset($params['form']['available_fields_order']);
 
         $params['default_query'] = trim($params['default_query'], "? \t\n\r\0\x0B");
 
@@ -246,7 +258,7 @@ class SearchPageController extends AbstractActionController
             if (empty($params[$type])) {
                 continue;
             }
-            // Sort enabled first, then available, else sort by weigth.
+            // Sort enabled first, then available, else sort by weight.
             uasort($params[$type], [$this, 'sortByEnabledFirst']);
         }
 
@@ -454,7 +466,6 @@ class SearchPageController extends AbstractActionController
         $adapter = $index->adapter();
 
         $params = $this->getRequest()->getPost()->toArray();
-
         unset($params['fieldsets']);
         unset($params['form_class']);
         unset($params['available_facets']);

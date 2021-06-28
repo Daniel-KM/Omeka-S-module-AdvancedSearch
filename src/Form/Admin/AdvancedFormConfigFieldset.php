@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * Copyright Daniel Berthereau 2018-2020
+ * Copyright Daniel Berthereau 2018-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -31,12 +31,23 @@ namespace Search\Form\Admin;
 
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
+use Omeka\Form\Element\ArrayTextarea;
 
 class AdvancedFormConfigFieldset extends Fieldset
 {
     public function init(): void
     {
         $fieldOptions = $this->getFieldsOptions();
+
+        // TODO Simplify the form with js, storing the whole form one time. See UserProfile and https://docs.laminas.dev/laminas-form/v3/form-creation/creation-via-factory/
+        $orderElements = [
+            'q',
+            'itemSet',
+            'resourceClass',
+            'resourceTemplate',
+            'filters',
+            'submit',
+        ];
 
         // These fields may be overridden by the available fields.
         $specialOptions = [
@@ -228,6 +239,35 @@ class AdvancedFormConfigFieldset extends Fieldset
                     'value' => $this->getFieldsOptionsAsText(),
                     'placeholder' => 'dcterms:title | Title',
                     'rows' => 12,
+                ],
+            ])
+
+            ->add([
+                'name' => 'fields_order',
+                'type' => ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Order of fields', // @translate
+                    'info' => 'List of elements that will be displayed in the search form. Only existing fields will be used.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'fields_order',
+                    'value' => $orderElements,
+                    'placeholder' => implode("\n", $orderElements) . "\n",
+                    'rows' => 6,
+                ],
+            ])
+            ->add([
+                'name' => 'available_fields_order',
+                'type' => ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Available fields to order on the form', // @translate
+                    'info' => 'List of all available elements, among which some can be copied above.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'available_fields_order',
+                    'value' => $orderElements,
+                    'placeholder' => implode("\n", $orderElements) . "\n",
+                    'rows' => 6,
                 ],
             ])
         ;

@@ -50,6 +50,7 @@ return [
             Form\Element\ArrayText::class => Form\Element\ArrayText::class,
             Form\Element\OptionalMultiCheckbox::class => Form\Element\OptionalMultiCheckbox::class,
             Form\Element\OptionalSelect::class => Form\Element\OptionalSelect::class,
+            Form\Element\OptionalUrl::class => Form\Element\OptionalUrl::class,
         ],
         'factories' => [
             Form\Admin\ApiFormConfigFieldset::class => Service\Form\ApiFormConfigFieldsetFactory::class,

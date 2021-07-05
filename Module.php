@@ -1288,6 +1288,9 @@ class Module extends AbstractModule
      * @link https://mariadb.com/kb/en/datetime/
      * @see \NumericDataTypes\DataType\AbstractDateTimeDataType::getDateTimeFromValue()
      *
+     * Allow mysql datetime too, not only iso 8601 (so with a space, not only a
+     * "T" to separate date and time).
+     *
      * @param string $value
      * @param bool $defaultFirst
      * @return array|null
@@ -1298,7 +1301,7 @@ class Module extends AbstractModule
         // $yearMax = 292277026595;
         $yearMin = 1000;
         $yearMax = 9999;
-        $patternIso8601 = '^(?<date>(?<year>-?\d{4,})(-(?<month>\d{1,2}))?(-(?<day>\d{1,2}))?)(?<time>(T(?<hour>\d{1,2}))?(:(?<minute>\d{1,2}))?(:(?<second>\d{1,2}))?)(?<offset>((?<offset_hour>[+-]\d{1,2})?(:(?<offset_minute>\d{1,2}))?)|Z?)$';
+        $patternIso8601 = '^(?<date>(?<year>-?\d{4,})(-(?<month>\d{1,2}))?(-(?<day>\d{1,2}))?)(?<time>((?:T| )(?<hour>\d{1,2}))?(:(?<minute>\d{1,2}))?(:(?<second>\d{1,2}))?)(?<offset>((?<offset_hour>[+-]\d{1,2})?(:(?<offset_minute>\d{1,2}))?)|Z?)$';
         static $dateTimes = [];
 
         $firstOrLast = $defaultFirst ? 'first' : 'last';

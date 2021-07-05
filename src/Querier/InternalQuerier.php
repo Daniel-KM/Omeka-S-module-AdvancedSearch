@@ -145,6 +145,21 @@ class InternalQuerier extends AbstractQuerier
             'value_length' => \PDO::PARAM_INT,
         ];
 
+        $fields = $this->query->getSuggestFields();
+        if ($fields) {
+            $ids = $this->listPropertyIds($fields);
+            if (!$ids) {
+                // Searching inside non-existing properties outputs no result.
+                return $this->response
+                   ->setIsSuccess(true);
+            }
+            $sqlFields = 'AND `value`.`property_id` IN (:property_ids)';
+            $bind['property_ids'] = $this->listPropertyIds($fields);
+            $types['property_ids'] = $connection::PARAM_INT_ARRAY;
+        } else {
+            $sqlFields = '';
+        }
+
         if ($this->query->getSuggestMode() === 'contain') {
             // $bind['value'] = $q;
             // $bind['value_like'] = '%' . str_replace(['%', '_'], ['\%', '\_'], $q) . '%';
@@ -161,6 +176,7 @@ FROM `value` AS `value`
 INNER JOIN `resource` ON `resource`.`id` = `value`.`resource_id`
 WHERE `resource`.`resource_type` IN ($classes)
     $sqlIsPublic
+    $sqlFields
     AND `value`.`value` LIKE :value_like
 GROUP BY SUBSTRING(`value`.`value`, 1, LOCATE(" ", CONCAT(`value`.`value`, " "), :value_length))
 ORDER BY data DESC
@@ -169,6 +185,7 @@ LIMIT :limit
 SQL;
             $bind['value_like'] = str_replace(['%', '_'], ['\%', '\_'], $q) . '%';
         }
+
         try {
             $results = $connection
                 ->executeQuery($sql, $bind, $types)
@@ -641,9 +658,6 @@ SQL;
      */
     protected function listPropertyIds(array $values): array
     {
-        $values = array_filter(array_map(function ($term) {
-            return $this->isTerm($term) ? $term : null;
-        }, $values));
         return array_intersect_key($this->getPropertyIds(), array_fill_keys($values, null));
     }
 
@@ -718,7 +732,7 @@ SQL;
     /**
      * Get all property ids by term.
      *
-     * @see \Reference\Mvc\Controller\Plugin\References::getPropertyIds()
+     * @see \BulkImport\Mvc\Controller\Plugin\Bulk::getPropertyIds()
      *
      * @return array Associative array of ids by term.
      */
@@ -727,25 +741,22 @@ SQL;
         static $properties;
 
         if (is_null($properties)) {
-            /** @var \Doctrine\ORM\EntityManager $entityManager */
-            $entityManager = $this->getServiceLocator()->get('Omeka\EntityManager');
-            $qb = $entityManager->createQueryBuilder();
-            $expr = $qb->expr();
+            /** @var \Doctrine\DBAL\Connection $connection */
+            $connection = $this->getServiceLocator()->get('Omeka\Connection');
+            $qb = $connection->createQueryBuilder();
             $qb
                 ->select([
-                    "CONCAT(vocabulary.prefix, ':', property.localName) AS term",
+                    'CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
                     'property.id AS id',
                 ])
-                ->from(\Omeka\Entity\Property::class, 'property')
-                ->innerJoin(
-                    \Omeka\Entity\Vocabulary::class,
-                    'vocabulary',
-                    \Doctrine\ORM\Query\Expr\Join::WITH,
-                    $expr->eq('vocabulary.id', 'property.vocabulary')
-                )
+                ->from('property', 'property')
+                ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
+                ->orderBy('vocabulary.id', 'asc')
+                ->addOrderBy('property.id', 'asc')
+                ->addGroupBy('property.id')
             ;
-
-            $properties = $qb->getQuery()->getScalarResult();
+            $stmt = $connection->executeQuery($qb);
+            $properties = $stmt->fetchAll(\PDO::FETCH_KEY_PAIR);
             $properties = array_map('intval', $properties);
         }
 

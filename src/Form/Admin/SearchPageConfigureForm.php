@@ -35,6 +35,7 @@ use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
 use Omeka\Form\Element\ArrayTextarea;
 use Search\Form\Element\ArrayText;
+use Search\Form\Element\OptionalSelect;
 use Search\Form\Element\OptionalUrl;
 
 class SearchPageConfigureForm extends Form
@@ -156,6 +157,21 @@ class SearchPageConfigureForm extends Form
                     'id' => 'autosuggest_mode',
                     'required' => false,
                     'value' => 'start',
+                ],
+            ])
+            ->add([
+                'name' => 'fields',
+                'type' => OptionalSelect::class,
+                'options' => [
+                    'label' => 'Limit query to specific fields', // @translate
+                    'value_options' => $availableFields,
+                    'empty_value' => '',
+                ],
+                'attributes' => [
+                    'id' => 'autosuggest_fields',
+                    'multiple' => true,
+                    'class' => 'chosen-select',
+                    'data-placeholder' => ' ', // @translate
                 ],
             ])
             ->add([

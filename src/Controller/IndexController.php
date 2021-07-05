@@ -270,7 +270,7 @@ class IndexController extends AbstractActionController
         $searchPageSettings = $searchPage->settings();
         $searchFormSettings = $searchPageSettings['form'] ?? [];
 
-        $autosuggestMode = $searchPage->subSetting('autosuggest', 'mode');
+        $autosuggestSettings = $searchPage->setting('autosuggest', []);
 
         /** @var \Search\Query $query */
         $query = $formAdapter->toQuery(['q' => $q], $searchFormSettings);
@@ -299,7 +299,8 @@ class IndexController extends AbstractActionController
         $query
             ->setResources($indexSettings['resources'])
             ->setLimitPage(1, 100)
-            ->setSuggestMode($autosuggestMode);
+            ->setSuggestMode($autosuggestSettings['mode'] ?? 'start')
+            ->setSuggestFields($autosuggestSettings['fields'] ?? []);
 
         /** @var \Search\Querier\QuerierInterface $querier */
         $querier = $searchIndex

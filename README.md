@@ -12,7 +12,7 @@ Furthermore, it provides a common interface for other modules to extend it
 
 Here is a live example:
 
-![example of search page](data/images/search_page.png))
+![example of search page](data/images/search_page.png)
 
 It can be extended in two ways:
 
@@ -322,5 +322,5 @@ library of [Campus Condorcet].
 [BibLibre]: https://github.com/biblibre
 [GitLab]: https://gitlab.com/Daniel-KM
 [digital library of PSL]: https://bibnum.explore.univ-psl.fr
-[campus Condorct]: https://www.campus-condorcet.fr
+[Campus Condorcet]: https://www.campus-condorcet.fr
 [Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"

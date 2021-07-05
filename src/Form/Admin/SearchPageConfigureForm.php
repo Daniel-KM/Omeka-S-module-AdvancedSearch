@@ -35,6 +35,7 @@ use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
 use Omeka\Form\Element\ArrayTextarea;
 use Search\Form\Element\ArrayText;
+use Search\Form\Element\OptionalUrl;
 
 class SearchPageConfigureForm extends Form
 {
@@ -118,6 +119,16 @@ class SearchPageConfigureForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'default_query',
+                ],
+            ])
+            ->add([
+                'name' => 'autosuggest_url',
+                'type' => OptionalUrl::class,
+                'options' => [
+                    'label' => 'Optional url for auto-suggest', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'autosuggest_url',
                 ],
             ])
         ;

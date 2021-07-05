@@ -53,6 +53,11 @@ interface QuerierInterface extends LoggerAwareInterface
     public function query(): Response;
 
     /**
+     * Process a search query for suggestions.
+     */
+    public function querySuggestions(): Response;
+
+    /**
      * Prepare a search query.
      *
      * @return mixed|null The query formatted for this specific search engine.

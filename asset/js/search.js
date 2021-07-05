@@ -102,6 +102,28 @@ $(document).ready(function() {
     }
     $('.search-view-type-' + view_type).click();
 
+    if ($.isFunction($.fn.autocomplete)
+        && $('.autosuggest[name=q]').data('autosuggest-url')
+    ) {
+        let suggestUrl = $('.autosuggest[name=q]').data('autosuggest-url');
+        console.log(suggestUrl);
+        $('.autosuggest[name=q]').autocomplete({
+            serviceUrl: suggestUrl.charAt(0) === '/' ? window.location.origin + suggestUrl : suggestUrl,
+            dataType: 'json',
+            paramName: 'q',
+            transformResult: function(response) {
+                return response.data;
+            },
+            onSearchError: function(query, jqXHR, textStatus, errorThrown) {
+                if (jqXHR.responseJson && jqXHR.responseJson.message) {
+                    console.log(jqXHR.responseJson.message);
+                } else {
+                    console.log(errorThrown)
+                }
+            },
+        });
+    }
+
     if ($.isFunction($.fn.chosen)) {
         /**
          * Chosen default options.

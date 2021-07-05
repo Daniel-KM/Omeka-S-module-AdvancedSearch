@@ -4,30 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1dad11916f2e865b3f713e103f06d3a7",
+    "content-hash": "afc2bb701975b6c931519ab404b57648",
     "packages": [
         {
-            "name": "components/jqueryui",
-            "version": "1.12.1",
-            "dist": {
-                "type": "tar",
-                "url": "https://github.com/components/jqueryui/archive/refs/tags/1.12.1.tar.gz",
-                "reference": "1.12.1"
-            },
-            "type": "omeka-addon-asset"
-        },
-        {
             "name": "composer/installers",
-            "version": "v1.10.0",
+            "version": "v1.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/installers.git",
-                "reference": "1a0357fccad9d1cc1ea0c9a05b8847fbccccb78d"
+                "reference": "ae03311f45dfe194412081526be2e003960df74b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/installers/zipball/1a0357fccad9d1cc1ea0c9a05b8847fbccccb78d",
-                "reference": "1a0357fccad9d1cc1ea0c9a05b8847fbccccb78d",
+                "url": "https://api.github.com/repos/composer/installers/zipball/ae03311f45dfe194412081526be2e003960df74b",
+                "reference": "ae03311f45dfe194412081526be2e003960df74b",
                 "shasum": ""
             },
             "require": {
@@ -121,6 +111,7 @@
                 "majima",
                 "mako",
                 "mediawiki",
+                "miaoxing",
                 "modulework",
                 "modx",
                 "moodle",
@@ -138,6 +129,7 @@
                 "sydes",
                 "sylius",
                 "symfony",
+                "tastyigniter",
                 "typo3",
                 "wordpress",
                 "yawik",
@@ -146,7 +138,7 @@
             ],
             "support": {
                 "issues": "https://github.com/composer/installers/issues",
-                "source": "https://github.com/composer/installers/tree/v1.10.0"
+                "source": "https://github.com/composer/installers/tree/v1.11.0"
             },
             "funding": [
                 {
@@ -162,7 +154,17 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-01-14T11:07:16+00:00"
+            "time": "2021-04-28T06:42:17+00:00"
+        },
+        {
+            "name": "devbridge/jquery-autocomplete",
+            "version": "1.4.11",
+            "dist": {
+                "type": "file",
+                "url": "https://github.com/devbridge/jQuery-Autocomplete/raw/master/dist/jquery.autocomplete.min.js",
+                "reference": ""
+            },
+            "type": "omeka-addon-asset"
         },
         {
             "name": "oomphinc/composer-installers-extender",

@@ -37,6 +37,11 @@ class NoopQuerier implements QuerierInterface
         return new Response;
     }
 
+    public function querySuggestions(): Response
+    {
+        return new Response;
+    }
+
     public function getPreparedQuery()
     {
         return null;

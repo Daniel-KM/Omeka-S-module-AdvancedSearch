@@ -249,57 +249,91 @@ class Module extends AbstractModule
         }
 
         $api = $services->get('Omeka\ApiManager');
-        /** @var \Search\Api\Representation\SearchPageRepresentation[] $api */
-        $pages = $api->search('search_pages')->getContent();
+        /** @var \Search\Api\Representation\SearchPageRepresentation[] $searchPages */
+        $searchPages = $api->search('search_pages')->getContent();
 
         $isAdminRequest = $status->isAdminRequest();
         if ($isAdminRequest) {
             $settings = $services->get('Omeka\Settings');
             $adminSearchPages = $settings->get('search_pages', []);
-            foreach ($pages as $page) {
-                $pageId = $page->id();
-                if (in_array($pageId, $adminSearchPages)) {
+            foreach ($searchPages as $searchPage) {
+                $searchPageId = $searchPage->id();
+                if (in_array($searchPageId, $adminSearchPages)) {
                     $router->addRoute(
-                        'search-admin-page-' . $pageId,
+                        'search-admin-page-' . $searchPageId,
                         [
                             'type' => \Laminas\Router\Http\Segment::class,
                             'options' => [
-                                'route' => '/admin/' . $page->path(),
+                                'route' => '/admin/' . $searchPage->path(),
                                 'defaults' => [
                                     '__NAMESPACE__' => 'Search\Controller',
                                     '__ADMIN__' => true,
                                     'controller' => \Search\Controller\IndexController::class,
                                     'action' => 'search',
-                                    'id' => $pageId,
+                                    'id' => $searchPageId,
                                 ],
                             ],
-                        ]
+                            'may_terminate' => true,
+                            'child_routes' => [
+                                'suggest' => [
+                                    'type' => \Laminas\Router\Http\Literal::class,
+                                    'options' => [
+                                        'route' => '/suggest',
+                                        'defaults' => [
+                                            '__NAMESPACE__' => 'Search\Controller',
+                                            '__ADMIN__' => true,
+                                            'controller' => \Search\Controller\IndexController::class,
+                                            'action' => 'suggest',
+                                            'id' => $searchPageId,
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
                     );
                 }
             }
         }
 
         // Public search pages are required to manage them at site level.
-        foreach ($pages as $page) {
-            $pageId = $page->id();
-            $pageSlug = $page->path();
+        foreach ($searchPages as $searchPage) {
+            $searchPageId = $searchPage->id();
+            $searchPageSlug = $searchPage->path();
             $router->addRoute(
-                'search-page-' . $pageId,
+                'search-page-' . $searchPageId,
                 [
                     'type' => \Laminas\Router\Http\Segment::class,
                     'options' => [
-                        'route' => '/s/:site-slug/' . $pageSlug,
+                        'route' => '/s/:site-slug/' . $searchPageSlug,
                         'defaults' => [
                             '__NAMESPACE__' => 'Search\Controller',
                             '__SITE__' => true,
                             'controller' => \Search\Controller\IndexController::class,
                             'action' => 'search',
-                            'id' => $pageId,
+                            'id' => $searchPageId,
                             // Store the page slug to simplify checks.
-                            'page-slug' => $pageSlug,
+                            'page-slug' => $searchPageSlug,
                         ],
                     ],
-                ]
+                    'may_terminate' => true,
+                    'child_routes' => [
+                        'suggest' => [
+                            'type' => \Laminas\Router\Http\Literal::class,
+                            'options' => [
+                                'route' => '/suggest',
+                                'defaults' => [
+                                    '__NAMESPACE__' => 'Search\Controller',
+                                    '__SITE__' => true,
+                                    'controller' => \Search\Controller\IndexController::class,
+                                    'action' => 'suggest',
+                                    'id' => $searchPageId,
+                                    // Store the page slug to simplify checks.
+                                    'page-slug' => $searchPageSlug,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
             );
         }
     }

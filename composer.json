@@ -1,6 +1,6 @@
 {
     "name": "daniel-km/omeka-s-module-search",
-    "description": "Add improved search capabilities to Omeka S.",
+    "description": "Add improved search capabilities to Omeka S: auto-suggest, filters, facets, etc.",
     "type": "library",
     "license": "CECILL-2.1",
     "authors": [
@@ -21,6 +21,8 @@
         "Omeka S",
         "Omeka S module",
         "search",
+        "auto-suggestion",
+        "filter",
         "facet",
         "solr"
     ],
@@ -28,23 +30,20 @@
         {
             "type": "package",
             "package": {
-                "name": "components/jqueryui",
-                "version": "1.12.1",
+                "name": "devbridge/jquery-autocomplete",
+                "version": "1.4.11",
                 "type": "omeka-addon-asset",
                 "dist": {
-                    "type": "tar",
-                    "url": "https://github.com/components/jqueryui/archive/refs/tags/1.12.1.tar.gz",
-                    "reference": "1.12.1"
+                    "type": "file",
+                    "url": "https://github.com/devbridge/jQuery-Autocomplete/raw/master/dist/jquery.autocomplete.min.js",
+                    "reference": ""
                 }
             }
         }
     ],
     "require": {
         "oomphinc/composer-installers-extender": "^2.0",
-        "components/jqueryui": "1.12.1"
-    },
-    "replace": {
-        "components/jquery": "*"
+        "devbridge/jquery-autocomplete": "1.4.11"
     },
     "require-dev": {
         "biblibre/omeka-s-test-helper": "dev-master"

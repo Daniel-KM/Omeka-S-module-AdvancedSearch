@@ -97,6 +97,12 @@ class InternalQuerier extends AbstractQuerier
             ->setIsSuccess(true);
     }
 
+    public function querySuggestions(): Response
+    {
+        return (new Response)
+            ->setMessage('Suggestions are not implemented'); // @translate
+    }
+
     /**
      * @return array|null Arguments for the Omeka api, or null if unprocessable
      * or empty results.

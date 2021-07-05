@@ -33,7 +33,10 @@ namespace Search\Controller;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
+use Omeka\Api\Representation\SiteRepresentation;
+use Omeka\Stdlib\Message;
 use Search\Api\Representation\SearchPageRepresentation;
+use Search\Querier\Exception\QuerierException;
 use Search\Query;
 use Search\Response;
 
@@ -171,6 +174,135 @@ class IndexController extends AbstractActionController
         return $view
             ->setVariables($result['data'], true)
             ->setVariable('searchPage', $searchPage);
+    }
+
+    public function suggestAction()
+    {
+        if (!$this->getRequest()->isXmlHttpRequest()) {
+            return new JsonModel([
+                'status' => 'error',
+                'message' => 'This action requires an ajax request.', // @translate
+            ]);
+        }
+
+        $pageId = (int) $this->params('id');
+
+        $isPublic = $this->status()->isSiteRequest();
+        if ($isPublic) {
+            $site = $this->currentSite();
+            $siteSettings = $this->siteSettings();
+            $siteSearchPages = $siteSettings->get('search_pages', []);
+            if (!in_array($pageId, $siteSearchPages)) {
+                return new JsonModel([
+                    'status' => 'error',
+                    'message' => 'Not a search page for this site.', // @translate
+                ]);
+            }
+            // TODO Manage item set redirection.
+        } else {
+            $site = null;
+        }
+
+        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
+        $searchPage = $this->api()->read('search_pages', $pageId)->getContent();
+
+        /** @var \Search\FormAdapter\FormAdapterInterface $formAdapter */
+        $formAdapter = $searchPage->formAdapter();
+        if (!$formAdapter) {
+            return new JsonModel([
+                'status' => 'error',
+                'message' => 'The search page has no querier.', // @translate
+            ]);
+        }
+
+        $q = (string) $this->params()->fromQuery('q');
+        if (!strlen($q)) {
+            return new JsonModel([
+                'status' => 'success',
+                'data' => [
+                    'query' => '',
+                    'suggestions' => [],
+                ],
+            ]);
+        }
+
+        $response = $this->processQuerySuggestions($searchPage, $q, $site);
+        if (!$response) {
+            $this->getResponse()->setStatusCode(\Laminas\Http\Response::STATUS_CODE_500);
+            return new JsonModel([
+                'status' => 'error',
+                'message' => 'An error occurred.', // @translate
+            ]);
+        }
+
+        if (!$response->isSuccess()) {
+            $this->getResponse()->setStatusCode(\Laminas\Http\Response::STATUS_CODE_500);
+            return new JsonModel([
+                'status' => 'error',
+                'message' => $response->getMessage(),
+            ]);
+        }
+
+        /** @var \Search\Response $response */
+        return new JsonModel([
+            'status' => 'success',
+            'data' => [
+                'query' => $q,
+                'suggestions' => $response->getSuggestions(),
+            ],
+        ]);
+    }
+
+    protected function processQuerySuggestions(
+        SearchPageRepresentation $searchPage,
+        string $q,
+        ?SiteRepresentation $site
+    ): Response {
+        /** @var \Search\FormAdapter\FormAdapterInterface $formAdapter */
+        $formAdapter = $searchPage->formAdapter();
+        $searchPageSettings = $searchPage->settings();
+        $searchFormSettings = $searchPageSettings['form'] ?? [];
+
+        /** @var \Search\Query $query */
+        $query = $formAdapter->toQuery(['q' => $q], $searchFormSettings);
+
+        $searchIndex = $searchPage->index();
+        $indexSettings = $searchIndex->settings();
+
+        $user = $this->identity();
+        // TODO Manage roles from modules and visibility from modules (access resources).
+        $omekaRoles = [
+            \Omeka\Permissions\Acl::ROLE_GLOBAL_ADMIN,
+            \Omeka\Permissions\Acl::ROLE_SITE_ADMIN,
+            \Omeka\Permissions\Acl::ROLE_EDITOR,
+            \Omeka\Permissions\Acl::ROLE_REVIEWER,
+            \Omeka\Permissions\Acl::ROLE_AUTHOR,
+            \Omeka\Permissions\Acl::ROLE_RESEARCHER,
+        ];
+        if ($user && in_array($user->getRole(), $omekaRoles)) {
+            $query->setIsPublic(false);
+        }
+
+        if ($site) {
+            $query->setSiteId($site->id());
+        }
+
+        $query
+            ->setResources($indexSettings['resources'])
+            ->setLimitPage(1, 100);
+
+        /** @var \Search\Querier\QuerierInterface $querier */
+        $querier = $searchIndex
+            ->querier()
+            ->setQuery($query);
+        try {
+            return $querier->querySuggestions();
+        } catch (QuerierException $e) {
+            $message = new Message("Query error: %s\nQuery:%s", $e->getMessage(), json_encode($query->jsonSerialize(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)); // @translate
+            $this->logger()->err($message);
+            return (new Response)
+                ->setMessage($message);
+        }
     }
 
     /**

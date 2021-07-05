@@ -40,6 +40,11 @@ use Omeka\View\Helper\Setting;
 class MainSearchForm extends Form
 {
     /**
+     * @var string
+     */
+    protected $basePath;
+
+    /**
      * @var SiteRepresentation
      */
     protected $site;
@@ -74,6 +79,7 @@ class MainSearchForm extends Form
 
         /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
         $searchPage = $this->getOption('search_page');
+        // TODO Throw exception when search page is not set.
         $searchPageSettings = $searchPage ? $searchPage->settings() : [];
 
         $defaultFieldsOrder = [
@@ -108,6 +114,16 @@ class MainSearchForm extends Form
                 ],
             ])
         ;
+
+        if (!empty($searchPageSettings['search']['autosuggest'])) {
+            $autoSuggestUrl = empty($searchPageSettings['search']['autosuggest_url'])
+                // TODO Use url helper.
+                ? $this->basePath . ($this->site ? '/s/' . $this->site->slug() : '/admin') . '/' . ($searchPage ? $searchPage->path() : 'search') . '/suggest'
+                : $searchPageSettings['search']['autosuggest_url'];
+            $this->get('q')
+                ->setAttribute('class', 'autosuggest')
+                ->setAttribute('data-autosuggest-url', $autoSuggestUrl);
+        }
 
         $appendItemSetFieldset = !empty($searchPageSettings['form']['item_set_filter_type'])
             && !empty($searchPageSettings['form']['item_set_id_field']);
@@ -417,6 +433,12 @@ class MainSearchForm extends Form
     protected function getForm(string $name, ?array $options = null): \Laminas\Form\ElementInterface
     {
         return $this->formElementManager->get($name, $options);
+    }
+
+    public function setBasePath(string $basePath): Form
+    {
+        $this->basePath = $basePath;
+        return $this;
     }
 
     public function setSite(?SiteRepresentation $site): Form

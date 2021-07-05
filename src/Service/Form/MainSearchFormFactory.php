@@ -44,6 +44,7 @@ class MainSearchFormFactory implements FactoryInterface
             ? $helpers->get('siteSetting')
             : null;
         return (new MainSearchForm(null, $options))
+            ->setBasePath($helpers->get('basePath')())
             ->setSite($currentSite)
             ->setSiteSetting($siteSetting)
             ->setFormElementManager($services->get('FormElementManager'));

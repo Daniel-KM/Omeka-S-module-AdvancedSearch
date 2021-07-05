@@ -80,6 +80,8 @@ abstract class AbstractQuerier implements QuerierInterface
 
     abstract public function query(): Response;
 
+    abstract public function querySuggestions(): Response;
+
     abstract public function getPreparedQuery();
 
     /**

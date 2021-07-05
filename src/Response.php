@@ -67,6 +67,11 @@ class Response implements \JsonSerializable
      */
     protected $facetCounts = [];
 
+    /**
+     * @var array
+     */
+    protected $suggestions = [];
+
     public function setIsSuccess(bool $isSuccess): self
     {
         $this->isSuccess = $isSuccess;
@@ -264,6 +269,17 @@ class Response implements \JsonSerializable
             : $this->facetCounts[$name] ?? [];
     }
 
+    public function setSuggestions(array $suggestions): self
+    {
+        $this->suggestions = $suggestions;
+        return $this;
+    }
+
+    public function getSuggestions(): array
+    {
+        return $this->suggestions;
+    }
+
     public function jsonSerialize(): array
     {
         return [
@@ -273,6 +289,7 @@ class Response implements \JsonSerializable
             'resourceTotalResults' => $this->getResourceTotalResults(),
             'results' => $this->getResults(),
             'facetCounts' => $this->getFacetCounts(),
+            'suggestions' => $this->getSuggestions(),
         ];
     }
 }

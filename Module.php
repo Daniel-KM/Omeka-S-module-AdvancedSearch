@@ -6,7 +6,7 @@
  * Add some fields to the advanced search form (before/after creation date, has
  * media, etc.).
  *
- * @copyright Daniel Berthereau, 2018-2020
+ * @copyright Daniel Berthereau, 2018-2021
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
  *
  * This software is governed by the CeCILL license under French law and abiding
@@ -1108,7 +1108,12 @@ class Module extends AbstractModule
             $joiner = $queryRow['joiner'] ?? '';
             $value = $queryRow['text'] ?? '';
 
-            if (!strlen((string) $value) && $queryType !== 'nex' && $queryType !== 'ex') {
+            // A value can be an array with types "list" and "nlist".
+            if (!is_array($value)
+                && !strlen((string) $value)
+                && $queryType !== 'nex'
+                && $queryType !== 'ex'
+            ) {
                 continue;
             }
 
@@ -1167,7 +1172,7 @@ class Module extends AbstractModule
                         ->createQueryBuilder()
                         ->select("$subqueryAlias.id")
                         ->from('Omeka\Entity\Resource', $subqueryAlias)
-                        ->where($expr->eq("$subqueryAlias.title", $param));
+                        ->where($expr->in("$subqueryAlias.title", $param));
                     $predicateExpr = $expr->orX(
                         $expr->in("$valuesAlias.valueResource", $subquery->getDQL()),
                         $expr->in("$valuesAlias.value", $param),

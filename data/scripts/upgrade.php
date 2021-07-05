@@ -372,4 +372,13 @@ SQL;
     $message = new Message(
         'The search page form defines new keys and use sub settings, in particular for facets. Check your theme if it was customized.' // @translate
     );
+    $messenger->addWarning($message);
+}
+
+if (version_compare($oldVersion, '3.5.22.3', '<')) {
+    $messenger = new Messenger();
+    $message = new Message(
+        'You may enable the auto-suggestion in the search page settings.' // @translate
+    );
+    $messenger->addSuccess($message);
 }

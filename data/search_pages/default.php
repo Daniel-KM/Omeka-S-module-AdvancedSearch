@@ -11,6 +11,13 @@ return [
         'default_query' => '',
     ],
 
+    'autosuggest' => [
+        'enable' => true,
+        'mode' => 'start',
+        'fields' => [],
+        'url' => '',
+    ],
+
     'form' => [
         'item_set_filter_type' => 'select',
         'item_set_id_field' => 'item_set_id_field',

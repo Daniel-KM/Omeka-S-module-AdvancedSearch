@@ -142,6 +142,23 @@ class SearchPageConfigureForm extends Form
                 ],
             ])
             ->add([
+                'name' => 'mode',
+                'type' => Element\Radio::class,
+                'options' => [
+                    'label' => 'Mode', // @translate
+                    'info' => 'Should be implemented in internal search engine.',
+                    'value_options' => [
+                        'start' => 'Start with', // @translate
+                        'contain' => 'Contains', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'autosuggest_mode',
+                    'required' => false,
+                    'value' => 'start',
+                ],
+            ])
+            ->add([
                 'name' => 'url',
                 'type' => OptionalUrl::class,
                 'options' => [
@@ -539,6 +556,16 @@ class SearchPageConfigureForm extends Form
         $inputFilter = $this->getInputFilter();
 
         // A check is done because the specific form may remove them.
+        if ($inputFilter->has('autosuggest')) {
+            $inputFilter
+                ->get('autosuggest')
+                ->add([
+                    'name' => 'mode',
+                    'required' => false,
+                ])
+            ;
+        }
+
         if ($inputFilter->has('form')) {
             $inputFilter
                 ->get('form')

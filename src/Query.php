@@ -99,6 +99,11 @@ class Query implements \JsonSerializable
     protected $excludedFields = [];
 
     /**
+     * @var string
+     */
+    protected $suggestMode = 'start';
+
+    /**
      * @var int
      */
     protected $siteId;
@@ -288,6 +293,17 @@ class Query implements \JsonSerializable
         return $this->excludedFields;
     }
 
+    public function setSuggestMode(string $suggestMode): self
+    {
+        $this->suggestMode = $suggestMode;
+        return $this;
+    }
+
+    public function getSuggestMode(): string
+    {
+        return $this->suggestMode;
+    }
+
     public function setSiteId(?int $siteId): self
     {
         $this->siteId = $siteId;
@@ -315,6 +331,7 @@ class Query implements \JsonSerializable
             'facet_limit' => $this->getFacetLimit(),
             'facet_languages' => $this->getFacetLanguages(),
             'excluded_fields' => $this->getExcludedFields(),
+            'suggest_mode' => $this->getSuggestMode(),
             'site_id' => $this->getSiteId(),
         ];
     }

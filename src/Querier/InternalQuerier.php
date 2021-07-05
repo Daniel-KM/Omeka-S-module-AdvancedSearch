@@ -129,12 +129,31 @@ class InternalQuerier extends AbstractQuerier
         $classes = '"' . implode('", "', $classes) . '"';
 
         // TODO Manage site id and item set id and any other filter query.
-        // TODO Return a single word.
         // TODO Use the full text search table.
 
-        // Use keys "value" and "data" to get a well formatted output for
-        // suggestions.
-        $sql = <<<SQL
+        /** @var \Doctrine\DBAL\Connection $connection */
+        $connection = $this->getServiceLocator()->get('Omeka\Connection');
+        $q = $this->query->getQuery();
+        $bind = [
+            // 'resource_types' => $classes,
+            'limit' => $this->query->getLimit(),
+            'value_length' => mb_strlen($q),
+        ];
+        $types = [
+            // 'resource_types' => $connection::PARAM_STR_ARRAY,
+            'limit' => \PDO::PARAM_INT,
+            'value_length' => \PDO::PARAM_INT,
+        ];
+
+        if ($this->query->getSuggestMode() === 'contain') {
+            // $bind['value'] = $q;
+            // $bind['value_like'] = '%' . str_replace(['%', '_'], ['\%', '\_'], $q) . '%';
+            return $this->response
+                ->setMessage('This mode is currently not supported with the internal search engine.'); // @translate
+        } else {
+            // Use keys "value" and "data" to get a well formatted output for
+            // suggestions.
+            $sql = <<<SQL
 SELECT
     DISTINCT SUBSTRING(`value`.`value`, 1, LOCATE(" ", CONCAT(`value`.`value`, " "), :value_length)) AS "value",
     COUNT(SUBSTRING(`value`.`value`, 1, LOCATE(" ", CONCAT(`value`.`value`, " "), :value_length))) as "data"
@@ -148,23 +167,8 @@ ORDER BY data DESC
 LIMIT :limit
 ;
 SQL;
-        /** @var \Doctrine\DBAL\Connection $connection */
-        $connection = $this->getServiceLocator()->get('Omeka\Connection');
-        $q = $this->query->getQuery();
-        $bind = [
-            // 'resource_types' => $classes,
-            'limit' => $this->query->getLimit(),
-            // 'value' => $q,
-            'value_length' => mb_strlen($q),
-            // No initial "%" for simplicity in sql ("start by", not "contains").
-            'value_like' => str_replace(['%', '_'], ['\%', '\_'], $q)
-                . '%',
-        ];
-        $types = [
-            // 'resource_types' => $connection::PARAM_STR_ARRAY,
-            'limit' => \PDO::PARAM_INT,
-            'value_length' => \PDO::PARAM_INT,
-        ];
+            $bind['value_like'] = str_replace(['%', '_'], ['\%', '\_'], $q) . '%';
+        }
         try {
             $results = $connection
                 ->executeQuery($sql, $bind, $types)

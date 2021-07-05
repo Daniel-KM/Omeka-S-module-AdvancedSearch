@@ -6,9 +6,13 @@ Search (module for Omeka S)
 > than the previous repository.__
 
 [Search] is a module for [Omeka S] that adds search capabilities to the public
-interface of Omeka S, in particular filters and facets. Furthermore, it provides
-a common interface for other modules to extend it (forms, indexers, queriers).
-It can be displayed as a block on any page too.
+interface of Omeka S, in particular search autocompletion, filters and facets.
+Furthermore, it provides a common interface for other modules to extend it
+(forms, indexers, queriers). It can be displayed as a block on any page too.
+
+Here is a live example:
+
+![example of search page](data/images/search_page.png))
 
 It can be extended in two ways:
 
@@ -40,8 +44,8 @@ An adapter is available for [Solr], one of the most used search engine.
 Installation
 ------------
 
-The module uses an external library [jQueryUI], so use the release zip to
-install it, or use and init the source.
+The module uses an external library [jQuery-Autocomplete], so use the release
+zip to install it, or use and init the source.
 
 * From the zip
 
@@ -78,6 +82,8 @@ See general end user documentation for [Installing a module].
 Quick start
 -----------
 
+The default search engine is automatically added to the sites.
+
 The main admin menu `Search` allows to manage the search indexes and the search
 pages: an instance of Omeka can contain multiple indexes, for example to hide
 some fields in the public front-end, and multiple pages, for example a single
@@ -99,8 +105,8 @@ To create a page with a search engine, follow these steps.
 2. Create a page
     1. Add a page named `Internal search` or whatever you want, a path to access
        it, for example `search` or `find`, the index that was created in the
-       previous step (`Internal` here), and a form adapter (`Basic`) that will
-       do the mapping between the form and the index. Forms added by modules can
+       previous step (`Internal` here), and a form adapter (`Main`) that will do
+       the mapping between the form and the index. Forms added by modules can
        manage an advanced input field and/or filters.
     2. In the page configuration, you can enable/disable facet and sort fields
        by drag-drop. The order of the fields will be the one that will be used
@@ -199,8 +205,14 @@ be some minutes with Solr, according to your configuration).
 TODO
 ----
 
-- [ ] Normalize the url query with a true standard (or the Omeka S one, or at the 
+- [x] Remove distinction between advanced and basic form: they are just a list
+  of elements.
+- [ ] Simplify the form with https://docs.laminas.dev/laminas-form/v3/form-creation/creation-via-factory/
+  and js, storing the whole form one time. See UserProfile too.
+- [ ] Normalize the url query with a true standard (or the Omeka S one, or at the
   choice of the admin, or the developer of the forms and queriers).
+- [x] Genericize the name of the fields of be able for internal querier to use
+  or convert the fields names.
 - [ ] Make the search arguments groupable to allow smart facets: always display all
   facets from the original queries, with "or" between facets of the same group,
   and "and" between groups. Require that the core api allows groups.
@@ -208,7 +220,7 @@ TODO
   in order not to limit it to Dublin Core terms. The tabs may be "Filters",
   "Facets", and "Sort".
 - [ ] Create an internal index (see Omeka Classic) and move all related code into
-  another module.
+  another module (use the fulltext feature).
 - [ ] Allow to remove an index without removing pages.
 - [ ] Allow to import/export a mapping via json, for example the default one.
 - [ ] Add an option to use the search api by default (and an option `'index' => false`).
@@ -217,6 +229,9 @@ TODO
 - [ ] Genericize and move the value extractor from module Solr to module Search.
 - [ ] Improve the check of presence of an item in sites for real time indexation.
 - [ ] Updated index in batch, not one by one.
+- [ ] Add an option to replace the default Omeka search form.
+- [ ] Improve the internal autosuggester to return the list of next words when space.
+- [ ] Use a or for facets of each group.
 
 
 Warning
@@ -236,6 +251,8 @@ See online issues on the [module issues] page on GitLab.
 
 License
 -------
+
+### Module
 
 This module is published under the [CeCILL v2.1] license, compatible with
 [GNU/GPL] and approved by [FSF] and [OSI].
@@ -263,6 +280,10 @@ conditions as regards security.
 The fact that you are presently reading this means that you have had knowledge
 of the CeCILL license and that you accept its terms.
 
+### Libraries
+
+- jQuery-Autocomplete : [MIT]
+
 
 Copyright
 ---------
@@ -271,10 +292,13 @@ See commits for full list of contributors.
 
 * Copyright BibLibre, 2016-2017 (see [BibLibre])
 * Copyright Daniel Berthereau, 2017-2021 (see [Daniel-KM])
+* Copyright Tomas Kirda 2017 (library jQuery-Autocomplete)
+
 
 The Psl search form and the Solr modules were initially built by [BibLibre] and
 are used by the [digital library of PSL], a French university. Next improvements
-were done for various projects.
+were done for various projects. The auto-completion was build for future digital
+library of [Campus Condorcet].
 
 
 [Search]: https://github.com/BibLibre/Omeka-S-module-Search
@@ -282,10 +306,9 @@ were done for various projects.
 [Psl Search Form]: https://github.com/BibLibre/Omeka-S-module-PslSearchForm
 [Solr]: https://gitlab.com/Daniel-KM/Omeka-S-module-SearchSolr
 [SearchSolr]: https://gitlab.com/Daniel-KM/Omeka-S-module-SearchSolr
-[digital library of PSL]: https://bibnum.explore.univ-psl.fr
 [Installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
 [this patch]: https://github.com/omeka/omeka-s/pull/1519/files
-[jQueryUI]: https://jqueryui.com/
+[jQuery-Autocomplete]: https://github.com/devbridge/jQuery-Autocomplete
 [Reference]: https://gitlab.com/Daniel-KM/Omeka-S-module-Reference
 [Advanced Search Plus]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearchPlus
 [Solr of Biblibre]: https://github.com/BibLibre/Omeka-S-module-Solr
@@ -295,6 +318,9 @@ were done for various projects.
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org
 [OSI]: http://opensource.org
+[MIT]: https://github.com/devbridge/jQuery-Autocomplete/blob/master/license.txt
 [BibLibre]: https://github.com/biblibre
 [GitLab]: https://gitlab.com/Daniel-KM
+[digital library of PSL]: https://bibnum.explore.univ-psl.fr
+[campus Condorct]: https://www.campus-condorcet.fr
 [Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"

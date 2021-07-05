@@ -36,7 +36,8 @@ class InternalQuerier extends AbstractQuerier
 
         $this->args = $this->getPreparedQuery();
         if (is_null($this->args)) {
-            return $this->response;
+            return $this->response
+                ->setMessage('An issue occurred.'); // @translate
         }
 
         /**
@@ -92,7 +93,8 @@ class InternalQuerier extends AbstractQuerier
             $this->facetResponse($facetData);
         }
 
-        return $this->response;
+        return $this->response
+            ->setIsSuccess(true);
     }
 
     /**

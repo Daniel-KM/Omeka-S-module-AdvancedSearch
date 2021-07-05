@@ -33,6 +33,16 @@ namespace Search;
 class Response implements \JsonSerializable
 {
     /**
+     * @var bool
+     */
+    protected $isSuccess = false;
+
+    /**
+     * @var ?string
+     */
+    protected $message;
+
+    /**
      * @var int
      */
     protected $totalResults = 0;
@@ -56,6 +66,28 @@ class Response implements \JsonSerializable
      * @var array
      */
     protected $facetCounts = [];
+
+    public function setIsSuccess(bool $isSuccess): self
+    {
+        $this->isSuccess = $isSuccess;
+        return $this;
+    }
+
+    public function isSuccess(): bool
+    {
+        return $this->isSuccess;
+    }
+
+    public function setMessage($message): self
+    {
+        $this->message = $message;
+        return $this;
+    }
+
+    public function getMessage(): ?string
+    {
+        return (string) $this->message ?: null;
+    }
 
     /**
      * @param int $totalResults
@@ -235,6 +267,8 @@ class Response implements \JsonSerializable
     public function jsonSerialize(): array
     {
         return [
+            'success' => $this->isSuccess(),
+            'message' => $this->getMessage(),
             'totalResults' => $this->getTotalResults(),
             'resourceTotalResults' => $this->getResourceTotalResults(),
             'results' => $this->getResults(),

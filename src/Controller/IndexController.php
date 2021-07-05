@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016-2017
- * Copyright Daniel Berthereau, 2017-2020
+ * Copyright Daniel Berthereau, 2017-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -142,7 +142,24 @@ class IndexController extends AbstractActionController
         }
 
         if ($isJsonQuery) {
+            /** @var \Search\Response $response */
             $response = $result['data']['response'];
+            if (!$response) {
+                $this->getResponse()->setStatusCode(\Laminas\Http\Response::STATUS_CODE_500);
+                return new JsonModel([
+                    'status' => 'error',
+                    'message' => 'An error occurred.', // @translate
+                ]);
+            }
+
+            if (!$response->isSuccess()) {
+                $this->getResponse()->setStatusCode(\Laminas\Http\Response::STATUS_CODE_500);
+                return new JsonModel([
+                    'status' => 'error',
+                    'message' => $response->getMessage(),
+                ]);
+            }
+
             $indexSettings = $searchPage->index()->settings();
             $result = [];
             foreach ($indexSettings['resources'] as $resource) {

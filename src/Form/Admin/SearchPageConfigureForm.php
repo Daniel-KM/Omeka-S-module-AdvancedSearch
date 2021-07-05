@@ -121,11 +121,32 @@ class SearchPageConfigureForm extends Form
                     'id' => 'default_query',
                 ],
             ])
+        ;
+        $this
             ->add([
-                'name' => 'autosuggest_url',
+                'name' => 'autosuggest',
+                'type' => Fieldset::class,
+                'options' => [
+                    'label' => 'Auto-suggestions', // @translate
+                ],
+            ])
+            ->get('autosuggest')
+            ->add([
+                'name' => 'enable',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Enable auto-suggestions', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'autosuggest_enable',
+                ],
+            ])
+            ->add([
+                'name' => 'url',
                 'type' => OptionalUrl::class,
                 'options' => [
-                    'label' => 'Optional url for auto-suggest', // @translate
+                    'label' => 'Optional endpoint for auto-suggest', // @translate
+                    'info' => 'This url allows to use an external endpoint to manage keywords.', // @translate
                 ],
                 'attributes' => [
                     'id' => 'autosuggest_url',
@@ -404,7 +425,7 @@ class SearchPageConfigureForm extends Form
                     'placeholder' => 'dcterms:subject asc = Subject (asc)',
                     'rows' => 12,
                 ],
-            ]);
+            ])
         ;
 
         // Settings for the results (facets).
@@ -504,7 +525,7 @@ class SearchPageConfigureForm extends Form
                     'required' => false,
                     'value' => 'button',
                 ],
-            ]);
+            ])
         ;
 
         $this

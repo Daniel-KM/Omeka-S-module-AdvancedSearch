@@ -115,11 +115,11 @@ class MainSearchForm extends Form
             ])
         ;
 
-        if (!empty($searchPageSettings['search']['autosuggest'])) {
-            $autoSuggestUrl = empty($searchPageSettings['search']['autosuggest_url'])
+        if (!empty($searchPageSettings['autosuggest']['enable'])) {
+            $autoSuggestUrl = empty($searchPageSettings['autosuggest']['url'])
                 // TODO Use url helper.
                 ? $this->basePath . ($this->site ? '/s/' . $this->site->slug() : '/admin') . '/' . ($searchPage ? $searchPage->path() : 'search') . '/suggest'
-                : $searchPageSettings['search']['autosuggest_url'];
+                : $searchPageSettings['autosuggest']['url'];
             $this->get('q')
                 ->setAttribute('class', 'autosuggest')
                 ->setAttribute('data-autosuggest-url', $autoSuggestUrl);

@@ -99,8 +99,84 @@ class InternalQuerier extends AbstractQuerier
 
     public function querySuggestions(): Response
     {
-        return (new Response)
-            ->setMessage('Suggestions are not implemented'); // @translate
+        $this->response = new Response;
+
+        $this->args = $this->getPreparedQuery();
+        if (is_null($this->args)) {
+            return $this->response
+                ->setMessage('An issue occurred.'); // @translate
+        }
+
+        /**
+         * @var \Omeka\Mvc\Controller\Plugin\Api $api
+         */
+        $plugins = $this->getServiceLocator()->get('ControllerPluginManager');
+        $api = $plugins->get('api');
+
+        // Only items and itemSets are managed currently.
+        $resourceTypesToClasses = [
+            // 'items' => \Omeka\Entity\Item::class,
+            // 'item_sets' => \Omeka\Entity\ItemSet::class,
+            'items' => 'Omeka\\\\Entity\\\\Item',
+            'item_sets' => 'Omeka\\\\Entity\\\\ItemSet',
+        ];
+        $sqlIsPublic = $this->query->getIsPublic()
+            ? 'AND `resource`.`is_public` = 1 AND `value`.`is_public` = 1'
+            : '';
+
+        // The bind is not working in a array, so use a direct string.
+        $classes = array_intersect_key($resourceTypesToClasses, array_flip($this->resourceTypes));
+        $classes = '"' . implode('", "', $classes) . '"';
+
+        // TODO Manage site id and item set id and any other filter query.
+        // TODO Return a single word.
+        // TODO Use the full text search table.
+
+        // Use keys "value" and "data" to get a well formatted output for
+        // suggestions.
+        $sql = <<<SQL
+SELECT
+    DISTINCT SUBSTRING(`value`.`value`, 1, LOCATE(" ", CONCAT(`value`.`value`, " "), :value_length)) AS "value",
+    COUNT(SUBSTRING(`value`.`value`, 1, LOCATE(" ", CONCAT(`value`.`value`, " "), :value_length))) as "data"
+FROM `value` AS `value`
+INNER JOIN `resource` ON `resource`.`id` = `value`.`resource_id`
+WHERE `resource`.`resource_type` IN ($classes)
+    $sqlIsPublic
+    AND `value`.`value` LIKE :value_like
+GROUP BY SUBSTRING(`value`.`value`, 1, LOCATE(" ", CONCAT(`value`.`value`, " "), :value_length))
+ORDER BY data DESC
+LIMIT :limit
+;
+SQL;
+        /** @var \Doctrine\DBAL\Connection $connection */
+        $connection = $this->getServiceLocator()->get('Omeka\Connection');
+        $q = $this->query->getQuery();
+        $bind = [
+            // 'resource_types' => $classes,
+            'limit' => $this->query->getLimit(),
+            // 'value' => $q,
+            'value_length' => mb_strlen($q),
+            // No initial "%" for simplicity in sql ("start by", not "contains").
+            'value_like' => str_replace(['%', '_'], ['\%', '\_'], $q)
+                . '%',
+        ];
+        $types = [
+            // 'resource_types' => $connection::PARAM_STR_ARRAY,
+            'limit' => \PDO::PARAM_INT,
+            'value_length' => \PDO::PARAM_INT,
+        ];
+        try {
+            $results = $connection
+                ->executeQuery($sql, $bind, $types)
+                ->fetchAll();
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            $this->getServiceLocator()->get('Omeka\Logger')->err($e->getMessage());
+            return $this->response
+                ->setMessage('An internal issue in database occurred.'); // @translate
+        }
+        return $this->response
+            ->setSuggestions($results)
+            ->setIsSuccess(true);
     }
 
     /**

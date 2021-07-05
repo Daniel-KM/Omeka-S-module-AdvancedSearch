@@ -215,6 +215,13 @@ class IndexController extends AbstractActionController
             ]);
         }
 
+        if (!$searchPage->subSetting('autosuggest', 'enable')) {
+            return new JsonModel([
+                'status' => 'error',
+                'message' => 'Auto-suggestion is not enabled on this server.', // @translate
+            ]);
+        }
+
         $q = (string) $this->params()->fromQuery('q');
         if (!strlen($q)) {
             return new JsonModel([

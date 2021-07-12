@@ -141,20 +141,26 @@ msgstr ""
 #: view/search/admin/search-index/index-confirm.phtml:29
 msgid "You may redirect the users on a clone of the current index temporary."
 msgstr ""
+"Vous pouvez rediriger les utilisateurs sur un clone de l’index actuel "
+"temporairement."
 
 #: view/search/admin/search-index/index-confirm.phtml:32
 msgid ""
 "You may prefer to keep existing indexes and to start the indexing at the "
 "following resource id."
 msgstr ""
+"Vous pouvez conserver les index existants et commencer l’indexation à la "
+"ressource suivante."
 
 #: view/search/admin/search-index/index-confirm.phtml:33
 msgid "Set \"1\" to reindex all resources without clearing the current index."
 msgstr ""
+"indiquez \"1\" pour ré-indexer toutes les ressources sans effacer l’index "
+"actuel."
 
 #: view/search/admin/search-index/index-confirm.phtml:37
 msgid "You may want to limit the reindexing to a resource type."
-msgstr ""
+msgstr "Vous pouvez limiter l’indexation à un type de ressource."
 
 #: view/search/admin/search-index/index-confirm.phtml:44
 #, php-format
@@ -167,7 +173,7 @@ msgstr "Forcer la réindexation"
 
 #: view/search/admin/search-index/index-confirm.phtml:47
 msgid "No running indexing: process can be launched."
-msgstr ""
+msgstr "Pas d’indexation en cours : la tâche peut être lancée."
 
 #: view/search/admin/search-index/index-confirm.phtml:53
 msgid "This index has no resource type to index."

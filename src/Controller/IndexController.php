@@ -298,7 +298,7 @@ class IndexController extends AbstractActionController
 
         $query
             ->setResources($indexSettings['resources'])
-            ->setLimitPage(1, 100)
+            ->setLimitPage(1, empty($autosuggestSettings['limit']) ? \Omeka\Stdlib\Paginator::PER_PAGE : (int) $autosuggestSettings['limit'])
             ->setSuggestMode($autosuggestSettings['mode'] ?? 'start')
             ->setSuggestFields($autosuggestSettings['fields'] ?? []);
 

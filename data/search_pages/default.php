@@ -14,8 +14,10 @@ return [
     'autosuggest' => [
         'enable' => true,
         'mode' => 'start',
+        'limit' => 25,
         'fields' => [],
         'url' => '',
+        'url_param_name' => '',
     ],
 
     'form' => [

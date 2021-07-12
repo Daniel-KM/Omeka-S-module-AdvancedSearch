@@ -160,6 +160,19 @@ class SearchPageConfigureForm extends Form
                 ],
             ])
             ->add([
+                'name' => 'limit',
+                'type' => Element\Number::class,
+                'options' => [
+                    'label' => 'Max number of results', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'autosuggest_limit',
+                    'required' => false,
+                    'value' => \Omeka\Stdlib\Paginator::PER_PAGE,
+                    'min' => '0',
+                ],
+            ])
+            ->add([
                 'name' => 'fields',
                 'type' => OptionalSelect::class,
                 'options' => [
@@ -589,6 +602,10 @@ class SearchPageConfigureForm extends Form
                 ->get('autosuggest')
                 ->add([
                     'name' => 'mode',
+                    'required' => false,
+                ])
+                ->add([
+                    'name' => 'limit',
                     'required' => false,
                 ])
             ;

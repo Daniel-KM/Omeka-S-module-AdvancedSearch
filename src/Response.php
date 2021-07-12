@@ -285,10 +285,11 @@ class Response implements \JsonSerializable
         return [
             'success' => $this->isSuccess(),
             'message' => $this->getMessage(),
-            'totalResults' => $this->getTotalResults(),
-            'resourceTotalResults' => $this->getResourceTotalResults(),
+            'total_results' => $this->getTotalResults(),
+            'resource_total_results' => $this->getResourceTotalResults(),
             'results' => $this->getResults(),
-            'facetCounts' => $this->getFacetCounts(),
+            'facet_counts' => $this->getFacetCounts(),
+            'active_facets' => $this->getActiveFacets(),
             'suggestions' => $this->getSuggestions(),
         ];
     }

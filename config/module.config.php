@@ -27,6 +27,7 @@ return [
     ],
     'view_helpers' => [
         'invokables' => [
+            'hiddenInputsFromFilteredQuery' => View\Helper\HiddenInputsFromFilteredQuery::class,
             'searchForm' => View\Helper\SearchForm::class,
             'searchingForm' => View\Helper\SearchingForm::class,
             'searchingUrl' => View\Helper\SearchingUrl::class,

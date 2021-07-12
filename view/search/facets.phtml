@@ -65,6 +65,7 @@ unset($options['facets']);
 ?>
 
 <aside class="search-facets">
+
     <h3><?= $translate('Filters') ?></h3>
     <?php if (count($activeFacets)): ?>
     <h4><?= $translate('Active filters') ?></h4>
@@ -74,7 +75,9 @@ unset($options['facets']);
         <?php endforeach; ?>
     </ul>
     <?php endif; ?>
+
     <form id="form-facets">
+
         <?php if (empty($facets) && empty($activeFacets)): ?>
         <p><?= $translate('No filters.') ?></p>
         <?php else: ?>
@@ -93,10 +96,14 @@ unset($options['facets']);
             <?php endforeach; ?>
         </ul>
         <?php endif; ?>
+
         <?php if ($isFacetModeButton && !empty($facets)): ?>
+        <?= $this->hiddenInputsFromFilteredQuery(null, ['facet', 'page', 'limit', 'offset', 'per_page']) ?>
         <div class="apply-facets">
             <input type="submit" value="<?= $translate('Apply filters') ?>"/>
         </div>
-    <?php endif; ?>
+        <?php endif; ?>
+
     </form>
+
 </aside>

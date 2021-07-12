@@ -53,6 +53,7 @@ return [
         'invokables' => [
             Form\Element\ArrayText::class => Form\Element\ArrayText::class,
             Form\Element\OptionalMultiCheckbox::class => Form\Element\OptionalMultiCheckbox::class,
+            Form\Element\OptionalRadio::class => Form\Element\OptionalRadio::class,
             Form\Element\OptionalSelect::class => Form\Element\OptionalSelect::class,
             Form\Element\OptionalUrl::class => Form\Element\OptionalUrl::class,
         ],

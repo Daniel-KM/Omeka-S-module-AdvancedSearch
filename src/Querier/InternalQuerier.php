@@ -30,6 +30,11 @@ class InternalQuerier extends AbstractQuerier
      */
     protected $args;
 
+    /**
+     * @var array
+     */
+    protected $argsWithoutActiveFacets;
+
     public function query(): Response
     {
         $this->response = new Response;
@@ -45,6 +50,7 @@ class InternalQuerier extends AbstractQuerier
          */
         $plugins = $this->getServiceLocator()->get('ControllerPluginManager');
         $api = $plugins->get('api');
+        $hasReferences = $plugins->has('references');
 
         // The standard api way implies a double query, because scalar doesn't
         // set the full total and doesn't use paginator.
@@ -71,7 +77,6 @@ class InternalQuerier extends AbstractQuerier
                 throw new QuerierException($e->getMessage(), $e->getCode(), $e);
             }
             $this->response->setResourceTotalResults($resourceType, $totalResults);
-            $this->response->setTotalResults($this->response->getTotalResults() + $totalResults);
             if ($totalResults) {
                 $result = array_map(function ($v) {
                     return ['id' => $v];
@@ -82,15 +87,12 @@ class InternalQuerier extends AbstractQuerier
             $this->response->addResults($resourceType, $result);
         }
 
-        // TODO To be removed when the filters will be groupable (see version 3.5.12 where this is after filter).
-        // Facets data don't use sort or limit.
-        if ($plugins->has('references')) {
-            $facetData = $this->args;
-            unset($facetData['sort_by']);
-            unset($facetData['sort_order']);
-            unset($facetData['limit']);
-            unset($facetData['offset']);
-            $this->facetResponse($facetData);
+        $this->response->setTotalResults(
+            array_sum($this->response->getResourceTotalResults())
+        );
+
+        if ($hasReferences) {
+            $this->fillFacetResponse();
         }
 
         return $this->response
@@ -213,6 +215,7 @@ SQL;
     {
         if (empty($this->query)) {
             $this->args = null;
+            $this->argsWithoutActiveFacets = null;
             return $this->args;
         }
 
@@ -229,6 +232,7 @@ SQL;
         $this->resourceTypes = array_intersect($this->resourceTypes, $indexerResourceTypes);
         if (empty($this->resourceTypes)) {
             $this->args = null;
+            $this->argsWithoutActiveFacets = null;
             return $this->args;
         }
 
@@ -323,7 +327,7 @@ SQL;
             $q = trim($q, '" ');
         }
 
-        // TODO Use fulltext_search, but when more than 50% results, no results, not understandable by end user.
+        // TODO Use fulltext_search, but when more than 50% results, no results, not understandable by end user (or use boolean mode).
         $this->args['property'][] = [
             'joiner' => 'and',
             'property' => '',
@@ -370,8 +374,58 @@ SQL;
     protected function filterQuery(): void
     {
         // Don't use excluded fields for filters.
-        $filters = $this->query->getFilters();
+        $this->filterQueryValues($this->query->getFilters());
 
+        // TODO Manage the date range filters (one or two properties?).
+        /*
+        $dateRangeFilters = $this->query->getFiltersDateRange();
+        foreach ($dateRangeFilters as $name => $filterValues) {
+            $name = $this->underscoredNameToTerm($name);
+            if (!$name) {
+                continue;
+            }
+            foreach ($filterValues as $filterValue) {
+                $start = $filterValue['start'] ? $filterValue['start'] : '*';
+                $end = $filterValue['end'] ? $filterValue['end'] : '*';
+                $this->args['property'][] = [
+                    'joiner' => 'and',
+                    'property' => 'dcterms:date',
+                    'type' => 'gte',
+                    'text' => $start,
+                ];
+                $this->args['property'][] = [
+                    'joiner' => 'and',
+                    'property' => 'dcterms:date',
+                    'type' => 'lte',
+                    'text' => $end,
+                ];
+            }
+        }
+        */
+
+        $filters = $this->query->getFilterQueries();
+        foreach ($filters as $name => $values) {
+            $name = $this->underscoredNameToTerm($name);
+            if (!$name) {
+                continue;
+            }
+            foreach ($values as $value) {
+                $this->args['property'][] = [
+                    'joiner' => $value['join'],
+                    'property' => $name,
+                    'type' => $value['type'],
+                    'text' => $value['value'],
+                ];
+            }
+        }
+
+        $this->argsWithoutActiveFacets = $this->args;
+
+        $this->filterQueryValues($this->query->getActiveFacets(), true);
+    }
+
+    protected function filterQueryValues(array $filters, bool $inList = false): void
+    {
         foreach ($filters as $name => $values) {
             // "is_public" is automatically managed by this internal adapter.
             // "creation_date_year_field" should be a property.
@@ -429,6 +483,16 @@ SQL;
                     if (!$name) {
                         break;
                     }
+                    if ($inList) {
+                        $this->args['property'][] = [
+                            'joiner' => 'and',
+                            'property' => $name,
+                            // FIXME Require a hack (or the module AdvancedSearchPlus).
+                            'type' => 'list',
+                            'text' => is_array($values) ? $values : [$values],
+                        ];
+                        break;
+                    }
                     foreach ($values as $value) {
                         // Use "or" when multiple (checkbox), else "and" (radio).
                         if (is_array($value)) {
@@ -450,49 +514,6 @@ SQL;
                         }
                     }
                     break;
-            }
-        }
-
-        // TODO Manage the date range filters (one or two properties?).
-        /*
-        $dateRangeFilters = $this->query->getFiltersDateRange();
-        foreach ($dateRangeFilters as $name => $filterValues) {
-            $name = $this->underscoredNameToTerm($name);
-            if (!$name) {
-                continue;
-            }
-            foreach ($filterValues as $filterValue) {
-                $start = $filterValue['start'] ? $filterValue['start'] : '*';
-                $end = $filterValue['end'] ? $filterValue['end'] : '*';
-                $this->args['property'][] = [
-                    'joiner' => 'and',
-                    'property' => 'dcterms:date',
-                    'type' => 'gte',
-                    'text' => $start,
-                ];
-                $this->args['property'][] = [
-                    'joiner' => 'and',
-                    'property' => 'dcterms:date',
-                    'type' => 'lte',
-                    'text' => $end,
-                ];
-            }
-        }
-        */
-
-        $filters = $this->query->getFilterQueries();
-        foreach ($filters as $name => $values) {
-            $name = $this->underscoredNameToTerm($name);
-            if (!$name) {
-                continue;
-            }
-            foreach ($values as $value) {
-                $this->args['property'][] = [
-                    'joiner' => $value['join'],
-                    'property' => $name,
-                    'type' => $value['type'],
-                    'text' => $value['value'],
-                ];
             }
         }
     }
@@ -532,18 +553,9 @@ SQL;
             : null;
     }
 
-    protected function facetResponse(array $facetData): void
+    protected function fillFacetResponse(): void
     {
-        // Use the filters as facets, except the special fields.
-        // TODO Remove all non-facetable from the page settings (or simplify somewhere else).
-        $filters = $this->query->getFilters();
-        unset(
-            $filters['item_set_id_field'],
-            $filters['resource_class_id_field'],
-            $filters['resource_template_id_field'],
-            $filters['is_public_field']
-        );
-        $this->response->setActiveFacets($filters);
+        $this->response->setActiveFacets($this->query->getActiveFacets());
 
         /** @var \Reference\Mvc\Controller\Plugin\References $references */
         $references = $this->getServiceLocator()->get('ControllerPluginManager')->get('references');
@@ -572,6 +584,14 @@ SQL;
         // should be merged here. This is needed as long as there is no single
         // query for resource (items and item sets together).
         $facetCountsByField = array_fill_keys($facetFields, []);
+
+        // TODO To be removed when the filters will be groupable (see version 3.5.12 where this is after filter).
+        // Facets data don't use sort or limit.
+        $facetData = $this->argsWithoutActiveFacets;
+        unset($facetData['sort_by']);
+        unset($facetData['sort_order']);
+        unset($facetData['limit']);
+        unset($facetData['offset']);
 
         foreach ($this->resourceTypes as $resourceType) {
             $options = [

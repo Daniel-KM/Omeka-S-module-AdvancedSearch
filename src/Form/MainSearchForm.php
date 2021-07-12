@@ -120,9 +120,13 @@ class MainSearchForm extends Form
                 // TODO Use url helper.
                 ? $this->basePath . ($this->site ? '/s/' . $this->site->slug() : '/admin') . '/' . ($searchPage ? $searchPage->path() : 'search') . '/suggest'
                 : $searchPageSettings['autosuggest']['url'];
-            $this->get('q')
+            $elementQ = $this->get('q')
                 ->setAttribute('class', 'autosuggest')
                 ->setAttribute('data-autosuggest-url', $autoSuggestUrl);
+            if (!empty($searchPageSettings['autosuggest']['url_param_name'])) {
+                $elementQ
+                    ->setAttribute('data-autosuggest-param-name', $searchPageSettings['autosuggest']['url_param_name']);
+            }
         }
 
         $appendItemSetFieldset = !empty($searchPageSettings['form']['item_set_filter_type'])

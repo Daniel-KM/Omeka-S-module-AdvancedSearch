@@ -186,6 +186,17 @@ class SearchPageConfigureForm extends Form
                     'id' => 'autosuggest_url',
                 ],
             ])
+            ->add([
+                'name' => 'url_param_name',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Optional query param name for endpoint', // @translate
+                    'info' => 'For a direct Solr endpoint, it should be "suggest.q", else "q" is used by default.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'autosuggest_url_param_name',
+                ],
+            ])
         ;
 
         // Settings for the form querier (advanced form and filters).

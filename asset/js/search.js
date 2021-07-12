@@ -49,6 +49,23 @@ var Search = (function() {
         include_group_label_in_selected: true,
     };
 
+    var transformResult = function(response) {
+        // Managed by Solr endpoint.
+        // @see https://solr.apache.org/guide/suggester.html#example-usages
+        if (response.suggest) {
+            const answer = response.suggest[Object.keys(response.suggest)[0]];
+            const searchString = answer[Object.keys(answer)[0]];
+            return {
+                query: searchString,
+                suggestions: $.map(answer[searchString].suggestions, function(dataItem) {
+                    return { value: dataItem.term, data: dataItem.weight };
+                })
+            };
+        }
+        // Managed by module or try the format of jQuery-Autocomplete.
+        return response.data ? response.data : response;
+    }
+
     /**
      * @see https://github.com/devbridge/jQuery-Autocomplete
      */
@@ -57,13 +74,13 @@ var Search = (function() {
         if (!serviceUrl || !serviceUrl.length) {
             return null;
         }
+        let paramName = searchElement.data('autosuggest-param-name');
+        paramName = paramName && paramName.length ? paramName : 'q'
         return {
             serviceUrl: serviceUrl,
             dataType: 'json',
-            paramName: 'q',
-            transformResult: function(response) {
-                return response.data ? response.data : response;
-            },
+            paramName: paramName,
+            transformResult: transformResult,
             onSearchError: function(query, jqXHR, textStatus, errorThrown) {
                 if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
                     console.log(jqXHR.responseJSON.message);

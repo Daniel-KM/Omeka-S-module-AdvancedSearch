@@ -106,15 +106,15 @@ class AbstractFacetElement extends AbstractHelper
             // The facet value is compared against a string (the query args).
             $facetValueLabel = (string) $this->facetValueLabel($name, $facetValue);
             if (strlen($facetValueLabel)) {
-                if (isset($query['limit'][$name]) && array_search($facetValue, $query['limit'][$name]) !== false) {
-                    $values = $query['limit'][$name];
+                if (isset($query['facet'][$name]) && array_search($facetValue, $query['facet'][$name]) !== false) {
+                    $values = $query['facet'][$name];
                     $values = array_filter($values, function ($v) use ($facetValue) {
                         return $v !== $facetValue;
                     });
-                    $query['limit'][$name] = $values;
+                    $query['facet'][$name] = $values;
                     $active = true;
                 } else {
-                    $query['limit'][$name][] = $facetValue;
+                    $query['facet'][$name][] = $facetValue;
                     $active = false;
                 }
                 $url = $urlHelper($route, $params, ['query' => $query]);

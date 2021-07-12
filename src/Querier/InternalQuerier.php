@@ -366,7 +366,7 @@ SQL;
     /**
      * Filter the query.
      *
-     * @todo FIx the process for facets: all the facets should be displayed, and "or" by group of facets.
+     * @todo Fix the process for facets: all the facets should be displayed, and "or" by group of facets.
      * @todo Make core search properties groupable ("or" inside a group, "and" between group).
      *
      * Note: when a facet is selected, it is managed like a filter.

@@ -364,7 +364,6 @@ class IndexController extends AbstractActionController
             $request,
             [
                 // @see \Omeka\Api\Adapter\AbstractEntityAdapter::limitQuery().
-                // Note: facets use "limit" currently.
                 'page' => null,
                 'per_page' => null,
                 'limit' => null,

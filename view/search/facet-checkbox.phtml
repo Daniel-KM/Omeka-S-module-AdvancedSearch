@@ -19,5 +19,5 @@ $escapedId = $name . '[]' . $escapedValue;
 $displayCount = !empty($options['display_count']);
 ?>
 
-<input type="checkbox" name="limit[<?= $name ?>][]" id="<?= $escapedId ?>" value="<?= $escapedValue ?>" data-url="<?= $escapeHtmlAttr($url) ?>" <?php if ($active) echo ' checked="checked"'; ?>/>
+<input type="checkbox" name="facet[<?= $name ?>][]" id="<?= $escapedId ?>" value="<?= $escapedValue ?>" data-url="<?= $escapeHtmlAttr($url) ?>" <?php if ($active) echo ' checked="checked"'; ?>/>
 <label for="<?= $escapedId ?>"><?= $escapeHtml($label) ?><?php if ($displayCount): ?> (<span class="count"><?= $count ?></span>)<?php endif; ?></label>

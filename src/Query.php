@@ -96,6 +96,11 @@ class Query implements \JsonSerializable
     /**
      * @var array
      */
+    protected $activeFacets = [];
+
+    /**
+     * @var array
+     */
     protected $excludedFields = [];
 
     /**
@@ -284,6 +289,23 @@ class Query implements \JsonSerializable
         return $this->facetLanguages;
     }
 
+    public function setActiveFacets(array $activeFacets): self
+    {
+        $this->activeFacets = $activeFacets;
+        return $this;
+    }
+
+    public function addActiveFacet(string $name, $value): self
+    {
+        $this->activeFacets[$name][] = $value;
+        return $this;
+    }
+
+    public function getActiveFacets(): array
+    {
+        return $this->activeFacets;
+    }
+
     /**
      * Exclude fields from main search query, for example to exclude full text.
      */
@@ -346,6 +368,7 @@ class Query implements \JsonSerializable
             'facet_fields' => $this->getFacetFields(),
             'facet_limit' => $this->getFacetLimit(),
             'facet_languages' => $this->getFacetLanguages(),
+            'active_facets' => $this->getActiveFacets(),
             'excluded_fields' => $this->getExcludedFields(),
             'suggest_mode' => $this->getSuggestMode(),
             'suggest_fields' => $this->getSuggestFields(),

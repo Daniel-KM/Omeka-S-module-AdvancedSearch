@@ -127,6 +127,8 @@ class SearchRequestToResponse extends AbstractPlugin
 
         $hasFacets = !empty($searchPageSettings['facet']['facets']);
         if ($hasFacets) {
+            // Set the settings.
+            // TODO Set all the settings of the form one time (move process into Query, and other keys).
             $query->addFacetFields(array_keys($searchPageSettings['facet']['facets']));
             if (!empty($searchPageSettings['facet']['limit'])) {
                 $query->setFacetLimit((int) $searchPageSettings['facet']['limit']);
@@ -134,14 +136,11 @@ class SearchRequestToResponse extends AbstractPlugin
             if (!empty($searchPageSettings['facet']['languages'])) {
                 $query->setFacetLanguages($searchPageSettings['facet']['languages']);
             }
-            // FIXME Rename "limit" by "facet" or something else.
-            // A facet is added as a standard filter, but named differently in
-            // real query. It allows to do a query with and without limit in
-            // order to get all the facets from the initial query.
-            if (!empty($request['limit']) && is_array($request['limit'])) {
-                foreach ($request['limit'] as $name => $values) {
+            // Set the request for active facets.
+            if (!empty($request['facet']) && is_array($request['facet'])) {
+                foreach ($request['facet'] as $name => $values) {
                     foreach ($values as $value) {
-                        $query->addFilter($name, $value);
+                        $query->addActiveFacet($name, $value);
                     }
                 }
             }
@@ -215,7 +214,6 @@ class SearchRequestToResponse extends AbstractPlugin
             $request,
             [
                 // @see \Omeka\Api\Adapter\AbstractEntityAdapter::limitQuery().
-                // Note: facets use "limit" currently.
                 'page' => null,
                 'per_page' => null,
                 'limit' => null,

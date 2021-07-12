@@ -51,7 +51,7 @@ interface IndexerInterface extends LoggerAwareInterface
      * @param string $resourceName The resource type ("items", "item_sets"…).
      * @return bool
      */
-    public function canIndex($resourceName): bool;
+    public function canIndex(string $resourceName): bool;
 
     /**
      * Reset the index.

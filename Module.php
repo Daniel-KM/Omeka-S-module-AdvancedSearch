@@ -560,8 +560,9 @@ class Module extends AbstractModule
 
         $view = $event->getTarget();
 
+        $plugins = $view->getHelperPluginManager();
         /** @var \Omeka\Mvc\Status $status */
-        $status = $this->getServiceLocator()->get('Omeka\Status');
+        $status = $plugins->get('status');
         if ($status->isSiteRequest()) {
             $params = $view->params()->fromRoute();
             if ($params['controller'] === \Search\Controller\IndexController::class) {
@@ -580,32 +581,36 @@ class Module extends AbstractModule
         }
 
         /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
-        $searchPage = $view->api()->searchOne('search_pages', ['id' => $searchPage])->getContent();
+        $searchPage = $plugins->get('api')->searchOne('search_pages', ['id' => $searchPage])->getContent();
         if (!$searchPage) {
             return;
         }
 
+        $formAdapter = $searchPage->formAdapter();
+        $partialHeaders = $formAdapter ? $formAdapter->getFormPartialHeaders() : null;
+
         if ($status->isAdminRequest()) {
-            $basePath = $view->plugin('basePath');
-            $assetUrl = $view->plugin('assetUrl');
-            $view->headLink()
+            $basePath = $plugins->get('basePath');
+            $assetUrl = $plugins->get('assetUrl');
+            $searchUrl = $basePath('admin/' . $searchPage->path());
+            if ($searchPage->subSetting('autosuggest', 'enable')) {
+                $autoSuggestUrl = $searchPage->subSetting('autosuggest', 'url') ?: $searchUrl . '/suggest';
+            }
+            $plugins->get('headLink')
                 ->appendStylesheet($assetUrl('css/search-admin-search.css', 'Search'));
-            $view->headScript()
-                ->appendScript(sprintf('var searchUrl = %s;', json_encode($basePath('admin/' . $searchPage->path()), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)))
+            $plugins->get('headScript')
+                ->appendScript(sprintf('var searchUrl = %s;', json_encode($searchUrl, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE))
+                   . (isset($autoSuggestUrl) ? sprintf("\nvar searchAutosuggestUrl=%s;", json_encode($autoSuggestUrl, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)) : '')
+                )
                 ->appendFile($assetUrl('js/search-admin-search.js', 'Search'), 'text/javascript', ['defer' => 'defer']);
         }
 
-        $formAdapter = $searchPage->formAdapter();
-        if (!$formAdapter) {
-            return;
-        }
-
-        $partialHeaders = $formAdapter->getFormPartialHeaders();
         if (!$partialHeaders) {
             return;
         }
 
         // No echo: it should just be a preload.
+        $view->vars()->offsetSet('searchPage', $searchPage);
         $view->partial($partialHeaders);
     }
 

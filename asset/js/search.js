@@ -38,6 +38,42 @@ var Search = (function() {
         localStorage.setItem('search_view_type', viewType);
     };
 
+    /**
+     * Chosen default options.
+     * @see https://harvesthq.github.io/chosen/
+     */
+    self.chosenOptions = {
+        allow_single_deselect: true,
+        disable_search_threshold: 10,
+        width: '100%',
+        include_group_label_in_selected: true,
+    };
+
+    /**
+     * @see https://github.com/devbridge/jQuery-Autocomplete
+     */
+    self.autosuggestOptions = function (searchElement) {
+        let serviceUrl = searchElement.data('autosuggest-url');
+        if (!serviceUrl || !serviceUrl.length) {
+            return null;
+        }
+        return {
+            serviceUrl: serviceUrl,
+            dataType: 'json',
+            paramName: 'q',
+            transformResult: function(response) {
+                return response.data ? response.data : response;
+            },
+            onSearchError: function(query, jqXHR, textStatus, errorThrown) {
+                if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+                    console.log(jqXHR.responseJSON.message);
+                } else if (errorThrown.length) {
+                    console.log(errorThrown)
+                }
+            },
+        };
+    };
+
     return self;
 })();
 
@@ -102,40 +138,14 @@ $(document).ready(function() {
     }
     $('.search-view-type-' + view_type).click();
 
-    if ($.isFunction($.fn.autocomplete)
-        && $('.autosuggest[name=q]').data('autosuggest-url')
-    ) {
-        let suggestUrl = $('.autosuggest[name=q]').data('autosuggest-url');
-        console.log(suggestUrl);
-        $('.autosuggest[name=q]').autocomplete({
-            serviceUrl: suggestUrl.charAt(0) === '/' ? window.location.origin + suggestUrl : suggestUrl,
-            dataType: 'json',
-            paramName: 'q',
-            transformResult: function(response) {
-                return response.data;
-            },
-            onSearchError: function(query, jqXHR, textStatus, errorThrown) {
-                if (jqXHR.responseJson && jqXHR.responseJson.message) {
-                    console.log(jqXHR.responseJson.message);
-                } else {
-                    console.log(errorThrown)
-                }
-            },
-        });
+    if ($.isFunction($.fn.autocomplete)) {
+        let searchElement = $('.form-search .autosuggest[name=q]');
+        let autosuggestOptions = Search.autosuggestOptions(searchElement);
+        if (autosuggestOptions) searchElement.autocomplete(autosuggestOptions);
     }
 
     if ($.isFunction($.fn.chosen)) {
-        /**
-         * Chosen default options.
-         * @see https://harvesthq.github.io/chosen/
-         */
-        var chosenOptions = {
-            allow_single_deselect: true,
-            disable_search_threshold: 10,
-            width: '100%',
-            include_group_label_in_selected: true,
-        };
-        $('.chosen-select').chosen(chosenOptions);
+        $('.chosen-select').chosen(Search.chosenOptions);
     }
 
 });

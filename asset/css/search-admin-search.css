@@ -1,15 +1,15 @@
 /* Copy from application/asset/sass/_screen.scss */
-#find {
+#search-form-quick {
     width: 100%;
     display: inline-block;
     vertical-align: top;
     margin: 0 0 24px;
 }
-#find input[type=text] {
+#search-form-quick input[type=text] {
     width: calc(100% - 36px);
     float: left;
 }
-#find button {
+#search-form-quick button {
     width: 36px;
     text-indent: -9999px;
     background-color: #222933;
@@ -22,11 +22,11 @@
     height: 36px;
     box-shadow: none;
 }
-#find button:last-of-type {
+#search-form-quick button:last-of-type {
     border-left: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 0 3px 3px 0;
 }
-#find button:after {
+#search-form-quick button:after {
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
     text-indent: 0;
@@ -37,6 +37,33 @@
     line-height: 36px;
     text-align: center;
 }
-#find button:last-of-type:after {
+#search-form-quick button:last-of-type:after {
     content: "";
+}
+
+.autocomplete-suggestions {
+    border: 1px solid #999999;
+    background: #ffffff;
+    overflow: auto;
+}
+.autocomplete-suggestion {
+    padding: 2px 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    /* Fix safari */
+    cursor: pointer;
+}
+.autocomplete-selected {
+    background: #f0f0f0;
+}
+.autocomplete-suggestions strong {
+    font-weight: normal;
+    color: #3399FF;
+}
+.autocomplete-group {
+    padding: 2px 5px;
+}
+.autocomplete-group strong {
+    display: block;
+    border-bottom: 1px solid #000;
 }

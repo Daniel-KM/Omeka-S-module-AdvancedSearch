@@ -171,15 +171,16 @@ class SearchPageConfigureForm extends Form
                     'id' => 'autosuggest_fields',
                     'multiple' => true,
                     'class' => 'chosen-select',
-                    'data-placeholder' => ' ', // @translate
+                    'data-placeholder' => ' ',
                 ],
             ])
             ->add([
                 'name' => 'url',
                 'type' => OptionalUrl::class,
                 'options' => [
-                    'label' => 'Optional endpoint for auto-suggest', // @translate
-                    'info' => 'This url allows to use an external endpoint to manage keywords.', // @translate
+                    'label' => 'Optional direct endpoint', // @translate
+                    // @see https://solr.apache.org/guide/suggester.html#suggest-request-handler-parameters
+                    'info' => 'This url allows to use an external endpoint to manage keywords and is generally quicker.', // @translate
                 ],
                 'attributes' => [
                     'id' => 'autosuggest_url',

@@ -1,14 +1,25 @@
 <?php
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Search\Api\Representation\SearchPageRepresentation $searchPage
  */
 
 // Add headers (css or scripts) to be included for the form.
 // The form itself is managed by search-form-main.
 
+// The form can be used independantly of the search page, but they share the same css/js.
+// By the way, they are loaded one time only by Laminas.
+
 $assetUrl = $this->plugin('assetUrl');
 
+if ($searchPage->subSetting('autosuggest', 'enable')) {
+    $this->headScript()
+        ->appendFile($assetUrl('vendor/jquery-autocomplete/jquery.autocomplete.min.js', 'Search'), 'text/javascript', ['defer' => 'defer']);
+}
+
 $this->headLink()
-    ->appendStylesheet($assetUrl('vendor/chosen-js/chosen.min.css', 'Omeka'));
+    ->appendStylesheet($assetUrl('vendor/chosen-js/chosen.min.css', 'Omeka'))
+    ->appendStylesheet($assetUrl('css/search.css', 'Search'));
 $this->headScript()
-    ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.min.js', 'Omeka'), 'text/javascript', ['defer' => 'defer']);
+    ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.min.js', 'Omeka'), 'text/javascript', ['defer' => 'defer'])
+    ->appendFile($assetUrl('js/search.js', 'Search'), 'text/javascript', ['defer' => 'defer']);

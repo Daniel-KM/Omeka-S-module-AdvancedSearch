@@ -73,10 +73,9 @@ class IndexController extends AbstractActionController
             // or via searchPage.
             'searchPage' => $searchPage,
             'site' => $site,
+            // Set a default empty query and response to simplify view.
             'query' => new Query,
-            // Set a default empty response and values to simplify view.
             'response' => new Response,
-            'sortOptions' => [],
         ]);
 
         $request = $this->params()->fromQuery();

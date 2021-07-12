@@ -26,6 +26,14 @@ class SearchSortSelector extends AbstractHelper
             return '';
         }
 
+        /** @deprecated Since 3.5.23.3. Kept for old themes. */
+        if (!is_array(reset($sortOptions))) {
+            foreach ($sortOptions as $name => &$sortOption) {
+                $sortOption = ['name' => $name, 'label' => $sortOption];
+            }
+            unset($sortOption);
+        }
+
         $select = $asSortUrls
             ? $this->asSortUrls($query, $sortOptions)
             : $this->asForm($query, $sortOptions);
@@ -72,7 +80,7 @@ class SearchSortSelector extends AbstractHelper
             if ($name === $currentSort) {
                 $currentSortUrl = $sortName;
             }
-            $sortOptions[$sortName] = $translate($sortOption['value']);
+            $sortOptions[$sortName] = $translate($sortOption['label']);
         }
 
         return (new Select('sort'))

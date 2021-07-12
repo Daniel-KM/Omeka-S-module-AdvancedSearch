@@ -1,9 +1,9 @@
 <?php
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Search\Api\Representation\SearchPageRepresentation $searchPage
  * @var \Search\Query $query
  * @var \Search\Response $response
- * @var array $sortOptions
  */
 
 $translate = $this->plugin('translate');
@@ -13,7 +13,7 @@ $translate = $this->plugin('translate');
     <div class="search-results-count">
         <?= $this->pagination() ?>
     </div>
-    <?= $this->searchSortSelector($query, $sortOptions) ?>
+    <?= $this->searchSortSelector($query, $searchPage->subSetting('sort', 'fields')) ?>
     <div>
         <a class="search-view-type search-view-type-list" href="#"><?= $translate('list') ?></a>
         |

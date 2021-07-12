@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace Search\Site\BlockLayout;
 
 use Laminas\View\Renderer\PhpRenderer;
@@ -58,9 +59,9 @@ class SearchingForm extends AbstractBlockLayout
 
     public function render(PhpRenderer $view, SitePageBlockRepresentation $block)
     {
+        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
         $searchPage = $block->dataValue('search_page');
         if ($searchPage) {
-            /* @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
             try {
                 $searchPage = $view->api()->read('search_pages', ['id' => $searchPage])->getContent();
             } catch (\Omeka\Api\Exception\NotFoundException $e) {
@@ -94,7 +95,6 @@ class SearchingForm extends AbstractBlockLayout
             'site' => $site,
             'query' => null,
             'response' => new Response,
-            'sortOptions' => [],
         ];
 
         if ($displayResults) {

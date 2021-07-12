@@ -33,7 +33,6 @@
  * @var \Search\Api\Representation\SearchPageRepresentation $searchPage
  * @var \Search\Query $query
  * @var \Search\Response $response
- * @var array $sortOptions
  * For block layout:
  * @var string $heading Unused in current template.
  * @var bool $skipFormAction Remove action of the form, so it uses current page.
@@ -94,9 +93,9 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javas
 
         <?php if ($response->getTotalResults()): ?>
             <?= $partial('search/results-header', [
+                'searchPage' => $searchPage,
                 'query' => $query,
                 'response' => $response,
-                'sortOptions' => $sortOptions,
             ]) ?>
 
             <?php $itemSetsCount = $response->getResourceTotalResults('item_sets'); ?>
@@ -116,22 +115,22 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javas
             ]) ?>
 
             <?= $partial('search/results-footer', [
+                'searchPage' => $searchPage,
                 'query' => $query,
                 'response' => $response,
-                'sortOptions' => $sortOptions,
             ]) ?>
-
-        <?php elseif (empty($query) && !$itemSet): ?>
-
-            <div class="noresults"><?= $translate('Fill a query and get results.') ?></div>
-
-        <?php elseif (empty($query) && $itemSetId): ?>
-
-            <div class="noresults"><?= $translate('This item set has no items.') ?></div>
 
         <?php else: ?>
 
-            <div class="noresults"><?= $translate('Your query returned no results') ?></div>
+            <div class="noresults">
+                <?php if (empty($query) && !$itemSet): ?>
+                <?= $translate('Fill a query and get results.') ?>
+                <?php elseif (empty($query) && $itemSet): ?>
+                <?= $translate('This item set has no items.') ?>
+                <?php else: ?>
+                <?= $translate('Your query returned no results') ?>
+                <?php endif; ?>
+            </div>
 
         <?php endif; ?>
 

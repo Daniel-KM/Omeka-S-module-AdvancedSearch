@@ -35,6 +35,7 @@ use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
 use Omeka\Form\Element\ArrayTextarea;
 use Search\Form\Element\ArrayText;
+use Search\Form\Element\OptionalRadio;
 use Search\Form\Element\OptionalSelect;
 use Search\Form\Element\OptionalUrl;
 
@@ -144,7 +145,7 @@ class SearchPageConfigureForm extends Form
             ])
             ->add([
                 'name' => 'mode',
-                'type' => Element\Radio::class,
+                'type' => OptionalRadio::class,
                 'options' => [
                     'label' => 'Mode', // @translate
                     'info' => 'Should be implemented in internal search engine.',
@@ -203,7 +204,7 @@ class SearchPageConfigureForm extends Form
                 'name' => 'url_param_name',
                 'type' => Element\Text::class,
                 'options' => [
-                    'label' => 'Optional query param name for endpoint', // @translate
+                    'label' => 'Optional query param name for direct endpoint', // @translate
                     'info' => 'For a direct Solr endpoint, it should be "suggest.q", else "q" is used by default.', // @translate
                 ],
                 'attributes' => [
@@ -509,7 +510,7 @@ class SearchPageConfigureForm extends Form
                     'key_value_separator' => '=',
                 ],
                 'attributes' => [
-                    'id' => 'facetting_facets',
+                    'id' => 'facet_facets',
                     'placeholder' => 'dcterms:subject = Subjects',
                     'rows' => 12,
                 ],
@@ -524,7 +525,7 @@ class SearchPageConfigureForm extends Form
                     'key_value_separator' => '=',
                 ],
                 'attributes' => [
-                    'id' => 'facetting_available_facets',
+                    'id' => 'facet_available_facets',
                     'value' => $this->getAvailableFacetFields(),
                     'placeholder' => 'dcterms:subject = Subjects',
                     'rows' => 12,
@@ -538,10 +539,28 @@ class SearchPageConfigureForm extends Form
                     'info' => 'The maximum number of values fetched for each facet', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'facetting_limit',
+                    'id' => 'facet_limit',
                     'value' => 10,
                     'min' => 1,
                     'required' => false,
+                ],
+            ])
+            ->add([
+                'name' => 'order',
+                'type' => OptionalRadio::class,
+                'options' => [
+                    'label' => 'Order of facet items', // @translate
+                    'value_options' => [
+                        '' => 'Native', // @translate
+                        'alphabetic asc' => 'Alphabetical', // @translate
+                        'total desc' => 'Count (biggest first)', // @translate
+                        'total asc' => 'Count (smallest first)', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'facet_order',
+                    'required' => false,
+                    'value' => '',
                 ],
             ])
             ->add([
@@ -553,19 +572,8 @@ class SearchPageConfigureForm extends Form
                     'value_separator' => '|',
                 ],
                 'attributes' => [
-                    'id' => 'facetting_languages',
+                    'id' => 'facet_languages',
                     'placeholder' => 'fra|way|apy|',
-                ],
-            ])
-            ->add([
-                'name' => 'display_count',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'label' => 'Display the count of each facet', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'display_count',
-                    'value' => true,
                 ],
             ])
             ->add([
@@ -579,9 +587,20 @@ class SearchPageConfigureForm extends Form
                     ],
                 ],
                 'attributes' => [
-                    'id' => 'facetting_mode',
+                    'id' => 'facet_mode',
                     'required' => false,
                     'value' => 'button',
+                ],
+            ])
+            ->add([
+                'name' => 'display_count',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Display the count of each facet item', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'facet_display_count',
+                    'value' => true,
                 ],
             ])
         ;

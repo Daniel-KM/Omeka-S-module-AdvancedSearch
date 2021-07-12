@@ -89,6 +89,11 @@ class Query implements \JsonSerializable
     protected $facetLimit = 0;
 
     /**
+     * @var string
+     */
+    protected $facetOrder = '';
+
+    /**
      * @var array
      */
     protected $facetLanguages = [];
@@ -276,6 +281,17 @@ class Query implements \JsonSerializable
     public function getFacetLimit(): int
     {
         return $this->facetLimit;
+    }
+
+    public function setFacetOrder(?string $facetOrder): self
+    {
+        $this->facetOrder = (string) $facetOrder;
+        return $this;
+    }
+
+    public function getFacetOrder(): string
+    {
+        return $this->facetOrder;
     }
 
     public function setFacetLanguages(array $facetLanguages): self

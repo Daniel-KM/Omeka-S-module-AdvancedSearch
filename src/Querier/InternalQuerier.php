@@ -562,6 +562,7 @@ SQL;
 
         $facetFields = $this->query->getFacetFields();
         $facetLimit = $this->query->getFacetLimit();
+        $facetOrder = $this->query->getFacetOrder();
         $facetLanguages = $this->query->getFacetLanguages();
 
         $metadataFieldsToNames = [
@@ -593,14 +594,36 @@ SQL;
         unset($facetData['limit']);
         unset($facetData['offset']);
 
+        $facetOrders = [
+            'alphabetic asc' => [
+                'sort_by' => 'alphabetic',
+                'sort_order' => 'ASC',
+            ],
+            'total asc' => [
+                'sort_by' => 'total',
+                'sort_order' => 'ASC',
+            ],
+            'total desc' => [
+                'sort_by' => 'total',
+                'sort_order' => 'DESC',
+            ],
+            'default' => [
+                'sort_by' => 'alphabetic',
+                'sort_order' => 'ASC',
+            ],
+        ];
+        if (!isset($facetOrders[$facetOrder])) {
+            $facetOrder = 'default';
+        }
+
         foreach ($this->resourceTypes as $resourceType) {
             $options = [
                 'resource_name' => $resourceType,
                 // Options sql.
                 'per_page' => $facetLimit,
                 'page' => 1,
-                'sort_by' => 'total',
-                'sort_order' => 'DESC',
+                'sort_by' => $facetOrders[$facetOrder]['sort_by'],
+                'sort_order' => $facetOrders[$facetOrder]['sort_order'],
                 'filters' => [
                     'languages' => $facetLanguages,
                     'datatypes' => [],
@@ -636,6 +659,7 @@ SQL;
                 }
             }
         }
+
         $this->response->setFacetCounts(array_map('array_values', $facetCountsByField));
     }
 

@@ -52,9 +52,9 @@ return [
     'sort' => [
         'fields' => [
             ['dcterms:title asc' => 'Title'],
-            ['dcterms:title desc' => 'Title (reverted)'],
+            ['dcterms:title desc' => 'Title (from z to a)'],
             ['dcterms:date asc' => 'Date'],
-            ['dcterms:date desc' => 'Date (reverted)'],
+            ['dcterms:date desc' => 'Date (most recent first)'],
         ],
     ],
 
@@ -68,8 +68,10 @@ return [
             ['dcterms:date' => 'Date'],
             ['dcterms:language' => 'Language'],
         ],
-        'limit' => 10,
         'languages' => [],
         'mode' => 'button',
+        'limit' => 10,
+        'order' => '',
+        'display_count' => true,
     ],
 ];

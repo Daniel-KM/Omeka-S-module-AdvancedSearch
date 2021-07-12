@@ -133,9 +133,13 @@ class SearchRequestToResponse extends AbstractPlugin
             if (!empty($searchPageSettings['facet']['limit'])) {
                 $query->setFacetLimit((int) $searchPageSettings['facet']['limit']);
             }
+            if (!empty($searchPageSettings['facet']['order'])) {
+                $query->setFacetOrder($searchPageSettings['facet']['order']);
+            }
             if (!empty($searchPageSettings['facet']['languages'])) {
                 $query->setFacetLanguages($searchPageSettings['facet']['languages']);
             }
+
             // Set the request for active facets.
             if (!empty($request['facet']) && is_array($request['facet'])) {
                 foreach ($request['facet'] as $name => $values) {

@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016-2017
- * Copyright Daniel Berthereau, 2018
+ * Copyright Daniel Berthereau, 2018-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -30,82 +30,35 @@
 
 namespace Search\View\Helper;
 
-use Laminas\Mvc\Application;
 use Laminas\View\Helper\AbstractHelper;
-use Omeka\Api\Manager as ApiManager;
-use Search\Api\Representation\SearchPageRepresentation;
 
 class FacetLabel extends AbstractHelper
 {
-    /**
-     * @var Application
-     */
-    protected $application;
-
-    /**
-     * @var ApiManager
-     */
-    protected $api;
-
-    /**
-     * @var array
-     */
-    protected $availableFacetFields;
-
-    /**
-     * @var SearchPageRepresentation
-     */
-    protected $searchPage;
-
-    public function __construct(Application $application, ApiManager $api)
+    public function __invoke($name): string
     {
-        $this->application = $application;
-        $this->api = $api;
-    }
+        static $availableFacetFields;
 
-    public function __invoke($name)
-    {
         $settings = $this->getSearchPage()->settings();
-
-        if (!empty($settings['facets'][$name]['display']['label'])) {
-            return $settings['facets'][$name]['display']['label'];
+        if (!empty($settings['facet']['facets'][$name])) {
+            return $settings['facet']['facets'][$name];
         }
 
-        $availables = $this->getAvailableFacetFields();
-        if (!empty($availables[$name]['label'])) {
-            return $availables[$name]['label'];
-        }
-
-        return $name;
-    }
-
-    /**
-     * @return array
-     */
-    protected function getAvailableFacetFields()
-    {
-        if (!isset($this->availableFacetFields)) {
+        if (!isset($availableFacetFields)) {
             $index = $this->getSearchPage()->index();
-            $this->availableFacetFields = $index->adapter()->getAvailableFacetFields($index);
+            $availableFacetFields = $index->adapter()
+                ->getAvailableFacetFields($index);
         }
-        return $this->availableFacetFields;
+
+        return $availableFacetFields[$name]['label'] ?? $name;
     }
 
-    /**
-     * @return \Search\Api\Representation\SearchPageRepresentation
-     */
-    protected function getSearchPage()
+    protected function getSearchPage(): \Search\Api\Representation\SearchPageRepresentation
     {
-        if (!isset($this->searchPage)) {
-            $view = $this->getView();
-            if (empty($view->searchPage)) {
-                $this->searchPage = $this->api
-                    ->read('search_pages', $this->application->getMvcEvent()->getRouteMatch()->getParam('id'))
-                    ->getContent();
-            } else {
-                $this->searchPage = $view->searchPage;
-            }
+        if (!property_exists($this->view, 'searchPage')) {
+            $this->view->searchPage = $this->view->api()
+                ->read('search_pages', $this->view->params()->fromRoute('id'))
+                ->getContent();
         }
-        return $this->searchPage;
+        return $this->view->searchPage;
     }
 }

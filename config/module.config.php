@@ -27,6 +27,7 @@ return [
     ],
     'view_helpers' => [
         'invokables' => [
+            'facetLabel' => View\Helper\FacetLabel::class,
             'hiddenInputsFromFilteredQuery' => View\Helper\HiddenInputsFromFilteredQuery::class,
             'searchForm' => View\Helper\SearchForm::class,
             'searchingForm' => View\Helper\SearchingForm::class,
@@ -38,7 +39,6 @@ return [
             'apiSearchOne' => Service\ViewHelper\ApiSearchOneFactory::class,
             'facetActive' => Service\ViewHelper\FacetActiveFactory::class,
             'facetCheckbox' => Service\ViewHelper\FacetCheckboxFactory::class,
-            'facetLabel' => Service\ViewHelper\FacetLabelFactory::class,
             'facetLink' => Service\ViewHelper\FacetLinkFactory::class,
             'searchIndexConfirm' => Service\ViewHelper\SearchIndexConfirmFactory::class,
             'searchRequestToResponse' => Service\ViewHelper\SearchRequestToResponseFactory::class,

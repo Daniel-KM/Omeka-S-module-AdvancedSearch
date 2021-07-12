@@ -42,7 +42,10 @@ class SearchSortSelector extends AbstractHelper
     {
         $plugins = $this->getView()->getHelperPluginManager();
         $translate = $plugins->get('translate');
-
+        foreach ($sortOptions as &$sortOption) {
+            $sortOption = $translate($sortOption['label']);
+        }
+        unset($sortOption);
         $sortOptions = array_map($translate, $sortOptions);
         return (new Select('sort'))
             ->setValueOptions($sortOptions)
@@ -64,12 +67,12 @@ class SearchSortSelector extends AbstractHelper
         $sorts = $sortOptions;
         $sortOptions = [];
         $currentSortUrl = null;
-        foreach ($sorts as $key => $value) {
-            $sortKey = $currentUrl . '?' . http_build_query(['sort' => $key] + $currentQuery, '', '&', PHP_QUERY_RFC3986);
-            if ($key === $currentSort) {
-                $currentSortUrl = $sortKey;
+        foreach ($sorts as $name => $sortOption) {
+            $sortName = $currentUrl . '?' . http_build_query(['sort' => $name] + $currentQuery, '', '&', PHP_QUERY_RFC3986);
+            if ($name === $currentSort) {
+                $currentSortUrl = $sortName;
             }
-            $sortOptions[$sortKey] = $translate($value);
+            $sortOptions[$sortName] = $translate($sortOption['value']);
         }
 
         return (new Select('sort'))

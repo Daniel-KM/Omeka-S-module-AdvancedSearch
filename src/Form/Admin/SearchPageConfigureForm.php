@@ -35,6 +35,7 @@ use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
 use Omeka\Form\Element\ArrayTextarea;
 use Search\Form\Element\ArrayText;
+use Search\Form\Element\DataTextarea;
 use Search\Form\Element\OptionalRadio;
 use Search\Form\Element\OptionalSelect;
 use Search\Form\Element\OptionalUrl;
@@ -340,12 +341,16 @@ class SearchPageConfigureForm extends Form
 
             ->add([
                 'name' => 'filters',
-                'type' => ArrayTextarea::class,
+                'type' => DataTextarea::class,
                 'options' => [
                     'label' => 'Filters', // @translate
                     'info' => 'List of filters that will be displayed in the search form. Format is "term = Label". The field should exist in all resources fields.', // @translate
                     'as_key_value' => true,
                     'key_value_separator' => '=',
+                    'data_keys' => [
+                        'name',
+                        'label',
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'filters',
@@ -456,12 +461,16 @@ class SearchPageConfigureForm extends Form
             // field (term + asc/desc) = label (+ asc/desc) (order means weight).
             ->add([
                 'name' => 'fields',
-                'type' => ArrayTextarea::class,
+                'type' => DataTextarea::class,
                 'options' => [
                     'label' => 'Sort fields', // @translate
                     'info' => 'List of sort fields that will be displayed in the search page. Format is "term dir = Label".', // @translate
                     'as_key_value' => true,
                     'key_value_separator' => '=',
+                    'data_keys' => [
+                        'name',
+                        'label',
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'sorting_fields',
@@ -502,12 +511,16 @@ class SearchPageConfigureForm extends Form
             // field (term) = label (order means weight).
             ->add([
                 'name' => 'facets',
-                'type' => ArrayTextarea::class,
+                'type' => DataTextarea::class,
                 'options' => [
                     'label' => 'List of facets', // @translate
                     'info' => 'List of facets that will be displayed in the search page. Format is "field = Label".', // @translate
                     'as_key_value' => true,
                     'key_value_separator' => '=',
+                    'data_keys' => [
+                        'name',
+                        'label',
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'facet_facets',

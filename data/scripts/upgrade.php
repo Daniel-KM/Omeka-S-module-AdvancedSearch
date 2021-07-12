@@ -382,3 +382,49 @@ if (version_compare($oldVersion, '3.5.22.3', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.5.23.3', '<')) {
+    $sql = <<<'SQL'
+SELECT `id`, `settings` FROM `search_page`;
+SQL;
+    $default = [
+        'search' => [],
+        'autosuggest' => [],
+        'form' => [],
+        'sort' => [],
+        'facet' => [],
+    ];
+    $stmt = $connection->query($sql);
+    $results = $stmt->fetchAll();
+    foreach ($results as $result) {
+        $id = $result['id'];
+        $searchPageSettings = $result['settings'];
+        $searchPageSettings = json_decode($searchPageSettings, true) ?: [];
+        $searchPageSettings = array_replace($default, $searchPageSettings);
+
+        if (!empty($searchPageSettings['form']['filters'])) {
+            foreach ($searchPageSettings['form']['filters'] as $name => &$val) {
+                $val = ['name' => $name, 'label' => $val];
+            }
+            unset($val);
+        }
+
+        foreach ($searchPageSettings['sort']['fields'] as $name => &$val) {
+            $val = ['name' => $name, 'label' => $val];
+        }
+        unset($val);
+
+        foreach ($searchPageSettings['facet']['facets'] as $name => &$val) {
+            $val = ['name' => $name, 'label' => $val];
+        }
+        unset($val);
+
+        $searchPageSettings = $connection->quote(json_encode($searchPageSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        $sql = <<<SQL
+UPDATE `search_page`
+SET `settings` = $searchPageSettings
+WHERE `id` = $id;
+SQL;
+        $connection->exec($sql);
+    }
+}

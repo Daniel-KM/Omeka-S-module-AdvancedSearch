@@ -586,13 +586,7 @@ SQL;
         // query for resource (items and item sets together).
         $facetCountsByField = array_fill_keys($facetFields, []);
 
-        // TODO To be removed when the filters will be groupable (see version 3.5.12 where this is after filter).
-        // Facets data don't use sort or limit.
         $facetData = $this->argsWithoutActiveFacets;
-        unset($facetData['sort_by']);
-        unset($facetData['sort_order']);
-        unset($facetData['limit']);
-        unset($facetData['offset']);
 
         $facetOrders = [
             'alphabetic asc' => [

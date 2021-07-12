@@ -120,6 +120,8 @@ return [
         'mode' => 'button',
         'limit' => 10,
         'order' => '',
+        'display_button' => 'above',
+        'display_active' => true,
         'display_count' => true,
     ],
 ];

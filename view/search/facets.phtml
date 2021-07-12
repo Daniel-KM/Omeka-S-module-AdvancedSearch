@@ -47,7 +47,11 @@ $activeFacets = $response->getActiveFacets();
 // Don't display facet groups without facet elements.
 $facets = array_filter($facets);
 
+$displayActive = (bool) $searchPage->subSetting('facet', 'display_active', true);
+
 $isFacetModeButton = $searchPage->subSetting('facet', 'mode') !== 'link';
+$displayFacetButton = $isFacetModeButton && !empty($facets);
+$displayButton = $displayFacetButton ? $searchPage->subSetting('facet', 'display_button', 'above') : 'none';
 
 $facetActive = $plugins->get('facetActive');
 $facetLabel = $plugins->get('facetLabel');
@@ -67,7 +71,8 @@ unset($options['facets']);
 <aside class="search-facets">
 
     <h3><?= $translate('Filters') ?></h3>
-    <?php if (count($activeFacets)): ?>
+
+    <?php if ($displayActive && count($activeFacets)): ?>
     <h4><?= $translate('Active filters') ?></h4>
     <ul class="search-facets-active">
         <?php foreach ($activeFacets as $name => $facetValues) foreach ($facetValues as $facetValue): ?>
@@ -77,6 +82,16 @@ unset($options['facets']);
     <?php endif; ?>
 
     <form id="form-facets">
+
+        <?php if ($displayFacetButton): ?>
+        <?= $this->hiddenInputsFromFilteredQuery(null, ['facet', 'page', 'limit', 'offset', 'per_page']) ?>
+        <?php endif; ?>
+
+        <?php if ($displayFacetButton && ($displayButton === 'above' || $displayButton === 'both')): ?>
+        <div class="apply-facets apply-facets-top">
+            <input type="submit" value="<?= $translate('Apply filters') ?>"/>
+        </div>
+        <?php endif; ?>
 
         <?php if (empty($facets) && empty($activeFacets)): ?>
         <p><?= $translate('No filters.') ?></p>
@@ -97,9 +112,8 @@ unset($options['facets']);
         </ul>
         <?php endif; ?>
 
-        <?php if ($isFacetModeButton && !empty($facets)): ?>
-        <?= $this->hiddenInputsFromFilteredQuery(null, ['facet', 'page', 'limit', 'offset', 'per_page']) ?>
-        <div class="apply-facets">
+        <?php if ($displayFacetButton && ($displayButton === 'below' || $displayButton === 'both')): ?>
+        <div class="apply-facets apply-facets-bottom">
             <input type="submit" value="<?= $translate('Apply filters') ?>"/>
         </div>
         <?php endif; ?>

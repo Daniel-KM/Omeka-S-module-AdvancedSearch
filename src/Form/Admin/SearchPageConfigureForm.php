@@ -591,7 +591,7 @@ class SearchPageConfigureForm extends Form
             ])
             ->add([
                 'name' => 'mode',
-                'type' => Element\Radio::class,
+                'type' => OptionalRadio::class,
                 'options' => [
                     'label' => 'Facet mode', // @translate
                     'value_options' => [
@@ -603,6 +603,36 @@ class SearchPageConfigureForm extends Form
                     'id' => 'facet_mode',
                     'required' => false,
                     'value' => 'button',
+                ],
+            ])
+            ->add([
+                'name' => 'display_button',
+                'type' => OptionalRadio::class,
+                'options' => [
+                    'label' => 'Position of the button "Apply filters"', // @translate
+                    'value_options' => [
+                        'above' => 'Above facets', // @translate
+                        'below' => 'Below facets', // @translate
+                        'both' => 'Both', // @translate
+                        'none' => 'None', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'facet_display_button',
+                    'required' => false,
+                    'value' => 'above',
+                ],
+            ])
+            ->add([
+                'name' => 'display_active',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Display the list of active facets', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'facet_display_active',
+                    'required' => false,
+                    'value' => true,
                 ],
             ])
             ->add([
@@ -633,10 +663,6 @@ class SearchPageConfigureForm extends Form
             $inputFilter
                 ->get('autosuggest')
                 ->add([
-                    'name' => 'mode',
-                    'required' => false,
-                ])
-                ->add([
                     'name' => 'limit',
                     'required' => false,
                 ])
@@ -662,10 +688,6 @@ class SearchPageConfigureForm extends Form
                 ])
                 ->add([
                     'name' => 'languages',
-                    'required' => false,
-                ])
-                ->add([
-                    'name' => 'mode',
                     'required' => false,
                 ])
             ;

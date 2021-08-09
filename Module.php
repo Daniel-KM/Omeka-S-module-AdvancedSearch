@@ -705,7 +705,8 @@ SQL;
             $searchIndexId = $connection->fetchColumn($sqlSearchIndexId);
             $message = new Message(
                 'The internal search engine (sql) is available. Configure it in the %ssearch manager%s.', // @translate
-                sprintf('<a href="%s">', $urlHelper('admin/search')),
+                // Don't use the url helper, the route is not available during install.
+                sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager'),
                 '</a>'
             );
             $message->setEscapeHtml(false);
@@ -728,14 +729,15 @@ INSERT INTO `search_page`
 VALUES
 ($searchIndexId, 'Default', 'find', 'main', ?, NOW());
 SQL;
-            $searchPageSettings = require __DIR__ . '/data//search_pages/main.php';
+            $searchPageSettings = require __DIR__ . '/data/search_pages/default.php';
             $connection->executeQuery($sql, [
                 json_encode($searchPageSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
             ]);
 
             $message = new Message(
                 'The default search page is available. Configure it in the %ssearch manager%s, in the main settings (for admin) and in site settings (for public).', // @translate
-                sprintf('<a href="%s">', $urlHelper('admin/search')),
+                // Don't use the url helper, the route is not available during install.
+                sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager'),
                 '</a>'
             );
             $message->setEscapeHtml(false);

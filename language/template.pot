@@ -1,0 +1,184 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-01-18 00:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: Module.php:447 view/common/advanced-search/date-time.phtml:74
+msgid "after"
+msgstr ""
+
+#: Module.php:448 view/common/advanced-search/date-time.phtml:73
+msgid "after or on"
+msgstr ""
+
+#: Module.php:449 view/common/advanced-search/date-time.phtml:75
+msgid "on"
+msgstr ""
+
+#: Module.php:450 view/common/advanced-search/date-time.phtml:76
+msgid "not on"
+msgstr ""
+
+#: Module.php:451 view/common/advanced-search/date-time.phtml:77
+msgid "before or on"
+msgstr ""
+
+#: Module.php:452 view/common/advanced-search/date-time.phtml:78
+msgid "before"
+msgstr ""
+
+#: Module.php:453 view/common/advanced-search/date-time.phtml:79
+msgid "has any date / time"
+msgstr ""
+
+#: Module.php:454 view/common/advanced-search/date-time.phtml:80
+msgid "has no date / time"
+msgstr ""
+
+#: Module.php:487 Module.php:490 view/common/advanced-search/has-media.phtml:12
+#: view/common/advanced-search/has-media.phtml:27
+msgid "Has media"
+msgstr ""
+
+#: Module.php:498 Module.php:501
+msgid "Has original"
+msgstr ""
+
+#: Module.php:509 Module.php:512
+#: view/common/advanced-search/has-thumbnails.phtml:12
+#: view/common/advanced-search/has-thumbnails.phtml:27
+msgid "Has thumbnails"
+msgstr ""
+
+#: Module.php:522
+msgid "Media types"
+msgstr ""
+
+#: src/View/Helper/SearchFilters.php:37
+#: view/common/advanced-search/properties.phtml:86
+msgid "starts with"
+msgstr ""
+
+#: src/View/Helper/SearchFilters.php:38
+#: view/common/advanced-search/properties.phtml:87
+msgid "does not start with"
+msgstr ""
+
+#: src/View/Helper/SearchFilters.php:39
+#: view/common/advanced-search/properties.phtml:88
+msgid "ends with"
+msgstr ""
+
+#: src/View/Helper/SearchFilters.php:40
+#: view/common/advanced-search/properties.phtml:89
+msgid "does not end with"
+msgstr ""
+
+#: view/common/advanced-search/date-time.phtml:32
+msgid "Date / time"
+msgstr ""
+
+#: view/common/advanced-search/date-time.phtml:38
+msgid "Search by date / time"
+msgstr ""
+
+#: view/common/advanced-search/date-time.phtml:42
+msgid ""
+"Date / time can be full like \"2018-01-23 12:34:56\", or partial like "
+"\"2018-12-25\" or \"2017-11\"."
+msgstr ""
+
+#: view/common/advanced-search/date-time.phtml:55
+msgid "And"
+msgstr ""
+
+#: view/common/advanced-search/date-time.phtml:56
+msgid "Or"
+msgstr ""
+
+#: view/common/advanced-search/date-time.phtml:68
+msgid "Creation or modification date / time"
+msgstr ""
+
+#: view/common/advanced-search/date-time.phtml:83
+msgid "Remove date / time"
+msgstr ""
+
+#: view/common/advanced-search/has-original.phtml:12
+#: view/common/advanced-search/has-original.phtml:27
+msgid "Has original file"
+msgstr ""
+
+#: view/common/advanced-search/media-type.phtml:12
+msgid "Media type"
+msgstr ""
+
+#: view/common/advanced-search/has-thumbnails.phtml:22
+#: view/common/advanced-search/visibility.phtml:22
+#: view/common/advanced-search/has-original.phtml:22
+#: view/common/advanced-search/has-media.phtml:22
+msgid "Any"
+msgstr ""
+
+#: view/common/advanced-search/media-type.phtml:19
+msgid "Search by media type"
+msgstr ""
+
+#: view/common/advanced-search/media-type.phtml:28
+msgid "Select media types…"
+msgstr ""
+
+#: view/common/advanced-search/media-item-sets.phtml:27
+msgid "Select item sets…"
+msgstr ""
+
+#: Module.php:214
+msgid "Advanced Search Plus"
+msgstr ""
+
+#: Module.php:225 Module.php:260
+msgid "Restrict to used properties and resources classes"
+msgstr ""
+
+#: Module.php:226 Module.php:261
+msgid ""
+"If checked, restrict the list of properties and resources classes to the "
+"used ones in advanced search form."
+msgstr ""
+
+#: Module.php:272
+msgid "Display only following fields"
+msgstr ""
+
+#: src/View/Helper/MediaTypeSelect.php:39
+#: src/Service/Form/Element/MediaTypeSelectFactory.php:16
+msgid "Select media type…"
+msgstr ""
+
+#: config/module.config.php:70
+msgid "Full text"
+msgstr ""
+
+#: config/module.config.php:73 config/module.config.php:81
+#: config/module.config.php:82 config/module.config.php:84
+#: config/module.config.php:86 config/module.config.php:88
+msgid "default"
+msgstr ""
+
+#: config/module.config.php:79
+msgid "Date time"
+msgstr ""

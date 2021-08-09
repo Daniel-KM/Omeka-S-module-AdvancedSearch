@@ -1,0 +1,33 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var array $query
+ */
+
+$translate = $this->plugin('translate');
+?>
+
+<div id="visibility-queries" class="field" role="group" aria-labelledby="by-visibility-label">
+    <div class="field-meta">
+        <span id="by-visibility-label" class="label"><?= $translate('Visibility') ?></span>
+    </div>
+    <div class="inputs">
+        <div class="value">
+            <?php
+            $select = (new \Laminas\Form\Element\Radio())
+                ->setName('is_public')
+                ->setValueOptions([
+                    '1' => 'Public', // @translate
+                    '0' => 'Private', // @translate
+                    '' => 'Any', // @translate
+                ])
+                ->setAttributes([
+                    'class' => 'query-visibility',
+                    'value' => $query['is_public'] ?? '',
+                    'aria-label' => $translate('Visibility'),
+                ]);
+            echo $this->formRadio($select);
+            ?>
+        </div>
+    </div>
+</div>

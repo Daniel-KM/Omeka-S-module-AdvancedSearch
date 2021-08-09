@@ -1,0 +1,33 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var array $query
+ */
+
+$translate = $this->plugin('translate');
+?>
+
+<div id="hasoriginal-queries" class="field" role="group" aria-labelledby="by-has-original-label">
+    <div class="field-meta">
+        <span id="by-has-original-label" class="label"><?= $translate('Has original file') ?></span>
+    </div>
+    <div class="inputs">
+        <div class="value">
+            <?php
+            $select = (new \Laminas\Form\Element\Radio())
+                ->setName('has_original')
+                ->setValueOptions([
+                    '1' => 'Yes', // @translate
+                    '0' => 'No', // @translate
+                    '' => 'Any', // @translate
+                ])
+                ->setAttributes([
+                    'class' => 'query-has-original',
+                    'value' => $query['has_original'] ?? '',
+                    'aria-label' => $translate('Has original file'), // @translate
+                ]);
+            echo $this->formRadio($select);
+            ?>
+        </div>
+    </div>
+</div>

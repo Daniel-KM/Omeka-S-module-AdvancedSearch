@@ -1,0 +1,200 @@
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Daniel Berthereau <Daniel.github@Berthereau.net>, 2018.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-10-19 00:00+0000\n"
+"PO-Revision-Date: 2020-10-19 00:00+0000\n"
+"Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
+"Language-Team: French <kde-i18n-doc@kde.org>\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Poedit 2.4.1\n"
+
+#: Module.php:421 view/common/advanced-search/date-time.phtml:74
+msgid "after"
+msgstr "après"
+
+#: Module.php:422 view/common/advanced-search/date-time.phtml:73
+msgid "after or on"
+msgstr "après ou le"
+
+#: Module.php:423 view/common/advanced-search/date-time.phtml:75
+msgid "on"
+msgstr "le"
+
+#: Module.php:424 view/common/advanced-search/date-time.phtml:76
+msgid "not on"
+msgstr "pas le"
+
+#: Module.php:425 view/common/advanced-search/date-time.phtml:77
+msgid "before or on"
+msgstr "avant ou le"
+
+#: Module.php:426 view/common/advanced-search/date-time.phtml:78
+msgid "before"
+msgstr "avant"
+
+#: Module.php:427 view/common/advanced-search/date-time.phtml:79
+msgid "has any date / time"
+msgstr "a une date / heure"
+
+#: Module.php:428 view/common/advanced-search/date-time.phtml:80
+msgid "has no date / time"
+msgstr "n’a pas de date / heure"
+
+#: Module.php:461 Module.php:464 view/common/advanced-search/has-media.phtml:12
+#: view/common/advanced-search/has-media.phtml:27
+msgid "Has media"
+msgstr "A un média"
+
+#: Module.php:472 Module.php:475
+msgid "Has original"
+msgstr "A un original"
+
+#: Module.php:483 Module.php:486
+#: view/common/advanced-search/has-thumbnails.phtml:12
+#: view/common/advanced-search/has-thumbnails.phtml:27
+msgid "Has thumbnails"
+msgstr "A des vignettes"
+
+#: Module.php:496
+msgid "Media types"
+msgstr "Types de média"
+
+#: src/View/Helper/SearchFilters.php:37
+#: view/common/advanced-search/properties.phtml:86
+msgid "starts with"
+msgstr "commence par"
+
+#: src/View/Helper/SearchFilters.php:38
+#: view/common/advanced-search/properties.phtml:87
+msgid "does not start with"
+msgstr "ne commence pas par"
+
+#: src/View/Helper/SearchFilters.php:39
+#: view/common/advanced-search/properties.phtml:88
+msgid "ends with"
+msgstr "se termine par"
+
+#: src/View/Helper/SearchFilters.php:40
+#: view/common/advanced-search/properties.phtml:89
+msgid "does not end with"
+msgstr "ne se termine pas par"
+
+#: view/common/advanced-search/date-time.phtml:32
+msgid "Date / time"
+msgstr "Date / heure"
+
+#: view/common/advanced-search/date-time.phtml:38
+msgid "Search by date / time"
+msgstr "Recherche par date / heure"
+
+#: view/common/advanced-search/date-time.phtml:42
+msgid ""
+"Date / time can be full like \"2018-01-23 12:34:56\", or partial like "
+"\"2018-12-25\" or \"2017-11\"."
+msgstr ""
+"La date / heure peut être complète, comme \"2018-01-23 12:34:56\", ou "
+"partielle, comme \"2018-12-25\" ou \"2017-11\"."
+
+#: view/common/advanced-search/date-time.phtml:55
+msgid "And"
+msgstr "Et"
+
+#: view/common/advanced-search/date-time.phtml:56
+msgid "Or"
+msgstr "Ou"
+
+#: view/common/advanced-search/date-time.phtml:68
+msgid "Creation or modification date / time"
+msgstr "Date / heure de création ou de modification"
+
+#: view/common/advanced-search/date-time.phtml:83
+msgid "Remove date / time"
+msgstr "Supprimer la date / heure"
+
+#: view/common/advanced-search/has-original.phtml:12
+#: view/common/advanced-search/has-original.phtml:27
+msgid "Has original file"
+msgstr "A un fichier original"
+
+#: view/common/advanced-search/media-type.phtml:12
+msgid "Media type"
+msgstr "Type de média"
+
+#: view/common/advanced-search/has-thumbnails.phtml:22
+#: view/common/advanced-search/visibility.phtml:22
+#: view/common/advanced-search/has-original.phtml:22
+#: view/common/advanced-search/has-media.phtml:22
+msgid "Any"
+msgstr "Tous"
+
+#: view/common/advanced-search/media-type.phtml:19
+msgid "Search by media type"
+msgstr "Recherche par type de média"
+
+#: view/common/advanced-search/media-type.phtml:28
+msgid "Select media types…"
+msgstr "Choisir des types de médias…"
+
+#: view/common/advanced-search/media-item-sets.phtml:27
+msgid "Select item sets…"
+msgstr "Choisir les collections…"
+
+#: Module.php:203
+msgid "Advanced Search Plus"
+msgstr "Recherche avancée +"
+
+#: Module.php:214 Module.php:249
+msgid "Restrict to used properties and resources classes"
+msgstr "Restreindre aux propriétés et aux classes utilisées"
+
+#: Module.php:215 Module.php:250
+msgid ""
+"If checked, restrict the list of properties and resources classes to the "
+"used ones in advanced search form."
+msgstr ""
+"Si coché, restreindre la liste des propriétés et des classes à celles "
+"utilisées dans la recherche avancée."
+
+#: Module.php:261
+msgid "Display only following fields"
+msgstr "Afficher seulement les champs suivants"
+
+#: src/View/Helper/MediaTypeSelect.php:39
+#: src/Service/Form/Element/MediaTypeSelectFactory.php:16
+msgid "Select media type…"
+msgstr "Choisir un type de média…"
+
+#: config/module.config.php:57
+msgid "Full text"
+msgstr "Plein texte"
+
+#: config/module.config.php:60 config/module.config.php:68
+#: config/module.config.php:69 config/module.config.php:71
+#: config/module.config.php:73 config/module.config.php:75
+msgid "default"
+msgstr "défaut"
+
+#: config/module.config.php:66
+msgid "Date time"
+msgstr "Date / heure"
+
+#~ msgid "Modified"
+#~ msgstr "Modifié"
+
+#~ msgid "Add new date / time"
+#~ msgstr "Ajouter une date / heure"
+
+#~ msgid "yes"
+#~ msgstr "oui"
+
+#~ msgid "no"
+#~ msgstr "non"

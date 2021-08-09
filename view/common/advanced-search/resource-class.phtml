@@ -1,0 +1,54 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var array $query
+ */
+
+$plugins = $this->getHelperPluginManager();
+$translate = $plugins->get('translate');
+$resourceClassSelect = $plugins->get('resourceClassSelect');
+$setting = $plugins->get('setting');
+$siteSetting = $plugins->get('siteSetting');
+
+$isSiteRequest = $this->status()->isSiteRequest();
+$usedTerms = $isSiteRequest ? $siteSetting('advancedsearchplus_restrict_used_terms', true) : $setting('advancedsearchplus_restrict_used_terms', true);
+
+// Prepare the resource class query.
+$ids = $query['resource_class_id'] ?? [];
+if (!is_array($ids)) {
+    $ids = [$ids];
+}
+$ids = array_filter($ids);
+if (!$ids) {
+    $ids = [null];
+}
+?>
+
+<div id="resource-class" class="field removable multi-value" role="group">
+    <div class="field-meta">
+        <span id="by-resource-class-label" class="label"><?php echo $translate('Search by class'); ?></span>
+        <?php echo $this->hyperlink('', '#', ['class' => 'expand', 'title' => $translate('Expand')]); ?>
+        <div class="collapsible">
+            <div class="field-description"><?php echo $translate('Searches for resources that are any of these classes.'); ?></div>
+        </div>
+        <button type="button" class="add-value o-icon-add button" aria-label="<?php echo $translate('Add new class'); ?>" title="<?php echo $translate('Add new class'); ?>"></button>
+    </div>
+    <div class="inputs">
+        <?php foreach ($ids as $id): ?>
+        <div class="value">
+            <?php echo $resourceClassSelect([
+                'name' => 'resource_class_id[]',
+                'attributes' => [
+                    'value' => $id,
+                    'aria-labelledby' => 'by-resource-class-label',
+                    'class' => 'chosen-select',
+                ],
+                'options' => [
+                    'used_terms' => $usedTerms,
+                ],
+            ]); ?>
+            <button type="button" class="o-icon-delete remove-value button" aria-label="<?php echo $translate('Remove value'); ?>" title="<?php echo $translate('Remove value'); ?>"></button>
+        </div>
+        <?php endforeach; ?>
+    </div>
+</div>

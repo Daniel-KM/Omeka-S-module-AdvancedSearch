@@ -1,0 +1,33 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var array $query
+ */
+
+$translate = $this->plugin('translate');
+?>
+
+<div id="hasmedia-queries" class="field" role="group" aria-labelledby="by-has-media-label">
+    <div class="field-meta">
+        <span id="by-has-media-label" class="label"><?= $translate('Has media') ?></span>
+    </div>
+    <div class="inputs">
+        <div class="value">
+            <?php
+            $select = (new \Laminas\Form\Element\Radio())
+                ->setName('has_media')
+                ->setValueOptions([
+                    '1' => 'Yes', // @translate
+                    '0' => 'No', // @translate
+                    '' => 'Any', // @translate
+                ])
+                ->setAttributes([
+                    'class' => 'query-has-media',
+                    'value' => $query['has_media'] ?? '',
+                    'aria-label' => $translate('Has media'), // @translate
+                ]);
+            echo $this->formRadio($select);
+            ?>
+        </div>
+    </div>
+</div>

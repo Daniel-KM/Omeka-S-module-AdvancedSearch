@@ -56,8 +56,10 @@ class IndexController extends AbstractActionController
             }
             // Check if it is an item set redirection.
             $itemSetId = (int) $this->params('item-set-id');
+            // This is just a check: if set, mvc listeners add itemSet['ids'][].
+            // @see \Search\Mvc\MvcListeners::redirectItemSetToSearch()
             if ($itemSetId) {
-                // May throw an not found exception.
+                // May throw a not found exception.
                 $this->api()->read('item_sets', $itemSetId);
             }
         } else {
@@ -84,6 +86,7 @@ class IndexController extends AbstractActionController
         $isJsonQuery = !$form;
 
         if ($form) {
+            // Check csrf issue.
             $request = $this->validateSearchRequest($searchPage, $form, $request);
             if ($request === false) {
                 return $view;
@@ -135,6 +138,7 @@ class IndexController extends AbstractActionController
             }
             return $view;
         }
+
         if ($result['status'] === 'error') {
             if ($isJsonQuery) {
                 return new JsonModel($result);
@@ -270,6 +274,8 @@ class IndexController extends AbstractActionController
         $searchFormSettings = $searchPageSettings['form'] ?? [];
 
         $autosuggestSettings = $searchPage->setting('autosuggest', []);
+
+        // TODO Add a default query to manage any suggestion on any field and suggestions on item set page.
 
         /** @var \Search\Query $query */
         $query = $formAdapter->toQuery(['q' => $q], $searchFormSettings);

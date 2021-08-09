@@ -38,7 +38,7 @@ class MainFormAdapter extends AbstractFormAdapter implements FormAdapterInterfac
 
     public function getFormClass(): ?string
     {
-        return  \Search\Form\MainSearchForm::class;
+        return \Search\Form\MainSearchForm::class;
     }
 
     public function getFormPartialHeaders(): ?string

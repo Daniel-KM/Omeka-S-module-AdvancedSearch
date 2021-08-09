@@ -1,0 +1,159 @@
+<?php
+/*
+ * Copyright BibLibre, 2016
+ * Copyright Daniel Berthereau, 2017-2021
+ *
+ * This software is governed by the CeCILL license under French law and abiding
+ * by the rules of distribution of free software.  You can use, modify and/ or
+ * redistribute the software under the terms of the CeCILL license as circulated
+ * by CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
+ *
+ * As a counterpart to the access to the source code and rights to copy, modify
+ * and redistribute granted by the license, users are provided only with a
+ * limited warranty and the software's author, the holder of the economic
+ * rights, and the successive licensors have only limited liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated with
+ * loading, using, modifying and/or developing or reproducing the software by
+ * the user in light of its specific status of free software, that may mean that
+ * it is complicated to manipulate, and that also therefore means that it is
+ * reserved for developers and experienced professionals having in-depth
+ * computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling
+ * the security of their systems and/or data to be ensured and, more generally,
+ * to use and operate it in the same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
+ */
+
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\SiteRepresentation $site
+ * @var \Search\Api\Representation\SearchPageRepresentation $searchPage
+ * @var \Search\Query $query
+ * @var \Search\Response $response
+ * For block layout:
+ * @var string $heading Unused in current template.
+ * @var bool $skipFormAction Remove action of the form, so it uses current page.
+ */
+
+$plugins = $this->getHelperPluginManager();
+$translate = $plugins->get('translate');
+$translatePlural = $plugins->get('translatePlural');
+$assetUrl = $plugins->get('assetUrl');
+$partial = $plugins->get('partial');
+$api = $plugins->get('api');
+$vars = $this->vars();
+
+$isPartial = !$site;
+$skipFormAction = !empty($skipFormAction);
+
+// Used in case of a redirect of item-set/show to search, when used like item/browse.
+$itemSetId = $this->params()->fromRoute('item-set-id');
+// TODO Use site item set ?
+$itemSet = $itemSetId ? $api->searchOne('item_sets', ['id' => $itemSetId])->getContent() : null;
+
+$this->headLink()->appendStylesheet($assetUrl('css/search.css', 'Search'));
+$this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javascript', ['defer' => 'defer']);
+?>
+
+<?php if (empty($isPartial)): ?>
+<div id="search-page">
+<?php endif; ?>
+
+<?php if ($itemSet): ?>
+
+    <?php
+    $vars->offsetSet('itemSet', $itemSet);
+    $vars->offsetSet('resourceType', 'item_sets'); // TODO Check if really needed.
+    $this->htmlElement('body')->appendAttribute('class', 'search-page item-set resource browse');
+    ?>
+    <?= $this->pageTitle($itemSet->displayTitle(), 2) ?>
+    <h3><?= $translate('Item set') ?></h3>
+    <div class="metadata">
+        <?= $itemSet->displayValues() ?>
+    </div>
+    <div class="item-set-items">
+        <h3><?= $translate('Items') ?></h3>
+    </div>
+
+<?php else: ?>
+
+    <?php $this->htmlElement('body')->appendAttribute('class', 'search-page resource browse'); ?>
+    <?= $this->pageTitle($translate('Search'), 2) ?>
+
+<?php endif; ?>
+
+<?= $this->searchForm($searchPage, null, $skipFormAction) ?>
+
+<?php if (isset($response)): ?>
+<div class="search-results-wrapper">
+    <div class="search-results">
+
+        <?php if ($response->getTotalResults()): ?>
+            <?= $partial('search/results-header', [
+                'searchPage' => $searchPage,
+                'query' => $query,
+                'response' => $response,
+            ]) ?>
+
+            <?php $itemSetsCount = $response->getResourceTotalResults('item_sets'); ?>
+            <?= $partial('search/resource-list', [
+                'site' => $site,
+                'title' => sprintf($translatePlural('%s item set', '%s item sets', $itemSetsCount), $itemSetsCount),
+                'response' => $response,
+                'resourceName' => 'item_sets',
+            ]) ?>
+
+            <?php $itemsCount = $response->getResourceTotalResults('items'); ?>
+            <?= $partial('search/resource-list', [
+                'site' => $site,
+                'title' => sprintf($translatePlural('%s item', '%s items', $itemsCount), $itemsCount),
+                'response' => $response,
+                'resourceName' => 'items',
+            ]) ?>
+
+            <?= $partial('search/results-footer', [
+                'searchPage' => $searchPage,
+                'query' => $query,
+                'response' => $response,
+            ]) ?>
+
+        <?php else: ?>
+
+            <div class="noresults">
+                <?php if (empty($query) && !$itemSet): ?>
+                <?= $translate('Fill a query and get results.') ?>
+                <?php elseif (empty($query) && $itemSet): ?>
+                <?= $translate('This item set has no items.') ?>
+                <?php else: ?>
+                <?= $translate('Your query returned no results') ?>
+                <?php endif; ?>
+            </div>
+
+        <?php endif; ?>
+
+    </div>
+
+    <?= $partial('search/facets', [
+        'searchPage' => $searchPage,
+        'query' => $query,
+        'response' => $response,
+        'itemSet' => $itemSet,
+    ]) ?>
+</div>
+
+<?php else: ?>
+
+<div class="search-results-wrapper">
+    <div class="search-results">
+        <div class="noresults"><?= $translate('An error occured and your query returned no results.') ?></div>
+    </div>
+</div>
+
+<?php endif; ?>
+
+<?php if (empty($isPartial)): ?>
+</div>
+<?php endif; ?>

@@ -1,0 +1,22 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Search\Api\Representation\SearchPageRepresentation $searchPage
+ * @var \Search\Query $query
+ * @var \Search\Response $response
+ */
+
+$translate = $this->plugin('translate');
+?>
+
+<div class="search-results-header">
+    <div class="search-results-count">
+        <?= $this->pagination() ?>
+    </div>
+    <?= $this->searchSortSelector($query, $searchPage->subSetting('sort', 'fields')) ?>
+    <div>
+        <a class="search-view-type search-view-type-list" href="#"><?= $translate('list') ?></a>
+        |
+        <a class="search-view-type search-view-type-grid" href="#"><?= $translate('grid') ?></a>
+    </div>
+</div>

@@ -1,0 +1,57 @@
+<?php
+/*
+ * Copyright BibLibre, 2016
+ * Copyright Daniel Berthereau, 2019-2021
+ *
+ * This software is governed by the CeCILL license under French law and abiding
+ * by the rules of distribution of free software.  You can use, modify and/ or
+ * redistribute the software under the terms of the CeCILL license as circulated
+ * by CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
+ *
+ * As a counterpart to the access to the source code and rights to copy, modify
+ * and redistribute granted by the license, users are provided only with a
+ * limited warranty and the software's author, the holder of the economic
+ * rights, and the successive licensors have only limited liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated with
+ * loading, using, modifying and/or developing or reproducing the software by
+ * the user in light of its specific status of free software, that may mean that
+ * it is complicated to manipulate, and that also therefore means that it is
+ * reserved for developers and experienced professionals having in-depth
+ * computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling
+ * the security of their systems and/or data to be ensured and, more generally,
+ * to use and operate it in the same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
+ */
+
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\SiteRepresentation $site
+ * @var \Search\Response $response
+ * @var string $resourceName
+ * @var string $title
+ */
+
+// Extract results as a whole to avoid subquery for each resource.
+$ids = array_column($response->getResults($resourceName), 'id', 'id');
+if (!count($ids)) return;
+
+// Filter resources existing on search index, but not in Omeka, and prepare the loop.
+// The sort order is unknown, so in order to keep order of results, use the id as key
+// and use array_replace(). This process avoids to do a single read() for each result.
+$results = [];
+foreach ($this->api()->search($resourceName, ['id' => $ids])->getContent() as $resource):
+    $results[$resource->id()] = $resource;
+endforeach;
+if (!count($results)) return;
+$results = array_replace(array_intersect_key($ids, $results), $results);
+?>
+
+<h3><?= $title ?></h3>
+<div class="resource-list">
+    <?php $resources = array_map(function ($v) { return ['resource' => $v,'tag' => 'div']; }, $results); ?>
+    <?= $this->partialLoop('search/resource', $resources) ?>
+</div>

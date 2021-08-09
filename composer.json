@@ -1,0 +1,64 @@
+{
+    "name": "daniel-km/omeka-s-module-search",
+    "description": "Add improved search capabilities to Omeka S: auto-suggest, filters, facets, etc.",
+    "type": "library",
+    "license": "CECILL-2.1",
+    "authors": [
+        {
+            "name": "BibLibre"
+        },
+        {
+            "name": "Daniel Berthereau",
+            "email": "Daniel.git@Berthereau.net"
+        }
+    ],
+    "homepage": "https://gitlab.com/Daniel-KM/Omeka-S-module-Search",
+    "support": {
+        "issues": "https://gitlab.com/Daniel-KM/Omeka-S-module-Search/-/issues",
+        "forum": "https://forum.omeka.org/"
+    },
+    "keywords": [
+        "Omeka S",
+        "Omeka S module",
+        "search",
+        "auto-suggestion",
+        "filter",
+        "facet",
+        "solr"
+    ],
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "devbridge/jquery-autocomplete",
+                "version": "1.4.11",
+                "type": "omeka-addon-asset",
+                "dist": {
+                    "type": "file",
+                    "url": "https://github.com/devbridge/jQuery-Autocomplete/raw/master/dist/jquery.autocomplete.min.js",
+                    "reference": ""
+                }
+            }
+        }
+    ],
+    "require": {
+        "oomphinc/composer-installers-extender": "^2.0",
+        "devbridge/jquery-autocomplete": "1.4.11"
+    },
+    "require-dev": {
+        "biblibre/omeka-s-test-helper": "dev-master"
+    },
+    "extra": {
+        "installer-types": ["omeka-addon-asset"],
+        "installer-paths": {
+            "asset/vendor/{$name}/": [
+                "type:omeka-addon-asset"
+            ]
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SearchTest\\": "test/SearchTest/"
+        }
+    }
+}

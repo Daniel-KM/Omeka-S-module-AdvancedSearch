@@ -1,0 +1,33 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Laminas\Form\Form $form
+ */
+
+// This quick form displays only the first field (the main one) and the required or hidden elements.
+
+$params = $this->params()->fromQuery() ?: [];
+$form
+    ->setData($params)
+    ->prepare();
+
+$main = null;
+foreach ($form->getElements() as $element):
+    if ($element instanceof \Laminas\Form\Element\Csrf || $element instanceof \Laminas\Form\Element\Hidden || $element instanceof \Laminas\Form\Element\Submit):
+        continue;
+    endif;
+    if ($main):
+        if (!$element->getOption('required')):
+            $form->remove($element->getName());
+        endif;
+    else:
+        $main = $element;
+    endif;
+endforeach;
+
+foreach ($form->getFieldsets() as $fieldset):
+    $form->remove($fieldset->getName());
+endforeach;
+?>
+
+<?= $this->form($form) ?>

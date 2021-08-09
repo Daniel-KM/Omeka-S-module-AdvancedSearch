@@ -1,0 +1,123 @@
+<?php
+/*
+ * Copyright BibLibre, 2016
+ * Copyright, Daniel Berthereau, 2018-2021
+ *
+ * This software is governed by the CeCILL license under French law and abiding
+ * by the rules of distribution of free software.  You can use, modify and/ or
+ * redistribute the software under the terms of the CeCILL license as circulated
+ * by CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
+ *
+ * As a counterpart to the access to the source code and rights to copy, modify
+ * and redistribute granted by the license, users are provided only with a
+ * limited warranty and the software's author, the holder of the economic
+ * rights, and the successive licensors have only limited liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated with
+ * loading, using, modifying and/or developing or reproducing the software by
+ * the user in light of its specific status of free software, that may mean that
+ * it is complicated to manipulate, and that also therefore means that it is
+ * reserved for developers and experienced professionals having in-depth
+ * computer knowledge. Users are therefore encouraged to load and test the
+ * software's suitability as regards their requirements in conditions enabling
+ * the security of their systems and/or data to be ensured and, more generally,
+ * to use and operate it in the same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL license and that you accept its terms.
+ */
+
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Search\Api\Representation\SearchPageRepresentation $searchPage
+ * @var \Search\Query $query
+ * @var \Search\Response $response
+ * Options:
+ * @var ?\Omeka\Api\Representation\ItemSetRepresentation $itemSet
+ */
+
+if (!isset($response) || empty($searchPage->subSetting('facet', 'facets'))) return;
+
+$plugins = $this->getHelperPluginManager();
+$translate = $plugins->get('translate');
+
+$facets = $response->getFacetCounts();
+$activeFacets = $response->getActiveFacets();
+
+// Don't display facet groups without facet elements.
+$facets = array_filter($facets);
+
+$displayActive = (bool) $searchPage->subSetting('facet', 'display_active', true);
+
+$isFacetModeButton = $searchPage->subSetting('facet', 'mode') !== 'link';
+$displayFacetButton = $isFacetModeButton && !empty($facets);
+$displayButton = $displayFacetButton ? $searchPage->subSetting('facet', 'display_button', 'above') : 'none';
+
+$facetActive = $plugins->get('facetActive');
+$facetLabel = $plugins->get('facetLabel');
+// Facet checkbox can be used in any case anyway, the js checks it.
+$facetElement = $isFacetModeButton ? $plugins->get('facetCheckbox') : $plugins->get('facetLink');
+
+// Don't display facets for item sets when browsing an item set.
+if (!empty($itemSet)) {
+    unset($facets['item_set_id']);
+    unset($activeFacets['item_set_id']);
+}
+
+$options = $searchPage->setting('facet', []);
+unset($options['facets']);
+?>
+
+<aside class="search-facets">
+
+    <h3><?= $translate('Filters') ?></h3>
+
+    <?php if ($displayActive && count($activeFacets)): ?>
+    <h4><?= $translate('Active filters') ?></h4>
+    <ul class="search-facets-active">
+        <?php foreach ($activeFacets as $name => $facetValues) foreach ($facetValues as $facetValue): ?>
+        <li><?= $facetActive($name, ['value' => $facetValue, 'count' => null], $options) ?></li>
+        <?php endforeach; ?>
+    </ul>
+    <?php endif; ?>
+
+    <form id="form-facets">
+
+        <?php if ($displayFacetButton): ?>
+        <?= $this->hiddenInputsFromFilteredQuery(null, ['facet', 'page', 'limit', 'offset', 'per_page']) ?>
+        <?php endif; ?>
+
+        <?php if ($displayFacetButton && ($displayButton === 'above' || $displayButton === 'both')): ?>
+        <div class="apply-facets apply-facets-top">
+            <input type="submit" value="<?= $translate('Apply filters') ?>"/>
+        </div>
+        <?php endif; ?>
+
+        <?php if (empty($facets) && empty($activeFacets)): ?>
+        <p><?= $translate('No filters.') ?></p>
+        <?php else: ?>
+        <ul class="search-facets-list">
+            <?php foreach ($facets as $name => $facetValues): ?>
+            <li class="search-facet">
+                <h4><?= $translate($facetLabel($name)) ?></h4>
+                <ul class="search-facet-items">
+                    <?php foreach ($facetValues as $facetValue): ?>
+                    <li class="search-facet-item">
+                        <?= $facetElement($name, $facetValue, $options) ?>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+            </li>
+            <?php endforeach; ?>
+        </ul>
+        <?php endif; ?>
+
+        <?php if ($displayFacetButton && ($displayButton === 'below' || $displayButton === 'both')): ?>
+        <div class="apply-facets apply-facets-bottom">
+            <input type="submit" value="<?= $translate('Apply filters') ?>"/>
+        </div>
+        <?php endif; ?>
+
+    </form>
+
+</aside>

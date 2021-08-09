@@ -1,10 +1,100 @@
 <?php declare(strict_types=1);
 
-namespace AdvancedSearchPlus;
+namespace AdvancedSearch;
 
 return [
-    // Waiting for fix https://github.com/omeka/omeka-s/pull/1671.
-    // May use a service delegator for api manager like module Search.
+    'api_adapters' => [
+        'invokables' => [
+            'search_indexes' => Api\Adapter\SearchIndexAdapter::class,
+            'search_pages' => Api\Adapter\SearchPageAdapter::class,
+        ],
+    ],
+    'entity_manager' => [
+        'mapping_classes_paths' => [
+            dirname(__DIR__) . '/src/Entity',
+        ],
+        'proxy_paths' => [
+            dirname(__DIR__) . '/data/doctrine-proxies',
+        ],
+    ],
+    'view_manager' => [
+        'template_path_stack' => [
+            dirname(__DIR__) . '/view',
+        ],
+        'strategies' => [
+            'ViewJsonStrategy',
+        ],
+    ],
+    'view_helpers' => [
+        'invokables' => [
+            'facetLabel' => View\Helper\FacetLabel::class,
+            'hiddenInputsFromFilteredQuery' => View\Helper\HiddenInputsFromFilteredQuery::class,
+            'searchForm' => View\Helper\SearchForm::class,
+            'searchingForm' => View\Helper\SearchingForm::class,
+            'searchingUrl' => View\Helper\SearchingUrl::class,
+            'searchSortSelector' => View\Helper\SearchSortSelector::class,
+        ],
+        'factories' => [
+            'apiSearch' => Service\ViewHelper\ApiSearchFactory::class,
+            'apiSearchOne' => Service\ViewHelper\ApiSearchOneFactory::class,
+            'facetActive' => Service\ViewHelper\FacetActiveFactory::class,
+            'facetCheckbox' => Service\ViewHelper\FacetCheckboxFactory::class,
+            'facetLink' => Service\ViewHelper\FacetLinkFactory::class,
+            'mediaTypeSelect' => Service\ViewHelper\MediaTypeSelectFactory::class,
+            'searchIndexConfirm' => Service\ViewHelper\SearchIndexConfirmFactory::class,
+            'searchRequestToResponse' => Service\ViewHelper\SearchRequestToResponseFactory::class,
+        ],
+    ],
+    'block_layouts' => [
+        'invokables' => [
+            'searchingForm' => Site\BlockLayout\SearchingForm::class,
+        ],
+    ],
+    'form_elements' => [
+        'invokables' => [
+            Form\Element\ArrayText::class => Form\Element\ArrayText::class,
+            Form\Element\DataTextarea::class => Form\Element\DataTextarea::class,
+            Form\Element\OptionalMultiCheckbox::class => Form\Element\OptionalMultiCheckbox::class,
+            Form\Element\OptionalRadio::class => Form\Element\OptionalRadio::class,
+            Form\Element\OptionalSelect::class => Form\Element\OptionalSelect::class,
+            Form\Element\OptionalUrl::class => Form\Element\OptionalUrl::class,
+        ],
+        'factories' => [
+            Form\Admin\ApiFormConfigFieldset::class => Service\Form\ApiFormConfigFieldsetFactory::class,
+            Form\Admin\SearchIndexConfigureForm::class => Service\Form\SearchIndexConfigureFormFactory::class,
+            Form\Admin\SearchIndexForm::class => Service\Form\SearchIndexFormFactory::class,
+            Form\Admin\SearchPageConfigureForm::class => Service\Form\SearchPageConfigureFormFactory::class,
+            Form\Admin\SearchPageForm::class => Service\Form\SearchPageFormFactory::class,
+            Form\Element\MediaTypeSelect::class => Service\Form\Element\MediaTypeSelectFactory::class,
+            Form\Element\SearchPageSelect::class => Service\Form\Element\SearchPageSelectFactory::class,
+            Form\FilterFieldset::class => Service\Form\FilterFieldsetFactory::class,
+            Form\MainSearchForm::class => Service\Form\MainSearchFormFactory::class,
+            Form\SearchingFormFieldset::class => Service\Form\SearchingFormFieldsetFactory::class,
+            Form\SettingsFieldset::class => Service\Form\SettingsFieldsetFactory::class,
+            Form\SiteSettingsFieldset::class => Service\Form\SiteSettingsFieldsetFactory::class,
+        ],
+    ],
+    'controllers' => [
+        'invokables' => [
+            Controller\Admin\IndexController::class => Controller\Admin\IndexController::class,
+            Controller\IndexController::class => Controller\IndexController::class,
+        ],
+        'factories' => [
+            Controller\Admin\SearchIndexController::class => Service\Controller\Admin\SearchIndexControllerFactory::class,
+            Controller\Admin\SearchPageController::class => Service\Controller\Admin\SearchPageControllerFactory::class,
+        ],
+    ],
+    'controller_plugins' => [
+        'invokables' => [
+            'searchRequestToResponse' => Mvc\Controller\Plugin\SearchRequestToResponse::class,
+        ],
+        'factories' => [
+            'apiSearch' => Service\ControllerPlugin\ApiSearchFactory::class,
+            'apiSearchOne' => Service\ControllerPlugin\ApiSearchOneFactory::class,
+            'searchForm' => Service\ControllerPlugin\SearchFormFactory::class,
+            'totalJobs' => Service\ControllerPlugin\TotalJobsFactory::class,
+        ],
+    ],
     'listeners' => [
         Mvc\MvcListeners::class,
     ],
@@ -15,23 +105,103 @@ return [
         'delegators' => [
             'Omeka\ApiManager' => [Service\ApiManagerDelegatorFactory::class],
         ],
-    ],
-    'view_manager' => [
-        'template_path_stack' => [
-            dirname(__DIR__) . '/view',
-        ],
-    ],
-    'view_helpers' => [
         'factories' => [
-            'mediaTypeSelect' => Service\ViewHelper\MediaTypeSelectFactory::class,
+            'Search\AdapterManager' => Service\AdapterManagerFactory::class,
+            'Search\FormAdapterManager' => Service\FormAdapterManagerFactory::class,
         ],
     ],
-    'form_elements' => [
+    'navigation' => [
+        'AdminGlobal' => [
+            'search' => [
+                'label' => 'Search', // @translate
+                'route' => 'admin/search',
+                'resource' => Controller\Admin\IndexController::class,
+                'privilege' => 'browse',
+                'class' => 'o-icon-search',
+            ],
+        ],
+    ],
+    'navigation_links' => [
         'invokables' => [
-            'OptionalMultiCheckbox' => Form\Element\OptionalMultiCheckbox::class,
+            'search-page' => Site\Navigation\Link\SearchPage::class,
         ],
-        'factories' => [
-            Form\Element\MediaTypeSelect::class => Service\Form\Element\MediaTypeSelectFactory::class,
+    ],
+    'router' => [
+        'routes' => [
+            'admin' => [
+                'child_routes' => [
+                    'search' => [
+                        'type' => \Laminas\Router\Http\Literal::class,
+                        'options' => [
+                            'route' => '/search-manager',
+                            'defaults' => [
+                                '__NAMESPACE__' => 'Search\Controller\Admin',
+                                'controller' => Controller\Admin\IndexController::class,
+                                'action' => 'browse',
+                            ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes' => [
+                            'index' => [
+                                'type' => \Laminas\Router\Http\Segment::class,
+                                'options' => [
+                                    'route' => '/index/:action',
+                                    'constraints' => [
+                                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                                    ],
+                                    'defaults' => [
+                                        '__NAMESPACE__' => 'Search\Controller\Admin',
+                                        'controller' => Controller\Admin\SearchIndexController::class,
+                                    ],
+                                ],
+                            ],
+                            'index-id' => [
+                                'type' => \Laminas\Router\Http\Segment::class,
+                                'options' => [
+                                    'route' => '/index/:id[/:action]',
+                                    'constraints' => [
+                                        'id' => '\d+',
+                                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                                    ],
+                                    'defaults' => [
+                                        '__NAMESPACE__' => 'Search\Controller\Admin',
+                                        'controller' => Controller\Admin\SearchIndexController::class,
+                                        'action' => 'show',
+                                    ],
+                                ],
+                            ],
+                            'page' => [
+                                'type' => \Laminas\Router\Http\Segment::class,
+                                'options' => [
+                                    'route' => '/page/:action',
+                                    'constraints' => [
+                                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                                    ],
+                                    'defaults' => [
+                                        '__NAMESPACE__' => 'Search\Controller\Admin',
+                                        'controller' => Controller\Admin\SearchPageController::class,
+                                    ],
+                                ],
+                            ],
+                            'page-id' => [
+                                'type' => \Laminas\Router\Http\Segment::class,
+                                'options' => [
+                                    'route' => '/page/:id[/:action]',
+                                    'constraints' => [
+                                        'id' => '\d+',
+                                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                                    ],
+                                    'defaults' => [
+                                        '__NAMESPACE__' => 'Search\Controller\Admin',
+                                        'controller' => Controller\Admin\SearchPageController::class,
+                                        'action' => 'show',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
     'translator' => [
@@ -44,9 +214,35 @@ return [
             ],
         ],
     ],
-    'advancedsearchplus' => [
+    'js_translate_strings' => [
+        'Automatic mapping of empty values', // @translate
+        'Available', // @translate
+        'Enabled', // @translate
+        'Find', // @translate
+        'Find resources…', // @translate
+        'Processing…', // @translate
+        'Try to map automatically the metadata and the properties that are not mapped yet with the fields of the index', // @translate
+    ],
+    'search_adapters' => [
+        'factories' => [
+            'internal' => Service\Adapter\InternalAdapterFactory::class,
+        ],
+    ],
+    'search_form_adapters' => [
+        'invokables' => [
+            'main' => FormAdapter\MainFormAdapter::class,
+        ],
+        'factories' => [
+            'api' => Service\FormAdapter\ApiFormAdapterFactory::class,
+        ],
+    ],
+    'advancedsearch' => [
         'settings' => [
             'advancedsearchplus_restrict_used_terms' => true,
+            'search_main_page' => 1,
+            'search_pages' => [1],
+            'search_api_page' => '',
+            'search_batch_size' => 100,
         ],
         'site_settings' => [
             'advancedsearchplus_restrict_used_terms' => true,
@@ -60,6 +256,19 @@ return [
                 'common/advanced-search/media-type',
                 'common/advanced-search/data-type-geography',
                 'common/numeric-data-types-advanced-search',
+            ],
+            'search_main_page' => null,
+            'search_pages' => [],
+            'search_redirect_itemset' => true,
+        ],
+        'block_settings' => [
+            'searchingForm' => [
+                'heading' => '',
+                'search_page' => null,
+                'display_results' => false,
+                'query' => '',
+                'query_filter' => '',
+                'template' => '',
             ],
         ],
         // This is the default list of all possible fields, allowing other modules

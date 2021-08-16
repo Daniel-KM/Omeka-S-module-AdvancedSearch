@@ -355,6 +355,7 @@ class IndexController extends AbstractActionController
      * Remove all empty values (zero length strings) and check empty request.
      *
      * @todo Factorize with \AdvancedSearch\Mvc\Controller\Plugin\SearchRequestToResponse::cleanRequest()
+     * @see \AdvancedSearch\Mvc\Controller\Plugin\SearchRequestToResponse::cleanRequest()
      *
      * @return array First key is the cleaned request, the second a bool to
      * indicate if it is empty.

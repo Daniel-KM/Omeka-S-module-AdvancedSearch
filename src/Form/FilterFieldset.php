@@ -81,7 +81,7 @@ class FilterFieldset extends Fieldset
                     'value_options' => $filterFields,
                 ],
                 'attributes' => [
-                    'value' => '',
+                    'value' => (string) key($filterFields),
                     // TODO Manage width for chosen select (but useless: the number of options is small).
                     // 'class' => 'chosen-select',
                 ],
@@ -132,10 +132,18 @@ class FilterFieldset extends Fieldset
             return [];
         }
         $availableFields = $searchAdapter->getAvailableFields($searchEngine);
-        $settings = $searchConfig->settings();
-        if (empty($availableFields) || empty($settings['form']['filters'])) {
+        if (empty($availableFields)) {
             return [];
         }
-        return array_intersect_key($settings['form']['filters'], $availableFields);
+        $settings = $searchConfig->settings();
+        if (empty($settings['form']['filters'])) {
+            return [];
+        }
+        $fields = array_intersect_key($settings['form']['filters'], $availableFields);
+        foreach ($fields as $key => &$field) {
+            $field['value'] = $key;
+        }
+        unset($field);
+        return $fields;
     }
 }

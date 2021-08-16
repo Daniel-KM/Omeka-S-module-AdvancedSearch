@@ -73,15 +73,15 @@ class Indexing extends AbstractJob
 
         /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation $searchEngine */
         $searchEngine = $api->read('search_engines', $searchEngineId)->getContent();
-        $enginer = $searchEngine->indexer();
+        $indexer = $searchEngine->indexer();
 
         $resourceNames = $searchEngine->setting('resources', []);
         $selectedResourceNames = $this->getArg('resource_names', []);
         if ($selectedResourceNames) {
             $resourceNames = array_intersect($resourceNames, $selectedResourceNames);
         }
-        $resourceNames = array_filter($resourceNames, function ($resourceName) use ($enginer) {
-            return $enginer->canIndex($resourceName);
+        $resourceNames = array_filter($resourceNames, function ($resourceName) use ($indexer) {
+            return $indexer->canIndex($resourceName);
         });
         if (empty($resourceNames)) {
             $this->logger->notice(new Message(
@@ -120,7 +120,7 @@ class Indexing extends AbstractJob
             && array_values($rNames) === ['item_sets', 'items'];
 
         if ($fullClearIndex) {
-            $enginer->clearIndex();
+            $indexer->clearIndex();
         } elseif ($startResourceId > 0) {
             $this->logger->info(new Message(
                 'Search index is not cleared: reindexing starts at resource #%d.', // @translate
@@ -134,7 +134,7 @@ class Indexing extends AbstractJob
             if (!$fullClearIndex && $startResourceId <= 0) {
                 $query = new Query();
                 $query->setResources([$resourceName]);
-                $enginer->clearIndex($query);
+                $indexer->clearIndex($query);
             }
 
             $totals[$resourceName] = 0;
@@ -179,7 +179,7 @@ class Indexing extends AbstractJob
                 /** @var \Omeka\Entity\Resource[] $resources */
                 $resources = $q->getResult();
 
-                $enginer->indexResources($resources);
+                $indexer->engineResources($resources);
 
                 ++$searchConfig;
                 $totals[$resourceName] += count($resources);

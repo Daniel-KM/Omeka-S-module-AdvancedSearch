@@ -340,7 +340,7 @@ class ApiFormConfigFieldset extends Fieldset
     {
         $options = [];
         $searchConfig = $this->getOption('advancedsearch_config');
-        $searchEngine = $searchConfig->index();
+        $searchEngine = $searchConfig->engine();
         $searchAdapter = $searchEngine->adapter();
         if (empty($searchAdapter)) {
             return [];
@@ -356,7 +356,7 @@ class ApiFormConfigFieldset extends Fieldset
     {
         $options = [];
         $searchConfig = $this->getOption('advancedsearch_config');
-        $searchEngine = $searchConfig->index();
+        $searchEngine = $searchConfig->engine();
         $searchAdapter = $searchEngine->adapter();
         if (empty($searchAdapter)) {
             return [];

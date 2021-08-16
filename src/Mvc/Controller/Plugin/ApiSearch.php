@@ -114,7 +114,7 @@ class ApiSearch extends AbstractPlugin
     ) {
         $this->api = $api;
         $this->page = $searchConfig;
-        $this->index = $engine;
+        $this->engine = $engine;
         $this->adapterManager = $adapterManager;
         $this->apiFormAdapter = $apiFormAdapter;
         $this->acl = $acl;
@@ -138,7 +138,7 @@ class ApiSearch extends AbstractPlugin
      */
     public function __invoke($resource, array $data = [], array $options = [])
     {
-        if (!$this->index) {
+        if (!$this->engine) {
             // Unset the "index" option to avoid a loop.
             unset($data['index']);
             unset($options['index']);
@@ -146,7 +146,7 @@ class ApiSearch extends AbstractPlugin
         }
 
         // Check it the resource is managed by this index.
-        if (!in_array($resource, $this->index->setting('resources', []))) {
+        if (!in_array($resource, $this->engine->setting('resources', []))) {
             // Unset the "index" option to avoid a loop.
             unset($data['index']);
             unset($options['index']);
@@ -307,7 +307,7 @@ class ApiSearch extends AbstractPlugin
 
         // Send the query to the search engine.
         /** @var \AdvancedSearch\Querier\QuerierInterface $querier */
-        $querier = $this->index
+        $querier = $this->engine
             ->querier()
             ->setQuery($searchQuery);
         try {
@@ -320,7 +320,7 @@ class ApiSearch extends AbstractPlugin
 
         $totalResults = array_map(function ($resource) use ($searchResponse) {
             return $searchResponse->getResourceTotalResults($resource);
-        }, $this->index->setting('resources', []));
+        }, $this->engine->setting('resources', []));
 
         // Get entities from the search response.
         $ids = $this->extractIdsFromResponse($searchResponse, $resource);

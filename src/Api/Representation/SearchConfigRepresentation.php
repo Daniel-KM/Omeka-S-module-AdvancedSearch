@@ -49,7 +49,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         return [
             'o:name' => $this->resource->getName(),
             'o:path' => $this->resource->getPath(),
-            'o:index_id' => $this->resource->getIndex()->getId(),
+            'o:index_id' => $this->resource->getEngine()->getId(),
             'o:form' => $this->resource->getFormAdapter(),
             'o:settings' => $this->resource->getSettings(),
             'o:created' => $this->getDateTime($this->resource->getCreated()),
@@ -107,7 +107,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
 
     public function index(): ?\AdvancedSearch\Api\Representation\SearchEngineRepresentation
     {
-        $searchEngine = $this->resource->getIndex();
+        $searchEngine = $this->resource->getEngine();
         return $searchEngine
             ? $this->getAdapter('search_engines')->getRepresentation($searchEngine)
             : null;

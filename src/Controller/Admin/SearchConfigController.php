@@ -160,7 +160,7 @@ class SearchConfigController extends AbstractActionController
             'searchConfig' => $searchConfig,
         ]);
 
-        $engine = $searchConfig->index();
+        $engine = $searchConfig->engine();
         $adapter = $engine ? $engine->adapter() : null;
         if (empty($adapter)) {
             $message = new Message(
@@ -323,7 +323,7 @@ class SearchConfigController extends AbstractActionController
      */
     protected function getConfigureForm(SearchConfigRepresentation $searchConfig): ?\AdvancedSearch\Form\Admin\SearchConfigConfigureForm
     {
-        return $searchConfig->index()
+        return $searchConfig->engine()
             ? $this->getForm(SearchConfigConfigureForm::class, ['advancedsearch_config' => $searchConfig])
             : null;
     }

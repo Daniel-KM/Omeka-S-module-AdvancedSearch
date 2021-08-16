@@ -68,7 +68,7 @@ abstract class AbstractQuerier implements QuerierInterface
 
     public function setSearchEngine(SearchEngineRepresentation $engine): QuerierInterface
     {
-        $this->index = $engine;
+        $this->engine = $engine;
         return $this;
     }
 
@@ -93,7 +93,7 @@ abstract class AbstractQuerier implements QuerierInterface
      */
     protected function getSetting(string $name, $default = null)
     {
-        $settings = $this->index->settings();
+        $settings = $this->engine->settings();
         return $settings[$name] ?? $default;
     }
 

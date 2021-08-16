@@ -238,23 +238,23 @@ class SearchConfig extends \AdvancedSearch\Entity\SearchConfig implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function setIndex(\AdvancedSearch\Entity\SearchEngine $engine)
+    public function setEngine(\AdvancedSearch\Entity\SearchEngine $engine)
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setIndex', [$engine]);
 
-        return parent::setIndex($engine);
+        return parent::setEngine($engine);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getIndex()
+    public function getEngine()
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getIndex', []);
 
-        return parent::getIndex();
+        return parent::getEngine();
     }
 
     /**

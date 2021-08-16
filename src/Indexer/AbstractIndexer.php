@@ -61,7 +61,7 @@ abstract class AbstractIndexer implements IndexerInterface
 
     public function setSearchEngine(SearchEngineRepresentation $engine): IndexerInterface
     {
-        $this->index = $engine;
+        $this->engine = $engine;
         return $this;
     }
 
@@ -74,7 +74,7 @@ abstract class AbstractIndexer implements IndexerInterface
      */
     protected function getSetting(string $name, $default = null)
     {
-        $settings = $this->index->settings();
+        $settings = $this->engine->settings();
         return $settings[$name] ?? $default;
     }
 

@@ -1714,9 +1714,9 @@ class Module extends AbstractModule
         $searchEngines = $api->search('search_engines')->getContent();
         foreach ($searchEngines as $searchEngine) {
             if (in_array($requestResource, $searchEngine->setting('resources', []))) {
-                $enginer = $searchEngine->indexer();
+                $indexer = $searchEngine->indexer();
                 try {
-                    $enginer->indexResources($resources);
+                    $indexer->engineResources($resources);
                 } catch (\Exception $e) {
                     $services = $this->getServiceLocator();
                     $logger = $services->get('Omeka\Logger');
@@ -1762,13 +1762,13 @@ class Module extends AbstractModule
         $searchEngines = $api->search('search_engines')->getContent();
         foreach ($searchEngines as $searchEngine) {
             if (in_array($requestResource, $searchEngine->setting('resources', []))) {
-                $enginer = $searchEngine->indexer();
+                $indexer = $searchEngine->indexer();
                 if ($request->getOperation() == 'delete') {
                     $id = $request->getId();
-                    $this->deleteIndexResource($enginer, $requestResource, $id);
+                    $this->deleteIndexResource($indexer, $requestResource, $id);
                 } else {
                     $resource = $response->getContent();
-                    $this->updateIndexResource($enginer, $resource);
+                    $this->updateIndexResource($indexer, $resource);
                 }
             }
         }
@@ -1790,8 +1790,8 @@ class Module extends AbstractModule
         $searchEngines = $api->search('search_engines')->getContent();
         foreach ($searchEngines as $searchEngine) {
             if (in_array('items', $searchEngine->setting('resources', []))) {
-                $enginer = $searchEngine->indexer();
-                $this->updateIndexResource($enginer, $item);
+                $indexer = $searchEngine->indexer();
+                $this->updateIndexResource($indexer, $item);
             }
         }
     }
@@ -1799,14 +1799,14 @@ class Module extends AbstractModule
     /**
      * Delete the search index for a resource.
      *
-     * @param IndexerInterface $enginer
+     * @param IndexerInterface $indexer
      * @param string $resourceName
      * @param int $id
      */
-    protected function deleteIndexResource(IndexerInterface $enginer, $resourceName, $id): void
+    protected function deleteIndexResource(IndexerInterface $indexer, $resourceName, $id): void
     {
         try {
-            $enginer->deleteResource($resourceName, $id);
+            $indexer->deleteResource($resourceName, $id);
         } catch (\Exception $e) {
             $services = $this->getServiceLocator();
             $logger = $services->get('Omeka\Logger');
@@ -1825,13 +1825,13 @@ class Module extends AbstractModule
     /**
      * Update the search index for a resource.
      *
-     * @param IndexerInterface $enginer
+     * @param IndexerInterface $indexer
      * @param Resource $resource
      */
-    protected function updateIndexResource(IndexerInterface $enginer, Resource $resource): void
+    protected function updateIndexResource(IndexerInterface $indexer, Resource $resource): void
     {
         try {
-            $enginer->indexResource($resource);
+            $indexer->engineResource($resource);
         } catch (\Exception $e) {
             $services = $this->getServiceLocator();
             $logger = $services->get('Omeka\Logger');

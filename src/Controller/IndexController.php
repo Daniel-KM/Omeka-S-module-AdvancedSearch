@@ -166,7 +166,7 @@ class IndexController extends AbstractActionController
                 ]);
             }
 
-            $engineSettings = $searchConfig->index()->settings();
+            $engineSettings = $searchConfig->engine()->settings();
             $result = [];
             foreach ($engineSettings['resources'] as $resource) {
                 $result[$resource] = $response->getResults($resource);
@@ -280,7 +280,7 @@ class IndexController extends AbstractActionController
         /** @var \AdvancedSearch\Query $query */
         $query = $formAdapter->toQuery(['q' => $q], $searchFormSettings);
 
-        $searchEngine = $searchConfig->index();
+        $searchEngine = $searchConfig->engine();
         $engineSettings = $searchEngine->settings();
 
         $user = $this->identity();

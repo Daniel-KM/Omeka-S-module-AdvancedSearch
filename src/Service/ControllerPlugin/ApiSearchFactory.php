@@ -17,7 +17,7 @@ class ApiSearchFactory implements FactoryInterface
             try {
                 /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
                 $searchConfig = $api->read('search_configs', ['id' => $apiPage])->getContent();
-                $engine = $searchConfig->index();
+                $engine = $searchConfig->engine();
             } catch (\Omeka\Api\Exception\NotFoundException $e) {
             }
             if ($engine) {

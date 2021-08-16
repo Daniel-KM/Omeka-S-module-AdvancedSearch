@@ -69,7 +69,7 @@ class SearchRequestToResponse extends AbstractPlugin
 
         // Add global parameters.
 
-        $this->searchEngine = $searchConfig->index();
+        $this->searchEngine = $searchConfig->engine();
         $engineSettings = $this->searchEngine->settings();
 
         $user = $controller->identity();

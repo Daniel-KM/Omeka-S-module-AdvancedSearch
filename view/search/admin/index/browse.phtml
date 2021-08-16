@@ -121,7 +121,7 @@ $url = $this->plugin('url');
                                     'title' => $translate('Edit'),
                                 ]) ?>
                             </li>
-                            <?php if ($search_config->index()->adapter()): ?>
+                            <?php if ($search_config->engine()->adapter()): ?>
                             <li>
                                 <?= $search_config->link('', 'configure', [
                                     'class' => 'o-icon- fa fa-sliders fa-sliders-h',
@@ -139,7 +139,7 @@ $url = $this->plugin('url');
                         </ul>
                     </td>
                     <td><?= $search_config->path() ?></td>
-                    <td><?= $search_config->index()->name() ?></td>
+                    <td><?= $search_config->engine()->name() ?></td>
                     <td>
                         <?php
                             $formAdapter = $search_config->formAdapter();

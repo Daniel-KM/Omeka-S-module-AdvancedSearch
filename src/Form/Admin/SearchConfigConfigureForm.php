@@ -48,7 +48,7 @@ class SearchConfigConfigureForm extends Form
     {
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $this->getOption('advancedsearch_config');
-        $engine = $searchConfig->index();
+        $engine = $searchConfig->engine();
         if (empty($engine)) {
             return;
         }
@@ -729,7 +729,7 @@ class SearchConfigConfigureForm extends Form
     {
         $options = [];
         $searchConfig = $this->getOption('advancedsearch_config');
-        $searchEngine = $searchConfig->index();
+        $searchEngine = $searchConfig->engine();
         $searchAdapter = $searchEngine->adapter();
         if (empty($searchAdapter)) {
             return [];
@@ -745,7 +745,7 @@ class SearchConfigConfigureForm extends Form
     {
         $options = [];
         $searchConfig = $this->getOption('advancedsearch_config');
-        $searchEngine = $searchConfig->index();
+        $searchEngine = $searchConfig->engine();
         $searchAdapter = $searchEngine->adapter();
         if (empty($searchAdapter)) {
             return [];
@@ -761,7 +761,7 @@ class SearchConfigConfigureForm extends Form
     {
         $options = [];
         $searchConfig = $this->getOption('advancedsearch_config');
-        $searchEngine = $searchConfig->index();
+        $searchEngine = $searchConfig->engine();
         $searchAdapter = $searchEngine->adapter();
         if (empty($searchAdapter)) {
             return [];

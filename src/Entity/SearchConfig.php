@@ -151,18 +151,18 @@ class SearchConfig extends AbstractEntity
      * @param SearchEngine $engine
      * @return self
      */
-    public function setIndex(SearchEngine $engine)
+    public function setEngine(SearchEngine $engine)
     {
-        $this->index = $engine;
+        $this->engine = $engine;
         return $this;
     }
 
     /**
      * @return \AdvancedSearch\Entity\SearchEngine
      */
-    public function getIndex()
+    public function getEngine()
     {
-        return $this->index;
+        return $this->engine;
     }
 
     /**

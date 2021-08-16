@@ -21,6 +21,9 @@ return [
         'template_path_stack' => [
             dirname(__DIR__) . '/view',
         ],
+        'controller_map' => [
+            Controller\IndexController::class => 'search',
+        ],
         'strategies' => [
             'ViewJsonStrategy',
         ],

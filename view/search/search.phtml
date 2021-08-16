@@ -38,6 +38,14 @@
  * @var bool $skipFormAction Remove action of the form, so it uses current page.
  */
 
+// Compatibility with old theme for module Search.
+
+if ($this->resolver('search/index/search.phtml')) {
+    $this->logger()->warn('The file "search/index/search.phtml" of your current theme should be moved to "search/search.phtml".');
+    echo $this->partial('search/index/search.phtml', $this->vars());
+    return;
+}
+
 $plugins = $this->getHelperPluginManager();
 $translate = $plugins->get('translate');
 $translatePlural = $plugins->get('translatePlural');

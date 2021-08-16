@@ -11,6 +11,16 @@ return [
         'default_query' => '',
     ],
 
+    // Specific fields for external search engines.
+    // TODO To be moved to Internal and Solr.
+    'resource_fields' => [
+        'is_public_field' => 'is_public_field',
+        'item_set_id_field' => 'item_set_id_field',
+        'resource_class_id_field' => 'resource_class_id_field',
+        'resource_template_id_field' => 'resource_template_id_field',
+        'owner_id_field' => 'owner_id_field',
+    ],
+
     'autosuggest' => [
         'enable' => true,
         'mode' => 'start',
@@ -21,50 +31,116 @@ return [
     ],
 
     'form' => [
-        'item_set_filter_type' => 'select',
-        'item_set_id_field' => 'item_set_id_field',
-        'resource_class_filter_type' => 'select_flat',
-        'resource_class_id_field' => 'resource_class_id_field',
-        'resource_template_filter_type' => '0',
-        'resource_template_id_field' => 'resource_template_id_field',
-        'is_public_field' => 'is_public_field',
+        // All filters are managed the same via the querier: a form is a query configurator.
 
         'filters' => [
-            'dcterms:title' => [
-                'name' => 'dcterms:title',
-                'label' => 'Title',
+            // Ordered list of specific filters.
+            [
+                'field' => 'items_set_id_field',
+                'label' => 'Collection',
+                'type' => 'Select',
             ],
-            'dcterms:subject' => [
-                'name' => 'dcterms:subject',
-                'label' => 'Subject',
-            ],
-            'dcterms:creator' => [
-                'name' => 'dcterms:creator',
-                'label' => 'Creator',
-            ],
-            'dcterms:date' => [
-                'name' => 'dcterms:date',
-                'label' => 'Date',
-            ],
-            'dcterms:description' => [
-                'name' => 'dcterms:description',
-                'label' => 'Description',
-            ],
-            'resource_class_id' => [
-                'name' => 'resource_class_id',
+            [
+                'field' => 'resource_class_id_field',
                 'label' => 'Class',
+                'type' => 'SelectFlat',
             ],
-        ],
-        'filters_max_number' => '5',
-        'filter_value_joiner' => true,
-        'filter_value_type' => true,
-
-        'fields_order' => [
-            'q',
-            'itemSet',
-            'resourceClass',
-            'filters',
-            'submit',
+            [
+                'field' => 'resource_template_id_field',
+                'label' => 'Template',
+                'type' => 'Radio',
+            ],
+            [
+                'field' => 'advanced',
+                'label' => 'Filters',
+                'type' => 'Advanced',
+                'fields' => [
+                    'dcterms:title' => [
+                        'value' => 'dcterms:title',
+                        'label' => 'Title',
+                    ],
+                    'dcterms:subject' => [
+                        'value' => 'dcterms:subject',
+                        'label' => 'Subject',
+                    ],
+                    'dcterms:creator' => [
+                        'value' => 'dcterms:creator',
+                        'label' => 'Creator',
+                    ],
+                    'dcterms:date' => [
+                        'value' => 'dcterms:date',
+                        'label' => 'Date',
+                    ],
+                    'dcterms:description' => [
+                        'value' => 'dcterms:description',
+                        'label' => 'Description',
+                    ],
+                    'resource_class_id' => [
+                        'value' => 'resource_class_id',
+                        'label' => 'Class',
+                    ],
+                ],
+                'max_number' => '5',
+                'field_joiner' => true,
+                'field_operator' => true,
+            ],
+            [
+                'field' => 'dcterms:date',
+                'label' => 'Date range',
+                'type' => 'DateRange',
+            ],
+            // Other available filters.
+            /*
+            [
+                'field' => 'dcterms:created',
+                'label' => 'Number',
+                'type' => 'Number',
+            ],
+            [
+                'field' => 'dcterms:valid',
+                'label' => 'Number',
+                'type' => 'NumberRange',
+            ],
+            [
+                'field' => 'dcterms:provenance',
+                'type' => 'Hidden',
+                'options' => [
+                    'the provenance',
+                ],
+            ],
+            [
+                'field' => 'dcterms:audience',
+                'type' => 'Checkbox',
+                'options' => ['no', 'yes'],
+            ],
+            */
+            // Not managed currently.
+            /*
+            [
+                'field' => 'date',
+                'label' => 'Date',
+                'type' => 'Date',
+            ],
+            [
+                'field' => 'date_range',
+                'label' => 'Date range',
+                'type' => 'DateRangeStartEnd',
+                'options' => [
+                    'from' => 'dcterms:created',
+                    'to' => 'dcterms:issued',
+                ],
+            ],
+            [
+                'field' => 'dcterms:spatial',
+                'label' => 'Place',
+                'type' => 'Spatial',
+            ],
+            [
+                'field' => 'dcterms:spatial',
+                'label' => 'Place',
+                'type' => 'SpatialBox',
+            ],
+            */
         ],
     ],
 

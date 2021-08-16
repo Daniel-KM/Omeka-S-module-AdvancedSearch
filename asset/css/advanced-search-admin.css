@@ -81,26 +81,23 @@
     }
 
     /* Quick fix for search form in admin. */
-    #search-text-filters > legend {
+    #search-filters {
+        margin-top: 0;
+        margin-bottom: 6px;
+        background-color: rgba(0,0,0,.04);
+    }
+    #search-filters > legend {
         font-size: 16px;
         font-weight: normal;
         padding-left: 6px;
     }
-    #search-text-filters fieldset {
-        min-width: 0;
-    }
-    #search-filters {
-        padding-left: 0;
-    }
+    #search-filters .filter {
+        margin-left: inherit;
+}
     #search-filters .filter select:nth-of-type(1) {
-        margin-left: 6px;
+        margin-left: 0;
     }
     #search-filters .filter input {
         margin-right: 6px;
-    }
-}
-@media screen and (max-width: 640px) {
-    #search-filters {
-        margin-left: 0;
     }
 }

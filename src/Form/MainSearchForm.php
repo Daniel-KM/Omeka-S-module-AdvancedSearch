@@ -29,6 +29,9 @@
 
 namespace AdvancedSearch\Form;
 
+use AdvancedSearch\Form\Element\OptionalMultiCheckbox;
+use AdvancedSearch\Form\Element\OptionalRadio;
+use AdvancedSearch\Form\Element\OptionalSelect;
 use Laminas\Form\Element;
 use Laminas\Form\ElementInterface;
 use Laminas\Form\Fieldset;
@@ -90,6 +93,7 @@ class MainSearchForm extends Form
                 break;
             }
         }
+        unset($name);
 
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $this->getOption('search_config');
@@ -125,53 +129,67 @@ class MainSearchForm extends Form
             }
         }
 
-        // In displayed form, "filters" is a sub-fieldset of "text".
-
         foreach ($this->formSettings['form']['filters'] ?? [] as $filter) {
-            if (empty($filter['field'])) {
+            if (empty($filter['field']) || empty($filter['type'])) {
                 continue;
             }
+
             $field = $filter['field'];
-            $type = $filter['type'] ?? 'Noop';
+            $type = $filter['type'];
+            if (!isset($filter['label'])) {
+                $filter['label'] = '';
+            }
+
             $element = null;
-            switch ($type) {
-                default:
-                case 'Noop':
-                    continue 2;
-                case 'Advanced':
-                    $element = $this->advancedFieldset($filter);
-                    break;
-                case 'DateRange':
-                    $element = $this->dateRangeElement($filter);
-                    break;
-                case 'MultiCheckbox':
-                case 'Radio':
-                case 'Select':
-                case 'SelectFlat':
-                    switch ($field) {
-                        default:
-                            $element = $this->fieldElement($filter);
-                            break;
-                        // TODO These exception should be removed: the search engine will manage them.
-                        case 'items_set_id_field':
-                            $element = $this->itemSetFieldset($filter);
-                            break;
-                        case 'resource_class_id_field':
-                            $element = $this->resourceClassFieldset($filter);
-                            break;
-                        case 'resource_template_id_field':
-                            $element = $this->resourceTemplateFieldset($filter);
-                            break;
+
+            // Manage exceptions.
+            // TODO These exception should be removed: the search engine will manage them.
+            // TODO Add special types for these special inputs. Or use them only with name "field".
+            // TODO In fact, they are standard field with autosuggestion, so it will be fixed when autosuggestion (or short list) will be added.
+            switch ($field) {
+                case 'is_public_field':
+                    $element = $this->searchIsPublic($filter);
+                    if ($element) {
+                        $this->add($element);
                     }
+                    continue 2;
+                case 'item_set_id_field':
+                    $element = $this->searchItemSet($filter);
+                    if ($element) {
+                        $this->add($element);
+                    }
+                    continue 2;
+                case 'resource_class_id_field':
+                    $element = $this->searchResourceClass($filter);
+                    if ($element) {
+                        $this->add($element);
+                    }
+                    continue 2;
+                case 'resource_template_id_field':
+                    $element = $this->searchResourceTemplate($filter);
+                    if ($element) {
+                        $this->add($element);
+                    }
+                    continue 2;
+                case 'owner_id_field':
+                    $element = $this->searchOwner($filter);
+                    if ($element) {
+                        $this->add($element);
+                    }
+                    continue 2;
+                default:
                     break;
             }
+
+            $method = 'search' . $type;
+            $element = method_exists($this, $method)
+                ? $this->$method($filter)
+                : $this->searchElement($filter);
             if ($element) {
                 $this
                     ->add($element);
             }
         }
-
-        $this->appendSpecificFields();
 
         $this
             ->add([
@@ -194,15 +212,60 @@ class MainSearchForm extends Form
         $this->appendInputFilters();
     }
 
-    protected function fieldElement(array $filter): ?ElementInterface
+    protected function searchElement(array $filter): ?ElementInterface
     {
-        // TODO Check if the field is available? It should be already checked in the config.
         return null;
     }
 
-    protected function dateRangeElement(array $filter): ?ElementInterface
+    protected function searchAdvanced(array $filter): ?ElementInterface
     {
-        $fieldset = new Fieldset('date');
+        if (empty($filter['max_number'])) {
+            return null;
+        }
+
+        $filter['search_config'] = $this->getOption('search_config');
+        $advanced = $this->formElementManager->get(SearchFilter\Advanced::class, $filter);
+        if (!$advanced->count()) {
+            return null;
+        }
+
+        $element = new Element\Collection('filter');
+        $element
+            ->setLabel((string) $filter['label'])
+            ->setOptions([
+                'label' => $filter['label'],
+                'count' => $filter['max_number'],
+                'should_create_template' => true,
+                'allow_add' => true,
+                'target_element' => $advanced,
+                'required' => false,
+            ])
+            ->setAttributes([
+                'id' => 'search-filters',
+            ])
+        ;
+
+        return $element;
+    }
+
+    protected function searchCheckbox(array $filter): ?ElementInterface
+    {
+        $element = new Element\Checkbox($filter['field']);
+        $element
+            ->setLabel($filter['label'])
+        ;
+        if (!empty($filter['options']) && count($filter['options']) === 2) {
+            $element->setOptions([
+                'unchecked_value' => $filter['options'][0],
+                'checked_value' => $filter['options'][1],
+            ]);
+        }
+        return $element;
+    }
+
+    protected function searchDateRange(array $filter): ?ElementInterface
+    {
+        $fieldset = new Fieldset($filter['field']);
         $fieldset
             ->setLabel($filter['label'])
             ->add([
@@ -230,29 +293,140 @@ class MainSearchForm extends Form
         return $fieldset;
     }
 
-    protected function itemSetFieldset(array $filter): ?Fieldset
+    protected function searchHidden(array $filter): ?ElementInterface
     {
-        if (empty($this->formSettings['resource_fields']['item_set_id_field'])) {
+        $value = $filter['options'] === [] ? '' : reset($filter['options']);
+        $element = new Element\Hidden($filter['field']);
+        $element
+            ->setValue($value);
+        return $element;
+    }
+
+    protected function searchMultiCheckbox(array $filter): ?ElementInterface
+    {
+        $valueOptions = $this->prepareValueOptions($filter['options']);
+        $element = new OptionalMultiCheckbox($filter['field']);
+        $element
+            ->setLabel($filter['label'])
+            ->setValueOptions($valueOptions)
+        ;
+        return $element;
+    }
+
+    protected function searchMultiSelect(array $filter): ?ElementInterface
+    {
+        $filter['attributes']['multiple'] = true;
+        return $this->searchSelect($filter);
+    }
+
+    protected function searchMultiSelectFlat(array $filter): ?ElementInterface
+    {
+        $filter['attributes']['multiple'] = true;
+        return $this->searchSelectFlat($filter);
+    }
+
+    protected function searchNumber(array $filter): ?ElementInterface
+    {
+        $element = new Element\Number($filter['field']);
+        $element
+            ->setLabel($filter['label'])
+        ;
+        return $element;
+    }
+
+    protected function searchRadio(array $filter): ?ElementInterface
+    {
+        $valueOptions = $this->prepareValueOptions($filter['options']);
+        $element = new OptionalRadio($filter['field']);
+        $element
+            ->setLabel($filter['label'])
+            ->setValueOptions($valueOptions)
+        ;
+        return $element;
+    }
+
+    protected function searchSelect(array $filter): ?ElementInterface
+    {
+        $valueOptions = $this->prepareValueOptions($filter['options']);
+        $valueOptions = ['' => ''] + $valueOptions;
+
+        $attributes = $filter['attributes'] ?? [];
+        $attributes['class'] = $attributes['class'] ?? 'chosen-select';
+        $attributes['placeholder'] = $attributes['placeholder'] ?? '';
+        $attributes['data-placeholder'] = $attributes['data-placeholder'] ?? ' ';
+
+        $element = new OptionalSelect($filter['field']);
+        $element
+            ->setLabel($filter['label'])
+            ->setOptions([
+                'value_options' => $valueOptions,
+                'empty_option' => '',
+            ])
+            ->setAttributes($attributes)
+        ;
+        return $element;
+    }
+
+    protected function searchSelectFlat(array $filter): ?ElementInterface
+    {
+        return $this->searchSelect($filter);
+    }
+
+    protected function searchText(array $filter): ?ElementInterface
+    {
+        $element = new Element\Text($filter['field']);
+        $element
+            ->setLabel($filter['label'])
+        ;
+        return $element;
+    }
+
+    protected function searchIsPublic(array $filter): ?ElementInterface
+    {
+        if ($filter['field'] === 'is_public'
+            && empty($this->formSettings['resource_fields']['is_public'])
+        ) {
             return null;
         }
 
-        $fieldset = new Fieldset('itemSet');
+        $element = new Element\Checkbox('is_public');
+        $element
+            ->setAttributes([
+                'id' => 'search-is-public',
+            ])
+            ->setOptions([
+                'label' => $filter['label'], // @translate
+            ])
+        ;
+
+        return $element;
+    }
+
+    protected function searchItemSet(array $filter): ?ElementInterface
+    {
+        if ($filter['field'] === 'item_set_id_field'
+            && empty($this->formSettings['resource_fields']['item_set_id_field'])
+        ) {
+            return null;
+        }
+
+        $fieldset = new Fieldset('item_set');
         $fieldset
             ->setAttributes([
                 'id' => 'search-item-sets',
             ])
             ->add([
-                'name' => 'ids',
+                'name' => 'id',
                 'type' => $filter['type'] === 'MultiCheckbox'
-                    ? Element\MultiCheckbox::class
-                    : Element\Select::class,
+                    ? OptionalMultiCheckbox::class
+                    : OptionalSelect::class,
                 'options' => [
                     'label' => $filter['label'], // @translate
                     'value_options' => $this->getItemSetsOptions($filter['type'] !== 'MultiCheckbox'),
                     'empty_option' => '',
                 ],
                 'attributes' => [
-                    'id' => 'item-sets-ids',
+                    'id' => 'item-set-id',
                     'multiple' => true,
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
                     // End users understand "collections" more than "item sets".
@@ -261,23 +435,23 @@ class MainSearchForm extends Form
             ])
         ;
 
-        $this->listInputFilters[] = 'item_sets';
-
         return $fieldset;
     }
 
-    protected function resourceClassFieldset(array $filter): ?Fieldset
+    protected function searchResourceClass(array $filter): ?ElementInterface
     {
-        if (empty($this->formSettings['resource_fields']['resource_class_id_field'])) {
+        if ($filter['field'] === 'resource_class_id_field'
+            && empty($this->formSettings['resource_fields']['resource_class_id_field'])
+        ) {
             return null;
         }
 
         // For an unknown reason, the ResourceClassSelect can not be added
         // directly to a fieldset (factory is not used).
 
-        $fieldset = new Fieldset('resourceClass');
+        $fieldset = new Fieldset('class');
         $fieldset->setAttributes([
-            'id' => 'search-resource-classes',
+            'id' => 'search-classes',
         ]);
 
         /** @var \Omeka\Form\Element\ResourceClassSelect $element */
@@ -313,7 +487,7 @@ class MainSearchForm extends Form
                 }
             }
             natcasesort($result);
-            $element = new Element\Select;
+            $element = new OptionalSelect;
             $element
                 ->setOptions([
                     'label' => $filter['label'], // @translate
@@ -323,9 +497,9 @@ class MainSearchForm extends Form
         }
 
         $element
-            ->setName('ids')
+            ->setName('id')
             ->setAttributes([
-                'id' => 'resource-classes-ids',
+                'id' => 'class-id',
                 'multiple' => true,
                 'class' => 'chosen-select',
                 'data-placeholder' => 'Select classes…', // @translate
@@ -339,24 +513,26 @@ class MainSearchForm extends Form
         return $fieldset;
     }
 
-    protected function resourceTemplateFieldset(array $filter): ?Fieldset
+    protected function searchResourceTemplate(array $filter): ?ElementInterface
     {
-        if (empty($this->formSettings['resource_fields']['resource_template_id_field'])) {
+        if ($filter['field'] === 'resource_template_id_field'
+            && empty($this->formSettings['resource_fields']['resource_template_id_field'])
+        ) {
             return null;
         }
 
         // For an unknown reason, the ResourceTemplateSelect can not be added
         // directly to a fieldset (factory is not used).
 
-        $fieldset = new Fieldset('resourceTemplate');
+        $fieldset = new Fieldset('template');
         $fieldset->setAttributes([
-            'id' => 'search-resource-templates',
+            'id' => 'search-templates',
         ]);
 
         /** @var \Omeka\Form\Element\ResourceTemplateSelect $element */
         $element = $this->formElementManager->get(ResourceTemplateSelect::class);
         $element
-            ->setName('ids')
+            ->setName('id')
             ->setOptions([
                 'label' => $filter['label'], // @translate
                 'empty_option' => '',
@@ -365,7 +541,7 @@ class MainSearchForm extends Form
                 'query' => ['used' => true],
             ])
             ->setAttributes([
-                'id' => 'resource-templates-ids',
+                'id' => 'template-id',
                 'multiple' => true,
                 'class' => 'chosen-select',
                 'data-placeholder' => 'Select templates…', // @translate
@@ -380,15 +556,15 @@ class MainSearchForm extends Form
                 if ($hasValues) {
                     $fieldset
                         ->add([
-                            'name' => 'ids',
-                            'type' => Element\Select::class,
+                            'name' => 'id',
+                            'type' => OptionalSelect::class,
                             'options' => [
                                 'label' => $filter['label'], // @translate
                                 'value_options' => $values,
                                 'empty_option' => '',
                             ],
                             'attributes' => [
-                                'id' => 'resource-templates',
+                                'id' => 'template-id',
                                 'multiple' => true,
                                 'class' => 'chosen-select',
                                 'data-placeholder' => 'Select templates…', // @translate
@@ -409,37 +585,35 @@ class MainSearchForm extends Form
         return $fieldset;
     }
 
-    protected function advancedFieldset(array $filter): ?Fieldset
+    protected function searchOwner(array $filter): ?ElementInterface
     {
-        if (empty($filter['max_number'])) {
+        if ($filter['field'] === 'owner_id_field'
+            && empty($this->formSettings['resource_fields']['owner_id_field'])
+        ) {
             return null;
         }
 
-        $filter['search_config'] = $this->getOption('search_config');
-        $advanced = $this->formElementManager->get(SearchFilter\Advanced::class, $filter);
-        if (!$advanced->count()) {
-            return null;
-        }
-
-        $fieldset = new Fieldset('text');
+        $fieldset = new Fieldset('owner');
         $fieldset
-            ->setLabel((string) $filter['label'])
             ->setAttributes([
-                'id' => 'search-text-filters',
+                'id' => 'search-owners',
             ])
             ->add([
-                'name' => 'filters',
-                'type' => Element\Collection::class,
+                'name' => 'id',
+                'type' => $filter['type'] === 'MultiCheckbox'
+                    ? OptionalMultiCheckbox::class
+                    : OptionalSelect::class,
                 'options' => [
-                    'label' => '',
-                    'count' => $filter['max_number'],
-                    'should_create_template' => true,
-                    'allow_add' => true,
-                    'target_element' => $advanced,
-                    'required' => false,
+                    'label' => $filter['label'], // @translate
+                    'value_options' => $this->getOwnerOptions(),
+                    'empty_option' => '',
                 ],
                 'attributes' => [
-                    'id' => 'search-filters',
+                    'id' => 'owner-id',
+                    'multiple' => true,
+                    'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
+                    // End users understand "collections" more than "item sets".
+                    'data-placeholder' => 'Select owners…', // @translate
                 ],
             ])
         ;
@@ -448,47 +622,49 @@ class MainSearchForm extends Form
     }
 
     /**
-     * Add specific fields.
-     *
-     * This method is used for forms that extend this form.
-     * It should include the specific input filters.
-     */
-    protected function appendSpecificFields(): Form
-    {
-        return $this;
-    }
-
-    /**
      * Add input filters.
+     *
+     * It is recommended to use an optional element to avoid input filters: this
+     * is a search form, everything is generally optional.
      */
     protected function appendInputFilters(): Form
     {
         $inputFilter = $this->getInputFilter();
-        if (in_array('item_sets', $this->listInputFilters)) {
-            $inputFilter
-                ->get('itemSet')
-                ->add([
-                    'name' => 'ids',
-                    'required' => false,
-                ]);
-        }
         if (in_array('resource_classes', $this->listInputFilters)) {
             $inputFilter
-                ->get('resourceClass')
+                ->get('class')
                 ->add([
-                    'name' => 'ids',
+                    'name' => 'id',
                     'required' => false,
                 ]);
         }
         if (in_array('resource_templates', $this->listInputFilters)) {
             $inputFilter
-                ->get('resourceTemplate')
+                ->get('template')
                 ->add([
-                    'name' => 'ids',
+                    'name' => 'id',
                     'required' => false,
                 ]);
         }
         return $this;
+    }
+
+    /**
+     * @todo Improve DataTextarea or explode options here with a ":".
+     */
+    protected function prepareValueOptions($options): array
+    {
+        if ($options === null || $options === [] || $options === '') {
+            return [];
+        }
+        if (is_string($options)) {
+            $options = array_filter(array_map('trim', explode($options)), 'strlen');
+        } elseif (!is_array($options)) {
+            return [(string) $options => $options];
+        }
+        // Avoid issue with duplicates.
+        $options = array_filter(array_keys(array_flip($options)), 'strlen');
+        return array_combine($options, $options);
     }
 
     protected function getItemSetsOptions($byOwner = false): array
@@ -510,6 +686,12 @@ class MainSearchForm extends Form
             $valueOptions = $select->getValueOptions();
         }
         return $valueOptions;
+    }
+
+    protected function getOwnerOptions(): array
+    {
+        $select = $this->formElementManager->get(\Omeka\Form\Element\UserSelect::class, []);
+        return $select->getValueOptions();
     }
 
     public function setBasePath(string $basePath): Form

@@ -80,8 +80,8 @@ class MvcListeners extends AbstractListenerAggregate
         $routeMatch->setMatchedRouteName('search-page-' . $searchMainPage);
         $event->setRouteMatch($routeMatch);
 
-        /* @var \Laminas\Stdlib\Parameters $query */
+        /** @see \Laminas\Stdlib\Parameters */
         $event->getRequest()->getQuery()
-            ->set('itemSet', ['ids' => [$itemSetId]]);
+            ->set('item_set', ['id' => [$itemSetId]]);
     }
 }

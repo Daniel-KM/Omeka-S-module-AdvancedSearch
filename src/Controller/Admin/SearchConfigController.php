@@ -502,12 +502,20 @@ class SearchConfigController extends AbstractActionController
         // Normalize filters.
         $inputTypes = [
             'advanced' => 'Advanced',
+            'checkbox' => 'Checkbox',
+            // 'date' => 'Date',
             'daterange' => 'DateRange',
+            // 'daterangestartend' => 'DateRangeStartEnd',
+            'hidden' => 'Hidden',
             'multicheckbox' => 'MultiCheckbox',
             'noop' => 'Noop',
+            'number' => 'Number',
+            // 'numberrange' => 'NumberRange',
+            // 'place' => 'Place',
             'radio' => 'Radio',
             'select' => 'Select',
             'selectflat' => 'SelectFlat',
+            'text' => 'Text',
         ];
 
         // Include advanced fields in filters..
@@ -520,7 +528,7 @@ class SearchConfigController extends AbstractActionController
                 continue;
             }
             $filterField = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '', $filter['type'] ?? 'Noop'));
-            $params['form']['filters'][$keyFilter]['type'] = $inputTypes[$filterField] ?? 'Noop';
+            $params['form']['filters'][$keyFilter]['type'] = $inputTypes[$filterField] ?? ucfirst($filterField);
             if ($filter['type'] === 'Advanced') {
                 if ($keyAdvanced !== false) {
                     unset($params['form']['filters'][$keyAdvanced]);

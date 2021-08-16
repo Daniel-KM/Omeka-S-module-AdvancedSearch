@@ -65,6 +65,7 @@ class SearchConfigConfigureForm extends Form
             'item_set_id_field' => 'Item set id (if available in fields)', // @translate
             'resource_class_id_field' => 'Resource class id (if available in fields)', // @translate
             'resource_template_id_field' => 'Resource template id (if available in fields)', // @translate
+            'owner_id_field' => 'Owner id (if available in fields)', // @translate
         ] + $availableFields;
 
         // Remove some of the available fields used by the internal adapter,
@@ -72,6 +73,7 @@ class SearchConfigConfigureForm extends Form
         unset($specialOptions['item_set_id']);
         unset($specialOptions['resource_class_id']);
         unset($specialOptions['resource_template_id']);
+        unset($specialOptions['owner_id']);
 
         $this
             ->setAttribute('id', 'search-form-configure');
@@ -185,6 +187,21 @@ class SearchConfigConfigureForm extends Form
                     'value' => 'resource_template_id_field',
                 ],
             ])
+            ->add([
+                'name' => 'owner_id_field',
+                'type' => Element\Select::class,
+                'options' => [
+                    'label' => 'Owner id field', // @translate
+                    'value_options' => $specialOptions,
+                    'empty_option' => 'None', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'owner_id_field',
+                    'required' => false,
+                    'class' => 'chosen-select',
+                    'value' => 'owner_id_field',
+                ],
+            ])
         ;
 
         $this
@@ -242,7 +259,7 @@ class SearchConfigConfigureForm extends Form
                 'options' => [
                     'label' => 'Limit query to specific fields', // @translate
                     'value_options' => $availableFields,
-                    'empty_value' => '',
+                    'empty_option' => '',
                 ],
                 'attributes' => [
                     'id' => 'autosuggest_fields',
@@ -311,8 +328,10 @@ class SearchConfigConfigureForm extends Form
                     // field (term) = label = type = options
                     'placeholder' => 'item_set_id_field = Collection = Select
 resource_class_id_field = Class = SelectFlat
-advanced = Filters = Advanced
-',
+dcterms:title = Title = Text
+dcterms:date = Date = DateRange
+dcterms:subject = Subject = MultiCheckbox = alpha | beta | gamma
+advanced = Filters = Advanced',
                     'rows' => 12,
                 ],
             ])

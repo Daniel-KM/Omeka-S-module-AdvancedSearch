@@ -56,7 +56,7 @@ class IndexController extends AbstractActionController
             }
             // Check if it is an item set redirection.
             $itemSetId = (int) $this->params('item-set-id');
-            // This is just a check: if set, mvc listeners add itemSet['ids'][].
+            // This is just a check: if set, mvc listeners add item_set['id'][].
             // @see \AdvancedSearch\Mvc\MvcListeners::redirectItemSetToSearch()
             if ($itemSetId) {
                 // May throw a not found exception.

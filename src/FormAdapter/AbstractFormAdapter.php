@@ -33,7 +33,7 @@ use AdvancedSearch\Query;
 
 abstract class AbstractFormAdapter implements FormAdapterInterface
 {
-    use TraitUnrestrictedQuery;
+    abstract public function getLabel(): string;
 
     public function getFormPartialHeaders(): ?string
     {
@@ -52,19 +52,178 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
 
     public function toQuery(array $request, array $formSettings): \AdvancedSearch\Query
     {
-        // Check of restricted is removed currently.
-        return $this->toUnrestrictedQuery($request, $formSettings);
-        /*
-        if (empty($formSettings['restrict_query_to_form'])) {
-            return $this->toUnrestrictedQuery($request, $formSettings);
+        $query = new Query;
+
+        // TODO Manage the "browse_attached_items" / "site_attachments_only".
+
+        // This function manages only one level, so check value when needed.
+        $flatArray = function ($value): array {
+            if (!is_array($value)) {
+                return [$value];
+            }
+            $firstKey = key($value);
+            if (is_numeric($firstKey)) {
+                return $value;
+            }
+            return is_array(reset($value)) ? $value[$firstKey] : [$value[$firstKey]];
+        };
+
+        $isSimpleList = function ($value): bool {
+            if (!is_array($value)) {
+                return false;
+            }
+            foreach ($value as $key => $val) {
+                if (!is_numeric($key) || is_array($val)) {
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        foreach ($request as $name => $value) {
+            if ($value === '' || $value === [] || $value === null) {
+                continue;
+            }
+            switch ($name) {
+                case 'q':
+                    $query->setQuery($request['q']);
+                    continue 2;
+
+                case 'is_public':
+                    if (is_string($value) && strlen($value)) {
+                        $nameFilter = empty($formSettings['resource_fields']['is_public_field']) ? 'is_public': $formSettings['resource_fields']['is_public_field'];
+                        $query->addFilter($nameFilter, (bool) $value);
+                    }
+                    continue 2;
+
+                case 'resource':
+                    $valueArray = $flatArray($value);
+                    $query->addFilter('id', $valueArray);
+                    continue 2;
+
+                case 'item_set':
+                    $nameFilter = empty($formSettings['resource_fields']['item_set_id_field']) ? 'item_set_id': $formSettings['resource_fields']['item_set_id_field'];
+                    $valueArray = $flatArray($value);
+                    $query->addFilter($nameFilter, $valueArray);
+                    continue 2;
+
+                case 'class':
+                    $nameFilter = empty($formSettings['resource_fields']['resource_class_id_field']) ? 'resource_class_id': $formSettings['resource_fields']['resource_class_id_field'];
+                    $valueArray = $flatArray($value);
+                    $query->addFilter($nameFilter, $valueArray);
+                    continue 2;
+
+                case 'template':
+                    $nameFilter = empty($formSettings['resource_fields']['resource_template_id_field']) ? 'resource_class_id': $formSettings['resource_fields']['resource_template_id_field'];
+                    $valueArray = $flatArray($value);
+                    $query->addFilter($nameFilter, $valueArray);
+                    continue 2;
+
+                // TODO Manage query on owner (only one in core).
+                case 'owner':
+                    $nameFilter = empty($formSettings['resource_fields']['owner_id_field']) ? 'owner_id': $formSettings['resource_fields']['owner_id_field'];
+                    $valueArray = $flatArray($value);
+                    $query->addFilter($nameFilter, $valueArray);
+                    continue 2;
+
+                case 'filter':
+                    // The request filters are the advanced ones in the form settings.
+                    $joiner = null;
+                    $operator = null;
+                    foreach ($formSettings['filters'] as $filter) {
+                        if ($filter['type'] === 'Advanced') {
+                            $joiner = (bool) $filter['field_joiner'];
+                            $operator = (bool) $filter['field_operator'];
+                            break;
+                        }
+                    }
+
+                    if (empty($joiner)) {
+                        if (empty($operator)) {
+                            foreach ($value as $filter) {
+                                if (isset($filter['field']) && isset($filter['value']) && trim($filter['value']) !== '') {
+                                    $query->addFilter($filter['field'], $filter['value']);
+                                }
+                            }
+                        } else {
+                            foreach ($value as $filter) {
+                                if (isset($filter['field'])) {
+                                    $type = empty($filter['type']) ? 'in' : $filter['type'];
+                                    if ($type === 'ex' || $type === 'nex') {
+                                        $query->addFilterQuery($filter['field'], null, $type);
+                                    } elseif (isset($filter['value']) && trim($filter['value']) !== '') {
+                                        $query->addFilterQuery($filter['field'], $filter['value'], $type);
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        if (empty($operator)) {
+                            foreach ($value as $filter) {
+                                if (isset($filter['field']) && isset($filter['value']) && trim($filter['value']) !== '') {
+                                    $join = isset($filter['join']) && $filter['join'] === 'or' ? 'or' : 'and';
+                                    $query->addFilterQuery($filter['field'], $filter['value'], $type, $join);
+                                }
+                            }
+                        } else {
+                            foreach ($value as $filter) {
+                                if (isset($filter['field'])) {
+                                    $type = empty($filter['type']) ? 'in' : $filter['type'];
+                                    if ($type === 'ex' || $type === 'nex') {
+                                        $join = isset($filter['join']) && $filter['join'] === 'or' ? 'or' : 'and';
+                                        $query->addFilterQuery($filter['field'], null, $type, $join);
+                                    } elseif (isset($filter['value']) && trim($filter['value']) !== '') {
+                                        $join = isset($filter['join']) && $filter['join'] === 'or' ? 'or' : 'and';
+                                        $query->addFilterQuery($filter['field'], $filter['value'], $type, $join);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    continue 2;
+
+                case 'excluded':
+                    $excluded = $flatArray($value);
+                    $query->setExcludedFields($excluded);
+                    continue 2;
+
+                // TODO Manage the main form to use multiple times the same field. Or force creation of alias (like multifield)?
+                // Standard field, generally a property or an alias/multifield.
+                // The fields cannot be repeated for now: use an alias if needed.
+                // The availability is not checked here, but by the search engine.
+                default:
+                    if (is_string($value)
+                        || $isSimpleList($value)
+                    ) {
+                        $query->addFilter($name, $value);
+                        continue 2;
+                    }
+
+                    // TODO Sub-sub-input key is not managed currently.
+                    $firstValue = reset($value);
+                    if (is_array($firstValue)) {
+                        continue 2;
+                    }
+
+                    $firstKey = key($value);
+                    switch ($firstKey) {
+                        default:
+                            $query->addFilter($name, $value);
+                            continue 3;
+
+                        case 'from':
+                        case 'to':
+                            $dateFrom = (string) ($value['from'] ?? '');
+                            $dateTo = (string) ($value['to'] ?? '');
+                            if (strlen($dateFrom) || strlen($dateTo)) {
+                                $query->addDateRangeFilter($name, $dateFrom, $dateTo);
+                            }
+                            continue 3;
+                    }
+                    continue 2;
+            }
         }
 
-        // Only fields that are present on the form are used.
-        $query = new Query();
-        if (isset($request['q'])) {
-            $query->setQuery($request['q']);
-        }
         return $query;
-        */
     }
 }

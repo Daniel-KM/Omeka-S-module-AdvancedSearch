@@ -19,15 +19,14 @@
     }
 
     #search-filters {
-        padding-bottom: 6px;
-        margin-bottom: 6px;
-        margin-left: 30%;
-        padding-left: 1.69492%;
-    }
+        margin: 36px 0;
+}
     #search-filters .filter {
-        margin-bottom: 0;
         display: flex;
+        margin-bottom: 0;
+        margin-left: 30%;
         padding-bottom: 6px;
+        padding-left: 1.69492%;
     }
     #search-filters .filter:first-of-type {
         padding-top: 6px;
@@ -39,7 +38,6 @@
         margin-left: 6px;
         min-width: 0;
     }
-
     #search-filters .filter select:nth-of-type(1) {
         min-width: 36px;
         margin-left: 0;

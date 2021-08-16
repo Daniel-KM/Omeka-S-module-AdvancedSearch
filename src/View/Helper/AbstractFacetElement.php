@@ -174,6 +174,8 @@ class AbstractFacetElement extends AbstractHelper
                     // In public side, the item set should belong to a site too.
                     : null;
 
+            case 'item_set':
+            // Deprecated keys (use simple lower singular with "_").
             case 'item_sets':
             case 'itemSet':
             case 'item_set_id':
@@ -191,6 +193,9 @@ class AbstractFacetElement extends AbstractHelper
                     // In public side, the item set should belong to a site too.
                     : null;
 
+            case 'class':
+            // Deprecated keys (use simple lower singular with "_").
+            case 'resource_class':
             case 'resource_classes':
             case 'resourceClass':
             case 'resource_class_id':
@@ -212,6 +217,9 @@ class AbstractFacetElement extends AbstractHelper
                     : null;
                 break;
 
+            case 'template':
+            // Deprecated keys (use simple lower singular with "_").
+            case 'resource_template':
             case 'resource_templates':
             case 'resourceTemplate':
             case 'resource_template_id':
@@ -232,6 +240,8 @@ class AbstractFacetElement extends AbstractHelper
                     : null;
                 break;
 
+            case 'property':
+            // Deprecated keys (use simple lower singular with "_").
             case 'properties':
             default:
                 return $facetValue;

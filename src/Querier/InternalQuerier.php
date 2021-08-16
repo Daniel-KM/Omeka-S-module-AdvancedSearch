@@ -429,10 +429,9 @@ SQL;
     protected function filterQueryValues(array $filters, bool $inList = false): void
     {
         foreach ($filters as $name => $values) {
-            // "is_public" is automatically managed by this internal adapter.
-            // "creation_date_year_field" should be a property.
-            // "date_range_field" is managed below.
             switch ($name) {
+                // "is_public" is automatically managed by this internal adapter
+                // TODO Improve is_public to search public/private only.
                 case 'is_public':
                 case 'is_public_field':
                     continue 2;
@@ -485,6 +484,7 @@ SQL;
                     if (!$name) {
                         break;
                     }
+                    // "In list" is used for facets.
                     if ($inList) {
                         $this->args['property'][] = [
                             'joiner' => 'and',
@@ -495,16 +495,13 @@ SQL;
                         break;
                     }
                     foreach ($values as $value) {
-                        // Use "or" when multiple (checkbox), else "and" (radio).
                         if (is_array($value)) {
-                            foreach ($value as $val) {
-                                $this->args['property'][] = [
-                                    'joiner' => 'or',
-                                    'property' => $name,
-                                    'type' => 'eq',
-                                    'text' => $val,
-                                ];
-                            }
+                            $this->args['property'][] = [
+                                'joiner' => 'and',
+                                'property' => $name,
+                                'type' => 'list',
+                                'text' => $value,
+                            ];
                         } else {
                             $this->args['property'][] = [
                                 'joiner' => 'and',

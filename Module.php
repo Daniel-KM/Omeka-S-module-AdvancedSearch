@@ -84,14 +84,15 @@ class Module extends AbstractModule
         $serviceListener = $moduleManager->getEvent()->getParam('ServiceManager')
             ->get('ServiceListener');
 
+        // Keep old name for compatibility with other modules.
         $serviceListener->addServiceManager(
-            'AdvancedSearch\AdapterManager',
+            'Search\AdapterManager',
             'search_adapters',
             Feature\AdapterProviderInterface::class,
             'getSearchAdapterConfig'
         );
         $serviceListener->addServiceManager(
-            'AdvancedSearch\FormAdapterManager',
+            'Search\FormAdapterManager',
             'search_form_adapters',
             Feature\FormAdapterProviderInterface::class,
             'getSearchFormAdapterConfig'

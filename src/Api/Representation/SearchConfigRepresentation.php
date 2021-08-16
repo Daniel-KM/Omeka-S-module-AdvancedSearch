@@ -122,7 +122,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
     public function formAdapter(): ?\AdvancedSearch\FormAdapter\FormAdapterInterface
     {
         if (!$this->formAdapter) {
-            $formAdapterManager = $this->getServiceLocator()->get('AdvancedSearch\FormAdapterManager');
+            $formAdapterManager = $this->getServiceLocator()->get('Search\FormAdapterManager');
             $formAdapterName = $this->formAdapterName();
             if ($formAdapterManager->has($formAdapterName)) {
                 $this->formAdapter = $formAdapterManager->get($formAdapterName);

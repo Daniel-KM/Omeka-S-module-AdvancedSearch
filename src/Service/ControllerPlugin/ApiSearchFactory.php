@@ -22,7 +22,7 @@ class ApiSearchFactory implements FactoryInterface
             }
             if ($engine) {
                 $adapterManager = $services->get('Omeka\ApiAdapterManager');
-                $formAdapter = $services->get('AdvancedSearch\FormAdapterManager')->get('api');
+                $formAdapter = $services->get('Search\FormAdapterManager')->get('api');
                 $acl = $services->get('Omeka\Acl');
                 $logger = $services->get('Omeka\Logger');
                 $translator = $services->get('MvcTranslator');

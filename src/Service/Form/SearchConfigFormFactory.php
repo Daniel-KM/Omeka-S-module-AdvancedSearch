@@ -12,6 +12,6 @@ class SearchConfigFormFactory implements FactoryInterface
     {
         return (new SearchConfigForm(null, $options))
             ->setApiManager($services->get('Omeka\ApiManager'))
-            ->setFormAdapterManager($services->get('AdvancedSearch\FormAdapterManager'));
+            ->setFormAdapterManager($services->get('Search\FormAdapterManager'));
     }
 }

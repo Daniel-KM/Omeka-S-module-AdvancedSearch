@@ -117,8 +117,8 @@ return [
             'Omeka\ApiManager' => [Service\ApiManagerDelegatorFactory::class],
         ],
         'factories' => [
-            'AdvancedSearch\AdapterManager' => Service\AdapterManagerFactory::class,
-            'AdvancedSearch\FormAdapterManager' => Service\FormAdapterManagerFactory::class,
+            'Search\AdapterManager' => Service\AdapterManagerFactory::class,
+            'Search\FormAdapterManager' => Service\FormAdapterManagerFactory::class,
         ],
     ],
     'navigation' => [

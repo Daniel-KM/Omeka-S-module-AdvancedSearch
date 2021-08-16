@@ -11,8 +11,8 @@ class SearchConfigControllerFactory implements FactoryInterface
     {
         return new SearchConfigController(
             $services->get('Omeka\EntityManager'),
-            $services->get('AdvancedSearch\AdapterManager'),
-            $services->get('AdvancedSearch\FormAdapterManager')
+            $services->get('Search\AdapterManager'),
+            $services->get('Search\FormAdapterManager')
         );
     }
 }

@@ -7,6 +7,7 @@ use AdvancedSearch\Form\Element\OptionalSelect;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Omeka\View\Helper\Api;
+use Omeka\View\Helper\Setting;
 
 class SettingsFieldset extends Fieldset
 {
@@ -14,6 +15,11 @@ class SettingsFieldset extends Fieldset
      * @var Api
      */
     protected $api;
+
+    /**
+     * @var Setting
+     */
+    protected $setting;
 
     protected $label = 'Advanced Search (admin board)'; // @translate
 
@@ -32,12 +38,13 @@ class SettingsFieldset extends Fieldset
             }
         }
 
-        $selectAllTerms = $settings->get('advancedsearch_restrict_used_terms', false);
+        $selectAllTerms = $this->setting->__invoke('advancedsearch_restrict_used_terms', false);
 
         $this
+            /** @deprecated Since Omeka v3.1 */
             ->add([
                 'name' => 'advancedsearch_restrict_used_terms',
-                'type' => \Laminas\Form\Element\Checkbox::class,
+                'type' => Element\Checkbox::class,
                 'options' => [
                     'label' => 'Restrict to used properties and resources classes', // @translate
                     'info' => 'If checked, restrict the list of properties and resources classes to the used ones in advanced search form.', // @translate
@@ -102,12 +109,15 @@ class SettingsFieldset extends Fieldset
         ]);
     }
 
-    /**
-     * @param Api $api
-     */
-    public function setApi(Api $api)
+    public function setApi(Api $api): Fieldset
     {
         $this->api = $api;
+        return $this;
+    }
+
+    public function setSetting(Setting $setting): Fieldset
+    {
+        $this->setting = $setting;
         return $this;
     }
 }

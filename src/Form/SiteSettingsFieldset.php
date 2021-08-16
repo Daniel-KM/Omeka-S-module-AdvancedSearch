@@ -2,11 +2,13 @@
 
 namespace AdvancedSearch\Form;
 
+use AdvancedSearch\Form\Element\Note;
 use AdvancedSearch\Form\Element\OptionalMultiCheckbox;
 use AdvancedSearch\Form\Element\OptionalSelect;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Omeka\View\Helper\Api;
+use Omeka\View\Helper\Setting;
 
 class SiteSettingsFieldset extends Fieldset
 {
@@ -16,25 +18,34 @@ class SiteSettingsFieldset extends Fieldset
     protected $api;
 
     /**
+     * @var Setting
+     */
+    protected $setting;
+
+    /**
+     * @var array
+     */
+    protected $defaultSearchFields = [];
+
+    /**
      * Warning: there is a core fieldset "Search".
      *
      * @var string
      */
-    protected $label = 'Search module'; // @translate
+    protected $label = 'Advanced Search (module)'; // @translate
 
     public function init(): void
     {
-        $defaultSearchFields = $this->getDefaultSearchFields();
         $defaultSelectedFields = [];
-        foreach ($defaultSearchFields as $key => $defaultSearchField) {
+        foreach ($this->defaultSearchFields as $key => $defaultSearchField) {
             if (!array_key_exists('default', $defaultSearchField) || $defaultSearchField['default'] === true) {
                 $defaultSelectedFields[] = $key;
             }
-            $defaultSearchFields[$key] = $defaultSearchField['label'] ?? $key;
+            $this->defaultSearchFields[$key] = $defaultSearchField['label'] ?? $key;
         }
 
-        $selectAllTerms = $settings->get('advancedsearch_restrict_used_terms', false);
-        $searchFields = $settings->get('advancedsearch_search_fields', $defaultSelectedFields) ?: [];
+        $selectAllTerms = $this->setting->__invoke('advancedsearch_restrict_used_terms', false);
+        $searchFields = $this->setting->__invoke('advancedsearch_search_fields', $defaultSelectedFields) ?: [];
 
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation[] $searchConfigs */
         $searchConfigs = $this->api->search('search_configs')->getContent();
@@ -46,8 +57,19 @@ class SiteSettingsFieldset extends Fieldset
 
         $this
             ->add([
+                'name' => 'advancedsearch_note_core',
+                'type' => Note::class,
+                'options' => [
+                    'text' => 'Core advanced search page', // @translate
+                ],
+                'attributes' => [
+                    'style' => 'font-weight: bold; font-style: italic; margin: 0 0 16px;',
+                ],
+            ])
+            /** @deprecated Since Omeka v3.1 */
+            ->add([
                 'name' => 'advancedsearch_restrict_used_terms',
-                'type' => \Laminas\Form\Element\Checkbox::class,
+                'type' => Element\Checkbox::class,
                 'options' => [
                     'label' => 'Restrict to used properties and resources classes', // @translate
                     'info' => 'If checked, restrict the list of properties and resources classes to the used ones in advanced search form.', // @translate
@@ -59,10 +81,10 @@ class SiteSettingsFieldset extends Fieldset
             ])
             ->add([
                 'name' => 'advancedsearch_search_fields',
-                'type' => 'OptionalMultiCheckbox',
+                'type' => OptionalMultiCheckbox::class,
                 'options' => [
                     'label' => 'Display only following fields', // @translate
-                    'value_options' => $defaultSearchFields,
+                    'value_options' => $this->defaultSearchFields,
                     'use_hidden_element' => true,
                 ],
                 'attributes' => [
@@ -71,6 +93,16 @@ class SiteSettingsFieldset extends Fieldset
                 ],
             ])
 
+            ->add([
+                'name' => 'advancedsearch_note_page',
+                'type' => Note::class,
+                'options' => [
+                    'text' => 'Module search pages', // @translate
+                ],
+                'attributes' => [
+                    'style' => 'font-weight: bold; font-style: italic; margin: 16px 0;',
+                ],
+            ])
             ->add([
                 'name' => 'advancedsearch_main_config',
                 'type' => OptionalSelect::class,
@@ -113,6 +145,18 @@ class SiteSettingsFieldset extends Fieldset
     public function setApi(Api $api): Fieldset
     {
         $this->api = $api;
+        return $this;
+    }
+
+    public function setSetting(Setting $setting): Fieldset
+    {
+        $this->setting = $setting;
+        return $this;
+    }
+
+    public function setDefaultSearchFields(array $defaultSearchFields): Fieldset
+    {
+        $this->defaultSearchFields = $defaultSearchFields;
         return $this;
     }
 }

@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace AdvancedSearch\Service\Form;
 
 use AdvancedSearch\Form\SettingsFieldset;
@@ -11,7 +12,8 @@ class SettingsFieldsetFactory implements FactoryInterface
     {
         $fieldset = new SettingsFieldset(null, $options);
         $viewHelpers = $services->get('ViewHelperManager');
-        $fieldset->setApi($viewHelpers->get('api'));
-        return $fieldset;
+        return $fieldset
+            ->setApi($viewHelpers->get('api'))
+            ->setSetting($viewHelpers->get('setting'));
     }
 }

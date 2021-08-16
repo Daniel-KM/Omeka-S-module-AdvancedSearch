@@ -149,8 +149,6 @@ class SearchConfigController extends AbstractActionController
      */
     public function configureAction()
     {
-        $entityManager = $this->getEntityManager();
-
         $id = $this->params('id');
 
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
@@ -183,7 +181,9 @@ class SearchConfigController extends AbstractActionController
 
         $searchConfigSettings = $searchConfig->settings() ?: [];
 
-        $form->setData($searchConfigSettings);
+        $formSettings = $this->prepareDataForForm($searchConfigSettings);
+
+        $form->setData($formSettings);
         $view->setVariable('form', $form);
 
         if (!$this->getRequest()->isPost()) {
@@ -206,25 +206,12 @@ class SearchConfigController extends AbstractActionController
         }
 
         $params = $form->getData();
-        $params = $this->removeAvailableFields($params);
-        unset($params['csrf']);
-        if (isset($params['search']['default_query'])) {
-            $params['search']['default_query'] = trim($params['search']['default_query'] ?? '', "? \t\n\r\0\x0B");
-        }
 
-        // Add a warning because it may be a hard to understand issue.
-        if (isset($params['facet']['languages'])) {
-            $params['facet']['languages'] = array_unique(array_map('trim', $params['facet']['languages']));
-            if (!empty($params['facet']['languages']) && !in_array('', $params['facet']['languages'])) {
-                $this->messenger()->addWarning(
-                    'Note that you didn’t set a trailing "|", so all values without language will be removed.' // @translate
-                );
-            }
-        }
+        $params = $this->prepareDataToSave($params);
 
         $searchConfig = $searchConfig->getEntity();
         $searchConfig->setSettings($params);
-        $entityManager->flush();
+        $this->entityManager->flush();
 
         $this->messenger()->addSuccess(new Message(
             'Configuration "%s" saved.', // @translate
@@ -354,25 +341,6 @@ class SearchConfigController extends AbstractActionController
     }
 
     /**
-     * Remove all params starting with "available_".
-     */
-    protected function removeAvailableFields(array $params): array
-    {
-        foreach ($params as $name => $values) {
-            if (substr($name, 0, 10) === 'available_') {
-                unset($params[$name]);
-            } elseif (is_array($values)) {
-                foreach (array_keys($values) as $subName) {
-                    if (substr($subName, 0, 10) === 'available_') {
-                        unset($params[$name][$subName]);
-                    }
-                }
-            }
-        }
-        return $params;
-    }
-
-    /**
      * Set the config for all sites.
      */
     protected function manageSearchConfigOnSites(
@@ -454,18 +422,159 @@ class SearchConfigController extends AbstractActionController
         $this->messenger()->addSuccess($message);
     }
 
-    protected function getEntityManager(): EntityManager
+    /**
+     * Adapt the settings for the form to be edited.
+     *
+     * @todo Adapt the settings via the form itself.
+     * @see data/search_configs/default.php
+     */
+    protected function prepareDataForForm(array $settings): array
     {
-        return $this->entityManager;
+        // Ok search.
+        // Ok resource_fields.
+        // Ok autosuggest.
+        // Ok sort.
+        // Ok facet.
+
+        // Fix form.
+        $settings['form']['filters'] = $settings['form']['filters'] ?? [];
+        if (empty($settings['form']['filters'])) {
+            return $settings;
+        }
+        $keyAdvancedFilter = false;
+        foreach ($settings['form']['filters'] as $keyFilter => $filter) {
+            if (empty($filter['type'])) {
+                continue;
+            }
+            if ($filter['type'] === 'Advanced') {
+                $keyAdvancedFilter = $keyFilter;
+                break;
+            }
+        }
+        if ($keyAdvancedFilter === false) {
+            return $settings;
+        }
+
+        $advanced = $settings['form']['filters'][$keyAdvancedFilter];
+        $settings['form']['advanced'] = $advanced['fields'];
+        $settings['form']['max_number'] = $advanced['max_number'];
+        $settings['form']['field_joiner'] = $advanced['field_joiner'];
+        $settings['form']['field_operator'] = $advanced['field_operator'];
+        $settings['form']['filters'][$keyAdvancedFilter] = [
+            'field' => 'advanced',
+            'label' => 'Filters',
+            'type' => 'Advanced',
+        ];
+
+        return $settings;
     }
 
-    protected function getSearchAdapterManager(): SearchAdapterManager
+    /**
+     * Adapt the settings from the form to be saved.
+     *
+     * @todo Adapt the settings via the form itself.
+     * @see data/search_configs/default.php
+     */
+    protected function prepareDataToSave(array $params): array
     {
-        return $this->searchAdapterManager;
+        unset($params['csrf']);
+
+        $params = $this->removeAvailableFields($params);
+
+        if (isset($params['search']['default_query'])) {
+            $params['search']['default_query'] = trim($params['search']['default_query'] ?? '', "? \t\n\r\0\x0B");
+        }
+
+        // Add a warning because it may be a hard to understand issue.
+        if (isset($params['facet']['languages'])) {
+            $params['facet']['languages'] = array_unique(array_map('trim', $params['facet']['languages']));
+            if (!empty($params['facet']['languages']) && !in_array('', $params['facet']['languages'])) {
+                $this->messenger()->addWarning(
+                    'Note that you didn’t set a trailing "|", so all values without language will be removed.' // @translate
+                );
+            }
+        }
+
+        // Normalize filters.
+        $inputTypes = [
+            'advanced' => 'Advanced',
+            'multicheckbox' => 'MultiCheckbox',
+            'noop' => 'Noop',
+            'radio' => 'Radio',
+            'select' => 'Select',
+            'selectflat' => 'SelectFlat',
+        ];
+
+        // Include advanced fields in filters..
+        $params['form']['filters'] = $params['form']['filters'] ?? [];
+        $advanced = $params['form']['advanced'] ?? [];
+        $keyAdvanced = false;
+        foreach ($params['form']['filters'] as $keyFilter => $filter) {
+            if (empty($filter['field'])) {
+                unset($params['form']['filters'][$keyFilter]);
+                continue;
+            }
+            $filterField = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '', $filter['type'] ?? 'Noop'));
+            $params['form']['filters'][$keyFilter]['type'] = $inputTypes[$filterField] ?? 'Noop';
+            if ($filter['type'] === 'Advanced') {
+                if ($keyAdvanced !== false) {
+                    unset($params['form']['filters'][$keyAdvanced]);
+                }
+                $keyAdvanced = $keyFilter;
+            }
+        }
+        $params['form']['filters'] = array_values($params['form']['filters']);
+
+        if ($keyAdvanced === false) {
+            if (!$advanced) {
+                unset(
+                    $params['form']['advanced'],
+                    $params['form']['max_number'],
+                    $params['form']['field_joiner'],
+                    $params['form']['field_operator']
+                );
+                return $params;
+            }
+            $params['form']['filters'][] = [
+                'field' => 'advanced',
+                'label' => $this->translate('Filters'), // @translate
+                'type' => 'Advanced',
+            ];
+            $keyAdvanced = key(array_slice($params['form']['filters'], -1, 1, true));
+        }
+
+        $params['form']['filters'][$keyAdvanced]['fields'] = $advanced;
+        $params['form']['filters'][$keyAdvanced]['max_number'] = $params['form']['max_number'] ?? 5;
+        $params['form']['filters'][$keyAdvanced]['field_joiner'] = $params['form']['field_joiner'] ?? false;
+        $params['form']['filters'][$keyAdvanced]['field_operator'] = $params['form']['field_operator'] ?? false;
+        unset(
+            $params['form']['advanced'],
+            $params['form']['max_number'],
+            $params['form']['field_joiner'],
+            $params['form']['field_operator']
+        );
+
+        // TODO Store the final form as an array to be created via factory. https://docs.laminas.dev/laminas-form/v3/form-creation/creation-via-factory/
+
+        return $params;
     }
 
-    protected function getSearchFormAdapterManager(): SearchFormAdapterManager
+    /**
+     * Remove all params starting with "available_".
+     */
+    protected function removeAvailableFields(array $params): array
     {
-        return $this->searchFormAdapterManager;
+        foreach ($params as $name => $values) {
+            if (substr($name, 0, 10) === 'available_') {
+                unset($params[$name]);
+            } elseif (is_array($values)) {
+                foreach (array_keys($values) as $subName) {
+                    if (substr($subName, 0, 10) === 'available_') {
+                        unset($params[$name][$subName]);
+                    }
+                }
+            }
+        }
+        return $params;
     }
 }

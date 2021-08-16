@@ -78,7 +78,7 @@ return [
             Form\Admin\SearchEngineForm::class => Service\Form\SearchEngineFormFactory::class,
             Form\Element\MediaTypeSelect::class => Service\Form\Element\MediaTypeSelectFactory::class,
             Form\Element\SearchConfigSelect::class => Service\Form\Element\SearchConfigSelectFactory::class,
-            Form\FilterFieldset::class => Service\Form\FilterFieldsetFactory::class,
+            Form\SearchFilter\Advanced::class => Service\Form\StandardFactory::class,
             Form\MainSearchForm::class => Service\Form\MainSearchFormFactory::class,
             Form\SearchingFormFieldset::class => Service\Form\SearchingFormFieldsetFactory::class,
             Form\SettingsFieldset::class => Service\Form\SettingsFieldsetFactory::class,

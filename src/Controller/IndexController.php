@@ -277,6 +277,8 @@ class IndexController extends AbstractActionController
         $formAdapter = $searchConfig->formAdapter();
         $searchConfigSettings = $searchConfig->settings();
         $searchFormSettings = $searchConfigSettings['form'] ?? [];
+        // Fix to be removed.
+        $searchFormSettings['resource_fields'] = $searchConfigSettings['resource_fields'] ?? [];
 
         $autosuggestSettings = $searchConfig->setting('autosuggest', []);
 

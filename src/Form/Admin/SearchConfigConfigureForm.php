@@ -73,15 +73,6 @@ class SearchConfigConfigureForm extends Form
         unset($specialOptions['resource_class_id']);
         unset($specialOptions['resource_template_id']);
 
-        $orderElements = [
-            'q',
-            'itemSet',
-            'resourceClass',
-            'resourceTemplate',
-            'filters',
-            'submit',
-        ];
-
         $this
             ->setAttribute('id', 'search-form-configure');
 
@@ -125,6 +116,77 @@ class SearchConfigConfigureForm extends Form
                 ],
             ])
         ;
+
+        $this
+            ->add([
+                'name' => 'resource_fields',
+                'type' => Fieldset::class,
+                'options' => [
+                    'label' => 'Resources fields for external search engines', // @translate
+                ],
+            ])
+            ->get('resource_fields')
+            ->add([
+                'name' => 'is_public_field',
+                'type' => Element\Select::class,
+                'options' => [
+                    'label' => 'Is public field', // @translate
+                    'value_options' => $specialOptions,
+                    'empty_option' => 'None', // @translate
+                ],
+                'attributes' => [
+                    'required' => false,
+                    'class' => 'chosen-select',
+                    'value' => 'is_public_field',
+                ],
+            ])
+            ->add([
+                'name' => 'item_set_id_field',
+                'type' => Element\Select::class,
+                'options' => [
+                    'label' => 'Item set id field', // @translate
+                    'value_options' => $specialOptions,
+                    'empty_option' => 'None', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'item_set_id_field',
+                    'required' => false,
+                    'class' => 'chosen-select',
+                    'value' => 'item_set_id_field',
+                ],
+            ])
+            ->add([
+                'name' => 'resource_class_id_field',
+                'type' => Element\Select::class,
+                'options' => [
+                    'label' => 'Resource class id field', // @translate
+                    'value_options' => $specialOptions,
+                    'empty_option' => 'None', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'resource_class_id_field',
+                    'required' => false,
+                    'class' => 'chosen-select',
+                    'value' => 'resource_class_id_field',
+                ],
+            ])
+            ->add([
+                'name' => 'resource_template_id_field',
+                'type' => Element\Select::class,
+                'options' => [
+                    'label' => 'Resource template id field', // @translate
+                    'value_options' => $specialOptions,
+                    'empty_option' => 'None', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'resource_template_id_field',
+                    'required' => false,
+                    'class' => 'chosen-select',
+                    'value' => 'resource_template_id_field',
+                ],
+            ])
+        ;
+
         $this
             ->add([
                 'name' => 'autosuggest',
@@ -227,135 +289,30 @@ class SearchConfigConfigureForm extends Form
             ->get('form')
 
             ->add([
-                'name' => 'item_set_filter_type',
-                'type' => Element\Radio::class,
-                'options' => [
-                    'label' => 'Display item set filter', // @translate
-                    'value_options' => [
-                        '0' => 'No', // @translate
-                        'select' => 'As select', // @translate
-                        'multi-checkbox' => 'As multi checkbox', // @translate
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'item_set_filter_type',
-                    'required' => false,
-                    'value' => '0',
-                ],
-            ])
-            ->add([
-                'name' => 'item_set_id_field',
-                'type' => Element\Select::class,
-                'options' => [
-                    'label' => 'Item set id field', // @translate
-                    'value_options' => $specialOptions,
-                    'empty_option' => 'None', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'item_set_id_field',
-                    'required' => false,
-                    'class' => 'chosen-select',
-                    'value' => 'item_set_id_field',
-                ],
-            ])
-
-            ->add([
-                'name' => 'resource_class_filter_type',
-                'type' => Element\Radio::class,
-                'options' => [
-                    'label' => 'Display resource class filter', // @translate
-                    'value_options' => [
-                        '0' => 'No', // @translate
-                        'select' => 'As select', // @translate
-                        'select_flat' => 'As flat select', // @translate
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'resource_class_filter_type',
-                    'required' => false,
-                    'value' => '0',
-                ],
-            ])
-            ->add([
-                'name' => 'resource_class_id_field',
-                'type' => Element\Select::class,
-                'options' => [
-                    'label' => 'Resource class id field', // @translate
-                    'value_options' => $specialOptions,
-                    'empty_option' => 'None', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'resource_class_id_field',
-                    'required' => false,
-                    'class' => 'chosen-select',
-                    'value' => 'resource_class_id_field',
-                ],
-            ])
-
-            ->add([
-                'name' => 'resource_template_filter_type',
-                'type' => Element\Radio::class,
-                'options' => [
-                    'label' => 'Display resource template filter', // @translate
-                    'value_options' => [
-                        '0' => 'No', // @translate
-                        'select' => 'As select', // @translate
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'resource_template_filter_type',
-                    'required' => false,
-                    'value' => '0',
-                ],
-            ])
-            ->add([
-                'name' => 'resource_template_id_field',
-                'type' => Element\Select::class,
-                'options' => [
-                    'label' => 'Resource template id field', // @translate
-                    'value_options' => $specialOptions,
-                    'empty_option' => 'None', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'resource_template_id_field',
-                    'required' => false,
-                    'class' => 'chosen-select',
-                    'value' => 'resource_template_id_field',
-                ],
-            ])
-
-            ->add([
-                'name' => 'is_public_field',
-                'type' => Element\Select::class,
-                'options' => [
-                    'label' => 'Is public field', // @translate
-                    'value_options' => $specialOptions,
-                    'empty_option' => 'None', // @translate
-                ],
-                'attributes' => [
-                    'required' => false,
-                    'class' => 'chosen-select',
-                    'value' => 'is_public_field',
-                ],
-            ])
-
-            ->add([
                 'name' => 'filters',
                 'type' => DataTextarea::class,
                 'options' => [
                     'label' => 'Filters', // @translate
-                    'info' => 'List of filters that will be displayed in the search form. Format is "term = Label". The field should exist in all resources fields.', // @translate
-                    'as_key_value' => true,
+                    'info' => 'List of filters that will be displayed in the search form. Format is "field = Label = Type = options". The field should exist in all resources fields.', // @translate
+                    'as_key_value' => false,
                     'key_value_separator' => '=',
                     'data_keys' => [
-                        'name',
+                        'field',
                         'label',
+                        'type',
+                        'options',
                     ],
+                    'data_array_keys' => [
+                        'options' => '|'
+                    ]
                 ],
                 'attributes' => [
                     'id' => 'filters',
-                    // field (term) = label (order means weight).
-                    'placeholder' => 'dcterms:title = Title',
+                    // field (term) = label = type = options
+                    'placeholder' => 'item_set_id_field = Collection = Select
+resource_class_id_field = Class = SelectFlat
+advanced = Filters = Advanced
+',
                     'rows' => 12,
                 ],
             ])
@@ -376,14 +333,34 @@ class SearchConfigConfigureForm extends Form
                 ],
             ])
             ->add([
-                'name' => 'filters_max_number',
+                'name' => 'advanced',
+                'type' => DataTextarea::class,
+                'options' => [
+                    'label' => 'Advanced filters', // @translate
+                    'info' => 'List of filters that will be displayed in the search form. Format is "term = Label". The field should exist in all resources fields.', // @translate
+                    'as_key_value' => true,
+                    'key_value_separator' => '=',
+                    'data_keys' => [
+                        'value',
+                        'label',
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'filters',
+                    // field (term) = label (order means weight).
+                    'placeholder' => 'dcterms:title = Title',
+                    'rows' => 12,
+                ],
+            ])
+            ->add([
+                'name' => 'max_number',
                 'type' => Element\Number::class,
                 'options' => [
-                    'label' => 'Number of filter groups to display', // @translate
+                    'label' => 'Number of advanced filters to display', // @translate
                     'info' => 'The filters may be managed via js for a better display.', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'filters_max_number',
+                    'id' => 'max_number',
                     'required' => false,
                     'value' => '5',
                     'min' => '0',
@@ -393,54 +370,24 @@ class SearchConfigConfigureForm extends Form
                 ],
             ])
             ->add([
-                'name' => 'filter_value_joiner',
+                'name' => 'field_joiner',
                 'type' => Element\Checkbox::class,
                 'options' => [
-                    'label' => 'Add the joiner ("and" or "or") to the filters', // @translate
+                    'label' => 'Add the joiner ("and" or "or") to the advanced filters', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'filter_value_joiner',
+                    'id' => 'field_joiner',
                 ],
             ])
             // TODO List value type (rename/remove).
             ->add([
-                'name' => 'filter_value_type',
+                'name' => 'field_operator',
                 'type' => Element\Checkbox::class,
                 'options' => [
-                    'label' => 'Add the type ("equal", "in", etc.) to the filters', // @translate
+                    'label' => 'Add the operator ("equal", "in", etc.) to the advanced filters', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'filter_value_type',
-                ],
-            ])
-
-            ->add([
-                'name' => 'fields_order',
-                'type' => ArrayTextarea::class,
-                'options' => [
-                    'label' => 'Order of fields', // @translate
-                    'info' => 'List of elements that will be displayed in the search form. Only existing fields will be used.', // @translate
-                    'as_key_value' => false,
-                ],
-                'attributes' => [
-                    'id' => 'fields_order',
-                    'placeholder' => implode("\n", $orderElements) . "\n",
-                    'rows' => 6,
-                ],
-            ])
-            ->add([
-                'name' => 'available_fields_order',
-                'type' => ArrayTextarea::class,
-                'options' => [
-                    'label' => 'Available fields to order on the form', // @translate
-                    'info' => 'List of all available elements, among which some can be copied above.', // @translate
-                    'as_key_value' => false,
-                ],
-                'attributes' => [
-                    'id' => 'available_fields_order',
-                    'value' => $orderElements,
-                    'placeholder' => implode("\n", $orderElements) . "\n",
-                    'rows' => 6,
+                    'id' => 'field_operator',
                 ],
             ])
         ;
@@ -673,7 +620,7 @@ class SearchConfigConfigureForm extends Form
             $inputFilter
                 ->get('form')
                 ->add([
-                    'name' => 'filters_max_number',
+                    'name' => 'max_number',
                     'required' => false,
                 ])
             ;

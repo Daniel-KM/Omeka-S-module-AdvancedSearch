@@ -66,6 +66,8 @@ class SearchRequestToResponse extends AbstractPlugin
         }
 
         $searchFormSettings = $searchConfigSettings['form'] ?? [];
+        // Fix to be removed.
+        $searchFormSettings['resource_fields'] = $searchConfigSettings['resource_fields'] ?? [];
 
         /** @var \AdvancedSearch\Query $query */
         $query = $formAdapter->toQuery($request, $searchFormSettings);

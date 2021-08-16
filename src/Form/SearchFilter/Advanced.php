@@ -27,12 +27,12 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace AdvancedSearch\Form;
+namespace AdvancedSearch\Form\SearchFilter;
 
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 
-class FilterFieldset extends Fieldset
+class Advanced extends Fieldset
 {
     public function init(): void
     {
@@ -42,15 +42,13 @@ class FilterFieldset extends Fieldset
         }
 
         $this
+            ->setLabel('')
             ->setAttributes([
                 'class' => 'filter',
             ]);
 
-        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
-        $searchConfig = $this->getOption('search_config');
-        $searchConfigSettings = $searchConfig ? $searchConfig->settings() : [];
-
-        if (!empty($searchConfigSettings['form']['filter_value_joiner'])) {
+        $joiner = $this->getOption('field_joiner');
+        if ($joiner) {
             $this
                 ->add([
                     'name' => 'join',
@@ -87,7 +85,8 @@ class FilterFieldset extends Fieldset
                 ],
             ]);
 
-        if (!empty($searchConfigSettings['form']['filter_value_type'])) {
+        $operator = $this->getOption('field_operator');
+        if ($operator) {
             $this
                 ->add([
                     'name' => 'type',
@@ -122,10 +121,20 @@ class FilterFieldset extends Fieldset
             ]);
     }
 
-    protected function getFilterFields()
+    /**
+     * TODO The fields should be checked in
+     */
+    protected function getFilterFields(): array
     {
+        $fields = $this->getOption('fields');
+        if (empty($fields)) {
+            return [];
+        }
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $this->getOption('search_config');
+        if (!$searchConfig) {
+            return [];
+        }
         $searchEngine = $searchConfig->engine();
         $searchAdapter = $searchEngine->adapter();
         if (empty($searchAdapter)) {
@@ -135,15 +144,6 @@ class FilterFieldset extends Fieldset
         if (empty($availableFields)) {
             return [];
         }
-        $settings = $searchConfig->settings();
-        if (empty($settings['form']['filters'])) {
-            return [];
-        }
-        $fields = array_intersect_key($settings['form']['filters'], $availableFields);
-        foreach ($fields as $key => &$field) {
-            $field['value'] = $key;
-        }
-        unset($field);
-        return $fields;
+        return array_intersect_key($fields, $availableFields);
     }
 }

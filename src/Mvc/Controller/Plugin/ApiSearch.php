@@ -282,6 +282,8 @@ class ApiSearch extends AbstractPlugin
             'sort_fields' => [],
         ];
         $searchFormSettings['resource'] = $resource;
+        // Fix to be removed.
+        $searchFormSettings['resource_fields'] = $searchConfigSettings['resource_fields'] ?? [];
         $searchQuery = $this->apiFormAdapter->toQuery($query, $searchFormSettings);
         $searchQuery->setResources([$resource]);
 

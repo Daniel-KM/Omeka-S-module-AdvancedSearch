@@ -43,40 +43,51 @@ trait TraitUnrestrictedQuery
             $query->setQuery($request['q']);
         }
 
-        if (!empty($formSettings['is_public_field'])
+        if (!empty($formSettings['resource_fields']['is_public_field'])
             && isset($request['isPublic'])
             && strlen($request['isPublic'])
         ) {
-            $query->addFilter($formSettings['is_public_field'], (bool) $request['isPublic']);
+            $query->addFilter($formSettings['resource_fields']['is_public_field'], (bool) $request['isPublic']);
         }
 
         if (isset($request['resource']['ids'])) {
             $query->addFilter('id', $request['resource']['ids']);
         }
 
-        if (!empty($formSettings['item_set_id_field'])
+        if (!empty($formSettings['resource_fields']['item_set_id_field'])
             && isset($request['itemSet']['ids'])
         ) {
-            $query->addFilter($formSettings['item_set_id_field'], $request['itemSet']['ids']);
+            $query->addFilter($formSettings['resource_fields']['item_set_id_field'], $request['itemSet']['ids']);
         }
 
-        if (!empty($formSettings['resource_class_id_field'])
+        if (!empty($formSettings['resource_fields']['resource_class_id_field'])
             && isset($request['resourceClass']['ids'])
         ) {
-            $query->addFilter($formSettings['resource_class_id_field'], $request['resourceClass']['ids']);
+            $query->addFilter($formSettings['resource_fields']['resource_class_id_field'], $request['resourceClass']['ids']);
         }
 
-        if (!empty($formSettings['resource_template_id_field'])
+        if (!empty($formSettings['resource_fields']['resource_template_id_field'])
             && isset($request['resourceTemplate']['ids'])
         ) {
-            $query->addFilter($formSettings['resource_template_id_field'], $request['resourceTemplate']['ids']);
+            $query->addFilter($formSettings['resource_fields']['resource_template_id_field'], $request['resourceTemplate']['ids']);
         }
 
         // TODO Manage query on owner (only one in core).
 
         if (isset($request['text']['filters'])) {
-            if (empty($formSettings['filter_value_joiner'])) {
-                if (empty($formSettings['filter_value_type'])) {
+            // Prepare options.
+            $joiner = false;
+            $operator = false;
+            foreach ($formSettings['filters'] as $filter) {
+                if ($filter['type'] === 'Advanced') {
+                    $joiner = (bool) $filter['field_joiner'];
+                    $operator = (bool) $filter['field_operator'];
+                    break;
+                }
+            }
+
+            if (empty($joiner)) {
+                if (empty($operator)) {
                     foreach ($request['text']['filters'] as $filter) {
                         if (isset($filter['field']) && isset($filter['value']) && trim($filter['value']) !== '') {
                             $query->addFilter($filter['field'], $filter['value']);
@@ -95,7 +106,7 @@ trait TraitUnrestrictedQuery
                     }
                 }
             } else {
-                if (empty($formSettings['filter_value_type'])) {
+                if (empty($operator)) {
                     foreach ($request['text']['filters'] as $filter) {
                         if (isset($filter['field']) && isset($filter['value']) && trim($filter['value']) !== '') {
                             $join = isset($filter['join']) && $filter['join'] === 'or' ? 'or' : 'and';

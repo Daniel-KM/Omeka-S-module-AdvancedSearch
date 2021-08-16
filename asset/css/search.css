@@ -21,6 +21,8 @@
     #search-filters {
         padding-bottom: 6px;
         margin-bottom: 6px;
+        margin-left: 30%;
+        padding-left: 1.69492%;
     }
     #search-filters .filter {
         margin-bottom: 0;
@@ -39,16 +41,18 @@
     }
 
     #search-filters .filter select:nth-of-type(1) {
-        min-width: 48px;
+        min-width: 36px;
+        margin-left: 0;
     }
     #search-filters .filter select:nth-of-type(2) {
-        min-width: 144px;
+        min-width: 72px;
     }
     #search-filters .filter select:nth-of-type(3) {
-        min-width: 96px;
+        min-width: 48px;
     }
     #search-filters .filter input {
-        min-width: calc( 100% - 450px );
+        width: calc( 100% - 200px );
+        margin-right: 0;
     }
 
     .form-search label.search-submit {

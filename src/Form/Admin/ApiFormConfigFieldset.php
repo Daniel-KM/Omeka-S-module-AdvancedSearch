@@ -339,8 +339,8 @@ class ApiFormConfigFieldset extends Fieldset
     protected function getAvailableFields(): array
     {
         $options = [];
-        $searchPage = $this->getOption('search_page');
-        $searchEngine = $searchPage->index();
+        $searchConfig = $this->getOption('search_config');
+        $searchEngine = $searchConfig->index();
         $searchAdapter = $searchEngine->adapter();
         if (empty($searchAdapter)) {
             return [];
@@ -355,8 +355,8 @@ class ApiFormConfigFieldset extends Fieldset
     protected function getAvailableSortFields(): array
     {
         $options = [];
-        $searchPage = $this->getOption('search_page');
-        $searchEngine = $searchPage->index();
+        $searchConfig = $this->getOption('search_config');
+        $searchEngine = $searchConfig->index();
         $searchAdapter = $searchEngine->adapter();
         if (empty($searchAdapter)) {
             return [];

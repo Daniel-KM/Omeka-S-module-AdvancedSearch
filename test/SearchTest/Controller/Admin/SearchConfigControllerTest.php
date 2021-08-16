@@ -6,7 +6,7 @@ require_once dirname(__DIR__) . '/SearchControllerTestCase.php';
 
 use AdvancedSearchTest\Controller\SearchControllerTestCase;
 
-class SearchPageControllerTest extends SearchControllerTestCase
+class SearchConfigControllerTest extends SearchControllerTestCase
 {
     public function testAddGetAction(): void
     {
@@ -22,7 +22,7 @@ class SearchPageControllerTest extends SearchControllerTestCase
     public function testAddPostAction(): void
     {
         $forms = $this->getServiceLocator()->get('FormElementManager');
-        $form = $forms->get(\Search\Form\Admin\SearchPageForm::class);
+        $form = $forms->get(\Search\Form\Admin\SearchConfigForm::class);
 
         $this->dispatch('/admin/search-manager/page/add', 'POST', [
             'o:name' => 'TestPage [testAddPostAction]',
@@ -34,18 +34,18 @@ class SearchPageControllerTest extends SearchControllerTestCase
             'csrf' => $form->get('csrf')->getValue(),
         ]);
         $this->assertResponseStatusCode(302);
-        $response = $this->api()->search('search_pages', [
+        $response = $this->api()->search('search_configs', [
             'name' => 'TestPage [testAddPostAction]',
         ]);
-        $searchPages = $response->getContent();
-        $this->assertNotEmpty($searchPages);
-        $searchPage = reset($searchPages);
-        $this->assertRedirectTo($searchPage->adminUrl('configure'));
+        $searchConfigs = $response->getContent();
+        $this->assertNotEmpty($searchConfigs);
+        $searchConfig = reset($searchConfigs);
+        $this->assertRedirectTo($searchConfig->adminUrl('configure'));
     }
 
     public function testConfigureGetAction(): void
     {
-        $this->dispatch($this->searchPage->adminUrl('configure'));
+        $this->dispatch($this->searchConfig->adminUrl('configure'));
         $this->assertResponseStatusCode(200);
 
         $this->assertQueryContentContains('h2', 'Facets');
@@ -55,11 +55,11 @@ class SearchPageControllerTest extends SearchControllerTestCase
     public function testConfigurePostAction(): void
     {
         $forms = $this->getServiceLocator()->get('FormElementManager');
-        $form = $forms->get(\Search\Form\Admin\SearchPageConfigureForm::class, [
-            'search_page' => $this->searchPage,
+        $form = $forms->get(\Search\Form\Admin\SearchConfigConfigureForm::class, [
+            'search_config' => $this->searchConfig,
         ]);
 
-        $url = '/admin/search-manager/page/' . $this->searchPage->id() . '/configure';
+        $url = '/admin/search-manager/page/' . $this->searchConfig->id() . '/configure';
         $this->dispatch($url, 'POST', [
             'facet_limit' => '10',
             'csrf' => $form->get('csrf')->getValue(),

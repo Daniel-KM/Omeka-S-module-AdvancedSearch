@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2017-2020
+ * Copyright Daniel Berthereau, 2017-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -37,7 +37,7 @@ use Omeka\Entity\EntityInterface;
 use Omeka\Stdlib\ErrorStore;
 use AdvancedSearch\Entity\SearchEngine;
 
-class SearchPageAdapter extends AbstractEntityAdapter
+class SearchConfigAdapter extends AbstractEntityAdapter
 {
     protected $sortFields = [
         'id' => 'id',
@@ -48,17 +48,17 @@ class SearchPageAdapter extends AbstractEntityAdapter
 
     public function getResourceName()
     {
-        return 'search_pages';
+        return 'search_configs';
     }
 
     public function getRepresentationClass()
     {
-        return \Search\Api\Representation\SearchPageRepresentation::class;
+        return \Search\Api\Representation\SearchConfigRepresentation::class;
     }
 
     public function getEntityClass()
     {
-        return \Search\Entity\SearchPage::class;
+        return \Search\Entity\SearchConfig::class;
     }
 
     public function buildQuery(QueryBuilder $qb, array $query): void

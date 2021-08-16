@@ -86,10 +86,10 @@ class SearchEngine extends AbstractEntity
     protected $modified;
 
     /**
-     * @var SearchPage[]
+     * @var SearchConfig[]
      *
      * @OneToMany(
-     *     targetEntity="SearchPage",
+     *     targetEntity="SearchConfig",
      *     mappedBy="index",
      *     orphanRemoval=true,
      *     cascade={"persist", "remove"},

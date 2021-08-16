@@ -26,7 +26,7 @@ $config = require dirname(__DIR__, 2) . '/config/module.config.php';
 
 if (version_compare($oldVersion, '0.1.1', '<')) {
     $connection->exec('
-        ALTER TABLE search_page
+        ALTER TABLE search_config
         CHANGE `form` `form_adapter` varchar(255) NOT NULL
     ');
 }
@@ -35,25 +35,25 @@ if (version_compare($oldVersion, '0.5.0', '<')) {
     // There is no "drop foreign key if exists", so check it.
     $sql = '';
     $sm = $connection->getSchemaManager();
-    $keys = ['search_page_ibfk_1', 'index_id', 'IDX_4F10A34984337261', 'FK_4F10A34984337261'];
-    $foreignKeys = $sm->listTableForeignKeys('search_page');
+    $keys = ['search_config_ibfk_1', 'index_id', 'IDX_4F10A34984337261', 'FK_4F10A34984337261'];
+    $foreignKeys = $sm->listTableForeignKeys('search_config');
     foreach ($foreignKeys as $foreignKey) {
         if ($foreignKey && in_array($foreignKey->getName(), $keys)) {
-            $sql .= 'ALTER TABLE search_page DROP FOREIGN KEY ' . $foreignKey->getName() . ';' . PHP_EOL;
+            $sql .= 'ALTER TABLE search_config DROP FOREIGN KEY ' . $foreignKey->getName() . ';' . PHP_EOL;
         }
     }
-    $indexes = $sm->listTableIndexes('search_page');
+    $indexes = $sm->listTableIndexes('search_config');
     foreach ($indexes as $index) {
         if ($index && in_array($index->getName(), $keys)) {
-            $sql .= 'DROP INDEX ' . $index->getName() . ' ON search_page;' . PHP_EOL;
+            $sql .= 'DROP INDEX ' . $index->getName() . ' ON search_config;' . PHP_EOL;
         }
     }
 
     $sql .= <<<'SQL'
 ALTER TABLE search_index CHANGE id id INT AUTO_INCREMENT NOT NULL, CHANGE settings settings LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json_array)';
-ALTER TABLE search_page CHANGE id id INT AUTO_INCREMENT NOT NULL, CHANGE index_id index_id INT NOT NULL AFTER id, CHANGE settings settings LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json_array)';
-CREATE INDEX IDX_4F10A34984337261 ON search_page (index_id);
-ALTER TABLE search_page ADD CONSTRAINT search_page_ibfk_1 FOREIGN KEY (index_id) REFERENCES search_index (id);
+ALTER TABLE search_config CHANGE id id INT AUTO_INCREMENT NOT NULL, CHANGE index_id index_id INT NOT NULL AFTER id, CHANGE settings settings LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json_array)';
+CREATE INDEX IDX_4F10A34984337261 ON search_config (index_id);
+ALTER TABLE search_config ADD CONSTRAINT search_config_ibfk_1 FOREIGN KEY (index_id) REFERENCES search_index (id);
 SQL;
     $sqls = array_filter(array_map('trim', explode(';', $sql)));
     foreach ($sqls as $sql) {
@@ -65,23 +65,23 @@ if (version_compare($oldVersion, '0.5.1', '<')) {
     // There is no "drop foreign key if exists", so check it.
     $sql = '';
     $sm = $connection->getSchemaManager();
-    $keys = ['search_page_ibfk_1', 'index_id', 'IDX_4F10A34984337261', 'FK_4F10A34984337261'];
-    $foreignKeys = $sm->listTableForeignKeys('search_page');
+    $keys = ['search_config_ibfk_1', 'index_id', 'IDX_4F10A34984337261', 'FK_4F10A34984337261'];
+    $foreignKeys = $sm->listTableForeignKeys('search_config');
     foreach ($foreignKeys as $foreignKey) {
         if ($foreignKey && in_array($foreignKey->getName(), $keys)) {
-            $sql .= 'ALTER TABLE search_page DROP FOREIGN KEY ' . $foreignKey->getName() . ';' . PHP_EOL;
+            $sql .= 'ALTER TABLE search_config DROP FOREIGN KEY ' . $foreignKey->getName() . ';' . PHP_EOL;
         }
     }
-    $indexes = $sm->listTableIndexes('search_page');
+    $indexes = $sm->listTableIndexes('search_config');
     foreach ($indexes as $index) {
         if ($index && in_array($index->getName(), $keys)) {
-            $sql .= 'DROP INDEX ' . $index->getName() . ' ON search_page;' . PHP_EOL;
+            $sql .= 'DROP INDEX ' . $index->getName() . ' ON search_config;' . PHP_EOL;
         }
     }
 
     $sql .= <<<'SQL'
-CREATE INDEX IDX_4F10A34984337261 ON search_page (index_id);
-ALTER TABLE search_page ADD CONSTRAINT FK_4F10A34984337261 FOREIGN KEY (index_id) REFERENCES search_index (id) ON DELETE CASCADE;
+CREATE INDEX IDX_4F10A34984337261 ON search_config (index_id);
+ALTER TABLE search_config ADD CONSTRAINT FK_4F10A34984337261 FOREIGN KEY (index_id) REFERENCES search_index (id) ON DELETE CASCADE;
 SQL;
     $sqls = array_filter(array_map('trim', explode(';', $sql)));
     foreach ($sqls as $sql) {
@@ -107,9 +107,9 @@ if (version_compare($oldVersion, '3.5.7', '<')) {
         $siteSettings->setTargetId($site->id());
         $key = 'theme_settings_' . $theme;
         $themeSettings = $siteSettings->get($key, []);
-        if (array_key_exists('search_page_id', $themeSettings)) {
-            $siteSettings->set('search_main_page', $themeSettings['search_page_id']);
-            unset($themeSettings['search_page_id']);
+        if (array_key_exists('search_config_id', $themeSettings)) {
+            $siteSettings->set('search_main_page', $themeSettings['search_config_id']);
+            unset($themeSettings['search_config_id']);
             $siteSettings->set($key, $themeSettings);
         }
     }
@@ -125,21 +125,21 @@ if (version_compare($oldVersion, '3.5.8', '<')) {
     // Reorder the search pages by weight to avoid to do it each time.
     // The api is not available for search pages during upgrade, so use sql.
     $sql = <<<'SQL'
-SELECT `id`, `settings` FROM `search_page`;
+SELECT `id`, `settings` FROM `search_config`;
 SQL;
     $stmt = $connection->query($sql);
     $result = $stmt->fetchAll(\PDO::FETCH_KEY_PAIR);
     if ($result) {
-        foreach ($result as $id => $searchPageSettings) {
-            $searchPageSettings = json_decode($searchPageSettings, true) ?: [];
-            if ($searchPageSettings) {
+        foreach ($result as $id => $searchConfigSettings) {
+            $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
+            if ($searchConfigSettings) {
                 foreach (['facets', 'sort_fields'] as $type) {
-                    if (!isset($searchPageSettings[$type])) {
-                        $searchPageSettings[$type] = [];
+                    if (!isset($searchConfigSettings[$type])) {
+                        $searchConfigSettings[$type] = [];
                     } else {
-                        // @see \Search\Controller\Admin\SearchPageController::configureAction()
+                        // @see \Search\Controller\Admin\SearchConfigController::configureAction()
                         // Sort enabled first, then available, else sort by weigth.
-                        uasort($searchPageSettings[$type], function ($a, $b) {
+                        uasort($searchConfigSettings[$type], function ($a, $b) {
                             // Sort by availability.
                             if (isset($a['enabled']) && isset($b['enabled'])) {
                                 if ($a['enabled'] > $b['enabled']) {
@@ -167,10 +167,10 @@ SQL;
                     }
                 }
             }
-            $searchPageSettings = $connection->quote(json_encode($searchPageSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+            $searchConfigSettings = $connection->quote(json_encode($searchConfigSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
             $sql = <<<SQL
-UPDATE `search_page`
-SET `settings` = $searchPageSettings
+UPDATE `search_config`
+SET `settings` = $searchConfigSettings
 WHERE `id` = $id;
 SQL;
             $connection->exec($sql);
@@ -191,24 +191,24 @@ SQL;
     $sites = $api->search('sites')->getContent();
     foreach ($sites as $site) {
         $siteSettings->setTargetId($site->id());
-        $searchPages = $siteSettings->get('search_pages', []) ?: [];
-        $searchPages = array_unique(array_filter(array_map('intval', $searchPages)));
-        sort($searchPages);
-        $siteSettings->set('search_pages', $searchPages);
+        $searchConfigs = $siteSettings->get('search_configs', []) ?: [];
+        $searchConfigs = array_unique(array_filter(array_map('intval', $searchConfigs)));
+        sort($searchConfigs);
+        $siteSettings->set('search_configs', $searchConfigs);
     }
 }
 
 if (version_compare($oldVersion, '3.5.12.2', '<')) {
-    $mainSearchPage = $settings->get('search_main_page');
-    if ($mainSearchPage) {
-        $mainSearchPage = basename($mainSearchPage);
-        // The api for search_pages is not available during upgrade.
+    $mainSearchConfig = $settings->get('search_main_page');
+    if ($mainSearchConfig) {
+        $mainSearchConfig = basename($mainSearchConfig);
+        // The api for search_configs is not available during upgrade.
         $sql = <<<SQL
 SELECT `id`
-FROM `search_page`
-WHERE `path` = :search_page;
+FROM `search_config`
+WHERE `path` = :search_config;
 SQL;
-        $id = $connection->fetchColumn($sql, ['search_page' => $mainSearchPage], 0);
+        $id = $connection->fetchColumn($sql, ['search_config' => $mainSearchConfig], 0);
         $settings->set('search_main_page', $id ? (string) $id : null);
     }
 }
@@ -216,26 +216,26 @@ SQL;
 if (version_compare($oldVersion, '3.5.14', '<')) {
     // Add new default options to settings of search pages.
     $sql = <<<'SQL'
-SELECT `id`, `settings` FROM `search_page`;
+SELECT `id`, `settings` FROM `search_config`;
 SQL;
     $stmt = $connection->query($sql);
     $result = $stmt->fetchAll(\PDO::FETCH_KEY_PAIR);
     if ($result) {
-        foreach ($result as $id => $searchPageSettings) {
-            $searchPageSettings = json_decode($searchPageSettings, true) ?: [];
-            $searchPageSettings += [
+        foreach ($result as $id => $searchConfigSettings) {
+            $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
+            $searchConfigSettings += [
                 'default_results' => 'default',
                 'default_query' => '',
                 'restrict_query_to_form' => '0',
             ];
-            $searchPageSettings['form']['item_set_filter_type'] = 'multi-checkbox';
-            $searchPageSettings['form']['resource_class_filter_type'] = 'select';
-            $searchPageSettings['form']['resource_template_filter_type'] = 'select';
-            $searchPageSettings['form']['filter_collection_number'] = '1';
-            $searchPageSettings = $connection->quote(json_encode($searchPageSettings, 320));
+            $searchConfigSettings['form']['item_set_filter_type'] = 'multi-checkbox';
+            $searchConfigSettings['form']['resource_class_filter_type'] = 'select';
+            $searchConfigSettings['form']['resource_template_filter_type'] = 'select';
+            $searchConfigSettings['form']['filter_collection_number'] = '1';
+            $searchConfigSettings = $connection->quote(json_encode($searchConfigSettings, 320));
             $sql = <<<SQL
-UPDATE `search_page`
-SET `settings` = $searchPageSettings
+UPDATE `search_config`
+SET `settings` = $searchConfigSettings
 WHERE `id` = $id;
 SQL;
             $connection->exec($sql);
@@ -252,7 +252,7 @@ CHANGE `modified` `modified` DATETIME DEFAULT NULL;
 SQL;
     $connection->exec($sql);
     $sql = <<<'SQL'
-ALTER TABLE `search_page`
+ALTER TABLE `search_config`
 CHANGE `settings` `settings` LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json)',
 CHANGE `modified` `modified` DATETIME DEFAULT NULL;
 SQL;
@@ -261,63 +261,63 @@ SQL;
 
 if (version_compare($oldVersion, '3.5.21.3', '<')) {
     $sql = <<<'SQL'
-SELECT `id`, `form_adapter`, `settings` FROM `search_page`;
+SELECT `id`, `form_adapter`, `settings` FROM `search_config`;
 SQL;
     $stmt = $connection->query($sql);
     $results = $stmt->fetchAll();
     foreach ($results as $result) {
         $id = $result['id'];
         // $formAdapter = $result['form_adapter'];
-        $searchPageSettings = $result['settings'];
-        $searchPageSettings = json_decode($searchPageSettings, true) ?: [];
-        if (empty($searchPageSettings['search'])) {
-            $searchPageSettings['search'] = [];
+        $searchConfigSettings = $result['settings'];
+        $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
+        if (empty($searchConfigSettings['search'])) {
+            $searchConfigSettings['search'] = [];
         }
 
         // For simplicity, keep old params as they are, and merge them with the
         // new one. It will be cleaned once the config form will be saved.
 
         // Move search main settings from root to [search].
-        $searchPageSettings['search']['default_results'] = $searchPageSettings['default_results'] ?? 'default';
-        $searchPageSettings['search']['default_query'] = $searchPageSettings['default_query'] ?? '';
+        $searchConfigSettings['search']['default_results'] = $searchConfigSettings['default_results'] ?? 'default';
+        $searchConfigSettings['search']['default_query'] = $searchConfigSettings['default_query'] ?? '';
 
-        $searchPageSettings['form']['filters_max_number'] = $searchPageSettings['form']['filter_collection_number'] ?? 5;
+        $searchConfigSettings['form']['filters_max_number'] = $searchConfigSettings['form']['filter_collection_number'] ?? 5;
 
-        $searchPageSettings['form']['filters'] = $searchPageSettings['form']['filters'] ?? [];
-        $searchPageSettings['form']['fields_order'] = $searchPageSettings['form']['fields_order'] ?? [];
+        $searchConfigSettings['form']['filters'] = $searchConfigSettings['form']['filters'] ?? [];
+        $searchConfigSettings['form']['fields_order'] = $searchConfigSettings['form']['fields_order'] ?? [];
 
-        foreach ($searchPageSettings['form']['filters'] as $name => &$field) {
+        foreach ($searchConfigSettings['form']['filters'] as $name => &$field) {
             if (empty($field['enabled'])) {
-                unset($searchPageSettings['form']['filters'][$name]);
+                unset($searchConfigSettings['form']['filters'][$name]);
             } else {
                 $field = $field['display']['label'];
             }
         }
         unset($field);
 
-        $searchPageSettings['sort'] = [
-            'fields' => $searchPageSettings['sort_fields'] ?? [],
+        $searchConfigSettings['sort'] = [
+            'fields' => $searchConfigSettings['sort_fields'] ?? [],
         ];
 
-        foreach ($searchPageSettings['sort']['fields'] as $name => &$field) {
+        foreach ($searchConfigSettings['sort']['fields'] as $name => &$field) {
             if (empty($field['enabled'])) {
-                unset($searchPageSettings['sort']['fields'][$name]);
+                unset($searchConfigSettings['sort']['fields'][$name]);
             } else {
                 $field = $field['display']['label'];
             }
         }
         unset($field);
 
-        $searchPageSettings['facet'] = [
-            'facets' => $searchPageSettings['facets'] ?? [],
-            'limit' => $searchPageSettings['facet_limit'] ?? 10,
-            'languages' => $searchPageSettings['facet_languages'] ?? [],
-            'mode' => $searchPageSettings['facet_mode'] ?? 'button',
+        $searchConfigSettings['facet'] = [
+            'facets' => $searchConfigSettings['facets'] ?? [],
+            'limit' => $searchConfigSettings['facet_limit'] ?? 10,
+            'languages' => $searchConfigSettings['facet_languages'] ?? [],
+            'mode' => $searchConfigSettings['facet_mode'] ?? 'button',
         ];
 
-        foreach ($searchPageSettings['facet']['facets'] as $name => &$field) {
+        foreach ($searchConfigSettings['facet']['facets'] as $name => &$field) {
             if (empty($field['enabled'])) {
-                unset($searchPageSettings['facet']['facets'][$name]);
+                unset($searchConfigSettings['facet']['facets'][$name]);
             } else {
                 $field = $field['display']['label'];
             }
@@ -325,21 +325,21 @@ SQL;
         unset($field);
 
         unset(
-            $searchPageSettings['form_class'],
-            $searchPageSettings['default_results'],
-            $searchPageSettings['default_query'],
-            $searchPageSettings['facet_limit'],
-            $searchPageSettings['facet_languages'],
-            $searchPageSettings['facet_mode'],
-            $searchPageSettings['facets'],
-            $searchPageSettings['sort_fields'],
-            $searchPageSettings['restrict_query_to_form']
+            $searchConfigSettings['form_class'],
+            $searchConfigSettings['default_results'],
+            $searchConfigSettings['default_query'],
+            $searchConfigSettings['facet_limit'],
+            $searchConfigSettings['facet_languages'],
+            $searchConfigSettings['facet_mode'],
+            $searchConfigSettings['facets'],
+            $searchConfigSettings['sort_fields'],
+            $searchConfigSettings['restrict_query_to_form']
         );
 
-        $searchPageSettings = $connection->quote(json_encode($searchPageSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        $searchConfigSettings = $connection->quote(json_encode($searchConfigSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
         $sql = <<<SQL
-UPDATE `search_page`
-SET `settings` = $searchPageSettings
+UPDATE `search_config`
+SET `settings` = $searchConfigSettings
 WHERE `id` = $id;
 SQL;
         $connection->exec($sql);
@@ -347,7 +347,7 @@ SQL;
 
     // Replace forms "Basic" and "Advanced" by "Main".
     $sql = <<<'SQL'
-UPDATE `search_page`
+UPDATE `search_config`
 SET `form_adapter` = "main"
 WHERE `form_adapter` IN ("basic", "advanced");
 SQL;
@@ -385,7 +385,7 @@ if (version_compare($oldVersion, '3.5.22.3', '<')) {
 
 if (version_compare($oldVersion, '3.5.23.3', '<')) {
     $sql = <<<'SQL'
-SELECT `id`, `settings` FROM `search_page`;
+SELECT `id`, `settings` FROM `search_config`;
 SQL;
     $default = [
         'search' => [],
@@ -398,31 +398,31 @@ SQL;
     $results = $stmt->fetchAll();
     foreach ($results as $result) {
         $id = $result['id'];
-        $searchPageSettings = $result['settings'];
-        $searchPageSettings = json_decode($searchPageSettings, true) ?: [];
-        $searchPageSettings = array_replace($default, $searchPageSettings);
+        $searchConfigSettings = $result['settings'];
+        $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
+        $searchConfigSettings = array_replace($default, $searchConfigSettings);
 
-        if (!empty($searchPageSettings['form']['filters'])) {
-            foreach ($searchPageSettings['form']['filters'] as $name => &$val) {
+        if (!empty($searchConfigSettings['form']['filters'])) {
+            foreach ($searchConfigSettings['form']['filters'] as $name => &$val) {
                 $val = ['name' => $name, 'label' => $val];
             }
             unset($val);
         }
 
-        foreach ($searchPageSettings['sort']['fields'] as $name => &$val) {
+        foreach ($searchConfigSettings['sort']['fields'] as $name => &$val) {
             $val = ['name' => $name, 'label' => $val];
         }
         unset($val);
 
-        foreach ($searchPageSettings['facet']['facets'] as $name => &$val) {
+        foreach ($searchConfigSettings['facet']['facets'] as $name => &$val) {
             $val = ['name' => $name, 'label' => $val];
         }
         unset($val);
 
-        $searchPageSettings = $connection->quote(json_encode($searchPageSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+        $searchConfigSettings = $connection->quote(json_encode($searchConfigSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
         $sql = <<<SQL
-UPDATE `search_page`
-SET `settings` = $searchPageSettings
+UPDATE `search_config`
+SET `settings` = $searchConfigSettings
 WHERE `id` = $id;
 SQL;
         $connection->exec($sql);

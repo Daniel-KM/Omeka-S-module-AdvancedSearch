@@ -308,7 +308,7 @@ class Module extends AbstractModule
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\SiteAdapter::class,
             'api.create.post',
-            [$this, 'addSearchPageToSite']
+            [$this, 'addSearchConfigToSite']
         );
 
         $sharedEventManager->attach(
@@ -332,7 +332,7 @@ class Module extends AbstractModule
                 null,
                 [
                     \Search\Controller\IndexController::class,
-                    \Search\Api\Adapter\SearchPageAdapter::class,
+                    \Search\Api\Adapter\SearchConfigAdapter::class,
                     \Search\Api\Adapter\SearchEngineAdapter::class,
                 ],
                 ['read', 'search']
@@ -341,14 +341,14 @@ class Module extends AbstractModule
                 null,
                 [
                     \Search\Controller\IndexController::class,
-                    \Search\Api\Adapter\SearchPageAdapter::class,
+                    \Search\Api\Adapter\SearchConfigAdapter::class,
                     \Search\Api\Adapter\SearchEngineAdapter::class,
                 ]
             )
             ->allow(
                 null,
                 [
-                    \Search\Entity\SearchPage::class,
+                    \Search\Entity\SearchConfig::class,
                     \Search\Entity\SearchEngine::class,
                 ],
                 ['read']
@@ -371,28 +371,28 @@ class Module extends AbstractModule
         }
 
         $api = $services->get('Omeka\ApiManager');
-        /** @var \Search\Api\Representation\SearchPageRepresentation[] $searchPages */
-        $searchPages = $api->search('search_pages')->getContent();
+        /** @var \Search\Api\Representation\SearchConfigRepresentation[] $searchConfigs */
+        $searchConfigs = $api->search('search_configs')->getContent();
 
         $isAdminRequest = $status->isAdminRequest();
         if ($isAdminRequest) {
             $settings = $services->get('Omeka\Settings');
-            $adminSearchPages = $settings->get('search_pages', []);
-            foreach ($searchPages as $searchPage) {
-                $searchPageId = $searchPage->id();
-                if (in_array($searchPageId, $adminSearchPages)) {
+            $adminSearchConfigs = $settings->get('search_configs', []);
+            foreach ($searchConfigs as $searchConfig) {
+                $searchConfigId = $searchConfig->id();
+                if (in_array($searchConfigId, $adminSearchConfigs)) {
                     $router->addRoute(
-                        'search-admin-page-' . $searchPageId,
+                        'search-admin-page-' . $searchConfigId,
                         [
                             'type' => \Laminas\Router\Http\Segment::class,
                             'options' => [
-                                'route' => '/admin/' . $searchPage->path(),
+                                'route' => '/admin/' . $searchConfig->path(),
                                 'defaults' => [
                                     '__NAMESPACE__' => 'Search\Controller',
                                     '__ADMIN__' => true,
                                     'controller' => \Search\Controller\IndexController::class,
                                     'action' => 'search',
-                                    'id' => $searchPageId,
+                                    'id' => $searchConfigId,
                                 ],
                             ],
                             'may_terminate' => true,
@@ -406,7 +406,7 @@ class Module extends AbstractModule
                                             '__ADMIN__' => true,
                                             'controller' => \Search\Controller\IndexController::class,
                                             'action' => 'suggest',
-                                            'id' => $searchPageId,
+                                            'id' => $searchConfigId,
                                         ],
                                     ],
                                 ],
@@ -418,23 +418,23 @@ class Module extends AbstractModule
         }
 
         // Public search pages are required to manage them at site level.
-        foreach ($searchPages as $searchPage) {
-            $searchPageId = $searchPage->id();
-            $searchPageSlug = $searchPage->path();
+        foreach ($searchConfigs as $searchConfig) {
+            $searchConfigId = $searchConfig->id();
+            $searchConfigSlug = $searchConfig->path();
             $router->addRoute(
-                'search-page-' . $searchPageId,
+                'search-config-' . $searchConfigId,
                 [
                     'type' => \Laminas\Router\Http\Segment::class,
                     'options' => [
-                        'route' => '/s/:site-slug/' . $searchPageSlug,
+                        'route' => '/s/:site-slug/' . $searchConfigSlug,
                         'defaults' => [
                             '__NAMESPACE__' => 'Search\Controller',
                             '__SITE__' => true,
                             'controller' => \Search\Controller\IndexController::class,
                             'action' => 'search',
-                            'id' => $searchPageId,
+                            'id' => $searchConfigId,
                             // Store the page slug to simplify checks.
-                            'page-slug' => $searchPageSlug,
+                            'page-slug' => $searchConfigSlug,
                         ],
                     ],
                     'may_terminate' => true,
@@ -448,9 +448,9 @@ class Module extends AbstractModule
                                     '__SITE__' => true,
                                     'controller' => \Search\Controller\IndexController::class,
                                     'action' => 'suggest',
-                                    'id' => $searchPageId,
+                                    'id' => $searchConfigId,
                                     // Store the page slug to simplify checks.
-                                    'page-slug' => $searchPageSlug,
+                                    'page-slug' => $searchConfigSlug,
                                 ],
                             ],
                         ],
@@ -1893,35 +1893,35 @@ class Module extends AbstractModule
         if ($status->isSiteRequest()) {
             $params = $view->params()->fromRoute();
             if ($params['controller'] === \Search\Controller\IndexController::class) {
-                $searchPage = @$params['id'];
+                $searchConfig = @$params['id'];
             } else {
-                $searchPage = $view->siteSetting('search_main_page');
+                $searchConfig = $view->siteSetting('search_main_page');
             }
         } elseif ($status->isAdminRequest()) {
-            $searchPage = $view->setting('search_main_page');
+            $searchConfig = $view->setting('search_main_page');
         } else {
             return;
         }
 
-        if (!$searchPage) {
+        if (!$searchConfig) {
             return;
         }
 
-        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
-        $searchPage = $plugins->get('api')->searchOne('search_pages', ['id' => $searchPage])->getContent();
-        if (!$searchPage) {
+        /** @var \Search\Api\Representation\SearchConfigRepresentation $searchConfig */
+        $searchConfig = $plugins->get('api')->searchOne('search_configs', ['id' => $searchConfig])->getContent();
+        if (!$searchConfig) {
             return;
         }
 
-        $formAdapter = $searchPage->formAdapter();
+        $formAdapter = $searchConfig->formAdapter();
         $partialHeaders = $formAdapter ? $formAdapter->getFormPartialHeaders() : null;
 
         if ($status->isAdminRequest()) {
             $basePath = $plugins->get('basePath');
             $assetUrl = $plugins->get('assetUrl');
-            $searchUrl = $basePath('admin/' . $searchPage->path());
-            if ($searchPage->subSetting('autosuggest', 'enable')) {
-                $autoSuggestUrl = $searchPage->subSetting('autosuggest', 'url') ?: $searchUrl . '/suggest';
+            $searchUrl = $basePath('admin/' . $searchConfig->path());
+            if ($searchConfig->subSetting('autosuggest', 'enable')) {
+                $autoSuggestUrl = $searchConfig->subSetting('autosuggest', 'url') ?: $searchUrl . '/suggest';
             }
             $plugins->get('headLink')
                 ->appendStylesheet($assetUrl('css/search-admin-search.css', 'Search'));
@@ -1937,11 +1937,11 @@ class Module extends AbstractModule
         }
 
         // No echo: it should just be a preload.
-        $view->vars()->offsetSet('searchPage', $searchPage);
+        $view->vars()->offsetSet('searchConfig', $searchConfig);
         $view->partial($partialHeaders);
     }
 
-    public function addSearchPageToSite(Event $event): void
+    public function addSearchConfigToSite(Event $event): void
     {
         /**
          * @var \Omeka\Settings\Settings $settings
@@ -1949,14 +1949,14 @@ class Module extends AbstractModule
          * @var \Omeka\Mvc\Controller\Plugin\Api $api
          *
          * @var \Omeka\Api\Representation\SiteRepresentation $site
-         * @var \Search\Api\Representation\SearchPageRepresentation $searchPage
+         * @var \Search\Api\Representation\SearchConfigRepresentation $searchConfig
          */
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings');
         $siteSettings = $services->get('Omeka\Settings\Site');
         $api = $services->get('ControllerPluginManager')->get('api');
         $site = null;
-        $searchPage = null;
+        $searchConfig = null;
 
         // Take the search page of the default site or the first site, else the
         // default search page.
@@ -1966,36 +1966,36 @@ class Module extends AbstractModule
         }
         if ($site) {
             $siteSettings->setTargetId($site->id());
-            $searchPageId = (int) $siteSettings->get('search_main_page');
+            $searchConfigId = (int) $siteSettings->get('search_main_page');
         } else {
-            $searchPageId = (int) $settings->get('search_main_page');
+            $searchConfigId = (int) $settings->get('search_main_page');
         }
-        if ($searchPageId) {
-            $searchPage = $api->searchOne('search_pages', ['id' => $searchPageId])->getContent();
+        if ($searchConfigId) {
+            $searchConfig = $api->searchOne('search_configs', ['id' => $searchConfigId])->getContent();
         }
-        if (!$searchPage) {
-            $searchPage = $api->searchOne('search_pages')->getContent();
+        if (!$searchConfig) {
+            $searchConfig = $api->searchOne('search_configs')->getContent();
         }
-        if (!$searchPage) {
-            $searchPageId = $this->createDefaultSearchPage();
-            $searchPage = $api->searchOne('search_pages', ['id' => $searchPageId])->getContent();
+        if (!$searchConfig) {
+            $searchConfigId = $this->createDefaultSearchConfig();
+            $searchConfig = $api->searchOne('search_configs', ['id' => $searchConfigId])->getContent();
         }
 
         /** @var \Omeka\Entity\Site $site */
         $site = $event->getParam('response')->getContent();
 
         $siteSettings->setTargetId($site->getId());
-        $siteSettings->set('search_main_page', $searchPage->id());
-        $siteSettings->set('search_pages', [$searchPage->id()]);
+        $siteSettings->set('search_main_page', $searchConfig->id());
+        $siteSettings->set('search_configs', [$searchConfig->id()]);
         $siteSettings->set('search_redirect_itemset', true);
     }
 
     protected function installResources(): void
     {
-        $this->createDefaultSearchPage();
+        $this->createDefaultSearchConfig();
     }
 
-    protected function createDefaultSearchPage(): int
+    protected function createDefaultSearchConfig(): int
     {
         // Note: during installation or upgrade, the api may not be available
         // for the search api adapters, so use direct sql queries.
@@ -2041,24 +2041,24 @@ SQL;
         }
 
         // Check if the default search page exists.
-        $sqlSearchPageId = <<<SQL
+        $sqlSearchConfigId = <<<SQL
 SELECT `id`
-FROM `search_page`
+FROM `search_config`
 WHERE `index_id` = $searchEngineId
 ORDER BY `id`;
 SQL;
-        $searchPageId = (int) $connection->fetchColumn($sqlSearchPageId);
+        $searchConfigId = (int) $connection->fetchColumn($sqlSearchConfigId);
 
-        if (!$searchPageId) {
+        if (!$searchConfigId) {
             $sql = <<<SQL
-INSERT INTO `search_page`
+INSERT INTO `search_config`
 (`index_id`, `name`, `path`, `form_adapter`, `settings`, `created`)
 VALUES
 ($searchEngineId, 'Default', 'find', 'main', ?, NOW());
 SQL;
-            $searchPageSettings = require __DIR__ . '/data/search_pages/default.php';
+            $searchConfigSettings = require __DIR__ . '/data/search_configs/default.php';
             $connection->executeQuery($sql, [
-                json_encode($searchPageSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+                json_encode($searchConfigSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
             ]);
 
             $message = new Message(
@@ -2071,6 +2071,6 @@ SQL;
             $messenger->addSuccess($message);
         }
 
-        return $searchPageId;
+        return $searchConfigId;
     }
 }

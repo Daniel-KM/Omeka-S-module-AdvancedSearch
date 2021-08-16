@@ -38,13 +38,13 @@ class FacetLabel extends AbstractHelper
     {
         static $availableFacetFields;
 
-        $settings = $this->getSearchPage()->settings();
+        $settings = $this->getSearchConfig()->settings();
         if (!empty($settings['facet']['facets'][$name]['label'])) {
             return $settings['facet']['facets'][$name]['label'];
         }
 
         if (!isset($availableFacetFields)) {
-            $index = $this->getSearchPage()->index();
+            $index = $this->getSearchConfig()->index();
             $availableFacetFields = $index->adapter()
                 ->getAvailableFacetFields($index);
         }
@@ -52,13 +52,13 @@ class FacetLabel extends AbstractHelper
         return $availableFacetFields[$name]['label'] ?? $name;
     }
 
-    protected function getSearchPage(): \Search\Api\Representation\SearchPageRepresentation
+    protected function getSearchConfig(): \Search\Api\Representation\SearchConfigRepresentation
     {
-        if (!property_exists($this->view, 'searchPage')) {
-            $this->view->searchPage = $this->view->api()
-                ->read('search_pages', $this->view->params()->fromRoute('id'))
+        if (!property_exists($this->view, 'searchConfig')) {
+            $this->view->searchConfig = $this->view->api()
+                ->read('search_configs', $this->view->params()->fromRoute('id'))
                 ->getContent();
         }
-        return $this->view->searchPage;
+        return $this->view->searchConfig;
     }
 }

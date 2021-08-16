@@ -46,11 +46,11 @@ class FilterFieldset extends Fieldset
                 'class' => 'filter',
             ]);
 
-        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
-        $searchPage = $this->getOption('search_page');
-        $searchPageSettings = $searchPage ? $searchPage->settings() : [];
+        /** @var \Search\Api\Representation\SearchConfigRepresentation $searchConfig */
+        $searchConfig = $this->getOption('search_config');
+        $searchConfigSettings = $searchConfig ? $searchConfig->settings() : [];
 
-        if (!empty($searchPageSettings['form']['filter_value_joiner'])) {
+        if (!empty($searchConfigSettings['form']['filter_value_joiner'])) {
             $this
                 ->add([
                     'name' => 'join',
@@ -87,7 +87,7 @@ class FilterFieldset extends Fieldset
                 ],
             ]);
 
-        if (!empty($searchPageSettings['form']['filter_value_type'])) {
+        if (!empty($searchConfigSettings['form']['filter_value_type'])) {
             $this
                 ->add([
                     'name' => 'type',
@@ -124,15 +124,15 @@ class FilterFieldset extends Fieldset
 
     protected function getFilterFields()
     {
-        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
-        $searchPage = $this->getOption('search_page');
-        $searchEngine = $searchPage->index();
+        /** @var \Search\Api\Representation\SearchConfigRepresentation $searchConfig */
+        $searchConfig = $this->getOption('search_config');
+        $searchEngine = $searchConfig->index();
         $searchAdapter = $searchEngine->adapter();
         if (empty($searchAdapter)) {
             return [];
         }
         $availableFields = $searchAdapter->getAvailableFields($searchEngine);
-        $settings = $searchPage->settings();
+        $settings = $searchConfig->settings();
         if (empty($availableFields) || empty($settings['form']['filters'])) {
             return [];
         }

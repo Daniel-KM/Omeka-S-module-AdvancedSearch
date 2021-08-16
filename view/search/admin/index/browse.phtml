@@ -30,7 +30,7 @@
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var \Search\Api\Representation\SearchEngineRepresentation[] $search_engines
- * @var \Search\Api\Representation\SearchPageRepresentation[] $search_pages
+ * @var \Search\Api\Representation\SearchConfigRepresentation[] $search_configs
  */
 
 $translate = $this->plugin('translate');
@@ -99,7 +99,7 @@ $url = $this->plugin('url');
 <?php endif; ?>
 
 <h2><?= $translate('Pages') ?></h2>
-<?php if (count($search_pages) > 0): ?>
+<?php if (count($search_configs) > 0): ?>
     <table class="tablesaw" data-tablesaw-mode="stack">
         <thead>
             <tr>
@@ -110,20 +110,20 @@ $url = $this->plugin('url');
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($search_pages as $search_page): ?>
+            <?php foreach ($search_configs as $search_config): ?>
                 <tr>
                     <td>
-                        <span><?= $search_page->name() ?></span>
+                        <span><?= $search_config->name() ?></span>
                         <ul class="actions">
                             <li>
-                                <?= $search_page->link('', 'edit', [
+                                <?= $search_config->link('', 'edit', [
                                     'class' => 'o-icon-edit',
                                     'title' => $translate('Edit'),
                                 ]) ?>
                             </li>
-                            <?php if ($search_page->index()->adapter()): ?>
+                            <?php if ($search_config->index()->adapter()): ?>
                             <li>
-                                <?= $search_page->link('', 'configure', [
+                                <?= $search_config->link('', 'configure', [
                                     'class' => 'o-icon- fa fa-sliders fa-sliders-h',
                                     'title' => $translate('Configure facets and sort fields'),
                                 ]) ?>
@@ -131,22 +131,22 @@ $url = $this->plugin('url');
                             <?php endif; ?>
                             <li>
                                 <a href="#"
-                                data-sidebar-content-url="<?= $escape($search_page->url('delete-confirm')) ?>"
+                                data-sidebar-content-url="<?= $escape($search_config->url('delete-confirm')) ?>"
                                 class="o-icon-delete sidebar-content"
                                 aria-label="<?= $escape($translate('Delete')) ?>"
                                 title="<?= $escape($translate('Delete')) ?>"></a>
                             </li>
                         </ul>
                     </td>
-                    <td><?= $search_page->path() ?></td>
-                    <td><?= $search_page->index()->name() ?></td>
+                    <td><?= $search_config->path() ?></td>
+                    <td><?= $search_config->index()->name() ?></td>
                     <td>
                         <?php
-                            $formAdapter = $search_page->formAdapter();
+                            $formAdapter = $search_config->formAdapter();
                             if ($formAdapter) {
                                 echo $formAdapter->getLabel();
                             } else {
-                                echo $search_page->formAdapterName();
+                                echo $search_config->formAdapterName();
                             }
                         ?>
                     </td>

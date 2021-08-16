@@ -39,7 +39,7 @@ use Omeka\Entity\AbstractEntity;
  * @Entity
  * @HasLifecycleCallbacks
  */
-class SearchPage extends AbstractEntity
+class SearchConfig extends AbstractEntity
 {
     /**
      * @var int

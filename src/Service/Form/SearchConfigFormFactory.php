@@ -4,13 +4,13 @@ namespace AdvancedSearch\Service\Form;
 
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
-use AdvancedSearch\Form\Admin\SearchPageForm;
+use AdvancedSearch\Form\Admin\SearchConfigForm;
 
-class SearchPageFormFactory implements FactoryInterface
+class SearchConfigFormFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        return (new SearchPageForm(null, $options))
+        return (new SearchConfigForm(null, $options))
             ->setApiManager($services->get('Omeka\ApiManager'))
             ->setFormAdapterManager($services->get('Search\FormAdapterManager'));
     }

@@ -4,7 +4,7 @@ namespace AdvancedSearch\View\Helper;
 
 use Laminas\Form\Form;
 use Laminas\View\Helper\AbstractHelper;
-use AdvancedSearch\Api\Representation\SearchPageRepresentation;
+use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 
 class SearchForm extends AbstractHelper
 {
@@ -14,9 +14,9 @@ class SearchForm extends AbstractHelper
     const PARTIAL_NAME = 'search/search-form';
 
     /**
-     * @var SearchPageRepresentation
+     * @var SearchConfigRepresentation
      */
-    protected $searchPage;
+    protected $searchConfig;
 
     /**
      * @var Form
@@ -29,54 +29,54 @@ class SearchForm extends AbstractHelper
     protected $partial = '';
 
     /**
-     * @param SearchPageRepresentation $searchPage
+     * @param SearchConfigRepresentation $searchConfig
      * @param string $partial Specific partial for the search form of the page.
      * @param bool $skipFormAction Don't set form action, so use the current page.
      * @return \Search\View\Helper\SearchForm
      */
-    public function __invoke(SearchPageRepresentation $searchPage = null, $partial = null, $skipFormAction = false): self
+    public function __invoke(SearchConfigRepresentation $searchConfig = null, $partial = null, $skipFormAction = false): self
     {
-        $this->initSearchForm($searchPage, $partial, $skipFormAction);
+        $this->initSearchForm($searchConfig, $partial, $skipFormAction);
         return $this;
     }
 
     /**
      * Prepare default search page, form and partial.
      *
-     * @param SearchPageRepresentation $searchPage
+     * @param SearchConfigRepresentation $searchConfig
      * @param string $partial Specific partial for the search form.
      * @param bool $skipFormAction Don't set form action, so use the current page.
      */
-    protected function initSearchForm(SearchPageRepresentation $searchPage = null, $partial = null, $skipFormAction = false): void
+    protected function initSearchForm(SearchConfigRepresentation $searchConfig = null, $partial = null, $skipFormAction = false): void
     {
         $plugins = $this->getView()->getHelperPluginManager();
         $isAdmin = $plugins->get('status')->isAdminRequest();
-        if (empty($searchPage)) {
+        if (empty($searchConfig)) {
             // If it is on a search page route, use the id, else use the setting.
             $params = $plugins->get('params')->fromRoute();
             $setting = $plugins->get($isAdmin ? 'setting' : 'siteSetting');
             if ($params['controller'] === 'Search\Controller\IndexController') {
-                $searchPageId = $params['id'];
+                $searchConfigId = $params['id'];
                 // Check if this search page is allowed.
-                if (!in_array($searchPageId, $setting('search_pages'))) {
-                    $searchPageId = 0;
+                if (!in_array($searchConfigId, $setting('search_configs'))) {
+                    $searchConfigId = 0;
                 }
             }
-            if (empty($searchPageId)) {
-                $searchPageId = $setting('search_main_page');
+            if (empty($searchConfigId)) {
+                $searchConfigId = $setting('search_main_page');
             }
-            $this->searchPage = $plugins->get('api')->searchOne('search_pages', ['id' => (int) $searchPageId])->getContent();
+            $this->searchConfig = $plugins->get('api')->searchOne('search_configs', ['id' => (int) $searchConfigId])->getContent();
         } else {
-            $this->searchPage = $searchPage;
+            $this->searchConfig = $searchConfig;
         }
 
         $this->form = null;
-        if ($this->searchPage) {
-            $this->form = $this->searchPage->form();
+        if ($this->searchConfig) {
+            $this->form = $this->searchConfig->form();
             if ($this->form && !$skipFormAction) {
                 $url = $isAdmin
-                    ? $this->searchPage->adminSearchUrl()
-                    : $this->searchPage->siteUrl();
+                    ? $this->searchConfig->adminSearchUrl()
+                    : $this->searchConfig->siteUrl();
                 $this->form->setAttribute('action', $url);
             }
         }
@@ -87,7 +87,7 @@ class SearchForm extends AbstractHelper
         if ($this->form) {
             $this->partial = $partial ?? '';
             if (empty($this->partial)) {
-                $formAdapter = $this->searchPage->formAdapter();
+                $formAdapter = $this->searchConfig->formAdapter();
                 $this->partial = $formAdapter && ($formPartial = $formAdapter->getFormPartial())
                     ? $formPartial
                     : self::PARTIAL_NAME;
@@ -98,11 +98,11 @@ class SearchForm extends AbstractHelper
     /**
      * Get the specified search page or the default one.
      *
-     * @return \Search\Api\Representation\SearchPageRepresentation|null
+     * @return \Search\Api\Representation\SearchConfigRepresentation|null
      */
-    public function getSearchPage(): ?SearchPageRepresentation
+    public function getSearchConfig(): ?SearchConfigRepresentation
     {
-        return $this->searchPage;
+        return $this->searchConfig;
     }
 
     /**

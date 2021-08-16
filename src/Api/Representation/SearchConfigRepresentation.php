@@ -32,7 +32,7 @@ namespace AdvancedSearch\Api\Representation;
 
 use Omeka\Api\Representation\AbstractEntityRepresentation;
 
-class SearchPageRepresentation extends AbstractEntityRepresentation
+class SearchConfigRepresentation extends AbstractEntityRepresentation
 {
     /**
      * @var \Search\FormAdapter\FormAdapterInterface
@@ -41,7 +41,7 @@ class SearchPageRepresentation extends AbstractEntityRepresentation
 
     public function getJsonLdType()
     {
-        return 'o:SearchPage';
+        return 'o:SearchConfig';
     }
 
     public function getJsonLd()
@@ -93,7 +93,7 @@ class SearchPageRepresentation extends AbstractEntityRepresentation
             'force_canonical' => $canonical,
         ];
         $url = $this->getViewHelper('Url');
-        return $url('search-page-' . $this->id(), $params, $options);
+        return $url('search-config-' . $this->id(), $params, $options);
     }
 
     public function name(): string
@@ -147,7 +147,7 @@ class SearchPageRepresentation extends AbstractEntityRepresentation
         return $this->getServiceLocator()
             ->get('FormElementManager')
             ->get($formClass, [
-                'search_page' => $this,
+                'search_config' => $this,
             ])
             ->setAttribute('method', 'GET');
     }
@@ -174,7 +174,7 @@ class SearchPageRepresentation extends AbstractEntityRepresentation
         return $this->resource->getCreated();
     }
 
-    public function getEntity(): \Search\Entity\SearchPage
+    public function getEntity(): \Search\Entity\SearchConfig
     {
         return $this->resource;
     }

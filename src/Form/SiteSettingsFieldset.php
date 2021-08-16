@@ -36,8 +36,8 @@ class SiteSettingsFieldset extends Fieldset
         $selectAllTerms = $settings->get('advancedsearchplus_restrict_used_terms', false);
         $searchFields = $settings->get('advancedsearchplus_search_fields', $defaultSelectedFields) ?: [];
 
-        /** @var \Search\Api\Representation\SearchPageRepresentation[] $pages */
-        $pages = $this->api->search('search_pages')->getContent();
+        /** @var \Search\Api\Representation\SearchConfigRepresentation[] $pages */
+        $pages = $this->api->search('search_configs')->getContent();
 
         $valueOptions = [];
         foreach ($pages as $page) {
@@ -84,14 +84,14 @@ class SiteSettingsFieldset extends Fieldset
                 ],
             ])
             ->add([
-                'name' => 'search_pages',
+                'name' => 'search_configs',
                 'type' => OptionalMultiCheckbox::class,
                 'options' => [
                     'label' => 'Available search pages', // @translate
                     'value_options' => $valueOptions,
                 ],
                 'attributes' => [
-                    'id' => 'search_pages',
+                    'id' => 'search_configs',
                 ],
             ])
             // TODO Move the option to redirect item set to search page or a search page setting?

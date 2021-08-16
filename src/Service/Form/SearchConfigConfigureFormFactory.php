@@ -4,13 +4,13 @@ namespace AdvancedSearch\Service\Form;
 
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
-use AdvancedSearch\Form\Admin\SearchPageConfigureForm;
+use AdvancedSearch\Form\Admin\SearchConfigConfigureForm;
 
-class SearchPageConfigureFormFactory implements FactoryInterface
+class SearchConfigConfigureFormFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        return (new SearchPageConfigureForm(null, $options))
+        return (new SearchConfigConfigureForm(null, $options))
             ->setFormElementManager($services->get('FormElementManager'));
     }
 }

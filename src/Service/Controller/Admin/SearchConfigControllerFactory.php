@@ -3,13 +3,13 @@ namespace AdvancedSearch\Service\Controller\Admin;
 
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
-use AdvancedSearch\Controller\Admin\SearchPageController;
+use AdvancedSearch\Controller\Admin\SearchConfigController;
 
-class SearchPageControllerFactory implements FactoryInterface
+class SearchConfigControllerFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        return new SearchPageController(
+        return new SearchConfigController(
             $services->get('Omeka\EntityManager'),
             $services->get('Search\AdapterManager'),
             $services->get('Search\FormAdapterManager')

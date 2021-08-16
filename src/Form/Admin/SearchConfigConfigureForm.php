@@ -40,15 +40,15 @@ use AdvancedSearch\Form\Element\OptionalRadio;
 use AdvancedSearch\Form\Element\OptionalSelect;
 use AdvancedSearch\Form\Element\OptionalUrl;
 
-class SearchPageConfigureForm extends Form
+class SearchConfigConfigureForm extends Form
 {
     protected $formElementManager;
 
     public function init(): void
     {
-        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
-        $searchPage = $this->getOption('search_page');
-        $index = $searchPage->index();
+        /** @var \Search\Api\Representation\SearchConfigRepresentation $searchConfig */
+        $searchConfig = $this->getOption('search_config');
+        $index = $searchConfig->index();
         if (empty($index)) {
             return;
         }
@@ -698,9 +698,9 @@ class SearchPageConfigureForm extends Form
 
     protected function addFormFieldset(): self
     {
-        $searchPage = $this->getOption('search_page');
+        $searchConfig = $this->getOption('search_config');
 
-        $formAdapter = $searchPage->formAdapter();
+        $formAdapter = $searchConfig->formAdapter();
         if (!$formAdapter) {
             return $this;
         }
@@ -712,7 +712,7 @@ class SearchPageConfigureForm extends Form
 
         /** @var \Laminas\Form\Fieldset $fieldset */
         $fieldset = $this->getFormElementManager()
-            ->get($configFormClass, ['search_page' => $searchPage]);
+            ->get($configFormClass, ['search_config' => $searchConfig]);
 
         if (method_exists($fieldset, 'skipDefaultElementsOrFieldsets')) {
             foreach ($fieldset->skipDefaultElementsOrFieldsets() as $skip) {
@@ -728,8 +728,8 @@ class SearchPageConfigureForm extends Form
     protected function getAvailableFields(): array
     {
         $options = [];
-        $searchPage = $this->getOption('search_page');
-        $searchEngine = $searchPage->index();
+        $searchConfig = $this->getOption('search_config');
+        $searchEngine = $searchConfig->index();
         $searchAdapter = $searchEngine->adapter();
         if (empty($searchAdapter)) {
             return [];
@@ -744,8 +744,8 @@ class SearchPageConfigureForm extends Form
     protected function getAvailableSortFields(): array
     {
         $options = [];
-        $searchPage = $this->getOption('search_page');
-        $searchEngine = $searchPage->index();
+        $searchConfig = $this->getOption('search_config');
+        $searchEngine = $searchConfig->index();
         $searchAdapter = $searchEngine->adapter();
         if (empty($searchAdapter)) {
             return [];
@@ -760,8 +760,8 @@ class SearchPageConfigureForm extends Form
     protected function getAvailableFacetFields(): array
     {
         $options = [];
-        $searchPage = $this->getOption('search_page');
-        $searchEngine = $searchPage->index();
+        $searchConfig = $this->getOption('search_config');
+        $searchEngine = $searchConfig->index();
         $searchAdapter = $searchEngine->adapter();
         if (empty($searchAdapter)) {
             return [];

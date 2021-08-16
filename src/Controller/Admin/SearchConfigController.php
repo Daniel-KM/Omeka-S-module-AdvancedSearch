@@ -36,12 +36,12 @@ use Laminas\View\Model\ViewModel;
 use Omeka\Form\ConfirmForm;
 use Omeka\Stdlib\Message;
 use AdvancedSearch\Adapter\Manager as SearchAdapterManager;
-use AdvancedSearch\Api\Representation\SearchPageRepresentation;
-use AdvancedSearch\Form\Admin\SearchPageConfigureForm;
-use AdvancedSearch\Form\Admin\SearchPageForm;
+use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
+use AdvancedSearch\Form\Admin\SearchConfigConfigureForm;
+use AdvancedSearch\Form\Admin\SearchConfigForm;
 use AdvancedSearch\FormAdapter\Manager as SearchFormAdapterManager;
 
-class SearchPageController extends AbstractActionController
+class SearchConfigController extends AbstractActionController
 {
     /**
      * @var EntityManager
@@ -70,7 +70,7 @@ class SearchPageController extends AbstractActionController
 
     public function addAction()
     {
-        $form = $this->getForm(SearchPageForm::class);
+        $form = $this->getForm(SearchConfigForm::class);
 
         $view = new ViewModel;
         $view->setVariable('form', $form);
@@ -79,15 +79,15 @@ class SearchPageController extends AbstractActionController
         }
 
         $formData = $form->getData();
-        $response = $this->api()->create('search_pages', $formData);
-        $searchPage = $response->getContent();
+        $response = $this->api()->create('search_configs', $formData);
+        $searchConfig = $response->getContent();
 
         $this->messenger()->addSuccess(new Message(
             'Search page "%s" created.', // @translate
-            $searchPage->name()
+            $searchConfig->name()
         ));
-        $this->manageSearchPageOnSites(
-            $searchPage,
+        $this->manageSearchConfigOnSites(
+            $searchConfig,
             $formData['manage_page_default'] ?: [],
             $formData['manage_page_availability']
         );
@@ -97,25 +97,25 @@ class SearchPageController extends AbstractActionController
             $this->messenger()->addWarning('You can enable this page in your site settings or in admin settings.'); // @translate
         }
 
-        if ($searchPage->formAdapter() instanceof \Search\FormAdapter\ApiFormAdapter) {
+        if ($searchConfig->formAdapter() instanceof \Search\FormAdapter\ApiFormAdapter) {
             $this->messenger()->addWarning(
                 'The api adapter should be selected in the main settings.' // @translate
             );
         }
 
-        return $this->redirect()->toUrl($searchPage->url('configure'));
+        return $this->redirect()->toUrl($searchConfig->url('configure'));
     }
 
     public function editAction()
     {
-        /** @var \Search\Api\Representation\SearchPageRepresentation $page */
+        /** @var \Search\Api\Representation\SearchConfigRepresentation $page */
         $id = $this->params('id');
-        $page = $this->api()->read('search_pages', ['id' => $id])->getContent();
+        $page = $this->api()->read('search_configs', ['id' => $id])->getContent();
 
         $data = $page->jsonSerialize();
-        $data['manage_page_default'] = $this->sitesWithSearchPage($page);
+        $data['manage_page_default'] = $this->sitesWithSearchConfig($page);
 
-        $form = $this->getForm(SearchPageForm::class);
+        $form = $this->getForm(SearchConfigForm::class);
         $form->setData($data);
 
         $view = new ViewModel;
@@ -126,17 +126,17 @@ class SearchPageController extends AbstractActionController
         }
 
         $formData = $form->getData();
-        $searchPage = $this->api()
-            ->update('search_pages', $id, $formData, [], ['isPartial' => true])
+        $searchConfig = $this->api()
+            ->update('search_configs', $id, $formData, [], ['isPartial' => true])
             ->getContent();
 
         $this->messenger()->addSuccess(new Message(
             'Search page "%s" saved.', // @translate
-            $searchPage->name()
+            $searchConfig->name()
         ));
 
-        $this->manageSearchPageOnSites(
-            $searchPage,
+        $this->manageSearchConfigOnSites(
+            $searchConfig,
             $formData['manage_page_default'] ?: [],
             $formData['manage_page_availability']
         );
@@ -153,14 +153,14 @@ class SearchPageController extends AbstractActionController
 
         $id = $this->params('id');
 
-        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
-        $searchPage = $this->api()->read('search_pages', $id)->getContent();
+        /** @var \Search\Api\Representation\SearchConfigRepresentation $searchConfig */
+        $searchConfig = $this->api()->read('search_configs', $id)->getContent();
 
         $view = new ViewModel([
-            'searchPage' => $searchPage,
+            'searchConfig' => $searchConfig,
         ]);
 
-        $index = $searchPage->index();
+        $index = $searchConfig->index();
         $adapter = $index ? $index->adapter() : null;
         if (empty($adapter)) {
             $message = new Message(
@@ -171,7 +171,7 @@ class SearchPageController extends AbstractActionController
             return $view;
         }
 
-        $form = $this->getConfigureForm($searchPage);
+        $form = $this->getConfigureForm($searchConfig);
         if (empty($form)) {
             $message = new Message(
                 'This index adapter "%s" has no config form.', // @translate
@@ -181,9 +181,9 @@ class SearchPageController extends AbstractActionController
             return $view;
         }
 
-        $searchPageSettings = $searchPage->settings() ?: [];
+        $searchConfigSettings = $searchConfig->settings() ?: [];
 
-        $form->setData($searchPageSettings);
+        $form->setData($searchConfigSettings);
         $view->setVariable('form', $form);
 
         if (!$this->getRequest()->isPost()) {
@@ -222,13 +222,13 @@ class SearchPageController extends AbstractActionController
             }
         }
 
-        $page = $searchPage->getEntity();
+        $page = $searchConfig->getEntity();
         $page->setSettings($params);
         $entityManager->flush();
 
         $this->messenger()->addSuccess(new Message(
-            'Configuration saved for page "%s".', // @translate
-            $searchPage->name()
+            'Configuration "%s" saved.', // @translate
+            $searchConfig->getName()
         ));
 
         return $this->redirect()->toRoute('admin/search');
@@ -237,11 +237,11 @@ class SearchPageController extends AbstractActionController
     public function deleteConfirmAction()
     {
         $id = $this->params('id');
-        $searchPage = $this->api()->read('search_pages', $id)->getContent();
+        $searchConfig = $this->api()->read('search_configs', $id)->getContent();
 
         $view = new ViewModel([
             'resourceLabel' => 'search page',
-            'resource' => $searchPage,
+            'resource' => $searchConfig,
         ]);
         return $view
             ->setTerminal(true)
@@ -254,9 +254,9 @@ class SearchPageController extends AbstractActionController
             $form = $this->getForm(ConfirmForm::class);
             $form->setData($this->getRequest()->getPost());
             $id = $this->params('id');
-            $pageName = $this->api()->read('search_pages', $id)->getContent()->name();
+            $pageName = $this->api()->read('search_configs', $id)->getContent()->name();
             if ($form->isValid()) {
-                $this->api()->delete('search_pages', $this->params('id'));
+                $this->api()->delete('search_configs', $this->params('id'));
                 $this->messenger()->addSuccess(new Message(
                     'Search page "%s" successfully deleted', // @translate
                     $pageName
@@ -283,17 +283,17 @@ class SearchPageController extends AbstractActionController
         $path = $params['o:path'];
 
         $paths = $this->api()
-            ->search('search_pages', [], ['returnScalar' => 'path'])
+            ->search('search_configs', [], ['returnScalar' => 'path'])
             ->getContent();
         if (in_array($path, $paths)) {
             if (!$id) {
                 $this->messenger()->addError('The path should be unique.'); // @translate
                 return false;
             }
-            $searchPageId = $this->api()
-                ->searchOne('search_pages', ['path' => $path], ['returnScalar' => 'id'])
+            $searchConfigId = $this->api()
+                ->searchOne('search_configs', ['path' => $path], ['returnScalar' => 'id'])
                 ->getContent();
-            if ($id !== $searchPageId) {
+            if ($id !== $searchConfigId) {
                 $this->messenger()->addError('The path should be unique.'); // @translate
                 return false;
             }
@@ -321,21 +321,21 @@ class SearchPageController extends AbstractActionController
     /**
      * Check if the configuration should use simple or visual form and get it.
      */
-    protected function getConfigureForm(SearchPageRepresentation $searchPage): ?\Search\Form\Admin\SearchPageConfigureForm
+    protected function getConfigureForm(SearchConfigRepresentation $searchConfig): ?\Search\Form\Admin\SearchConfigConfigureForm
     {
-        return $searchPage->index()
-            ? $this->getForm(SearchPageConfigureForm::class, ['search_page' => $searchPage])
+        return $searchConfig->index()
+            ? $this->getForm(SearchConfigConfigureForm::class, ['search_config' => $searchConfig])
             : null;
     }
 
-    protected function sitesWithSearchPage(SearchPageRepresentation $searchPage): array
+    protected function sitesWithSearchConfig(SearchConfigRepresentation $searchConfig): array
     {
         $result = [];
-        $searchPageId = $searchPage->id();
+        $searchConfigId = $searchConfig->id();
 
         // Check admin.
         $adminSearchId = $this->settings()->get('search_main_page');
-        if ($adminSearchId && $adminSearchId == $searchPageId) {
+        if ($adminSearchId && $adminSearchId == $searchConfigId) {
             $result[] = 'admin';
         }
 
@@ -345,7 +345,7 @@ class SearchPageController extends AbstractActionController
         foreach ($sites as $site) {
             $settings->setTargetId($site->id());
             $siteSearchId = $settings->get('search_main_page');
-            if ($siteSearchId && $siteSearchId == $searchPageId) {
+            if ($siteSearchId && $siteSearchId == $searchConfigId) {
                 $result[] = $site->id();
             }
         }
@@ -375,26 +375,26 @@ class SearchPageController extends AbstractActionController
     /**
      * Config the page for all sites.
      */
-    protected function manageSearchPageOnSites(
-        SearchPageRepresentation $searchPage,
-        array $newMainSearchPageForSites,
+    protected function manageSearchConfigOnSites(
+        SearchConfigRepresentation $searchConfig,
+        array $newMainSearchConfigForSites,
         $availability
     ): void {
-        $searchPageId = $searchPage->id();
-        $currentMainSearchPageForSites = $this->sitesWithSearchPage($searchPage);
+        $searchConfigId = $searchConfig->id();
+        $currentMainSearchConfigForSites = $this->sitesWithSearchConfig($searchConfig);
 
         // Manage admin settings.
-        $current = in_array('admin', $currentMainSearchPageForSites);
-        $new = in_array('admin', $newMainSearchPageForSites);
+        $current = in_array('admin', $currentMainSearchConfigForSites);
+        $new = in_array('admin', $newMainSearchConfigForSites);
         if ($current !== $new) {
             $settings = $this->settings();
             if ($new) {
-                $settings->set('search_main_page', $searchPageId);
-                $searchPages = $settings->get('search_pages', []);
-                $searchPages[] = $searchPageId;
-                $searchPages = array_unique(array_filter(array_map('intval', $searchPages)));
-                sort($searchPages);
-                $settings->set('search_pages', $searchPages);
+                $settings->set('search_main_page', $searchConfigId);
+                $searchConfigs = $settings->get('search_configs', []);
+                $searchConfigs[] = $searchConfigId;
+                $searchConfigs = array_unique(array_filter(array_map('intval', $searchConfigs)));
+                sort($searchConfigs);
+                $settings->set('search_configs', $searchConfigs);
 
                 $message = 'The page has been set by default in admin board.'; // @translate
             } else {
@@ -404,7 +404,7 @@ class SearchPageController extends AbstractActionController
             $this->messenger()->addSuccess($message);
         }
 
-        $allSites = in_array('all', $newMainSearchPageForSites);
+        $allSites = in_array('all', $newMainSearchConfigForSites);
         switch ($availability) {
             case 'disable':
                 $available = false;
@@ -425,30 +425,30 @@ class SearchPageController extends AbstractActionController
         foreach ($sites as $site) {
             $siteId = $site->id();
             $siteSettings->setTargetId($siteId);
-            $searchPages = $siteSettings->get('search_pages', []);
-            $current = in_array($siteId, $currentMainSearchPageForSites);
-            $new = $allSites || in_array($siteId, $newMainSearchPageForSites);
+            $searchConfigs = $siteSettings->get('search_configs', []);
+            $current = in_array($siteId, $currentMainSearchConfigForSites);
+            $new = $allSites || in_array($siteId, $newMainSearchConfigForSites);
             if ($current !== $new) {
                 if ($new) {
-                    $siteSettings->set('search_main_page', $searchPageId);
-                    $searchPages[] = $searchPageId;
+                    $siteSettings->set('search_main_page', $searchConfigId);
+                    $searchConfigs[] = $searchConfigId;
                 } else {
                     $siteSettings->set('search_main_page', null);
                 }
             }
 
             if ($new || $available) {
-                $searchPages[] = $searchPageId;
+                $searchConfigs[] = $searchConfigId;
             } else {
-                $key = array_search($searchPageId, $searchPages);
+                $key = array_search($searchConfigId, $searchConfigs);
                 if ($key === false) {
                     continue;
                 }
-                unset($searchPages[$key]);
+                unset($searchConfigs[$key]);
             }
-            $searchPages = array_unique(array_filter(array_map('intval', $searchPages)));
-            sort($searchPages);
-            $siteSettings->set('search_pages', $searchPages);
+            $searchConfigs = array_unique(array_filter(array_map('intval', $searchConfigs)));
+            sort($searchConfigs);
+            $siteSettings->set('search_configs', $searchConfigs);
         }
 
         $this->messenger()->addSuccess($message);

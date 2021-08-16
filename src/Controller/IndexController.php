@@ -35,7 +35,7 @@ use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Stdlib\Message;
-use AdvancedSearch\Api\Representation\SearchPageRepresentation;
+use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use AdvancedSearch\Querier\Exception\QuerierException;
 use AdvancedSearch\Query;
 use AdvancedSearch\Response;
@@ -50,8 +50,8 @@ class IndexController extends AbstractActionController
         if ($isPublic) {
             $site = $this->currentSite();
             $siteSettings = $this->siteSettings();
-            $siteSearchPages = $siteSettings->get('search_pages', []);
-            if (!in_array($pageId, $siteSearchPages)) {
+            $siteSearchConfigs = $siteSettings->get('search_configs', []);
+            if (!in_array($pageId, $siteSearchConfigs)) {
                 return $this->notFoundAction();
             }
             // Check if it is an item set redirection.
@@ -67,13 +67,13 @@ class IndexController extends AbstractActionController
         }
 
         // The page is required, else there is no form.
-        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
-        $searchPage = $this->api()->read('search_pages', $pageId)->getContent();
+        /** @var \Search\Api\Representation\SearchConfigRepresentation $searchConfig */
+        $searchConfig = $this->api()->read('search_configs', $pageId)->getContent();
 
         $view = new ViewModel([
             // The form is not set in the view, but via helper searchingForm()
-            // or via searchPage.
-            'searchPage' => $searchPage,
+            // or via searchConfig.
+            'searchConfig' => $searchConfig,
             'site' => $site,
             // Set a default empty query and response to simplify view.
             'query' => new Query,
@@ -81,13 +81,13 @@ class IndexController extends AbstractActionController
         ]);
 
         $request = $this->params()->fromQuery();
-        $form = $this->searchForm($searchPage);
+        $form = $this->searchForm($searchConfig);
         // The form may be empty for a direct query.
         $isJsonQuery = !$form;
 
         if ($form) {
             // Check csrf issue.
-            $request = $this->validateSearchRequest($searchPage, $form, $request);
+            $request = $this->validateSearchRequest($searchConfig, $form, $request);
             if ($request === false) {
                 return $view;
             }
@@ -97,13 +97,13 @@ class IndexController extends AbstractActionController
         // So the default query is used only on the search page.
         list($request, $isEmptyRequest) = $this->cleanRequest($request);
         if ($isEmptyRequest) {
-            $defaultResults = $searchPage->subSetting('search', 'default_results') ?: 'default';
+            $defaultResults = $searchConfig->subSetting('search', 'default_results') ?: 'default';
             switch ($defaultResults) {
                 case 'none':
                     $defaultQuery = '';
                     break;
                 case 'query':
-                    $defaultQuery = $searchPage->subSetting('search', 'default_query') ?: '';
+                    $defaultQuery = $searchConfig->subSetting('search', 'default_query') ?: '';
                     break;
                 case 'default':
                 default:
@@ -127,7 +127,7 @@ class IndexController extends AbstractActionController
             $request = $parsedQuery + $request;
         }
 
-        $result = $this->searchRequestToResponse($request, $searchPage, $site);
+        $result = $this->searchRequestToResponse($request, $searchConfig, $site);
         if ($result['status'] === 'fail') {
             // Currently only "no query".
             if ($isJsonQuery) {
@@ -166,7 +166,7 @@ class IndexController extends AbstractActionController
                 ]);
             }
 
-            $indexSettings = $searchPage->index()->settings();
+            $indexSettings = $searchConfig->index()->settings();
             $result = [];
             foreach ($indexSettings['resources'] as $resource) {
                 $result[$resource] = $response->getResults($resource);
@@ -176,7 +176,7 @@ class IndexController extends AbstractActionController
 
         return $view
             ->setVariables($result['data'], true)
-            ->setVariable('searchPage', $searchPage);
+            ->setVariable('searchConfig', $searchConfig);
     }
 
     public function suggestAction()
@@ -194,8 +194,8 @@ class IndexController extends AbstractActionController
         if ($isPublic) {
             $site = $this->currentSite();
             $siteSettings = $this->siteSettings();
-            $siteSearchPages = $siteSettings->get('search_pages', []);
-            if (!in_array($pageId, $siteSearchPages)) {
+            $siteSearchConfigs = $siteSettings->get('search_configs', []);
+            if (!in_array($pageId, $siteSearchConfigs)) {
                 return new JsonModel([
                     'status' => 'error',
                     'message' => 'Not a search page for this site.', // @translate
@@ -206,11 +206,11 @@ class IndexController extends AbstractActionController
             $site = null;
         }
 
-        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
-        $searchPage = $this->api()->read('search_pages', $pageId)->getContent();
+        /** @var \Search\Api\Representation\SearchConfigRepresentation $searchConfig */
+        $searchConfig = $this->api()->read('search_configs', $pageId)->getContent();
 
         /** @var \Search\FormAdapter\FormAdapterInterface $formAdapter */
-        $formAdapter = $searchPage->formAdapter();
+        $formAdapter = $searchConfig->formAdapter();
         if (!$formAdapter) {
             return new JsonModel([
                 'status' => 'error',
@@ -218,7 +218,7 @@ class IndexController extends AbstractActionController
             ]);
         }
 
-        if (!$searchPage->subSetting('autosuggest', 'enable')) {
+        if (!$searchConfig->subSetting('autosuggest', 'enable')) {
             return new JsonModel([
                 'status' => 'error',
                 'message' => 'Auto-suggestion is not enabled on this server.', // @translate
@@ -236,7 +236,7 @@ class IndexController extends AbstractActionController
             ]);
         }
 
-        $response = $this->processQuerySuggestions($searchPage, $q, $site);
+        $response = $this->processQuerySuggestions($searchConfig, $q, $site);
         if (!$response) {
             $this->getResponse()->setStatusCode(\Laminas\Http\Response::STATUS_CODE_500);
             return new JsonModel([
@@ -264,23 +264,23 @@ class IndexController extends AbstractActionController
     }
 
     protected function processQuerySuggestions(
-        SearchPageRepresentation $searchPage,
+        SearchConfigRepresentation $searchConfig,
         string $q,
         ?SiteRepresentation $site
     ): Response {
         /** @var \Search\FormAdapter\FormAdapterInterface $formAdapter */
-        $formAdapter = $searchPage->formAdapter();
-        $searchPageSettings = $searchPage->settings();
-        $searchFormSettings = $searchPageSettings['form'] ?? [];
+        $formAdapter = $searchConfig->formAdapter();
+        $searchConfigSettings = $searchConfig->settings();
+        $searchFormSettings = $searchConfigSettings['form'] ?? [];
 
-        $autosuggestSettings = $searchPage->setting('autosuggest', []);
+        $autosuggestSettings = $searchConfig->setting('autosuggest', []);
 
         // TODO Add a default query to manage any suggestion on any field and suggestions on item set page.
 
         /** @var \Search\Query $query */
         $query = $formAdapter->toQuery(['q' => $q], $searchFormSettings);
 
-        $searchEngine = $searchPage->index();
+        $searchEngine = $searchConfig->index();
         $indexSettings = $searchEngine->settings();
 
         $user = $this->identity();
@@ -329,7 +329,7 @@ class IndexController extends AbstractActionController
      * @return array|bool
      */
     protected function validateSearchRequest(
-        SearchPageRepresentation $searchPage,
+        SearchConfigRepresentation $searchConfig,
         \Laminas\Form\Form $form,
         array $request
     ) {

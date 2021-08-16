@@ -8,7 +8,7 @@ use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Stdlib\Message;
 use Omeka\Stdlib\Paginator;
 use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
-use AdvancedSearch\Api\Representation\SearchPageRepresentation;
+use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use AdvancedSearch\Querier\Exception\QuerierException;
 
 /**
@@ -18,9 +18,9 @@ use AdvancedSearch\Querier\Exception\QuerierException;
 class SearchRequestToResponse extends AbstractPlugin
 {
     /**
-     * @var SearchPageRepresentation
+     * @var SearchConfigRepresentation
      */
-    protected $searchPage;
+    protected $searchConfig;
 
     /**
      * @var SearchEngineRepresentation
@@ -35,16 +35,16 @@ class SearchRequestToResponse extends AbstractPlugin
      */
     public function __invoke(
         array $request,
-        SearchPageRepresentation $searchPage,
+        SearchConfigRepresentation $searchConfig,
         SiteRepresentation $site = null
     ): array {
         $controller = $this->getController();
-        $this->searchPage = $searchPage;
+        $this->searchConfig = $searchConfig;
 
         /** @var \Search\FormAdapter\FormAdapterInterface $formAdapter */
-        $formAdapter = $searchPage->formAdapter();
+        $formAdapter = $searchConfig->formAdapter();
         if (!$formAdapter) {
-            $formAdapterName = $searchPage->formAdapterName();
+            $formAdapterName = $searchConfig->formAdapterName();
             $message = new Message('Form adapter "%s" not found.', $formAdapterName); // @translate
             $controller->logger()->err($message);
             return [
@@ -53,7 +53,7 @@ class SearchRequestToResponse extends AbstractPlugin
             ];
         }
 
-        $searchPageSettings = $searchPage->settings();
+        $searchConfigSettings = $searchConfig->settings();
 
         list($request, $isEmptyRequest) = $this->cleanRequest($request);
         if ($isEmptyRequest) {
@@ -62,14 +62,14 @@ class SearchRequestToResponse extends AbstractPlugin
             $request = ['*' => ''] + $request;
         }
 
-        $searchFormSettings = $searchPageSettings['form'] ?? [];
+        $searchFormSettings = $searchConfigSettings['form'] ?? [];
 
         /** @var \Search\Query $query */
         $query = $formAdapter->toQuery($request, $searchFormSettings);
 
         // Add global parameters.
 
-        $this->searchEngine = $searchPage->index();
+        $this->searchEngine = $searchConfig->index();
         $indexSettings = $this->searchEngine->settings();
 
         $user = $controller->identity();
@@ -125,19 +125,19 @@ class SearchRequestToResponse extends AbstractPlugin
         }
         $query->setLimitPage($pageNumber, $perPage);
 
-        $hasFacets = !empty($searchPageSettings['facet']['facets']);
+        $hasFacets = !empty($searchConfigSettings['facet']['facets']);
         if ($hasFacets) {
             // Set the settings.
             // TODO Set all the settings of the form one time (move process into Query, and other keys).
-            $query->addFacetFields(array_keys($searchPageSettings['facet']['facets']));
-            if (!empty($searchPageSettings['facet']['limit'])) {
-                $query->setFacetLimit((int) $searchPageSettings['facet']['limit']);
+            $query->addFacetFields(array_keys($searchConfigSettings['facet']['facets']));
+            if (!empty($searchConfigSettings['facet']['limit'])) {
+                $query->setFacetLimit((int) $searchConfigSettings['facet']['limit']);
             }
-            if (!empty($searchPageSettings['facet']['order'])) {
-                $query->setFacetOrder($searchPageSettings['facet']['order']);
+            if (!empty($searchConfigSettings['facet']['order'])) {
+                $query->setFacetOrder($searchConfigSettings['facet']['order']);
             }
-            if (!empty($searchPageSettings['facet']['languages'])) {
-                $query->setFacetLanguages($searchPageSettings['facet']['languages']);
+            if (!empty($searchConfigSettings['facet']['languages'])) {
+                $query->setFacetLanguages($searchConfigSettings['facet']['languages']);
             }
 
             // Set the request for active facets.
@@ -155,7 +155,7 @@ class SearchRequestToResponse extends AbstractPlugin
             'request' => $request,
             'query' => $query,
         ]);
-        $eventManager->triggerEvent(new Event('search.query.pre', $searchPage, $eventArgs));
+        $eventManager->triggerEvent(new Event('search.query.pre', $searchConfig, $eventArgs));
         $query = $eventArgs['query'];
 
         // Send the query to the search engine.
@@ -178,7 +178,7 @@ class SearchRequestToResponse extends AbstractPlugin
         if ($hasFacets) {
             $facetCounts = $response->getFacetCounts();
             // Order facet according to settings of the search page.
-            $facetCounts = array_intersect_key($facetCounts, $searchPageSettings['facet']['facets']);
+            $facetCounts = array_intersect_key($facetCounts, $searchConfigSettings['facet']['facets']);
             $response->setFacetCounts($facetCounts);
         }
 
@@ -260,7 +260,7 @@ class SearchRequestToResponse extends AbstractPlugin
      */
     protected function getSortOptions(): array
     {
-        $sortFieldsSettings = $this->searchPage->subSetting('sort', 'fields', []);
+        $sortFieldsSettings = $this->searchConfig->subSetting('sort', 'fields', []);
         if (empty($sortFieldsSettings)) {
             return [];
         }

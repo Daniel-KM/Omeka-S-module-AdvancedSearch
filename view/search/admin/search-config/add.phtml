@@ -1,7 +1,7 @@
 <?php
 /*
- * Copyright BibLibre, 2016-2017
- * Copyright Daniel Berthereau, 2017-2021
+ * Copyright BibLibre, 2016
+ * Copyright Daniel Berthereau, 2017-2018
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -29,32 +29,20 @@
 
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
- * @var \Search\Api\Representation\SearchPageRepresentation $searchPage
- * @var \Search\Form\Admin\SearchPageConfigureForm $form
+ * @var \Search\Form\Admin\SearchConfigForm $form
  */
 
 $translate = $this->plugin('translate');
-$assetUrl = $this->plugin('assetUrl');
-
-$this->headLink()
-    ->appendStylesheet($assetUrl('css/search-page-configure.css', 'Search'));
-$this->headScript()
-    ->appendFile($assetUrl('js/search-admin.js', 'Search'), 'text/javascript', ['defer' => 'defer']);
-;
-
-$index = $searchPage->index();
-$adapter = $index ? $index->adapter() : null;
-if (empty($adapter)) {
-    return;
-}
-
 $form->prepare();
 ?>
 
-<?= $this->pageTitle(sprintf($translate('Search page "%1$s" (%2$s)'), $searchPage->name(), $searchPage->path())) ?>
+<?= $this->pageTitle($translate('Add search page')) ?>
 
+<?= $this->form()->openTag($form) ?>
 <div id="page-actions">
-    <button form="search-form-configure"><?= $translate('Save configuration') ?></button>
+    <button><?= $translate('Add and configure') ?></button>
 </div>
-
-<?= $this->form($form) ?>
+<?= $this->formCollection($form, false) ?>
+<?php $this->trigger('view.add.form.after'); ?>
+<?= $this->form()->closeTag() ?>
+<?php $this->trigger('view.add.after'); ?>

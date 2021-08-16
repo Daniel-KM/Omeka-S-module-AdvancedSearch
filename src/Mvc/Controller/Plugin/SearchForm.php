@@ -2,7 +2,7 @@
 namespace AdvancedSearch\Mvc\Controller\Plugin;
 
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
-use AdvancedSearch\Api\Representation\SearchPageRepresentation;
+use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use AdvancedSearch\View\Helper\SearchForm as SearchFormHelper;
 
 class SearchForm extends AbstractPlugin
@@ -21,12 +21,12 @@ class SearchForm extends AbstractPlugin
     }
 
     /**
-     * @param SearchPageRepresentation|null $searchPage
+     * @param SearchConfigRepresentation|null $searchConfig
      * @return \Laminas\Form\Form;
      */
-    public function __invoke(SearchPageRepresentation $searchPage = null)
+    public function __invoke(SearchConfigRepresentation $searchConfig = null)
     {
         $searchForm = $this->searchFormHelper;
-        return $searchForm($searchPage)->getForm();
+        return $searchForm($searchConfig)->getForm();
     }
 }

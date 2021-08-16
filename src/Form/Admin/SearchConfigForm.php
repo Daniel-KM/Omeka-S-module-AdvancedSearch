@@ -35,7 +35,7 @@ use Laminas\Form\Form;
 use Omeka\Api\Manager as ApiManager;
 use Omeka\Form\Element\SiteSelect;
 
-class SearchPageForm extends Form
+class SearchConfigForm extends Form
 {
     /**
      * @var ApiManager

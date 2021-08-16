@@ -19,16 +19,16 @@ class SettingsFieldset extends Fieldset
 
     public function init(): void
     {
-        /** @var \Search\Api\Representation\SearchPageRepresentation[] $pages */
-        $pages = $this->api->search('search_pages')->getContent();
+        /** @var \Search\Api\Representation\SearchConfigRepresentation[] $pages */
+        $pages = $this->api->search('search_configs')->getContent();
 
         $valueOptions = [];
         $apiOptions = [];
         foreach ($pages as $page) {
-            $labelSearchPage = sprintf('%s (/%s)', $page->name(), $page->path());
-            $valueOptions[$page->id()] = $labelSearchPage;
+            $labelSearchConfig = sprintf('%s (/%s)', $page->name(), $page->path());
+            $valueOptions[$page->id()] = $labelSearchConfig;
             if ($page->formAdapter() instanceof \Search\FormAdapter\ApiFormAdapter) {
-                $apiOptions[$page->id()] = $labelSearchPage;
+                $apiOptions[$page->id()] = $labelSearchConfig;
             }
         }
 
@@ -63,14 +63,14 @@ class SettingsFieldset extends Fieldset
         ]);
 
         $this->add([
-            'name' => 'search_pages',
+            'name' => 'search_configs',
             'type' => OptionalMultiCheckbox::class,
             'options' => [
                 'label' => 'Available search pages', // @translate
                 'value_options' => $valueOptions,
             ],
             'attributes' => [
-                'id' => 'search_pages',
+                'id' => 'search_configs',
             ],
         ]);
 

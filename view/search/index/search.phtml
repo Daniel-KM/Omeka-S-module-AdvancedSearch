@@ -30,7 +30,7 @@
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var \Omeka\Api\Representation\SiteRepresentation $site
- * @var \Search\Api\Representation\SearchPageRepresentation $searchPage
+ * @var \Search\Api\Representation\SearchConfigRepresentation $searchConfig
  * @var \Search\Query $query
  * @var \Search\Response $response
  * For block layout:
@@ -59,7 +59,7 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javas
 ?>
 
 <?php if (empty($isPartial)): ?>
-<div id="search-page">
+<div id="search-config">
 <?php endif; ?>
 
 <?php if ($itemSet): ?>
@@ -67,7 +67,7 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javas
     <?php
     $vars->offsetSet('itemSet', $itemSet);
     $vars->offsetSet('resourceType', 'item_sets'); // TODO Check if really needed.
-    $this->htmlElement('body')->appendAttribute('class', 'search-page item-set resource browse');
+    $this->htmlElement('body')->appendAttribute('class', 'search-config item-set resource browse');
     ?>
     <?= $this->pageTitle($itemSet->displayTitle(), 2) ?>
     <h3><?= $translate('Item set') ?></h3>
@@ -80,12 +80,12 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javas
 
 <?php else: ?>
 
-    <?php $this->htmlElement('body')->appendAttribute('class', 'search-page resource browse'); ?>
+    <?php $this->htmlElement('body')->appendAttribute('class', 'search-config resource browse'); ?>
     <?= $this->pageTitle($translate('Search'), 2) ?>
 
 <?php endif; ?>
 
-<?= $this->searchForm($searchPage, null, $skipFormAction) ?>
+<?= $this->searchForm($searchConfig, null, $skipFormAction) ?>
 
 <?php if (isset($response)): ?>
 <div class="search-results-wrapper">
@@ -93,7 +93,7 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javas
 
         <?php if ($response->getTotalResults()): ?>
             <?= $partial('search/results-header', [
-                'searchPage' => $searchPage,
+                'searchConfig' => $searchConfig,
                 'query' => $query,
                 'response' => $response,
             ]) ?>
@@ -115,7 +115,7 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javas
             ]) ?>
 
             <?= $partial('search/results-footer', [
-                'searchPage' => $searchPage,
+                'searchConfig' => $searchConfig,
                 'query' => $query,
                 'response' => $response,
             ]) ?>
@@ -137,7 +137,7 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javas
     </div>
 
     <?= $partial('search/facets', [
-        'searchPage' => $searchPage,
+        'searchConfig' => $searchConfig,
         'query' => $query,
         'response' => $response,
         'itemSet' => $itemSet,

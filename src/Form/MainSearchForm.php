@@ -77,10 +77,10 @@ class MainSearchForm extends Form
             }
         }
 
-        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
-        $searchPage = $this->getOption('search_page');
+        /** @var \Search\Api\Representation\SearchConfigRepresentation $searchConfig */
+        $searchConfig = $this->getOption('search_config');
         // TODO Throw exception when search page is not set.
-        $searchPageSettings = $searchPage ? $searchPage->settings() : [];
+        $searchConfigSettings = $searchConfig ? $searchConfig->settings() : [];
 
         $defaultFieldsOrder = [
             'q',
@@ -90,11 +90,11 @@ class MainSearchForm extends Form
             'text',
             'submit',
         ];
-        if (empty($searchPageSettings['form']['fields_order'])) {
+        if (empty($searchConfigSettings['form']['fields_order'])) {
             $fieldsOrder = $defaultFieldsOrder;
         } else {
             // Set the required fields.
-            $fieldsOrder = array_unique(array_merge(array_values($searchPageSettings['form']['fields_order']) + ['q', 'submit']));
+            $fieldsOrder = array_unique(array_merge(array_values($searchConfigSettings['form']['fields_order']) + ['q', 'submit']));
             // Replace "filters" that is a sub-fieldset of "text".
             $index = array_search('filters', $fieldsOrder);
             if ($index !== false) {
@@ -115,46 +115,46 @@ class MainSearchForm extends Form
             ])
         ;
 
-        if (!empty($searchPageSettings['autosuggest']['enable'])) {
-            $autoSuggestUrl = empty($searchPageSettings['autosuggest']['url'])
+        if (!empty($searchConfigSettings['autosuggest']['enable'])) {
+            $autoSuggestUrl = empty($searchConfigSettings['autosuggest']['url'])
                 // TODO Use url helper.
-                ? $this->basePath . ($this->site ? '/s/' . $this->site->slug() : '/admin') . '/' . ($searchPage ? $searchPage->path() : 'search') . '/suggest'
-                : $searchPageSettings['autosuggest']['url'];
+                ? $this->basePath . ($this->site ? '/s/' . $this->site->slug() : '/admin') . '/' . ($searchConfig ? $searchConfig->path() : 'search') . '/suggest'
+                : $searchConfigSettings['autosuggest']['url'];
             $elementQ = $this->get('q')
                 ->setAttribute('class', 'autosuggest')
                 ->setAttribute('data-autosuggest-url', $autoSuggestUrl);
-            if (!empty($searchPageSettings['autosuggest']['url_param_name'])) {
+            if (!empty($searchConfigSettings['autosuggest']['url_param_name'])) {
                 $elementQ
-                    ->setAttribute('data-autosuggest-param-name', $searchPageSettings['autosuggest']['url_param_name']);
+                    ->setAttribute('data-autosuggest-param-name', $searchConfigSettings['autosuggest']['url_param_name']);
             }
         }
 
-        $appendItemSetFieldset = !empty($searchPageSettings['form']['item_set_filter_type'])
-            && !empty($searchPageSettings['form']['item_set_id_field']);
+        $appendItemSetFieldset = !empty($searchConfigSettings['form']['item_set_filter_type'])
+            && !empty($searchConfigSettings['form']['item_set_id_field']);
         if ($appendItemSetFieldset) {
             $this
-                ->add($this->itemSetFieldset($searchPageSettings['form']['item_set_filter_type']));
+                ->add($this->itemSetFieldset($searchConfigSettings['form']['item_set_filter_type']));
         }
 
-        $appendResourceClassFieldset = !empty($searchPageSettings['form']['resource_class_filter_type'])
-            && !empty($searchPageSettings['form']['resource_class_id_field']);
+        $appendResourceClassFieldset = !empty($searchConfigSettings['form']['resource_class_filter_type'])
+            && !empty($searchConfigSettings['form']['resource_class_id_field']);
         if ($appendResourceClassFieldset) {
             $this
-                ->add($this->resourceClassFieldset($searchPageSettings['form']['resource_class_filter_type']));
+                ->add($this->resourceClassFieldset($searchConfigSettings['form']['resource_class_filter_type']));
         }
 
-        $appendResourceTemplateFieldset = !empty($searchPageSettings['form']['resource_template_filter_type'])
-            && !empty($searchPageSettings['form']['resource_template_id_field']);
+        $appendResourceTemplateFieldset = !empty($searchConfigSettings['form']['resource_template_filter_type'])
+            && !empty($searchConfigSettings['form']['resource_template_id_field']);
         if ($appendResourceTemplateFieldset) {
             $this
                 ->add($this->resourceTemplateFieldset());
         }
 
-        $appendTextFieldset = !empty($searchPageSettings['form']['filters_max_number'])
-            && !empty($searchPageSettings['form']['filters']);
+        $appendTextFieldset = !empty($searchConfigSettings['form']['filters_max_number'])
+            && !empty($searchConfigSettings['form']['filters']);
         if ($appendTextFieldset) {
             $this
-                ->add($this->textFieldset($searchPageSettings['form']['filters_max_number']));
+                ->add($this->textFieldset($searchConfigSettings['form']['filters_max_number']));
         }
 
         $this->appendSpecificFields();

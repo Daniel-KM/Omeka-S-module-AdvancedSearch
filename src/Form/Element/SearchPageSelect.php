@@ -4,18 +4,18 @@ namespace AdvancedSearch\Form\Element;
 
 use Laminas\Form\Element\Select;
 
-class SearchPageSelect extends Select
+class SearchConfigSelect extends Select
 {
     protected $apiManager;
 
     public function getValueOptions()
     {
-        $response = $this->getApiManager()->search('search_pages');
-        $searchPages = $response->getContent();
+        $response = $this->getApiManager()->search('search_configs');
+        $searchConfigs = $response->getContent();
 
         $options = [];
-        foreach ($searchPages as $searchPage) {
-            $options[$searchPage->id()] = $searchPage->name();
+        foreach ($searchConfigs as $searchConfig) {
+            $options[$searchConfig->id()] = $searchConfig->name();
         }
 
         return $options;

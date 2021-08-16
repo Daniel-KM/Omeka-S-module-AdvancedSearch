@@ -37,9 +37,9 @@ $translate = $this->plugin('translate');
 $escape = $this->plugin('escapeHtml');
 
 $label = $data['label'] ?? null;
-$searchPageId = $data['search_page_id'] ?? null;
+$searchConfigId = $data['search_config_id'] ?? null;
 
-$searchPages = $this->api()->search('search_pages')->getContent();
+$searchConfigs = $this->api()->search('search_configs')->getContent();
 ?>
 
 <label><?php $translate('Type'); ?>
@@ -50,11 +50,11 @@ $searchPages = $this->api()->search('search_pages')->getContent();
 </label>
 <label>
     <?php echo $translate('Page'); ?>
-    <select data-name="search_page_id">
-        <?php foreach ($searchPages as $searchPage): ?>
-            <?php $selected = $searchPageId && $searchPageId == $searchPage->id(); ?>
-            <option value="<?php echo $searchPage->id(); ?>" <?php echo ($selected) ? 'selected="selected"' : ''; ?>>
-                <?php echo $searchPage->name(); ?>
+    <select data-name="search_config_id">
+        <?php foreach ($searchConfigs as $searchConfig): ?>
+            <?php $selected = $searchConfigId && $searchConfigId == $searchConfig->id(); ?>
+            <option value="<?php echo $searchConfig->id(); ?>" <?php echo ($selected) ? 'selected="selected"' : ''; ?>>
+                <?php echo $searchConfig->name(); ?>
             </option>
         <?php endforeach; ?>
     </select>

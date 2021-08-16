@@ -9,7 +9,7 @@ use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Entity\SitePageBlock;
 use Omeka\Site\BlockLayout\AbstractBlockLayout;
 use Omeka\Stdlib\ErrorStore;
-use AdvancedSearch\Api\Representation\SearchPageRepresentation;
+use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use AdvancedSearch\Response;
 
 class SearchingForm extends AbstractBlockLayout
@@ -59,20 +59,20 @@ class SearchingForm extends AbstractBlockLayout
 
     public function render(PhpRenderer $view, SitePageBlockRepresentation $block)
     {
-        /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
-        $searchPage = $block->dataValue('search_page');
-        if ($searchPage) {
+        /** @var \Search\Api\Representation\SearchConfigRepresentation $searchConfig */
+        $searchConfig = $block->dataValue('search_config');
+        if ($searchConfig) {
             try {
-                $searchPage = $view->api()->read('search_pages', ['id' => $searchPage])->getContent();
+                $searchConfig = $view->api()->read('search_configs', ['id' => $searchConfig])->getContent();
             } catch (\Omeka\Api\Exception\NotFoundException $e) {
                 $view->logger()->err($e->getMessage());
                 return '';
             }
-            $available = $view->siteSetting('search_pages');
-            if (!in_array($searchPage->id(), $available)) {
+            $available = $view->siteSetting('search_configs');
+            if (!in_array($searchConfig->id(), $available)) {
                 $message = new \Omeka\Stdlib\Message(
                     'The search page #%d is not available for the site %s.', // @translate
-                    $searchPage->id(), $block->page()->site()->slug()
+                    $searchConfig->id(), $block->page()->site()->slug()
                 );
                 $view->logger()->err($message);
                 return '';
@@ -80,7 +80,7 @@ class SearchingForm extends AbstractBlockLayout
         }
 
         /** @var \Laminas\Form\Form $form */
-        $form = $view->searchForm($searchPage)->getForm();
+        $form = $view->searchForm($searchConfig)->getForm();
         if (!$form) {
             return '';
         }
@@ -91,7 +91,7 @@ class SearchingForm extends AbstractBlockLayout
         $vars = [
             'heading' => $block->dataValue('heading', ''),
             'displayResults' => $displayResults,
-            'searchPage' => $searchPage,
+            'searchConfig' => $searchConfig,
             'site' => $site,
             'query' => null,
             'response' => new Response,
@@ -112,12 +112,12 @@ class SearchingForm extends AbstractBlockLayout
             $request = array_filter($request);
             if ($request) {
                 $request += $filterQuery;
-                $request = $this->validateSearchRequest($searchPage, $form, $request) ?: $query;
+                $request = $this->validateSearchRequest($searchConfig, $form, $request) ?: $query;
             } else {
                 $request = $query;
             }
 
-            $result = $view->searchRequestToResponse($request, $searchPage, $site);
+            $result = $view->searchRequestToResponse($request, $searchConfig, $site);
             if ($result['status'] === 'success') {
                 $vars = array_replace($vars, $result['data']);
             } elseif ($result['status'] === 'error') {
@@ -137,13 +137,13 @@ class SearchingForm extends AbstractBlockLayout
      *
      * @todo Factorize with \Search\Controller\IndexController::getSearchRequest()
      *
-     * @param SearchPageRepresentation $searchPage
+     * @param SearchConfigRepresentation $searchConfig
      * @param \Laminas\Form\Form $searchForm
      * @param array $request
      * @return array|bool
      */
     protected function validateSearchRequest(
-        SearchPageRepresentation $searchPage,
+        SearchConfigRepresentation $searchConfig,
         \Laminas\Form\Form $form,
         array $request
     ) {

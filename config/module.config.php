@@ -6,7 +6,7 @@ return [
     'api_adapters' => [
         'invokables' => [
             'search_engines' => Api\Adapter\SearchEngineAdapter::class,
-            'search_pages' => Api\Adapter\SearchPageAdapter::class,
+            'search_configs' => Api\Adapter\SearchConfigAdapter::class,
         ],
     ],
     'entity_manager' => [
@@ -63,10 +63,10 @@ return [
             Form\Admin\ApiFormConfigFieldset::class => Service\Form\ApiFormConfigFieldsetFactory::class,
             Form\Admin\SearchEngineConfigureForm::class => Service\Form\SearchEngineConfigureFormFactory::class,
             Form\Admin\SearchEngineForm::class => Service\Form\SearchEngineFormFactory::class,
-            Form\Admin\SearchPageConfigureForm::class => Service\Form\SearchPageConfigureFormFactory::class,
-            Form\Admin\SearchPageForm::class => Service\Form\SearchPageFormFactory::class,
+            Form\Admin\SearchConfigConfigureForm::class => Service\Form\SearchConfigConfigureFormFactory::class,
+            Form\Admin\SearchConfigForm::class => Service\Form\SearchConfigFormFactory::class,
             Form\Element\MediaTypeSelect::class => Service\Form\Element\MediaTypeSelectFactory::class,
-            Form\Element\SearchPageSelect::class => Service\Form\Element\SearchPageSelectFactory::class,
+            Form\Element\SearchConfigSelect::class => Service\Form\Element\SearchConfigSelectFactory::class,
             Form\FilterFieldset::class => Service\Form\FilterFieldsetFactory::class,
             Form\MainSearchForm::class => Service\Form\MainSearchFormFactory::class,
             Form\SearchingFormFieldset::class => Service\Form\SearchingFormFieldsetFactory::class,
@@ -81,7 +81,7 @@ return [
         ],
         'factories' => [
             Controller\Admin\SearchEngineController::class => Service\Controller\Admin\SearchEngineControllerFactory::class,
-            Controller\Admin\SearchPageController::class => Service\Controller\Admin\SearchPageControllerFactory::class,
+            Controller\Admin\SearchConfigController::class => Service\Controller\Admin\SearchConfigControllerFactory::class,
         ],
     ],
     'controller_plugins' => [
@@ -123,7 +123,7 @@ return [
     ],
     'navigation_links' => [
         'invokables' => [
-            'search-page' => Site\Navigation\Link\SearchPage::class,
+            'search-config' => Site\Navigation\Link\SearchConfig::class,
         ],
     ],
     'router' => [
@@ -179,7 +179,7 @@ return [
                                     ],
                                     'defaults' => [
                                         '__NAMESPACE__' => 'Search\Controller\Admin',
-                                        'controller' => Controller\Admin\SearchPageController::class,
+                                        'controller' => Controller\Admin\SearchConfigController::class,
                                     ],
                                 ],
                             ],
@@ -193,7 +193,7 @@ return [
                                     ],
                                     'defaults' => [
                                         '__NAMESPACE__' => 'Search\Controller\Admin',
-                                        'controller' => Controller\Admin\SearchPageController::class,
+                                        'controller' => Controller\Admin\SearchConfigController::class,
                                         'action' => 'show',
                                     ],
                                 ],
@@ -240,7 +240,7 @@ return [
         'settings' => [
             'advancedsearchplus_restrict_used_terms' => true,
             'search_main_page' => 1,
-            'search_pages' => [1],
+            'search_configs' => [1],
             'search_api_page' => '',
             'search_batch_size' => 100,
         ],
@@ -258,13 +258,13 @@ return [
                 'common/numeric-data-types-advanced-search',
             ],
             'search_main_page' => null,
-            'search_pages' => [],
+            'search_configs' => [],
             'search_redirect_itemset' => true,
         ],
         'block_settings' => [
             'searchingForm' => [
                 'heading' => '',
-                'search_page' => null,
+                'search_config' => null,
                 'display_results' => false,
                 'query' => '',
                 'query_filter' => '',

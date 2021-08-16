@@ -7,7 +7,7 @@ use OmekaTestHelper\Controller\OmekaControllerTestCase;
 abstract class SearchControllerTestCase extends OmekaControllerTestCase
 {
     protected $searchEngine;
-    protected $searchPage;
+    protected $searchConfig;
 
     public function setUp(): void
     {
@@ -28,7 +28,7 @@ abstract class SearchControllerTestCase extends OmekaControllerTestCase
             ],
         ]);
         $searchEngine = $response->getContent();
-        $response = $this->api()->create('search_pages', [
+        $response = $this->api()->create('search_configs', [
             'o:name' => 'TestPage',
             'o:path' => 'test/search',
             'o:index_id' => $searchEngine->id(),
@@ -38,15 +38,15 @@ abstract class SearchControllerTestCase extends OmekaControllerTestCase
                 'sort_fields' => [],
             ],
         ]);
-        $searchPage = $response->getContent();
+        $searchConfig = $response->getContent();
 
         $this->searchEngine = $searchEngine;
-        $this->searchPage = $searchPage;
+        $this->searchConfig = $searchConfig;
     }
 
     public function tearDown(): void
     {
-        $this->api()->delete('search_pages', $this->searchPage->id());
+        $this->api()->delete('search_configs', $this->searchConfig->id());
         $this->api()->delete('search_engines', $this->searchEngine->id());
     }
 

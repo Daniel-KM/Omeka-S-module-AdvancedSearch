@@ -16,7 +16,7 @@ class SearchingFormFieldset extends Fieldset
 
     public function init(): void
     {
-        $searchPages = $this->searchPages();
+        $searchConfigs = $this->searchConfigs();
 
         $this
             ->add([
@@ -31,15 +31,15 @@ class SearchingFormFieldset extends Fieldset
                 ],
             ])
             ->add([
-                'name' => 'o:block[__blockIndex__][o:data][search_page]',
+                'name' => 'o:block[__blockIndex__][o:data][search_config]',
                 'type' => Element\Select::class,
                 'options' => [
                     'label' => 'Search page', // @translate
                     'info' => 'The request below will be checked against the matching form below. Keys unknown by the form will be removed.', // @translate
-                    'value_options' => $searchPages,
+                    'value_options' => $searchConfigs,
                 ],
                 'attributes' => [
-                    'id' => 'searching-form-search-page',
+                    'id' => 'searching-form-search-config',
                     'required' => true,
                 ],
             ])
@@ -96,18 +96,18 @@ class SearchingFormFieldset extends Fieldset
         }
     }
 
-    protected function searchPages()
+    protected function searchConfigs()
     {
-        /** @var \Search\Api\Representation\SearchPageRepresentation[] $pages */
-        $searchPages = $this->api->search('search_pages')->getContent();
+        /** @var \Search\Api\Representation\SearchConfigRepresentation[] $pages */
+        $searchConfigs = $this->api->search('search_configs')->getContent();
 
         $pages = [];
-        foreach ($searchPages as $searchPage) {
-            $pages[$searchPage->id()] = sprintf('%s (/%s)', $searchPage->name(), $searchPage->path());
+        foreach ($searchConfigs as $searchConfig) {
+            $pages[$searchConfig->id()] = sprintf('%s (/%s)', $searchConfig->name(), $searchConfig->path());
         }
 
         $siteSetting = $this->siteSetting;
-        $available = $siteSetting('search_pages', []);
+        $available = $siteSetting('search_configs', []);
         $pages = array_intersect_key($pages, array_flip($available));
 
         // Set the main search page as default.

@@ -33,11 +33,11 @@ use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Site\Navigation\Link\LinkInterface;
 use Omeka\Stdlib\ErrorStore;
 
-class SearchPage implements LinkInterface
+class SearchConfig implements LinkInterface
 {
     public function getName()
     {
-        return 'Search';
+        return 'Advanced search page';
     }
 
     public function getLabel(array $data, SiteRepresentation $site)
@@ -51,7 +51,7 @@ class SearchPage implements LinkInterface
             $errorStore->addError('o:navigation', 'Invalid navigation: browse link missing label'); // @translate
             return false;
         }
-        if (!isset($data['search_page_id'])) {
+        if (!isset($data['search_config_id'])) {
             $errorStore->addError('o:navigation', 'Invalid navigation: browse link missing search page id'); // @translate
             return false;
         }
@@ -60,14 +60,14 @@ class SearchPage implements LinkInterface
 
     public function getFormTemplate()
     {
-        return 'search/navigation-link-form/search-page';
+        return 'search/navigation-link-form/search-config';
     }
 
     public function toZend(array $data, SiteRepresentation $site)
     {
         $api = $site->getServiceLocator()->get('Omeka\ApiManager');
         try {
-            $page = $api->read('search_pages', ['id' => $data['search_page_id']])->getContent();
+            $page = $api->read('search_configs', ['id' => $data['search_config_id']])->getContent();
         } catch (\Omeka\Api\Exception\NotFoundException $e) {
             return [
                 'type' => 'uri',
@@ -76,7 +76,7 @@ class SearchPage implements LinkInterface
         }
         return [
             'label' => $data['label'],
-            'route' => 'search-page-' . $page->id(),
+            'route' => 'search-config-' . $page->id(),
             'params' => [
                 'site-slug' => $site->slug(),
             ],
@@ -86,10 +86,10 @@ class SearchPage implements LinkInterface
     public function toJstree(array $data, SiteRepresentation $site)
     {
         $label = $data['label'] ?? $site->title();
-        $searchPageId = $data['search_page_id'] ?? null;
+        $searchConfigId = $data['search_config_id'] ?? null;
         return [
             'label' => $label,
-            'search_page_id' => $searchPageId,
+            'search_config_id' => $searchConfigId,
         ];
     }
 }

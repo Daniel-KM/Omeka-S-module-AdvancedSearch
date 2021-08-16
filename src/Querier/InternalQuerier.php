@@ -140,11 +140,13 @@ class InternalQuerier extends AbstractQuerier
             // 'resource_types' => $classes,
             'limit' => $this->query->getLimit(),
             'value_length' => mb_strlen($q),
+            'length' => $this->query->getSuggestOptions()['length'] ?? 50,
         ];
         $types = [
             // 'resource_types' => $connection::PARAM_STR_ARRAY,
             'limit' => \PDO::PARAM_INT,
             'value_length' => \PDO::PARAM_INT,
+            'length' => \PDO::PARAM_INT,
         ];
 
         $fields = $this->query->getSuggestFields();
@@ -162,7 +164,8 @@ class InternalQuerier extends AbstractQuerier
             $sqlFields = '';
         }
 
-        if ($this->query->getSuggestMode() === 'contain') {
+        $mode = $this->query->getSuggestOptions()['mode'] === 'contain' ? 'contain' : 'start';
+        if ($mode === 'contain') {
             // $bind['value'] = $q;
             // $bind['value_like'] = '%' . str_replace(['%', '_'], ['\%', '\_'], $q) . '%';
             return $this->response
@@ -170,17 +173,69 @@ class InternalQuerier extends AbstractQuerier
         } else {
             // Use keys "value" and "data" to get a well formatted output for
             // suggestions.
+            // The query cuts the value to the first space. The end of line is
+            // removed to avoid some strange results.
+            // The group by uses the same than the select, because suggester
+            // requires "value".
+/*
             $sql = <<<SQL
-SELECT
-    DISTINCT SUBSTRING(`value`.`value`, 1, LOCATE(" ", CONCAT(`value`.`value`, " "), :value_length)) AS "value",
-    COUNT(SUBSTRING(`value`.`value`, 1, LOCATE(" ", CONCAT(`value`.`value`, " "), :value_length))) as "data"
+SELECT DISTINCT
+    SUBSTRING(SUBSTRING_INDEX(
+        CONCAT(
+            TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")),
+        " "), " ", 1
+    ), 1, :length) AS "value",
+    COUNT(SUBSTRING(SUBSTRING_INDEX(
+        CONCAT(
+            TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")),
+        " "), " ", 1
+    ), 1, :length)) as "data"
+FROM `value` AS `value`
+INNER JOIN `resource` ON `resource`.`id` = `value`.`resource_id`
+WHERE `resource`.`resource_type` IN ("Omeka\\Entity\\Item", "Omeka\\Entity\\ItemSet")
+    AND `value`.`value` LIKE :value_like
+GROUP BY SUBSTRING(SUBSTRING_INDEX(
+        CONCAT(
+            TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")),
+        " "), " ", 1
+    ), 1, :length)
+ORDER BY data DESC
+LIMIT :limit
+;
+SQL;
+*/
+            $sql = <<<SQL
+SELECT DISTINCT
+    SUBSTRING(
+        SUBSTRING(
+            TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")),
+            1,
+            LOCATE(" ", CONCAT(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), " "), :value_length)
+        ), 1, :length
+    ) AS "value",
+    COUNT(
+        SUBSTRING(
+            SUBSTRING(
+                TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")),
+                1,
+                LOCATE(" ", CONCAT(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), " "), :value_length)
+            ), 1, :length
+        )
+    ) AS "data"
 FROM `value` AS `value`
 INNER JOIN `resource` ON `resource`.`id` = `value`.`resource_id`
 WHERE `resource`.`resource_type` IN ($inClasses)
     $sqlIsPublic
     $sqlFields
     AND `value`.`value` LIKE :value_like
-GROUP BY SUBSTRING(`value`.`value`, 1, LOCATE(" ", CONCAT(`value`.`value`, " "), :value_length))
+GROUP BY
+    SUBSTRING(
+        SUBSTRING(
+            TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")),
+            1,
+            LOCATE(" ", CONCAT(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), " "), :value_length)
+        ), 1, :length
+    )
 ORDER BY data DESC
 LIMIT :limit
 ;

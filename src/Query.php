@@ -114,9 +114,12 @@ class Query implements \JsonSerializable
     protected $excludedFields = [];
 
     /**
-     * @var string
+     * @var array
      */
-    protected $suggestMode = 'start';
+    protected $suggestOptions = [
+        'mode' => 'start',
+        'length' => 50,
+    ];
 
     /**
      * @var array
@@ -357,15 +360,20 @@ class Query implements \JsonSerializable
         return $this->excludedFields;
     }
 
-    public function setSuggestMode(string $suggestMode): self
+    /**
+     * Available options are (internal engine):
+     * - mode: "start" (default) or "contain"
+     * - length: max size of a string (50 default)
+     */
+    public function setSuggestOptions(array $suggestOptions): self
     {
-        $this->suggestMode = $suggestMode;
+        $this->suggestOptions = $suggestOptions;
         return $this;
     }
 
-    public function getSuggestMode(): string
+    public function getSuggestOptions(): array
     {
-        return $this->suggestMode;
+        return $this->suggestOptions;
     }
 
     public function setSuggestFields(array $suggestFields): self
@@ -408,7 +416,7 @@ class Query implements \JsonSerializable
             'facet_languages' => $this->getFacetLanguages(),
             'active_facets' => $this->getActiveFacets(),
             'excluded_fields' => $this->getExcludedFields(),
-            'suggest_mode' => $this->getSuggestMode(),
+            'suggest_options' => $this->getSuggestOptions(),
             'suggest_fields' => $this->getSuggestFields(),
             'site_id' => $this->getSiteId(),
         ];

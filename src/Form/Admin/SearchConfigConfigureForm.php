@@ -254,6 +254,20 @@ class SearchConfigConfigureForm extends Form
                 ],
             ])
             ->add([
+                'name' => 'length',
+                'type' => Element\Number::class,
+                'options' => [
+                    'label' => 'Max number of characters of a result', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'autosuggest_length',
+                    'required' => false,
+                    'value' => '50',
+                    'min' => '1',
+                    'max' => '190',
+                ],
+            ])
+            ->add([
                 'name' => 'fields',
                 'type' => OptionalSelect::class,
                 'options' => [

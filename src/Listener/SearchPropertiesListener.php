@@ -11,18 +11,18 @@ use Omeka\Api\Adapter\MediaAdapter;
 class SearchPropertiesListener
 {
     /**
-     * List of property ids by term.
+     * List of property ids by term and id.
      *
      * @var array
      */
-    protected $properties;
+    protected $propertiesByTermsAndIds;
 
     /**
-     * List of used property ids.
+     * List of used property ids by term and id.
      *
      * @var array
      */
-    protected $usedProperties;
+    protected $usedPropertiesByTerm;
 
     /**
      * The adapter that is requesting.
@@ -152,8 +152,8 @@ class SearchPropertiesListener
     /**
      * Build query on value.
      *
-     * Pseudo-override \Omeka\Api\Adapter\AbstractResourceEntityAdapter::buildPropertyQuery()
-     * via the api manager delegator.
+     * Pseudo-override buildPropertyQuery() via the api manager delegator.
+     * @see \Omeka\Api\Adapter\AbstractResourceEntityAdapter::buildPropertyQuery()
      *
      * Query format:
      *
@@ -203,8 +203,7 @@ class SearchPropertiesListener
             )) {
                 continue;
             }
-            $propertyId = $queryRow['property'];
-            $excludePropertyIds = $propertyId || empty($queryRow['except']) ? false : $queryRow['except'];
+
             $queryType = $queryRow['type'];
             $joiner = $queryRow['joiner'] ?? '';
             $value = $queryRow['text'] ?? '';
@@ -217,6 +216,12 @@ class SearchPropertiesListener
             ) {
                 continue;
             }
+
+            $propertyId = $queryRow['property'];
+            if ($propertyId) {
+                $propertyId = $this->getPropertyId($propertyId);
+            }
+            $excludePropertyIds = $queryRow['property'] || empty($queryRow['except']) ? false : $queryRow['except'];
 
             $valuesAlias = $this->adapter->createAlias();
             $positive = true;
@@ -341,17 +346,16 @@ class SearchPropertiesListener
             $joinConditions = [];
             // Narrow to specific property, if one is selected
             if ($propertyId) {
-                $propertyId = $this->getPropertyId($propertyId);
                 $joinConditions[] = $expr->eq("$valuesAlias.property", $propertyId);
             } elseif ($excludePropertyIds) {
                 $excludePropertyIds = is_array($excludePropertyIds)
-                    ? array_map([$this, 'getPropertyId'], $excludePropertyIds)
-                    : [$this->getPropertyId($excludePropertyIds)];
+                    ? $this->getPropertyIds($excludePropertyIds)
+                    : array_filter([$this->getPropertyId($excludePropertyIds)]);
                 // Use standard query if nothing to exclude, else limit search.
                 if (count($excludePropertyIds)) {
                     // The aim is to search anywhere except ocr content.
                     // Use not positive + in() or notIn()? A full list is simpler.
-                    $otherIds = array_diff($this->usedProperties, $excludePropertyIds);
+                    $otherIds = array_diff($this->usedPropertiesByTerm, $excludePropertyIds);
                     $joinConditions[] = $expr->in("$valuesAlias.property", $otherIds);
                 }
             }
@@ -960,13 +964,37 @@ class SearchPropertiesListener
     }
 
     /**
-     * Get a property id by JSON-LD term or by numeric id.
+     * Get property ids by JSON-LD terms or by numeric ids.
      *
-     * Prepare the list of properties and used properties too.
+     * @return int[]
      */
-    public function getPropertyId($termOrId): int
+    public function getPropertyIds(array $termOrIds): array
     {
-        if (is_null($this->properties)) {
+        if (is_null($this->propertiesByTermsAndIds)) {
+            $this->prepareProperties();
+        }
+        return array_values(array_intersect_key($this->propertiesByTermsAndIds, array_flip($termOrIds)));
+    }
+
+    /**
+     * Get property ids by JSON-LD terms or by numeric ids.
+     *
+     * @return int
+     */
+    public function getPropertyId($termOrId): ?int
+    {
+        if (is_null($this->propertiesByTermsAndIds)) {
+            $this->prepareProperties();
+        }
+        return $this->propertiesByTermsAndIds[$termOrId] ?? null;
+    }
+
+    /**
+     * Prepare the list of properties and used properties.
+     */
+    protected function prepareProperties(): void
+    {
+        if (is_null($this->propertiesByTermsAndIds)) {
             $connection = $this->adapter->getServiceLocator()->get('Omeka\Connection');
             $qb = $connection->createQueryBuilder();
             $qb
@@ -986,19 +1014,15 @@ class SearchPropertiesListener
             ;
             $stmt = $connection->executeQuery($qb);
             // Fetch by key pair is not supported by doctrine 2.0.
-            $this->properties = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            $this->properties = array_map('intval', array_column($this->properties, 'id', 'term'));
+            $properties = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $properties = array_map('intval', array_column($properties, 'id', 'term'));
+            $this->propertiesByTermsAndIds = array_replace($properties, array_combine($properties, $properties));
 
             $qb->innerJoin('property', 'value', 'value', 'property.id = value.property_id');
             $stmt = $connection->executeQuery($qb);
             // Fetch by key pair is not supported by doctrine 2.0.
-            $this->usedProperties = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            $this->usedProperties = array_map('intval', array_column($this->usedProperties, 'id', 'term'));
+            $properties = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $this->usedPropertiesByTerm = array_map('intval', array_column($properties, 'id', 'term'));
         }
-
-        return $this->properties[$termOrId]
-            ?? in_array($termOrId, $this->properties)
-                ? $termOrId
-                : 0;
     }
 }

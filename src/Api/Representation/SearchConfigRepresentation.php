@@ -46,14 +46,13 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
 
     public function getJsonLd()
     {
-        $entity = $this->resource;
         return [
-            'o:name' => $entity->getName(),
-            'o:path' => $entity->getPath(),
-            'o:index_id' => $entity->getIndex()->getId(),
-            'o:form' => $entity->getFormAdapter(),
-            'o:settings' => $entity->getSettings(),
-            'o:created' => $this->getDateTime($entity->getCreated()),
+            'o:name' => $this->resource->getName(),
+            'o:path' => $this->resource->getPath(),
+            'o:index_id' => $this->resource->getIndex()->getId(),
+            'o:form' => $this->resource->getFormAdapter(),
+            'o:settings' => $this->resource->getSettings(),
+            'o:created' => $this->getDateTime($this->resource->getCreated()),
         ];
     }
 

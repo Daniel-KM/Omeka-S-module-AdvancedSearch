@@ -43,12 +43,11 @@ class SearchEngineRepresentation extends AbstractEntityRepresentation
 
     public function getJsonLd()
     {
-        $entity = $this->resource;
         return [
-            'o:name' => $entity->getName(),
-            'o:adapter' => $entity->getAdapter(),
-            'o:settings' => $entity->getSettings(),
-            'o:created' => $this->getDateTime($entity->getCreated()),
+            'o:name' => $this->resource->getName(),
+            'o:adapter' => $this->resource->getAdapter(),
+            'o:settings' => $this->resource->getSettings(),
+            'o:created' => $this->getDateTime($this->resource->getCreated()),
         ];
     }
 

@@ -8,12 +8,8 @@ class SearchingForm extends AbstractHelper
 {
     /**
      * Display the search form if any, else display the standard form.
-     *
-     * @param string $searchFormPartial Specific partial for the search form.
-     * @param bool $skipFormAction
-     * @return string
      */
-    public function __invoke($searchFormPartial = null, $skipFormAction = false)
+    public function __invoke(?string $searchFormPartial = null, bool $skipFormAction = false): string
     {
         $view = $this->getView();
 

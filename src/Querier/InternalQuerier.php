@@ -128,7 +128,7 @@ class InternalQuerier extends AbstractQuerier
 
         // The bind is not working in a array, so use a direct string.
         $classes = array_intersect_key($resourceTypesToClasses, array_flip($this->resourceTypes));
-        $classes = '"' . implode('", "', $classes) . '"';
+        $inClasses = '"' . implode('", "', $classes) . '"';
 
         // TODO Manage site id and item set id and any other filter query.
         // TODO Use the full text search table.
@@ -176,7 +176,7 @@ SELECT
     COUNT(SUBSTRING(`value`.`value`, 1, LOCATE(" ", CONCAT(`value`.`value`, " "), :value_length))) as "data"
 FROM `value` AS `value`
 INNER JOIN `resource` ON `resource`.`id` = `value`.`resource_id`
-WHERE `resource`.`resource_type` IN ($classes)
+WHERE `resource`.`resource_type` IN ($inClasses)
     $sqlIsPublic
     $sqlFields
     AND `value`.`value` LIKE :value_like

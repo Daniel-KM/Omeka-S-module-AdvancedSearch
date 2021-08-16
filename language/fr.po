@@ -76,7 +76,7 @@ msgstr "Asc"
 msgid "Desc"
 msgstr "Desc"
 
-#: src/Api/Representation/SearchIndexRepresentation.php:140
+#: src/Api/Representation/SearchEngineRepresentation.php:140
 #, php-format
 msgid "[Missing adapter \"%s\"]"
 msgstr "[Adaptateur \"%s\" manquant]"
@@ -215,33 +215,33 @@ msgstr ""
 msgid "No search pages created yet."
 msgstr "Aucune page de recherche créée pour l'instant."
 
-#: view/search/admin/search-index/add.phtml:39
+#: view/search/admin/search-engine/add.phtml:39
 msgid "Add search index"
 msgstr "Ajouter un index de recherche"
 
-#: view/search/admin/search-index/add.phtml:43
+#: view/search/admin/search-engine/add.phtml:43
 #: view/search/admin/search-page/add.phtml:43
 msgid "Add and configure"
 msgstr "Ajouter et configurer"
 
-#: view/search/admin/search-index/edit.phtml:39
+#: view/search/admin/search-engine/edit.phtml:39
 msgid "Edit search index"
 msgstr "Modifier l’index de recherche"
 
-#: view/search/admin/search-index/index-confirm.phtml:16
+#: view/search/admin/search-engine/index-confirm.phtml:16
 msgid "Confirm reindex"
 msgstr "Confirmer la réindexation"
 
-#: view/search/admin/search-index/index-confirm.phtml:25
+#: view/search/admin/search-engine/index-confirm.phtml:25
 #, php-format
 msgid "Reindex \"%s\""
 msgstr "Réindexer \"%s\""
 
-#: view/search/admin/search-index/index-confirm.phtml:26
+#: view/search/admin/search-engine/index-confirm.phtml:26
 msgid "Are you sure you would like to reindex this index?"
 msgstr "Êtes-vous sûr de vouloir ré-indexer cet index ?"
 
-#: view/search/admin/search-index/index-confirm.phtml:28
+#: view/search/admin/search-engine/index-confirm.phtml:28
 msgid ""
 "All the indexes will be cleared first, so the search will be unavailable for "
 "a while."
@@ -249,13 +249,13 @@ msgstr ""
 "Tous les index seront supprimés et la recherche ne sera pas disponible "
 "pendant un moment."
 
-#: view/search/admin/search-index/index-confirm.phtml:29
+#: view/search/admin/search-engine/index-confirm.phtml:29
 msgid "You may redirect the users on a clone of the current index temporary."
 msgstr ""
 "Vous pouvez rediriger les utilisateurs sur un clone de l’index actuel "
 "temporairement."
 
-#: view/search/admin/search-index/index-confirm.phtml:32
+#: view/search/admin/search-engine/index-confirm.phtml:32
 msgid ""
 "You may prefer to keep existing indexes and to start the indexing at the "
 "following resource id."
@@ -263,30 +263,30 @@ msgstr ""
 "Vous pouvez conserver les index existants et commencer l’indexation à la "
 "ressource suivante."
 
-#: view/search/admin/search-index/index-confirm.phtml:33
+#: view/search/admin/search-engine/index-confirm.phtml:33
 msgid "Set \"1\" to reindex all resources without clearing the current index."
 msgstr ""
 "indiquez \"1\" pour ré-indexer toutes les ressources sans effacer l’index "
 "actuel."
 
-#: view/search/admin/search-index/index-confirm.phtml:37
+#: view/search/admin/search-engine/index-confirm.phtml:37
 msgid "You may want to limit the reindexing to a resource type."
 msgstr "Vous pouvez limiter l’indexation à un type de ressource."
 
-#: view/search/admin/search-index/index-confirm.phtml:44
+#: view/search/admin/search-engine/index-confirm.phtml:44
 #, php-format
 msgid "%d running indexings."
 msgstr "%d indexations en cours."
 
-#: view/search/admin/search-index/index-confirm.phtml:45
+#: view/search/admin/search-engine/index-confirm.phtml:45
 msgid "Force indexing"
 msgstr "Forcer la réindexation"
 
-#: view/search/admin/search-index/index-confirm.phtml:47
+#: view/search/admin/search-engine/index-confirm.phtml:47
 msgid "No running indexing: process can be launched."
 msgstr "Pas d’indexation en cours : la tâche peut être lancée."
 
-#: view/search/admin/search-index/index-confirm.phtml:53
+#: view/search/admin/search-engine/index-confirm.phtml:53
 msgid "This index has no resource type to index."
 msgstr ""
 
@@ -912,11 +912,11 @@ msgstr ""
 msgid "Display the count of each facet item"
 msgstr ""
 
-#: src/Form/Admin/SearchIndexForm.php:60
+#: src/Form/Admin/SearchEngineForm.php:60
 msgid "Select an adapter below…"
 msgstr ""
 
-#: src/Form/Admin/SearchIndexConfigureForm.php:62
+#: src/Form/Admin/SearchEngineConfigureForm.php:62
 msgid "Resources indexed"
 msgstr "Ressources indexées"
 
@@ -1134,8 +1134,8 @@ msgstr ""
 
 #: src/Controller/Admin/SearchPageController.php:203
 #: src/Controller/Admin/SearchPageController.php:316
-#: src/Controller/Admin/SearchIndexController.php:72
-#: src/Controller/Admin/SearchIndexController.php:128
+#: src/Controller/Admin/SearchEngineController.php:72
+#: src/Controller/Admin/SearchEngineController.php:128
 msgid "There was an error during validation"
 msgstr ""
 
@@ -1189,42 +1189,42 @@ msgstr ""
 msgid "The availability of pages of sites was let unmodified."
 msgstr ""
 
-#: src/Controller/Admin/SearchIndexController.php:78
+#: src/Controller/Admin/SearchEngineController.php:78
 #, php-format
 msgid "Search index \"%s\" created."
 msgstr "Index de recherche \"%s\" créé."
 
-#: src/Controller/Admin/SearchIndexController.php:96
+#: src/Controller/Admin/SearchEngineController.php:96
 #, php-format
 msgid "The adapter \"%s\" is not available."
 msgstr ""
 
-#: src/Controller/Admin/SearchIndexController.php:113
+#: src/Controller/Admin/SearchEngineController.php:113
 msgid "Adapter settings"
 msgstr "Paramètres de l’adaptateur"
 
-#: src/Controller/Admin/SearchIndexController.php:139
+#: src/Controller/Admin/SearchEngineController.php:139
 #, php-format
 msgid "Search index \"%s\" successfully configured."
 msgstr ""
 
-#: src/Controller/Admin/SearchIndexController.php:142
+#: src/Controller/Admin/SearchEngineController.php:142
 msgid "Don’t forget to run the indexation of the core."
 msgstr ""
 
-#: src/Controller/Admin/SearchIndexController.php:183
+#: src/Controller/Admin/SearchEngineController.php:183
 #, php-format
 msgid "Indexing of \"%1$s\" started in job %2$s#%3$d%4$s (%5$slogs%4$s)"
 msgstr ""
 "L'indexation de \"%1$s\" a commencé dans la tâche %2$s#%3$d%4$s (%5$slogs"
 "%4$s)"
 
-#: src/Controller/Admin/SearchIndexController.php:222
+#: src/Controller/Admin/SearchEngineController.php:222
 #, php-format
 msgid "Search index \"%s\" successfully deleted"
 msgstr ""
 
-#: src/Controller/Admin/SearchIndexController.php:227
+#: src/Controller/Admin/SearchEngineController.php:227
 #, php-format
 msgid "Search index \"%s\" could not be deleted"
 msgstr ""

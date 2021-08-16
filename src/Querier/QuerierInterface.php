@@ -32,7 +32,7 @@ namespace AdvancedSearch\Querier;
 
 use Laminas\Log\LoggerAwareInterface;
 use Laminas\ServiceManager\ServiceLocatorInterface;
-use AdvancedSearch\Api\Representation\SearchIndexRepresentation;
+use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
 use AdvancedSearch\Query;
 use AdvancedSearch\Response;
 
@@ -43,7 +43,7 @@ interface QuerierInterface extends LoggerAwareInterface
 {
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator): QuerierInterface;
 
-    public function setSearchIndex(SearchIndexRepresentation $index): QuerierInterface;
+    public function setSearchEngine(SearchEngineRepresentation $index): QuerierInterface;
 
     public function setQuery(Query $query): QuerierInterface;
 

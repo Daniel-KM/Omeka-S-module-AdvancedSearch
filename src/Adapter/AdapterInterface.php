@@ -31,7 +31,7 @@
 namespace AdvancedSearch\Adapter;
 
 use Laminas\ServiceManager\ServiceLocatorInterface;
-use AdvancedSearch\Api\Representation\SearchIndexRepresentation;
+use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
 
 interface AdapterInterface
 {
@@ -62,27 +62,27 @@ interface AdapterInterface
      *
      * The available fields are used for filters.
      *
-     * @param SearchIndexRepresentation $index
+     * @param SearchEngineRepresentation $index
      * @return array Associative array with field name as key and an array with
      * field name and field label as value.
      */
-    public function getAvailableFields(SearchIndexRepresentation $index): array;
+    public function getAvailableFields(SearchEngineRepresentation $index): array;
 
     /**
      * Get the available sort fields.
      *
-     * @param SearchIndexRepresentation $index
+     * @param SearchEngineRepresentation $index
      * @return array Associative array with sort name as key and an array with
      * sort name and sort label as value.
      */
-    public function getAvailableSortFields(SearchIndexRepresentation $index): array;
+    public function getAvailableSortFields(SearchEngineRepresentation $index): array;
 
     /**
      * Get the available facet fields.
      *
-     * @param SearchIndexRepresentation $index
+     * @param SearchEngineRepresentation $index
      * @return array Associative array with facet name as key and an array with
      * facet name and facet label as value.
      */
-    public function getAvailableFacetFields(SearchIndexRepresentation $index): array;
+    public function getAvailableFacetFields(SearchEngineRepresentation $index): array;
 }

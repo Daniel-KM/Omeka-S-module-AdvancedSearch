@@ -32,7 +32,7 @@ namespace AdvancedSearch\Indexer;
 
 use Laminas\Log\LoggerAwareTrait;
 use Laminas\ServiceManager\ServiceLocatorInterface;
-use AdvancedSearch\Api\Representation\SearchIndexRepresentation;
+use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
 
 abstract class AbstractIndexer implements IndexerInterface
 {
@@ -44,7 +44,7 @@ abstract class AbstractIndexer implements IndexerInterface
     protected $serviceLocator;
 
     /**
-     * @var SearchIndexRepresentation
+     * @var SearchEngineRepresentation
      */
     protected $index;
 
@@ -59,7 +59,7 @@ abstract class AbstractIndexer implements IndexerInterface
         return $this->serviceLocator;
     }
 
-    public function setSearchIndex(SearchIndexRepresentation $index): IndexerInterface
+    public function setSearchEngine(SearchEngineRepresentation $index): IndexerInterface
     {
         $this->index = $index;
         return $this;

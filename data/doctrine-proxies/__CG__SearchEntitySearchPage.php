@@ -238,7 +238,7 @@ class SearchPage extends \Search\Entity\SearchPage implements \Doctrine\ORM\Prox
     /**
      * {@inheritDoc}
      */
-    public function setIndex(\Search\Entity\SearchIndex $index)
+    public function setIndex(\Search\Entity\SearchEngine $index)
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setIndex', [$index]);

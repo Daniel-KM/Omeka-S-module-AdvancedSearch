@@ -34,11 +34,11 @@ use Omeka\Api\Representation\AbstractEntityRepresentation;
 use AdvancedSearch\Indexer\NoopIndexer;
 use AdvancedSearch\Querier\NoopQuerier;
 
-class SearchIndexRepresentation extends AbstractEntityRepresentation
+class SearchEngineRepresentation extends AbstractEntityRepresentation
 {
     public function getJsonLdType()
     {
-        return 'o:SearchIndex';
+        return 'o:SearchEngine';
     }
 
     public function getJsonLd()
@@ -127,7 +127,7 @@ class SearchIndexRepresentation extends AbstractEntityRepresentation
         return $this->resource->getCreated();
     }
 
-    public function getEntity(): \Search\Entity\SearchIndex
+    public function getEntity(): \Search\Entity\SearchEngine
     {
         return $this->resource;
     }
@@ -161,7 +161,7 @@ class SearchIndexRepresentation extends AbstractEntityRepresentation
         $indexer = new $indexerClass;
         return $indexer
             ->setServiceLocator($services)
-            ->setSearchIndex($this)
+            ->setSearchEngine($this)
             ->setLogger($services->get('Omeka\Logger'));
     }
 
@@ -182,7 +182,7 @@ class SearchIndexRepresentation extends AbstractEntityRepresentation
         $querier = new $querierClass;
         return $querier
             ->setServiceLocator($services)
-            ->setSearchIndex($this)
+            ->setSearchEngine($this)
             ->setLogger($services->get('Omeka\Logger'));
     }
 }

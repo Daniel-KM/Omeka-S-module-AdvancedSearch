@@ -7,7 +7,7 @@ use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Stdlib\Message;
 use Omeka\Stdlib\Paginator;
-use AdvancedSearch\Api\Representation\SearchIndexRepresentation;
+use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
 use AdvancedSearch\Api\Representation\SearchPageRepresentation;
 use AdvancedSearch\Querier\Exception\QuerierException;
 
@@ -23,9 +23,9 @@ class SearchRequestToResponse extends AbstractPlugin
     protected $searchPage;
 
     /**
-     * @var SearchIndexRepresentation
+     * @var SearchEngineRepresentation
      */
-    protected $searchIndex;
+    protected $searchEngine;
 
     /**
      * Get response from a search request.
@@ -69,8 +69,8 @@ class SearchRequestToResponse extends AbstractPlugin
 
         // Add global parameters.
 
-        $this->searchIndex = $searchPage->index();
-        $indexSettings = $this->searchIndex->settings();
+        $this->searchEngine = $searchPage->index();
+        $indexSettings = $this->searchEngine->settings();
 
         $user = $controller->identity();
         // TODO Manage roles from modules and visibility from modules (access resources).
@@ -161,7 +161,7 @@ class SearchRequestToResponse extends AbstractPlugin
         // Send the query to the search engine.
 
         /** @var \Search\Querier\QuerierInterface $querier */
-        $querier = $this->searchIndex
+        $querier = $this->searchEngine
             ->querier()
             ->setQuery($query);
         try {
@@ -264,11 +264,11 @@ class SearchRequestToResponse extends AbstractPlugin
         if (empty($sortFieldsSettings)) {
             return [];
         }
-        $indexAdapter = $this->searchIndex->adapter();
+        $indexAdapter = $this->searchEngine->adapter();
         if (empty($indexAdapter)) {
             return [];
         }
-        $availableSortFields = $indexAdapter->getAvailableSortFields($this->searchIndex);
+        $availableSortFields = $indexAdapter->getAvailableSortFields($this->searchEngine);
         return array_intersect_key($sortFieldsSettings, $availableSortFields);
     }
 }

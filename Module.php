@@ -228,79 +228,79 @@ class Module extends AbstractModule
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemAdapter::class,
             'api.create.post',
-            [$this, 'updateSearchIndex']
+            [$this, 'updateSearchEngine']
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemAdapter::class,
             'api.batch_update.pre',
-            [$this, 'preBatchUpdateSearchIndex']
+            [$this, 'preBatchUpdateSearchEngine']
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemAdapter::class,
             'api.batch_update.post',
-            [$this, 'postBatchUpdateSearchIndex']
+            [$this, 'postBatchUpdateSearchEngine']
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemAdapter::class,
             'api.update.post',
-            [$this, 'updateSearchIndex']
+            [$this, 'updateSearchEngine']
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemAdapter::class,
             'api.delete.post',
-            [$this, 'updateSearchIndex']
+            [$this, 'updateSearchEngine']
         );
 
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemSetAdapter::class,
             'api.create.post',
-            [$this, 'updateSearchIndex']
+            [$this, 'updateSearchEngine']
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemSetAdapter::class,
             'api.batch_update.pre',
-            [$this, 'preBatchUpdateSearchIndex']
+            [$this, 'preBatchUpdateSearchEngine']
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemSetAdapter::class,
             'api.batch_update.post',
-            [$this, 'postBatchUpdateSearchIndex']
+            [$this, 'postBatchUpdateSearchEngine']
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemSetAdapter::class,
             'api.update.post',
-            [$this, 'updateSearchIndex']
+            [$this, 'updateSearchEngine']
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemSetAdapter::class,
             'api.delete.post',
-            [$this, 'updateSearchIndex']
+            [$this, 'updateSearchEngine']
         );
 
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\MediaAdapter::class,
             'api.update.post',
-            [$this, 'updateSearchIndexMedia']
+            [$this, 'updateSearchEngineMedia']
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\MediaAdapter::class,
             'api.batch_update.pre',
-            [$this, 'preBatchUpdateSearchIndex']
+            [$this, 'preBatchUpdateSearchEngine']
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\MediaAdapter::class,
             'api.batch_update.post',
-            [$this, 'postBatchUpdateSearchIndex']
+            [$this, 'postBatchUpdateSearchEngine']
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\MediaAdapter::class,
             'api.delete.pre',
-            [$this, 'preUpdateSearchIndexMedia']
+            [$this, 'preUpdateSearchEngineMedia']
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\MediaAdapter::class,
             'api.delete.post',
-            [$this, 'updateSearchIndexMedia']
+            [$this, 'updateSearchEngineMedia']
         );
 
         // Listeners for sites.
@@ -333,7 +333,7 @@ class Module extends AbstractModule
                 [
                     \Search\Controller\IndexController::class,
                     \Search\Api\Adapter\SearchPageAdapter::class,
-                    \Search\Api\Adapter\SearchIndexAdapter::class,
+                    \Search\Api\Adapter\SearchEngineAdapter::class,
                 ],
                 ['read', 'search']
             )
@@ -342,14 +342,14 @@ class Module extends AbstractModule
                 [
                     \Search\Controller\IndexController::class,
                     \Search\Api\Adapter\SearchPageAdapter::class,
-                    \Search\Api\Adapter\SearchIndexAdapter::class,
+                    \Search\Api\Adapter\SearchEngineAdapter::class,
                 ]
             )
             ->allow(
                 null,
                 [
                     \Search\Entity\SearchPage::class,
-                    \Search\Entity\SearchIndex::class,
+                    \Search\Entity\SearchEngine::class,
                 ],
                 ['read']
             );
@@ -1689,14 +1689,14 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function preBatchUpdateSearchIndex(Event $event): void
+    public function preBatchUpdateSearchEngine(Event $event): void
     {
         // This is a background job if there is no route match.
         $routeMatch = $this->getServiceLocator()->get('application')->getMvcEvent()->getRouteMatch();
         $this->isBatchUpdate = !empty($routeMatch);
     }
 
-    public function postBatchUpdateSearchIndex(Event $event): void
+    public function postBatchUpdateSearchEngine(Event $event): void
     {
         if (!$this->isBatchUpdate) {
             return;
@@ -1710,11 +1710,11 @@ class Module extends AbstractModule
         $response = $event->getParam('response');
         $resources = $response->getContent();
 
-        /** @var \Search\Api\Representation\SearchIndexRepresentation[] $searchIndexes */
-        $searchIndexes = $api->search('search_indexes')->getContent();
-        foreach ($searchIndexes as $searchIndex) {
-            if (in_array($requestResource, $searchIndex->setting('resources', []))) {
-                $indexer = $searchIndex->indexer();
+        /** @var \Search\Api\Representation\SearchEngineRepresentation[] $searchEnginees */
+        $searchEnginees = $api->search('search_engines')->getContent();
+        foreach ($searchEnginees as $searchEngine) {
+            if (in_array($requestResource, $searchEngine->setting('resources', []))) {
+                $indexer = $searchEngine->indexer();
                 try {
                     $indexer->indexResources($resources);
                 } catch (\Exception $e) {
@@ -1722,12 +1722,12 @@ class Module extends AbstractModule
                     $logger = $services->get('Omeka\Logger');
                     $logger->err(new Message(
                         'Unable to batch index metadata for search index "%s": %s', // @translate
-                        $searchIndex->name(), $e->getMessage()
+                        $searchEngine->name(), $e->getMessage()
                     ));
                     $messenger = $services->get('ControllerPluginManager')->get('messenger');
                     $messenger->addWarning(new Message(
                         'Unable to batch update the search index "%s": see log.', // @translate
-                        $searchIndex->name()
+                        $searchEngine->name()
                     ));
                 }
             }
@@ -1736,7 +1736,7 @@ class Module extends AbstractModule
         $this->isBatchUpdate = false;
     }
 
-    public function preUpdateSearchIndexMedia(Event $event): void
+    public function preUpdateSearchEngineMedia(Event $event): void
     {
         $api = $this->getServiceLocator()->get('Omeka\ApiManager');
         $request = $event->getParam('request');
@@ -1746,7 +1746,7 @@ class Module extends AbstractModule
         $request->setContent($data);
     }
 
-    public function updateSearchIndex(Event $event): void
+    public function updateSearchEngine(Event $event): void
     {
         if ($this->isBatchUpdate) {
             return;
@@ -1758,11 +1758,11 @@ class Module extends AbstractModule
         $response = $event->getParam('response');
         $requestResource = $request->getResource();
 
-        /** @var \Search\Api\Representation\SearchIndexRepresentation[] $searchIndexes */
-        $searchIndexes = $api->search('search_indexes')->getContent();
-        foreach ($searchIndexes as $searchIndex) {
-            if (in_array($requestResource, $searchIndex->setting('resources', []))) {
-                $indexer = $searchIndex->indexer();
+        /** @var \Search\Api\Representation\SearchEngineRepresentation[] $searchEnginees */
+        $searchEnginees = $api->search('search_engines')->getContent();
+        foreach ($searchEnginees as $searchEngine) {
+            if (in_array($requestResource, $searchEngine->setting('resources', []))) {
+                $indexer = $searchEngine->indexer();
                 if ($request->getOperation() == 'delete') {
                     $id = $request->getId();
                     $this->deleteIndexResource($indexer, $requestResource, $id);
@@ -1774,7 +1774,7 @@ class Module extends AbstractModule
         }
     }
 
-    public function updateSearchIndexMedia(Event $event): void
+    public function updateSearchEngineMedia(Event $event): void
     {
         $serviceLocator = $this->getServiceLocator();
         $api = $serviceLocator->get('Omeka\ApiManager');
@@ -1786,11 +1786,11 @@ class Module extends AbstractModule
             ? $api->read('items', $itemId, [], ['responseContent' => 'resource'])->getContent()
             : $response->getContent()->getItem();
 
-        /** @var \Search\Api\Representation\SearchIndexRepresentation[] $searchIndexes */
-        $searchIndexes = $api->search('search_indexes')->getContent();
-        foreach ($searchIndexes as $searchIndex) {
-            if (in_array('items', $searchIndex->setting('resources', []))) {
-                $indexer = $searchIndex->indexer();
+        /** @var \Search\Api\Representation\SearchEngineRepresentation[] $searchEnginees */
+        $searchEnginees = $api->search('search_engines')->getContent();
+        foreach ($searchEnginees as $searchEngine) {
+            if (in_array('items', $searchEngine->setting('resources', []))) {
+                $indexer = $searchEngine->indexer();
                 $this->updateIndexResource($indexer, $item);
             }
         }
@@ -2009,15 +2009,15 @@ class Module extends AbstractModule
         $connection = $services->get('Omeka\Connection');
 
         // Check if the internal index exists.
-        $sqlSearchIndexId = <<<'SQL'
+        $sqlSearchEngineId = <<<'SQL'
 SELECT `id`
 FROM `search_index`
 WHERE `adapter` = "internal"
 ORDER BY `id`;
 SQL;
-        $searchIndexId = (int) $connection->fetchColumn($sqlSearchIndexId);
+        $searchEngineId = (int) $connection->fetchColumn($sqlSearchEngineId);
 
-        if (!$searchIndexId) {
+        if (!$searchEngineId) {
             // Create the internal adapter.
             $sql = <<<'SQL'
 INSERT INTO `search_index`
@@ -2025,11 +2025,11 @@ INSERT INTO `search_index`
 VALUES
 ('Internal (sql)', 'internal', ?, NOW());
 SQL;
-            $searchIndexSettings = ['resources' => ['items', 'item_sets']];
+            $searchEngineSettings = ['resources' => ['items', 'item_sets']];
             $connection->executeQuery($sql, [
-                json_encode($searchIndexSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+                json_encode($searchEngineSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
             ]);
-            $searchIndexId = $connection->fetchColumn($sqlSearchIndexId);
+            $searchEngineId = $connection->fetchColumn($sqlSearchEngineId);
             $message = new Message(
                 'The internal search engine (sql) is available. Configure it in the %ssearch manager%s.', // @translate
                 // Don't use the url helper, the route is not available during install.
@@ -2044,7 +2044,7 @@ SQL;
         $sqlSearchPageId = <<<SQL
 SELECT `id`
 FROM `search_page`
-WHERE `index_id` = $searchIndexId
+WHERE `index_id` = $searchEngineId
 ORDER BY `id`;
 SQL;
         $searchPageId = (int) $connection->fetchColumn($sqlSearchPageId);
@@ -2054,7 +2054,7 @@ SQL;
 INSERT INTO `search_page`
 (`index_id`, `name`, `path`, `form_adapter`, `settings`, `created`)
 VALUES
-($searchIndexId, 'Default', 'find', 'main', ?, NOW());
+($searchEngineId, 'Default', 'find', 'main', ?, NOW());
 SQL;
             $searchPageSettings = require __DIR__ . '/data/search_pages/default.php';
             $connection->executeQuery($sql, [

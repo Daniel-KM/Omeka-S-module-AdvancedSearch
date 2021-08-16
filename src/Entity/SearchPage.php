@@ -65,10 +65,10 @@ class SearchPage extends AbstractEntity
     protected $path;
 
     /**
-     * @var SearchIndex
+     * @var SearchEngine
      *
      * @ManyToOne(
-     *     targetEntity="SearchIndex",
+     *     targetEntity="SearchEngine",
      *     inversedBy="pages"
      * )
      * @JoinColumn(
@@ -148,17 +148,17 @@ class SearchPage extends AbstractEntity
     }
 
     /**
-     * @param SearchIndex $index
+     * @param SearchEngine $index
      * @return self
      */
-    public function setIndex(SearchIndex $index)
+    public function setIndex(SearchEngine $index)
     {
         $this->index = $index;
         return $this;
     }
 
     /**
-     * @return \Search\Entity\SearchIndex
+     * @return \Search\Entity\SearchEngine
      */
     public function getIndex()
     {

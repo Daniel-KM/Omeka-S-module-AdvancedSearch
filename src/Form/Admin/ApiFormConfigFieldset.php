@@ -340,12 +340,12 @@ class ApiFormConfigFieldset extends Fieldset
     {
         $options = [];
         $searchPage = $this->getOption('search_page');
-        $searchIndex = $searchPage->index();
-        $searchAdapter = $searchIndex->adapter();
+        $searchEngine = $searchPage->index();
+        $searchAdapter = $searchEngine->adapter();
         if (empty($searchAdapter)) {
             return [];
         }
-        $fields = $searchAdapter->getAvailableFields($searchIndex);
+        $fields = $searchAdapter->getAvailableFields($searchEngine);
         foreach ($fields as $name => $field) {
             $options[$name] = $field['label'] ?? $name;
         }
@@ -356,12 +356,12 @@ class ApiFormConfigFieldset extends Fieldset
     {
         $options = [];
         $searchPage = $this->getOption('search_page');
-        $searchIndex = $searchPage->index();
-        $searchAdapter = $searchIndex->adapter();
+        $searchEngine = $searchPage->index();
+        $searchAdapter = $searchEngine->adapter();
         if (empty($searchAdapter)) {
             return [];
         }
-        $fields = $searchAdapter->getAvailableSortFields($searchIndex);
+        $fields = $searchAdapter->getAvailableSortFields($searchEngine);
         foreach ($fields as $name => $field) {
             $options[$name] = $field['label'] ?? $name;
         }

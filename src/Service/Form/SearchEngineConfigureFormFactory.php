@@ -3,16 +3,16 @@ namespace AdvancedSearch\Service\Form;
 
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
-use AdvancedSearch\Form\Admin\SearchIndexConfigureForm;
+use AdvancedSearch\Form\Admin\SearchEngineConfigureForm;
 
-class SearchIndexConfigureFormFactory implements FactoryInterface
+class SearchEngineConfigureFormFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
         $api = $services->get('Omeka\ApiManager');
         $translator = $services->get('MvcTranslator');
 
-        $form = new SearchIndexConfigureForm(null, $options);
+        $form = new SearchEngineConfigureForm(null, $options);
         $form->setTranslator($translator);
         $form->setApiManager($api);
 

@@ -33,7 +33,7 @@ namespace AdvancedSearch\Indexer;
 use Laminas\Log\LoggerAwareInterface;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Omeka\Entity\Resource;
-use AdvancedSearch\Api\Representation\SearchIndexRepresentation;
+use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
 use AdvancedSearch\Query;
 
 /**
@@ -43,7 +43,7 @@ interface IndexerInterface extends LoggerAwareInterface
 {
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator): IndexerInterface;
 
-    public function setSearchIndex(SearchIndexRepresentation $index): IndexerInterface;
+    public function setSearchEngine(SearchEngineRepresentation $index): IndexerInterface;
 
     /**
      * Inidicate if the resource can be indexed.

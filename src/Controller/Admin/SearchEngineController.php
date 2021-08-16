@@ -36,10 +36,10 @@ use Laminas\View\Model\ViewModel;
 use Omeka\Form\ConfirmForm;
 use Omeka\Stdlib\Message;
 use AdvancedSearch\Adapter\Manager as SearchAdapterManager;
-use AdvancedSearch\Form\Admin\SearchIndexConfigureForm;
-use AdvancedSearch\Form\Admin\SearchIndexForm;
+use AdvancedSearch\Form\Admin\SearchEngineConfigureForm;
+use AdvancedSearch\Form\Admin\SearchEngineForm;
 
-class SearchIndexController extends AbstractActionController
+class SearchEngineController extends AbstractActionController
 {
     /**
      * @var EntityManager
@@ -61,7 +61,7 @@ class SearchIndexController extends AbstractActionController
 
     public function addAction()
     {
-        $form = $this->getForm(SearchIndexForm::class);
+        $form = $this->getForm(SearchEngineForm::class);
         $view = new ViewModel([
             'form' => $form,
         ]);
@@ -73,7 +73,7 @@ class SearchIndexController extends AbstractActionController
                 return $view;
             }
             $formData = $form->getData();
-            $index = $this->api()->create('search_indexes', $formData)->getContent();
+            $index = $this->api()->create('search_engines', $formData)->getContent();
             $this->messenger()->addSuccess(new Message(
                 'Search index "%s" created.', // @translate
                 $index->name()
@@ -89,20 +89,20 @@ class SearchIndexController extends AbstractActionController
 
         $id = $this->params('id');
 
-        /** @var \Search\Entity\SearchIndex $searchIndex */
-        $searchIndex = $this->getEntityManager()->find(\Search\Entity\SearchIndex::class, $id);
-        $searchIndexAdapterName = $searchIndex->getAdapter();
-        if (!$adapterManager->has($searchIndexAdapterName)) {
+        /** @var \Search\Entity\SearchEngine $searchEngine */
+        $searchEngine = $this->getEntityManager()->find(\Search\Entity\SearchEngine::class, $id);
+        $searchEngineAdapterName = $searchEngine->getAdapter();
+        if (!$adapterManager->has($searchEngineAdapterName)) {
             $this->messenger()->addError(new Message('The adapter "%s" is not available.', // @translate
-                $searchIndexAdapterName
+                $searchEngineAdapterName
             ));
             return $this->redirect()->toRoute('admin/search', ['action' => 'browse'], true);
         }
 
         /** @var \Search\Adapter\AdapterInterface $adapter */
-        $adapter = $adapterManager->get($searchIndexAdapterName);
+        $adapter = $adapterManager->get($searchEngineAdapterName);
 
-        $form = $this->getForm(SearchIndexConfigureForm::class, [
+        $form = $this->getForm(SearchEngineConfigureForm::class, [
             'search_index_id' => $id,
         ]);
         $adapterFieldset = $adapter->getConfigFieldset();
@@ -114,8 +114,8 @@ class SearchIndexController extends AbstractActionController
                 ->init();
             $form->add($adapterFieldset);
         }
-        $data = $searchIndex->getSettings() ?: [];
-        $data['o:name'] = $searchIndex->getName();
+        $data = $searchEngine->getSettings() ?: [];
+        $data['o:name'] = $searchEngine->getName();
         $form->setData($data);
 
         $view = new ViewModel([
@@ -131,13 +131,13 @@ class SearchIndexController extends AbstractActionController
             $formData = $form->getData();
             $name = $formData['o:name'];
             unset($formData['csrf'], $formData['o:name']);
-            $searchIndex
+            $searchEngine
                 ->setName($name)
                 ->setSettings($formData);
-            $this->getEntityManager()->flush($searchIndex);
+            $this->getEntityManager()->flush($searchEngine);
             $this->messenger()->addSuccess(new Message(
                 'Search index "%s" successfully configured.',  // @translate
-                $searchIndex->getName()
+                $searchEngine->getName()
             ));
             $this->messenger()->addWarning('Don’t forget to run the indexation of the core.'); // @translate
             return $this->redirect()->toRoute('admin/search', ['action' => 'browse'], true);
@@ -148,7 +148,7 @@ class SearchIndexController extends AbstractActionController
 
     public function indexConfirmAction()
     {
-        $index = $this->api()->read('search_indexes', $this->params('id'))->getContent();
+        $index = $this->api()->read('search_engines', $this->params('id'))->getContent();
 
         $totalJobs = $this->totalJobs(\Search\Job\Indexing::class, true);
 
@@ -159,20 +159,20 @@ class SearchIndexController extends AbstractActionController
         ]);
         return $view
             ->setTerminal(true)
-            ->setTemplate('search/admin/search-index/index-confirm-details');
+            ->setTemplate('search/admin/search-engine/index-confirm-details');
     }
 
     public function indexAction()
     {
-        $searchIndexId = (int) $this->params('id');
-        $searchIndex = $this->api()->read('search_indexes', $searchIndexId)->getContent();
+        $searchEngineId = (int) $this->params('id');
+        $searchEngine = $this->api()->read('search_engines', $searchEngineId)->getContent();
 
         $startResourceId = (int) $this->params()->fromPost('start_resource_id');
         $resourceNames = $this->params()->fromPost('resource_names') ?: [];
         $force = (bool) $this->params()->fromPost('force');
 
         $jobArgs = [];
-        $jobArgs['search_index_id'] = $searchIndex->id();
+        $jobArgs['search_index_id'] = $searchEngine->id();
         $jobArgs['start_resource_id'] = $startResourceId;
         $jobArgs['resource_names'] = $resourceNames;
         $jobArgs['force'] = $force;
@@ -181,7 +181,7 @@ class SearchIndexController extends AbstractActionController
         $urlHelper = $this->viewHelpers()->get('url');
         $message = new Message(
             'Indexing of "%1$s" started in job %2$s#%3$d%4$s (%5$slogs%4$s)', // @translate
-            $searchIndex->name(),
+            $searchEngine->name(),
             sprintf('<a href="%1$s">', $urlHelper('admin/id', ['controller' => 'job', 'id' => $job->getId()])),
             $job->getId(),
             '</a>',
@@ -195,7 +195,7 @@ class SearchIndexController extends AbstractActionController
 
     public function deleteConfirmAction()
     {
-        $response = $this->api()->read('search_indexes', $this->params('id'));
+        $response = $this->api()->read('search_engines', $this->params('id'));
         $index = $response->getContent();
 
         // TODO Add a warning about the related pages, that will be deleted.
@@ -215,9 +215,9 @@ class SearchIndexController extends AbstractActionController
             $form = $this->getForm(ConfirmForm::class);
             $form->setData($this->getRequest()->getPost());
             $indexId = $this->params('id');
-            $indexName = $this->api()->read('search_indexes', $indexId)->getContent()->name();
+            $indexName = $this->api()->read('search_engines', $indexId)->getContent()->name();
             if ($form->isValid()) {
-                $this->api()->delete('search_indexes', $indexId);
+                $this->api()->delete('search_engines', $indexId);
                 $this->messenger()->addSuccess(new Message(
                     'Search index "%s" successfully deleted', // @translate
                     $indexName

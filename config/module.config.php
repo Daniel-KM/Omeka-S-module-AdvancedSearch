@@ -5,7 +5,7 @@ namespace AdvancedSearch;
 return [
     'api_adapters' => [
         'invokables' => [
-            'search_indexes' => Api\Adapter\SearchIndexAdapter::class,
+            'search_engines' => Api\Adapter\SearchEngineAdapter::class,
             'search_pages' => Api\Adapter\SearchPageAdapter::class,
         ],
     ],
@@ -41,7 +41,7 @@ return [
             'facetCheckbox' => Service\ViewHelper\FacetCheckboxFactory::class,
             'facetLink' => Service\ViewHelper\FacetLinkFactory::class,
             'mediaTypeSelect' => Service\ViewHelper\MediaTypeSelectFactory::class,
-            'searchIndexConfirm' => Service\ViewHelper\SearchIndexConfirmFactory::class,
+            'searchEngineConfirm' => Service\ViewHelper\SearchEngineConfirmFactory::class,
             'searchRequestToResponse' => Service\ViewHelper\SearchRequestToResponseFactory::class,
         ],
     ],
@@ -61,8 +61,8 @@ return [
         ],
         'factories' => [
             Form\Admin\ApiFormConfigFieldset::class => Service\Form\ApiFormConfigFieldsetFactory::class,
-            Form\Admin\SearchIndexConfigureForm::class => Service\Form\SearchIndexConfigureFormFactory::class,
-            Form\Admin\SearchIndexForm::class => Service\Form\SearchIndexFormFactory::class,
+            Form\Admin\SearchEngineConfigureForm::class => Service\Form\SearchEngineConfigureFormFactory::class,
+            Form\Admin\SearchEngineForm::class => Service\Form\SearchEngineFormFactory::class,
             Form\Admin\SearchPageConfigureForm::class => Service\Form\SearchPageConfigureFormFactory::class,
             Form\Admin\SearchPageForm::class => Service\Form\SearchPageFormFactory::class,
             Form\Element\MediaTypeSelect::class => Service\Form\Element\MediaTypeSelectFactory::class,
@@ -80,7 +80,7 @@ return [
             Controller\IndexController::class => Controller\IndexController::class,
         ],
         'factories' => [
-            Controller\Admin\SearchIndexController::class => Service\Controller\Admin\SearchIndexControllerFactory::class,
+            Controller\Admin\SearchEngineController::class => Service\Controller\Admin\SearchEngineControllerFactory::class,
             Controller\Admin\SearchPageController::class => Service\Controller\Admin\SearchPageControllerFactory::class,
         ],
     ],
@@ -151,7 +151,7 @@ return [
                                     ],
                                     'defaults' => [
                                         '__NAMESPACE__' => 'Search\Controller\Admin',
-                                        'controller' => Controller\Admin\SearchIndexController::class,
+                                        'controller' => Controller\Admin\SearchEngineController::class,
                                     ],
                                 ],
                             ],
@@ -165,7 +165,7 @@ return [
                                     ],
                                     'defaults' => [
                                         '__NAMESPACE__' => 'Search\Controller\Admin',
-                                        'controller' => Controller\Admin\SearchIndexController::class,
+                                        'controller' => Controller\Admin\SearchEngineController::class,
                                         'action' => 'show',
                                     ],
                                 ],

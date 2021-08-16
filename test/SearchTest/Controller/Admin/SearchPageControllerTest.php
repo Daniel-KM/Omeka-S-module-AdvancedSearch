@@ -27,7 +27,7 @@ class SearchPageControllerTest extends SearchControllerTestCase
         $this->dispatch('/admin/search-manager/page/add', 'POST', [
             'o:name' => 'TestPage [testAddPostAction]',
             'o:path' => 'search/test2',
-            'o:index_id' => $this->searchIndex->id(),
+            'o:index_id' => $this->searchEngine->id(),
             'o:form' => 'basic',
             'manage_page_default' => '0',
             'manage_page_availability' => 'let',

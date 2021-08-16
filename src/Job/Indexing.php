@@ -68,14 +68,14 @@ class Indexing extends AbstractJob
             $batchSize = self::BATCH_SIZE;
         }
 
-        $searchIndexId = $this->getArg('search_index_id');
+        $searchEngineId = $this->getArg('search_index_id');
         $startResourceId = (int) $this->getArg('start_resource_id');
 
-        /** @var \Search\Api\Representation\SearchIndexRepresentation $searchIndex */
-        $searchIndex = $api->read('search_indexes', $searchIndexId)->getContent();
-        $indexer = $searchIndex->indexer();
+        /** @var \Search\Api\Representation\SearchEngineRepresentation $searchEngine */
+        $searchEngine = $api->read('search_engines', $searchEngineId)->getContent();
+        $indexer = $searchEngine->indexer();
 
-        $resourceNames = $searchIndex->setting('resources', []);
+        $resourceNames = $searchEngine->setting('resources', []);
         $selectedResourceNames = $this->getArg('resource_names', []);
         if ($selectedResourceNames) {
             $resourceNames = array_intersect($resourceNames, $selectedResourceNames);
@@ -86,7 +86,7 @@ class Indexing extends AbstractJob
         if (empty($resourceNames)) {
             $this->logger->notice(new Message(
                 'Search index #%d ("%s"): there is no resource type to index or the indexation is not needed.', // @translate
-                $searchIndex->id(), $searchIndex->name()
+                $searchEngine->id(), $searchEngine->name()
             ));
             return;
         }
@@ -98,7 +98,7 @@ class Indexing extends AbstractJob
             if (!$force) {
                 $this->logger->err(new Message(
                     'Search index #%d ("%s"): There are already %d other jobs "Search Index" and the current one is not forced.', // @translate
-                    $searchIndex->id(), $searchIndex->name(), $totalJobs - 1
+                    $searchEngine->id(), $searchEngine->name(), $totalJobs - 1
                 ));
                 return;
             }
@@ -112,7 +112,7 @@ class Indexing extends AbstractJob
         $timeStart = microtime(true);
 
         $this->logger->info(new Message('Search index #%d ("%s"): start of indexing', // @translate
-            $searchIndex->id(), $searchIndex->name()));
+            $searchEngine->id(), $searchEngine->name()));
 
         $rNames = $resourceNames;
         sort($rNames);
@@ -150,7 +150,7 @@ class Indexing extends AbstractJob
                 if ($this->shouldStop()) {
                     if (empty($resources)) {
                         $this->logger->warn(new Message('Search index #%d ("%s"): the indexing was stopped. Nothing was indexed.', // @translate
-                            $searchIndex->id(), $searchIndex->name()));
+                            $searchEngine->id(), $searchEngine->name()));
                     } else {
                         $totalResults = [];
                         foreach ($resourceNames as $resourceName) {
@@ -159,8 +159,8 @@ class Indexing extends AbstractJob
                         $resource = array_pop($resources);
                         $this->logger->warn(new Message(
                             'Search index #%d ("%s"): the indexing was stopped. Last indexed resource: %s #%d; %s. Execution time: %d seconds.', // @translate
-                            $searchIndex->id(),
-                            $searchIndex->name(),
+                            $searchEngine->id(),
+                            $searchEngine->name(),
                             $resource->getResourceName(),
                             $resource->getId(),
                             implode('; ', $totalResults),
@@ -192,7 +192,7 @@ class Indexing extends AbstractJob
             $totalResults[] = new Message('%s: %d indexed', $resourceName, $totals[$resourceName]); // @translate
         }
         $this->logger->info(new Message('Search index #%d ("%s"): end of indexing. %s. Execution time: %s seconds. Failed indexed resources should be checked manually.', // @translate
-            $searchIndex->id(), $searchIndex->name(), implode('; ', $totalResults), (int) (microtime(true) - $timeStart)
+            $searchEngine->id(), $searchEngine->name(), implode('; ', $totalResults), (int) (microtime(true) - $timeStart)
         ));
     }
 

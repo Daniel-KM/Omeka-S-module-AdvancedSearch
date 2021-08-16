@@ -38,11 +38,11 @@ class IndexController extends AbstractActionController
     public function browseAction()
     {
         $api = $this->api();
-        $search_indexes = $api->search('search_indexes', ['sort_by' => 'name'])->getContent();
+        $search_engines = $api->search('search_engines', ['sort_by' => 'name'])->getContent();
         $search_pages = $api->search('search_pages', ['sort_by' => 'name'])->getContent();
 
         return new ViewModel([
-            'search_indexes' => $search_indexes,
+            'search_engines' => $search_engines,
             'search_pages' => $search_pages,
         ]);
     }

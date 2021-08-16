@@ -175,7 +175,7 @@ class SearchPageForm extends Form
 
         $api = $this->getApiManager();
 
-        $indexes = $api->search('search_indexes')->getContent();
+        $indexes = $api->search('search_engines')->getContent();
         foreach ($indexes as $index) {
             $options[$index->id()] =
                 sprintf('%s (%s)', $index->name(), $index->adapterLabel());

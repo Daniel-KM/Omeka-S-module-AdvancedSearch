@@ -280,8 +280,8 @@ class IndexController extends AbstractActionController
         /** @var \Search\Query $query */
         $query = $formAdapter->toQuery(['q' => $q], $searchFormSettings);
 
-        $searchIndex = $searchPage->index();
-        $indexSettings = $searchIndex->settings();
+        $searchEngine = $searchPage->index();
+        $indexSettings = $searchEngine->settings();
 
         $user = $this->identity();
         // TODO Manage roles from modules and visibility from modules (access resources).
@@ -308,7 +308,7 @@ class IndexController extends AbstractActionController
             ->setSuggestFields($autosuggestSettings['fields'] ?? []);
 
         /** @var \Search\Querier\QuerierInterface $querier */
-        $querier = $searchIndex
+        $querier = $searchEngine
             ->querier()
             ->setQuery($query);
         try {

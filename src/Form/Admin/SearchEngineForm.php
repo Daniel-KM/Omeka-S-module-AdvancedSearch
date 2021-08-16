@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
 /*
- * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2017-2020
+ * Copyright BibLibre, 2016-2017
+ * Copyright Daniel Berthereau, 2017-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -32,14 +32,10 @@ namespace AdvancedSearch\Form\Admin;
 
 use Laminas\Form\Element;
 use Laminas\Form\Form;
-use Laminas\I18n\Translator\TranslatorAwareInterface;
-use Laminas\I18n\Translator\TranslatorAwareTrait;
 
-class SearchIndexConfigureForm extends Form implements TranslatorAwareInterface
+class SearchEngineForm extends Form
 {
-    use TranslatorAwareTrait;
-
-    protected $apiManager;
+    protected $searchAdapterManager;
 
     public function init(): void
     {
@@ -56,42 +52,43 @@ class SearchIndexConfigureForm extends Form implements TranslatorAwareInterface
                 ],
             ])
             ->add([
-                'name' => 'resources',
-                'type' => Element\MultiCheckbox::class,
+                'name' => 'o:adapter',
+                'type' => Element\Select::class,
                 'options' => [
-                    'label' => 'Resources indexed', // @translate
-                    'value_options' => $this->getResourcesOptions(),
+                    'label' => 'Adapter', // @translate
+                    'value_options' => $this->getAdaptersOptions(),
+                    'empty_option' => 'Select an adapter below…', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'resources',
-                    'value' => ['items'],
+                    'id' => 'o-adapter',
+                    'required' => true,
                 ],
             ]);
     }
 
-    /**
-     * Get the list of resource types.
-     *
-     * @todo There may be other resources types to index for search: media, external resources types. See git history of this file.
-     *
-     * @return array
-     */
-    protected function getResourcesOptions(): array
+    protected function getAdaptersOptions(): array
     {
-        return [
-            'items' => 'Items',
-            'item_sets' => 'Item sets',
-        ];
+        $adapterManager = $this->getSearchAdapterManager();
+        $adapterNames = $adapterManager->getRegisteredNames();
+
+        $options = [];
+
+        foreach ($adapterNames as $name) {
+            $adapter = $adapterManager->get($name);
+            $options[$name] = $adapter->getLabel();
+        }
+
+        return $options;
     }
 
-    public function setApiManager($apiManager): self
+    public function setSearchAdapterManager($searchAdapterManager)
     {
-        $this->apiManager = $apiManager;
+        $this->searchAdapterManager = $searchAdapterManager;
         return $this;
     }
 
-    public function getApiManager(): \Omeka\Api\Manager
+    public function getSearchAdapterManager()
     {
-        return $this->apiManager;
+        return $this->searchAdapterManager;
     }
 }

@@ -4,7 +4,7 @@ namespace AdvancedSearch\Querier;
 
 use Laminas\Log\LoggerAwareTrait;
 use Laminas\ServiceManager\ServiceLocatorInterface;
-use AdvancedSearch\Api\Representation\SearchIndexRepresentation;
+use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
 use AdvancedSearch\Query;
 use AdvancedSearch\Response;
 
@@ -22,7 +22,7 @@ class NoopQuerier implements QuerierInterface
         return $this;
     }
 
-    public function setSearchIndex(SearchIndexRepresentation $index): QuerierInterface
+    public function setSearchEngine(SearchEngineRepresentation $index): QuerierInterface
     {
         return $this;
     }

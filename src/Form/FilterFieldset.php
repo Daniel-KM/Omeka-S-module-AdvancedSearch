@@ -126,12 +126,12 @@ class FilterFieldset extends Fieldset
     {
         /** @var \Search\Api\Representation\SearchPageRepresentation $searchPage */
         $searchPage = $this->getOption('search_page');
-        $searchIndex = $searchPage->index();
-        $searchAdapter = $searchIndex->adapter();
+        $searchEngine = $searchPage->index();
+        $searchAdapter = $searchEngine->adapter();
         if (empty($searchAdapter)) {
             return [];
         }
-        $availableFields = $searchAdapter->getAvailableFields($searchIndex);
+        $availableFields = $searchAdapter->getAvailableFields($searchEngine);
         $settings = $searchPage->settings();
         if (empty($availableFields) || empty($settings['form']['filters'])) {
             return [];

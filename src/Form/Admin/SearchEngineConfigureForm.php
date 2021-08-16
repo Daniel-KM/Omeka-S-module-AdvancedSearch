@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * Copyright BibLibre, 2016-2017
+ * Copyright BibLibre, 2016
  * Copyright Daniel Berthereau, 2017-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
@@ -32,10 +32,14 @@ namespace AdvancedSearch\Form\Admin;
 
 use Laminas\Form\Element;
 use Laminas\Form\Form;
+use Laminas\I18n\Translator\TranslatorAwareInterface;
+use Laminas\I18n\Translator\TranslatorAwareTrait;
 
-class SearchIndexForm extends Form
+class SearchEngineConfigureForm extends Form implements TranslatorAwareInterface
 {
-    protected $searchAdapterManager;
+    use TranslatorAwareTrait;
+
+    protected $apiManager;
 
     public function init(): void
     {
@@ -52,43 +56,42 @@ class SearchIndexForm extends Form
                 ],
             ])
             ->add([
-                'name' => 'o:adapter',
-                'type' => Element\Select::class,
+                'name' => 'resources',
+                'type' => Element\MultiCheckbox::class,
                 'options' => [
-                    'label' => 'Adapter', // @translate
-                    'value_options' => $this->getAdaptersOptions(),
-                    'empty_option' => 'Select an adapter below…', // @translate
+                    'label' => 'Resources indexed', // @translate
+                    'value_options' => $this->getResourcesOptions(),
                 ],
                 'attributes' => [
-                    'id' => 'o-adapter',
-                    'required' => true,
+                    'id' => 'resources',
+                    'value' => ['items'],
                 ],
             ]);
     }
 
-    protected function getAdaptersOptions(): array
+    /**
+     * Get the list of resource types.
+     *
+     * @todo There may be other resources types to index for search: media, external resources types. See git history of this file.
+     *
+     * @return array
+     */
+    protected function getResourcesOptions(): array
     {
-        $adapterManager = $this->getSearchAdapterManager();
-        $adapterNames = $adapterManager->getRegisteredNames();
-
-        $options = [];
-
-        foreach ($adapterNames as $name) {
-            $adapter = $adapterManager->get($name);
-            $options[$name] = $adapter->getLabel();
-        }
-
-        return $options;
+        return [
+            'items' => 'Items',
+            'item_sets' => 'Item sets',
+        ];
     }
 
-    public function setSearchAdapterManager($searchAdapterManager)
+    public function setApiManager($apiManager): self
     {
-        $this->searchAdapterManager = $searchAdapterManager;
+        $this->apiManager = $apiManager;
         return $this;
     }
 
-    public function getSearchAdapterManager()
+    public function getApiManager(): \Omeka\Api\Manager
     {
-        return $this->searchAdapterManager;
+        return $this->apiManager;
     }
 }

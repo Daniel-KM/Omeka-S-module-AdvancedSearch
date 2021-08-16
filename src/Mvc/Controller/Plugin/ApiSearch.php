@@ -14,7 +14,7 @@ use Omeka\Api\ResourceInterface;
 use Omeka\Api\Response;
 use Omeka\Permissions\Acl;
 use Omeka\Stdlib\Paginator;
-use AdvancedSearch\Api\Representation\SearchIndexRepresentation;
+use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
 use AdvancedSearch\Api\Representation\SearchPageRepresentation;
 use AdvancedSearch\FormAdapter\ApiFormAdapter;
 use AdvancedSearch\Querier\Exception\QuerierException;
@@ -49,7 +49,7 @@ class ApiSearch extends AbstractPlugin
     protected $page;
 
     /**
-     * @var SearchIndexRepresentation
+     * @var SearchEngineRepresentation
      */
     protected $index;
 
@@ -91,7 +91,7 @@ class ApiSearch extends AbstractPlugin
     /**
      * @param Manager $api
      * @param SearchPageRepresentation $page
-     * @param SearchIndexRepresentation $index
+     * @param SearchEngineRepresentation $index
      * @param AdapterManager $adapterManager
      * @param ApiFormAdapter $apiFormAdapter
      * @param Acl $acl
@@ -103,7 +103,7 @@ class ApiSearch extends AbstractPlugin
     public function __construct(
         Manager $api,
         SearchPageRepresentation $page = null,
-        SearchIndexRepresentation $index = null,
+        SearchEngineRepresentation $index = null,
         AdapterManager $adapterManager = null,
         ApiFormAdapter $apiFormAdapter = null,
         Acl $acl = null,

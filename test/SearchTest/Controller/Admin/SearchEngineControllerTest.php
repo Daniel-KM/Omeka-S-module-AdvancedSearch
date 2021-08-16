@@ -6,10 +6,10 @@ require_once dirname(__DIR__) . '/SearchControllerTestCase.php';
 
 use Omeka\Mvc\Controller\Plugin\Messenger;
 use Omeka\Stdlib\Message;
-use AdvancedSearch\Form\Admin\SearchIndexConfigureForm;
+use AdvancedSearch\Form\Admin\SearchEngineConfigureForm;
 use AdvancedSearchTest\Controller\SearchControllerTestCase;
 
-class SearchIndexControllerTest extends SearchControllerTestCase
+class SearchEngineControllerTest extends SearchControllerTestCase
 {
     public function testAddGetAction(): void
     {
@@ -23,24 +23,24 @@ class SearchIndexControllerTest extends SearchControllerTestCase
     public function testAddPostAction(): void
     {
         $forms = $this->getServiceLocator()->get('FormElementManager');
-        $form = $forms->get(\Search\Form\Admin\SearchIndexForm::class);
+        $form = $forms->get(\Search\Form\Admin\SearchEngineForm::class);
 
         $this->dispatch('/admin/search-manager/index/add', 'POST', [
             'o:name' => 'TestIndex2',
             'o:adapter' => 'test',
             'csrf' => $form->get('csrf')->getValue(),
         ]);
-        $response = $this->api()->search('search_indexes', [
+        $response = $this->api()->search('search_engines', [
             'name' => 'TestIndex2',
         ]);
-        $searchIndexes = $response->getContent();
-        $searchIndex = reset($searchIndexes);
-        $this->assertRedirectTo($searchIndex->adminUrl('edit'));
+        $searchEnginees = $response->getContent();
+        $searchEngine = reset($searchEnginees);
+        $this->assertRedirectTo($searchEngine->adminUrl('edit'));
     }
 
     public function testConfigureGetAction(): void
     {
-        $this->dispatch($this->searchIndex->adminUrl('edit'));
+        $this->dispatch($this->searchEngine->adminUrl('edit'));
         $this->assertResponseStatusCode(200);
 
         $this->assertQuery('input[name="resources[]"]');
@@ -49,11 +49,11 @@ class SearchIndexControllerTest extends SearchControllerTestCase
     public function testConfigurePostAction(): void
     {
         $forms = $this->getServiceLocator()->get('FormElementManager');
-        $form = $forms->get(SearchIndexConfigureForm::class, [
-            'search_index_id' => $this->searchIndex->id(),
+        $form = $forms->get(SearchEngineConfigureForm::class, [
+            'search_index_id' => $this->searchEngine->id(),
         ]);
 
-        $this->dispatch($this->searchIndex->adminUrl('edit'), 'POST', [
+        $this->dispatch($this->searchEngine->adminUrl('edit'), 'POST', [
             'resources' => ['items', 'item_sets'],
             'csrf' => $form->get('csrf')->getValue(),
         ]);
@@ -62,7 +62,7 @@ class SearchIndexControllerTest extends SearchControllerTestCase
 
     public function testIndexAction(): void
     {
-        $this->dispatch($this->searchIndex->adminUrl('index'));
+        $this->dispatch($this->searchEngine->adminUrl('index'));
 
         $this->assertRedirectTo('/admin/search-manager');
 

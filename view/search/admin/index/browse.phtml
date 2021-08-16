@@ -29,7 +29,7 @@
 
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
- * @var \Search\Api\Representation\SearchIndexRepresentation[] $search_indexes
+ * @var \Search\Api\Representation\SearchEngineRepresentation[] $search_engines
  * @var \Search\Api\Representation\SearchPageRepresentation[] $search_pages
  */
 
@@ -44,13 +44,13 @@ $url = $this->plugin('url');
 
 <div id="page-actions">
     <a class="button" href="<?= $url('admin/search/index', ['action' => 'add']) ?>"><?= $translate('Add new index') ?></a>
-    <?php if (!empty($search_indexes)): ?>
+    <?php if (!empty($search_engines)): ?>
         <a class="button" href="<?= $url('admin/search/page', ['action' => 'add']) ?>"><?= $translate('Add new page') ?></a>
     <?php endif; ?>
 </div>
 
 <h2><?= $translate('Indexes') ?></h2>
-<?php if (count($search_indexes) > 0): ?>
+<?php if (count($search_engines) > 0): ?>
     <table class="tablesaw" data-tablesaw-mode="stack">
         <thead>
             <tr>
@@ -59,7 +59,7 @@ $url = $this->plugin('url');
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($search_indexes as $search_index): ?>
+            <?php foreach ($search_engines as $search_index): ?>
                 <tr>
                     <td>
                         <span><?= $search_index->name() ?></span>

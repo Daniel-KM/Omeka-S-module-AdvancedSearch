@@ -3,12 +3,12 @@ namespace AdvancedSearch\Service\ViewHelper;
 
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
-use AdvancedSearch\View\Helper\SearchIndexConfirm;
+use AdvancedSearch\View\Helper\SearchEngineConfirm;
 
-class SearchIndexConfirmFactory implements FactoryInterface
+class SearchEngineConfirmFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        return new SearchIndexConfirm($services->get('FormElementManager'));
+        return new SearchEngineConfirm($services->get('FormElementManager'));
     }
 }

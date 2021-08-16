@@ -2,7 +2,7 @@
 
 namespace AdvancedSearch\Adapter;
 
-use AdvancedSearch\Api\Representation\SearchIndexRepresentation;
+use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
 
 class InternalAdapter extends AbstractAdapter
 {
@@ -26,7 +26,7 @@ class InternalAdapter extends AbstractAdapter
         return \Search\Querier\InternalQuerier::class;
     }
 
-    public function getAvailableFields(SearchIndexRepresentation $index): array
+    public function getAvailableFields(SearchEngineRepresentation $index): array
     {
         static $availableFields;
 
@@ -81,7 +81,7 @@ class InternalAdapter extends AbstractAdapter
         return $availableFields = $fields;
     }
 
-    public function getAvailableSortFields(SearchIndexRepresentation $index): array
+    public function getAvailableSortFields(SearchEngineRepresentation $index): array
     {
         static $sortFields;
 
@@ -116,7 +116,7 @@ class InternalAdapter extends AbstractAdapter
         return $sortFields;
     }
 
-    public function getAvailableFacetFields(SearchIndexRepresentation $index): array
+    public function getAvailableFacetFields(SearchEngineRepresentation $index): array
     {
         return $this->getAvailableFields($index);
     }

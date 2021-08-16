@@ -6,7 +6,7 @@ use OmekaTestHelper\Controller\OmekaControllerTestCase;
 
 abstract class SearchControllerTestCase extends OmekaControllerTestCase
 {
-    protected $searchIndex;
+    protected $searchEngine;
     protected $searchPage;
 
     public function setUp(): void
@@ -17,7 +17,7 @@ abstract class SearchControllerTestCase extends OmekaControllerTestCase
 
         $this->setupTestSearchAdapter();
 
-        $response = $this->api()->create('search_indexes', [
+        $response = $this->api()->create('search_engines', [
             'o:name' => 'TestIndex',
             'o:adapter' => 'test',
             'o:settings' => [
@@ -27,11 +27,11 @@ abstract class SearchControllerTestCase extends OmekaControllerTestCase
                 ],
             ],
         ]);
-        $searchIndex = $response->getContent();
+        $searchEngine = $response->getContent();
         $response = $this->api()->create('search_pages', [
             'o:name' => 'TestPage',
             'o:path' => 'test/search',
-            'o:index_id' => $searchIndex->id(),
+            'o:index_id' => $searchEngine->id(),
             'o:form' => 'basic',
             'o:settings' => [
                 'facets' => [],
@@ -40,14 +40,14 @@ abstract class SearchControllerTestCase extends OmekaControllerTestCase
         ]);
         $searchPage = $response->getContent();
 
-        $this->searchIndex = $searchIndex;
+        $this->searchEngine = $searchEngine;
         $this->searchPage = $searchPage;
     }
 
     public function tearDown(): void
     {
         $this->api()->delete('search_pages', $this->searchPage->id());
-        $this->api()->delete('search_indexes', $this->searchIndex->id());
+        $this->api()->delete('search_engines', $this->searchEngine->id());
     }
 
     protected function setupTestSearchAdapter(): void

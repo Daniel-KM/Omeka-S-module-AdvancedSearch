@@ -5,7 +5,7 @@ namespace AdvancedSearch\Indexer;
 use Laminas\Log\LoggerAwareTrait;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Omeka\Entity\Resource;
-use AdvancedSearch\Api\Representation\SearchIndexRepresentation;
+use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
 use AdvancedSearch\Query;
 
 class NoopIndexer implements IndexerInterface
@@ -17,7 +17,7 @@ class NoopIndexer implements IndexerInterface
         return $this;
     }
 
-    public function setSearchIndex(SearchIndexRepresentation $index): IndexerInterface
+    public function setSearchEngine(SearchEngineRepresentation $index): IndexerInterface
     {
         return $this;
     }

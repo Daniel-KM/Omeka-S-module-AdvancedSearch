@@ -31,7 +31,7 @@
 namespace AdvancedSearch\Adapter;
 
 use Laminas\ServiceManager\ServiceLocatorInterface;
-use AdvancedSearch\Api\Representation\SearchIndexRepresentation;
+use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
 
 abstract class AbstractAdapter implements AdapterInterface
 {
@@ -46,17 +46,17 @@ abstract class AbstractAdapter implements AdapterInterface
         return $this;
     }
 
-    public function getAvailableFields(SearchIndexRepresentation $index): array
+    public function getAvailableFields(SearchEngineRepresentation $index): array
     {
         return [];
     }
 
-    public function getAvailableFacetFields(SearchIndexRepresentation $index): array
+    public function getAvailableFacetFields(SearchEngineRepresentation $index): array
     {
         return [];
     }
 
-    public function getAvailableSortFields(SearchIndexRepresentation $index): array
+    public function getAvailableSortFields(SearchEngineRepresentation $index): array
     {
         return [];
     }

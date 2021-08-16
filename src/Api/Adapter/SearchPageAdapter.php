@@ -35,7 +35,7 @@ use Omeka\Api\Adapter\AbstractEntityAdapter;
 use Omeka\Api\Request;
 use Omeka\Entity\EntityInterface;
 use Omeka\Stdlib\ErrorStore;
-use AdvancedSearch\Entity\SearchIndex;
+use AdvancedSearch\Entity\SearchEngine;
 
 class SearchPageAdapter extends AbstractEntityAdapter
 {
@@ -66,16 +66,16 @@ class SearchPageAdapter extends AbstractEntityAdapter
         $expr = $qb->expr();
 
         if (isset($query['index_id'])) {
-            $searchIndexAlias = $this->createAlias();
+            $searchEngineAlias = $this->createAlias();
             // The join avoids to find a page without index.
             $qb->innerJoin(
-                SearchIndex::class,
-                $searchIndexAlias,
+                SearchEngine::class,
+                $searchEngineAlias,
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 $expr->andX(
-                    $expr->eq($searchIndexAlias . '.id', 'omeka_root.index'),
+                    $expr->eq($searchEngineAlias . '.id', 'omeka_root.index'),
                     $expr->in(
-                        $searchIndexAlias . '.id',
+                        $searchEngineAlias . '.id',
                         $this->createNamedParameter($qb, $query['index_id'])
                     )
                 )
@@ -112,7 +112,7 @@ class SearchPageAdapter extends AbstractEntityAdapter
         }
         if ($this->shouldHydrate($request, 'o:index_id')) {
             $indexId = $request->getValue('o:index_id');
-            $entity->setIndex($this->getAdapter('search_indexes')->findEntity($indexId));
+            $entity->setIndex($this->getAdapter('search_engines')->findEntity($indexId));
         }
         if ($this->shouldHydrate($request, 'o:form')) {
             $entity->setFormAdapter($request->getValue('o:form'));

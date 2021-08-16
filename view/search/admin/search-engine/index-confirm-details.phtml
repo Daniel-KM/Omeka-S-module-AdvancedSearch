@@ -1,7 +1,7 @@
 <?php
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
- * @var \Search\Api\Representation\SearchIndexRepresentation $resource
+ * @var \Search\Api\Representation\SearchEngineRepresentation $resource
  * @var string $resourceLabel
  * @var int $totalJobs
  * @var string $partialPath
@@ -9,7 +9,7 @@
 
 ?>
 
-<?= $this->searchIndexConfirm($this->resource, $this->resourceLabel, false, $totalJobs) ?>
+<?= $this->searchEngineConfirm($this->resource, $this->resourceLabel, false, $totalJobs) ?>
 <?php if (isset($this->partialPath)): ?>
     <?= $this->partial($this->partialPath) ?>
 <?php endif; ?>

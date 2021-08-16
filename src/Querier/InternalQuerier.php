@@ -374,32 +374,36 @@ SQL;
         // Don't use excluded fields for filters.
         $this->filterQueryValues($this->query->getFilters());
 
-        // TODO Manage the date range filters (one or two properties?).
-        /*
-        $dateRangeFilters = $this->query->getFiltersDateRange();
+        $dateRangeFilters = $this->query->getDateRangeFilters();
         foreach ($dateRangeFilters as $name => $filterValues) {
-            $name = $this->underscoredNameToTerm($name);
-            if (!$name) {
-                continue;
+            if ($name === 'created' || $name === 'modified') {
+                $argName = 'datetime';
+            } else {
+                $name = $this->underscoredNameToTerm($name);
+                if (!$name) {
+                    continue;
+                }
+                $argName = 'property';
             }
             foreach ($filterValues as $filterValue) {
-                $start = $filterValue['start'] ? $filterValue['start'] : '*';
-                $end = $filterValue['end'] ? $filterValue['end'] : '*';
-                $this->args['property'][] = [
-                    'joiner' => 'and',
-                    'property' => 'dcterms:date',
-                    'type' => 'gte',
-                    'text' => $start,
-                ];
-                $this->args['property'][] = [
-                    'joiner' => 'and',
-                    'property' => 'dcterms:date',
-                    'type' => 'lte',
-                    'text' => $end,
-                ];
+                if (strlen($filterValue['from'])) {
+                    $this->args[$argName][] = [
+                        'joiner' => 'and',
+                        'property' => $name,
+                        'type' => 'gte',
+                        'text' => $filterValue['from'],
+                    ];
+                }
+                if (strlen($filterValue['to'])) {
+                    $this->args[$argName][] = [
+                        'joiner' => 'and',
+                        'property' => $name,
+                        'type' => 'lte',
+                        'text' => $filterValue['to'],
+                    ];
+                }
             }
         }
-        */
 
         $filters = $this->query->getFilterQueries();
         foreach ($filters as $name => $values) {

@@ -502,6 +502,7 @@ class SearchConfigController extends AbstractActionController
         // Normalize filters.
         $inputTypes = [
             'advanced' => 'Advanced',
+            'daterange' => 'DateRange',
             'multicheckbox' => 'MultiCheckbox',
             'noop' => 'Noop',
             'radio' => 'Radio',

@@ -179,11 +179,11 @@ class Query implements \JsonSerializable
         return $this->filters;
     }
 
-    public function addDateRangeFilter(string $name, string $start, string $end): self
+    public function addDateRangeFilter(string $name, string $from, string $to): self
     {
         $this->dateRangeFilters[$name][] = [
-            'start' => trim($start),
-            'end' => trim($end),
+            'from' => trim($from),
+            'to' => trim($to),
         ];
         return $this;
     }

@@ -74,18 +74,29 @@ trait TraitUnrestrictedQuery
 
         // TODO Manage query on owner (only one in core).
 
-        if (isset($request['text']['filters'])) {
-            // Prepare options.
-            $joiner = false;
-            $operator = false;
-            foreach ($formSettings['filters'] as $filter) {
-                if ($filter['type'] === 'Advanced') {
-                    $joiner = (bool) $filter['field_joiner'];
-                    $operator = (bool) $filter['field_operator'];
-                    break;
-                }
+        // Prepare other fields.
+        $dateRangeField = null;
+        $joiner = null;
+        $operator = null;
+        foreach ($formSettings['filters'] as $filter) {
+            if ($filter['type'] === 'DateRange') {
+                $dateRangeField = $filter['field'];
             }
+            if ($filter['type'] === 'Advanced') {
+                $joiner = (bool) $filter['field_joiner'];
+                $operator = (bool) $filter['field_operator'];
+            }
+        }
 
+        if ($dateRangeField) {
+            $dateFrom = (string) ($request['date']['from'] ?? '');
+            $dateTo = (string) ($request['date']['to'] ?? '');
+            if (strlen($dateFrom) || strlen($dateTo)) {
+                $query->addDateRangeFilter($dateRangeField, $dateFrom, $dateTo);
+            }
+        }
+
+        if (isset($request['text']['filters'])) {
             if (empty($joiner)) {
                 if (empty($operator)) {
                     foreach ($request['text']['filters'] as $filter) {

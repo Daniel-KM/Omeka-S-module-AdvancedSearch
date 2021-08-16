@@ -30,6 +30,7 @@
 namespace AdvancedSearch\Form;
 
 use Laminas\Form\Element;
+use Laminas\Form\ElementInterface;
 use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
 use Omeka\Api\Representation\SiteRepresentation;
@@ -140,13 +141,18 @@ class MainSearchForm extends Form
                 case 'Advanced':
                     $element = $this->advancedFieldset($filter);
                     break;
+                case 'DateRange':
+                    $element = $this->dateRangeElement($filter);
+                    break;
                 case 'MultiCheckbox':
                 case 'Radio':
                 case 'Select':
                 case 'SelectFlat':
                     switch ($field) {
                         default:
+                            $element = $this->fieldElement($filter);
                             break;
+                        // TODO These exception should be removed: the search engine will manage them.
                         case 'items_set_id_field':
                             $element = $this->itemSetFieldset($filter);
                             break;
@@ -186,6 +192,42 @@ class MainSearchForm extends Form
         ;
 
         $this->appendInputFilters();
+    }
+
+    protected function fieldElement(array $filter): ?ElementInterface
+    {
+        // TODO Check if the field is available? It should be already checked in the config.
+        return null;
+    }
+
+    protected function dateRangeElement(array $filter): ?ElementInterface
+    {
+        $fieldset = new Fieldset('date');
+        $fieldset
+            ->setLabel($filter['label'])
+            ->add([
+                'name' => 'from',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'From', // @translate
+                ],
+                'attributes' => [
+                    'placeholder' => 'YYYY', // @translate
+                ],
+            ])
+            ->add([
+                'name' => 'to',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'To', // @translate
+                ],
+                'attributes' => [
+                    'placeholder' => 'YYYY', // @translate
+                ],
+            ])
+        ;
+
+        return $fieldset;
     }
 
     protected function itemSetFieldset(array $filter): ?Fieldset

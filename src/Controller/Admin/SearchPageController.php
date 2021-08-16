@@ -331,20 +331,21 @@ class SearchPageController extends AbstractActionController
     protected function sitesWithSearchPage(SearchPageRepresentation $searchPage): array
     {
         $result = [];
+        $searchPageId = $searchPage->id();
 
         // Check admin.
         $adminSearchId = $this->settings()->get('search_main_page');
-        if ($adminSearchId) {
+        if ($adminSearchId && $adminSearchId == $searchPageId) {
             $result[] = 'admin';
         }
 
         // Check all sites.
-        $searchPageId = $searchPage->id();
         $settings = $this->siteSettings();
         $sites = $this->api()->search('sites')->getContent();
         foreach ($sites as $site) {
             $settings->setTargetId($site->id());
-            if ($settings->get('search_main_page') == $searchPageId) {
+            $siteSearchId = $settings->get('search_main_page');
+            if ($siteSearchId && $siteSearchId == $searchPageId) {
                 $result[] = $site->id();
             }
         }

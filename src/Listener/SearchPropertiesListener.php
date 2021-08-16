@@ -175,6 +175,13 @@ class SearchPropertiesListener
      *   - new: does not end with
      *   - res: has resource
      *   - nres: has no resource
+     *   For date time only for now (a check is done to have a meaningful answer):
+     *   TODO Remove the check for valid date time? Add another key (before/after)?
+     *   Of course, it's better to use Numeric Data Types.
+     *   - gt: greater than (after)
+     *   - gte: greater than or equal
+     *   - lte: lower than or equal
+     *   - lt: lower than (before)
      *
      * @param QueryBuilder $qb
      * @param array $query
@@ -225,6 +232,7 @@ class SearchPropertiesListener
 
             $valuesAlias = $this->adapter->createAlias();
             $positive = true;
+            $incorrectValue = false;
 
             switch ($queryType) {
                 case 'neq':
@@ -341,6 +349,52 @@ class SearchPropertiesListener
 
                 default:
                     continue 2;
+
+                // TODO Manage uri and resources with gt, gte, lte, lt (it has a meaning at least for resource ids, but separate).
+                case 'gt':
+                    $valueNorm = $this->getDateTimeFromValue($value, false);
+                    if (is_null($valueNorm)) {
+                        $incorrectValue = true;
+                    } else {
+                        $predicateExpr = $expr->gt(
+                            "$valuesAlias.value",
+                            $this->adapter->createNamedParameter($qb, $valueNorm)
+                        );
+                    }
+                    break;
+                case 'gte':
+                    $valueNorm = $this->getDateTimeFromValue($value, true);
+                    if (is_null($valueNorm)) {
+                        $incorrectValue = true;
+                    } else {
+                        $predicateExpr = $expr->gte(
+                            "$valuesAlias.value",
+                            $this->adapter->createNamedParameter($qb, $valueNorm)
+                        );
+                    }
+                    break;
+                case 'lte':
+                    $valueNorm = $this->getDateTimeFromValue($value, false);
+                    if (is_null($valueNorm)) {
+                        $incorrectValue = true;
+                    } else {
+                        $predicateExpr = $expr->lte(
+                            "$valuesAlias.value",
+                            $this->adapter->createNamedParameter($qb, $valueNorm)
+                        );
+                    }
+                    break;
+                case 'lt':
+                    $valueNorm = $this->getDateTimeFromValue($value, true);
+                    if (is_null($valueNorm)) {
+                        $incorrectValue = true;
+                    } else {
+                        $predicateExpr = $expr->lt(
+                            "$valuesAlias.value",
+                            $this->adapter->createNamedParameter($qb, $valueNorm)
+                        );
+                    }
+                    break;
             }
 
             $joinConditions = [];
@@ -358,6 +412,12 @@ class SearchPropertiesListener
                     $otherIds = array_diff($this->usedPropertiesByTerm, $excludePropertyIds);
                     $joinConditions[] = $expr->in("$valuesAlias.property", $otherIds);
                 }
+            }
+
+            // Avoid to get results with some incorrect query.
+            if ($incorrectValue) {
+                $where = $expr->eq('incorrect date time request', '');
+                break;
             }
 
             if ($positive) {
@@ -968,7 +1028,7 @@ class SearchPropertiesListener
      *
      * @return int[]
      */
-    public function getPropertyIds(array $termOrIds): array
+    protected function getPropertyIds(array $termOrIds): array
     {
         if (is_null($this->propertiesByTermsAndIds)) {
             $this->prepareProperties();
@@ -981,7 +1041,7 @@ class SearchPropertiesListener
      *
      * @return int
      */
-    public function getPropertyId($termOrId): ?int
+    protected function getPropertyId($termOrId): ?int
     {
         if (is_null($this->propertiesByTermsAndIds)) {
             $this->prepareProperties();

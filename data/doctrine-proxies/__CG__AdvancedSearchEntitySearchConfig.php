@@ -26,7 +26,7 @@ class SearchConfig extends \AdvancedSearch\Entity\SearchConfig implements \Doctr
     /**
      * @var boolean flag indicating if this object was already initialized
      *
-     * @see \Doctrine\Common\Persistence\Proxy::__isInitialized
+     * @see \Doctrine\Persistence\Proxy::__isInitialized
      */
     public $__isInitialized__ = false;
 
@@ -293,7 +293,7 @@ class SearchConfig extends \AdvancedSearch\Entity\SearchConfig implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function getSettings(): ?array
+    public function getSettings(): array
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getSettings', []);

@@ -72,13 +72,15 @@ class SearchConfigController extends AbstractActionController
     {
         $form = $this->getForm(SearchConfigForm::class);
 
-        $view = new ViewModel;
-        $view->setVariable('form', $form);
+        $view = new ViewModel([
+            'form' => $form,
+        ]);
         if (!$this->checkPostAndValidForm($form)) {
             return $view;
         }
 
         $formData = $form->getData();
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $response = $this->api()->create('search_configs', $formData);
         $searchConfig = $response->getContent();
 
@@ -108,8 +110,9 @@ class SearchConfigController extends AbstractActionController
 
     public function editAction()
     {
-        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $id = $this->params('id');
+
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $this->api()->read('search_configs', ['id' => $id])->getContent();
 
         $data = $searchConfig->jsonSerialize();
@@ -118,8 +121,9 @@ class SearchConfigController extends AbstractActionController
         $form = $this->getForm(SearchConfigForm::class);
         $form->setData($data);
 
-        $view = new ViewModel;
-        $view->setVariable('form', $form);
+        $view = new ViewModel([
+            'form' => $form,
+        ]);
 
         if (!$this->checkPostAndValidForm($form)) {
             return $view;

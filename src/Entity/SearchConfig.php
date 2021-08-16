@@ -45,7 +45,9 @@ class SearchConfig extends AbstractEntity
      * @var int
      *
      * @Id
-     * @Column(type="integer")
+     * @Column(
+     *     type="integer"
+     * )
      * @GeneratedValue
      */
     protected $id;
@@ -53,14 +55,20 @@ class SearchConfig extends AbstractEntity
     /**
      * @var string
      *
-     * @Column(type="string", length=190)
+     * @Column(
+     *     type="string",
+     *     length=190
+     * )
      */
     protected $name;
 
     /**
      * @var string
      *
-     * @Column(type="string", length=190)
+     * @Column(
+     *     type="string",
+     *     length=190
+     * )
      */
     protected $path;
 
@@ -68,7 +76,7 @@ class SearchConfig extends AbstractEntity
      * @var SearchEngine
      *
      * @ManyToOne(
-     *     targetEntity="SearchEngine",
+     *     targetEntity=SearchEngine::class,
      *     inversedBy="searchConfigs"
      * )
      * @JoinColumn(
@@ -81,28 +89,39 @@ class SearchConfig extends AbstractEntity
     /**
      * @var string
      *
-     * @Column(type="string", length=190)
+     * @Column(
+     *     type="string",
+     *     length=190
+     * )
      */
     protected $formAdapter;
 
     /**
      * @var array
      *
-     * @Column(type="json", nullable=true)
+     * @Column(
+     *     type="json",
+     *     nullable=true
+     * )
      */
-    protected $settings;
+    protected $settings = [];
 
     /**
      * @var DateTime
      *
-     * @Column(type="datetime")
+     * @Column(
+     *     type="datetime"
+     * )
      */
     protected $created;
 
     /**
      * @var DateTime
      *
-     * @Column(type="datetime", nullable=true)
+     * @Column(
+     *     type="datetime",
+     *     nullable=true
+     * )
      */
     protected $modified;
 
@@ -161,9 +180,9 @@ class SearchConfig extends AbstractEntity
         return $this;
     }
 
-    public function getSettings(): ?array
+    public function getSettings(): array
     {
-        return $this->settings;
+        return $this->settings ?? [];
     }
 
     public function setCreated(DateTime $created): self

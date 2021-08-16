@@ -31,6 +31,7 @@
 namespace AdvancedSearch\Entity;
 
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Omeka\Entity\AbstractEntity;
@@ -45,7 +46,9 @@ class SearchEngine extends AbstractEntity
      * @var int
      *
      * @Id
-     * @Column(type="integer")
+     * @Column(
+     *     type="integer"
+     * )
      * @GeneratedValue
      */
     protected $id;
@@ -53,35 +56,49 @@ class SearchEngine extends AbstractEntity
     /**
      * @var string
      *
-     * @Column(type="string", length=190)
+     * @Column(
+     *     type="string",
+     *     length=190
+     * )
      */
     protected $name;
 
     /**
      * @var string
      *
-     * @Column(type="string", length=190)
+     * @Column(
+     *     type="string",
+     *     length=190
+     * )
      */
     protected $adapter;
 
     /**
      * @var array
      *
-     * @Column(type="json", nullable=true)
+     * @Column(
+     *     type="json",
+     *     nullable=true
+     * )
      */
-    protected $settings;
+    protected $settings = [];
 
     /**
      * @var DateTime
      *
-     * @Column(type="datetime")
+     * @Column(
+     *     type="datetime"
+     * )
      */
     protected $created;
 
     /**
      * @var DateTime
      *
-     * @Column(type="datetime", nullable=true)
+     * @Column(
+     *     type="datetime",
+     *     nullable=true
+     * )
      */
     protected $modified;
 
@@ -89,7 +106,7 @@ class SearchEngine extends AbstractEntity
      * @var SearchConfig[]
      *
      * @OneToMany(
-     *     targetEntity="SearchConfig",
+     *     targetEntity=SearchConfig::class,
      *     mappedBy="engine",
      *     orphanRemoval=true,
      *     cascade={"persist", "remove"},
@@ -97,6 +114,12 @@ class SearchEngine extends AbstractEntity
      * )
      */
     protected $searchConfigs;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->searchConfigs = new ArrayCollection;
+    }
 
     public function getId()
     {
@@ -131,9 +154,9 @@ class SearchEngine extends AbstractEntity
         return $this;
     }
 
-    public function getSettings(): ?array
+    public function getSettings(): array
     {
-        return $this->settings;
+        return $this->settings ?? [];
     }
 
     public function setCreated(DateTime $created): self

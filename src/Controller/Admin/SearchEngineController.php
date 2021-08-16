@@ -85,22 +85,20 @@ class SearchEngineController extends AbstractActionController
 
     public function editAction()
     {
-        $adapterManager = $this->getSearchAdapterManager();
-
         $id = $this->params('id');
 
         /** @var \AdvancedSearch\Entity\SearchEngine $searchEngine */
-        $searchEngine = $this->getEntityManager()->find(\AdvancedSearch\Entity\SearchEngine::class, $id);
+        $searchEngine = $this->entityManager->find(\AdvancedSearch\Entity\SearchEngine::class, $id);
         $searchEngineAdapterName = $searchEngine->getAdapter();
-        if (!$adapterManager->has($searchEngineAdapterName)) {
-            $this->messenger()->addError(new Message('The adapter "%s" is not available.', // @translate
+        if (!$this->searchAdapterManager->has($searchEngineAdapterName)) {
+            $this->messenger()->addError(new Message('The search adapter "%s" is not available.', // @translate
                 $searchEngineAdapterName
             ));
             return $this->redirect()->toRoute('admin/search', ['action' => 'browse'], true);
         }
 
         /** @var \AdvancedSearch\Adapter\AdapterInterface $adapter */
-        $adapter = $adapterManager->get($searchEngineAdapterName);
+        $adapter = $this->searchAdapterManager->get($searchEngineAdapterName);
 
         $form = $this->getForm(SearchEngineConfigureForm::class, [
             'advancedsearch_engine_id' => $id,
@@ -134,7 +132,7 @@ class SearchEngineController extends AbstractActionController
             $searchEngine
                 ->setName($name)
                 ->setSettings($formData);
-            $this->getEntityManager()->flush($searchEngine);
+            $this->entityManager->flush($searchEngine);
             $this->messenger()->addSuccess(new Message(
                 'Search index "%s" successfully configured.',  // @translate
                 $searchEngine->getName()
@@ -230,15 +228,5 @@ class SearchEngineController extends AbstractActionController
             }
         }
         return $this->redirect()->toRoute('admin/search');
-    }
-
-    protected function getEntityManager(): EntityManager
-    {
-        return $this->entityManager;
-    }
-
-    protected function getSearchAdapterManager(): SearchAdapterManager
-    {
-        return $this->searchAdapterManager;
     }
 }

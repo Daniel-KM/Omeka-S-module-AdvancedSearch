@@ -43,11 +43,13 @@ class SearchEngineRepresentation extends AbstractEntityRepresentation
 
     public function getJsonLd()
     {
+        $modified = $this->resource->getModified();
         return [
             'o:name' => $this->resource->getName(),
             'o:adapter' => $this->resource->getAdapter(),
             'o:settings' => $this->resource->getSettings(),
             'o:created' => $this->getDateTime($this->resource->getCreated()),
+            'o:modified' => $modified ? $this->getDateTime($modified) : null,
         ];
     }
 
@@ -100,7 +102,7 @@ class SearchEngineRepresentation extends AbstractEntityRepresentation
 
     public function settings(): array
     {
-        return $this->resource->getSettings() ?? [];
+        return $this->resource->getSettings();
     }
 
     public function setting(string $name, $default = null)
@@ -124,6 +126,11 @@ class SearchEngineRepresentation extends AbstractEntityRepresentation
     public function created(): \DateTime
     {
         return $this->resource->getCreated();
+    }
+
+    public function modified(): ?\DateTime
+    {
+        return $this->resource->getModified();
     }
 
     public function getEntity(): \AdvancedSearch\Entity\SearchEngine

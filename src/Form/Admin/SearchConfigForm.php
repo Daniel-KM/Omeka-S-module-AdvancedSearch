@@ -75,12 +75,12 @@ class SearchConfigForm extends Form
             ])
 
             ->add([
-                'name' => 'o:engine_id',
+                'name' => 'o:engine',
                 'type' => Element\Select::class,
                 'options' => [
-                    'label' => 'Index', // @translate
-                    'value_options' => $this->getIndexesOptions(),
-                    'empty_option' => 'Select an index below…', // @translate
+                    'label' => 'Search engine', // @translate
+                    'value_options' => $this->getEnginesOptions(),
+                    'empty_option' => 'Select a search engine below…', // @translate
                 ],
                 'attributes' => [
                     'required' => true,
@@ -163,7 +163,7 @@ class SearchConfigForm extends Form
         return $this;
     }
 
-    protected function getIndexesOptions(): array
+    protected function getEnginesOptions(): array
     {
         $options = [];
 

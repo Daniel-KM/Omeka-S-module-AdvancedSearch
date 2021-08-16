@@ -110,21 +110,24 @@ class SearchConfigAdapter extends AbstractEntityAdapter
         if ($this->shouldHydrate($request, 'o:path')) {
             $entity->setPath($request->getValue('o:path'));
         }
-        if ($this->shouldHydrate($request, 'o:engine_id')) {
-            $engineId = $request->getValue('o:engine_id');
-            $entity->setEngine($this->getAdapter('search_engines')->findEntity($engineId));
+        if ($this->shouldHydrate($request, 'o:engine')) {
+            $engine = $request->getValue('o:engine');
+            if (!is_object($engine)) {
+                $engine = $this->getAdapter('search_engines')->findEntity($engine);
+            }
+            $entity->setEngine($engine);
         }
         if ($this->shouldHydrate($request, 'o:form')) {
             $entity->setFormAdapter($request->getValue('o:form'));
         }
         if ($this->shouldHydrate($request, 'o:settings')) {
-            $entity->setSettings($request->getValue('o:settings'));
+            $entity->setSettings($request->getValue('o:settings') ?? []);
         }
     }
 
     public function validateEntity(EntityInterface $entity, ErrorStore $errorStore): void
     {
-        if (false == $entity->getName()) {
+        if (!$entity->getName()) {
             $errorStore->addError('o:name', 'The name cannot be empty.'); // @translate
         }
 

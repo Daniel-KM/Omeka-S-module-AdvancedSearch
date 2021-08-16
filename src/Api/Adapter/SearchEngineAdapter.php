@@ -88,13 +88,13 @@ class SearchEngineAdapter extends AbstractEntityAdapter
             $entity->setAdapter($request->getValue('o:adapter'));
         }
         if ($this->shouldHydrate($request, 'o:settings')) {
-            $entity->setSettings($request->getValue('o:settings') ?: []);
+            $entity->setSettings($request->getValue('o:settings') ?? []);
         }
     }
 
     public function validateEntity(EntityInterface $entity, ErrorStore $errorStore): void
     {
-        if (false == $entity->getName()) {
+        if (!$entity->getName()) {
             $errorStore->addError('o:name', 'The name cannot be empty.');
         }
     }

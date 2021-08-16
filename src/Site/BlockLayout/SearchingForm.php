@@ -41,7 +41,7 @@ class SearchingForm extends AbstractBlockLayout
         // Factory is not used to make rendering simpler.
         $services = $site->getServiceLocator();
         $formElementManager = $services->get('FormElementManager');
-        $defaultSettings = $services->get('Config')['search']['block_settings']['searchingForm'];
+        $defaultSettings = $services->get('Config')['advancedsearch']['block_settings']['searchingForm'];
         $blockFieldset = \AdvancedSearch\Form\SearchingFormFieldset::class;
 
         $data = $block ? $block->data() + $defaultSettings : $defaultSettings;
@@ -59,8 +59,10 @@ class SearchingForm extends AbstractBlockLayout
 
     public function render(PhpRenderer $view, SitePageBlockRepresentation $block)
     {
+        // Name "search_page" is kept to simplify migration.
+
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
-        $searchConfig = $block->dataValue('advancedsearch_config');
+        $searchConfig = $block->dataValue('search_page');
         if ($searchConfig) {
             try {
                 $searchConfig = $view->api()->read('search_configs', ['id' => $searchConfig])->getContent();
@@ -91,7 +93,7 @@ class SearchingForm extends AbstractBlockLayout
         $vars = [
             'heading' => $block->dataValue('heading', ''),
             'displayResults' => $displayResults,
-            'searchConfig' => $searchConfig,
+            'searchPage' => $searchConfig,
             'site' => $site,
             'query' => null,
             'response' => new Response,

@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
+
 namespace AdvancedSearch\Service\ViewHelper;
 
+use AdvancedSearch\Mvc\Controller\Plugin\SearchRequestToResponse;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 

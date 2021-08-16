@@ -30,8 +30,9 @@ class SearchingFormFieldset extends Fieldset
                     'id' => 'searching-form-heading',
                 ],
             ])
+            // Name "search_page" is kept to simplify migration.
             ->add([
-                'name' => 'o:block[__blockIndex__][o:data][advancedsearch_config]',
+                'name' => 'o:block[__blockIndex__][o:data][search_page]',
                 'type' => Element\Select::class,
                 'options' => [
                     'label' => 'Search page', // @translate
@@ -39,7 +40,7 @@ class SearchingFormFieldset extends Fieldset
                     'value_options' => $searchConfigs,
                 ],
                 'attributes' => [
-                    'id' => 'searching-form-search-config',
+                    'id' => 'searching-form-search-page',
                     'required' => true,
                 ],
             ])

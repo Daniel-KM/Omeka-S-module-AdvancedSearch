@@ -38,15 +38,18 @@ class SearchRequestToResponse extends AbstractPlugin
         SearchConfigRepresentation $searchConfig,
         SiteRepresentation $site = null
     ): array {
-        $controller = $this->getController();
         $this->searchConfig = $searchConfig;
+
+        // The controller may not be available.
+        $services = $searchConfig->getServiceLocator();
+        $plugins = $services->get('ControllerPluginManager');
 
         /** @var \AdvancedSearch\FormAdapter\FormAdapterInterface $formAdapter */
         $formAdapter = $searchConfig->formAdapter();
         if (!$formAdapter) {
             $formAdapterName = $searchConfig->formAdapterName();
             $message = new Message('Form adapter "%s" not found.', $formAdapterName); // @translate
-            $controller->logger()->err($message);
+            $plugins->get('logger')()->err($message);
             return [
                 'status' => 'error',
                 'message' => $message,
@@ -72,7 +75,7 @@ class SearchRequestToResponse extends AbstractPlugin
         $this->searchEngine = $searchConfig->engine();
         $engineSettings = $this->searchEngine->settings();
 
-        $user = $controller->identity();
+        $user = $plugins->get('identity')();
         // TODO Manage roles from modules and visibility from modules (access resources).
         $omekaRoles = [
             \Omeka\Permissions\Acl::ROLE_GLOBAL_ADMIN,
@@ -118,10 +121,12 @@ class SearchRequestToResponse extends AbstractPlugin
         if (isset($request['per_page']) && $request['per_page'] > 0) {
             $perPage = (int) $request['per_page'];
         } elseif ($site) {
-            $siteSettings = $controller->siteSettings();
-            $perPage = (int) $siteSettings->get('pagination_per_page') ?: (int) $controller->settings()->get('pagination_per_page', Paginator::PER_PAGE);
+            $siteSettings = $plugins->get('siteSettings')();
+            $settings = $plugins->get('settings')();
+            $perPage = (int) $siteSettings->get('pagination_per_page') ?: (int) $settings->get('pagination_per_page', Paginator::PER_PAGE);
         } else {
-            $perPage = (int) $controller->settings()->get('pagination_per_page', Paginator::PER_PAGE);
+            $settings = $plugins->get('settings')();
+            $perPage = (int) $settings->get('pagination_per_page', Paginator::PER_PAGE);
         }
         $query->setLimitPage($searchConfigNumber, $perPage);
 
@@ -150,7 +155,7 @@ class SearchRequestToResponse extends AbstractPlugin
             }
         }
 
-        $eventManager = $controller->getEventManager();
+        $eventManager = $services->get('Application')->getEventManager();
         $eventArgs = $eventManager->prepareArgs([
             'request' => $request,
             'query' => $query,
@@ -168,7 +173,7 @@ class SearchRequestToResponse extends AbstractPlugin
             $response = $querier->query();
         } catch (QuerierException $e) {
             $message = new Message("Query error: %s\nQuery:%s", $e->getMessage(), json_encode($query->jsonSerialize(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)); // @translate
-            $controller->logger()->err($message);
+            $plugins->get('logger')()->err($message);
             return [
                 'status' => 'error',
                 'message' => $message,
@@ -185,7 +190,7 @@ class SearchRequestToResponse extends AbstractPlugin
         $totalResults = array_map(function ($resource) use ($response) {
             return $response->getResourceTotalResults($resource);
         }, $engineSettings['resources']);
-        $controller->paginator(max($totalResults), $searchConfigNumber);
+        $plugins->get('paginator')(max($totalResults), $searchConfigNumber);
 
         return [
             'status' => 'success',

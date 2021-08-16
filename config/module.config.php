@@ -21,6 +21,7 @@ return [
         'template_path_stack' => [
             dirname(__DIR__) . '/view',
         ],
+        // View "search" is kept to simplify migration.
         'controller_map' => [
             Controller\IndexController::class => 'search',
         ],
@@ -274,7 +275,8 @@ return [
         'block_settings' => [
             'searchingForm' => [
                 'heading' => '',
-                'search_config' => null,
+                // Name "search_page" is kept to simplify migration.
+                'search_page' => null,
                 'display_results' => false,
                 'query' => '',
                 'query_filter' => '',

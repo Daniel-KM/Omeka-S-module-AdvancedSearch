@@ -324,7 +324,7 @@ class SearchConfigController extends AbstractActionController
     protected function getConfigureForm(SearchConfigRepresentation $searchConfig): ?\AdvancedSearch\Form\Admin\SearchConfigConfigureForm
     {
         return $searchConfig->index()
-            ? $this->getForm(SearchConfigConfigureForm::class, ['search_config' => $searchConfig])
+            ? $this->getForm(SearchConfigConfigureForm::class, ['advancedsearch_config' => $searchConfig])
             : null;
     }
 
@@ -334,7 +334,7 @@ class SearchConfigController extends AbstractActionController
         $searchConfigId = $searchConfig->id();
 
         // Check admin.
-        $adminSearchId = $this->settings()->get('search_main_page');
+        $adminSearchId = $this->settings()->get('advancedsearch_main_page');
         if ($adminSearchId && $adminSearchId == $searchConfigId) {
             $result[] = 'admin';
         }
@@ -344,7 +344,7 @@ class SearchConfigController extends AbstractActionController
         $sites = $this->api()->search('sites')->getContent();
         foreach ($sites as $site) {
             $settings->setTargetId($site->id());
-            $siteSearchId = $settings->get('search_main_page');
+            $siteSearchId = $settings->get('advancedsearch_main_page');
             if ($siteSearchId && $siteSearchId == $searchConfigId) {
                 $result[] = $site->id();
             }
@@ -389,7 +389,7 @@ class SearchConfigController extends AbstractActionController
         if ($current !== $new) {
             $settings = $this->settings();
             if ($new) {
-                $settings->set('search_main_page', $searchConfigId);
+                $settings->set('advancedsearch_main_page', $searchConfigId);
                 $searchConfigs = $settings->get('search_configs', []);
                 $searchConfigs[] = $searchConfigId;
                 $searchConfigs = array_unique(array_filter(array_map('intval', $searchConfigs)));
@@ -398,7 +398,7 @@ class SearchConfigController extends AbstractActionController
 
                 $message = 'The page has been set by default in admin board.'; // @translate
             } else {
-                $settings->set('search_main_page', null);
+                $settings->set('advancedsearch_main_page', null);
                 $message = 'The page has been unset in admin board.'; // @translate
             }
             $this->messenger()->addSuccess($message);
@@ -430,10 +430,10 @@ class SearchConfigController extends AbstractActionController
             $new = $allSites || in_array($siteId, $newMainSearchConfigForSites);
             if ($current !== $new) {
                 if ($new) {
-                    $siteSettings->set('search_main_page', $searchConfigId);
+                    $siteSettings->set('advancedsearch_main_page', $searchConfigId);
                     $searchConfigs[] = $searchConfigId;
                 } else {
-                    $siteSettings->set('search_main_page', null);
+                    $siteSettings->set('advancedsearch_main_page', null);
                 }
             }
 

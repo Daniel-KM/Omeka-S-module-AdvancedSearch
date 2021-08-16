@@ -238,15 +238,15 @@ return [
     ],
     'advancedsearch' => [
         'settings' => [
-            'advancedsearchplus_restrict_used_terms' => true,
-            'search_main_page' => 1,
+            'advancedsearch_restrict_used_terms' => true,
+            'advancedsearch_main_page' => 1,
             'search_configs' => [1],
-            'search_api_page' => '',
-            'search_batch_size' => 100,
+            'advancedsearch_api_page' => '',
+            'advancedsearch_batch_size' => 100,
         ],
         'site_settings' => [
-            'advancedsearchplus_restrict_used_terms' => true,
-            'advancedsearchplus_search_fields' => [
+            'advancedsearch_restrict_used_terms' => true,
+            'advancedsearch_advancedsearch_fields' => [
                 'common/advanced-search/fulltext',
                 'common/advanced-search/properties',
                 'common/advanced-search/resource-class',
@@ -257,14 +257,14 @@ return [
                 'common/advanced-search/data-type-geography',
                 'common/numeric-data-types-advanced-search',
             ],
-            'search_main_page' => null,
+            'advancedsearch_main_page' => null,
             'search_configs' => [],
-            'search_redirect_itemset' => true,
+            'advancedsearch_redirect_itemset' => true,
         ],
         'block_settings' => [
             'searchingForm' => [
                 'heading' => '',
-                'search_config' => null,
+                'advancedsearch_config' => null,
                 'display_results' => false,
                 'query' => '',
                 'query_filter' => '',
@@ -274,7 +274,7 @@ return [
         // This is the default list of all possible fields, allowing other modules
         // to complete it. The partials that are not set in merged Config (included
         // config/local.config.php) are not managed by this module.
-        'search_fields' => [
+        'advancedsearch_fields' => [
             // From view/common/advanced-search'.
             'common/advanced-search/fulltext' => ['label' => 'Full text'], // @translate
             'common/advanced-search/properties' => ['label' => 'Properties'], // @translate

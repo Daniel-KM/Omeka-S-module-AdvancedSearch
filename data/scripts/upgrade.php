@@ -26,7 +26,7 @@ $config = require dirname(__DIR__, 2) . '/config/module.config.php';
 
 if (version_compare($oldVersion, '0.1.1', '<')) {
     $connection->exec('
-        ALTER TABLE search_config
+        ALTER TABLE advancedsearch_config
         CHANGE `form` `form_adapter` varchar(255) NOT NULL
     ');
 }
@@ -35,25 +35,25 @@ if (version_compare($oldVersion, '0.5.0', '<')) {
     // There is no "drop foreign key if exists", so check it.
     $sql = '';
     $sm = $connection->getSchemaManager();
-    $keys = ['search_config_ibfk_1', 'index_id', 'IDX_4F10A34984337261', 'FK_4F10A34984337261'];
-    $foreignKeys = $sm->listTableForeignKeys('search_config');
+    $keys = ['advancedsearch_config_ibfk_1', 'index_id', 'IDX_4F10A34984337261', 'FK_4F10A34984337261'];
+    $foreignKeys = $sm->listTableForeignKeys('advancedsearch_config');
     foreach ($foreignKeys as $foreignKey) {
         if ($foreignKey && in_array($foreignKey->getName(), $keys)) {
-            $sql .= 'ALTER TABLE search_config DROP FOREIGN KEY ' . $foreignKey->getName() . ';' . PHP_EOL;
+            $sql .= 'ALTER TABLE advancedsearch_config DROP FOREIGN KEY ' . $foreignKey->getName() . ';' . PHP_EOL;
         }
     }
-    $indexes = $sm->listTableIndexes('search_config');
+    $indexes = $sm->listTableIndexes('advancedsearch_config');
     foreach ($indexes as $index) {
         if ($index && in_array($index->getName(), $keys)) {
-            $sql .= 'DROP INDEX ' . $index->getName() . ' ON search_config;' . PHP_EOL;
+            $sql .= 'DROP INDEX ' . $index->getName() . ' ON advancedsearch_config;' . PHP_EOL;
         }
     }
 
     $sql .= <<<'SQL'
-ALTER TABLE search_index CHANGE id id INT AUTO_INCREMENT NOT NULL, CHANGE settings settings LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json_array)';
-ALTER TABLE search_config CHANGE id id INT AUTO_INCREMENT NOT NULL, CHANGE index_id index_id INT NOT NULL AFTER id, CHANGE settings settings LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json_array)';
-CREATE INDEX IDX_4F10A34984337261 ON search_config (index_id);
-ALTER TABLE search_config ADD CONSTRAINT search_config_ibfk_1 FOREIGN KEY (index_id) REFERENCES search_index (id);
+ALTER TABLE advancedsearch_index CHANGE id id INT AUTO_INCREMENT NOT NULL, CHANGE settings settings LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json_array)';
+ALTER TABLE advancedsearch_config CHANGE id id INT AUTO_INCREMENT NOT NULL, CHANGE index_id index_id INT NOT NULL AFTER id, CHANGE settings settings LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json_array)';
+CREATE INDEX IDX_4F10A34984337261 ON advancedsearch_config (index_id);
+ALTER TABLE advancedsearch_config ADD CONSTRAINT advancedsearch_config_ibfk_1 FOREIGN KEY (index_id) REFERENCES advancedsearch_index (id);
 SQL;
     $sqls = array_filter(array_map('trim', explode(';', $sql)));
     foreach ($sqls as $sql) {
@@ -65,23 +65,23 @@ if (version_compare($oldVersion, '0.5.1', '<')) {
     // There is no "drop foreign key if exists", so check it.
     $sql = '';
     $sm = $connection->getSchemaManager();
-    $keys = ['search_config_ibfk_1', 'index_id', 'IDX_4F10A34984337261', 'FK_4F10A34984337261'];
-    $foreignKeys = $sm->listTableForeignKeys('search_config');
+    $keys = ['advancedsearch_config_ibfk_1', 'index_id', 'IDX_4F10A34984337261', 'FK_4F10A34984337261'];
+    $foreignKeys = $sm->listTableForeignKeys('advancedsearch_config');
     foreach ($foreignKeys as $foreignKey) {
         if ($foreignKey && in_array($foreignKey->getName(), $keys)) {
-            $sql .= 'ALTER TABLE search_config DROP FOREIGN KEY ' . $foreignKey->getName() . ';' . PHP_EOL;
+            $sql .= 'ALTER TABLE advancedsearch_config DROP FOREIGN KEY ' . $foreignKey->getName() . ';' . PHP_EOL;
         }
     }
-    $indexes = $sm->listTableIndexes('search_config');
+    $indexes = $sm->listTableIndexes('advancedsearch_config');
     foreach ($indexes as $index) {
         if ($index && in_array($index->getName(), $keys)) {
-            $sql .= 'DROP INDEX ' . $index->getName() . ' ON search_config;' . PHP_EOL;
+            $sql .= 'DROP INDEX ' . $index->getName() . ' ON advancedsearch_config;' . PHP_EOL;
         }
     }
 
     $sql .= <<<'SQL'
-CREATE INDEX IDX_4F10A34984337261 ON search_config (index_id);
-ALTER TABLE search_config ADD CONSTRAINT FK_4F10A34984337261 FOREIGN KEY (index_id) REFERENCES search_index (id) ON DELETE CASCADE;
+CREATE INDEX IDX_4F10A34984337261 ON advancedsearch_config (index_id);
+ALTER TABLE advancedsearch_config ADD CONSTRAINT FK_4F10A34984337261 FOREIGN KEY (index_id) REFERENCES advancedsearch_index (id) ON DELETE CASCADE;
 SQL;
     $sqls = array_filter(array_map('trim', explode(';', $sql)));
     foreach ($sqls as $sql) {
@@ -107,9 +107,9 @@ if (version_compare($oldVersion, '3.5.7', '<')) {
         $siteSettings->setTargetId($site->id());
         $key = 'theme_settings_' . $theme;
         $themeSettings = $siteSettings->get($key, []);
-        if (array_key_exists('search_config_id', $themeSettings)) {
-            $siteSettings->set('search_main_page', $themeSettings['search_config_id']);
-            unset($themeSettings['search_config_id']);
+        if (array_key_exists('advancedsearch_config_id', $themeSettings)) {
+            $siteSettings->set('advancedsearch_main_page', $themeSettings['advancedsearch_config_id']);
+            unset($themeSettings['advancedsearch_config_id']);
             $siteSettings->set($key, $themeSettings);
         }
     }
@@ -118,14 +118,14 @@ if (version_compare($oldVersion, '3.5.7', '<')) {
 if (version_compare($oldVersion, '3.5.8', '<')) {
     $defaultConfig = $config[strtolower(__NAMESPACE__)]['config'];
     $settings->set(
-        'search_batch_size',
-        $defaultConfig['search_batch_size']
+        'advancedsearch_batch_size',
+        $defaultConfig['advancedsearch_batch_size']
     );
 
     // Reorder the search pages by weight to avoid to do it each time.
     // The api is not available for search pages during upgrade, so use sql.
     $sql = <<<'SQL'
-SELECT `id`, `settings` FROM `search_config`;
+SELECT `id`, `settings` FROM `advancedsearch_config`;
 SQL;
     $stmt = $connection->query($sql);
     $result = $stmt->fetchAll(\PDO::FETCH_KEY_PAIR);
@@ -169,7 +169,7 @@ SQL;
             }
             $searchConfigSettings = $connection->quote(json_encode($searchConfigSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
             $sql = <<<SQL
-UPDATE `search_config`
+UPDATE `advancedsearch_config`
 SET `settings` = $searchConfigSettings
 WHERE `id` = $id;
 SQL;
@@ -199,24 +199,24 @@ SQL;
 }
 
 if (version_compare($oldVersion, '3.5.12.2', '<')) {
-    $mainSearchConfig = $settings->get('search_main_page');
+    $mainSearchConfig = $settings->get('advancedsearch_main_page');
     if ($mainSearchConfig) {
         $mainSearchConfig = basename($mainSearchConfig);
-        // The api for search_configs is not available during upgrade.
+        // The api for advancedsearch_configs is not available during upgrade.
         $sql = <<<SQL
 SELECT `id`
-FROM `search_config`
-WHERE `path` = :search_config;
+FROM `advancedsearch_config`
+WHERE `path` = :advancedsearch_config;
 SQL;
-        $id = $connection->fetchColumn($sql, ['search_config' => $mainSearchConfig], 0);
-        $settings->set('search_main_page', $id ? (string) $id : null);
+        $id = $connection->fetchColumn($sql, ['advancedsearch_config' => $mainSearchConfig], 0);
+        $settings->set('advancedsearch_main_page', $id ? (string) $id : null);
     }
 }
 
 if (version_compare($oldVersion, '3.5.14', '<')) {
     // Add new default options to settings of search pages.
     $sql = <<<'SQL'
-SELECT `id`, `settings` FROM `search_config`;
+SELECT `id`, `settings` FROM `advancedsearch_config`;
 SQL;
     $stmt = $connection->query($sql);
     $result = $stmt->fetchAll(\PDO::FETCH_KEY_PAIR);
@@ -234,7 +234,7 @@ SQL;
             $searchConfigSettings['form']['filter_collection_number'] = '1';
             $searchConfigSettings = $connection->quote(json_encode($searchConfigSettings, 320));
             $sql = <<<SQL
-UPDATE `search_config`
+UPDATE `advancedsearch_config`
 SET `settings` = $searchConfigSettings
 WHERE `id` = $id;
 SQL;
@@ -246,13 +246,13 @@ SQL;
 if (version_compare($oldVersion, '3.5.16.3', '<')) {
     // @link https://www.doctrine-project.org/projects/doctrine-dbal/en/2.6/reference/types.html#array-types
     $sql = <<<'SQL'
-ALTER TABLE `search_index`
+ALTER TABLE `advancedsearch_index`
 CHANGE `settings` `settings` LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json)',
 CHANGE `modified` `modified` DATETIME DEFAULT NULL;
 SQL;
     $connection->exec($sql);
     $sql = <<<'SQL'
-ALTER TABLE `search_config`
+ALTER TABLE `advancedsearch_config`
 CHANGE `settings` `settings` LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json)',
 CHANGE `modified` `modified` DATETIME DEFAULT NULL;
 SQL;
@@ -261,7 +261,7 @@ SQL;
 
 if (version_compare($oldVersion, '3.5.21.3', '<')) {
     $sql = <<<'SQL'
-SELECT `id`, `form_adapter`, `settings` FROM `search_config`;
+SELECT `id`, `form_adapter`, `settings` FROM `advancedsearch_config`;
 SQL;
     $stmt = $connection->query($sql);
     $results = $stmt->fetchAll();
@@ -338,7 +338,7 @@ SQL;
 
         $searchConfigSettings = $connection->quote(json_encode($searchConfigSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
         $sql = <<<SQL
-UPDATE `search_config`
+UPDATE `advancedsearch_config`
 SET `settings` = $searchConfigSettings
 WHERE `id` = $id;
 SQL;
@@ -347,14 +347,14 @@ SQL;
 
     // Replace forms "Basic" and "Advanced" by "Main".
     $sql = <<<'SQL'
-UPDATE `search_config`
+UPDATE `advancedsearch_config`
 SET `form_adapter` = "main"
 WHERE `form_adapter` IN ("basic", "advanced");
 SQL;
     $connection->exec($sql);
 
     $sql = <<<'SQL'
-UPDATE `search_index`
+UPDATE `advancedsearch_index`
 SET `name` = "Internal (sql)"
 WHERE `name` = "Internal";
 SQL;
@@ -385,7 +385,7 @@ if (version_compare($oldVersion, '3.5.22.3', '<')) {
 
 if (version_compare($oldVersion, '3.5.23.3', '<')) {
     $sql = <<<'SQL'
-SELECT `id`, `settings` FROM `search_config`;
+SELECT `id`, `settings` FROM `advancedsearch_config`;
 SQL;
     $default = [
         'search' => [],
@@ -421,7 +421,7 @@ SQL;
 
         $searchConfigSettings = $connection->quote(json_encode($searchConfigSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
         $sql = <<<SQL
-UPDATE `search_config`
+UPDATE `advancedsearch_config`
 SET `settings` = $searchConfigSettings
 WHERE `id` = $id;
 SQL;

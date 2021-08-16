@@ -37,7 +37,7 @@ $translate = $this->plugin('translate');
 $escape = $this->plugin('escapeHtml');
 
 $label = $data['label'] ?? null;
-$searchConfigId = $data['search_config_id'] ?? null;
+$searchConfigId = $data['advancedsearch_config_id'] ?? null;
 
 $searchConfigs = $this->api()->search('search_configs')->getContent();
 ?>
@@ -50,7 +50,7 @@ $searchConfigs = $this->api()->search('search_configs')->getContent();
 </label>
 <label>
     <?php echo $translate('Page'); ?>
-    <select data-name="search_config_id">
+    <select data-name="advancedsearch_config_id">
         <?php foreach ($searchConfigs as $searchConfig): ?>
             <?php $selected = $searchConfigId && $searchConfigId == $searchConfig->id(); ?>
             <option value="<?php echo $searchConfig->id(); ?>" <?php echo ($selected) ? 'selected="selected"' : ''; ?>>

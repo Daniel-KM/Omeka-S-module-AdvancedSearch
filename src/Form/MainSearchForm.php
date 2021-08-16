@@ -78,7 +78,7 @@ class MainSearchForm extends Form
         }
 
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
-        $searchConfig = $this->getOption('search_config');
+        $searchConfig = $this->getOption('advancedsearch_config');
         // TODO Throw exception when search page is not set.
         $searchConfigSettings = $searchConfig ? $searchConfig->settings() : [];
 
@@ -331,8 +331,8 @@ class MainSearchForm extends Form
             ]);
 
         $hasValues = false;
-        if ($this->siteSetting && $this->siteSetting->__invoke('search_restrict_templates', false)) {
-            $values = $this->siteSetting->__invoke('search_apply_templates', []);
+        if ($this->siteSetting && $this->siteSetting->__invoke('advancedsearch_restrict_templates', false)) {
+            $values = $this->siteSetting->__invoke('advancedsearch_apply_templates', []);
             if ($values) {
                 $values = array_intersect_key($element->getValueOptions(), array_flip($values));
                 $hasValues = (bool) $values;

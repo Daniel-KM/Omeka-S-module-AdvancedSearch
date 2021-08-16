@@ -31,7 +31,7 @@ class SearchingFormFieldset extends Fieldset
                 ],
             ])
             ->add([
-                'name' => 'o:block[__blockIndex__][o:data][search_config]',
+                'name' => 'o:block[__blockIndex__][o:data][advancedsearch_config]',
                 'type' => Element\Select::class,
                 'options' => [
                     'label' => 'Search page', // @translate
@@ -111,7 +111,7 @@ class SearchingFormFieldset extends Fieldset
         $pages = array_intersect_key($pages, array_flip($available));
 
         // Set the main search page as default.
-        $default = $siteSetting('search_main_page') ?: reset($available);
+        $default = $siteSetting('advancedsearch_main_page') ?: reset($available);
         if (isset($pages[$default])) {
             $pages = [$default => $pages[$default]] + $pages;
         }

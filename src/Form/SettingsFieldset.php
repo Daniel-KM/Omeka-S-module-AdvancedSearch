@@ -32,24 +32,24 @@ class SettingsFieldset extends Fieldset
             }
         }
 
-        $selectAllTerms = $settings->get('advancedsearchplus_restrict_used_terms', false);
+        $selectAllTerms = $settings->get('advancedadvancedsearch_restrict_used_terms', false);
 
         $this
             ->add([
-                'name' => 'advancedsearchplus_restrict_used_terms',
+                'name' => 'advancedadvancedsearch_restrict_used_terms',
                 'type' => \Laminas\Form\Element\Checkbox::class,
                 'options' => [
                     'label' => 'Restrict to used properties and resources classes', // @translate
                     'info' => 'If checked, restrict the list of properties and resources classes to the used ones in advanced search form.', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'advancedsearchplus_restrict_used_terms',
+                    'id' => 'advancedadvancedsearch_restrict_used_terms',
                     'value' => $selectAllTerms,
                 ],
             ]);
 
         $this->add([
-            'name' => 'search_main_page',
+            'name' => 'advancedsearch_main_page',
             'type' => OptionalSelect::class,
             'options' => [
                 'label' => 'Default search page (admin)', // @translate
@@ -58,7 +58,7 @@ class SettingsFieldset extends Fieldset
                 'empty_option' => 'Select the search engine for the admin bar…', // @translate
             ],
             'attributes' => [
-                'id' => 'search_main_page',
+                'id' => 'advancedsearch_main_page',
             ],
         ]);
 
@@ -75,7 +75,7 @@ class SettingsFieldset extends Fieldset
         ]);
 
         $this->add([
-            'name' => 'search_api_page',
+            'name' => 'advancedsearch_api_page',
             'type' => OptionalSelect::class,
             'options' => [
                 'label' => 'Page used for quick api search', // @translate
@@ -84,19 +84,19 @@ class SettingsFieldset extends Fieldset
                 'empty_option' => 'Select the page for quick api search…', // @translate
             ],
             'attributes' => [
-                'id' => 'search_api_page',
+                'id' => 'advancedsearch_api_page',
             ],
         ]);
 
         $this->add([
-            'name' => 'search_batch_size',
+            'name' => 'advancedsearch_batch_size',
             'type' => Element\Number::class,
             'options' => [
                 'label' => 'Search batch size for reindexation', // @translate
                 'info' => 'Default is 100, but it can be adapted according to your resource average size, your mapping and your architecture.', // @translate
             ],
             'attributes' => [
-                'id' => 'search_batch_size',
+                'id' => 'advancedsearch_batch_size',
                 'min' => 1,
             ],
         ]);

@@ -60,7 +60,7 @@ class SearchingForm extends AbstractBlockLayout
     public function render(PhpRenderer $view, SitePageBlockRepresentation $block)
     {
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
-        $searchConfig = $block->dataValue('search_config');
+        $searchConfig = $block->dataValue('advancedsearch_config');
         if ($searchConfig) {
             try {
                 $searchConfig = $view->api()->read('search_configs', ['id' => $searchConfig])->getContent();

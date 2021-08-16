@@ -63,7 +63,7 @@ class SearchForm extends AbstractHelper
                 }
             }
             if (empty($searchConfigId)) {
-                $searchConfigId = $setting('search_main_page');
+                $searchConfigId = $setting('advancedsearch_main_page');
             }
             $this->searchConfig = $plugins->get('api')->searchOne('search_configs', ['id' => (int) $searchConfigId])->getContent();
         } else {

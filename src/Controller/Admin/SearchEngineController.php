@@ -103,12 +103,12 @@ class SearchEngineController extends AbstractActionController
         $adapter = $adapterManager->get($searchEngineAdapterName);
 
         $form = $this->getForm(SearchEngineConfigureForm::class, [
-            'search_index_id' => $id,
+            'advancedsearch_index_id' => $id,
         ]);
         $adapterFieldset = $adapter->getConfigFieldset();
         if ($adapterFieldset) {
             $adapterFieldset
-                ->setOption('search_index_id', $id)
+                ->setOption('advancedsearch_index_id', $id)
                 ->setName('adapter')
                 ->setLabel('Adapter settings') // @translate
                 ->init();
@@ -172,7 +172,7 @@ class SearchEngineController extends AbstractActionController
         $force = (bool) $this->params()->fromPost('force');
 
         $jobArgs = [];
-        $jobArgs['search_index_id'] = $searchEngine->id();
+        $jobArgs['advancedsearch_index_id'] = $searchEngine->id();
         $jobArgs['start_resource_id'] = $startResourceId;
         $jobArgs['resource_names'] = $resourceNames;
         $jobArgs['force'] = $force;

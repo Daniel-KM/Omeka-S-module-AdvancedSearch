@@ -13,7 +13,7 @@ Furthermore, it adds some features to the standard advanced search form.
 
 Here is a live example:
 
-![example of search page](data/images/search_config.png)
+![example of search page](data/images/advancedsearch_config.png)
 
 It can be extended in two ways:
 
@@ -230,7 +230,7 @@ When ready, the api search is available via multiple means.
 - Use the controller plugins `$this->apiSearch()` and `$this->apiSearchOne()`.
 - The main api manager understand these arguments too.
 - If the api page form is made available on a site, it will be a quick access to
-  the results at `/s/mysite/api_search_config`.
+  the results at `/s/mysite/api_advancedsearch_config`.
 
 Note that some features may be not available in the external search engine. In
 particular, some events are not triggered.

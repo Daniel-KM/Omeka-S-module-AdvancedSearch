@@ -51,7 +51,7 @@ class SearchConfig implements LinkInterface
             $errorStore->addError('o:navigation', 'Invalid navigation: browse link missing label'); // @translate
             return false;
         }
-        if (!isset($data['search_config_id'])) {
+        if (!isset($data['advancedsearch_config_id'])) {
             $errorStore->addError('o:navigation', 'Invalid navigation: browse link missing search page id'); // @translate
             return false;
         }
@@ -67,7 +67,7 @@ class SearchConfig implements LinkInterface
     {
         $api = $site->getServiceLocator()->get('Omeka\ApiManager');
         try {
-            $page = $api->read('search_configs', ['id' => $data['search_config_id']])->getContent();
+            $page = $api->read('search_configs', ['id' => $data['advancedsearch_config_id']])->getContent();
         } catch (\Omeka\Api\Exception\NotFoundException $e) {
             return [
                 'type' => 'uri',
@@ -86,10 +86,10 @@ class SearchConfig implements LinkInterface
     public function toJstree(array $data, SiteRepresentation $site)
     {
         $label = $data['label'] ?? $site->title();
-        $searchConfigId = $data['search_config_id'] ?? null;
+        $searchConfigId = $data['advancedsearch_config_id'] ?? null;
         return [
             'label' => $label,
-            'search_config_id' => $searchConfigId,
+            'advancedsearch_config_id' => $searchConfigId,
         ];
     }
 }

@@ -33,8 +33,8 @@ class SearchEngineControllerTest extends SearchControllerTestCase
         $response = $this->api()->search('search_engines', [
             'name' => 'TestIndex2',
         ]);
-        $searchEnginees = $response->getContent();
-        $searchEngine = reset($searchEnginees);
+        $searchEngines = $response->getContent();
+        $searchEngine = reset($searchEngines);
         $this->assertRedirectTo($searchEngine->adminUrl('edit'));
     }
 
@@ -50,7 +50,7 @@ class SearchEngineControllerTest extends SearchControllerTestCase
     {
         $forms = $this->getServiceLocator()->get('FormElementManager');
         $form = $forms->get(SearchEngineConfigureForm::class, [
-            'search_index_id' => $this->searchEngine->id(),
+            'advancedsearch_index_id' => $this->searchEngine->id(),
         ]);
 
         $this->dispatch($this->searchEngine->adminUrl('edit'), 'POST', [

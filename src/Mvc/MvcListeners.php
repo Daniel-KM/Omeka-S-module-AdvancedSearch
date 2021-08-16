@@ -55,11 +55,11 @@ class MvcListeners extends AbstractListenerAggregate
         $services = $event->getApplication()->getServiceManager();
         $siteSettings = $services->get('Omeka\Settings\Site');
 
-        if (!$siteSettings->get('search_redirect_itemset')) {
+        if (!$siteSettings->get('advancedsearch_redirect_itemset')) {
             return;
         }
 
-        $searchMainPage = $siteSettings->get('search_main_page');
+        $searchMainPage = $siteSettings->get('advancedsearch_main_page');
         if (empty($searchMainPage)) {
             return;
         }

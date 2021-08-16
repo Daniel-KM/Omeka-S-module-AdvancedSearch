@@ -47,7 +47,7 @@ class SearchConfigConfigureForm extends Form
     public function init(): void
     {
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
-        $searchConfig = $this->getOption('search_config');
+        $searchConfig = $this->getOption('advancedsearch_config');
         $index = $searchConfig->index();
         if (empty($index)) {
             return;
@@ -698,7 +698,7 @@ class SearchConfigConfigureForm extends Form
 
     protected function addFormFieldset(): self
     {
-        $searchConfig = $this->getOption('search_config');
+        $searchConfig = $this->getOption('advancedsearch_config');
 
         $formAdapter = $searchConfig->formAdapter();
         if (!$formAdapter) {
@@ -712,7 +712,7 @@ class SearchConfigConfigureForm extends Form
 
         /** @var \Laminas\Form\Fieldset $fieldset */
         $fieldset = $this->getFormElementManager()
-            ->get($configFormClass, ['search_config' => $searchConfig]);
+            ->get($configFormClass, ['advancedsearch_config' => $searchConfig]);
 
         if (method_exists($fieldset, 'skipDefaultElementsOrFieldsets')) {
             foreach ($fieldset->skipDefaultElementsOrFieldsets() as $skip) {
@@ -728,7 +728,7 @@ class SearchConfigConfigureForm extends Form
     protected function getAvailableFields(): array
     {
         $options = [];
-        $searchConfig = $this->getOption('search_config');
+        $searchConfig = $this->getOption('advancedsearch_config');
         $searchEngine = $searchConfig->index();
         $searchAdapter = $searchEngine->adapter();
         if (empty($searchAdapter)) {
@@ -744,7 +744,7 @@ class SearchConfigConfigureForm extends Form
     protected function getAvailableSortFields(): array
     {
         $options = [];
-        $searchConfig = $this->getOption('search_config');
+        $searchConfig = $this->getOption('advancedsearch_config');
         $searchEngine = $searchConfig->index();
         $searchAdapter = $searchEngine->adapter();
         if (empty($searchAdapter)) {
@@ -760,7 +760,7 @@ class SearchConfigConfigureForm extends Form
     protected function getAvailableFacetFields(): array
     {
         $options = [];
-        $searchConfig = $this->getOption('search_config');
+        $searchConfig = $this->getOption('advancedsearch_config');
         $searchEngine = $searchConfig->index();
         $searchAdapter = $searchEngine->adapter();
         if (empty($searchAdapter)) {

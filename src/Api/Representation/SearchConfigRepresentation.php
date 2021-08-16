@@ -147,7 +147,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         return $this->getServiceLocator()
             ->get('FormElementManager')
             ->get($formClass, [
-                'search_config' => $this,
+                'advancedsearch_config' => $this,
             ])
             ->setAttribute('method', 'GET');
     }

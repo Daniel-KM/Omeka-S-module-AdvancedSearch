@@ -86,13 +86,13 @@ class Module extends AbstractModule
 
         $serviceListener->addServiceManager(
             'Search\AdapterManager',
-            'search_adapters',
+            'advancedsearch_adapters',
             Feature\AdapterProviderInterface::class,
             'getSearchAdapterConfig'
         );
         $serviceListener->addServiceManager(
             'Search\FormAdapterManager',
-            'search_form_adapters',
+            'advancedsearch_form_adapters',
             Feature\FormAdapterProviderInterface::class,
             'getSearchFormAdapterConfig'
         );
@@ -121,17 +121,17 @@ class Module extends AbstractModule
     {
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings');
-        $settings->set('advancedsearchplus_restrict_used_terms', true);
+        $settings->set('advancedadvancedsearch_restrict_used_terms', true);
 
         $siteSettings = $services->get('Omeka\Settings\Site');
         $defaultSearchFields = include __DIR__ . '/config/module.config.php';
-        $defaultSearchFields = $defaultSearchFields['advancedsearchplus']['site_settings']['advancedsearchplus_search_fields'];
+        $defaultSearchFields = $defaultSearchFields['advancedsearch']['site_settings']['advancedadvancedsearch_advancedsearch_fields'];
         /** @var int[] $siteIds */
         $siteIds = $services->get('Omeka\ApiManager')->search('sites', [], ['initialize' => false, 'returnScalar' => 'id'])->getContent();
         foreach ($siteIds as $siteId) {
             $siteSettings->setTargetId($siteId);
-            $siteSettings->set('advancedsearchplus_restrict_used_terms', true);
-            $siteSettings->set('advancedsearchplus_search_fields', $defaultSearchFields);
+            $siteSettings->set('advancedadvancedsearch_restrict_used_terms', true);
+            $siteSettings->set('advancedadvancedsearch_advancedsearch_fields', $defaultSearchFields);
         }
     }
 
@@ -542,10 +542,10 @@ class Module extends AbstractModule
             $assetUrl = $view->plugin('assetUrl');
             $view->headLink()
                 ->appendStylesheet($assetUrl('vendor/chosen-js/chosen.css', 'Omeka'))
-                ->appendStylesheet($assetUrl('css/advanced-search-plus.css', 'AdvancedSearch'));
+                ->appendStylesheet($assetUrl('css/advanced-search.css', 'AdvancedSearch'));
             $view->headScript()
                 ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.js', 'Omeka'), 'text/javascript', ['defer' => 'defer'])
-                ->appendFile($assetUrl('js/advanced-search-plus.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
+                ->appendFile($assetUrl('js/advanced-search.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
         }
 
         $query = $event->getParam('query', []);
@@ -594,7 +594,7 @@ class Module extends AbstractModule
         $view = $event->getTarget();
         $partials = $event->getParam('partials', []);
         $defaultSearchFields = $this->getDefaultSearchFields();
-        $searchFields = $view->siteSetting('advancedsearchplus_search_fields', $defaultSearchFields) ?: [];
+        $searchFields = $view->siteSetting('advancedadvancedsearch_advancedsearch_fields', $defaultSearchFields) ?: [];
         foreach ($partials as $key => $partial) {
             if (isset($defaultSearchFields[$partial]) && !in_array($partial, $searchFields)) {
                 unset($partials[$key]);
@@ -607,7 +607,7 @@ class Module extends AbstractModule
     protected function getDefaultSearchFields()
     {
         $config = $this->getServiceLocator()->get('Config');
-        return $config['advancedsearchplus']['search_fields'];
+        return $config['advancedsearch']['advancedsearch_fields'];
     }
 
     /**
@@ -1710,9 +1710,9 @@ class Module extends AbstractModule
         $response = $event->getParam('response');
         $resources = $response->getContent();
 
-        /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEnginees */
-        $searchEnginees = $api->search('search_engines')->getContent();
-        foreach ($searchEnginees as $searchEngine) {
+        /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
+        $searchEngines = $api->search('search_engines')->getContent();
+        foreach ($searchEngines as $searchEngine) {
             if (in_array($requestResource, $searchEngine->setting('resources', []))) {
                 $indexer = $searchEngine->indexer();
                 try {
@@ -1758,9 +1758,9 @@ class Module extends AbstractModule
         $response = $event->getParam('response');
         $requestResource = $request->getResource();
 
-        /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEnginees */
-        $searchEnginees = $api->search('search_engines')->getContent();
-        foreach ($searchEnginees as $searchEngine) {
+        /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
+        $searchEngines = $api->search('search_engines')->getContent();
+        foreach ($searchEngines as $searchEngine) {
             if (in_array($requestResource, $searchEngine->setting('resources', []))) {
                 $indexer = $searchEngine->indexer();
                 if ($request->getOperation() == 'delete') {
@@ -1786,9 +1786,9 @@ class Module extends AbstractModule
             ? $api->read('items', $itemId, [], ['responseContent' => 'resource'])->getContent()
             : $response->getContent()->getItem();
 
-        /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEnginees */
-        $searchEnginees = $api->search('search_engines')->getContent();
-        foreach ($searchEnginees as $searchEngine) {
+        /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
+        $searchEngines = $api->search('search_engines')->getContent();
+        foreach ($searchEngines as $searchEngine) {
             if (in_array('items', $searchEngine->setting('resources', []))) {
                 $indexer = $searchEngine->indexer();
                 $this->updateIndexResource($indexer, $item);
@@ -1850,7 +1850,7 @@ class Module extends AbstractModule
     public function handleSiteSettings(Event $event): void
     {
         // This is an exception, because there is already a fieldset named
-        // "search" in the core, so it should be named "search_module".
+        // "search" in the core, so it should be named "advancedsearch_module".
 
         $services = $this->getServiceLocator();
         $settingsType = 'site_settings';
@@ -1866,7 +1866,7 @@ class Module extends AbstractModule
             return;
         }
 
-        $space = 'search_module';
+        $space = 'advancedsearch_module';
 
         $fieldset = $services->get('FormElementManager')->get(\AdvancedSearch\Form\SiteSettingsFieldset::class);
         $fieldset->setName($space);
@@ -1895,10 +1895,10 @@ class Module extends AbstractModule
             if ($params['controller'] === \AdvancedSearch\Controller\IndexController::class) {
                 $searchConfig = @$params['id'];
             } else {
-                $searchConfig = $view->siteSetting('search_main_page');
+                $searchConfig = $view->siteSetting('advancedsearch_main_page');
             }
         } elseif ($status->isAdminRequest()) {
-            $searchConfig = $view->setting('search_main_page');
+            $searchConfig = $view->setting('advancedsearch_main_page');
         } else {
             return;
         }
@@ -1966,9 +1966,9 @@ class Module extends AbstractModule
         }
         if ($site) {
             $siteSettings->setTargetId($site->id());
-            $searchConfigId = (int) $siteSettings->get('search_main_page');
+            $searchConfigId = (int) $siteSettings->get('advancedsearch_main_page');
         } else {
-            $searchConfigId = (int) $settings->get('search_main_page');
+            $searchConfigId = (int) $settings->get('advancedsearch_main_page');
         }
         if ($searchConfigId) {
             $searchConfig = $api->searchOne('search_configs', ['id' => $searchConfigId])->getContent();
@@ -1985,9 +1985,9 @@ class Module extends AbstractModule
         $site = $event->getParam('response')->getContent();
 
         $siteSettings->setTargetId($site->getId());
-        $siteSettings->set('search_main_page', $searchConfig->id());
+        $siteSettings->set('advancedsearch_main_page', $searchConfig->id());
         $siteSettings->set('search_configs', [$searchConfig->id()]);
-        $siteSettings->set('search_redirect_itemset', true);
+        $siteSettings->set('advancedsearch_redirect_itemset', true);
     }
 
     protected function installResources(): void
@@ -2011,7 +2011,7 @@ class Module extends AbstractModule
         // Check if the internal index exists.
         $sqlSearchEngineId = <<<'SQL'
 SELECT `id`
-FROM `search_index`
+FROM `advancedsearch_index`
 WHERE `adapter` = "internal"
 ORDER BY `id`;
 SQL;
@@ -2020,7 +2020,7 @@ SQL;
         if (!$searchEngineId) {
             // Create the internal adapter.
             $sql = <<<'SQL'
-INSERT INTO `search_index`
+INSERT INTO `advancedsearch_index`
 (`name`, `adapter`, `settings`, `created`)
 VALUES
 ('Internal (sql)', 'internal', ?, NOW());
@@ -2043,7 +2043,7 @@ SQL;
         // Check if the default search page exists.
         $sqlSearchConfigId = <<<SQL
 SELECT `id`
-FROM `search_config`
+FROM `advancedsearch_config`
 WHERE `index_id` = $searchEngineId
 ORDER BY `id`;
 SQL;
@@ -2051,12 +2051,12 @@ SQL;
 
         if (!$searchConfigId) {
             $sql = <<<SQL
-INSERT INTO `search_config`
+INSERT INTO `advancedsearch_config`
 (`index_id`, `name`, `path`, `form_adapter`, `settings`, `created`)
 VALUES
 ($searchEngineId, 'Default', 'find', 'main', ?, NOW());
 SQL;
-            $searchConfigSettings = require __DIR__ . '/data/search_configs/default.php';
+            $searchConfigSettings = require __DIR__ . '/data/advancedsearch_configs/default.php';
             $connection->executeQuery($sql, [
                 json_encode($searchConfigSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
             ]);

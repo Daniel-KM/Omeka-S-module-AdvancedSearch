@@ -9,7 +9,7 @@ $(document).ready( function() {
     // See application/asset/js/chosen-options.js.
     var chosenOptions = chosenOptions || {
         allow_single_deselect: true,
-        disable_search_threshold: 10,
+        disable_advancedsearch_threshold: 10,
         width: '100%',
         include_group_label_in_selected: true,
     };

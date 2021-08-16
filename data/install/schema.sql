@@ -1,4 +1,4 @@
-CREATE TABLE `search_index` (
+CREATE TABLE `advancedsearch_index` (
     `id` INT AUTO_INCREMENT NOT NULL,
     `name` VARCHAR(190) NOT NULL,
     `adapter` VARCHAR(190) NOT NULL,
@@ -7,7 +7,7 @@ CREATE TABLE `search_index` (
     `modified` DATETIME DEFAULT NULL,
     PRIMARY KEY(`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB;
-CREATE TABLE `search_config` (
+CREATE TABLE `advancedsearch_config` (
     `id` INT AUTO_INCREMENT NOT NULL,
     `index_id` INT NOT NULL,
     `name` VARCHAR(190) NOT NULL,
@@ -19,4 +19,4 @@ CREATE TABLE `search_config` (
     INDEX IDX_4F10A34984337261 (`index_id`),
     PRIMARY KEY(`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB;
-ALTER TABLE `search_config` ADD CONSTRAINT FK_4F10A34984337261 FOREIGN KEY (`index_id`) REFERENCES `search_index` (`id`) ON DELETE CASCADE;
+ALTER TABLE `advancedsearch_config` ADD CONSTRAINT FK_4F10A34984337261 FOREIGN KEY (`index_id`) REFERENCES `advancedsearch_index` (`id`) ON DELETE CASCADE;

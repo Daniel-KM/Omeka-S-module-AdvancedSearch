@@ -47,7 +47,7 @@ class FilterFieldset extends Fieldset
             ]);
 
         /** @var \AdvancedSearch\Api\Representation\AdvancedSearchConfigRepresentation $searchConfig */
-        $searchConfig = $this->getOption('search_config');
+        $searchConfig = $this->getOption('advancedsearch_config');
         $searchConfigSettings = $searchConfig ? $searchConfig->settings() : [];
 
         if (!empty($searchConfigSettings['form']['filter_value_joiner'])) {
@@ -125,7 +125,7 @@ class FilterFieldset extends Fieldset
     protected function getFilterFields()
     {
         /** @var \AdvancedSearch\Api\Representation\AdvancedSearchConfigRepresentation $searchConfig */
-        $searchConfig = $this->getOption('search_config');
+        $searchConfig = $this->getOption('advancedsearch_config');
         $searchEngine = $searchConfig->index();
         $searchAdapter = $searchEngine->adapter();
         if (empty($searchAdapter)) {

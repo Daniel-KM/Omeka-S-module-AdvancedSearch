@@ -56,7 +56,7 @@ class SearchConfigControllerTest extends SearchControllerTestCase
     {
         $forms = $this->getServiceLocator()->get('FormElementManager');
         $form = $forms->get(\AdvancedSearch\Form\Admin\SearchConfigConfigureForm::class, [
-            'search_config' => $this->searchConfig,
+            'advancedsearch_config' => $this->searchConfig,
         ]);
 
         $url = '/admin/search-manager/page/' . $this->searchConfig->id() . '/configure';

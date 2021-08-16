@@ -63,12 +63,12 @@ class Indexing extends AbstractJob
         $settings = $services->get('Omeka\Settings');
         $this->logger = $services->get('Omeka\Logger');
 
-        $batchSize = (int) $settings->get('search_batch_size');
+        $batchSize = (int) $settings->get('advancedsearch_batch_size');
         if ($batchSize <= 0) {
             $batchSize = self::BATCH_SIZE;
         }
 
-        $searchEngineId = $this->getArg('search_index_id');
+        $searchEngineId = $this->getArg('advancedsearch_index_id');
         $startResourceId = (int) $this->getArg('start_resource_id');
 
         /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation $searchEngine */

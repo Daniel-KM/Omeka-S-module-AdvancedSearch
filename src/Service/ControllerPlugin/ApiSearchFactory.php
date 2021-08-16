@@ -12,7 +12,7 @@ class ApiSearchFactory implements FactoryInterface
         $api = $services->get('Omeka\ApiManager');
 
         $settings = $services->get('Omeka\Settings');
-        $apiPage = $settings->get('search_api_page');
+        $apiPage = $settings->get('advancedsearch_api_page');
         if ($apiPage) {
             try {
                 /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $page */

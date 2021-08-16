@@ -268,8 +268,8 @@ return [
                 'common/advanced-search/data-type-geography',
                 'common/numeric-data-types-advanced-search',
             ],
-            'advancedsearch_main_config' => null,
-            'advancedsearch_configs' => [],
+            'advancedsearch_main_config' => 1,
+            'advancedsearch_configs' => [1],
             'advancedsearch_redirect_itemset' => true,
         ],
         'block_settings' => [

@@ -50,6 +50,10 @@ return [
                 'name' => 'dcterms:description',
                 'label' => 'Description',
             ],
+            'resource_class_id' => [
+                'name' => 'resource_class_id',
+                'label' => 'Class',
+            ],
         ],
         'filters_max_number' => '5',
         'filter_value_joiner' => true,

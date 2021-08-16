@@ -37,9 +37,9 @@ $translate = $this->plugin('translate');
 $assetUrl = $this->plugin('assetUrl');
 
 $this->headLink()
-    ->appendStylesheet($assetUrl('css/search-config-configure.css', 'AdvancedSearch'));
+    ->appendStylesheet($assetUrl('css/advanced-search-configure.css', 'AdvancedSearch'));
 $this->headScript()
-    ->appendFile($assetUrl('js/search-admin.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
+    ->appendFile($assetUrl('js/advanced-search-configure.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
 ;
 
 $engine = $searchConfig->engine();

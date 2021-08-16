@@ -45,7 +45,8 @@ $hyperlink = $plugins->get('hyperlink');
             $media
                 ? $this->thumbnail($media, 'square', ['title' => $media->displayTitle(), 'alt' => $media->mediaType() . ' thumbnail'])
                 : '<img src="' . $this->assetUrl('thumbnails/default.png', 'Omeka') . '" title="' . $translate('No media') . '"/>',
-            $resource->url()
+            $resource->url(),
+            ['class' => 'resource-link']
         ) ?>
     </div>
     <div class="resource-metadata">

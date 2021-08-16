@@ -70,10 +70,10 @@ unset($options['facets']);
 
 <aside class="search-facets">
 
-    <h3><?= $translate('Filters') ?></h3>
+    <h3><?= $translate('Facets') ?></h3>
 
     <?php if ($displayActive && count($activeFacets)): ?>
-    <h4><?= $translate('Active filters') ?></h4>
+    <h4><?= $translate('Active facets') ?></h4>
     <ul class="search-facets-active">
         <?php foreach ($activeFacets as $name => $facetValues) foreach ($facetValues as $facetValue): ?>
         <li><?= $facetActive($name, ['value' => $facetValue, 'count' => null], $options) ?></li>
@@ -89,12 +89,12 @@ unset($options['facets']);
 
         <?php if ($displayFacetButton && ($displayButton === 'above' || $displayButton === 'both')): ?>
         <div class="apply-facets apply-facets-top">
-            <input type="submit" value="<?= $translate('Apply filters') ?>"/>
+            <input type="submit" value="<?= $translate('Apply facets') ?>"/>
         </div>
         <?php endif; ?>
 
         <?php if (empty($facets) && empty($activeFacets)): ?>
-        <p><?= $translate('No filters.') ?></p>
+        <p><?= $translate('No facets.') ?></p>
         <?php else: ?>
         <ul class="search-facets-list">
             <?php foreach ($facets as $name => $facetValues): ?>
@@ -114,7 +114,7 @@ unset($options['facets']);
 
         <?php if ($displayFacetButton && ($displayButton === 'below' || $displayButton === 'both')): ?>
         <div class="apply-facets apply-facets-bottom">
-            <input type="submit" value="<?= $translate('Apply filters') ?>"/>
+            <input type="submit" value="<?= $translate('Apply facets') ?>"/>
         </div>
         <?php endif; ?>
 

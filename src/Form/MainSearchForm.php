@@ -165,10 +165,14 @@ class MainSearchForm extends Form
                 'type' => Element\Button::class,
                 'options' => [
                     'label' => 'Search', // @translate
+                    'label_attributes' => [
+                        'class' => 'search-submit',
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'submit',
                     'type' => 'submit',
+                    'class' => 'search-submit',
                 ],
             ])
         ;

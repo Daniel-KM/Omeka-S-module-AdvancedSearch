@@ -21,7 +21,7 @@ class MediaTypeSelectFactory implements FactoryInterface
     {
         $connection = $services->get('Omeka\Connection');
         $sql = 'SELECT DISTINCT(media_type) FROM media WHERE media_type IS NOT NULL AND media_type != "" ORDER BY media_type';
-        $stmt = $connection->query($sql);
+        $stmt = $connection->executeQuery($sql);
         $result = $stmt->fetchAll(\PDO::FETCH_COLUMN);
         return array_combine($result, $result);
     }

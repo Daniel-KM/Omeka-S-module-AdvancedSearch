@@ -49,11 +49,21 @@ class DataTextarea extends ArrayTextarea
         $array = [];
         $count = count($this->dataKeys);
         foreach ($this->stringToList($string) as $values) {
-            $data = $count
+            if ($count) {
                 // Set keys to each part of the line.
-                ? array_combine(array_keys($this->dataKeys), array_map('trim', explode($this->keyValueSeparator, $values, count($this->dataKeys))))
+                $keys = array_keys($this->dataKeys);
+                $values = array_map('trim', explode($this->keyValueSeparator, $values, count($this->dataKeys)));
+                // Add empty missing values. The number cannot be higher.
+                // TODO Use substr_count() if quicker.
+                $missing = count($this->dataKeys) - count($values);
+                if ($missing) {
+                    $values = array_merge($values, array_fill(0, $missing, ''));
+                }
+                $data = array_combine($keys, $values);
+            } else {
                 // No keys: a simple list.
-                : array_map('trim', explode($this->keyValueSeparator, $values));
+                $data = array_map('trim', explode($this->keyValueSeparator, $values));
+            }
             $this->asKeyValue
                 ? $array[reset($data)] = $data
                 : $array[] = $data;

@@ -464,7 +464,7 @@ FROM property
 JOIN vocabulary ON vocabulary.id = property.vocabulary_id
 SQL;
             $properties = $this->entityManager->getConnection()
-                ->query($sql)->fetchAll(\PDO::FETCH_KEY_PAIR);
+                ->executeQuery($sql)->fetchAll(\PDO::FETCH_KEY_PAIR);
         }
         if (is_numeric($property)) {
             $property = (int) $property;

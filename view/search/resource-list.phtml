@@ -39,7 +39,7 @@
 $ids = array_column($response->getResults($resourceName), 'id', 'id');
 if (!count($ids)) return;
 
-// Filter resources existing on search index, but not in Omeka, and prepare the loop.
+// Filter resources existing on search engine, but not in Omeka, and prepare the loop.
 // The sort order is unknown, so in order to keep order of results, use the id as key
 // and use array_replace(). This process avoids to do a single read() for each result.
 $results = [];

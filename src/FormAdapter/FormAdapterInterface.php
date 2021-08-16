@@ -51,7 +51,7 @@ interface FormAdapterInterface
      * Convert a user query from a form into a Search query via a form mapping.
      *
      * The mapping between the query arguments that comes from a form and the
-     * fields managed by the index is set via the form settings of the page.
+     * fields managed by the index is set via the form settings of the config.
      *
      * @param array $request The user query formatted by the form.
      * @param array $formSettings The specific settings of the form page.

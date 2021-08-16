@@ -92,7 +92,7 @@ class SearchEngineRepresentation extends AbstractEntityRepresentation
     public function adapter(): ?\AdvancedSearch\Adapter\AdapterInterface
     {
         $name = $this->resource->getAdapter();
-        $adapterManager = $this->getServiceLocator()->get('Search\AdapterManager');
+        $adapterManager = $this->getServiceLocator()->get('AdvancedSearch\AdapterManager');
         return $adapterManager->has($name)
             ? $adapterManager->get($name)
             : null;

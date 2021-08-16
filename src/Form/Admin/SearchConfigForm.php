@@ -71,7 +71,7 @@ class SearchConfigForm extends Form
             ])
 
             ->add([
-                'name' => 'o:index_id',
+                'name' => 'o:engine_id',
                 'type' => Element\Select::class,
                 'options' => [
                     'label' => 'Index', // @translate
@@ -97,7 +97,7 @@ class SearchConfigForm extends Form
             ])
 
             ->add([
-                'name' => 'manage_page_default',
+                'name' => 'manage_config_default',
                 'type' => SiteSelect::class,
                 'options' => [
                     'label' => 'Set as default search page for sites', // @translate
@@ -109,14 +109,14 @@ class SearchConfigForm extends Form
                     ],
                 ],
                 'attributes' => [
-                    'id' => 'manage_page_default',
+                    'id' => 'manage_config_default',
                     'class' => 'chosen-select',
                     'multiple' => true,
                     'data-placeholder' => 'Select sites…', // @translate
                 ],
             ])
             ->add([
-                'name' => 'manage_page_availability',
+                'name' => 'manage_config_availability',
                 'type' => Element\Radio::class,
                 'options' => [
                     'label' => 'Availability on sites', // @translate
@@ -128,7 +128,7 @@ class SearchConfigForm extends Form
                     ],
                 ],
                 'attributes' => [
-                    'id' => 'manage_page_availability',
+                    'id' => 'manage_config_availability',
                     'value' => 'let',
                 ],
             ])
@@ -137,11 +137,11 @@ class SearchConfigForm extends Form
         $this
             ->getInputFilter()
             ->add([
-                'name' => 'manage_page_default',
+                'name' => 'manage_config_default',
                 'required' => false,
             ])
             ->add([
-                'name' => 'manage_page_availability',
+                'name' => 'manage_config_availability',
                 'required' => false,
             ])
         ;

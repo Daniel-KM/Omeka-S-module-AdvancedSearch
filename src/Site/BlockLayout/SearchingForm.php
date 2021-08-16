@@ -42,7 +42,7 @@ class SearchingForm extends AbstractBlockLayout
         $services = $site->getServiceLocator();
         $formElementManager = $services->get('FormElementManager');
         $defaultSettings = $services->get('Config')['search']['block_settings']['searchingForm'];
-        $blockFieldset = \AdvancedSearch\Form\AdvancedSearchingFormFieldset::class;
+        $blockFieldset = \AdvancedSearch\Form\SearchingFormFieldset::class;
 
         $data = $block ? $block->data() + $defaultSettings : $defaultSettings;
 
@@ -68,7 +68,7 @@ class SearchingForm extends AbstractBlockLayout
                 $view->logger()->err($e->getMessage());
                 return '';
             }
-            $available = $view->siteSetting('search_configs');
+            $available = $view->siteSetting('advancedsearch_configs');
             if (!in_array($searchConfig->id(), $available)) {
                 $message = new \Omeka\Stdlib\Message(
                     'The search page #%d is not available for the site %s.', // @translate
@@ -133,7 +133,7 @@ class SearchingForm extends AbstractBlockLayout
     }
 
     /**
-     * Get the request from the query and check it according to the search page.
+     * Get the request from the query and check it according to the search config.
      *
      * @todo Factorize with \AdvancedSearch\Controller\IndexController::getSearchRequest()
      *

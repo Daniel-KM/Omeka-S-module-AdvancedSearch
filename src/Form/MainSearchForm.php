@@ -78,8 +78,8 @@ class MainSearchForm extends Form
         }
 
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
-        $searchConfig = $this->getOption('advancedsearch_config');
-        // TODO Throw exception when search page is not set.
+        $searchConfig = $this->getOption('search_config');
+        // TODO Throw exception when search config is not set.
         $searchConfigSettings = $searchConfig ? $searchConfig->settings() : [];
 
         $defaultFieldsOrder = [
@@ -105,7 +105,7 @@ class MainSearchForm extends Form
         $this
             ->add([
                 'name' => 'q',
-                'type' => Element\AdvancedSearch::class,
+                'type' => Element\Search::class,
                 'options' => [
                     'label' => 'Search', // @translate
                 ],

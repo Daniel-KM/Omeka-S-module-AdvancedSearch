@@ -32,7 +32,7 @@ class SearchForm extends AbstractHelper
      * @param SearchConfigRepresentation $searchConfig
      * @param string $partial Specific partial for the search form of the page.
      * @param bool $skipFormAction Don't set form action, so use the current page.
-     * @return \AdvancedSearch\View\Helper\AdvancedSearchForm
+     * @return \AdvancedSearch\View\Helper\SearchForm
      */
     public function __invoke(SearchConfigRepresentation $searchConfig = null, $partial = null, $skipFormAction = false): self
     {
@@ -55,15 +55,15 @@ class SearchForm extends AbstractHelper
             // If it is on a search page route, use the id, else use the setting.
             $params = $plugins->get('params')->fromRoute();
             $setting = $plugins->get($isAdmin ? 'setting' : 'siteSetting');
-            if ($params['controller'] === 'Search\Controller\IndexController') {
+            if ($params['controller'] === 'AdvancedSearch\Controller\IndexController') {
                 $searchConfigId = $params['id'];
-                // Check if this search page is allowed.
-                if (!in_array($searchConfigId, $setting('search_configs'))) {
+                // Check if this search config is allowed.
+                if (!in_array($searchConfigId, $setting('advancedsearch_configs'))) {
                     $searchConfigId = 0;
                 }
             }
             if (empty($searchConfigId)) {
-                $searchConfigId = $setting('advancedsearch_main_page');
+                $searchConfigId = $setting('advancedsearch_main_config');
             }
             $this->searchConfig = $plugins->get('api')->searchOne('search_configs', ['id' => (int) $searchConfigId])->getContent();
         } else {
@@ -96,7 +96,7 @@ class SearchForm extends AbstractHelper
     }
 
     /**
-     * Get the specified search page or the default one.
+     * Get the specified search config or the default one.
      *
      * @return \AdvancedSearch\Api\Representation\SearchConfigRepresentation|null
      */
@@ -106,7 +106,7 @@ class SearchForm extends AbstractHelper
     }
 
     /**
-     * Get the form of the search page.
+     * Get the form of the search config.
      *
      * @return \Laminas\Form\Form|null
      */

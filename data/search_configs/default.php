@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-// Example of a generic page with the internal adapter and the main form.
+// Example of a generic config with the internal adapter and the main form.
 // When created, it can be modified in the admin board.
 
 // This config is used for new sites too.

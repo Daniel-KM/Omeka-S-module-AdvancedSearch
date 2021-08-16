@@ -13,7 +13,7 @@ $siteSetting = $plugins->get('siteSetting');
 
 $isSiteRequest = $this->status()->isSiteRequest();
 $applyTemplates = $isSiteRequest ? $siteSetting('advancedsearch_apply_templates') : false;
-$usedTerms = $isSiteRequest ? $siteSetting('advancedadvancedsearch_restrict_used_terms', true) : $setting('advancedadvancedsearch_restrict_used_terms', true);
+$usedTerms = $isSiteRequest ? $siteSetting('advancedsearch_restrict_used_terms', true) : $setting('advancedsearch_restrict_used_terms', true);
 
 // Prepare the property queries.
 $properties = $query['property'] ?? [];

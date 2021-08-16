@@ -49,7 +49,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         return [
             'o:name' => $this->resource->getName(),
             'o:path' => $this->resource->getPath(),
-            'o:index_id' => $this->resource->getEngine()->getId(),
+            'o:engine_id' => $this->resource->getEngine()->getId(),
             'o:form' => $this->resource->getFormAdapter(),
             'o:settings' => $this->resource->getSettings(),
             'o:created' => $this->getDateTime($this->resource->getCreated()),
@@ -121,7 +121,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
     public function formAdapter(): ?\AdvancedSearch\FormAdapter\FormAdapterInterface
     {
         if (!$this->formAdapter) {
-            $formAdapterManager = $this->getServiceLocator()->get('Search\FormAdapterManager');
+            $formAdapterManager = $this->getServiceLocator()->get('AdvancedSearch\FormAdapterManager');
             $formAdapterName = $this->formAdapterName();
             if ($formAdapterManager->has($formAdapterName)) {
                 $this->formAdapter = $formAdapterManager->get($formAdapterName);
@@ -146,7 +146,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         return $this->getServiceLocator()
             ->get('FormElementManager')
             ->get($formClass, [
-                'advancedsearch_config' => $this,
+                'search_config' => $this,
             ])
             ->setAttribute('method', 'GET');
     }

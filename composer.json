@@ -5,16 +5,13 @@
     "license": "CECILL-2.1",
     "authors": [
         {
-            "name": "BibLibre"
-        },
-        {
             "name": "Daniel Berthereau",
             "email": "Daniel.git@Berthereau.net"
         }
     ],
-    "homepage": "https://gitlab.com/Daniel-KM/Omeka-S-module-Search",
+    "homepage": "https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch",
     "support": {
-        "issues": "https://gitlab.com/Daniel-KM/Omeka-S-module-Search/-/issues",
+        "issues": "https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch/-/issues",
         "forum": "https://forum.omeka.org/"
     },
     "keywords": [
@@ -58,7 +55,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "SearchTest\\": "test/SearchTest/"
+            "AdvancedSearchTest\\": "test/AdvancedSearchTest/"
         }
     }
 }

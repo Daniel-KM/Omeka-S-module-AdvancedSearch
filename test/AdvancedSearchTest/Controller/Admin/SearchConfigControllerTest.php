@@ -13,7 +13,7 @@ class SearchConfigControllerTest extends SearchControllerTestCase
 
         $this->assertQuery('input[name="o:name"]');
         $this->assertQuery('input[name="o:path"]');
-        $this->assertQuery('select[name="o:index_id"]');
+        $this->assertQuery('select[name="o:engine_id"]');
         $this->assertQuery('select[name="o:form"]');
     }
 
@@ -25,10 +25,10 @@ class SearchConfigControllerTest extends SearchControllerTestCase
         $this->dispatch('/admin/search-manager/page/add', 'POST', [
             'o:name' => 'TestPage [testAddPostAction]',
             'o:path' => 'search/test2',
-            'o:index_id' => $this->searchEngine->id(),
+            'o:engine_id' => $this->searchEngine->id(),
             'o:form' => 'basic',
-            'manage_page_default' => '0',
-            'manage_page_availability' => 'let',
+            'manage_config_default' => '0',
+            'manage_config_availability' => 'let',
             'csrf' => $form->get('csrf')->getValue(),
         ]);
         $this->assertResponseStatusCode(302);
@@ -54,7 +54,7 @@ class SearchConfigControllerTest extends SearchControllerTestCase
     {
         $forms = $this->getServiceLocator()->get('FormElementManager');
         $form = $forms->get(\AdvancedSearch\Form\Admin\SearchConfigConfigureForm::class, [
-            'advancedsearch_config' => $this->searchConfig,
+            'search_config' => $this->searchConfig,
         ]);
 
         $url = '/admin/search-manager/page/' . $this->searchConfig->id() . '/configure';

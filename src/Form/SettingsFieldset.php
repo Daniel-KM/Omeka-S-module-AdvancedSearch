@@ -32,24 +32,24 @@ class SettingsFieldset extends Fieldset
             }
         }
 
-        $selectAllTerms = $settings->get('advancedadvancedsearch_restrict_used_terms', false);
+        $selectAllTerms = $settings->get('advancedsearch_restrict_used_terms', false);
 
         $this
             ->add([
-                'name' => 'advancedadvancedsearch_restrict_used_terms',
+                'name' => 'advancedsearch_restrict_used_terms',
                 'type' => \Laminas\Form\Element\Checkbox::class,
                 'options' => [
                     'label' => 'Restrict to used properties and resources classes', // @translate
                     'info' => 'If checked, restrict the list of properties and resources classes to the used ones in advanced search form.', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'advancedadvancedsearch_restrict_used_terms',
+                    'id' => 'advancedsearch_restrict_used_terms',
                     'value' => $selectAllTerms,
                 ],
             ]);
 
         $this->add([
-            'name' => 'advancedsearch_main_page',
+            'name' => 'advancedsearch_main_config',
             'type' => OptionalSelect::class,
             'options' => [
                 'label' => 'Default search page (admin)', // @translate
@@ -58,33 +58,33 @@ class SettingsFieldset extends Fieldset
                 'empty_option' => 'Select the search engine for the admin bar…', // @translate
             ],
             'attributes' => [
-                'id' => 'advancedsearch_main_page',
+                'id' => 'advancedsearch_main_config',
             ],
         ]);
 
         $this->add([
-            'name' => 'search_configs',
+            'name' => 'advancedsearch_configs',
             'type' => OptionalMultiCheckbox::class,
             'options' => [
                 'label' => 'Available search pages', // @translate
                 'value_options' => $valueOptions,
             ],
             'attributes' => [
-                'id' => 'search_configs',
+                'id' => 'advancedsearch_configs',
             ],
         ]);
 
         $this->add([
-            'name' => 'advancedsearch_api_page',
+            'name' => 'advancedsearch_api_config',
             'type' => OptionalSelect::class,
             'options' => [
                 'label' => 'Page used for quick api search', // @translate
                 'info' => 'The method apiSearch() allows to do a quick search in some cases. It requires a mapping done with the Omeka api and the selected index.', // @translate
                 'value_options' => $apiOptions,
-                'empty_option' => 'Select the page for quick api search…', // @translate
+                'empty_option' => 'Select the config for quick api search…', // @translate
             ],
             'attributes' => [
-                'id' => 'advancedsearch_api_page',
+                'id' => 'advancedsearch_api_config',
             ],
         ]);
 

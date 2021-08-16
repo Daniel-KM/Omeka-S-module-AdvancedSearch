@@ -101,22 +101,22 @@ class SearchingFormFieldset extends Fieldset
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation[] $searchConfigs */
         $searchConfigs = $this->api->search('search_configs')->getContent();
 
-        $searchConfigs = [];
+        $configs = [];
         foreach ($searchConfigs as $searchConfig) {
-            $searchConfigs[$searchConfig->id()] = sprintf('%s (/%s)', $searchConfig->name(), $searchConfig->path());
+            $configs[$searchConfig->id()] = sprintf('%s (/%s)', $searchConfig->name(), $searchConfig->path());
         }
 
         $siteSetting = $this->siteSetting;
-        $available = $siteSetting('search_configs', []);
-        $searchConfigs = array_intersect_key($searchConfigs, array_flip($available));
+        $available = $siteSetting('advancedsearch_configs', []);
+        $configs = array_intersect_key($configs, array_flip($available));
 
-        // Set the main search page as default.
-        $default = $siteSetting('advancedsearch_main_page') ?: reset($available);
-        if (isset($searchConfigs[$default])) {
-            $searchConfigs = [$default => $searchConfigs[$default]] + $searchConfigs;
+        // Set the main search config as default.
+        $default = $siteSetting('advancedsearch_main_config') ?: reset($available);
+        if (isset($configs[$default])) {
+            $configs = [$default => $configs[$default]] + $configs;
         }
 
-        return $searchConfigs;
+        return $configs;
     }
 
     /**

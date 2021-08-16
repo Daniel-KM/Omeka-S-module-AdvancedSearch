@@ -137,7 +137,7 @@ SQL;
                     if (!isset($searchConfigSettings[$type])) {
                         $searchConfigSettings[$type] = [];
                     } else {
-                        // @see \AdvancedSearch\Controller\Admin\AdvancedSearchConfigController::configureAction()
+                        // @see \AdvancedSearch\Controller\Admin\SearchConfigController::configureAction()
                         // Sort enabled first, then available, else sort by weigth.
                         uasort($searchConfigSettings[$type], function ($a, $b) {
                             // Sort by availability.

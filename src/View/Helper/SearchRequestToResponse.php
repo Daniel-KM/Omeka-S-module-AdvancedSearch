@@ -2,7 +2,7 @@
 namespace AdvancedSearch\View\Helper;
 
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
-use AdvancedSearch\Mvc\Controller\Plugin\AdvancedSearchRequestToResponse as SearchRequestToResponsePlugin;
+use AdvancedSearch\Mvc\Controller\Plugin\SearchRequestToResponse as SearchRequestToResponsePlugin;
 use Laminas\View\Helper\AbstractHelper;
 use Omeka\Api\Representation\SiteRepresentation;
 
@@ -24,7 +24,7 @@ class SearchRequestToResponse extends AbstractHelper
     /**
      * Get response from a search request.
      *
-     * @uses \AdvancedSearch\Mvc\Controller\Plugin\AdvancedSearchRequestToResponse
+     * @uses \AdvancedSearch\Mvc\Controller\Plugin\SearchRequestToResponse
      *
      * @param array $request Validated request.
      * @param SearchConfigRepresentation $searchConfig

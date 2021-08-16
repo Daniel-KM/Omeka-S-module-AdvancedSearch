@@ -85,7 +85,7 @@ abstract class AbstractQuerier implements QuerierInterface
     abstract public function getPreparedQuery();
 
     /**
-     * Get a setting of the search index.
+     * Get a setting of the search engine.
      *
      * @param string $name
      * @param mixed $default

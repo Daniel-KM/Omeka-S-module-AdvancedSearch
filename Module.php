@@ -85,14 +85,14 @@ class Module extends AbstractModule
             ->get('ServiceListener');
 
         $serviceListener->addServiceManager(
-            'Search\AdapterManager',
-            'advancedsearch_adapters',
+            'AdvancedSearch\AdapterManager',
+            'search_adapters',
             Feature\AdapterProviderInterface::class,
             'getSearchAdapterConfig'
         );
         $serviceListener->addServiceManager(
-            'Search\FormAdapterManager',
-            'advancedsearch_form_adapters',
+            'AdvancedSearch\FormAdapterManager',
+            'search_form_adapters',
             Feature\FormAdapterProviderInterface::class,
             'getSearchFormAdapterConfig'
         );
@@ -121,17 +121,17 @@ class Module extends AbstractModule
     {
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings');
-        $settings->set('advancedadvancedsearch_restrict_used_terms', true);
+        $settings->set('advancedsearch_restrict_used_terms', true);
 
         $siteSettings = $services->get('Omeka\Settings\Site');
         $defaultSearchFields = include __DIR__ . '/config/module.config.php';
-        $defaultSearchFields = $defaultSearchFields['advancedsearch']['site_settings']['advancedadvancedsearch_advancedsearch_fields'];
+        $defaultSearchFields = $defaultSearchFields['advancedsearch']['site_settings']['advancedsearch_search_fields'];
         /** @var int[] $siteIds */
         $siteIds = $services->get('Omeka\ApiManager')->search('sites', [], ['initialize' => false, 'returnScalar' => 'id'])->getContent();
         foreach ($siteIds as $siteId) {
             $siteSettings->setTargetId($siteId);
-            $siteSettings->set('advancedadvancedsearch_restrict_used_terms', true);
-            $siteSettings->set('advancedadvancedsearch_advancedsearch_fields', $defaultSearchFields);
+            $siteSettings->set('advancedsearch_restrict_used_terms', true);
+            $siteSettings->set('advancedsearch_search_fields', $defaultSearchFields);
         }
     }
 
@@ -377,7 +377,7 @@ class Module extends AbstractModule
         $isAdminRequest = $status->isAdminRequest();
         if ($isAdminRequest) {
             $settings = $services->get('Omeka\Settings');
-            $adminSearchConfigs = $settings->get('search_configs', []);
+            $adminSearchConfigs = $settings->get('advancedsearch_configs', []);
             foreach ($searchConfigs as $searchConfig) {
                 $searchConfigId = $searchConfig->id();
                 if (in_array($searchConfigId, $adminSearchConfigs)) {
@@ -388,7 +388,7 @@ class Module extends AbstractModule
                             'options' => [
                                 'route' => '/admin/' . $searchConfig->path(),
                                 'defaults' => [
-                                    '__NAMESPACE__' => 'Search\Controller',
+                                    '__NAMESPACE__' => 'AdvancedSearch\Controller',
                                     '__ADMIN__' => true,
                                     'controller' => \AdvancedSearch\Controller\IndexController::class,
                                     'action' => 'search',
@@ -402,7 +402,7 @@ class Module extends AbstractModule
                                     'options' => [
                                         'route' => '/suggest',
                                         'defaults' => [
-                                            '__NAMESPACE__' => 'Search\Controller',
+                                            '__NAMESPACE__' => 'AdvancedSearch\Controller',
                                             '__ADMIN__' => true,
                                             'controller' => \AdvancedSearch\Controller\IndexController::class,
                                             'action' => 'suggest',
@@ -428,7 +428,7 @@ class Module extends AbstractModule
                     'options' => [
                         'route' => '/s/:site-slug/' . $searchConfigSlug,
                         'defaults' => [
-                            '__NAMESPACE__' => 'Search\Controller',
+                            '__NAMESPACE__' => 'AdvancedSearch\Controller',
                             '__SITE__' => true,
                             'controller' => \AdvancedSearch\Controller\IndexController::class,
                             'action' => 'search',
@@ -444,7 +444,7 @@ class Module extends AbstractModule
                             'options' => [
                                 'route' => '/suggest',
                                 'defaults' => [
-                                    '__NAMESPACE__' => 'Search\Controller',
+                                    '__NAMESPACE__' => 'AdvancedSearch\Controller',
                                     '__SITE__' => true,
                                     'controller' => \AdvancedSearch\Controller\IndexController::class,
                                     'action' => 'suggest',
@@ -594,7 +594,7 @@ class Module extends AbstractModule
         $view = $event->getTarget();
         $partials = $event->getParam('partials', []);
         $defaultSearchFields = $this->getDefaultSearchFields();
-        $searchFields = $view->siteSetting('advancedadvancedsearch_advancedsearch_fields', $defaultSearchFields) ?: [];
+        $searchFields = $view->siteSetting('advancedsearch_search_fields', $defaultSearchFields) ?: [];
         foreach ($partials as $key => $partial) {
             if (isset($defaultSearchFields[$partial]) && !in_array($partial, $searchFields)) {
                 unset($partials[$key]);
@@ -607,7 +607,7 @@ class Module extends AbstractModule
     protected function getDefaultSearchFields()
     {
         $config = $this->getServiceLocator()->get('Config');
-        return $config['advancedsearch']['advancedsearch_fields'];
+        return $config['advancedsearch']['search_fields'];
     }
 
     /**
@@ -1716,17 +1716,17 @@ class Module extends AbstractModule
             if (in_array($requestResource, $searchEngine->setting('resources', []))) {
                 $indexer = $searchEngine->indexer();
                 try {
-                    $indexer->engineResources($resources);
+                    $indexer->indexResources($resources);
                 } catch (\Exception $e) {
                     $services = $this->getServiceLocator();
                     $logger = $services->get('Omeka\Logger');
                     $logger->err(new Message(
-                        'Unable to batch index metadata for search index "%s": %s', // @translate
+                        'Unable to batch index metadata for search engine "%s": %s', // @translate
                         $searchEngine->name(), $e->getMessage()
                     ));
                     $messenger = $services->get('ControllerPluginManager')->get('messenger');
                     $messenger->addWarning(new Message(
-                        'Unable to batch update the search index "%s": see log.', // @translate
+                        'Unable to batch update the search engine "%s": see log.', // @translate
                         $searchEngine->name()
                     ));
                 }
@@ -1797,7 +1797,7 @@ class Module extends AbstractModule
     }
 
     /**
-     * Delete the search index for a resource.
+     * Delete the search engine for a resource.
      *
      * @param IndexerInterface $indexer
      * @param string $resourceName
@@ -1811,19 +1811,19 @@ class Module extends AbstractModule
             $services = $this->getServiceLocator();
             $logger = $services->get('Omeka\Logger');
             $logger->err(new Message(
-                'Unable to delete the search index for resource #%d: %s', // @translate
+                'Unable to delete the search engine for resource #%d: %s', // @translate
                 $id, $e->getMessage()
             ));
             $messenger = $services->get('ControllerPluginManager')->get('messenger');
             $messenger->addWarning(new Message(
-                'Unable to delete the search index for the deleted resource #%d: see log.', // @translate
+                'Unable to delete the search engine for the deleted resource #%d: see log.', // @translate
                 $id
             ));
         }
     }
 
     /**
-     * Update the search index for a resource.
+     * Update the search engine for a resource.
      *
      * @param IndexerInterface $indexer
      * @param Resource $resource
@@ -1831,7 +1831,7 @@ class Module extends AbstractModule
     protected function updateIndexResource(IndexerInterface $indexer, Resource $resource): void
     {
         try {
-            $indexer->engineResource($resource);
+            $indexer->indexResource($resource);
         } catch (\Exception $e) {
             $services = $this->getServiceLocator();
             $logger = $services->get('Omeka\Logger');
@@ -1841,7 +1841,7 @@ class Module extends AbstractModule
             ));
             $messenger = $services->get('ControllerPluginManager')->get('messenger');
             $messenger->addWarning(new Message(
-                'Unable to update the search index for resource #%d: see log.', // @translate
+                'Unable to update the search engine for resource #%d: see log.', // @translate
                 $resource->getId()
             ));
         }
@@ -1895,10 +1895,10 @@ class Module extends AbstractModule
             if ($params['controller'] === \AdvancedSearch\Controller\IndexController::class) {
                 $searchConfig = @$params['id'];
             } else {
-                $searchConfig = $view->siteSetting('advancedsearch_main_page');
+                $searchConfig = $view->siteSetting('advancedsearch_main_config');
             }
         } elseif ($status->isAdminRequest()) {
-            $searchConfig = $view->setting('advancedsearch_main_page');
+            $searchConfig = $view->setting('advancedsearch_main_config');
         } else {
             return;
         }
@@ -1958,17 +1958,17 @@ class Module extends AbstractModule
         $site = null;
         $searchConfig = null;
 
-        // Take the search page of the default site or the first site, else the
-        // default search page.
+        // Take the search config of the default site or the first site, else the
+        // default search config.
         $defaultSite = (int) $settings->get('default_site');
         if ($defaultSite) {
             $site = $api->searchOne('sites', ['id' => $defaultSite])->getContent();
         }
         if ($site) {
             $siteSettings->setTargetId($site->id());
-            $searchConfigId = (int) $siteSettings->get('advancedsearch_main_page');
+            $searchConfigId = (int) $siteSettings->get('advancedsearch_main_config');
         } else {
-            $searchConfigId = (int) $settings->get('advancedsearch_main_page');
+            $searchConfigId = (int) $settings->get('advancedsearch_main_config');
         }
         if ($searchConfigId) {
             $searchConfig = $api->searchOne('search_configs', ['id' => $searchConfigId])->getContent();
@@ -1985,8 +1985,8 @@ class Module extends AbstractModule
         $site = $event->getParam('response')->getContent();
 
         $siteSettings->setTargetId($site->getId());
-        $siteSettings->set('advancedsearch_main_page', $searchConfig->id());
-        $siteSettings->set('search_configs', [$searchConfig->id()]);
+        $siteSettings->set('advancedsearch_main_config', $searchConfig->id());
+        $siteSettings->set('advancedsearch_configs', [$searchConfig->id()]);
         $siteSettings->set('advancedsearch_redirect_itemset', true);
     }
 
@@ -2011,7 +2011,7 @@ class Module extends AbstractModule
         // Check if the internal index exists.
         $sqlSearchEngineId = <<<'SQL'
 SELECT `id`
-FROM `advancedsearch_index`
+FROM `search_engine`
 WHERE `adapter` = "internal"
 ORDER BY `id`;
 SQL;
@@ -2020,7 +2020,7 @@ SQL;
         if (!$searchEngineId) {
             // Create the internal adapter.
             $sql = <<<'SQL'
-INSERT INTO `advancedsearch_index`
+INSERT INTO `search_engine`
 (`name`, `adapter`, `settings`, `created`)
 VALUES
 ('Internal (sql)', 'internal', ?, NOW());
@@ -2040,23 +2040,23 @@ SQL;
             $messenger->addSuccess($message);
         }
 
-        // Check if the default search page exists.
+        // Check if the default search config exists.
         $sqlSearchConfigId = <<<SQL
 SELECT `id`
-FROM `advancedsearch_config`
-WHERE `index_id` = $searchEngineId
+FROM `search_config`
+WHERE `engine_id` = $searchEngineId
 ORDER BY `id`;
 SQL;
         $searchConfigId = (int) $connection->fetchColumn($sqlSearchConfigId);
 
         if (!$searchConfigId) {
             $sql = <<<SQL
-INSERT INTO `advancedsearch_config`
-(`index_id`, `name`, `path`, `form_adapter`, `settings`, `created`)
+INSERT INTO `search_config`
+(`engine_id`, `name`, `path`, `form_adapter`, `settings`, `created`)
 VALUES
 ($searchEngineId, 'Default', 'find', 'main', ?, NOW());
 SQL;
-            $searchConfigSettings = require __DIR__ . '/data/advancedsearch_configs/default.php';
+            $searchConfigSettings = require __DIR__ . '/data/search_configs/default.php';
             $connection->executeQuery($sql, [
                 json_encode($searchConfigSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
             ]);

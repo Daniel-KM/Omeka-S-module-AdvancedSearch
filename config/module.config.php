@@ -5,8 +5,8 @@ namespace AdvancedSearch;
 return [
     'api_adapters' => [
         'invokables' => [
-            'search_engines' => Api\Adapter\SearchEngineAdapter::class,
             'search_configs' => Api\Adapter\SearchConfigAdapter::class,
+            'search_engines' => Api\Adapter\SearchEngineAdapter::class,
         ],
     ],
     'entity_manager' => [
@@ -32,10 +32,10 @@ return [
         'invokables' => [
             'facetLabel' => View\Helper\FacetLabel::class,
             'hiddenInputsFromFilteredQuery' => View\Helper\HiddenInputsFromFilteredQuery::class,
-            'searchForm' => View\Helper\AdvancedSearchForm::class,
-            'searchingForm' => View\Helper\AdvancedSearchingForm::class,
-            'searchingUrl' => View\Helper\AdvancedSearchingUrl::class,
-            'searchSortSelector' => View\Helper\AdvancedSearchSortSelector::class,
+            'searchForm' => View\Helper\SearchForm::class,
+            'searchingForm' => View\Helper\SearchingForm::class,
+            'searchingUrl' => View\Helper\SearchingUrl::class,
+            'searchSortSelector' => View\Helper\SearchSortSelector::class,
         ],
         'factories' => [
             'apiSearch' => Service\ViewHelper\ApiSearchFactory::class,
@@ -45,12 +45,12 @@ return [
             'facetLink' => Service\ViewHelper\FacetLinkFactory::class,
             'mediaTypeSelect' => Service\ViewHelper\MediaTypeSelectFactory::class,
             'searchEngineConfirm' => Service\ViewHelper\SearchEngineConfirmFactory::class,
-            'searchRequestToResponse' => Service\ViewHelper\AdvancedSearchRequestToResponseFactory::class,
+            'searchRequestToResponse' => Service\ViewHelper\SearchRequestToResponseFactory::class,
         ],
     ],
     'block_layouts' => [
         'invokables' => [
-            'searchingForm' => Site\BlockLayout\AdvancedSearchingForm::class,
+            'searchingForm' => Site\BlockLayout\SearchingForm::class,
         ],
     ],
     'form_elements' => [
@@ -64,15 +64,15 @@ return [
         ],
         'factories' => [
             Form\Admin\ApiFormConfigFieldset::class => Service\Form\ApiFormConfigFieldsetFactory::class,
-            Form\Admin\SearchEngineConfigureForm::class => Service\Form\SearchEngineConfigureFormFactory::class,
-            Form\Admin\SearchEngineForm::class => Service\Form\SearchEngineFormFactory::class,
             Form\Admin\SearchConfigConfigureForm::class => Service\Form\SearchConfigConfigureFormFactory::class,
             Form\Admin\SearchConfigForm::class => Service\Form\SearchConfigFormFactory::class,
+            Form\Admin\SearchEngineConfigureForm::class => Service\Form\SearchEngineConfigureFormFactory::class,
+            Form\Admin\SearchEngineForm::class => Service\Form\SearchEngineFormFactory::class,
             Form\Element\MediaTypeSelect::class => Service\Form\Element\MediaTypeSelectFactory::class,
             Form\Element\SearchConfigSelect::class => Service\Form\Element\SearchConfigSelectFactory::class,
             Form\FilterFieldset::class => Service\Form\FilterFieldsetFactory::class,
             Form\MainSearchForm::class => Service\Form\MainSearchFormFactory::class,
-            Form\AdvancedSearchingFormFieldset::class => Service\Form\AdvancedSearchingFormFieldsetFactory::class,
+            Form\SearchingFormFieldset::class => Service\Form\SearchingFormFieldsetFactory::class,
             Form\SettingsFieldset::class => Service\Form\SettingsFieldsetFactory::class,
             Form\SiteSettingsFieldset::class => Service\Form\SiteSettingsFieldsetFactory::class,
         ],
@@ -83,18 +83,18 @@ return [
             Controller\IndexController::class => Controller\IndexController::class,
         ],
         'factories' => [
-            Controller\Admin\SearchEngineController::class => Service\Controller\Admin\SearchEngineControllerFactory::class,
             Controller\Admin\SearchConfigController::class => Service\Controller\Admin\SearchConfigControllerFactory::class,
+            Controller\Admin\SearchEngineController::class => Service\Controller\Admin\SearchEngineControllerFactory::class,
         ],
     ],
     'controller_plugins' => [
         'invokables' => [
-            'searchRequestToResponse' => Mvc\Controller\Plugin\AdvancedSearchRequestToResponse::class,
+            'searchRequestToResponse' => Mvc\Controller\Plugin\SearchRequestToResponse::class,
         ],
         'factories' => [
             'apiSearch' => Service\ControllerPlugin\ApiSearchFactory::class,
             'apiSearchOne' => Service\ControllerPlugin\ApiSearchOneFactory::class,
-            'searchForm' => Service\ControllerPlugin\AdvancedSearchFormFactory::class,
+            'searchForm' => Service\ControllerPlugin\SearchFormFactory::class,
             'totalJobs' => Service\ControllerPlugin\TotalJobsFactory::class,
         ],
     ],
@@ -109,8 +109,8 @@ return [
             'Omeka\ApiManager' => [Service\ApiManagerDelegatorFactory::class],
         ],
         'factories' => [
-            'Search\AdapterManager' => Service\AdapterManagerFactory::class,
-            'Search\FormAdapterManager' => Service\FormAdapterManagerFactory::class,
+            'AdvancedSearch\AdapterManager' => Service\AdapterManagerFactory::class,
+            'AdvancedSearch\FormAdapterManager' => Service\FormAdapterManagerFactory::class,
         ],
     ],
     'navigation' => [
@@ -126,7 +126,7 @@ return [
     ],
     'navigation_links' => [
         'invokables' => [
-            'search-config' => Site\Navigation\Link\SearchConfig::class,
+            'search-page' => Site\Navigation\Link\SearchPage::class,
         ],
     ],
     'router' => [
@@ -138,7 +138,7 @@ return [
                         'options' => [
                             'route' => '/search-manager',
                             'defaults' => [
-                                '__NAMESPACE__' => 'Search\Controller\Admin',
+                                '__NAMESPACE__' => 'AdvancedSearch\Controller\Admin',
                                 'controller' => Controller\Admin\IndexController::class,
                                 'action' => 'browse',
                             ],
@@ -153,7 +153,7 @@ return [
                                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                                     ],
                                     'defaults' => [
-                                        '__NAMESPACE__' => 'Search\Controller\Admin',
+                                        '__NAMESPACE__' => 'AdvancedSearch\Controller\Admin',
                                         'controller' => Controller\Admin\SearchEngineController::class,
                                     ],
                                 ],
@@ -167,7 +167,7 @@ return [
                                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                                     ],
                                     'defaults' => [
-                                        '__NAMESPACE__' => 'Search\Controller\Admin',
+                                        '__NAMESPACE__' => 'AdvancedSearch\Controller\Admin',
                                         'controller' => Controller\Admin\SearchEngineController::class,
                                         'action' => 'show',
                                     ],
@@ -181,7 +181,7 @@ return [
                                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                                     ],
                                     'defaults' => [
-                                        '__NAMESPACE__' => 'Search\Controller\Admin',
+                                        '__NAMESPACE__' => 'AdvancedSearch\Controller\Admin',
                                         'controller' => Controller\Admin\SearchConfigController::class,
                                     ],
                                 ],
@@ -195,7 +195,7 @@ return [
                                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                                     ],
                                     'defaults' => [
-                                        '__NAMESPACE__' => 'Search\Controller\Admin',
+                                        '__NAMESPACE__' => 'AdvancedSearch\Controller\Admin',
                                         'controller' => Controller\Admin\SearchConfigController::class,
                                         'action' => 'show',
                                     ],
@@ -242,14 +242,14 @@ return [
     'advancedsearch' => [
         'settings' => [
             'advancedsearch_restrict_used_terms' => true,
-            'advancedsearch_main_page' => 1,
-            'search_configs' => [1],
-            'advancedsearch_api_page' => '',
+            'advancedsearch_main_config' => 1,
+            'advancedsearch_configs' => [1],
+            'advancedsearch_api_config' => '',
             'advancedsearch_batch_size' => 100,
         ],
         'site_settings' => [
             'advancedsearch_restrict_used_terms' => true,
-            'advancedsearch_advancedsearch_fields' => [
+            'advancedsearch_search_fields' => [
                 'common/advanced-search/fulltext',
                 'common/advanced-search/properties',
                 'common/advanced-search/resource-class',
@@ -260,14 +260,14 @@ return [
                 'common/advanced-search/data-type-geography',
                 'common/numeric-data-types-advanced-search',
             ],
-            'advancedsearch_main_page' => null,
-            'search_configs' => [],
+            'advancedsearch_main_config' => null,
+            'advancedsearch_configs' => [],
             'advancedsearch_redirect_itemset' => true,
         ],
         'block_settings' => [
             'searchingForm' => [
                 'heading' => '',
-                'advancedsearch_config' => null,
+                'search_config' => null,
                 'display_results' => false,
                 'query' => '',
                 'query_filter' => '',
@@ -277,7 +277,7 @@ return [
         // This is the default list of all possible fields, allowing other modules
         // to complete it. The partials that are not set in merged Config (included
         // config/local.config.php) are not managed by this module.
-        'advancedsearch_fields' => [
+        'search_fields' => [
             // From view/common/advanced-search'.
             'common/advanced-search/fulltext' => ['label' => 'Full text'], // @translate
             'common/advanced-search/properties' => ['label' => 'Properties'], // @translate

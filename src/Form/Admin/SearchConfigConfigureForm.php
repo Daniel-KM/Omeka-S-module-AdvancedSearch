@@ -47,13 +47,13 @@ class SearchConfigConfigureForm extends Form
     public function init(): void
     {
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
-        $searchConfig = $this->getOption('advancedsearch_config');
+        $searchConfig = $this->getOption('search_config');
         $engine = $searchConfig->engine();
         if (empty($engine)) {
             return;
         }
 
-        // This is the search page settings, not the search form one.
+        // This is the settings for the search config, not the search form one.
 
         // TODO Simplify the form with js, storing the whole form one time. See UserProfile and https://docs.laminas.dev/laminas-form/v3/form-creation/creation-via-factory/
 
@@ -698,7 +698,8 @@ class SearchConfigConfigureForm extends Form
 
     protected function addFormFieldset(): self
     {
-        $searchConfig = $this->getOption('advancedsearch_config');
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
+        $searchConfig = $this->getOption('search_config');
 
         $formAdapter = $searchConfig->formAdapter();
         if (!$formAdapter) {
@@ -711,8 +712,8 @@ class SearchConfigConfigureForm extends Form
         }
 
         /** @var \Laminas\Form\Fieldset $fieldset */
-        $fieldset = $this->getFormElementManager()
-            ->get($configFormClass, ['advancedsearch_config' => $searchConfig]);
+        $fieldset = $this->formElementManager
+            ->get($configFormClass, ['search_config' => $searchConfig]);
 
         if (method_exists($fieldset, 'skipDefaultElementsOrFieldsets')) {
             foreach ($fieldset->skipDefaultElementsOrFieldsets() as $skip) {
@@ -727,13 +728,15 @@ class SearchConfigConfigureForm extends Form
 
     protected function getAvailableFields(): array
     {
-        $options = [];
-        $searchConfig = $this->getOption('advancedsearch_config');
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
+        $searchConfig = $this->getOption('search_config');
         $searchEngine = $searchConfig->engine();
         $searchAdapter = $searchEngine->adapter();
         if (empty($searchAdapter)) {
             return [];
         }
+
+        $options = [];
         $fields = $searchAdapter->getAvailableFields($searchEngine);
         foreach ($fields as $name => $field) {
             $options[$name] = $field['label'] ?? $name;
@@ -743,13 +746,15 @@ class SearchConfigConfigureForm extends Form
 
     protected function getAvailableSortFields(): array
     {
-        $options = [];
-        $searchConfig = $this->getOption('advancedsearch_config');
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
+        $searchConfig = $this->getOption('search_config');
         $searchEngine = $searchConfig->engine();
         $searchAdapter = $searchEngine->adapter();
         if (empty($searchAdapter)) {
             return [];
         }
+
+        $options = [];
         $fields = $searchAdapter->getAvailableSortFields($searchEngine);
         foreach ($fields as $name => $field) {
             $options[$name] = $field['label'] ?? $name;
@@ -759,13 +764,15 @@ class SearchConfigConfigureForm extends Form
 
     protected function getAvailableFacetFields(): array
     {
-        $options = [];
-        $searchConfig = $this->getOption('advancedsearch_config');
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
+        $searchConfig = $this->getOption('search_config');
         $searchEngine = $searchConfig->engine();
         $searchAdapter = $searchEngine->adapter();
         if (empty($searchAdapter)) {
             return [];
         }
+
+        $options = [];
         $fields = $searchAdapter->getAvailableFacetFields($searchEngine);
         foreach ($fields as $name => $field) {
             $options[$name] = $field['label'] ?? $name;
@@ -773,14 +780,20 @@ class SearchConfigConfigureForm extends Form
         return $options;
     }
 
+    protected function getSearchAdapter(): ?\AdvancedSearch\Adapter\AdapterInterface
+    {
+        static $searchAdapter = false;
+        if ($searchAdapter === false) {
+            $searchConfig = $this->getOption('search_config');
+            $searchEngine = $searchConfig->engine();
+            $searchAdapter = $searchEngine->adapter();
+        }
+        return $searchAdapter;
+    }
+
     public function setFormElementManager($formElementManager): self
     {
         $this->formElementManager = $formElementManager;
         return $this;
-    }
-
-    public function getFormElementManager()
-    {
-        return $this->formElementManager;
     }
 }

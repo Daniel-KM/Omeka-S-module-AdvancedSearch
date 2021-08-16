@@ -43,13 +43,13 @@ $url = $this->plugin('url');
 <?= $this->pageTitle($translate('Search manager')) ?>
 
 <div id="page-actions">
-    <a class="button" href="<?= $url('admin/search/index', ['action' => 'add']) ?>"><?= $translate('Add new index') ?></a>
+    <a class="button" href="<?= $url('admin/search/index', ['action' => 'add']) ?>"><?= $translate('Add new search engine') ?></a>
     <?php if (!empty($search_engines)): ?>
         <a class="button" href="<?= $url('admin/search/page', ['action' => 'add']) ?>"><?= $translate('Add new page') ?></a>
     <?php endif; ?>
 </div>
 
-<h2><?= $translate('Indexes') ?></h2>
+<h2><?= $translate('Search engines') ?></h2>
 <?php if (count($search_engines) > 0): ?>
     <table class="tablesaw" data-tablesaw-mode="stack">
         <thead>
@@ -95,17 +95,17 @@ $url = $this->plugin('url');
         </tbody>
     </table>
 <?php else: ?>
-    <p><?= $translate('No search indexes created yet.') ?></p>
+    <p><?= $translate('No search engines created yet.') ?></p>
 <?php endif; ?>
 
-<h2><?= $translate('Pages') ?></h2>
+<h2><?= $translate('Page configs') ?></h2>
 <?php if (count($search_configs) > 0): ?>
     <table class="tablesaw" data-tablesaw-mode="stack">
         <thead>
             <tr>
                 <th><?= $translate('Name') ?></th>
                 <th><?= $translate('Path') ?></th>
-                    <th><?= $translate('Index') ?></th>
+                <th><?= $translate('Search engine') ?></th>
                 <th><?= $translate('Form') ?></th>
             </tr>
         </thead>
@@ -155,7 +155,7 @@ $url = $this->plugin('url');
         </tbody>
     </table>
 <?php else: ?>
-    <p><?= $translate('No search pages created yet.') ?></p>
+    <p><?= $translate('No search page configs created yet.') ?></p>
 <?php endif; ?>
 
 <div class="sidebar">

@@ -68,7 +68,7 @@ class Indexing extends AbstractJob
             $batchSize = self::BATCH_SIZE;
         }
 
-        $searchEngineId = $this->getArg('advancedsearch_index_id');
+        $searchEngineId = $this->getArg('advancedsearch_engine_id');
         $startResourceId = (int) $this->getArg('start_resource_id');
 
         /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation $searchEngine */
@@ -179,7 +179,7 @@ class Indexing extends AbstractJob
                 /** @var \Omeka\Entity\Resource[] $resources */
                 $resources = $q->getResult();
 
-                $indexer->engineResources($resources);
+                $indexer->indexResources($resources);
 
                 ++$searchConfig;
                 $totals[$resourceName] += count($resources);

@@ -9,7 +9,7 @@ class SearchingUrl extends AbstractHelper
      * Get url to the search page of current site or the default search page.
      *
      * @param bool $useItemSearch Use item/search instead of item/browse when
-     *   there is no search page.
+     *   there is no search config.
      * @return string
      */
     public function __invoke($useItemSearch = false)
@@ -17,7 +17,7 @@ class SearchingUrl extends AbstractHelper
         $view = $this->getView();
 
         // Check if the current site has a search form.
-        $searchMainPage = $view->siteSetting('advancedsearch_main_page');
+        $searchMainPage = $view->siteSetting('advancedsearch_main_config');
         if ($searchMainPage) {
             /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
             $searchConfig = $view->api()->searchOne('search_configs', ['id' => $searchMainPage])->getContent();

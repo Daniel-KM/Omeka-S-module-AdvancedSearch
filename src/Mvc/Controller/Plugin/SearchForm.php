@@ -2,7 +2,7 @@
 namespace AdvancedSearch\Mvc\Controller\Plugin;
 
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
-use AdvancedSearch\View\Helper\AdvancedSearchForm as SearchFormHelper;
+use AdvancedSearch\View\Helper\SearchForm as SearchFormHelper;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class SearchForm extends AbstractPlugin

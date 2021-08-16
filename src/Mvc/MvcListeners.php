@@ -59,7 +59,7 @@ class MvcListeners extends AbstractListenerAggregate
             return;
         }
 
-        $searchMainPage = $siteSettings->get('advancedsearch_main_page');
+        $searchMainPage = $siteSettings->get('advancedsearch_main_config');
         if (empty($searchMainPage)) {
             return;
         }
@@ -68,7 +68,7 @@ class MvcListeners extends AbstractListenerAggregate
         $itemSetId = $routeMatch->getParam('item-set-id');
 
         $params = [
-            '__NAMESPACE__' => 'Search\Controller',
+            '__NAMESPACE__' => 'AdvancedSearch\Controller',
             '__SITE__' => true,
             'controller' => \AdvancedSearch\Controller\IndexController::class,
             'action' => 'search',

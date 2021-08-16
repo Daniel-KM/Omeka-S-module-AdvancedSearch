@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace AdvancedSearch\Mvc\Controller\Plugin;
 
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
@@ -22,7 +23,7 @@ use Omeka\Permissions\Acl;
 use Omeka\Stdlib\Paginator;
 
 /**
- * Do an api search via the default search index.
+ * Do an api search via the default search engine.
  *
  * Does the same than the Omeka api controller plugin for method search().
  * Allows to get a standard Omeka Response from the external engine.
@@ -113,7 +114,7 @@ class ApiSearch extends AbstractPlugin
         Paginator $paginator = null
     ) {
         $this->api = $api;
-        $this->page = $searchConfig;
+        $this->searchConfig = $searchConfig;
         $this->engine = $engine;
         $this->adapterManager = $adapterManager;
         $this->apiFormAdapter = $apiFormAdapter;
@@ -273,7 +274,7 @@ class ApiSearch extends AbstractPlugin
 
         // Begin building the search query.
         $resource = $request->getResource();
-        $searchConfigSettings = $this->page->settings();
+        $searchConfigSettings = $this->searchConfig->settings();
         $searchFormSettings = $searchConfigSettings['form'] ?? [
             'options' => [],
             'metadata' => [],

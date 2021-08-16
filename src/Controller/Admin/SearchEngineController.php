@@ -103,12 +103,12 @@ class SearchEngineController extends AbstractActionController
         $adapter = $adapterManager->get($searchEngineAdapterName);
 
         $form = $this->getForm(SearchEngineConfigureForm::class, [
-            'advancedsearch_index_id' => $id,
+            'advancedsearch_engine_id' => $id,
         ]);
         $adapterFieldset = $adapter->getConfigFieldset();
         if ($adapterFieldset) {
             $adapterFieldset
-                ->setOption('advancedsearch_index_id', $id)
+                ->setOption('advancedsearch_engine_id', $id)
                 ->setName('adapter')
                 ->setLabel('Adapter settings') // @translate
                 ->init();
@@ -139,7 +139,7 @@ class SearchEngineController extends AbstractActionController
                 'Search index "%s" successfully configured.',  // @translate
                 $searchEngine->getName()
             ));
-            $this->messenger()->addWarning('Don’t forget to run the indexation of the core.'); // @translate
+            $this->messenger()->addWarning('Don’t forget to run the indexation of the search engine.'); // @translate
             return $this->redirect()->toRoute('admin/search', ['action' => 'browse'], true);
         }
 
@@ -172,7 +172,7 @@ class SearchEngineController extends AbstractActionController
         $force = (bool) $this->params()->fromPost('force');
 
         $jobArgs = [];
-        $jobArgs['advancedsearch_index_id'] = $searchEngine->id();
+        $jobArgs['advancedsearch_engine_id'] = $searchEngine->id();
         $jobArgs['start_resource_id'] = $startResourceId;
         $jobArgs['resource_names'] = $resourceNames;
         $jobArgs['force'] = $force;
@@ -198,10 +198,10 @@ class SearchEngineController extends AbstractActionController
         $response = $this->api()->read('search_engines', $this->params('id'));
         $engine = $response->getContent();
 
-        // TODO Add a warning about the related pages, that will be deleted.
+        // TODO Add a warning about the related configs, that will be deleted.
 
         $view = new ViewModel([
-            'resourceLabel' => 'search index',
+            'resourceLabel' => 'search engine',
             'resource' => $engine,
         ]);
         return $view

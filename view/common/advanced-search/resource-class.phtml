@@ -11,7 +11,7 @@ $setting = $plugins->get('setting');
 $siteSetting = $plugins->get('siteSetting');
 
 $isSiteRequest = $this->status()->isSiteRequest();
-$usedTerms = $isSiteRequest ? $siteSetting('advancedadvancedsearch_restrict_used_terms', true) : $setting('advancedadvancedsearch_restrict_used_terms', true);
+$usedTerms = $isSiteRequest ? $siteSetting('advancedsearch_restrict_used_terms', true) : $setting('advancedsearch_restrict_used_terms', true);
 
 // Prepare the resource class query.
 $ids = $query['resource_class_id'] ?? [];

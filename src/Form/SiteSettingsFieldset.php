@@ -46,19 +46,19 @@ class SiteSettingsFieldset extends Fieldset
 
         $this
             ->add([
-                'name' => 'advancedadvancedsearch_restrict_used_terms',
+                'name' => 'advancedsearch_restrict_used_terms',
                 'type' => \Laminas\Form\Element\Checkbox::class,
                 'options' => [
                     'label' => 'Restrict to used properties and resources classes', // @translate
                     'info' => 'If checked, restrict the list of properties and resources classes to the used ones in advanced search form.', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'advancedadvancedsearch_restrict_used_terms',
+                    'id' => 'advancedsearch_restrict_used_terms',
                     'value' => $selectAllTerms,
                 ],
             ])
             ->add([
-                'name' => 'advancedadvancedsearch_advancedsearch_fields',
+                'name' => 'advancedsearch_search_fields',
                 'type' => 'OptionalMultiCheckbox',
                 'options' => [
                     'label' => 'Display only following fields', // @translate
@@ -66,13 +66,13 @@ class SiteSettingsFieldset extends Fieldset
                     'use_hidden_element' => true,
                 ],
                 'attributes' => [
-                    'id' => 'advancedadvancedsearch_advancedsearch_fields',
+                    'id' => 'advancedsearch_search_fields',
                     'value' => $searchFields,
                 ],
             ])
 
             ->add([
-                'name' => 'advancedsearch_main_page',
+                'name' => 'advancedsearch_main_config',
                 'type' => OptionalSelect::class,
                 'options' => [
                     'label' => 'Default search page', // @translate
@@ -80,18 +80,18 @@ class SiteSettingsFieldset extends Fieldset
                     'empty_option' => 'Select the default search engine for the site…', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'advancedsearch_main_page',
+                    'id' => 'advancedsearch_main_config',
                 ],
             ])
             ->add([
-                'name' => 'search_configs',
+                'name' => 'advancedsearch_configs',
                 'type' => OptionalMultiCheckbox::class,
                 'options' => [
                     'label' => 'Available search pages', // @translate
                     'value_options' => $valueOptions,
                 ],
                 'attributes' => [
-                    'id' => 'search_configs',
+                    'id' => 'advancedsearch_configs',
                 ],
             ])
             // TODO Move the option to redirect item set to search page or a search page setting?

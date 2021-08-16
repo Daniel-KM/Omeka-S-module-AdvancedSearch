@@ -1,7 +1,8 @@
 <?php declare(strict_types=1);
+
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2018
+ * Copyright Daniel Berthereau, 2018-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -33,7 +34,7 @@ use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Site\Navigation\Link\LinkInterface;
 use Omeka\Stdlib\ErrorStore;
 
-class SearchConfig implements LinkInterface
+class SearchPage implements LinkInterface
 {
     public function getName()
     {

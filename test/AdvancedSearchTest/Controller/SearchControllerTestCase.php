@@ -31,7 +31,7 @@ abstract class SearchControllerTestCase extends OmekaControllerTestCase
         $response = $this->api()->create('search_configs', [
             'o:name' => 'TestPage',
             'o:path' => 'test/search',
-            'o:index_id' => $searchEngine->id(),
+            'o:engine_id' => $searchEngine->id(),
             'o:form' => 'basic',
             'o:settings' => [
                 'facets' => [],
@@ -53,7 +53,7 @@ abstract class SearchControllerTestCase extends OmekaControllerTestCase
     protected function setupTestSearchAdapter(): void
     {
         $serviceLocator = $this->getApplication()->getServiceManager();
-        $adapterManager = $serviceLocator->get('Search\AdapterManager');
+        $adapterManager = $serviceLocator->get('AdvancedSearch\AdapterManager');
         $config = [
             'invokables' => [
                 'test' => \AdvancedSearch\Test\Adapter\TestAdapter::class,

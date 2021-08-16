@@ -50,7 +50,7 @@ class IndexController extends AbstractActionController
         if ($isPublic) {
             $site = $this->currentSite();
             $siteSettings = $this->siteSettings();
-            $siteSearchConfigs = $siteSettings->get('search_configs', []);
+            $siteSearchConfigs = $siteSettings->get('advancedsearch_configs', []);
             if (!in_array($searchConfigId, $siteSearchConfigs)) {
                 return $this->notFoundAction();
             }
@@ -66,7 +66,8 @@ class IndexController extends AbstractActionController
             $site = null;
         }
 
-        // The page is required, else there is no form.
+        // The config is required, else there is no form.
+        // TODO Make the config and  the form independant (or noop form).
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $this->api()->read('search_configs', $searchConfigId)->getContent();
 
@@ -94,7 +95,7 @@ class IndexController extends AbstractActionController
         }
 
         // Check if the query is empty and use the default query in that case.
-        // So the default query is used only on the search page.
+        // So the default query is used only on the search config.
         list($request, $isEmptyRequest) = $this->cleanRequest($request);
         if ($isEmptyRequest) {
             $defaultResults = $searchConfig->subSetting('search', 'default_results') ?: 'default';
@@ -194,7 +195,7 @@ class IndexController extends AbstractActionController
         if ($isPublic) {
             $site = $this->currentSite();
             $siteSettings = $this->siteSettings();
-            $siteSearchConfigs = $siteSettings->get('search_configs', []);
+            $siteSearchConfigs = $siteSettings->get('advancedsearch_configs', []);
             if (!in_array($searchConfigId, $siteSearchConfigs)) {
                 return new JsonModel([
                     'status' => 'error',
@@ -324,7 +325,7 @@ class IndexController extends AbstractActionController
     /**
      * Get the request from the query and check it according to the search page.
      *
-     * @todo Factorize with \AdvancedSearch\Site\BlockLayout\AdvancedSearchingForm::getSearchRequest()
+     * @todo Factorize with \AdvancedSearch\Site\BlockLayout\SearchingForm::getSearchRequest()
      *
      * @return array|bool
      */
@@ -353,7 +354,7 @@ class IndexController extends AbstractActionController
     /**
      * Remove all empty values (zero length strings) and check empty request.
      *
-     * @todo Factorize with \AdvancedSearch\Mvc\Controller\Plugin\AdvancedSearchRequestToResponse::cleanRequest()
+     * @todo Factorize with \AdvancedSearch\Mvc\Controller\Plugin\SearchRequestToResponse::cleanRequest()
      *
      * @return array First key is the cleaned request, the second a bool to
      * indicate if it is empty.
@@ -391,7 +392,7 @@ class IndexController extends AbstractActionController
     /**
      * Remove zero-length values or an array, recursively.
      *
-     * @todo Factorize with \AdvancedSearch\Mvc\Controller\Plugin\AdvancedSearchRequestToResponse::arrayFilterRecursive()
+     * @todo Factorize with \AdvancedSearch\Mvc\Controller\Plugin\SearchRequestToResponse::arrayFilterRecursive()
      */
     protected function arrayFilterRecursive(array &$array): array
     {

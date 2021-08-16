@@ -52,19 +52,19 @@ class SearchConfigAdapter extends AbstractEntityAdapter
 
     public function getRepresentationClass()
     {
-        return \AdvancedSearch\Api\Representation\AdvancedSearchConfigRepresentation::class;
+        return \AdvancedSearch\Api\Representation\SearchConfigRepresentation::class;
     }
 
     public function getEntityClass()
     {
-        return \AdvancedSearch\Entity\AdvancedSearchConfig::class;
+        return \AdvancedSearch\Entity\SearchConfig::class;
     }
 
     public function buildQuery(QueryBuilder $qb, array $query): void
     {
         $expr = $qb->expr();
 
-        if (isset($query['index_id'])) {
+        if (isset($query['engine_id'])) {
             $searchEngineAlias = $this->createAlias();
             // The join avoids to find a page without index.
             $qb->innerJoin(
@@ -75,7 +75,7 @@ class SearchConfigAdapter extends AbstractEntityAdapter
                     $expr->eq($searchEngineAlias . '.id', 'omeka_root.index'),
                     $expr->in(
                         $searchEngineAlias . '.id',
-                        $this->createNamedParameter($qb, $query['index_id'])
+                        $this->createNamedParameter($qb, $query['engine_id'])
                     )
                 )
             );
@@ -109,8 +109,8 @@ class SearchConfigAdapter extends AbstractEntityAdapter
         if ($this->shouldHydrate($request, 'o:path')) {
             $entity->setPath($request->getValue('o:path'));
         }
-        if ($this->shouldHydrate($request, 'o:index_id')) {
-            $engineId = $request->getValue('o:index_id');
+        if ($this->shouldHydrate($request, 'o:engine_id')) {
+            $engineId = $request->getValue('o:engine_id');
             $entity->setEngine($this->getAdapter('search_engines')->findEntity($engineId));
         }
         if ($this->shouldHydrate($request, 'o:form')) {

@@ -339,8 +339,6 @@ SQL;
     /**
      * Prepare the main query with excluded fields.
      *
-     * Require module AdvancedSearch.
-     *
      * @todo Add support of exclude item set.
      * @todo Add support of grouped query (mutliple properties and/or multiple other properties).
      */
@@ -487,7 +485,6 @@ SQL;
                         $this->args['property'][] = [
                             'joiner' => 'and',
                             'property' => $name,
-                            // FIXME Require a hack (or the module AdvancedSearch).
                             'type' => 'list',
                             'text' => is_array($values) ? $values : [$values],
                         ];

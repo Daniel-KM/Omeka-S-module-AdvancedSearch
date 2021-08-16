@@ -1849,34 +1849,6 @@ class Module extends AbstractModule
         }
     }
 
-    public function handleSiteSettings(Event $event): void
-    {
-        // This is an exception, because there is already a fieldset named
-        // "search" in the core, so it should be named "advancedsearch_module".
-
-        $services = $this->getServiceLocator();
-        $settingsType = 'site_settings';
-        $settings = $services->get('Omeka\Settings\Site');
-
-        $site = $services->get('ControllerPluginManager')->get('currentSite');
-        $id = $site()->id();
-
-        $this->initDataToPopulate($settings, $settingsType, $id);
-
-        $data = $this->prepareDataToPopulate($settings, $settingsType);
-        if (is_null($data)) {
-            return;
-        }
-
-        $space = 'advancedsearch_module';
-
-        $fieldset = $services->get('FormElementManager')->get(\AdvancedSearch\Form\SiteSettingsFieldset::class);
-        $fieldset->setName($space);
-        $form = $event->getTarget();
-        $form->add($fieldset);
-        $form->get($space)->populateValues($data);
-    }
-
     /**
      * Add the headers.
      *

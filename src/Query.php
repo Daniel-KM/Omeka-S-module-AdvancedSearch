@@ -124,11 +124,6 @@ class Query implements \JsonSerializable
     protected $siteId;
 
     /**
-     * @var SiteRepresentation
-     */
-    protected $site;
-
-    /**
      * The key is always trimmed and it is always a stringed.
      */
     public function setQuery($query): self
@@ -390,23 +385,5 @@ class Query implements \JsonSerializable
             'suggest_fields' => $this->getSuggestFields(),
             'site_id' => $this->getSiteId(),
         ];
-    }
-
-    /**
-     * @deprecated 3.5.8 Use self::setSiteId() instead. Will be removed in 3.6.
-     */
-    public function setSite(SiteRepresentation $site): self
-    {
-        $this->site = $site;
-        $this->siteId = $site->id();
-        return $this;
-    }
-
-    /**
-     * @deprecated 3.5.8 Use self::getSiteId() instead. Will be removed in 3.6.
-     */
-    public function getSite(): SiteRepresentation
-    {
-        return $this->site;
     }
 }

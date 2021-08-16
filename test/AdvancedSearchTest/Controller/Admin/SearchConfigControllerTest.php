@@ -4,7 +4,7 @@ namespace AdvancedSearchTest\Controller\Admin;
 
 require_once dirname(__DIR__) . '/SearchControllerTestCase.php';
 
-use AdvancedSearchTest\Controller\SearchControllerTestCase;
+use AdvancedSearchTest\Controller\AdvancedSearchControllerTestCase;
 
 class SearchConfigControllerTest extends SearchControllerTestCase
 {
@@ -22,7 +22,7 @@ class SearchConfigControllerTest extends SearchControllerTestCase
     public function testAddPostAction(): void
     {
         $forms = $this->getServiceLocator()->get('FormElementManager');
-        $form = $forms->get(\Search\Form\Admin\SearchConfigForm::class);
+        $form = $forms->get(\AdvancedSearch\Form\Admin\SearchConfigForm::class);
 
         $this->dispatch('/admin/search-manager/page/add', 'POST', [
             'o:name' => 'TestPage [testAddPostAction]',
@@ -55,7 +55,7 @@ class SearchConfigControllerTest extends SearchControllerTestCase
     public function testConfigurePostAction(): void
     {
         $forms = $this->getServiceLocator()->get('FormElementManager');
-        $form = $forms->get(\Search\Form\Admin\SearchConfigConfigureForm::class, [
+        $form = $forms->get(\AdvancedSearch\Form\Admin\SearchConfigConfigureForm::class, [
             'search_config' => $this->searchConfig,
         ]);
 

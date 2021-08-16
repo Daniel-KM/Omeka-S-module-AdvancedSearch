@@ -89,8 +89,8 @@ class SearchEngineController extends AbstractActionController
 
         $id = $this->params('id');
 
-        /** @var \Search\Entity\SearchEngine $searchEngine */
-        $searchEngine = $this->getEntityManager()->find(\Search\Entity\SearchEngine::class, $id);
+        /** @var \AdvancedSearch\Entity\SearchEngine $searchEngine */
+        $searchEngine = $this->getEntityManager()->find(\AdvancedSearch\Entity\SearchEngine::class, $id);
         $searchEngineAdapterName = $searchEngine->getAdapter();
         if (!$adapterManager->has($searchEngineAdapterName)) {
             $this->messenger()->addError(new Message('The adapter "%s" is not available.', // @translate
@@ -99,7 +99,7 @@ class SearchEngineController extends AbstractActionController
             return $this->redirect()->toRoute('admin/search', ['action' => 'browse'], true);
         }
 
-        /** @var \Search\Adapter\AdapterInterface $adapter */
+        /** @var \AdvancedSearch\Adapter\AdapterInterface $adapter */
         $adapter = $adapterManager->get($searchEngineAdapterName);
 
         $form = $this->getForm(SearchEngineConfigureForm::class, [
@@ -150,7 +150,7 @@ class SearchEngineController extends AbstractActionController
     {
         $index = $this->api()->read('search_engines', $this->params('id'))->getContent();
 
-        $totalJobs = $this->totalJobs(\Search\Job\Indexing::class, true);
+        $totalJobs = $this->totalJobs(\AdvancedSearch\Job\Indexing::class, true);
 
         $view = new ViewModel([
             'resourceLabel' => 'search index',
@@ -176,7 +176,7 @@ class SearchEngineController extends AbstractActionController
         $jobArgs['start_resource_id'] = $startResourceId;
         $jobArgs['resource_names'] = $resourceNames;
         $jobArgs['force'] = $force;
-        $job = $this->jobDispatcher()->dispatch(\Search\Job\Indexing::class, $jobArgs);
+        $job = $this->jobDispatcher()->dispatch(\AdvancedSearch\Job\Indexing::class, $jobArgs);
 
         $urlHelper = $this->viewHelpers()->get('url');
         $message = new Message(

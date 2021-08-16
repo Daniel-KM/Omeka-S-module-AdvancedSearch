@@ -209,7 +209,7 @@ SQL;
      * List of resource types is prepared too.
      *
      * {@inheritDoc}
-     * @see \Search\Querier\AbstractQuerier::getPreparedQuery()
+     * @see \AdvancedSearch\Querier\AbstractQuerier::getPreparedQuery()
      */
     public function getPreparedQuery()
     {

@@ -158,7 +158,7 @@ class SearchConfig extends AbstractEntity
     }
 
     /**
-     * @return \Search\Entity\SearchEngine
+     * @return \AdvancedSearch\Entity\SearchEngine
      */
     public function getIndex()
     {

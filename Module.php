@@ -331,25 +331,25 @@ class Module extends AbstractModule
             ->allow(
                 null,
                 [
-                    \Search\Controller\IndexController::class,
-                    \Search\Api\Adapter\SearchConfigAdapter::class,
-                    \Search\Api\Adapter\SearchEngineAdapter::class,
+                    \AdvancedSearch\Controller\IndexController::class,
+                    \AdvancedSearch\Api\Adapter\SearchConfigAdapter::class,
+                    \AdvancedSearch\Api\Adapter\SearchEngineAdapter::class,
                 ],
                 ['read', 'search']
             )
             ->allow(
                 null,
                 [
-                    \Search\Controller\IndexController::class,
-                    \Search\Api\Adapter\SearchConfigAdapter::class,
-                    \Search\Api\Adapter\SearchEngineAdapter::class,
+                    \AdvancedSearch\Controller\IndexController::class,
+                    \AdvancedSearch\Api\Adapter\SearchConfigAdapter::class,
+                    \AdvancedSearch\Api\Adapter\SearchEngineAdapter::class,
                 ]
             )
             ->allow(
                 null,
                 [
-                    \Search\Entity\SearchConfig::class,
-                    \Search\Entity\SearchEngine::class,
+                    \AdvancedSearch\Entity\SearchConfig::class,
+                    \AdvancedSearch\Entity\SearchEngine::class,
                 ],
                 ['read']
             );
@@ -371,7 +371,7 @@ class Module extends AbstractModule
         }
 
         $api = $services->get('Omeka\ApiManager');
-        /** @var \Search\Api\Representation\SearchConfigRepresentation[] $searchConfigs */
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation[] $searchConfigs */
         $searchConfigs = $api->search('search_configs')->getContent();
 
         $isAdminRequest = $status->isAdminRequest();
@@ -390,7 +390,7 @@ class Module extends AbstractModule
                                 'defaults' => [
                                     '__NAMESPACE__' => 'Search\Controller',
                                     '__ADMIN__' => true,
-                                    'controller' => \Search\Controller\IndexController::class,
+                                    'controller' => \AdvancedSearch\Controller\IndexController::class,
                                     'action' => 'search',
                                     'id' => $searchConfigId,
                                 ],
@@ -404,7 +404,7 @@ class Module extends AbstractModule
                                         'defaults' => [
                                             '__NAMESPACE__' => 'Search\Controller',
                                             '__ADMIN__' => true,
-                                            'controller' => \Search\Controller\IndexController::class,
+                                            'controller' => \AdvancedSearch\Controller\IndexController::class,
                                             'action' => 'suggest',
                                             'id' => $searchConfigId,
                                         ],
@@ -430,7 +430,7 @@ class Module extends AbstractModule
                         'defaults' => [
                             '__NAMESPACE__' => 'Search\Controller',
                             '__SITE__' => true,
-                            'controller' => \Search\Controller\IndexController::class,
+                            'controller' => \AdvancedSearch\Controller\IndexController::class,
                             'action' => 'search',
                             'id' => $searchConfigId,
                             // Store the page slug to simplify checks.
@@ -446,7 +446,7 @@ class Module extends AbstractModule
                                 'defaults' => [
                                     '__NAMESPACE__' => 'Search\Controller',
                                     '__SITE__' => true,
-                                    'controller' => \Search\Controller\IndexController::class,
+                                    'controller' => \AdvancedSearch\Controller\IndexController::class,
                                     'action' => 'suggest',
                                     'id' => $searchConfigId,
                                     // Store the page slug to simplify checks.
@@ -1710,7 +1710,7 @@ class Module extends AbstractModule
         $response = $event->getParam('response');
         $resources = $response->getContent();
 
-        /** @var \Search\Api\Representation\SearchEngineRepresentation[] $searchEnginees */
+        /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEnginees */
         $searchEnginees = $api->search('search_engines')->getContent();
         foreach ($searchEnginees as $searchEngine) {
             if (in_array($requestResource, $searchEngine->setting('resources', []))) {
@@ -1758,7 +1758,7 @@ class Module extends AbstractModule
         $response = $event->getParam('response');
         $requestResource = $request->getResource();
 
-        /** @var \Search\Api\Representation\SearchEngineRepresentation[] $searchEnginees */
+        /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEnginees */
         $searchEnginees = $api->search('search_engines')->getContent();
         foreach ($searchEnginees as $searchEngine) {
             if (in_array($requestResource, $searchEngine->setting('resources', []))) {
@@ -1786,7 +1786,7 @@ class Module extends AbstractModule
             ? $api->read('items', $itemId, [], ['responseContent' => 'resource'])->getContent()
             : $response->getContent()->getItem();
 
-        /** @var \Search\Api\Representation\SearchEngineRepresentation[] $searchEnginees */
+        /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEnginees */
         $searchEnginees = $api->search('search_engines')->getContent();
         foreach ($searchEnginees as $searchEngine) {
             if (in_array('items', $searchEngine->setting('resources', []))) {
@@ -1868,7 +1868,7 @@ class Module extends AbstractModule
 
         $space = 'search_module';
 
-        $fieldset = $services->get('FormElementManager')->get(\Search\Form\SiteSettingsFieldset::class);
+        $fieldset = $services->get('FormElementManager')->get(\AdvancedSearch\Form\SiteSettingsFieldset::class);
         $fieldset->setName($space);
         $form = $event->getTarget();
         $form->add($fieldset);
@@ -1892,7 +1892,7 @@ class Module extends AbstractModule
         $status = $plugins->get('status');
         if ($status->isSiteRequest()) {
             $params = $view->params()->fromRoute();
-            if ($params['controller'] === \Search\Controller\IndexController::class) {
+            if ($params['controller'] === \AdvancedSearch\Controller\IndexController::class) {
                 $searchConfig = @$params['id'];
             } else {
                 $searchConfig = $view->siteSetting('search_main_page');
@@ -1907,7 +1907,7 @@ class Module extends AbstractModule
             return;
         }
 
-        /** @var \Search\Api\Representation\SearchConfigRepresentation $searchConfig */
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $plugins->get('api')->searchOne('search_configs', ['id' => $searchConfig])->getContent();
         if (!$searchConfig) {
             return;
@@ -1949,7 +1949,7 @@ class Module extends AbstractModule
          * @var \Omeka\Mvc\Controller\Plugin\Api $api
          *
          * @var \Omeka\Api\Representation\SiteRepresentation $site
-         * @var \Search\Api\Representation\SearchConfigRepresentation $searchConfig
+         * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
          */
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings');

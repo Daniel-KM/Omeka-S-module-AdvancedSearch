@@ -32,7 +32,7 @@ class SearchForm extends AbstractHelper
      * @param SearchConfigRepresentation $searchConfig
      * @param string $partial Specific partial for the search form of the page.
      * @param bool $skipFormAction Don't set form action, so use the current page.
-     * @return \Search\View\Helper\SearchForm
+     * @return \AdvancedSearch\View\Helper\AdvancedSearchForm
      */
     public function __invoke(SearchConfigRepresentation $searchConfig = null, $partial = null, $skipFormAction = false): self
     {
@@ -98,7 +98,7 @@ class SearchForm extends AbstractHelper
     /**
      * Get the specified search page or the default one.
      *
-     * @return \Search\Api\Representation\SearchConfigRepresentation|null
+     * @return \AdvancedSearch\Api\Representation\SearchConfigRepresentation|null
      */
     public function getSearchConfig(): ?SearchConfigRepresentation
     {

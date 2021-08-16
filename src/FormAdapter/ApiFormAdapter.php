@@ -47,10 +47,10 @@ class ApiFormAdapter implements FormAdapterInterface
 
     public function getConfigFormClass(): ?string
     {
-        return \Search\Form\Admin\ApiFormConfigFieldset::class;
+        return \AdvancedSearch\Form\Admin\ApiFormConfigFieldset::class;
     }
 
-    public function toQuery(array $request, array $formSettings): \Search\Query
+    public function toQuery(array $request, array $formSettings): \AdvancedSearch\Query
     {
         $query = new Query();
 
@@ -219,7 +219,7 @@ class ApiFormAdapter implements FormAdapterInterface
     /**
      * Get the term from a property string or integer.
      *
-     * @todo Factorize with \Search\Mvc\Controller\Plugin\ApiSearch::normalizeProperty().
+     * @todo Factorize with \AdvancedSearch\Mvc\Controller\Plugin\ApiSearch::normalizeProperty().
      *
      * @param string|int $property
      * @return string

@@ -52,7 +52,7 @@ class FacetLabel extends AbstractHelper
         return $availableFacetFields[$name]['label'] ?? $name;
     }
 
-    protected function getSearchConfig(): \Search\Api\Representation\SearchConfigRepresentation
+    protected function getSearchConfig(): \AdvancedSearch\Api\Representation\SearchConfigRepresentation
     {
         if (!property_exists($this->view, 'searchConfig')) {
             $this->view->searchConfig = $this->view->api()

@@ -7,7 +7,7 @@ require_once dirname(__DIR__) . '/SearchControllerTestCase.php';
 use Omeka\Mvc\Controller\Plugin\Messenger;
 use Omeka\Stdlib\Message;
 use AdvancedSearch\Form\Admin\SearchEngineConfigureForm;
-use AdvancedSearchTest\Controller\SearchControllerTestCase;
+use AdvancedSearchTest\Controller\AdvancedSearchControllerTestCase;
 
 class SearchEngineControllerTest extends SearchControllerTestCase
 {
@@ -23,7 +23,7 @@ class SearchEngineControllerTest extends SearchControllerTestCase
     public function testAddPostAction(): void
     {
         $forms = $this->getServiceLocator()->get('FormElementManager');
-        $form = $forms->get(\Search\Form\Admin\SearchEngineForm::class);
+        $form = $forms->get(\AdvancedSearch\Form\Admin\SearchEngineForm::class);
 
         $this->dispatch('/admin/search-manager/index/add', 'POST', [
             'o:name' => 'TestIndex2',

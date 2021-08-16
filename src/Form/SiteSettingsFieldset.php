@@ -36,7 +36,7 @@ class SiteSettingsFieldset extends Fieldset
         $selectAllTerms = $settings->get('advancedsearchplus_restrict_used_terms', false);
         $searchFields = $settings->get('advancedsearchplus_search_fields', $defaultSelectedFields) ?: [];
 
-        /** @var \Search\Api\Representation\SearchConfigRepresentation[] $pages */
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation[] $pages */
         $pages = $this->api->search('search_configs')->getContent();
 
         $valueOptions = [];

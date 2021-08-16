@@ -97,7 +97,7 @@ class SearchConfigController extends AbstractActionController
             $this->messenger()->addWarning('You can enable this page in your site settings or in admin settings.'); // @translate
         }
 
-        if ($searchConfig->formAdapter() instanceof \Search\FormAdapter\ApiFormAdapter) {
+        if ($searchConfig->formAdapter() instanceof \AdvancedSearch\FormAdapter\ApiFormAdapter) {
             $this->messenger()->addWarning(
                 'The api adapter should be selected in the main settings.' // @translate
             );
@@ -108,7 +108,7 @@ class SearchConfigController extends AbstractActionController
 
     public function editAction()
     {
-        /** @var \Search\Api\Representation\SearchConfigRepresentation $page */
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $page */
         $id = $this->params('id');
         $page = $this->api()->read('search_configs', ['id' => $id])->getContent();
 
@@ -153,7 +153,7 @@ class SearchConfigController extends AbstractActionController
 
         $id = $this->params('id');
 
-        /** @var \Search\Api\Representation\SearchConfigRepresentation $searchConfig */
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $this->api()->read('search_configs', $id)->getContent();
 
         $view = new ViewModel([
@@ -321,7 +321,7 @@ class SearchConfigController extends AbstractActionController
     /**
      * Check if the configuration should use simple or visual form and get it.
      */
-    protected function getConfigureForm(SearchConfigRepresentation $searchConfig): ?\Search\Form\Admin\SearchConfigConfigureForm
+    protected function getConfigureForm(SearchConfigRepresentation $searchConfig): ?\AdvancedSearch\Form\Admin\SearchConfigConfigureForm
     {
         return $searchConfig->index()
             ? $this->getForm(SearchConfigConfigureForm::class, ['search_config' => $searchConfig])

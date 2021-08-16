@@ -50,7 +50,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
         return null;
     }
 
-    public function toQuery(array $request, array $formSettings): \Search\Query
+    public function toQuery(array $request, array $formSettings): \AdvancedSearch\Query
     {
         // Check of restricted is removed currently.
         return $this->toUnrestrictedQuery($request, $formSettings);

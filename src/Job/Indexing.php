@@ -71,7 +71,7 @@ class Indexing extends AbstractJob
         $searchEngineId = $this->getArg('search_index_id');
         $startResourceId = (int) $this->getArg('start_resource_id');
 
-        /** @var \Search\Api\Representation\SearchEngineRepresentation $searchEngine */
+        /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation $searchEngine */
         $searchEngine = $api->read('search_engines', $searchEngineId)->getContent();
         $indexer = $searchEngine->indexer();
 

@@ -35,7 +35,7 @@ use Omeka\Api\Adapter\AbstractEntityAdapter;
 use Omeka\Api\Request;
 use Omeka\Entity\EntityInterface;
 use Omeka\Stdlib\ErrorStore;
-use AdvancedSearch\Entity\SearchEngine;
+use AdvancedSearch\Entity\AdvancedSearchEngine;
 
 class SearchConfigAdapter extends AbstractEntityAdapter
 {
@@ -53,12 +53,12 @@ class SearchConfigAdapter extends AbstractEntityAdapter
 
     public function getRepresentationClass()
     {
-        return \Search\Api\Representation\SearchConfigRepresentation::class;
+        return \AdvancedSearch\Api\Representation\AdvancedSearchConfigRepresentation::class;
     }
 
     public function getEntityClass()
     {
-        return \Search\Entity\SearchConfig::class;
+        return \AdvancedSearch\Entity\AdvancedSearchConfig::class;
     }
 
     public function buildQuery(QueryBuilder $qb, array $query): void

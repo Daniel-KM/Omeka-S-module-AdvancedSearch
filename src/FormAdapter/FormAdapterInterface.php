@@ -55,7 +55,7 @@ interface FormAdapterInterface
      *
      * @param array $request The user query formatted by the form.
      * @param array $formSettings The specific settings of the form page.
-     * @return \Search\Query The normalized query of the module Search.
+     * @return \AdvancedSearch\Query The normalized query of the module Search.
      */
-    public function toQuery(array $request, array $formSettings): \Search\Query;
+    public function toQuery(array $request, array $formSettings): \AdvancedSearch\Query;
 }

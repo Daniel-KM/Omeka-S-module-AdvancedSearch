@@ -19,11 +19,11 @@ class TestAdapter extends AbstractAdapter
 
     public function getIndexerClass()
     {
-        return \Search\Test\Indexer\TestIndexer::class;
+        return \AdvancedSearch\Test\Indexer\TestIndexer::class;
     }
 
     public function getQuerierClass()
     {
-        return \Search\Test\Querier\TestQuerier::class;
+        return \AdvancedSearch\Test\Querier\TestQuerier::class;
     }
 }

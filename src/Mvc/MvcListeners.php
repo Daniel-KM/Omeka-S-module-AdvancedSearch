@@ -70,7 +70,7 @@ class MvcListeners extends AbstractListenerAggregate
         $params = [
             '__NAMESPACE__' => 'Search\Controller',
             '__SITE__' => true,
-            'controller' => \Search\Controller\IndexController::class,
+            'controller' => \AdvancedSearch\Controller\IndexController::class,
             'action' => 'search',
             'site-slug' => $siteSlug,
             'id' => $searchMainPage,

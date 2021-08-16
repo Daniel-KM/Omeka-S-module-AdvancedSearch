@@ -18,12 +18,12 @@ class InternalAdapter extends AbstractAdapter
 
     public function getIndexerClass(): string
     {
-        return \Search\Indexer\InternalIndexer::class;
+        return \AdvancedSearch\Indexer\InternalIndexer::class;
     }
 
     public function getQuerierClass(): string
     {
-        return \Search\Querier\InternalQuerier::class;
+        return \AdvancedSearch\Querier\InternalQuerier::class;
     }
 
     public function getAvailableFields(SearchEngineRepresentation $index): array

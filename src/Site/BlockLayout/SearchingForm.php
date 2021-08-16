@@ -42,7 +42,7 @@ class SearchingForm extends AbstractBlockLayout
         $services = $site->getServiceLocator();
         $formElementManager = $services->get('FormElementManager');
         $defaultSettings = $services->get('Config')['search']['block_settings']['searchingForm'];
-        $blockFieldset = \Search\Form\SearchingFormFieldset::class;
+        $blockFieldset = \AdvancedSearch\Form\AdvancedSearchingFormFieldset::class;
 
         $data = $block ? $block->data() + $defaultSettings : $defaultSettings;
 
@@ -59,7 +59,7 @@ class SearchingForm extends AbstractBlockLayout
 
     public function render(PhpRenderer $view, SitePageBlockRepresentation $block)
     {
-        /** @var \Search\Api\Representation\SearchConfigRepresentation $searchConfig */
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $block->dataValue('search_config');
         if ($searchConfig) {
             try {
@@ -135,7 +135,7 @@ class SearchingForm extends AbstractBlockLayout
     /**
      * Get the request from the query and check it according to the search page.
      *
-     * @todo Factorize with \Search\Controller\IndexController::getSearchRequest()
+     * @todo Factorize with \AdvancedSearch\Controller\IndexController::getSearchRequest()
      *
      * @param SearchConfigRepresentation $searchConfig
      * @param \Laminas\Form\Form $searchForm

@@ -90,7 +90,7 @@ class SearchEngineRepresentation extends AbstractEntityRepresentation
         return base_convert((string) $this->id(), 10, 36);
     }
 
-    public function adapter(): ?\Search\Adapter\AdapterInterface
+    public function adapter(): ?\AdvancedSearch\Adapter\AdapterInterface
     {
         $name = $this->resource->getAdapter();
         $adapterManager = $this->getServiceLocator()->get('Search\AdapterManager');
@@ -127,7 +127,7 @@ class SearchEngineRepresentation extends AbstractEntityRepresentation
         return $this->resource->getCreated();
     }
 
-    public function getEntity(): \Search\Entity\SearchEngine
+    public function getEntity(): \AdvancedSearch\Entity\SearchEngine
     {
         return $this->resource;
     }
@@ -147,7 +147,7 @@ class SearchEngineRepresentation extends AbstractEntityRepresentation
     /**
      * @return NoopIndexer is returned when the indexer is not available.
      */
-    public function indexer(): \Search\Indexer\IndexerInterface
+    public function indexer(): \AdvancedSearch\Indexer\IndexerInterface
     {
         $services = $this->getServiceLocator();
         $adapter = $this->adapter();
@@ -157,7 +157,7 @@ class SearchEngineRepresentation extends AbstractEntityRepresentation
             $indexerClass = NoopIndexer::class;
         }
 
-        /** @var \Search\Indexer\IndexerInterface $indexer */
+        /** @var \AdvancedSearch\Indexer\IndexerInterface $indexer */
         $indexer = new $indexerClass;
         return $indexer
             ->setServiceLocator($services)
@@ -168,17 +168,17 @@ class SearchEngineRepresentation extends AbstractEntityRepresentation
     /**
      * @return NoopQuerier is returned when the querier is not available.
      */
-    public function querier(): \Search\Querier\QuerierInterface
+    public function querier(): \AdvancedSearch\Querier\QuerierInterface
     {
         $services = $this->getServiceLocator();
         $adapter = $this->adapter();
         if ($adapter) {
-            $querierClass = $adapter->getQuerierClass() ?: \Search\Querier\NoopQuerier::class;
+            $querierClass = $adapter->getQuerierClass() ?: \AdvancedSearch\Querier\NoopQuerier::class;
         } else {
-            $querierClass = \Search\Querier\NoopQuerier::class;
+            $querierClass = \AdvancedSearch\Querier\NoopQuerier::class;
         }
 
-        /** @var \Search\Querier\QuerierInterface $querier */
+        /** @var \AdvancedSearch\Querier\QuerierInterface $querier */
         $querier = new $querierClass;
         return $querier
             ->setServiceLocator($services)

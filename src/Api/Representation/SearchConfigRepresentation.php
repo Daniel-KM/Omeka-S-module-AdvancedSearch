@@ -35,7 +35,7 @@ use Omeka\Api\Representation\AbstractEntityRepresentation;
 class SearchConfigRepresentation extends AbstractEntityRepresentation
 {
     /**
-     * @var \Search\FormAdapter\FormAdapterInterface
+     * @var \AdvancedSearch\FormAdapter\FormAdapterInterface
      */
     protected $formAdapter;
 
@@ -106,7 +106,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         return $this->resource->getPath();
     }
 
-    public function index(): ?\Search\Api\Representation\SearchEngineRepresentation
+    public function index(): ?\AdvancedSearch\Api\Representation\SearchEngineRepresentation
     {
         $searchEngine = $this->resource->getIndex();
         return $searchEngine
@@ -119,7 +119,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         return $this->resource->getFormAdapter();
     }
 
-    public function formAdapter(): ?\Search\FormAdapter\FormAdapterInterface
+    public function formAdapter(): ?\AdvancedSearch\FormAdapter\FormAdapterInterface
     {
         if (!$this->formAdapter) {
             $formAdapterManager = $this->getServiceLocator()->get('Search\FormAdapterManager');
@@ -174,7 +174,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         return $this->resource->getCreated();
     }
 
-    public function getEntity(): \Search\Entity\SearchConfig
+    public function getEntity(): \AdvancedSearch\Entity\SearchConfig
     {
         return $this->resource;
     }

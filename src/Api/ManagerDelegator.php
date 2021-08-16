@@ -39,7 +39,7 @@ class ManagerDelegator extends \Omeka\Api\Manager
     public function search($resource, array $data = [], array $options = [])
     {
         // ApiSearch is set static to avoid a loop during init of Api Manager.
-        /** @var \Search\Mvc\Controller\Plugin\ApiSearch $apiSearch */
+        /** @var \AdvancedSearch\Mvc\Controller\Plugin\ApiSearch $apiSearch */
         static $apiSearch;
 
         // Fix https://github.com/omeka/omeka-s/pull/1671 (Omeka < 3.1).

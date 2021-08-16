@@ -41,7 +41,7 @@ class SearchRequestToResponse extends AbstractPlugin
         $controller = $this->getController();
         $this->searchConfig = $searchConfig;
 
-        /** @var \Search\FormAdapter\FormAdapterInterface $formAdapter */
+        /** @var \AdvancedSearch\FormAdapter\FormAdapterInterface $formAdapter */
         $formAdapter = $searchConfig->formAdapter();
         if (!$formAdapter) {
             $formAdapterName = $searchConfig->formAdapterName();
@@ -64,7 +64,7 @@ class SearchRequestToResponse extends AbstractPlugin
 
         $searchFormSettings = $searchConfigSettings['form'] ?? [];
 
-        /** @var \Search\Query $query */
+        /** @var \AdvancedSearch\Query $query */
         $query = $formAdapter->toQuery($request, $searchFormSettings);
 
         // Add global parameters.
@@ -160,7 +160,7 @@ class SearchRequestToResponse extends AbstractPlugin
 
         // Send the query to the search engine.
 
-        /** @var \Search\Querier\QuerierInterface $querier */
+        /** @var \AdvancedSearch\Querier\QuerierInterface $querier */
         $querier = $this->searchEngine
             ->querier()
             ->setQuery($query);

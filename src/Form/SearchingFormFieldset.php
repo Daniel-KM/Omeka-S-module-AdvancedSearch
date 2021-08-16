@@ -98,7 +98,7 @@ class SearchingFormFieldset extends Fieldset
 
     protected function searchConfigs()
     {
-        /** @var \Search\Api\Representation\SearchConfigRepresentation[] $pages */
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation[] $pages */
         $searchConfigs = $this->api->search('search_configs')->getContent();
 
         $pages = [];

@@ -29,10 +29,10 @@ return [
         'invokables' => [
             'facetLabel' => View\Helper\FacetLabel::class,
             'hiddenInputsFromFilteredQuery' => View\Helper\HiddenInputsFromFilteredQuery::class,
-            'searchForm' => View\Helper\SearchForm::class,
-            'searchingForm' => View\Helper\SearchingForm::class,
-            'searchingUrl' => View\Helper\SearchingUrl::class,
-            'searchSortSelector' => View\Helper\SearchSortSelector::class,
+            'searchForm' => View\Helper\AdvancedSearchForm::class,
+            'searchingForm' => View\Helper\AdvancedSearchingForm::class,
+            'searchingUrl' => View\Helper\AdvancedSearchingUrl::class,
+            'searchSortSelector' => View\Helper\AdvancedSearchSortSelector::class,
         ],
         'factories' => [
             'apiSearch' => Service\ViewHelper\ApiSearchFactory::class,
@@ -42,12 +42,12 @@ return [
             'facetLink' => Service\ViewHelper\FacetLinkFactory::class,
             'mediaTypeSelect' => Service\ViewHelper\MediaTypeSelectFactory::class,
             'searchEngineConfirm' => Service\ViewHelper\SearchEngineConfirmFactory::class,
-            'searchRequestToResponse' => Service\ViewHelper\SearchRequestToResponseFactory::class,
+            'searchRequestToResponse' => Service\ViewHelper\AdvancedSearchRequestToResponseFactory::class,
         ],
     ],
     'block_layouts' => [
         'invokables' => [
-            'searchingForm' => Site\BlockLayout\SearchingForm::class,
+            'searchingForm' => Site\BlockLayout\AdvancedSearchingForm::class,
         ],
     ],
     'form_elements' => [
@@ -69,7 +69,7 @@ return [
             Form\Element\SearchConfigSelect::class => Service\Form\Element\SearchConfigSelectFactory::class,
             Form\FilterFieldset::class => Service\Form\FilterFieldsetFactory::class,
             Form\MainSearchForm::class => Service\Form\MainSearchFormFactory::class,
-            Form\SearchingFormFieldset::class => Service\Form\SearchingFormFieldsetFactory::class,
+            Form\AdvancedSearchingFormFieldset::class => Service\Form\AdvancedSearchingFormFieldsetFactory::class,
             Form\SettingsFieldset::class => Service\Form\SettingsFieldsetFactory::class,
             Form\SiteSettingsFieldset::class => Service\Form\SiteSettingsFieldsetFactory::class,
         ],
@@ -86,12 +86,12 @@ return [
     ],
     'controller_plugins' => [
         'invokables' => [
-            'searchRequestToResponse' => Mvc\Controller\Plugin\SearchRequestToResponse::class,
+            'searchRequestToResponse' => Mvc\Controller\Plugin\AdvancedSearchRequestToResponse::class,
         ],
         'factories' => [
             'apiSearch' => Service\ControllerPlugin\ApiSearchFactory::class,
             'apiSearchOne' => Service\ControllerPlugin\ApiSearchOneFactory::class,
-            'searchForm' => Service\ControllerPlugin\SearchFormFactory::class,
+            'searchForm' => Service\ControllerPlugin\AdvancedSearchFormFactory::class,
             'totalJobs' => Service\ControllerPlugin\TotalJobsFactory::class,
         ],
     ],

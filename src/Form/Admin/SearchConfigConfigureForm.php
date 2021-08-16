@@ -46,7 +46,7 @@ class SearchConfigConfigureForm extends Form
 
     public function init(): void
     {
-        /** @var \Search\Api\Representation\SearchConfigRepresentation $searchConfig */
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $this->getOption('search_config');
         $index = $searchConfig->index();
         if (empty($index)) {

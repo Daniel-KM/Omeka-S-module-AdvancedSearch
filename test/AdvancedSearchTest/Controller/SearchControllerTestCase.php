@@ -56,7 +56,7 @@ abstract class SearchControllerTestCase extends OmekaControllerTestCase
         $adapterManager = $serviceLocator->get('Search\AdapterManager');
         $config = [
             'invokables' => [
-                'test' => \Search\Test\Adapter\TestAdapter::class,
+                'test' => \AdvancedSearch\Test\Adapter\TestAdapter::class,
             ],
         ];
         $adapterManager->configure($config);

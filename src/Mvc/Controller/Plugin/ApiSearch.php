@@ -230,7 +230,7 @@ class ApiSearch extends AbstractPlugin
      *
      * @see \Omeka\Api\Adapter\AbstractResourceEntityAdapter
      * @see \Omeka\Api\Adapter\AbstractEntityAdapter
-     * @see \Search\Controller\IndexController::searchAction()
+     * @see \AdvancedSearch\Controller\IndexController::searchAction()
      *
      * @param Request $request
      * @return Response
@@ -239,7 +239,7 @@ class ApiSearch extends AbstractPlugin
     {
         // TODO Manage all standard params.
         // See \Omeka\Api\Adapter\AbstractEntityAdapter::search() to normalize params.
-        // See \Search\Controller\IndexController::searchAction() for process.
+        // See \AdvancedSearch\Controller\IndexController::searchAction() for process.
         // Currently, only manage simple search and common params.
         // This corresponds to the search page form, but for the api.
         $query = $request->getContent();
@@ -306,7 +306,7 @@ class ApiSearch extends AbstractPlugin
         // No facets for the api.
 
         // Send the query to the search engine.
-        /** @var \Search\Querier\QuerierInterface $querier */
+        /** @var \AdvancedSearch\Querier\QuerierInterface $querier */
         $querier = $this->index
             ->querier()
             ->setQuery($searchQuery);
@@ -444,7 +444,7 @@ class ApiSearch extends AbstractPlugin
     /**
      * Get the term from a property string or integer.
      *
-     * @todo Factorize with \Search\FormAdapter\ApiFormAdapter::normalizeProperty().
+     * @todo Factorize with \AdvancedSearch\FormAdapter\ApiFormAdapter::normalizeProperty().
      *
      * @param string|int $property
      * @return string

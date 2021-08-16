@@ -57,7 +57,7 @@ class IndexController extends AbstractActionController
             // Check if it is an item set redirection.
             $itemSetId = (int) $this->params('item-set-id');
             // This is just a check: if set, mvc listeners add itemSet['ids'][].
-            // @see \Search\Mvc\MvcListeners::redirectItemSetToSearch()
+            // @see \AdvancedSearch\Mvc\MvcListeners::redirectItemSetToSearch()
             if ($itemSetId) {
                 // May throw a not found exception.
                 $this->api()->read('item_sets', $itemSetId);
@@ -67,7 +67,7 @@ class IndexController extends AbstractActionController
         }
 
         // The page is required, else there is no form.
-        /** @var \Search\Api\Representation\SearchConfigRepresentation $searchConfig */
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $this->api()->read('search_configs', $pageId)->getContent();
 
         $view = new ViewModel([
@@ -148,7 +148,7 @@ class IndexController extends AbstractActionController
         }
 
         if ($isJsonQuery) {
-            /** @var \Search\Response $response */
+            /** @var \AdvancedSearch\Response $response */
             $response = $result['data']['response'];
             if (!$response) {
                 $this->getResponse()->setStatusCode(\Laminas\Http\Response::STATUS_CODE_500);
@@ -206,10 +206,10 @@ class IndexController extends AbstractActionController
             $site = null;
         }
 
-        /** @var \Search\Api\Representation\SearchConfigRepresentation $searchConfig */
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $this->api()->read('search_configs', $pageId)->getContent();
 
-        /** @var \Search\FormAdapter\FormAdapterInterface $formAdapter */
+        /** @var \AdvancedSearch\FormAdapter\FormAdapterInterface $formAdapter */
         $formAdapter = $searchConfig->formAdapter();
         if (!$formAdapter) {
             return new JsonModel([
@@ -253,7 +253,7 @@ class IndexController extends AbstractActionController
             ]);
         }
 
-        /** @var \Search\Response $response */
+        /** @var \AdvancedSearch\Response $response */
         return new JsonModel([
             'status' => 'success',
             'data' => [
@@ -268,7 +268,7 @@ class IndexController extends AbstractActionController
         string $q,
         ?SiteRepresentation $site
     ): Response {
-        /** @var \Search\FormAdapter\FormAdapterInterface $formAdapter */
+        /** @var \AdvancedSearch\FormAdapter\FormAdapterInterface $formAdapter */
         $formAdapter = $searchConfig->formAdapter();
         $searchConfigSettings = $searchConfig->settings();
         $searchFormSettings = $searchConfigSettings['form'] ?? [];
@@ -277,7 +277,7 @@ class IndexController extends AbstractActionController
 
         // TODO Add a default query to manage any suggestion on any field and suggestions on item set page.
 
-        /** @var \Search\Query $query */
+        /** @var \AdvancedSearch\Query $query */
         $query = $formAdapter->toQuery(['q' => $q], $searchFormSettings);
 
         $searchEngine = $searchConfig->index();
@@ -307,7 +307,7 @@ class IndexController extends AbstractActionController
             ->setSuggestMode($autosuggestSettings['mode'] ?? 'start')
             ->setSuggestFields($autosuggestSettings['fields'] ?? []);
 
-        /** @var \Search\Querier\QuerierInterface $querier */
+        /** @var \AdvancedSearch\Querier\QuerierInterface $querier */
         $querier = $searchEngine
             ->querier()
             ->setQuery($query);
@@ -324,7 +324,7 @@ class IndexController extends AbstractActionController
     /**
      * Get the request from the query and check it according to the search page.
      *
-     * @todo Factorize with \Search\Site\BlockLayout\SearchingForm::getSearchRequest()
+     * @todo Factorize with \AdvancedSearch\Site\BlockLayout\AdvancedSearchingForm::getSearchRequest()
      *
      * @return array|bool
      */
@@ -353,7 +353,7 @@ class IndexController extends AbstractActionController
     /**
      * Remove all empty values (zero length strings) and check empty request.
      *
-     * @todo Factorize with \Search\Mvc\Controller\Plugin\SearchRequestToResponse::cleanRequest()
+     * @todo Factorize with \AdvancedSearch\Mvc\Controller\Plugin\AdvancedSearchRequestToResponse::cleanRequest()
      *
      * @return array First key is the cleaned request, the second a bool to
      * indicate if it is empty.
@@ -391,7 +391,7 @@ class IndexController extends AbstractActionController
     /**
      * Remove zero-length values or an array, recursively.
      *
-     * @todo Factorize with \Search\Mvc\Controller\Plugin\SearchRequestToResponse::arrayFilterRecursive()
+     * @todo Factorize with \AdvancedSearch\Mvc\Controller\Plugin\AdvancedSearchRequestToResponse::arrayFilterRecursive()
      */
     protected function arrayFilterRecursive(array &$array): array
     {

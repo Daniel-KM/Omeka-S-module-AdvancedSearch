@@ -46,7 +46,7 @@ class FilterFieldset extends Fieldset
                 'class' => 'filter',
             ]);
 
-        /** @var \Search\Api\Representation\SearchConfigRepresentation $searchConfig */
+        /** @var \AdvancedSearch\Api\Representation\AdvancedSearchConfigRepresentation $searchConfig */
         $searchConfig = $this->getOption('search_config');
         $searchConfigSettings = $searchConfig ? $searchConfig->settings() : [];
 
@@ -124,7 +124,7 @@ class FilterFieldset extends Fieldset
 
     protected function getFilterFields()
     {
-        /** @var \Search\Api\Representation\SearchConfigRepresentation $searchConfig */
+        /** @var \AdvancedSearch\Api\Representation\AdvancedSearchConfigRepresentation $searchConfig */
         $searchConfig = $this->getOption('search_config');
         $searchEngine = $searchConfig->index();
         $searchAdapter = $searchEngine->adapter();

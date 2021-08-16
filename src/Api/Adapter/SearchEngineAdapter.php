@@ -52,12 +52,12 @@ class SearchEngineAdapter extends AbstractEntityAdapter
 
     public function getRepresentationClass()
     {
-        return \Search\Api\Representation\SearchEngineRepresentation::class;
+        return \AdvancedSearch\Api\Representation\SearchEngineRepresentation::class;
     }
 
     public function getEntityClass()
     {
-        return \Search\Entity\SearchEngine::class;
+        return \AdvancedSearch\Entity\SearchEngine::class;
     }
 
     public function buildQuery(QueryBuilder $qb, array $query): void

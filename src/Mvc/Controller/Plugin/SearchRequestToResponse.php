@@ -2,14 +2,14 @@
 
 namespace AdvancedSearch\Mvc\Controller\Plugin;
 
+use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
+use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
+use AdvancedSearch\Querier\Exception\QuerierException;
 use Laminas\EventManager\Event;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Stdlib\Message;
 use Omeka\Stdlib\Paginator;
-use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
-use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
-use AdvancedSearch\Querier\Exception\QuerierException;
 
 /**
  * FIXME Remove or simplify this class or use it to convert the query directly to a omeka (or sql) or a solarium query.

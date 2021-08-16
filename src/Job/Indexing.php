@@ -29,10 +29,10 @@
 
 namespace AdvancedSearch\Job;
 
+use AdvancedSearch\Query;
 use Doctrine\ORM\EntityManager;
 use Omeka\Job\AbstractJob;
 use Omeka\Stdlib\Message;
-use AdvancedSearch\Query;
 
 class Indexing extends AbstractJob
 {

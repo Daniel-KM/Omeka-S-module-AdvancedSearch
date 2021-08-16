@@ -30,8 +30,8 @@
 
 namespace AdvancedSearch\Adapter;
 
-use Laminas\ServiceManager\ServiceLocatorInterface;
 use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 abstract class AbstractAdapter implements AdapterInterface
 {

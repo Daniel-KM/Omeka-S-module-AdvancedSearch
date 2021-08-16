@@ -3,7 +3,6 @@ namespace AdvancedSearch\Service\ControllerPlugin;
 
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
-use AdvancedSearch\Mvc\Controller\Plugin\AdvancedSearchForm;
 
 class SearchFormFactory implements FactoryInterface
 {

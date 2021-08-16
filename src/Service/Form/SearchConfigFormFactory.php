@@ -2,9 +2,9 @@
 
 namespace AdvancedSearch\Service\Form;
 
+use AdvancedSearch\Form\Admin\SearchConfigForm;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
-use AdvancedSearch\Form\Admin\SearchConfigForm;
 
 class SearchConfigFormFactory implements FactoryInterface
 {

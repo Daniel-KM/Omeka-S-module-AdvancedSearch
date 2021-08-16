@@ -30,11 +30,11 @@
 
 namespace AdvancedSearch\Indexer;
 
+use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
+use AdvancedSearch\Query;
 use Laminas\Log\LoggerAwareInterface;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Omeka\Entity\Resource;
-use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
-use AdvancedSearch\Query;
 
 /**
  * The signature uses "IndexerInterface" instead of "self" for compatibility with php < 7.4.

@@ -30,15 +30,15 @@
 
 namespace AdvancedSearch\Form\Admin;
 
-use Laminas\Form\Element;
-use Laminas\Form\Fieldset;
-use Laminas\Form\Form;
-use Omeka\Form\Element\ArrayTextarea;
 use AdvancedSearch\Form\Element\ArrayText;
 use AdvancedSearch\Form\Element\DataTextarea;
 use AdvancedSearch\Form\Element\OptionalRadio;
 use AdvancedSearch\Form\Element\OptionalSelect;
 use AdvancedSearch\Form\Element\OptionalUrl;
+use Laminas\Form\Element;
+use Laminas\Form\Fieldset;
+use Laminas\Form\Form;
+use Omeka\Form\Element\ArrayTextarea;
 
 class SearchConfigConfigureForm extends Form
 {

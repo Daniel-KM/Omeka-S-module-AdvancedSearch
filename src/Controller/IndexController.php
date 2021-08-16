@@ -30,15 +30,15 @@
 
 namespace AdvancedSearch\Controller;
 
+use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
+use AdvancedSearch\Querier\Exception\QuerierException;
+use AdvancedSearch\Query;
+use AdvancedSearch\Response;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Stdlib\Message;
-use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
-use AdvancedSearch\Querier\Exception\QuerierException;
-use AdvancedSearch\Query;
-use AdvancedSearch\Response;
 
 class IndexController extends AbstractActionController
 {
@@ -253,7 +253,7 @@ class IndexController extends AbstractActionController
             ]);
         }
 
-        /** @var \AdvancedSearch\Response $response */
+        /* @var \AdvancedSearch\Response $response */
         return new JsonModel([
             'status' => 'success',
             'data' => [

@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 namespace AdvancedSearch\Service\ViewHelper;
 
+use AdvancedSearch\View\Helper\ApiSearch;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
-use AdvancedSearch\View\Helper\ApiSearch;
 
 class ApiSearchFactory implements FactoryInterface
 {

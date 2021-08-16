@@ -2,9 +2,9 @@
 
 namespace AdvancedSearch\View\Helper;
 
+use AdvancedSearch\Query;
 use Laminas\Form\Element\Select;
 use Laminas\View\Helper\AbstractHelper;
-use AdvancedSearch\Query;
 
 class SearchSortSelector extends AbstractHelper
 {
@@ -26,7 +26,7 @@ class SearchSortSelector extends AbstractHelper
             return '';
         }
 
-        /** @deprecated Since 3.5.23.3. Kept for old themes. */
+        /* @deprecated Since 3.5.23.3. Kept for old themes. */
         if (!is_array(reset($sortOptions))) {
             foreach ($sortOptions as $name => &$sortOption) {
                 $sortOption = ['name' => $name, 'label' => $sortOption];

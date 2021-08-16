@@ -2,9 +2,9 @@
 
 namespace AdvancedSearch\Test\Indexer;
 
-use Omeka\Entity\Resource;
 use AdvancedSearch\Indexer\AbstractIndexer;
 use AdvancedSearch\Query;
+use Omeka\Entity\Resource;
 
 class TestIndexer extends AbstractIndexer
 {

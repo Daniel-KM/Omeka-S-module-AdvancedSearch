@@ -3,7 +3,6 @@ namespace AdvancedSearch\Service\ViewHelper;
 
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
-use AdvancedSearch\View\Helper\AdvancedSearchRequestToResponse;
 
 class SearchRequestToResponseFactory implements FactoryInterface
 {

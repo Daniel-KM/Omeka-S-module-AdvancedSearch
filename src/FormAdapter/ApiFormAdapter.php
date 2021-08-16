@@ -2,8 +2,8 @@
 
 namespace AdvancedSearch\FormAdapter;
 
-use Doctrine\DBAL\Connection;
 use AdvancedSearch\Query;
+use Doctrine\DBAL\Connection;
 
 /**
  * Simulate an api search with the module advanced search.

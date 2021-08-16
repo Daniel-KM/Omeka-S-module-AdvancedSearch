@@ -30,9 +30,9 @@
 
 namespace AdvancedSearch\Service\ViewHelper;
 
+use AdvancedSearch\View\Helper\FacetLink;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
-use AdvancedSearch\View\Helper\FacetLink;
 
 class FacetLinkFactory implements FactoryInterface
 {

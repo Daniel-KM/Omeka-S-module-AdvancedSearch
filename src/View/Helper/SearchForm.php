@@ -2,9 +2,9 @@
 
 namespace AdvancedSearch\View\Helper;
 
+use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use Laminas\Form\Form;
 use Laminas\View\Helper\AbstractHelper;
-use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 
 class SearchForm extends AbstractHelper
 {

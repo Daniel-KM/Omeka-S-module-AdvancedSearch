@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 namespace AdvancedSearch\Mvc\Controller\Plugin;
 
-use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use AdvancedSearch\View\Helper\AdvancedSearchForm as SearchFormHelper;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class SearchForm extends AbstractPlugin
 {

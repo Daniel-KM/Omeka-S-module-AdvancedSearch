@@ -259,7 +259,7 @@ class MainSearchForm extends Form
                 'disable_group_by_vocabulary' => $filterType === 'select_flat',
             ]);
 
-        /** @deprecated (Omeka v3.1): use option "disable_group_by_vocabulary" */
+        /* @deprecated (Omeka v3.1): use option "disable_group_by_vocabulary" */
         if ($filterType === 'select_flat'
             && version_compare(\Omeka\Module::VERSION, '3.1', '<')
         ) {

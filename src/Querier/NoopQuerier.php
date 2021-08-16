@@ -2,11 +2,11 @@
 
 namespace AdvancedSearch\Querier;
 
-use Laminas\Log\LoggerAwareTrait;
-use Laminas\ServiceManager\ServiceLocatorInterface;
 use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
 use AdvancedSearch\Query;
 use AdvancedSearch\Response;
+use Laminas\Log\LoggerAwareTrait;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 /**
  * Querier that doesn't answer anything.

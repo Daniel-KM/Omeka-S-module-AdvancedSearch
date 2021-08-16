@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 namespace AdvancedSearch\View\Helper;
 
-use Laminas\View\Helper\AbstractHelper;
 use AdvancedSearch\Mvc\Controller\Plugin\ApiSearch as ApiSearchPlugin;
+use Laminas\View\Helper\AbstractHelper;
 
 class ApiSearch extends AbstractHelper
 {

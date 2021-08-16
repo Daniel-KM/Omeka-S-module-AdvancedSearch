@@ -4,8 +4,6 @@ namespace AdvancedSearchTest\Controller\Admin;
 
 require_once dirname(__DIR__) . '/SearchControllerTestCase.php';
 
-use AdvancedSearchTest\Controller\AdvancedSearchControllerTestCase;
-
 class SearchConfigControllerTest extends SearchControllerTestCase
 {
     public function testAddGetAction(): void

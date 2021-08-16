@@ -29,9 +29,9 @@
 
 namespace AdvancedSearch\Service\ViewHelper;
 
+use AdvancedSearch\View\Helper\FacetActive;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
-use AdvancedSearch\View\Helper\FacetActive;
 
 class FacetActiveFactory implements FactoryInterface
 {

@@ -29,8 +29,8 @@
 
 namespace AdvancedSearch\Service;
 
-use Laminas\Mvc\Service\AbstractPluginManagerFactory;
 use AdvancedSearch\Adapter\Manager;
+use Laminas\Mvc\Service\AbstractPluginManagerFactory;
 
 class AdapterManagerFactory extends AbstractPluginManagerFactory
 {

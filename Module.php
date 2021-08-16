@@ -172,7 +172,7 @@ class Module extends AbstractModule
                 // Process before any other module in order to reset query.
                 +100
             );
-        };
+        }
 
         $sharedEventManager->attach(
             \Omeka\Form\Element\PropertySelect::class,

@@ -4,10 +4,9 @@ namespace AdvancedSearchTest\Controller\Admin;
 
 require_once dirname(__DIR__) . '/SearchControllerTestCase.php';
 
+use AdvancedSearch\Form\Admin\SearchEngineConfigureForm;
 use Omeka\Mvc\Controller\Plugin\Messenger;
 use Omeka\Stdlib\Message;
-use AdvancedSearch\Form\Admin\SearchEngineConfigureForm;
-use AdvancedSearchTest\Controller\AdvancedSearchControllerTestCase;
 
 class SearchEngineControllerTest extends SearchControllerTestCase
 {

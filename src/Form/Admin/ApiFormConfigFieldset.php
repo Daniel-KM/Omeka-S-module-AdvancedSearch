@@ -2,11 +2,11 @@
 
 namespace AdvancedSearch\Form\Admin;
 
+use AdvancedSearch\Form\Element\OptionalSelect;
 use Doctrine\DBAL\Connection;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Omeka\Form\Element\ArrayTextarea;
-use AdvancedSearch\Form\Element\OptionalSelect;
 
 class ApiFormConfigFieldset extends Fieldset
 {

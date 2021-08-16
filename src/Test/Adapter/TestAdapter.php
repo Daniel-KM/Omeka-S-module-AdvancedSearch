@@ -2,8 +2,8 @@
 
 namespace AdvancedSearch\Test\Adapter;
 
-use Laminas\Form\Fieldset;
 use AdvancedSearch\Adapter\AbstractAdapter;
+use Laminas\Form\Fieldset;
 
 class TestAdapter extends AbstractAdapter
 {

@@ -30,9 +30,9 @@
 
 namespace AdvancedSearch\Service\ViewHelper;
 
+use AdvancedSearch\View\Helper\FacetCheckbox;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
-use AdvancedSearch\View\Helper\FacetCheckbox;
 
 class FacetCheckboxFactory implements FactoryInterface
 {

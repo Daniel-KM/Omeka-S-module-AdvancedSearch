@@ -30,16 +30,16 @@
 
 namespace AdvancedSearch\Controller\Admin;
 
-use Doctrine\ORM\EntityManager;
-use Laminas\Mvc\Controller\AbstractActionController;
-use Laminas\View\Model\ViewModel;
-use Omeka\Form\ConfirmForm;
-use Omeka\Stdlib\Message;
 use AdvancedSearch\Adapter\Manager as SearchAdapterManager;
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use AdvancedSearch\Form\Admin\SearchConfigConfigureForm;
 use AdvancedSearch\Form\Admin\SearchConfigForm;
 use AdvancedSearch\FormAdapter\Manager as SearchFormAdapterManager;
+use Doctrine\ORM\EntityManager;
+use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\ViewModel;
+use Omeka\Form\ConfirmForm;
+use Omeka\Stdlib\Message;
 
 class SearchConfigController extends AbstractActionController
 {

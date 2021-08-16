@@ -30,11 +30,11 @@
 
 namespace AdvancedSearch\Querier;
 
-use Laminas\Log\LoggerAwareInterface;
-use Laminas\ServiceManager\ServiceLocatorInterface;
 use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
 use AdvancedSearch\Query;
 use AdvancedSearch\Response;
+use Laminas\Log\LoggerAwareInterface;
+use Laminas\ServiceManager\ServiceLocatorInterface;
 
 /**
  * The signature uses "QuerierInterface" instead of "self" for compatibility with php < 7.4.

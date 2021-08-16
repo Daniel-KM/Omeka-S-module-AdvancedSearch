@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 namespace AdvancedSearch\Service\Form;
 
+use AdvancedSearch\Form\FilterFieldset;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
-use AdvancedSearch\Form\FilterFieldset;
 
 class FilterFieldsetFactory implements FactoryInterface
 {

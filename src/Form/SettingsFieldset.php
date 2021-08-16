@@ -2,11 +2,11 @@
 
 namespace AdvancedSearch\Form;
 
+use AdvancedSearch\Form\Element\OptionalMultiCheckbox;
+use AdvancedSearch\Form\Element\OptionalSelect;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Omeka\View\Helper\Api;
-use AdvancedSearch\Form\Element\OptionalMultiCheckbox;
-use AdvancedSearch\Form\Element\OptionalSelect;
 
 class SettingsFieldset extends Fieldset
 {

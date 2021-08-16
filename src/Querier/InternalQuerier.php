@@ -2,10 +2,10 @@
 
 namespace AdvancedSearch\Querier;
 
-use Omeka\Mvc\Controller\Plugin\Messenger;
-use Omeka\Stdlib\Message;
 use AdvancedSearch\Querier\Exception\QuerierException;
 use AdvancedSearch\Response;
+use Omeka\Mvc\Controller\Plugin\Messenger;
+use Omeka\Stdlib\Message;
 
 class InternalQuerier extends AbstractQuerier
 {

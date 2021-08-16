@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 namespace AdvancedSearch\Mvc\Controller\Plugin;
 
-use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use AdvancedSearch\Mvc\Controller\Plugin\ApiSearch as ApiSearchPlugin;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
 class ApiSearchOne extends AbstractPlugin
 {

@@ -1,6 +1,12 @@
 <?php declare(strict_types=1);
 namespace AdvancedSearch\Mvc\Controller\Plugin;
 
+use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
+use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
+use AdvancedSearch\FormAdapter\ApiFormAdapter;
+use AdvancedSearch\Querier\Exception\QuerierException;
+use AdvancedSearch\Query;
+use AdvancedSearch\Response as SearchResponse;
 use Doctrine\ORM\EntityManager;
 use Laminas\I18n\Translator\TranslatorInterface;
 use Laminas\Log\LoggerInterface;
@@ -14,12 +20,6 @@ use Omeka\Api\ResourceInterface;
 use Omeka\Api\Response;
 use Omeka\Permissions\Acl;
 use Omeka\Stdlib\Paginator;
-use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
-use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
-use AdvancedSearch\FormAdapter\ApiFormAdapter;
-use AdvancedSearch\Querier\Exception\QuerierException;
-use AdvancedSearch\Query;
-use AdvancedSearch\Response as SearchResponse;
 
 /**
  * Do an api search via the default search index.

@@ -30,9 +30,9 @@
 
 namespace AdvancedSearch\Indexer;
 
+use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
 use Laminas\Log\LoggerAwareTrait;
 use Laminas\ServiceManager\ServiceLocatorInterface;
-use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
 
 abstract class AbstractIndexer implements IndexerInterface
 {

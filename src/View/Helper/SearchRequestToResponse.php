@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 namespace AdvancedSearch\View\Helper;
 
-use Laminas\View\Helper\AbstractHelper;
-use Omeka\Api\Representation\SiteRepresentation;
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use AdvancedSearch\Mvc\Controller\Plugin\AdvancedSearchRequestToResponse as SearchRequestToResponsePlugin;
+use Laminas\View\Helper\AbstractHelper;
+use Omeka\Api\Representation\SiteRepresentation;
 
 class SearchRequestToResponse extends AbstractHelper
 {

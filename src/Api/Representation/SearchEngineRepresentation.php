@@ -30,9 +30,9 @@
 
 namespace AdvancedSearch\Api\Representation;
 
-use Omeka\Api\Representation\AbstractEntityRepresentation;
 use AdvancedSearch\Indexer\NoopIndexer;
 use AdvancedSearch\Querier\NoopQuerier;
+use Omeka\Api\Representation\AbstractEntityRepresentation;
 
 class SearchEngineRepresentation extends AbstractEntityRepresentation
 {

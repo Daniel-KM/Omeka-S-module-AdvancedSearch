@@ -67,7 +67,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
             'force_canonical' => $canonical,
         ];
 
-        return $url('admin/search/page-id', $params, $options);
+        return $url('admin/search/config-id', $params, $options);
     }
 
     public function adminSearchUrl($canonical = false): string
@@ -92,7 +92,8 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
             'force_canonical' => $canonical,
         ];
         $url = $this->getViewHelper('Url');
-        return $url('search-config-' . $this->id(), $params, $options);
+        // The urls use "search-page-" to simplify migration.
+        return $url('search-page-' . $this->id(), $params, $options);
     }
 
     public function name(): string

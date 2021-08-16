@@ -327,7 +327,7 @@ class Module extends AbstractModule
     {
         $acl = $this->getServiceLocator()->get('Omeka\Acl');
         $acl
-            // This first rule duplicates the second, but is needed for a site.
+            // TODO This first rule duplicates the second, but is needed for a site.
             ->allow(
                 null,
                 [
@@ -418,11 +418,12 @@ class Module extends AbstractModule
         }
 
         // Public search pages are required to manage them at site level.
+        // The urls use "search-page-" to simplify migration.
         foreach ($searchConfigs as $searchConfig) {
             $searchConfigId = $searchConfig->id();
             $searchConfigSlug = $searchConfig->path();
             $router->addRoute(
-                'search-config-' . $searchConfigId,
+                'search-page-' . $searchConfigId,
                 [
                     'type' => \Laminas\Router\Http\Segment::class,
                     'options' => [

@@ -1,7 +1,7 @@
 <?php
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2017-2019
+ * Copyright Daniel Berthereau, 2017-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -43,9 +43,9 @@ $url = $this->plugin('url');
 <?= $this->pageTitle($translate('Search manager')) ?>
 
 <div id="page-actions">
-    <a class="button" href="<?= $url('admin/search/index', ['action' => 'add']) ?>"><?= $translate('Add new search engine') ?></a>
+    <a class="button" href="<?= $url('admin/search/engine', ['action' => 'add']) ?>"><?= $translate('Add new search engine') ?></a>
     <?php if (!empty($search_engines)): ?>
-        <a class="button" href="<?= $url('admin/search/page', ['action' => 'add']) ?>"><?= $translate('Add new page') ?></a>
+        <a class="button" href="<?= $url('admin/search/config', ['action' => 'add']) ?>"><?= $translate('Add new page') ?></a>
     <?php endif; ?>
 </div>
 

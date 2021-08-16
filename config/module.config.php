@@ -114,9 +114,9 @@ return [
         ],
     ],
     'navigation' => [
-        'AdminGlobal' => [
+        'AdminModule' => [
             'search' => [
-                'label' => 'Search', // @translate
+                'label' => 'Search manager', // @translate
                 'route' => 'admin/search',
                 'resource' => Controller\Admin\IndexController::class,
                 'privilege' => 'browse',
@@ -145,10 +145,10 @@ return [
                         ],
                         'may_terminate' => true,
                         'child_routes' => [
-                            'index' => [
+                            'engine' => [
                                 'type' => \Laminas\Router\Http\Segment::class,
                                 'options' => [
-                                    'route' => '/index/:action',
+                                    'route' => '/engine/:action',
                                     'constraints' => [
                                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                                     ],
@@ -158,10 +158,10 @@ return [
                                     ],
                                 ],
                             ],
-                            'index-id' => [
+                            'engine-id' => [
                                 'type' => \Laminas\Router\Http\Segment::class,
                                 'options' => [
-                                    'route' => '/index/:id[/:action]',
+                                    'route' => '/engine/:id[/:action]',
                                     'constraints' => [
                                         'id' => '\d+',
                                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
@@ -173,10 +173,10 @@ return [
                                     ],
                                 ],
                             ],
-                            'page' => [
+                            'config' => [
                                 'type' => \Laminas\Router\Http\Segment::class,
                                 'options' => [
-                                    'route' => '/page/:action',
+                                    'route' => '/config/:action',
                                     'constraints' => [
                                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                                     ],
@@ -186,10 +186,10 @@ return [
                                     ],
                                 ],
                             ],
-                            'page-id' => [
+                            'config-id' => [
                                 'type' => \Laminas\Router\Http\Segment::class,
                                 'options' => [
-                                    'route' => '/page/:id[/:action]',
+                                    'route' => '/config/:id[/:action]',
                                     'constraints' => [
                                         'id' => '\d+',
                                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',

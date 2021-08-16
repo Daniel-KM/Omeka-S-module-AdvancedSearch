@@ -12,7 +12,7 @@ class SearchEngineControllerTest extends SearchControllerTestCase
 {
     public function testAddGetAction(): void
     {
-        $this->dispatch('/admin/search-manager/index/add');
+        $this->dispatch('/admin/search-manager/engine/add');
         $this->assertResponseStatusCode(200);
 
         $this->assertQuery('input[name="o:name"]');
@@ -24,13 +24,13 @@ class SearchEngineControllerTest extends SearchControllerTestCase
         $forms = $this->getServiceLocator()->get('FormElementManager');
         $form = $forms->get(\AdvancedSearch\Form\Admin\SearchEngineForm::class);
 
-        $this->dispatch('/admin/search-manager/index/add', 'POST', [
-            'o:name' => 'TestIndex2',
+        $this->dispatch('/admin/search-manager/engine/add', 'POST', [
+            'o:name' => 'TestEngine2',
             'o:adapter' => 'test',
             'csrf' => $form->get('csrf')->getValue(),
         ]);
         $response = $this->api()->search('search_engines', [
-            'name' => 'TestIndex2',
+            'name' => 'TestEngine2',
         ]);
         $searchEngines = $response->getContent();
         $searchEngine = reset($searchEngines);

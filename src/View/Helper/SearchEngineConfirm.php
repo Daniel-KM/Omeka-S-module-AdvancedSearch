@@ -41,7 +41,7 @@ class SearchEngineConfirm extends AbstractHelper
         $form->setAttribute('action', $resource->url('index'));
 
         return $this->getView()->partial(
-            'search/admin/search-engine/index-confirm',
+            'advanced-search/admin/search-engine/index-confirm',
             [
                 'wrapSidebar' => $wrapSidebar,
                 'resource' => $resource,

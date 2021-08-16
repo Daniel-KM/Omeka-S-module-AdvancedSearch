@@ -8,7 +8,7 @@ class SearchConfigControllerTest extends SearchControllerTestCase
 {
     public function testAddGetAction(): void
     {
-        $this->dispatch('/admin/search-manager/page/add');
+        $this->dispatch('/admin/search-manager/config/add');
         $this->assertResponseStatusCode(200);
 
         $this->assertQuery('input[name="o:name"]');
@@ -22,7 +22,7 @@ class SearchConfigControllerTest extends SearchControllerTestCase
         $forms = $this->getServiceLocator()->get('FormElementManager');
         $form = $forms->get(\AdvancedSearch\Form\Admin\SearchConfigForm::class);
 
-        $this->dispatch('/admin/search-manager/page/add', 'POST', [
+        $this->dispatch('/admin/search-manager/config/add', 'POST', [
             'o:name' => 'TestPage [testAddPostAction]',
             'o:path' => 'search/test2',
             'o:engine_id' => $this->searchEngine->id(),
@@ -57,7 +57,7 @@ class SearchConfigControllerTest extends SearchControllerTestCase
             'search_config' => $this->searchConfig,
         ]);
 
-        $url = '/admin/search-manager/page/' . $this->searchConfig->id() . '/configure';
+        $url = '/admin/search-manager/config/' . $this->searchConfig->id() . '/configure';
         $this->dispatch($url, 'POST', [
             'facet_limit' => '10',
             'csrf' => $form->get('csrf')->getValue(),

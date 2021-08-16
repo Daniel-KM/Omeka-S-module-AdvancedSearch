@@ -159,7 +159,7 @@ class SearchEngineController extends AbstractActionController
         ]);
         return $view
             ->setTerminal(true)
-            ->setTemplate('search/admin/search-engine/index-confirm-details');
+            ->setTemplate('advanced-search/admin/search-engine/index-confirm-details');
     }
 
     public function indexAction()

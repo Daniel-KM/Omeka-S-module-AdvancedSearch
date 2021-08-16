@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * Copyright Daniel Berthereau 2020
+ * Copyright Daniel Berthereau 2020-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -78,37 +78,41 @@ trait TraitUnrestrictedQuery
             if (empty($formSettings['filter_value_joiner'])) {
                 if (empty($formSettings['filter_value_type'])) {
                     foreach ($request['text']['filters'] as $filter) {
-                        if (isset($filter['value']) && trim($filter['value']) !== '') {
+                        if (isset($filter['field']) && isset($filter['value']) && trim($filter['value']) !== '') {
                             $query->addFilter($filter['field'], $filter['value']);
                         }
                     }
                 } else {
                     foreach ($request['text']['filters'] as $filter) {
-                        $type = empty($filter['type']) ? 'in' : $filter['type'];
-                        if ($type === 'ex' || $type === 'nex') {
-                            $query->addFilterQuery($filter['field'], null, $type);
-                        } elseif (isset($filter['value']) && trim($filter['value']) !== '') {
-                            $query->addFilterQuery($filter['field'], $filter['value'], $type);
+                        if (isset($filter['field'])) {
+                            $type = empty($filter['type']) ? 'in' : $filter['type'];
+                            if ($type === 'ex' || $type === 'nex') {
+                                $query->addFilterQuery($filter['field'], null, $type);
+                            } elseif (isset($filter['value']) && trim($filter['value']) !== '') {
+                                $query->addFilterQuery($filter['field'], $filter['value'], $type);
+                            }
                         }
                     }
                 }
             } else {
                 if (empty($formSettings['filter_value_type'])) {
                     foreach ($request['text']['filters'] as $filter) {
-                        if (isset($filter['value']) && trim($filter['value']) !== '') {
+                        if (isset($filter['field']) && isset($filter['value']) && trim($filter['value']) !== '') {
                             $join = isset($filter['join']) && $filter['join'] === 'or' ? 'or' : 'and';
                             $query->addFilterQuery($filter['field'], $filter['value'], $type, $join);
                         }
                     }
                 } else {
                     foreach ($request['text']['filters'] as $filter) {
-                        $type = empty($filter['type']) ? 'in' : $filter['type'];
-                        if ($type === 'ex' || $type === 'nex') {
-                            $join = isset($filter['join']) && $filter['join'] === 'or' ? 'or' : 'and';
-                            $query->addFilterQuery($filter['field'], null, $type, $join);
-                        } elseif (isset($filter['value']) && trim($filter['value']) !== '') {
-                            $join = isset($filter['join']) && $filter['join'] === 'or' ? 'or' : 'and';
-                            $query->addFilterQuery($filter['field'], $filter['value'], $type, $join);
+                        if (isset($filter['field'])) {
+                            $type = empty($filter['type']) ? 'in' : $filter['type'];
+                            if ($type === 'ex' || $type === 'nex') {
+                                $join = isset($filter['join']) && $filter['join'] === 'or' ? 'or' : 'and';
+                                $query->addFilterQuery($filter['field'], null, $type, $join);
+                            } elseif (isset($filter['value']) && trim($filter['value']) !== '') {
+                                $join = isset($filter['join']) && $filter['join'] === 'or' ? 'or' : 'and';
+                                $query->addFilterQuery($filter['field'], $filter['value'], $type, $join);
+                            }
                         }
                     }
                 }

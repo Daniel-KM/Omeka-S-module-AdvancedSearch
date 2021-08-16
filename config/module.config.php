@@ -290,8 +290,11 @@ return [
             'common/advanced-search/properties' => ['label' => 'Properties'], // @translate
             'common/advanced-search/resource-class' => ['label' => 'Classes'], // @translate
             'common/advanced-search/resource-template' => ['label' => 'Templates', 'default' => false], // @translate
+            'common/advanced-search/resource-template-restrict' => ['label' => 'Templates (restricted)', 'default' => false], // @translate
             'common/advanced-search/item-sets' => ['label' => 'Item sets'], // @translate
-            'common/advanced-search/owner' => ['label' => 'Owner', 'default' => false],
+            'common/advanced-search/owner' => ['label' => 'Owner', 'default' => false], // @translate
+            'common/advanced-search/site' => ['label' => 'Site', 'default' => false], // @translate
+            'common/advanced-search/sort' => ['label' => 'Sort', 'default' => false], // @translate
             // This partial is managed separately by a core option.
             // 'common/advanced-search/resource-template-restrict' => ['label' => 'Resource template restrict'],
             // From module advanced search plus.

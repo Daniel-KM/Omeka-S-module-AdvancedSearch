@@ -151,14 +151,14 @@ class SearchEngineRepresentation extends AbstractEntityRepresentation
         $services = $this->getServiceLocator();
         $adapter = $this->adapter();
         if ($adapter) {
-            $indexerClass = $adapter->getIndexerClass() ?: NoopIndexer::class;
+            $enginerClass = $adapter->getIndexerClass() ?: NoopIndexer::class;
         } else {
-            $indexerClass = NoopIndexer::class;
+            $enginerClass = NoopIndexer::class;
         }
 
-        /** @var \AdvancedSearch\Indexer\IndexerInterface $indexer */
-        $indexer = new $indexerClass;
-        return $indexer
+        /** @var \AdvancedSearch\Indexer\IndexerInterface $enginer */
+        $enginer = new $enginerClass;
+        return $enginer
             ->setServiceLocator($services)
             ->setSearchEngine($this)
             ->setLogger($services->get('Omeka\Logger'));

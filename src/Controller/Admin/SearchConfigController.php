@@ -160,12 +160,12 @@ class SearchConfigController extends AbstractActionController
             'searchConfig' => $searchConfig,
         ]);
 
-        $index = $searchConfig->index();
-        $adapter = $index ? $index->adapter() : null;
+        $engine = $searchConfig->index();
+        $adapter = $engine ? $engine->adapter() : null;
         if (empty($adapter)) {
             $message = new Message(
                 'The index adapter "%s" is unavailable.', // @translate
-                $index->adapterLabel()
+                $engine->adapterLabel()
             );
             $this->messenger()->addError($message); // @translate
             return $view;
@@ -175,7 +175,7 @@ class SearchConfigController extends AbstractActionController
         if (empty($form)) {
             $message = new Message(
                 'This index adapter "%s" has no config form.', // @translate
-                $index->adapterLabel()
+                $engine->adapterLabel()
             );
             $this->messenger()->addWarning($message); // @translate
             return $view;

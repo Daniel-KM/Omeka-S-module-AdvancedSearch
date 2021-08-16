@@ -42,8 +42,8 @@ $this->headScript()
     ->appendFile($assetUrl('js/search-admin.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
 ;
 
-$index = $searchConfig->index();
-$adapter = $index ? $index->adapter() : null;
+$engine = $searchConfig->index();
+$adapter = $engine ? $engine->adapter() : null;
 if (empty($adapter)) {
     return;
 }

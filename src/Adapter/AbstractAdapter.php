@@ -46,17 +46,17 @@ abstract class AbstractAdapter implements AdapterInterface
         return $this;
     }
 
-    public function getAvailableFields(SearchEngineRepresentation $index): array
+    public function getAvailableFields(SearchEngineRepresentation $engine): array
     {
         return [];
     }
 
-    public function getAvailableFacetFields(SearchEngineRepresentation $index): array
+    public function getAvailableFacetFields(SearchEngineRepresentation $engine): array
     {
         return [];
     }
 
-    public function getAvailableSortFields(SearchEngineRepresentation $index): array
+    public function getAvailableSortFields(SearchEngineRepresentation $engine): array
     {
         return [];
     }

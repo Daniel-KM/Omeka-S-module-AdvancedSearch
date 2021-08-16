@@ -51,7 +51,7 @@ class ApiSearch extends AbstractPlugin
     /**
      * @var SearchEngineRepresentation
      */
-    protected $index;
+    protected $engine;
 
     /**
      * @var AdapterManager
@@ -91,7 +91,7 @@ class ApiSearch extends AbstractPlugin
     /**
      * @param Manager $api
      * @param SearchConfigRepresentation $searchConfig
-     * @param SearchEngineRepresentation $index
+     * @param SearchEngineRepresentation $engine
      * @param AdapterManager $adapterManager
      * @param ApiFormAdapter $apiFormAdapter
      * @param Acl $acl
@@ -103,7 +103,7 @@ class ApiSearch extends AbstractPlugin
     public function __construct(
         Manager $api,
         SearchConfigRepresentation $searchConfig = null,
-        SearchEngineRepresentation $index = null,
+        SearchEngineRepresentation $engine = null,
         AdapterManager $adapterManager = null,
         ApiFormAdapter $apiFormAdapter = null,
         Acl $acl = null,
@@ -114,7 +114,7 @@ class ApiSearch extends AbstractPlugin
     ) {
         $this->api = $api;
         $this->page = $searchConfig;
-        $this->index = $index;
+        $this->index = $engine;
         $this->adapterManager = $adapterManager;
         $this->apiFormAdapter = $apiFormAdapter;
         $this->acl = $acl;

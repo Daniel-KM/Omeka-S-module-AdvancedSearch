@@ -44,9 +44,9 @@ class FacetLabel extends AbstractHelper
         }
 
         if (!isset($availableFacetFields)) {
-            $index = $this->getSearchConfig()->index();
-            $availableFacetFields = $index->adapter()
-                ->getAvailableFacetFields($index);
+            $engine = $this->getSearchConfig()->index();
+            $availableFacetFields = $engine->adapter()
+                ->getAvailableFacetFields($engine);
         }
 
         return $availableFacetFields[$name]['label'] ?? $name;

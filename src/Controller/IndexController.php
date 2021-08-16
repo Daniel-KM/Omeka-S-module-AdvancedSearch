@@ -166,9 +166,9 @@ class IndexController extends AbstractActionController
                 ]);
             }
 
-            $indexSettings = $searchConfig->index()->settings();
+            $engineSettings = $searchConfig->index()->settings();
             $result = [];
-            foreach ($indexSettings['resources'] as $resource) {
+            foreach ($engineSettings['resources'] as $resource) {
                 $result[$resource] = $response->getResults($resource);
             }
             return new JsonModel($result);
@@ -281,7 +281,7 @@ class IndexController extends AbstractActionController
         $query = $formAdapter->toQuery(['q' => $q], $searchFormSettings);
 
         $searchEngine = $searchConfig->index();
-        $indexSettings = $searchEngine->settings();
+        $engineSettings = $searchEngine->settings();
 
         $user = $this->identity();
         // TODO Manage roles from modules and visibility from modules (access resources).
@@ -302,7 +302,7 @@ class IndexController extends AbstractActionController
         }
 
         $query
-            ->setResources($indexSettings['resources'])
+            ->setResources($engineSettings['resources'])
             ->setLimitPage(1, empty($autosuggestSettings['limit']) ? \Omeka\Stdlib\Paginator::PER_PAGE : (int) $autosuggestSettings['limit'])
             ->setSuggestMode($autosuggestSettings['mode'] ?? 'start')
             ->setSuggestFields($autosuggestSettings['fields'] ?? []);

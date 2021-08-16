@@ -76,7 +76,7 @@ class SearchConfig extends AbstractEntity
      *     onDelete="CASCADE"
      * )
      */
-    protected $index;
+    protected $engine;
 
     /**
      * @var string
@@ -148,12 +148,12 @@ class SearchConfig extends AbstractEntity
     }
 
     /**
-     * @param SearchEngine $index
+     * @param SearchEngine $engine
      * @return self
      */
-    public function setIndex(SearchEngine $index)
+    public function setIndex(SearchEngine $engine)
     {
-        $this->index = $index;
+        $this->index = $engine;
         return $this;
     }
 

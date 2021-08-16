@@ -17,7 +17,7 @@ class NoopIndexer implements IndexerInterface
         return $this;
     }
 
-    public function setSearchEngine(SearchEngineRepresentation $index): IndexerInterface
+    public function setSearchEngine(SearchEngineRepresentation $engine): IndexerInterface
     {
         return $this;
     }

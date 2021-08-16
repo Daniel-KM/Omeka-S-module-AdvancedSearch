@@ -73,12 +73,12 @@ class SearchEngineController extends AbstractActionController
                 return $view;
             }
             $formData = $form->getData();
-            $index = $this->api()->create('search_engines', $formData)->getContent();
+            $engine = $this->api()->create('search_engines', $formData)->getContent();
             $this->messenger()->addSuccess(new Message(
                 'Search index "%s" created.', // @translate
-                $index->name()
+                $engine->name()
             ));
-            return $this->redirect()->toUrl($index->url('edit'));
+            return $this->redirect()->toUrl($engine->url('edit'));
         }
         return $view;
     }
@@ -148,13 +148,13 @@ class SearchEngineController extends AbstractActionController
 
     public function indexConfirmAction()
     {
-        $index = $this->api()->read('search_engines', $this->params('id'))->getContent();
+        $engine = $this->api()->read('search_engines', $this->params('id'))->getContent();
 
         $totalJobs = $this->totalJobs(\AdvancedSearch\Job\Indexing::class, true);
 
         $view = new ViewModel([
             'resourceLabel' => 'search index',
-            'resource' => $index,
+            'resource' => $engine,
             'totalJobs' => $totalJobs,
         ]);
         return $view
@@ -196,13 +196,13 @@ class SearchEngineController extends AbstractActionController
     public function deleteConfirmAction()
     {
         $response = $this->api()->read('search_engines', $this->params('id'));
-        $index = $response->getContent();
+        $engine = $response->getContent();
 
         // TODO Add a warning about the related pages, that will be deleted.
 
         $view = new ViewModel([
             'resourceLabel' => 'search index',
-            'resource' => $index,
+            'resource' => $engine,
         ]);
         return $view
             ->setTerminal(true)
@@ -214,18 +214,18 @@ class SearchEngineController extends AbstractActionController
         if ($this->getRequest()->isPost()) {
             $form = $this->getForm(ConfirmForm::class);
             $form->setData($this->getRequest()->getPost());
-            $indexId = $this->params('id');
-            $indexName = $this->api()->read('search_engines', $indexId)->getContent()->name();
+            $engineId = $this->params('id');
+            $engineName = $this->api()->read('search_engines', $engineId)->getContent()->name();
             if ($form->isValid()) {
-                $this->api()->delete('search_engines', $indexId);
+                $this->api()->delete('search_engines', $engineId);
                 $this->messenger()->addSuccess(new Message(
                     'Search index "%s" successfully deleted', // @translate
-                    $indexName
+                    $engineName
                 ));
             } else {
                 $this->messenger()->addError(new Message(
                     'Search index "%s" could not be deleted', // @translate
-                    $indexName
+                    $engineName
                 ));
             }
         }

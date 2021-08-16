@@ -42,10 +42,10 @@ if (version_compare($oldVersion, '0.5.0', '<')) {
             $sql .= 'ALTER TABLE advancedsearch_config DROP FOREIGN KEY ' . $foreignKey->getName() . ';' . PHP_EOL;
         }
     }
-    $indexes = $sm->listTableIndexes('advancedsearch_config');
-    foreach ($indexes as $index) {
-        if ($index && in_array($index->getName(), $keys)) {
-            $sql .= 'DROP INDEX ' . $index->getName() . ' ON advancedsearch_config;' . PHP_EOL;
+    $engines = $sm->listTableIndexes('advancedsearch_config');
+    foreach ($engines as $engine) {
+        if ($engine && in_array($engine->getName(), $keys)) {
+            $sql .= 'DROP INDEX ' . $engine->getName() . ' ON advancedsearch_config;' . PHP_EOL;
         }
     }
 
@@ -72,10 +72,10 @@ if (version_compare($oldVersion, '0.5.1', '<')) {
             $sql .= 'ALTER TABLE advancedsearch_config DROP FOREIGN KEY ' . $foreignKey->getName() . ';' . PHP_EOL;
         }
     }
-    $indexes = $sm->listTableIndexes('advancedsearch_config');
-    foreach ($indexes as $index) {
-        if ($index && in_array($index->getName(), $keys)) {
-            $sql .= 'DROP INDEX ' . $index->getName() . ' ON advancedsearch_config;' . PHP_EOL;
+    $engines = $sm->listTableIndexes('advancedsearch_config');
+    foreach ($engines as $engine) {
+        if ($engine && in_array($engine->getName(), $keys)) {
+            $sql .= 'DROP INDEX ' . $engine->getName() . ' ON advancedsearch_config;' . PHP_EOL;
         }
     }
 

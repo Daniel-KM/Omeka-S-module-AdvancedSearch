@@ -70,7 +70,7 @@ class SearchRequestToResponse extends AbstractPlugin
         // Add global parameters.
 
         $this->searchEngine = $searchConfig->index();
-        $indexSettings = $this->searchEngine->settings();
+        $engineSettings = $this->searchEngine->settings();
 
         $user = $controller->identity();
         // TODO Manage roles from modules and visibility from modules (access resources).
@@ -97,7 +97,7 @@ class SearchRequestToResponse extends AbstractPlugin
             }
             $query->setResources($resourceType);
         } else {
-            $query->setResources($indexSettings['resources']);
+            $query->setResources($engineSettings['resources']);
         }
 
         // Don't sort if it's already managed by the form, like the api form.
@@ -184,7 +184,7 @@ class SearchRequestToResponse extends AbstractPlugin
 
         $totalResults = array_map(function ($resource) use ($response) {
             return $response->getResourceTotalResults($resource);
-        }, $indexSettings['resources']);
+        }, $engineSettings['resources']);
         $controller->paginator(max($totalResults), $searchConfigNumber);
 
         return [
@@ -264,11 +264,11 @@ class SearchRequestToResponse extends AbstractPlugin
         if (empty($sortFieldsSettings)) {
             return [];
         }
-        $indexAdapter = $this->searchEngine->adapter();
-        if (empty($indexAdapter)) {
+        $engineAdapter = $this->searchEngine->adapter();
+        if (empty($engineAdapter)) {
             return [];
         }
-        $availableSortFields = $indexAdapter->getAvailableSortFields($this->searchEngine);
+        $availableSortFields = $engineAdapter->getAvailableSortFields($this->searchEngine);
         return array_intersect_key($sortFieldsSettings, $availableSortFields);
     }
 }

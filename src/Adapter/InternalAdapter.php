@@ -26,7 +26,7 @@ class InternalAdapter extends AbstractAdapter
         return \AdvancedSearch\Querier\InternalQuerier::class;
     }
 
-    public function getAvailableFields(SearchEngineRepresentation $index): array
+    public function getAvailableFields(SearchEngineRepresentation $engine): array
     {
         static $availableFields;
 
@@ -81,7 +81,7 @@ class InternalAdapter extends AbstractAdapter
         return $availableFields = $fields;
     }
 
-    public function getAvailableSortFields(SearchEngineRepresentation $index): array
+    public function getAvailableSortFields(SearchEngineRepresentation $engine): array
     {
         static $sortFields;
 
@@ -89,7 +89,7 @@ class InternalAdapter extends AbstractAdapter
             return $sortFields;
         }
 
-        $availableFields = $this->getAvailableFields($index);
+        $availableFields = $this->getAvailableFields($engine);
 
         // There is no default score sort.
         $sortFields = [];
@@ -116,8 +116,8 @@ class InternalAdapter extends AbstractAdapter
         return $sortFields;
     }
 
-    public function getAvailableFacetFields(SearchEngineRepresentation $index): array
+    public function getAvailableFacetFields(SearchEngineRepresentation $engine): array
     {
-        return $this->getAvailableFields($index);
+        return $this->getAvailableFields($engine);
     }
 }

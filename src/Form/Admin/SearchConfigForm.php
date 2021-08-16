@@ -175,10 +175,10 @@ class SearchConfigForm extends Form
 
         $api = $this->getApiManager();
 
-        $indexes = $api->search('search_engines')->getContent();
-        foreach ($indexes as $index) {
-            $options[$index->id()] =
-                sprintf('%s (%s)', $index->name(), $index->adapterLabel());
+        $engines = $api->search('search_engines')->getContent();
+        foreach ($engines as $engine) {
+            $options[$engine->id()] =
+                sprintf('%s (%s)', $engine->name(), $engine->adapterLabel());
         }
 
         return $options;

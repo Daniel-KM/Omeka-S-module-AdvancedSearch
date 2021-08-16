@@ -40,10 +40,10 @@ $queryOption = function ($value, array $search, $key, $text) {
     }
     return sprintf('<option value="%s"%s>%s</option>', $value, $selected, $text);
 };
-$queryText = function (array $search, $index) use ($escape, $translate) {
+$queryText = function (array $search, $engine) use ($escape, $translate) {
     $text = $search['text'] ?? null;
     return sprintf('<input type="text" class="query-text" name="%s" value="%s" aria-label="%s">',
-        $escape("property[$index][text]"),
+        $escape("property[$engine][text]"),
         $escape($text),
         $escape($translate('Query text')));
 };
@@ -56,9 +56,9 @@ $queryText = function (array $search, $index) use ($escape, $translate) {
     </div>
     <div class="inputs">
         <?php
-        $index = 0;
+        $engine = 0;
         foreach ($properties as $property):
-            $stem = "property[$index]";
+            $stem = "property[$engine]";
         ?>
         <div class="value">
             <select class="joiner chosen-select" name="<?php echo $escape($stem . '[joiner]'); ?>">
@@ -92,11 +92,11 @@ $queryText = function (array $search, $index) use ($escape, $translate) {
                 <?php echo $queryOption('ex', $property, 'type', $translate('has any value')); ?>
                 <?php echo $queryOption('nex', $property, 'type', $translate('has no values')); ?>
             </select>
-            <?php echo $queryText($property, $index); ?>
+            <?php echo $queryText($property, $engine); ?>
             <button type="button" class="o-icon-delete remove-value button" aria-label="<?php echo $translate('Remove value'); ?>" title="<?php echo $translate('Remove value'); ?>"></button>
         </div>
         <?php
-            $index++;
+            $engine++;
         endforeach;
         ?>
     </div>

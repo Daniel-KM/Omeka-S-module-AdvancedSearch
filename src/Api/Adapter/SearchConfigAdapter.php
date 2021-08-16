@@ -110,8 +110,8 @@ class SearchConfigAdapter extends AbstractEntityAdapter
             $entity->setPath($request->getValue('o:path'));
         }
         if ($this->shouldHydrate($request, 'o:index_id')) {
-            $indexId = $request->getValue('o:index_id');
-            $entity->setIndex($this->getAdapter('search_engines')->findEntity($indexId));
+            $engineId = $request->getValue('o:index_id');
+            $entity->setIndex($this->getAdapter('search_engines')->findEntity($engineId));
         }
         if ($this->shouldHydrate($request, 'o:form')) {
             $entity->setFormAdapter($request->getValue('o:form'));

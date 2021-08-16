@@ -22,7 +22,7 @@ class NoopQuerier implements QuerierInterface
         return $this;
     }
 
-    public function setSearchEngine(SearchEngineRepresentation $index): QuerierInterface
+    public function setSearchEngine(SearchEngineRepresentation $engine): QuerierInterface
     {
         return $this;
     }

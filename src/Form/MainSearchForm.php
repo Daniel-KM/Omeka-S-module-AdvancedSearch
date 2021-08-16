@@ -96,9 +96,9 @@ class MainSearchForm extends Form
             // Set the required fields.
             $fieldsOrder = array_unique(array_merge(array_values($searchConfigSettings['form']['fields_order']) + ['q', 'submit']));
             // Replace "filters" that is a sub-fieldset of "text".
-            $index = array_search('filters', $fieldsOrder);
-            if ($index !== false) {
-                $fieldsOrder[$index] = 'text';
+            $engine = array_search('filters', $fieldsOrder);
+            if ($engine !== false) {
+                $fieldsOrder[$engine] = 'text';
             }
         }
 
@@ -175,9 +175,9 @@ class MainSearchForm extends Form
 
         // When a priority is set, elements are always first, so reverse the
         // list and set a high priority.
-        foreach (array_reverse($fieldsOrder) as $index => $elementOrFieldset) {
+        foreach (array_reverse($fieldsOrder) as $engine => $elementOrFieldset) {
             if ($this->has($elementOrFieldset)) {
-                $this->setPriority($elementOrFieldset, $index + 10000);
+                $this->setPriority($elementOrFieldset, $engine + 10000);
             }
         }
 

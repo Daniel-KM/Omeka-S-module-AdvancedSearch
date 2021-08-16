@@ -62,27 +62,27 @@ interface AdapterInterface
      *
      * The available fields are used for filters.
      *
-     * @param SearchEngineRepresentation $index
+     * @param SearchEngineRepresentation $engine
      * @return array Associative array with field name as key and an array with
      * field name and field label as value.
      */
-    public function getAvailableFields(SearchEngineRepresentation $index): array;
+    public function getAvailableFields(SearchEngineRepresentation $engine): array;
 
     /**
      * Get the available sort fields.
      *
-     * @param SearchEngineRepresentation $index
+     * @param SearchEngineRepresentation $engine
      * @return array Associative array with sort name as key and an array with
      * sort name and sort label as value.
      */
-    public function getAvailableSortFields(SearchEngineRepresentation $index): array;
+    public function getAvailableSortFields(SearchEngineRepresentation $engine): array;
 
     /**
      * Get the available facet fields.
      *
-     * @param SearchEngineRepresentation $index
+     * @param SearchEngineRepresentation $engine
      * @return array Associative array with facet name as key and an array with
      * facet name and facet label as value.
      */
-    public function getAvailableFacetFields(SearchEngineRepresentation $index): array;
+    public function getAvailableFacetFields(SearchEngineRepresentation $engine): array;
 }

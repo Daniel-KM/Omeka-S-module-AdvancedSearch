@@ -43,7 +43,7 @@ interface QuerierInterface extends LoggerAwareInterface
 {
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator): QuerierInterface;
 
-    public function setSearchEngine(SearchEngineRepresentation $index): QuerierInterface;
+    public function setSearchEngine(SearchEngineRepresentation $engine): QuerierInterface;
 
     public function setQuery(Query $query): QuerierInterface;
 

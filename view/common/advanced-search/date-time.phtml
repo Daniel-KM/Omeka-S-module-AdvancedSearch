@@ -24,10 +24,10 @@ $querySelectOption = function ($value, array $search, $key, $text) {
 };
 
 // TODO Use a widget or a validator (but allow partial date/time: year only, date only, etc.).
-$queryInputText = function (array $search, $index) use ($translate, $escape) {
+$queryInputText = function (array $search, $engine) use ($translate, $escape) {
     $value = $search['value'] ?? null;
     return sprintf('<input type="text" class="query-datetime query-text" name="%s" value="%s" aria-label="%s" placeholder="2017-11-07 17:21:17">',
-        $escape("datetime[$index][value]"),
+        $escape("datetime[$engine][value]"),
         $escape($value),
         $escape($translate('Date / time'))); // @translate
 }
@@ -46,9 +46,9 @@ $queryInputText = function (array $search, $index) use ($translate, $escape) {
     </div>
     <div class="inputs">
         <?php
-        $index = 0;
+        $engine = 0;
         foreach ($datetimes as $datetime):
-            $stem = 'datetime[' . $index . ']';
+            $stem = 'datetime[' . $engine . ']';
         ?>
         <div class="value">
             <select class="joiner chosen-select" name="<?= $escape($stem . '[joiner]') ?>">
@@ -79,11 +79,11 @@ $queryInputText = function (array $search, $index) use ($translate, $escape) {
                 <?= $querySelectOption('ex', $datetime, 'type', $translate('has any date / time')) // @translate ?>
                 <?= $querySelectOption('nex', $datetime, 'type', $translate('has no date / time')) // @translate ?>
             </select>
-            <?= $queryInputText($datetime, $index) ?>
+            <?= $queryInputText($datetime, $engine) ?>
             <button type="button" class="o-icon-delete remove-value button"><?= $translate('Remove date / time') // @translate ?></button>
         </div>
         <?php
-            $index++;
+            $engine++;
         endforeach;
         ?>
     </div>

@@ -43,7 +43,7 @@ interface IndexerInterface extends LoggerAwareInterface
 {
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator): IndexerInterface;
 
-    public function setSearchEngine(SearchEngineRepresentation $index): IndexerInterface;
+    public function setSearchEngine(SearchEngineRepresentation $engine): IndexerInterface;
 
     /**
      * Inidicate if the resource can be indexed.

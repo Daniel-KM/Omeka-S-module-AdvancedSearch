@@ -68,7 +68,7 @@ class SearchFilters extends AbstractHelper
 
                     // Search values (by property or all)
                     case 'property':
-                        $index = 0;
+                        $engine = 0;
                         foreach ($value as $queryRow) {
                             if (!(
                                 is_array($queryRow)
@@ -108,7 +108,7 @@ class SearchFilters extends AbstractHelper
                                 continue;
                             }
                             $filterLabel = $propertyLabel . ' ' . $queryTypes[$queryType];
-                            if ($index > 0) {
+                            if ($engine > 0) {
                                 if ($joiner === 'or') {
                                     $filterLabel = $translate('OR') . ' ' . $filterLabel;
                                 } else {
@@ -117,7 +117,7 @@ class SearchFilters extends AbstractHelper
                             }
 
                             $filters[$filterLabel][] = $value;
-                            $index++;
+                            $engine++;
                         }
                         break;
                     case 'search':

@@ -48,8 +48,8 @@ class SearchConfigConfigureForm extends Form
     {
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $this->getOption('advancedsearch_config');
-        $index = $searchConfig->index();
-        if (empty($index)) {
+        $engine = $searchConfig->index();
+        if (empty($engine)) {
             return;
         }
 

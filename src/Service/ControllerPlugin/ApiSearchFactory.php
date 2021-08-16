@@ -17,10 +17,10 @@ class ApiSearchFactory implements FactoryInterface
             try {
                 /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
                 $searchConfig = $api->read('search_configs', ['id' => $apiPage])->getContent();
-                $index = $searchConfig->index();
+                $engine = $searchConfig->index();
             } catch (\Omeka\Api\Exception\NotFoundException $e) {
             }
-            if ($index) {
+            if ($engine) {
                 $adapterManager = $services->get('Omeka\ApiAdapterManager');
                 $formAdapter = $services->get('Search\FormAdapterManager')->get('api');
                 $acl = $services->get('Omeka\Acl');
@@ -31,7 +31,7 @@ class ApiSearchFactory implements FactoryInterface
                 return new ApiSearch(
                     $api,
                     $searchConfig,
-                    $index,
+                    $engine,
                     $adapterManager,
                     $formAdapter,
                     $acl,

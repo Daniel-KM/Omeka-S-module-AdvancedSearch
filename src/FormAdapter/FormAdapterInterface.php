@@ -48,7 +48,7 @@ interface FormAdapterInterface
     public function getConfigFormClass(): ?string;
 
     /**
-     * Convert a user query from a form into a Search query via a form mapping.
+     * Convert a user query from a form into a search query via a form mapping.
      *
      * The mapping between the query arguments that comes from a form and the
      * fields managed by the index is set via the form settings of the config.

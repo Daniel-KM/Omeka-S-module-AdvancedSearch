@@ -11,10 +11,8 @@ class SearchConfigSelectFactory implements FactoryInterface
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
         $apiManager = $services->get('Omeka\ApiManager');
-
         $element = new SearchConfigSelect;
-        $element->setApiManager($apiManager);
-
-        return $element;
+        return $element
+            ->setApiManager($apiManager);
     }
 }

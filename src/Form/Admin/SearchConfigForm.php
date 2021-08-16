@@ -30,6 +30,7 @@
 
 namespace AdvancedSearch\Form\Admin;
 
+use AdvancedSearch\FormAdapter\Manager as SearchFormAdapterManager;
 use Laminas\Form\Element;
 use Laminas\Form\Form;
 use Omeka\Api\Manager as ApiManager;
@@ -42,6 +43,9 @@ class SearchConfigForm extends Form
      */
     protected $apiManager;
 
+    /**
+     * @var SearchFormAdapterManager
+     */
     protected $formAdapterManager;
 
     public function init(): void
@@ -153,29 +157,17 @@ class SearchConfigForm extends Form
         return $this;
     }
 
-    public function getApiManager(): \Omeka\Api\Manager
-    {
-        return $this->apiManager;
-    }
-
-    public function setFormAdapterManager($formAdapterManager): self
+    public function setFormAdapterManager(SearchFormAdapterManager $formAdapterManager): self
     {
         $this->formAdapterManager = $formAdapterManager;
         return $this;
-    }
-
-    public function getFormAdapterManager()
-    {
-        return $this->formAdapterManager;
     }
 
     protected function getIndexesOptions(): array
     {
         $options = [];
 
-        $api = $this->getApiManager();
-
-        $engines = $api->search('search_engines')->getContent();
+        $engines = $this->apiManager->search('search_engines')->getContent();
         foreach ($engines as $engine) {
             $options[$engine->id()] =
                 sprintf('%s (%s)', $engine->name(), $engine->adapterLabel());
@@ -188,11 +180,9 @@ class SearchConfigForm extends Form
     {
         $options = [];
 
-        $formAdapterManager = $this->getFormAdapterManager();
-        $formAdapterNames = $formAdapterManager->getRegisteredNames();
-
+        $formAdapterNames = $this->formAdapterManager->getRegisteredNames();
         foreach ($formAdapterNames as $name) {
-            $formAdapter = $formAdapterManager->get($name);
+            $formAdapter = $this->formAdapterManager->get($name);
             $options[$name] = $formAdapter->getLabel();
         }
 

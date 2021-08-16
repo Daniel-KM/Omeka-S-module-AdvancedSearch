@@ -6,11 +6,14 @@ use Laminas\Form\Element\Select;
 
 class SearchConfigSelect extends Select
 {
+    /**
+     * @var \Omeka\Api\Manager
+     */
     protected $apiManager;
 
     public function getValueOptions()
     {
-        $response = $this->getApiManager()->search('search_configs');
+        $response = $this->apiManager->search('search_configs');
         $searchConfigs = $response->getContent();
 
         $options = [];
@@ -25,10 +28,5 @@ class SearchConfigSelect extends Select
     {
         $this->apiManager = $apiManager;
         return $this;
-    }
-
-    public function getApiManager()
-    {
-        return $this->apiManager;
     }
 }

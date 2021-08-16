@@ -14,12 +14,12 @@ $assetUrl = $this->plugin('assetUrl');
 
 if ($searchConfig->subSetting('autosuggest', 'enable')) {
     $this->headScript()
-        ->appendFile($assetUrl('vendor/jquery-autocomplete/jquery.autocomplete.min.js', 'Search'), 'text/javascript', ['defer' => 'defer']);
+        ->appendFile($assetUrl('vendor/jquery-autocomplete/jquery.autocomplete.min.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
 }
 
 $this->headLink()
     ->appendStylesheet($assetUrl('vendor/chosen-js/chosen.min.css', 'Omeka'))
-    ->appendStylesheet($assetUrl('css/search.css', 'Search'));
+    ->appendStylesheet($assetUrl('css/search.css', 'AdvancedSearch'));
 $this->headScript()
     ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.min.js', 'Omeka'), 'text/javascript', ['defer' => 'defer'])
-    ->appendFile($assetUrl('js/search.js', 'Search'), 'text/javascript', ['defer' => 'defer']);
+    ->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);

@@ -542,10 +542,10 @@ class Module extends AbstractModule
             $assetUrl = $view->plugin('assetUrl');
             $view->headLink()
                 ->appendStylesheet($assetUrl('vendor/chosen-js/chosen.css', 'Omeka'))
-                ->appendStylesheet($assetUrl('css/advanced-search.css', 'AdvancedSearch'));
+                ->appendStylesheet($assetUrl('css/advanced-search-admin.css', 'AdvancedSearch'));
             $view->headScript()
                 ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.js', 'Omeka'), 'text/javascript', ['defer' => 'defer'])
-                ->appendFile($assetUrl('js/advanced-search.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
+                ->appendFile($assetUrl('js/advanced-search-admin.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
         }
 
         $query = $event->getParam('query', []);
@@ -1924,12 +1924,12 @@ class Module extends AbstractModule
                 $autoSuggestUrl = $searchConfig->subSetting('autosuggest', 'url') ?: $searchUrl . '/suggest';
             }
             $plugins->get('headLink')
-                ->appendStylesheet($assetUrl('css/search-admin-search.css', 'Search'));
+                ->appendStylesheet($assetUrl('css/advanced-search-admin.css', 'AdvancedSearch'));
             $plugins->get('headScript')
                 ->appendScript(sprintf('var searchUrl = %s;', json_encode($searchUrl, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE))
                    . (isset($autoSuggestUrl) ? sprintf("\nvar searchAutosuggestUrl=%s;", json_encode($autoSuggestUrl, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)) : '')
                 )
-                ->appendFile($assetUrl('js/search-admin-search.js', 'Search'), 'text/javascript', ['defer' => 'defer']);
+                ->appendFile($assetUrl('js/advanced-search-admin.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
         }
 
         if (!$partialHeaders) {

@@ -6,7 +6,7 @@ use Doctrine\DBAL\Connection;
 use AdvancedSearch\Query;
 
 /**
- * Simulate an api search with the module search.
+ * Simulate an api search with the module advanced search.
  *
  * Only main search and properties are managed currently, with the joiner "and".
  */

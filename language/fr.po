@@ -323,19 +323,19 @@ msgstr "Appliquer les filtres"
 msgid "No filters."
 msgstr "Pas de filtres."
 
-#: view/search/index/search.phtml:127
+#: view/search/index/advanced-search.phtml:127
 msgid "Fill a query and get results."
 msgstr "Faîtes une requête pour obtenir des résultats."
 
-#: view/search/index/search.phtml:129
+#: view/search/index/advanced-search.phtml:129
 msgid "This item set has no items."
 msgstr ""
 
-#: view/search/index/search.phtml:131
+#: view/search/index/advanced-search.phtml:131
 msgid "Your query returned no results"
 msgstr "Votre recherche n'a retourné aucun résultat"
 
-#: view/search/index/search.phtml:151
+#: view/search/index/advanced-search.phtml:151
 msgid "An error occured and your query returned no results."
 msgstr ""
 "Une erreur est survenue et votre recherche n'a retourné aucun résultat."

@@ -54,8 +54,8 @@ $itemSetId = $this->params()->fromRoute('item-set-id');
 // TODO Use site item set ?
 $itemSet = $itemSetId ? $api->searchOne('item_sets', ['id' => $itemSetId])->getContent() : null;
 
-$this->headLink()->appendStylesheet($assetUrl('css/search.css', 'Search'));
-$this->headScript()->appendFile($assetUrl('js/search.js', 'Search'), 'text/javascript', ['defer' => 'defer']);
+$this->headLink()->appendStylesheet($assetUrl('css/search.css', 'AdvancedSearch'));
+$this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
 ?>
 
 <?php if (empty($isPartial)): ?>

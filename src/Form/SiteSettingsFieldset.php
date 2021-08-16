@@ -36,12 +36,12 @@ class SiteSettingsFieldset extends Fieldset
         $selectAllTerms = $settings->get('advancedsearch_restrict_used_terms', false);
         $searchFields = $settings->get('advancedsearch_search_fields', $defaultSelectedFields) ?: [];
 
-        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation[] $pages */
-        $pages = $this->api->search('search_configs')->getContent();
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation[] $searchConfigs */
+        $searchConfigs = $this->api->search('search_configs')->getContent();
 
         $valueOptions = [];
-        foreach ($pages as $page) {
-            $valueOptions[$page->id()] = sprintf('%s (/%s)', $page->name(), $page->path());
+        foreach ($searchConfigs as $searchConfig) {
+            $valueOptions[$searchConfig->id()] = sprintf('%s (/%s)', $searchConfig->name(), $searchConfig->path());
         }
 
         $this

@@ -108,12 +108,12 @@ class SearchConfigController extends AbstractActionController
 
     public function editAction()
     {
-        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $page */
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $id = $this->params('id');
-        $page = $this->api()->read('search_configs', ['id' => $id])->getContent();
+        $searchConfig = $this->api()->read('search_configs', ['id' => $id])->getContent();
 
-        $data = $page->jsonSerialize();
-        $data['manage_page_default'] = $this->sitesWithSearchConfig($page);
+        $data = $searchConfig->jsonSerialize();
+        $data['manage_page_default'] = $this->sitesWithSearchConfig($searchConfig);
 
         $form = $this->getForm(SearchConfigForm::class);
         $form->setData($data);
@@ -222,8 +222,8 @@ class SearchConfigController extends AbstractActionController
             }
         }
 
-        $page = $searchConfig->getEntity();
-        $page->setSettings($params);
+        $searchConfig = $searchConfig->getEntity();
+        $searchConfig->setSettings($params);
         $entityManager->flush();
 
         $this->messenger()->addSuccess(new Message(
@@ -254,17 +254,17 @@ class SearchConfigController extends AbstractActionController
             $form = $this->getForm(ConfirmForm::class);
             $form->setData($this->getRequest()->getPost());
             $id = $this->params('id');
-            $pageName = $this->api()->read('search_configs', $id)->getContent()->name();
+            $searchConfigName = $this->api()->read('search_configs', $id)->getContent()->name();
             if ($form->isValid()) {
                 $this->api()->delete('search_configs', $this->params('id'));
                 $this->messenger()->addSuccess(new Message(
                     'Search page "%s" successfully deleted', // @translate
-                    $pageName
+                    $searchConfigName
                 ));
             } else {
                 $this->messenger()->addError(new Message(
                     'Search page "%s" could not be deleted', // @translate
-                    $pageName
+                    $searchConfigName
                 ));
             }
         }

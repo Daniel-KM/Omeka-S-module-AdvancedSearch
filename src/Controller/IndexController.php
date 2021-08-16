@@ -44,14 +44,14 @@ class IndexController extends AbstractActionController
 {
     public function searchAction()
     {
-        $pageId = (int) $this->params('id');
+        $searchConfigId = (int) $this->params('id');
 
         $isPublic = $this->status()->isSiteRequest();
         if ($isPublic) {
             $site = $this->currentSite();
             $siteSettings = $this->siteSettings();
             $siteSearchConfigs = $siteSettings->get('search_configs', []);
-            if (!in_array($pageId, $siteSearchConfigs)) {
+            if (!in_array($searchConfigId, $siteSearchConfigs)) {
                 return $this->notFoundAction();
             }
             // Check if it is an item set redirection.
@@ -68,7 +68,7 @@ class IndexController extends AbstractActionController
 
         // The page is required, else there is no form.
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
-        $searchConfig = $this->api()->read('search_configs', $pageId)->getContent();
+        $searchConfig = $this->api()->read('search_configs', $searchConfigId)->getContent();
 
         $view = new ViewModel([
             // The form is not set in the view, but via helper searchingForm()
@@ -188,14 +188,14 @@ class IndexController extends AbstractActionController
             ]);
         }
 
-        $pageId = (int) $this->params('id');
+        $searchConfigId = (int) $this->params('id');
 
         $isPublic = $this->status()->isSiteRequest();
         if ($isPublic) {
             $site = $this->currentSite();
             $siteSettings = $this->siteSettings();
             $siteSearchConfigs = $siteSettings->get('search_configs', []);
-            if (!in_array($pageId, $siteSearchConfigs)) {
+            if (!in_array($searchConfigId, $siteSearchConfigs)) {
                 return new JsonModel([
                     'status' => 'error',
                     'message' => 'Not a search page for this site.', // @translate
@@ -207,7 +207,7 @@ class IndexController extends AbstractActionController
         }
 
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
-        $searchConfig = $this->api()->read('search_configs', $pageId)->getContent();
+        $searchConfig = $this->api()->read('search_configs', $searchConfigId)->getContent();
 
         /** @var \AdvancedSearch\FormAdapter\FormAdapterInterface $formAdapter */
         $formAdapter = $searchConfig->formAdapter();

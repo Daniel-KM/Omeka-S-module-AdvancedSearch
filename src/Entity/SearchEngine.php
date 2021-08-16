@@ -96,7 +96,7 @@ class SearchEngine extends AbstractEntity
      *     indexBy="id"
      * )
      */
-    protected $pages;
+    protected $searchConfigs;
 
     public function getId()
     {

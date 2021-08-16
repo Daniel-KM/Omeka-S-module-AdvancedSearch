@@ -114,7 +114,7 @@ class SearchRequestToResponse extends AbstractPlugin
         }
 
         // Note: the global limit is managed via the pagination.
-        $pageNumber = isset($request['page']) && $request['page'] > 0 ? (int) $request['page'] : 1;
+        $searchConfigNumber = isset($request['page']) && $request['page'] > 0 ? (int) $request['page'] : 1;
         if (isset($request['per_page']) && $request['per_page'] > 0) {
             $perPage = (int) $request['per_page'];
         } elseif ($site) {
@@ -123,7 +123,7 @@ class SearchRequestToResponse extends AbstractPlugin
         } else {
             $perPage = (int) $controller->settings()->get('pagination_per_page', Paginator::PER_PAGE);
         }
-        $query->setLimitPage($pageNumber, $perPage);
+        $query->setLimitPage($searchConfigNumber, $perPage);
 
         $hasFacets = !empty($searchConfigSettings['facet']['facets']);
         if ($hasFacets) {
@@ -185,7 +185,7 @@ class SearchRequestToResponse extends AbstractPlugin
         $totalResults = array_map(function ($resource) use ($response) {
             return $response->getResourceTotalResults($resource);
         }, $indexSettings['resources']);
-        $controller->paginator(max($totalResults), $pageNumber);
+        $controller->paginator(max($totalResults), $searchConfigNumber);
 
         return [
             'status' => 'success',

@@ -138,7 +138,7 @@ class Indexing extends AbstractJob
             }
 
             $totals[$resourceName] = 0;
-            $page = 1;
+            $searchConfig = 1;
             $entityClass = $apiAdapters->get($resourceName)->getEntityClass();
             $dql = "SELECT resource FROM $entityClass resource";
             if ($startResourceId) {
@@ -171,7 +171,7 @@ class Indexing extends AbstractJob
                 }
 
                 // TODO Use doctrine large iterable data-processing? See https://www.doctrine-project.org/projects/doctrine-orm/en/latest/reference/batch-processing.html#iterating-large-results-for-data-processing
-                $offset = $batchSize * ($page - 1);
+                $offset = $batchSize * ($searchConfig - 1);
                 $q = $entityManager
                     ->createQuery($dql)
                     ->setFirstResult($offset)
@@ -181,7 +181,7 @@ class Indexing extends AbstractJob
 
                 $indexer->indexResources($resources);
 
-                ++$page;
+                ++$searchConfig;
                 $totals[$resourceName] += count($resources);
                 $entityManager->clear();
             } while (count($resources) == $batchSize);

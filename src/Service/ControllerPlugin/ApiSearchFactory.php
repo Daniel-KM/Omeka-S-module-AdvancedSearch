@@ -15,9 +15,9 @@ class ApiSearchFactory implements FactoryInterface
         $apiPage = $settings->get('advancedsearch_api_page');
         if ($apiPage) {
             try {
-                /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $page */
-                $page = $api->read('search_configs', ['id' => $apiPage])->getContent();
-                $index = $page->index();
+                /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
+                $searchConfig = $api->read('search_configs', ['id' => $apiPage])->getContent();
+                $index = $searchConfig->index();
             } catch (\Omeka\Api\Exception\NotFoundException $e) {
             }
             if ($index) {
@@ -30,7 +30,7 @@ class ApiSearchFactory implements FactoryInterface
                 $paginator = $services->get('Omeka\Paginator');
                 return new ApiSearch(
                     $api,
-                    $page,
+                    $searchConfig,
                     $index,
                     $adapterManager,
                     $formAdapter,

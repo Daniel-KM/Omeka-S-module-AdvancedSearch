@@ -98,25 +98,25 @@ class SearchingFormFieldset extends Fieldset
 
     protected function searchConfigs()
     {
-        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation[] $pages */
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation[] $searchConfigs */
         $searchConfigs = $this->api->search('search_configs')->getContent();
 
-        $pages = [];
+        $searchConfigs = [];
         foreach ($searchConfigs as $searchConfig) {
-            $pages[$searchConfig->id()] = sprintf('%s (/%s)', $searchConfig->name(), $searchConfig->path());
+            $searchConfigs[$searchConfig->id()] = sprintf('%s (/%s)', $searchConfig->name(), $searchConfig->path());
         }
 
         $siteSetting = $this->siteSetting;
         $available = $siteSetting('search_configs', []);
-        $pages = array_intersect_key($pages, array_flip($available));
+        $searchConfigs = array_intersect_key($searchConfigs, array_flip($available));
 
         // Set the main search page as default.
         $default = $siteSetting('advancedsearch_main_page') ?: reset($available);
-        if (isset($pages[$default])) {
-            $pages = [$default => $pages[$default]] + $pages;
+        if (isset($searchConfigs[$default])) {
+            $searchConfigs = [$default => $searchConfigs[$default]] + $searchConfigs;
         }
 
-        return $pages;
+        return $searchConfigs;
     }
 
     /**

@@ -19,16 +19,16 @@ class SettingsFieldset extends Fieldset
 
     public function init(): void
     {
-        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation[] $pages */
-        $pages = $this->api->search('search_configs')->getContent();
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation[] $searchConfigs */
+        $searchConfigs = $this->api->search('search_configs')->getContent();
 
         $valueOptions = [];
         $apiOptions = [];
-        foreach ($pages as $page) {
-            $labelSearchConfig = sprintf('%s (/%s)', $page->name(), $page->path());
-            $valueOptions[$page->id()] = $labelSearchConfig;
-            if ($page->formAdapter() instanceof \AdvancedSearch\FormAdapter\ApiFormAdapter) {
-                $apiOptions[$page->id()] = $labelSearchConfig;
+        foreach ($searchConfigs as $searchConfig) {
+            $labelSearchConfig = sprintf('%s (/%s)', $searchConfig->name(), $searchConfig->path());
+            $valueOptions[$searchConfig->id()] = $labelSearchConfig;
+            if ($searchConfig->formAdapter() instanceof \AdvancedSearch\FormAdapter\ApiFormAdapter) {
+                $apiOptions[$searchConfig->id()] = $labelSearchConfig;
             }
         }
 

@@ -35,7 +35,7 @@ class SearchingForm extends AbstractBlockLayout
     public function form(
         PhpRenderer $view,
         SiteRepresentation $site,
-        SitePageRepresentation $page = null,
+        SitePageRepresentation $searchConfig = null,
         SitePageBlockRepresentation $block = null
     ) {
         // Factory is not used to make rendering simpler.

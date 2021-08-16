@@ -243,12 +243,12 @@ class Query implements \JsonSerializable
         return $this->limit;
     }
 
-    public function setLimitPage(?int $page, ?int $rowCount): self
+    public function setLimitPage(?int $searchConfig, ?int $rowCount): self
     {
-        $page = ($page > 0) ? $page : 1;
+        $searchConfig = ($searchConfig > 0) ? $searchConfig : 1;
         $rowCount = ($rowCount > 0) ? $rowCount : 1;
         $this->limit = (int) $rowCount;
-        $this->offset = (int) $rowCount * ($page - 1);
+        $this->offset = (int) $rowCount * ($searchConfig - 1);
         return $this;
     }
 

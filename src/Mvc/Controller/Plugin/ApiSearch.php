@@ -46,7 +46,7 @@ class ApiSearch extends AbstractPlugin
     /**
      * @var SearchConfigRepresentation
      */
-    protected $page;
+    protected $searchConfig;
 
     /**
      * @var SearchEngineRepresentation
@@ -90,7 +90,7 @@ class ApiSearch extends AbstractPlugin
 
     /**
      * @param Manager $api
-     * @param SearchConfigRepresentation $page
+     * @param SearchConfigRepresentation $searchConfig
      * @param SearchEngineRepresentation $index
      * @param AdapterManager $adapterManager
      * @param ApiFormAdapter $apiFormAdapter
@@ -102,7 +102,7 @@ class ApiSearch extends AbstractPlugin
      */
     public function __construct(
         Manager $api,
-        SearchConfigRepresentation $page = null,
+        SearchConfigRepresentation $searchConfig = null,
         SearchEngineRepresentation $index = null,
         AdapterManager $adapterManager = null,
         ApiFormAdapter $apiFormAdapter = null,
@@ -113,7 +113,7 @@ class ApiSearch extends AbstractPlugin
         Paginator $paginator = null
     ) {
         $this->api = $api;
-        $this->page = $page;
+        $this->page = $searchConfig;
         $this->index = $index;
         $this->adapterManager = $adapterManager;
         $this->apiFormAdapter = $apiFormAdapter;
@@ -413,14 +413,14 @@ class ApiSearch extends AbstractPlugin
     protected function limitQuery(Query $searchQuery, array $query, array $options): void
     {
         if (is_numeric($query['page'])) {
-            $page = $query['page'] > 0 ? (int) $query['page'] : 1;
+            $searchConfig = $query['page'] > 0 ? (int) $query['page'] : 1;
             if (is_numeric($query['per_page']) && $query['per_page'] > 0) {
                 $perPage = (int) $query['per_page'];
                 $this->paginator->setPerPage($perPage);
             } else {
                 $perPage = $this->paginator->getPerPage();
             }
-            $searchQuery->setLimitPage($page, $perPage);
+            $searchQuery->setLimitPage($searchConfig, $perPage);
             return;
         }
 
@@ -432,8 +432,8 @@ class ApiSearch extends AbstractPlugin
         $offset = $query['offset'] > 0 ? (int) $query['offset'] : null;
         if ($limit && $offset) {
             // TODO Check the formule to convert offset and limit to page and per page (rarely used).
-            $page = $offset > $limit ? 1 + (int) (($offset - 1) / $limit) : 1;
-            $searchQuery->setLimitPage($page, $limit);
+            $searchConfig = $offset > $limit ? 1 + (int) (($offset - 1) / $limit) : 1;
+            $searchQuery->setLimitPage($searchConfig, $limit);
         } elseif ($limit) {
             $searchQuery->setLimitPage(1, $limit);
         } elseif ($offset) {

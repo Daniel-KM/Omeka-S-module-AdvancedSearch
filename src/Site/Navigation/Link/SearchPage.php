@@ -67,7 +67,7 @@ class SearchConfig implements LinkInterface
     {
         $api = $site->getServiceLocator()->get('Omeka\ApiManager');
         try {
-            $page = $api->read('search_configs', ['id' => $data['advancedsearch_config_id']])->getContent();
+            $searchConfig = $api->read('search_configs', ['id' => $data['advancedsearch_config_id']])->getContent();
         } catch (\Omeka\Api\Exception\NotFoundException $e) {
             return [
                 'type' => 'uri',
@@ -76,7 +76,7 @@ class SearchConfig implements LinkInterface
         }
         return [
             'label' => $data['label'],
-            'route' => 'search-config-' . $page->id(),
+            'route' => 'search-config-' . $searchConfig->id(),
             'params' => [
                 'site-slug' => $site->slug(),
             ],

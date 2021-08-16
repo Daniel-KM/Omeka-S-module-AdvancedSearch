@@ -66,10 +66,10 @@ class SearchConfig extends \AdvancedSearch\Entity\SearchConfig implements \Doctr
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', 'id', 'name', 'path', 'index', 'formAdapter', 'settings', 'created', 'modified'];
+            return ['__isInitialized__', 'id', 'name', 'path', 'engine', 'formAdapter', 'settings', 'created', 'modified'];
         }
 
-        return ['__isInitialized__', 'id', 'name', 'path', 'index', 'formAdapter', 'settings', 'created', 'modified'];
+        return ['__isInitialized__', 'id', 'name', 'path', 'engine', 'formAdapter', 'settings', 'created', 'modified'];
     }
 
     /**
@@ -194,7 +194,7 @@ class SearchConfig extends \AdvancedSearch\Entity\SearchConfig implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function setName($name)
+    public function setName(string $name): \AdvancedSearch\Entity\SearchConfig
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setName', [$name]);
@@ -205,7 +205,7 @@ class SearchConfig extends \AdvancedSearch\Entity\SearchConfig implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function getName()
+    public function getName(): string
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getName', []);
@@ -216,7 +216,7 @@ class SearchConfig extends \AdvancedSearch\Entity\SearchConfig implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function setPath($path)
+    public function setPath(string $path): \AdvancedSearch\Entity\SearchConfig
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setPath', [$path]);
@@ -227,7 +227,7 @@ class SearchConfig extends \AdvancedSearch\Entity\SearchConfig implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function getPath()
+    public function getPath(): string
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getPath', []);
@@ -238,10 +238,10 @@ class SearchConfig extends \AdvancedSearch\Entity\SearchConfig implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function setEngine(\AdvancedSearch\Entity\SearchEngine $engine)
+    public function setEngine(\AdvancedSearch\Entity\SearchEngine $engine): \AdvancedSearch\Entity\SearchConfig
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setIndex', [$engine]);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setEngine', [$engine]);
 
         return parent::setEngine($engine);
     }
@@ -249,10 +249,10 @@ class SearchConfig extends \AdvancedSearch\Entity\SearchConfig implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function getEngine()
+    public function getEngine(): \AdvancedSearch\Entity\SearchEngine
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getIndex', []);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getEngine', []);
 
         return parent::getEngine();
     }
@@ -260,7 +260,7 @@ class SearchConfig extends \AdvancedSearch\Entity\SearchConfig implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function setFormAdapter($formAdapter)
+    public function setFormAdapter(?string $formAdapter): \AdvancedSearch\Entity\SearchConfig
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setFormAdapter', [$formAdapter]);
@@ -271,7 +271,7 @@ class SearchConfig extends \AdvancedSearch\Entity\SearchConfig implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function getFormAdapter()
+    public function getFormAdapter(): ?string
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getFormAdapter', []);
@@ -282,7 +282,7 @@ class SearchConfig extends \AdvancedSearch\Entity\SearchConfig implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function setSettings($settings)
+    public function setSettings(?array $settings): \AdvancedSearch\Entity\SearchConfig
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setSettings', [$settings]);
@@ -293,7 +293,7 @@ class SearchConfig extends \AdvancedSearch\Entity\SearchConfig implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function getSettings()
+    public function getSettings(): ?array
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getSettings', []);
@@ -304,7 +304,7 @@ class SearchConfig extends \AdvancedSearch\Entity\SearchConfig implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function setCreated(\DateTime $created)
+    public function setCreated(\DateTime $created): \AdvancedSearch\Entity\SearchConfig
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setCreated', [$created]);
@@ -315,7 +315,7 @@ class SearchConfig extends \AdvancedSearch\Entity\SearchConfig implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function getCreated()
+    public function getCreated(): \DateTime
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getCreated', []);
@@ -326,7 +326,7 @@ class SearchConfig extends \AdvancedSearch\Entity\SearchConfig implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function setModified(\DateTime $dateTime)
+    public function setModified(?\DateTime $dateTime): \AdvancedSearch\Entity\SearchConfig
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setModified', [$dateTime]);
@@ -337,7 +337,7 @@ class SearchConfig extends \AdvancedSearch\Entity\SearchConfig implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function getModified()
+    public function getModified(): ?\DateTime
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getModified', []);
@@ -348,7 +348,7 @@ class SearchConfig extends \AdvancedSearch\Entity\SearchConfig implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function prePersist(\Doctrine\ORM\Event\LifecycleEventArgs $eventArgs)
+    public function prePersist(\Doctrine\ORM\Event\LifecycleEventArgs $eventArgs): \AdvancedSearch\Entity\SearchConfig
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'prePersist', [$eventArgs]);
@@ -359,7 +359,7 @@ class SearchConfig extends \AdvancedSearch\Entity\SearchConfig implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function preUpdate(\Doctrine\ORM\Event\PreUpdateEventArgs $eventArgs)
+    public function preUpdate(\Doctrine\ORM\Event\PreUpdateEventArgs $eventArgs): \AdvancedSearch\Entity\SearchConfig
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'preUpdate', [$eventArgs]);

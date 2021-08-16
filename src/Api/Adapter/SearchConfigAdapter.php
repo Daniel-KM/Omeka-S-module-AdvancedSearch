@@ -30,6 +30,7 @@
 
 namespace AdvancedSearch\Api\Adapter;
 
+use AdvancedSearch\Entity\SearchEngine;
 use Doctrine\ORM\QueryBuilder;
 use Omeka\Api\Adapter\AbstractEntityAdapter;
 use Omeka\Api\Request;
@@ -66,7 +67,7 @@ class SearchConfigAdapter extends AbstractEntityAdapter
 
         if (isset($query['engine_id'])) {
             $searchEngineAlias = $this->createAlias();
-            // The join avoids to find a page without index.
+            // The join avoids to find a config without engine.
             $qb->innerJoin(
                 SearchEngine::class,
                 $searchEngineAlias,

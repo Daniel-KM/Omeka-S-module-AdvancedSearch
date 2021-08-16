@@ -66,10 +66,10 @@ class SearchEngine extends \AdvancedSearch\Entity\SearchEngine implements \Doctr
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', 'id', 'name', 'adapter', 'settings', 'created', 'modified', 'pages'];
+            return ['__isInitialized__', 'id', 'name', 'adapter', 'settings', 'created', 'modified', 'searchConfigs'];
         }
 
-        return ['__isInitialized__', 'id', 'name', 'adapter', 'settings', 'created', 'modified', 'pages'];
+        return ['__isInitialized__', 'id', 'name', 'adapter', 'settings', 'created', 'modified', 'searchConfigs'];
     }
 
     /**
@@ -194,7 +194,7 @@ class SearchEngine extends \AdvancedSearch\Entity\SearchEngine implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function setName($name)
+    public function setName(string $name): \AdvancedSearch\Entity\SearchEngine
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setName', [$name]);
@@ -205,7 +205,7 @@ class SearchEngine extends \AdvancedSearch\Entity\SearchEngine implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function getName()
+    public function getName(): string
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getName', []);
@@ -216,7 +216,7 @@ class SearchEngine extends \AdvancedSearch\Entity\SearchEngine implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function setAdapter($adapter)
+    public function setAdapter(string $adapter): \AdvancedSearch\Entity\SearchEngine
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setAdapter', [$adapter]);
@@ -227,7 +227,7 @@ class SearchEngine extends \AdvancedSearch\Entity\SearchEngine implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function getAdapter()
+    public function getAdapter(): string
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getAdapter', []);
@@ -238,7 +238,7 @@ class SearchEngine extends \AdvancedSearch\Entity\SearchEngine implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function setSettings($settings)
+    public function setSettings(?array $settings): \AdvancedSearch\Entity\SearchEngine
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setSettings', [$settings]);
@@ -249,7 +249,7 @@ class SearchEngine extends \AdvancedSearch\Entity\SearchEngine implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function getSettings()
+    public function getSettings(): ?array
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getSettings', []);
@@ -260,7 +260,7 @@ class SearchEngine extends \AdvancedSearch\Entity\SearchEngine implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function setCreated(\DateTime $created)
+    public function setCreated(\DateTime $created): \AdvancedSearch\Entity\SearchEngine
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setCreated', [$created]);
@@ -271,7 +271,7 @@ class SearchEngine extends \AdvancedSearch\Entity\SearchEngine implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function getCreated()
+    public function getCreated(): \DateTime
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getCreated', []);
@@ -282,7 +282,7 @@ class SearchEngine extends \AdvancedSearch\Entity\SearchEngine implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function setModified(\DateTime $dateTime)
+    public function setModified(?\DateTime $dateTime): \AdvancedSearch\Entity\SearchEngine
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'setModified', [$dateTime]);
@@ -293,7 +293,7 @@ class SearchEngine extends \AdvancedSearch\Entity\SearchEngine implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function getModified()
+    public function getModified(): ?\DateTime
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'getModified', []);
@@ -304,7 +304,7 @@ class SearchEngine extends \AdvancedSearch\Entity\SearchEngine implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function prePersist(\Doctrine\ORM\Event\LifecycleEventArgs $eventArgs)
+    public function prePersist(\Doctrine\ORM\Event\LifecycleEventArgs $eventArgs): \AdvancedSearch\Entity\SearchEngine
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'prePersist', [$eventArgs]);
@@ -315,7 +315,7 @@ class SearchEngine extends \AdvancedSearch\Entity\SearchEngine implements \Doctr
     /**
      * {@inheritDoc}
      */
-    public function preUpdate(\Doctrine\ORM\Event\PreUpdateEventArgs $eventArgs)
+    public function preUpdate(\Doctrine\ORM\Event\PreUpdateEventArgs $eventArgs): \AdvancedSearch\Entity\SearchEngine
     {
 
         $this->__initializer__ && $this->__initializer__->__invoke($this, 'preUpdate', [$eventArgs]);

@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2020
+ * Copyright Daniel Berthereau, 2020-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -90,7 +90,7 @@ class SearchEngine extends AbstractEntity
      *
      * @OneToMany(
      *     targetEntity="SearchConfig",
-     *     mappedBy="index",
+     *     mappedBy="engine",
      *     orphanRemoval=true,
      *     cascade={"persist", "remove"},
      *     indexBy="id"
@@ -103,92 +103,57 @@ class SearchEngine extends AbstractEntity
         return $this->id;
     }
 
-    /**
-     * @param string $name
-     * @return self
-     */
-    public function setName($name)
+    public function setName(string $name): self
     {
         $this->name = $name;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $adapter
-     * @return self
-     */
-    public function setAdapter($adapter)
+    public function setAdapter(string $adapter): self
     {
         $this->adapter = $adapter;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getAdapter()
+    public function getAdapter(): string
     {
         return $this->adapter;
     }
 
-    /**
-     * @param array $settings
-     * @return self
-     */
-    public function setSettings($settings)
+    public function setSettings(?array $settings): self
     {
         $this->settings = $settings;
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getSettings()
+    public function getSettings(): ?array
     {
         return $this->settings;
     }
 
-    /**
-     * @param DateTime $created
-     * @return self
-     */
-    public function setCreated(DateTime $created)
+    public function setCreated(DateTime $created): self
     {
         $this->created = $created;
         return $this;
     }
 
-    /**
-     * @return DateTime
-     */
-    public function getCreated()
+    public function getCreated(): DateTime
     {
         return $this->created;
     }
 
-    /**
-     * @param DateTime $dateTime
-     * @return self
-     */
-    public function setModified(DateTime $dateTime)
+    public function setModified(?DateTime $dateTime): self
     {
         $this->modified = $dateTime;
         return $this;
     }
 
-    /**
-     * @return DateTime
-     */
-    public function getModified()
+    public function getModified(): ?DateTime
     {
         return $this->modified;
     }
@@ -196,7 +161,7 @@ class SearchEngine extends AbstractEntity
     /**
      * @PrePersist
      */
-    public function prePersist(LifecycleEventArgs $eventArgs)
+    public function prePersist(LifecycleEventArgs $eventArgs): self
     {
         $this->created = new DateTime('now');
         return $this;
@@ -205,7 +170,7 @@ class SearchEngine extends AbstractEntity
     /**
      * @PreUpdate
      */
-    public function preUpdate(PreUpdateEventArgs $eventArgs)
+    public function preUpdate(PreUpdateEventArgs $eventArgs): self
     {
         $this->modified = new DateTime('now');
         return $this;

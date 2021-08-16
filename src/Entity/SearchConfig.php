@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2020
+ * Copyright Daniel Berthereau, 2020-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -69,7 +69,7 @@ class SearchConfig extends AbstractEntity
      *
      * @ManyToOne(
      *     targetEntity="SearchEngine",
-     *     inversedBy="pages"
+     *     inversedBy="searchConfigs"
      * )
      * @JoinColumn(
      *     nullable=false,
@@ -111,128 +111,79 @@ class SearchConfig extends AbstractEntity
         return $this->id;
     }
 
-    /**
-     * @param string $name
-     * @return self
-     */
-    public function setName($name)
+    public function setName(string $name): self
     {
         $this->name = $name;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $path
-     * @return self
-     */
-    public function setPath($path)
+    public function setPath(string $path): self
     {
         $this->path = $path;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }
 
-    /**
-     * @param SearchEngine $engine
-     * @return self
-     */
-    public function setEngine(SearchEngine $engine)
+    public function setEngine(SearchEngine $engine): self
     {
         $this->engine = $engine;
         return $this;
     }
 
-    /**
-     * @return \AdvancedSearch\Entity\SearchEngine
-     */
-    public function getEngine()
+    public function getEngine(): SearchEngine
     {
         return $this->engine;
     }
 
-    /**
-     * @param string $formAdapter
-     * @return self
-     */
-    public function setFormAdapter($formAdapter)
+    public function setFormAdapter(?string $formAdapter): self
     {
         $this->formAdapter = $formAdapter;
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getFormAdapter()
+    public function getFormAdapter(): ?string
     {
         return $this->formAdapter;
     }
 
-    /**
-     * @param array $settings
-     * @return self
-     */
-    public function setSettings($settings)
+    public function setSettings(?array $settings): self
     {
         $this->settings = $settings;
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getSettings()
+    public function getSettings(): ?array
     {
         return $this->settings;
     }
 
-    /**
-     * @param DateTime $created
-     * @return self
-     */
-    public function setCreated(DateTime $created)
+    public function setCreated(DateTime $created): self
     {
         $this->created = $created;
         return $this;
     }
 
-    /**
-     * @return DateTime
-     */
-    public function getCreated()
+    public function getCreated(): \DateTime
     {
         return $this->created;
     }
 
-    /**
-     * @param DateTime $dateTime
-     * @return self
-     */
-    public function setModified(DateTime $dateTime)
+    public function setModified(?DateTime $dateTime): self
     {
         $this->modified = $dateTime;
         return $this;
     }
 
-    /**
-     * @return DateTime
-     */
-    public function getModified()
+    public function getModified(): ?DateTime
     {
         return $this->modified;
     }
@@ -240,7 +191,7 @@ class SearchConfig extends AbstractEntity
     /**
      * @PrePersist
      */
-    public function prePersist(LifecycleEventArgs $eventArgs)
+    public function prePersist(LifecycleEventArgs $eventArgs): self
     {
         $this->created = new DateTime('now');
         return $this;
@@ -249,7 +200,7 @@ class SearchConfig extends AbstractEntity
     /**
      * @PreUpdate
      */
-    public function preUpdate(PreUpdateEventArgs $eventArgs)
+    public function preUpdate(PreUpdateEventArgs $eventArgs): self
     {
         $this->modified = new DateTime('now');
         return $this;

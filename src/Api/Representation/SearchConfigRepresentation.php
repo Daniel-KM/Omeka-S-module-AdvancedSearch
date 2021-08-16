@@ -105,7 +105,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         return $this->resource->getPath();
     }
 
-    public function index(): ?\AdvancedSearch\Api\Representation\SearchEngineRepresentation
+    public function engine(): ?\AdvancedSearch\Api\Representation\SearchEngineRepresentation
     {
         $searchEngine = $this->resource->getEngine();
         return $searchEngine

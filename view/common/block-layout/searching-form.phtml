@@ -2,7 +2,7 @@
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var \Omeka\Api\Representation\SiteRepresentation $site
- * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
+ * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchPage
  * @var bool $displayResults
  * @var \AdvancedSearch\Query $query
  * @var \AdvancedSearch\Response $response
@@ -12,7 +12,7 @@
 $escape = $this->plugin('escapeHtml');
 ?>
 
-<?php if (empty($displayResults) || empty($searchConfig)): ?>
+<?php if (empty($displayResults) || empty($searchPage)): ?>
 
 <div class="block-search">
     <?php if (!empty($heading)): ?>

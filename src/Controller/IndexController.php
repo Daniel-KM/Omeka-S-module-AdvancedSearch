@@ -75,6 +75,8 @@ class IndexController extends AbstractActionController
             // The form is not set in the view, but via helper searchingForm()
             // or via searchConfig.
             'searchConfig' => $searchConfig,
+            // "searchPage" is kept to simplify migration.
+            'searchPage' => $searchConfig,
             'site' => $site,
             // Set a default empty query and response to simplify view.
             'query' => new Query,
@@ -177,7 +179,9 @@ class IndexController extends AbstractActionController
 
         return $view
             ->setVariables($result['data'], true)
-            ->setVariable('searchConfig', $searchConfig);
+            ->setVariable('searchConfig', $searchConfig)
+            // "searchPage" is kept to simplify migration.
+            ->setVariable('searchPage', $searchConfig);
     }
 
     public function suggestAction()

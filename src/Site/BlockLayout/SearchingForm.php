@@ -93,6 +93,7 @@ class SearchingForm extends AbstractBlockLayout
         $vars = [
             'heading' => $block->dataValue('heading', ''),
             'displayResults' => $displayResults,
+            // Name "searchPage" is kept to simplify migration.
             'searchPage' => $searchConfig,
             'site' => $site,
             'query' => null,

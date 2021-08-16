@@ -1,7 +1,7 @@
 <?php
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
- * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
+ * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchPage
  */
 
 // Add headers (css or scripts) to be included for the form.
@@ -12,7 +12,7 @@
 
 $assetUrl = $this->plugin('assetUrl');
 
-if ($searchConfig->subSetting('autosuggest', 'enable')) {
+if ($searchPage->subSetting('autosuggest', 'enable')) {
     $this->headScript()
         ->appendFile($assetUrl('vendor/jquery-autocomplete/jquery.autocomplete.min.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
 }

@@ -29,14 +29,14 @@
 
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
- * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
+ * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchPage
  * @var \AdvancedSearch\Query $query
  * @var \AdvancedSearch\Response $response
  * Options:
  * @var ?\Omeka\Api\Representation\ItemSetRepresentation $itemSet
  */
 
-if (!isset($response) || empty($searchConfig->subSetting('facet', 'facets'))) return;
+if (!isset($response) || empty($searchPage->subSetting('facet', 'facets'))) return;
 
 $plugins = $this->getHelperPluginManager();
 $translate = $plugins->get('translate');
@@ -47,11 +47,11 @@ $activeFacets = $response->getActiveFacets();
 // Don't display facet groups without facet elements.
 $facets = array_filter($facets);
 
-$displayActive = (bool) $searchConfig->subSetting('facet', 'display_active', true);
+$displayActive = (bool) $searchPage->subSetting('facet', 'display_active', true);
 
-$isFacetModeButton = $searchConfig->subSetting('facet', 'mode') !== 'link';
+$isFacetModeButton = $searchPage->subSetting('facet', 'mode') !== 'link';
 $displayFacetButton = $isFacetModeButton && !empty($facets);
-$displayButton = $displayFacetButton ? $searchConfig->subSetting('facet', 'display_button', 'above') : 'none';
+$displayButton = $displayFacetButton ? $searchPage->subSetting('facet', 'display_button', 'above') : 'none';
 
 $facetActive = $plugins->get('facetActive');
 $facetLabel = $plugins->get('facetLabel');
@@ -64,7 +64,7 @@ if (!empty($itemSet)) {
     unset($activeFacets['item_set_id']);
 }
 
-$options = $searchConfig->setting('facet', []);
+$options = $searchPage->setting('facet', []);
 unset($options['facets']);
 ?>
 

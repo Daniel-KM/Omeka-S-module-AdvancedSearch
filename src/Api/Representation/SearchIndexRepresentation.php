@@ -28,11 +28,11 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\Api\Representation;
+namespace AdvancedSearch\Api\Representation;
 
 use Omeka\Api\Representation\AbstractEntityRepresentation;
-use Search\Indexer\NoopIndexer;
-use Search\Querier\NoopQuerier;
+use AdvancedSearch\Indexer\NoopIndexer;
+use AdvancedSearch\Querier\NoopQuerier;
 
 class SearchIndexRepresentation extends AbstractEntityRepresentation
 {

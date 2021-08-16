@@ -27,7 +27,7 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\Querier\Exception;
+namespace AdvancedSearch\Querier\Exception;
 
 use Exception;
 

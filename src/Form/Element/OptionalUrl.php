@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Search\Form\Element;
+namespace AdvancedSearch\Form\Element;
 
 use Laminas\Form\Element\Url;
 

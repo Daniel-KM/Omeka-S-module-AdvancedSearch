@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Search\Test\Indexer;
+namespace AdvancedSearch\Test\Indexer;
 
 use Omeka\Entity\Resource;
-use Search\Indexer\AbstractIndexer;
-use Search\Query;
+use AdvancedSearch\Indexer\AbstractIndexer;
+use AdvancedSearch\Query;
 
 class TestIndexer extends AbstractIndexer
 {

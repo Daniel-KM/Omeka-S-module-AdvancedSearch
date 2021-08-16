@@ -28,13 +28,13 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\Querier;
+namespace AdvancedSearch\Querier;
 
 use Laminas\Log\LoggerAwareTrait;
 use Laminas\ServiceManager\ServiceLocatorInterface;
-use Search\Api\Representation\SearchIndexRepresentation;
-use Search\Query;
-use Search\Response;
+use AdvancedSearch\Api\Representation\SearchIndexRepresentation;
+use AdvancedSearch\Query;
+use AdvancedSearch\Response;
 
 abstract class AbstractQuerier implements QuerierInterface
 {

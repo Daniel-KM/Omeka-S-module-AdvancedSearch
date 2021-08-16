@@ -28,13 +28,13 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\Querier;
+namespace AdvancedSearch\Querier;
 
 use Laminas\Log\LoggerAwareInterface;
 use Laminas\ServiceManager\ServiceLocatorInterface;
-use Search\Api\Representation\SearchIndexRepresentation;
-use Search\Query;
-use Search\Response;
+use AdvancedSearch\Api\Representation\SearchIndexRepresentation;
+use AdvancedSearch\Query;
+use AdvancedSearch\Response;
 
 /**
  * The signature uses "QuerierInterface" instead of "self" for compatibility with php < 7.4.

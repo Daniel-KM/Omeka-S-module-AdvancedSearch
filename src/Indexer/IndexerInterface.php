@@ -28,13 +28,13 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\Indexer;
+namespace AdvancedSearch\Indexer;
 
 use Laminas\Log\LoggerAwareInterface;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Omeka\Entity\Resource;
-use Search\Api\Representation\SearchIndexRepresentation;
-use Search\Query;
+use AdvancedSearch\Api\Representation\SearchIndexRepresentation;
+use AdvancedSearch\Query;
 
 /**
  * The signature uses "IndexerInterface" instead of "self" for compatibility with php < 7.4.

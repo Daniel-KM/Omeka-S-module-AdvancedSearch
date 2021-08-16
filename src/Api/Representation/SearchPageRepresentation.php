@@ -28,7 +28,7 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\Api\Representation;
+namespace AdvancedSearch\Api\Representation;
 
 use Omeka\Api\Representation\AbstractEntityRepresentation;
 

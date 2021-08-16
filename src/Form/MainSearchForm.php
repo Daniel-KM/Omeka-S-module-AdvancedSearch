@@ -27,7 +27,7 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\Form;
+namespace AdvancedSearch\Form;
 
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;

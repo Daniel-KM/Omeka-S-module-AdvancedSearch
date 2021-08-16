@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Search\Querier;
+namespace AdvancedSearch\Querier;
 
 use Omeka\Mvc\Controller\Plugin\Messenger;
 use Omeka\Stdlib\Message;
-use Search\Querier\Exception\QuerierException;
-use Search\Response;
+use AdvancedSearch\Querier\Exception\QuerierException;
+use AdvancedSearch\Response;
 
 class InternalQuerier extends AbstractQuerier
 {
@@ -339,7 +339,7 @@ SQL;
     /**
      * Prepare the main query with excluded fields.
      *
-     * Require module AdvancedSearchPlus.
+     * Require module AdvancedSearch.
      *
      * @todo Add support of exclude item set.
      * @todo Add support of grouped query (mutliple properties and/or multiple other properties).
@@ -487,7 +487,7 @@ SQL;
                         $this->args['property'][] = [
                             'joiner' => 'and',
                             'property' => $name,
-                            // FIXME Require a hack (or the module AdvancedSearchPlus).
+                            // FIXME Require a hack (or the module AdvancedSearch).
                             'type' => 'list',
                             'text' => is_array($values) ? $values : [$values],
                         ];

@@ -28,11 +28,11 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\Service\ViewHelper;
+namespace AdvancedSearch\Service\ViewHelper;
 
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
-use Search\View\Helper\FacetCheckbox;
+use AdvancedSearch\View\Helper\FacetCheckbox;
 
 class FacetCheckboxFactory implements FactoryInterface
 {

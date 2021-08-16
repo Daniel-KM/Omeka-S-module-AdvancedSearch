@@ -27,12 +27,12 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\Job;
+namespace AdvancedSearch\Job;
 
 use Doctrine\ORM\EntityManager;
 use Omeka\Job\AbstractJob;
 use Omeka\Stdlib\Message;
-use Search\Query;
+use AdvancedSearch\Query;
 
 class Indexing extends AbstractJob
 {

@@ -28,7 +28,7 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\View\Helper;
+namespace AdvancedSearch\View\Helper;
 
 use Laminas\View\Helper\AbstractHelper;
 

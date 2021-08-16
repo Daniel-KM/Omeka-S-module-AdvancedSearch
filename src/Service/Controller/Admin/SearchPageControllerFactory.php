@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
-namespace Search\Service\Controller\Admin;
+namespace AdvancedSearch\Service\Controller\Admin;
 
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
-use Search\Controller\Admin\SearchPageController;
+use AdvancedSearch\Controller\Admin\SearchPageController;
 
 class SearchPageControllerFactory implements FactoryInterface
 {

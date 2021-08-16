@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Search\View\Helper;
+namespace AdvancedSearch\View\Helper;
 
 use Laminas\Form\Element\Select;
 use Laminas\View\Helper\AbstractHelper;
-use Search\Query;
+use AdvancedSearch\Query;
 
 class SearchSortSelector extends AbstractHelper
 {

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Search;
+namespace AdvancedSearch;
 
 use Omeka\Mvc\Controller\Plugin\Messenger;
 use Omeka\Stdlib\Message;

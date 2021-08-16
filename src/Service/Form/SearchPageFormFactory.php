@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Search\Service\Form;
+namespace AdvancedSearch\Service\Form;
 
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
-use Search\Form\Admin\SearchPageForm;
+use AdvancedSearch\Form\Admin\SearchPageForm;
 
 class SearchPageFormFactory implements FactoryInterface
 {

@@ -27,7 +27,7 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\Adapter;
+namespace AdvancedSearch\Adapter;
 
 use Omeka\ServiceManager\AbstractPluginManager;
 

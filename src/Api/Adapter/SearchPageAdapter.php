@@ -28,14 +28,14 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\Api\Adapter;
+namespace AdvancedSearch\Api\Adapter;
 
 use Doctrine\ORM\QueryBuilder;
 use Omeka\Api\Adapter\AbstractEntityAdapter;
 use Omeka\Api\Request;
 use Omeka\Entity\EntityInterface;
 use Omeka\Stdlib\ErrorStore;
-use Search\Entity\SearchIndex;
+use AdvancedSearch\Entity\SearchIndex;
 
 class SearchPageAdapter extends AbstractEntityAdapter
 {

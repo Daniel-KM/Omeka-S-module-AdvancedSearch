@@ -28,17 +28,17 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\Form\Admin;
+namespace AdvancedSearch\Form\Admin;
 
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
 use Omeka\Form\Element\ArrayTextarea;
-use Search\Form\Element\ArrayText;
-use Search\Form\Element\DataTextarea;
-use Search\Form\Element\OptionalRadio;
-use Search\Form\Element\OptionalSelect;
-use Search\Form\Element\OptionalUrl;
+use AdvancedSearch\Form\Element\ArrayText;
+use AdvancedSearch\Form\Element\DataTextarea;
+use AdvancedSearch\Form\Element\OptionalRadio;
+use AdvancedSearch\Form\Element\OptionalSelect;
+use AdvancedSearch\Form\Element\OptionalUrl;
 
 class SearchPageConfigureForm extends Form
 {

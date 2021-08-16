@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
-namespace Search\View\Helper;
+namespace AdvancedSearch\View\Helper;
 
 use Laminas\View\Helper\AbstractHelper;
-use Search\Mvc\Controller\Plugin\ApiSearch as ApiSearchPlugin;
+use AdvancedSearch\Mvc\Controller\Plugin\ApiSearch as ApiSearchPlugin;
 
 class ApiSearchOne extends AbstractHelper
 {

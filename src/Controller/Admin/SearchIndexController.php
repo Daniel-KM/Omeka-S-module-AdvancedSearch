@@ -28,16 +28,16 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\Controller\Admin;
+namespace AdvancedSearch\Controller\Admin;
 
 use Doctrine\ORM\EntityManager;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Omeka\Form\ConfirmForm;
 use Omeka\Stdlib\Message;
-use Search\Adapter\Manager as SearchAdapterManager;
-use Search\Form\Admin\SearchIndexConfigureForm;
-use Search\Form\Admin\SearchIndexForm;
+use AdvancedSearch\Adapter\Manager as SearchAdapterManager;
+use AdvancedSearch\Form\Admin\SearchIndexConfigureForm;
+use AdvancedSearch\Form\Admin\SearchIndexForm;
 
 class SearchIndexController extends AbstractActionController
 {

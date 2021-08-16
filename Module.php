@@ -542,10 +542,10 @@ class Module extends AbstractModule
             $assetUrl = $view->plugin('assetUrl');
             $view->headLink()
                 ->appendStylesheet($assetUrl('vendor/chosen-js/chosen.css', 'Omeka'))
-                ->appendStylesheet($assetUrl('css/advanced-search-plus.css', 'AdvancedSearchPlus'));
+                ->appendStylesheet($assetUrl('css/advanced-search-plus.css', 'AdvancedSearch'));
             $view->headScript()
                 ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.js', 'Omeka'), 'text/javascript', ['defer' => 'defer'])
-                ->appendFile($assetUrl('js/advanced-search-plus.js', 'AdvancedSearchPlus'), 'text/javascript', ['defer' => 'defer']);
+                ->appendFile($assetUrl('js/advanced-search-plus.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
         }
 
         $query = $event->getParam('query', []);

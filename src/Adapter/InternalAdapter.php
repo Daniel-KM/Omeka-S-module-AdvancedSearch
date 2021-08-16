@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Search\Adapter;
+namespace AdvancedSearch\Adapter;
 
-use Search\Api\Representation\SearchIndexRepresentation;
+use AdvancedSearch\Api\Representation\SearchIndexRepresentation;
 
 class InternalAdapter extends AbstractAdapter
 {

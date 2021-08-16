@@ -1,15 +1,15 @@
 <?php declare(strict_types=1);
 
-namespace Search\Mvc\Controller\Plugin;
+namespace AdvancedSearch\Mvc\Controller\Plugin;
 
 use Laminas\EventManager\Event;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Stdlib\Message;
 use Omeka\Stdlib\Paginator;
-use Search\Api\Representation\SearchIndexRepresentation;
-use Search\Api\Representation\SearchPageRepresentation;
-use Search\Querier\Exception\QuerierException;
+use AdvancedSearch\Api\Representation\SearchIndexRepresentation;
+use AdvancedSearch\Api\Representation\SearchPageRepresentation;
+use AdvancedSearch\Querier\Exception\QuerierException;
 
 /**
  * FIXME Remove or simplify this class or use it to convert the query directly to a omeka (or sql) or a solarium query.

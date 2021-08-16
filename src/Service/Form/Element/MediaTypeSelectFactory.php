@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
-namespace AdvancedSearchPlus\Service\Form\Element;
+namespace AdvancedSearch\Service\Form\Element;
 
-use AdvancedSearchPlus\Form\Element\MediaTypeSelect;
+use AdvancedSearch\Form\Element\MediaTypeSelect;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 

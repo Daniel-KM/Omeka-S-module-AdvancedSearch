@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
-namespace AdvancedSearchPlus\View\Helper;
+namespace AdvancedSearch\View\Helper;
 
-use AdvancedSearchPlus\Form\Element\MediaTypeSelect as Select;
+use AdvancedSearch\Form\Element\MediaTypeSelect as Select;
 use Laminas\Form\Factory;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Laminas\View\Helper\AbstractHelper;

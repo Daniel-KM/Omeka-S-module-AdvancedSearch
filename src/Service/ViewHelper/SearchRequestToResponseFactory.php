@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
-namespace Search\Service\ViewHelper;
+namespace AdvancedSearch\Service\ViewHelper;
 
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
-use Search\View\Helper\SearchRequestToResponse;
+use AdvancedSearch\View\Helper\SearchRequestToResponse;
 
 class SearchRequestToResponseFactory implements FactoryInterface
 {

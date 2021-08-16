@@ -28,10 +28,10 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\Adapter;
+namespace AdvancedSearch\Adapter;
 
 use Laminas\ServiceManager\ServiceLocatorInterface;
-use Search\Api\Representation\SearchIndexRepresentation;
+use AdvancedSearch\Api\Representation\SearchIndexRepresentation;
 
 interface AdapterInterface
 {

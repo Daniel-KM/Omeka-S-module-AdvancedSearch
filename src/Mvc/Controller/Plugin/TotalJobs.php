@@ -1,5 +1,5 @@
 <?php declare(strict_types=1);
-namespace Search\Mvc\Controller\Plugin;
+namespace AdvancedSearch\Mvc\Controller\Plugin;
 
 use Doctrine\ORM\EntityManager;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;

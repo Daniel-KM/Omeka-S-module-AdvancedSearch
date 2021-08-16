@@ -27,11 +27,11 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\Service\Form;
+namespace AdvancedSearch\Service\Form;
 
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
-use Search\Form\MainSearchForm;
+use AdvancedSearch\Form\MainSearchForm;
 
 class MainSearchFormFactory implements FactoryInterface
 {

@@ -28,7 +28,7 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\Entity;
+namespace AdvancedSearch\Entity;
 
 use DateTime;
 use Doctrine\ORM\Event\LifecycleEventArgs;

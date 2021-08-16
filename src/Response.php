@@ -28,7 +28,7 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search;
+namespace AdvancedSearch;
 
 class Response implements \JsonSerializable
 {

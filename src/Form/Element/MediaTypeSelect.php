@@ -1,5 +1,5 @@
 <?php declare(strict_types=1);
-namespace AdvancedSearchPlus\Form\Element;
+namespace AdvancedSearch\Form\Element;
 
 use Laminas\Form\Element\Select;
 

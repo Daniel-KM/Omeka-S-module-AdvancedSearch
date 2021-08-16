@@ -28,17 +28,17 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\Controller;
+namespace AdvancedSearch\Controller;
 
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Stdlib\Message;
-use Search\Api\Representation\SearchPageRepresentation;
-use Search\Querier\Exception\QuerierException;
-use Search\Query;
-use Search\Response;
+use AdvancedSearch\Api\Representation\SearchPageRepresentation;
+use AdvancedSearch\Querier\Exception\QuerierException;
+use AdvancedSearch\Query;
+use AdvancedSearch\Response;
 
 class IndexController extends AbstractActionController
 {

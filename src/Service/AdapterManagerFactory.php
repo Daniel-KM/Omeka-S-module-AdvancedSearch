@@ -27,10 +27,10 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\Service;
+namespace AdvancedSearch\Service;
 
 use Laminas\Mvc\Service\AbstractPluginManagerFactory;
-use Search\Adapter\Manager;
+use AdvancedSearch\Adapter\Manager;
 
 class AdapterManagerFactory extends AbstractPluginManagerFactory
 {

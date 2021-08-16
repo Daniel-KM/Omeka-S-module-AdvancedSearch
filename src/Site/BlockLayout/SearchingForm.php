@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Search\Site\BlockLayout;
+namespace AdvancedSearch\Site\BlockLayout;
 
 use Laminas\View\Renderer\PhpRenderer;
 use Omeka\Api\Representation\SitePageBlockRepresentation;
@@ -9,8 +9,8 @@ use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Entity\SitePageBlock;
 use Omeka\Site\BlockLayout\AbstractBlockLayout;
 use Omeka\Stdlib\ErrorStore;
-use Search\Api\Representation\SearchPageRepresentation;
-use Search\Response;
+use AdvancedSearch\Api\Representation\SearchPageRepresentation;
+use AdvancedSearch\Response;
 
 class SearchingForm extends AbstractBlockLayout
 {

@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Search\View\Helper;
+namespace AdvancedSearch\View\Helper;
 
 use Laminas\Form\Form;
 use Laminas\View\Helper\AbstractHelper;
-use Search\Api\Representation\SearchPageRepresentation;
+use AdvancedSearch\Api\Representation\SearchPageRepresentation;
 
 class SearchForm extends AbstractHelper
 {

@@ -1,5 +1,5 @@
 <?php declare(strict_types=1);
-namespace Search\View\Helper;
+namespace AdvancedSearch\View\Helper;
 
 use Laminas\View\Helper\AbstractHelper;
 

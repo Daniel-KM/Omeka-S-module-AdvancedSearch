@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace AdvancedSearchPlus\Service\ViewHelper;
+namespace AdvancedSearch\Service\ViewHelper;
 
-use AdvancedSearchPlus\View\Helper\MediaTypeSelect;
+use AdvancedSearch\View\Helper\MediaTypeSelect;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 

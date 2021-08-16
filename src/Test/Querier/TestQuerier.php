@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Search\Test\Querier;
+namespace AdvancedSearch\Test\Querier;
 
-use Search\Querier\AbstractQuerier;
-use Search\Query;
-use Search\Response;
+use AdvancedSearch\Querier\AbstractQuerier;
+use AdvancedSearch\Query;
+use AdvancedSearch\Response;
 
 class TestQuerier extends AbstractQuerier
 {

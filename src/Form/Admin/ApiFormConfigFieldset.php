@@ -1,12 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace Search\Form\Admin;
+namespace AdvancedSearch\Form\Admin;
 
 use Doctrine\DBAL\Connection;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Omeka\Form\Element\ArrayTextarea;
-use Search\Form\Element\OptionalSelect;
+use AdvancedSearch\Form\Element\OptionalSelect;
 
 class ApiFormConfigFieldset extends Fieldset
 {

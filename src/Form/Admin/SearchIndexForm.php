@@ -28,7 +28,7 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\Form\Admin;
+namespace AdvancedSearch\Form\Admin;
 
 use Laminas\Form\Element;
 use Laminas\Form\Form;

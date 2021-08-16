@@ -27,7 +27,7 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\FormAdapter;
+namespace AdvancedSearch\FormAdapter;
 
 class MainFormAdapter extends AbstractFormAdapter implements FormAdapterInterface
 {

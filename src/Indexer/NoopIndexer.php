@@ -1,12 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace Search\Indexer;
+namespace AdvancedSearch\Indexer;
 
 use Laminas\Log\LoggerAwareTrait;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Omeka\Entity\Resource;
-use Search\Api\Representation\SearchIndexRepresentation;
-use Search\Query;
+use AdvancedSearch\Api\Representation\SearchIndexRepresentation;
+use AdvancedSearch\Query;
 
 class NoopIndexer implements IndexerInterface
 {

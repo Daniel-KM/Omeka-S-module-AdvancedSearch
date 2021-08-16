@@ -27,7 +27,7 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\Feature;
+namespace AdvancedSearch\Feature;
 
 interface AdapterProviderInterface
 {

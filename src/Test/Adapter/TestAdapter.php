@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Search\Test\Adapter;
+namespace AdvancedSearch\Test\Adapter;
 
 use Laminas\Form\Fieldset;
-use Search\Adapter\AbstractAdapter;
+use AdvancedSearch\Adapter\AbstractAdapter;
 
 class TestAdapter extends AbstractAdapter
 {

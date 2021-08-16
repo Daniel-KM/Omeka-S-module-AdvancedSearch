@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Search\Indexer;
+namespace AdvancedSearch\Indexer;
 
 class InternalIndexer extends NoopIndexer
 {

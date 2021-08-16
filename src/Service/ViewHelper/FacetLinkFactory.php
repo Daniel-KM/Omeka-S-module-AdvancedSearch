@@ -28,11 +28,11 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace Search\Service\ViewHelper;
+namespace AdvancedSearch\Service\ViewHelper;
 
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
-use Search\View\Helper\FacetLink;
+use AdvancedSearch\View\Helper\FacetLink;
 
 class FacetLinkFactory implements FactoryInterface
 {

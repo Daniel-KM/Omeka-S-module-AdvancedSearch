@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace SearchTest\Controller;
+namespace AdvancedSearchTest\Controller;
 
 require_once __DIR__ . '/SearchControllerTestCase.php';
 

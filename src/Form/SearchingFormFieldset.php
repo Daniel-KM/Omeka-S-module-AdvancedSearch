@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Search\Form;
+namespace AdvancedSearch\Form;
 
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;

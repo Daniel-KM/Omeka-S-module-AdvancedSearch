@@ -2,7 +2,7 @@
 
 namespace AdvancedSearch\Api;
 
-// use Search\Mvc\Controller\Plugin\ApiSearch;
+// use AdvancedSearch\Mvc\Controller\Plugin\ApiSearch;
 use Laminas\Mvc\Controller\PluginManager as ControllerPluginManager;
 
 /**
@@ -18,7 +18,7 @@ class ManagerDelegator extends \Omeka\Api\Manager
     /**
      * @var bool
      */
-    protected $hasAdvancedSearchPlus;
+    protected $hasAdvancedSearch;
 
     /**
      * Execute a search API request with an option to do a quick search.
@@ -48,7 +48,7 @@ class ManagerDelegator extends \Omeka\Api\Manager
         }
 
         if (empty($options['index']) && empty($data['index'])) {
-            // @see \AdvancedSearchPlus\Api\ManagerDelegator::search()
+            // @see \AdvancedSearch\Api\ManagerDelegator::search()
             // Use the standard process when possible.
             if (array_key_exists('initialize', $options)
                 && !$options['initialize']

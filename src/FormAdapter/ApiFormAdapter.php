@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Search\FormAdapter;
+namespace AdvancedSearch\FormAdapter;
 
 use Doctrine\DBAL\Connection;
-use Search\Query;
+use AdvancedSearch\Query;
 
 /**
  * Simulate an api search with the module search.

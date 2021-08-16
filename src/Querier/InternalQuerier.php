@@ -164,6 +164,14 @@ class InternalQuerier extends AbstractQuerier
             $sqlFields = '';
         }
 
+        // FIXME The sql for site doesn't manage site item sets.
+        $site = $this->query->getSiteId();
+        if ($site) {
+            $sqlSite = 'JOIN `item_site` ON `item_site`.`item_id` = `resource`.`id` AND `item_site`.`site_id` = ' . $site;
+        } else {
+            $sqlSite = '';
+        }
+
         $mode = $this->query->getSuggestOptions()['mode'] === 'contain' ? 'contain' : 'start';
         if ($mode === 'contain') {
             // $bind['value'] = $q;
@@ -192,6 +200,7 @@ SELECT DISTINCT
     ), 1, :length)) as "data"
 FROM `value` AS `value`
 INNER JOIN `resource` ON `resource`.`id` = `value`.`resource_id`
+$sqlSite
 WHERE `resource`.`resource_type` IN ("Omeka\\Entity\\Item", "Omeka\\Entity\\ItemSet")
     AND `value`.`value` LIKE :value_like
 GROUP BY SUBSTRING(SUBSTRING_INDEX(
@@ -224,6 +233,7 @@ SELECT DISTINCT
     ) AS "data"
 FROM `value` AS `value`
 INNER JOIN `resource` ON `resource`.`id` = `value`.`resource_id`
+$sqlSite
 WHERE `resource`.`resource_type` IN ($inClasses)
     $sqlIsPublic
     $sqlFields

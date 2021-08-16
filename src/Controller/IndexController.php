@@ -385,7 +385,7 @@ class IndexController extends AbstractActionController
                 'sort_by' => null,
                 'sort_order' => null,
                 // Used by Search.
-                'resource-type' => null,
+                'resource_type' => null,
                 'sort' => null,
             ]
         );

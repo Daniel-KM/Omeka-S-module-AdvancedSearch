@@ -71,6 +71,11 @@ class Query implements \JsonSerializable
     /**
      * @var int
      */
+    protected $page = 0;
+
+    /**
+     * @var int
+     */
     protected $offset = 0;
 
     /**
@@ -228,6 +233,20 @@ class Query implements \JsonSerializable
         return $this->sort;
     }
 
+    public function getPage(): int
+    {
+        return $this->page;
+    }
+
+    /**
+     * Alias of getLimit().
+     * @uses self::getLimit()
+     */
+    public function getPerPage(): int
+    {
+        return $this->limit;
+    }
+
     public function getOffset(): int
     {
         return $this->offset;
@@ -238,12 +257,19 @@ class Query implements \JsonSerializable
         return $this->limit;
     }
 
-    public function setLimitPage(?int $searchConfig, ?int $rowCount): self
+    public function setLimitPage(?int $page, ?int $rowCount): self
     {
-        $searchConfig = ($searchConfig > 0) ? $searchConfig : 1;
-        $rowCount = ($rowCount > 0) ? $rowCount : 1;
-        $this->limit = (int) $rowCount;
-        $this->offset = (int) $rowCount * ($searchConfig - 1);
+        $this->page = $page > 0 ? $page : 1;
+        $this->limit = $rowCount > 0 ? $rowCount : 1;
+        $this->offset = $this->limit * ($this->page - 1);
+        return $this;
+    }
+
+    public function setLimitOffset(?int $offset, ?int $rowCount): self
+    {
+        $this->offset = $offset >= 0 ? (int) $offset : 0;
+        $this->limit = $rowCount > 0 ? $rowCount : 1;
+        $this->page = (int) floor($this->offset -1 / $this->limit);
         return $this;
     }
 
@@ -374,6 +400,7 @@ class Query implements \JsonSerializable
             'date_range_filters' => $this->getDateRangeFilters(),
             'filter_queries' => $this->getFilterQueries(),
             'sort' => $this->getSort(),
+            'page' => $this->getPage(),
             'offset' => $this->getOffset(),
             'limit' => $this->getLimit(),
             'facet_fields' => $this->getFacetFields(),

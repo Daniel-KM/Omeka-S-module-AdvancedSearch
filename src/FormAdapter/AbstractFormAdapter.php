@@ -80,6 +80,14 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
             return true;
         };
 
+        $page = null;
+        $perPage = null;
+        $limit = null;
+        $offset = null;
+        $sort = null;
+        $sortBy = null;
+        $sortOrder = null;
+
         foreach ($request as $name => $value) {
             if ($value === '' || $value === [] || $value === null) {
                 continue;
@@ -88,6 +96,13 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                 case 'q':
                     $query->setQuery($request['q']);
                     continue 2;
+
+                case 'resource_type':
+                    if (!is_array($value)) {
+                        $value = [$value];
+                    }
+                    $query->setResources($value);
+                    break;
 
                 case 'is_public':
                     if (is_string($value) && strlen($value)) {
@@ -191,6 +206,41 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                 // Standard field, generally a property or an alias/multifield.
                 // The fields cannot be repeated for now: use an alias if needed.
                 // The availability is not checked here, but by the search engine.
+
+                case 'page':
+                    $page = (int) $value ?: null;
+                    break;
+                case 'per_page':
+                    $perPage = (int) $value ?: null;
+                    break;
+                case 'limit':
+                    $limit = (int) $value ?: null;
+                    break;
+                case 'offset':
+                    $offset = (int) $value ?: null;
+                    break;
+
+                case 'sort':
+                    $sort = $value;
+                    break;
+                case 'sort_by':
+                    $sortBy = $value;
+                    break;
+                case 'sort_order':
+                    $sortOrder = $value;
+                    break;
+
+                case 'facet':
+                    if (!is_array($value)) {
+                        continue 2;
+                    }
+                    foreach ($value as $facetName => $facetValues) {
+                        foreach ($facetValues as $facetValue) {
+                            $query->addActiveFacet($facetName, $facetValue);
+                        }
+                    }
+                    break;
+
                 default:
                     if (is_string($value)
                         || $isSimpleList($value)
@@ -222,6 +272,21 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                     }
                     continue 2;
             }
+        }
+
+        if ($page || empty($offset)) {
+            $page = $page ?? 1;
+            $perPage = $perPage ?? $limit ?? $formSettings['per_page'] ?? \Omeka\Stdlib\Paginator::PER_PAGE;
+            $query->setLimitPage($page, $perPage);
+        } else {
+            $limit = $limit ?? $perPage ?? $formSettings['per_page'] ?? \Omeka\Stdlib\Paginator::PER_PAGE;
+            $query->setLimitOffset($offset, $perPage);
+        }
+
+        if ($sort) {
+            $query->setSort($sort);
+        } elseif ($sortBy) {
+            $query->setSort($sortBy . ($sortOrder ? ' ' . $sortOrder: ''));
         }
 
         return $query;

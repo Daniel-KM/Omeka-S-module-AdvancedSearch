@@ -66,8 +66,22 @@ class SearchRequestToResponse extends AbstractPlugin
         }
 
         $searchFormSettings = $searchConfigSettings['form'] ?? [];
+
+        // TODO Copy the option for per page in the search config form (keeping the default).
+        // TODO Add a max per_page.
+        if ($site) {
+            $siteSettings = $plugins->get('siteSettings')();
+            $settings = $plugins->get('settings')();
+            $perPage = (int) $siteSettings->get('pagination_per_page')
+                ?: (int) $settings->get('pagination_per_page', Paginator::PER_PAGE);
+        } else {
+            $settings = $plugins->get('settings')();
+            $perPage = (int) $settings->get('pagination_per_page', Paginator::PER_PAGE);
+        }
+
         // Fix to be removed.
         $searchFormSettings['resource_fields'] = $searchConfigSettings['resource_fields'] ?? [];
+        $searchFormSettings['search']['per_page'] = $perPage ?: Paginator::PER_PAGE;
 
         /** @var \AdvancedSearch\Query $query */
         $query = $formAdapter->toQuery($request, $searchFormSettings);
@@ -95,42 +109,31 @@ class SearchRequestToResponse extends AbstractPlugin
             $query->setSiteId($site->id());
         }
 
-        if (array_key_exists('resource-type', $request)) {
-            $resourceType = $request['resource-type'];
-            if (!is_array($resourceType)) {
-                $resourceType = [$resourceType];
-            }
-            $query->setResources($resourceType);
+        // Check resources.
+        $resourceTypes = $query->getResources();
+        if ($resourceTypes) {
+            $resourceTypes = array_intersect($engineSettings['resources']) + $engineSettings['resources'];
+            $query->setResources($resourceTypes);
         } else {
             $query->setResources($engineSettings['resources']);
         }
 
+        // Check sort.
         // Don't sort if it's already managed by the form, like the api form.
-        $sortOptions = $this->getSortOptions();
+        // TODO Previously: don't sort if it's already managed by the form, like the api form.
         $sort = $query->getSort();
-        if (!is_null($sort)) {
-            if (isset($request['sort']) && isset($sortOptions[$request['sort']])) {
-                $sort = $request['sort'];
-            } else {
+        $sortOptions = $this->getSortOptions();
+        if ($sort) {
+            if (!isset($sortOptions[$request['sort']])) {
                 reset($sortOptions);
                 $sort = key($sortOptions);
+                $query->setSort($sort);
             }
+        } else {
+            reset($sortOptions);
+            $sort = key($sortOptions);
             $query->setSort($sort);
         }
-
-        // Note: the global limit is managed via the pagination.
-        $searchConfigNumber = isset($request['page']) && $request['page'] > 0 ? (int) $request['page'] : 1;
-        if (isset($request['per_page']) && $request['per_page'] > 0) {
-            $perPage = (int) $request['per_page'];
-        } elseif ($site) {
-            $siteSettings = $plugins->get('siteSettings')();
-            $settings = $plugins->get('settings')();
-            $perPage = (int) $siteSettings->get('pagination_per_page') ?: (int) $settings->get('pagination_per_page', Paginator::PER_PAGE);
-        } else {
-            $settings = $plugins->get('settings')();
-            $perPage = (int) $settings->get('pagination_per_page', Paginator::PER_PAGE);
-        }
-        $query->setLimitPage($searchConfigNumber, $perPage);
 
         $hasFacets = !empty($searchConfigSettings['facet']['facets']);
         if ($hasFacets) {
@@ -146,15 +149,6 @@ class SearchRequestToResponse extends AbstractPlugin
             if (!empty($searchConfigSettings['facet']['languages'])) {
                 $query->setFacetLanguages($searchConfigSettings['facet']['languages']);
             }
-
-            // Set the request for active facets.
-            if (!empty($request['facet']) && is_array($request['facet'])) {
-                foreach ($request['facet'] as $name => $values) {
-                    foreach ($values as $value) {
-                        $query->addActiveFacet($name, $value);
-                    }
-                }
-            }
         }
 
         $eventManager = $services->get('Application')->getEventManager();
@@ -163,6 +157,7 @@ class SearchRequestToResponse extends AbstractPlugin
             'query' => $query,
         ]);
         $eventManager->triggerEvent(new Event('search.query.pre', $searchConfig, $eventArgs));
+        /** @var \AdvancedSearch\Query $query */
         $query = $eventArgs['query'];
 
         // Send the query to the search engine.
@@ -174,7 +169,7 @@ class SearchRequestToResponse extends AbstractPlugin
         try {
             $response = $querier->query();
         } catch (QuerierException $e) {
-            $message = new Message("Query error: %s\nQuery:%s", $e->getMessage(), json_encode($query->jsonSerialize(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)); // @translate
+            $message = new Message("Query error: %s\nQuery: %s", $e->getMessage(), json_encode($query->jsonSerialize(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)); // @translate
             $plugins->get('logger')()->err($message);
             return [
                 'status' => 'error',
@@ -192,7 +187,7 @@ class SearchRequestToResponse extends AbstractPlugin
         $totalResults = array_map(function ($resource) use ($response) {
             return $response->getResourceTotalResults($resource);
         }, $engineSettings['resources']);
-        $plugins->get('paginator')(max($totalResults), $searchConfigNumber);
+        $plugins->get('paginator')(max($totalResults), $query->getPage() ?: 1);
 
         return [
             'status' => 'success',
@@ -233,7 +228,7 @@ class SearchRequestToResponse extends AbstractPlugin
                 'sort_by' => null,
                 'sort_order' => null,
                 // Used by Search.
-                'resource-type' => null,
+                'resource_type' => null,
                 'sort' => null,
             ]
         );

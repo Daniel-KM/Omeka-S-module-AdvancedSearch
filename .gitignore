@@ -6,9 +6,11 @@
 /language/chef.mo
 /node_modules
 /vendor
+/test/.phpunit.result.cache
 .sass-cache/
 .bundle
 .DS_Store
 .php_cs.cache
+.phpunit.result.cache
 composer.phar
 debug.log

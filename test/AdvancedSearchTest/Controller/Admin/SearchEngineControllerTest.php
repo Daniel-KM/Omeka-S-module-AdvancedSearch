@@ -8,7 +8,7 @@ use AdvancedSearch\Form\Admin\SearchEngineConfigureForm;
 use Omeka\Mvc\Controller\Plugin\Messenger;
 use Omeka\Stdlib\Message;
 
-class SearchEngineControllerTest extends SearchControllerTestCase
+class SearchEngineControllerTest extends \AdvancedSearchTest\Controller\SearchControllerTestCase
 {
     public function testAddGetAction(): void
     {

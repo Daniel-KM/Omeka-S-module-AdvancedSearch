@@ -711,6 +711,14 @@ class Module extends AbstractModule
             $filters[$translate('Visibility')][] = $value;
         }
 
+        if (isset($query['resource_class_term'])) {
+            $value = $query['resource_class_term'];
+            if ($value) {
+                $filterLabel = $translate('Class'); // @translate
+                $filters[$filterLabel][] = $value;
+            }
+        }
+
         if (isset($query['has_media'])) {
             $value = $query['has_media'];
             if ($value) {

@@ -25,6 +25,20 @@ class SearchPropertiesListener
     protected $usedPropertiesByTerm;
 
     /**
+     * List of resource class ids by term and id.
+     *
+     * @var array
+     */
+    protected $resourceClassesByTermsAndIds;
+
+    /**
+     * List of used resource class ids by term and id.
+     *
+     * @var array
+     */
+    protected $usedResourceClassesByTerm;
+
+    /**
      * The adapter that is requesting.
      *
      * @var \Omeka\Api\Adapter\AbstractResourceEntityAdapter
@@ -54,6 +68,7 @@ class SearchPropertiesListener
         }
 
         // Process advanced search plus keys.
+        $this->searchResourceClassTerm($qb, $query);
         $this->searchDateTime($qb, $query);
         $this->buildPropertyQuery($qb, $query);
         if ($this->adapter instanceof ItemAdapter) {
@@ -147,6 +162,31 @@ class SearchPropertiesListener
         }
 
         return $query;
+    }
+
+    /**
+     * Allow to search a resource by a class term.
+     */
+    protected function searchResourceClassTerm(QueryBuilder $qb, array $query): void
+    {
+        if (empty($query['resource_class_term'])) {
+            return;
+        }
+
+        $classes = is_array($query['resource_class_term'])
+            ? $query['resource_class_term']
+            : [$query['resource_class_term']];
+
+        // When there is only one class and it is fake, no result should be
+        // returned, so 0 should be used.
+        $classIds = count($classes) <= 1
+            ? [(int) $this->getResourceClassId(reset($classes))]
+            : $this->getResourceClassIds($classes);
+
+        $qb->andWhere($qb->expr()->in(
+            'omeka_root.resourceClass',
+            $this->adapter->createNamedParameter($qb, $classIds)
+        ));
     }
 
     /**
@@ -1037,9 +1077,7 @@ class SearchPropertiesListener
     }
 
     /**
-     * Get property ids by JSON-LD terms or by numeric ids.
-     *
-     * @return int
+     * Get a property id by JSON-LD term or by numeric id.
      */
     protected function getPropertyId($termOrId): ?int
     {
@@ -1052,7 +1090,7 @@ class SearchPropertiesListener
     /**
      * Prepare the list of properties and used properties.
      */
-    protected function prepareProperties(): void
+    protected function prepareProperties(): self
     {
         if (is_null($this->propertiesByTermsAndIds)) {
             $connection = $this->adapter->getServiceLocator()->get('Omeka\Connection');
@@ -1083,6 +1121,69 @@ class SearchPropertiesListener
             // Fetch by key pair is not supported by doctrine 2.0.
             $properties = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             $this->usedPropertiesByTerm = array_map('intval', array_column($properties, 'id', 'term'));
+        }
+        return $this;
+    }
+
+    /**
+     * Get resource class ids by JSON-LD terms or by numeric ids.
+     *
+     * @return int[]
+     */
+    protected function getResourceClassIds(array $termOrIds): array
+    {
+        if (is_null($this->resourceClassesByTermsAndIds)) {
+            $this->prepareResourceClasses();
+        }
+        return array_values(array_intersect_key($this->resourceClassesByTermsAndIds, array_flip($termOrIds)));
+    }
+
+    /**
+     * Get resource class id by JSON-LD term or by numeric id.
+     */
+    protected function getResourceClassId($termOrId): ?int
+    {
+        if (is_null($this->resourceClassesByTermsAndIds)) {
+            $this->prepareResourceClasses();
+        }
+        return $this->resourceClassesByTermsAndIds[$termOrId] ?? null;
+    }
+
+    /**
+     * Prepare the list of resource classes and used properties.
+     */
+    protected function prepareResourceClasses(): self
+    {
+        if (is_null($this->propertiesByTermsAndIds)) {
+            $connection = $this->adapter->getServiceLocator()->get('Omeka\Connection');
+            $qb = $connection->createQueryBuilder();
+            $qb
+                ->select([
+                    'DISTINCT resource_class.id AS id',
+                    'CONCAT(vocabulary.prefix, ":", resource_class.local_name) AS term',
+                    // Only the two first selects are needed, but some databases
+                    // require "order by" or "group by" value to be in the select.
+                    'vocabulary.id',
+                    'resource_class.id',
+                ])
+                ->from('resource_class', 'resource_class')
+                ->innerJoin('resource_class', 'vocabulary', 'vocabulary', 'resource_class.vocabulary_id = vocabulary.id')
+                ->orderBy('vocabulary.id', 'asc')
+                ->addOrderBy('resource_class.id', 'asc')
+                ->addGroupBy('resource_class.id')
+            ;
+            $stmt = $connection->executeQuery($qb);
+            // Fetch by key pair is not supported by doctrine 2.0.
+            $resourceClasses = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $resourceClasses = array_map('intval', array_column($resourceClasses, 'id', 'term'));
+            $this->tesourceClassesByTermsAndIds = array_replace($resourceClasses, array_combine($resourceClasses, $resourceClasses));
+
+            // $qb->innerJoin('resource_class', 'resource', 'resource', 'resource_class.id = resource.resource_class_id');
+            // $stmt = $connection->executeQuery($qb);
+            // // Fetch by key pair is not supported by doctrine 2.0.
+            // $resourceClasses = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            // $this->usedResourceClassesByTerm = array_map('intval', array_column($resourceClasses, 'id', 'term'));
+            return $this;
         }
     }
 }

@@ -7,6 +7,7 @@ return [
         'invokables' => [
             'search_configs' => Api\Adapter\SearchConfigAdapter::class,
             'search_engines' => Api\Adapter\SearchEngineAdapter::class,
+            'search_suggesters' => Api\Adapter\SearchSuggesterAdapter::class,
         ],
     ],
     'entity_manager' => [

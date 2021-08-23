@@ -90,7 +90,6 @@ class SearchSuggester extends AbstractEntity
 
     public function __construct()
     {
-        parent::__construct();
         $this->suggests = new ArrayCollection;
     }
 

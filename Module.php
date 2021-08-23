@@ -220,7 +220,7 @@ class Module extends AbstractModule
             [$this, 'addHeaders']
         );
 
-        /**
+        /*
          * The listener is stored because it is uses for each adapter and in the
          * method "filterSearchFilters()".
          */

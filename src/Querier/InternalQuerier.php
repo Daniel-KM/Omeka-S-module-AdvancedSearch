@@ -273,7 +273,7 @@ SQL;
             // removed to avoid some strange results.
             // The group by uses the same than the select, because suggester
             // requires "value".
-/*
+            /*
             $sql = <<<SQL
 SELECT DISTINCT
     SUBSTRING(SUBSTRING_INDEX(

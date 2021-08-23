@@ -480,7 +480,7 @@ class SearchResourcesListener
             } else {
                 $where .= " AND $whereClause";
             }
-       }
+        }
 
         if ($where) {
             $qb->andWhere($where);

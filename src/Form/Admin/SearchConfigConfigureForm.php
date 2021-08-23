@@ -285,8 +285,8 @@ class SearchConfigConfigureForm extends Form
                         'options',
                     ],
                     'data_array_keys' => [
-                        'options' => '|'
-                    ]
+                        'options' => '|',
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'filters',

@@ -29,8 +29,6 @@
  */
 namespace AdvancedSearch;
 
-use Omeka\Api\Representation\SiteRepresentation;
-
 class Query implements \JsonSerializable
 {
     /**
@@ -275,7 +273,7 @@ class Query implements \JsonSerializable
     {
         $this->offset = $offset >= 0 ? (int) $offset : 0;
         $this->limit = $rowCount > 0 ? $rowCount : 1;
-        $this->page = (int) floor($this->offset -1 / $this->limit);
+        $this->page = (int) floor($this->offset - 1 / $this->limit);
         return $this;
     }
 

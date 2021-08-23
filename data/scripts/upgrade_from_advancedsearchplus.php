@@ -25,7 +25,6 @@ $messenger = new Messenger();
 
 // Convert the settings.
 
-
 $sql = <<<'SQL'
 REPLACE INTO `setting` (`id`, `value`)
 SELECT

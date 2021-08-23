@@ -173,15 +173,16 @@ class SearchPropertiesListener
             return;
         }
 
-        $classes = is_array($query['resource_class_term'])
-            ? $query['resource_class_term']
-            : [$query['resource_class_term']];
-
-        // When there is only one class and it is fake, no result should be
-        // returned, so 0 should be used.
-        $classIds = count($classes) <= 1
-            ? [(int) $this->getResourceClassId(reset($classes))]
-            : $this->getResourceClassIds($classes);
+        // When there are only fake classes, no result should be returned, so 0
+        // should be used.
+        if (is_array($query['resource_class_term'])) {
+            $classIds = $this->getResourceClassIds($query['resource_class_term']);
+            if (empty($classIds)) {
+                $classIds = [0];
+            }
+        } else {
+            $classIds = [(int) $this->getResourceClassId($query['resource_class_term'])];
+        }
 
         $qb->andWhere($qb->expr()->in(
             'omeka_root.resourceClass',
@@ -438,13 +439,12 @@ class SearchPropertiesListener
             }
 
             $joinConditions = [];
-            // Narrow to specific property, if one is selected
-            if ($propertyId) {
-                $joinConditions[] = $expr->eq("$valuesAlias.property", $propertyId);
+            // Narrow to specific property, if one is selected.
+            // The check is done against the requested property, like in core.
+            if ($queryRow['property']) {
+                $joinConditions[] = $expr->eq("$valuesAlias.property", (int) $propertyId);
             } elseif ($excludePropertyIds) {
-                $excludePropertyIds = is_array($excludePropertyIds)
-                    ? $this->getPropertyIds($excludePropertyIds)
-                    : array_filter([$this->getPropertyId($excludePropertyIds)]);
+                $excludePropertyIds = $this->getPropertyIds(is_array($excludePropertyIds) ? $excludePropertyIds : [$excludePropertyIds]);
                 // Use standard query if nothing to exclude, else limit search.
                 if (count($excludePropertyIds)) {
                     // The aim is to search anywhere except ocr content.

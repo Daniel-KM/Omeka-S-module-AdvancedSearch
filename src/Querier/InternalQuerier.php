@@ -109,12 +109,65 @@ class InternalQuerier extends AbstractQuerier
                 ->setMessage('An issue occurred.'); // @translate
         }
 
-        if (!empty($this->query->getSuggestOptions()['direct'])) {
+        $suggestOptions = $this->query->getSuggestOptions();
+        if (!empty($suggestOptions['direct'])) {
             return $this->querySuggestionsDirect();
         }
 
+        // TODO Manage site id and item set id and any other filter query.
+        // TODO Use the index full text?
+        // TODO Manage site here?
+
+        // The mode, resource types, fields, and length are managed during
+        // indexation.
+
+        $suggester = (int) ($suggestOptions['suggester'] ?? 0);
+        if (empty($suggester)) {
+            return $this->response
+                ->setMessage('An issue occurred for the suggester.'); // @translate
+        }
+
+        $isPublic = $this->query->getIsPublic();
+        $column = $isPublic ? 'public' : 'all';
+
+        /** @var \Doctrine\DBAL\Connection $connection */
+        $connection = $this->getServiceLocator()->get('Omeka\Connection');
+        $q = $this->query->getQuery();
+        $bind = [
+            'suggester' => $suggester,
+            'limit' => $this->query->getLimit(),
+            'value_like' => str_replace(['%', '_'], ['\%', '\_'], $q) . '%',
+        ];
+        $types = [
+            'suggester' => \PDO::PARAM_INT,
+            'limit' => \PDO::PARAM_INT,
+            'value_like' => \PDO::PARAM_STR,
+        ];
+
+        $sql = <<<SQL
+SELECT DISTINCT
+    `text` AS "value",
+    `total_$column` AS "data"
+FROM `search_suggestion` AS `search_suggestion`
+WHERE `search_suggestion`.`suggester_id` = :suggester
+    AND `search_suggestion`.`text` LIKE :value_like
+ORDER BY data DESC
+LIMIT :limit
+;
+SQL;
+
+        try {
+            $results = $connection
+                ->executeQuery($sql, $bind, $types)
+                ->fetchAll();
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            $this->getServiceLocator()->get('Omeka\Logger')->err($e->getMessage());
+            return $this->response
+                ->setMessage('An internal issue in database occurred.'); // @translate
+        }
         return $this->response
-            ->setMessage('TODO Index query'); // @translate
+            ->setSuggestions($results)
+            ->setIsSuccess(true);
     }
 
     protected function querySuggestionsDirect(): Response
@@ -255,6 +308,7 @@ LIMIT :limit
 ;
 SQL;
             $bind['value_like'] = str_replace(['%', '_'], ['\%', '\_'], $q) . '%';
+            $types['value_like'] = \PDO::PARAM_STR;
         }
 
         try {

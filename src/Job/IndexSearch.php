@@ -39,7 +39,7 @@ class IndexSearch extends AbstractJob
     const BATCH_SIZE = 100;
 
     /**
-     * @var \Omeka\Mvc\Controller\Plugin\Logger
+     * @var \Laminas\Log\Logger
      */
     protected $logger;
 
@@ -62,6 +62,13 @@ class IndexSearch extends AbstractJob
         $api = $services->get('Omeka\ApiManager');
         $settings = $services->get('Omeka\Settings');
         $this->logger = $services->get('Omeka\Logger');
+
+        // The reference id is the job id for now.
+        if (class_exists('Log\Stdlib\PsrMessage')) {
+            $referenceIdProcessor = new \Laminas\Log\Processor\ReferenceId();
+            $referenceIdProcessor->setReferenceId('search/index/job_' . $this->job->getId());
+            $this->logger->addProcessor($referenceIdProcessor);
+        }
 
         $batchSize = (int) $settings->get('advancedsearch_batch_size');
         if ($batchSize <= 0) {
@@ -102,7 +109,6 @@ class IndexSearch extends AbstractJob
                 ));
                 return;
             }
-
             $this->logger->warn(new Message(
                 'There are already %d other jobs "Index Search". Slowdowns may occur on the site.', // @translate
                 $totalJobs - 1
@@ -191,8 +197,11 @@ class IndexSearch extends AbstractJob
         foreach ($resourceNames as $resourceName) {
             $totalResults[] = new Message('%s: %d indexed', $resourceName, $totals[$resourceName]); // @translate
         }
+
+        $timeTotal = (int) (microtime(true) - $timeStart);
+
         $this->logger->info(new Message('Search index #%d ("%s"): end of indexing. %s. Execution time: %s seconds. Failed indexed resources should be checked manually.', // @translate
-            $searchEngine->id(), $searchEngine->name(), implode('; ', $totalResults), (int) (microtime(true) - $timeStart)
+            $searchEngine->id(), $searchEngine->name(), implode('; ', $totalResults), $timeTotal
         ));
     }
 

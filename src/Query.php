@@ -363,6 +363,7 @@ class Query implements \JsonSerializable
 
     /**
      * Available options are (internal engine when direct (without index)):
+     * - suggester: id of the suggester
      * - direct: direct query without the index (default false)
      * - mode: "start" (default) or "contain"
      * - length: max size of a string (default 50)

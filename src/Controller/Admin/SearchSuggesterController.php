@@ -3,6 +3,7 @@
 namespace AdvancedSearch\Controller\Admin;
 
 use AdvancedSearch\Form\Admin\SearchSuggesterForm;
+use AdvancedSearch\Job\IndexSuggestions;
 use Doctrine\ORM\EntityManager;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
@@ -106,7 +107,7 @@ class SearchSuggesterController extends AbstractActionController
     {
         $suggester = $this->api()->read('search_suggesters', $this->params('id'))->getContent();
 
-        $totalJobs = $this->totalJobs(\AdvancedSearch\Job\IndexSuggestions::class, true);
+        $totalJobs = $this->totalJobs(IndexSuggestions::class, true);
 
         $view = new ViewModel([
             'resourceLabel' => 'search suggester',
@@ -120,6 +121,7 @@ class SearchSuggesterController extends AbstractActionController
 
     public function indexAction()
     {
+        /** @var \AdvancedSearch\Api\Representation\SearchSuggesterRepresentation $suggester */
         $suggesterId = (int) $this->params('id');
         $suggester = $this->api()->read('search_suggesters', $suggesterId)->getContent();
 
@@ -128,7 +130,8 @@ class SearchSuggesterController extends AbstractActionController
         $jobArgs = [];
         $jobArgs['search_suggester_id'] = $suggester->id();
         $jobArgs['force'] = $force;
-        $job = $this->jobDispatcher()->dispatch(\AdvancedSearch\Job\IndexSuggestions::class, $jobArgs);
+        $dispatcher = $this->jobDispatcher();
+        $job = $dispatcher->dispatch(IndexSuggestions::class, $jobArgs);
 
         $urlHelper = $this->viewHelpers()->get('url');
         $message = new Message(

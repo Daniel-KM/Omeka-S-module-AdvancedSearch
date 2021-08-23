@@ -113,7 +113,6 @@ class SearchSuggesterForm extends Form
                 'type' => OptionalRadio::class,
                 'options' => [
                     'label' => 'Mode to index values', // @translate
-                    'info' => 'Should be implemented in internal search engine.', // @translate
                     'value_options' => [
                         'start' => 'First words of values', // @translate
                         'contain' => 'Any', // @translate

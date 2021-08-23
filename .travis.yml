@@ -7,9 +7,11 @@ services:
   - mysql
 
 php:
+  - 7.1
   - 7.2
   - 7.3
   - 7.4
+  - 8.0
 
 cache:
   directories:
@@ -22,7 +24,7 @@ before_install:
 install:
   - cd ../..
   - git clone --depth 1 https://github.com/omeka/omeka-s.git
-  - cp -a $(readlink -e $(cd -)) omeka-s/modules/Search
+  - cp -a $(readlink -e $(cd -)) omeka-s/modules/AdvancedSearch
   - cd omeka-s
   - npm install
   - ./node_modules/gulp/bin/gulp.js init
@@ -32,7 +34,7 @@ before_script:
   - sed -i 's/^host.*/host = "localhost"/' application/test/config/database.ini
   - sed -i 's/^user.*/user = "root"/' application/test/config/database.ini
   - sed -i 's/^dbname.*/dbname = "omeka_test"/' application/test/config/database.ini
-  - cd modules/Search
+  - cd modules/AdvancedSearch
   - composer install
   - cd test
 

@@ -8,7 +8,7 @@ use Laminas\EventManager\Event;
 use Omeka\Api\Adapter\ItemAdapter;
 use Omeka\Api\Adapter\MediaAdapter;
 
-class SearchPropertiesListener
+class SearchResourcesListener
 {
     /**
      * List of property ids by term and id.

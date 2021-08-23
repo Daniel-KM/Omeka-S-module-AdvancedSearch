@@ -60,9 +60,9 @@ class Module extends AbstractModule
     protected $isBatchUpdate;
 
     /**
-     * @var Listener\SearchPropertiesListener
+     * @var Listener\SearchResourcesListener
      */
-    protected $searchPropertiesListener;
+    protected $searchResourcesListener;
 
     public function init(ModuleManager $moduleManager): void
     {
@@ -224,7 +224,7 @@ class Module extends AbstractModule
          * The listener is stored because it is uses for each adapter and in the
          * method "filterSearchFilters()".
          */
-        $this->searchPropertiesListener = new Listener\SearchPropertiesListener();
+        $this->searchResourcesListener = new Listener\SearchResourcesListener();
 
         $adapters = [
             \Omeka\Api\Adapter\ItemAdapter::class,
@@ -251,7 +251,7 @@ class Module extends AbstractModule
             $sharedEventManager->attach(
                 $adapter,
                 'api.search.query',
-                [$this->searchPropertiesListener, 'onDispatch'],
+                [$this->searchResourcesListener, 'onDispatch'],
                 // Process before any other module in order to reset query.
                 +100
             );
@@ -671,7 +671,7 @@ class Module extends AbstractModule
         $translate = $view->plugin('translate');
         $filters = $event->getParam('filters');
 
-        $query = $this->searchPropertiesListener->normalizeQueryDateTime($query);
+        $query = $this->searchResourcesListener->normalizeQueryDateTime($query);
         if (!empty($query['datetime'])) {
             $queryTypes = [
                 'gt' => $translate('after'),

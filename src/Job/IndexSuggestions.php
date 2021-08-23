@@ -4,6 +4,7 @@ namespace AdvancedSearch\Job;
 
 use AdvancedSearch\Api\Representation\SearchSuggesterRepresentation;
 use AdvancedSearch\Entity\SearchSuggestion;
+use Doctrine\Common\Collections\Criteria;
 use Omeka\Job\AbstractJob;
 use Omeka\Stdlib\Message;
 
@@ -12,7 +13,12 @@ use Omeka\Stdlib\Message;
  */
 class IndexSuggestions extends AbstractJob
 {
-    const BATCH_SIZE = 100;
+    /**
+     * Limit for the loop to avoid heavy sql requests.
+     *
+     * @var int
+     */
+    const SQL_LIMIT = 1000;
 
     /**
      * @var \Laminas\Log\Logger
@@ -110,28 +116,38 @@ class IndexSuggestions extends AbstractJob
 
         $timeStart = microtime(true);
 
-        $this->logger->info(new Message('Suggester #%d ("%s"): start of indexing', // @translate
-            $suggester->id(), $suggester->name()));
+        $mode = $suggester->setting('mode_index') === 'contain' ? 'contain' : 'start';
 
-        $this->process($suggester);
+        $this->logger->notice(new Message('Suggester #%d ("%s"): start of indexing (index mode: %s)', // @translate
+            $suggester->id(), $suggester->name(), $mode));
+
+        $byValue = (bool) $this->getArg('by_value');
+        if ($byValue) {
+            $this->logger->info(new Message('Suggester #%d ("%s"): processing by value', // @translate
+                $suggester->id(), $suggester->name()
+            ));
+        }
+
+        $this->process($suggester, $byValue);
 
         $timeTotal = (int) (microtime(true) - $timeStart);
 
         $totalResults = $this->entityManager->getRepository(SearchSuggestion::class)->count(['suggester' => $suggester->id()]);
 
-        $this->logger->info(new Message('Suggester #%d ("%s"): end of indexing. %s suggestions indexed. Execution time: %s seconds.', // @translate
+        $this->logger->notice(new Message('Suggester #%d ("%s"): end of indexing. %s suggestions indexed. Execution time: %s seconds.', // @translate
             $suggester->id(), $suggester->name(), $totalResults, $timeTotal
         ));
     }
 
-    protected function process(SearchSuggesterRepresentation $suggester): self
+    protected function process(SearchSuggesterRepresentation $suggester, bool $byValue = false): self
     {
         $dql = 'DELETE FROM AdvancedSearch\Entity\SearchSuggestion s WHERE s.suggester = ' . $suggester->id();
         $query = $this->entityManager->createQuery($dql);
         $totalDeleted = $query->execute();
 
         $this->logger->notice(new Message('Suggester #%d ("%s"): %d suggestions deleted.', // @translate
-            $suggester->id(), $suggester->name(), $totalDeleted));
+            $suggester->id(), $suggester->name(), $totalDeleted
+        ));
 
         $resourceNames = $suggester->engine()->setting('resources', []);
         $mapResources = [
@@ -146,15 +162,23 @@ class IndexSuggestions extends AbstractJob
         $fields = $suggester->setting('fields') ?: [];
 
         $mode = $suggester->setting('mode_index') === 'contain' ? 'contain' : 'start';
-        $mode === 'start'
-            ? $this->processStart($suggester, $resourceNames, $fields)
-            : $this->processContain($suggester, $resourceNames, $fields);
+
+        if ($byValue) {
+            $this->processByValue($suggester, $resourceNames, $fields, $mode);
+        } else {
+            $mode === 'start'
+                ? $this->processStart($suggester, $resourceNames, $fields)
+                : $this->processContain($suggester, $resourceNames, $fields);
+        }
 
         return $this;
     }
 
-    protected function processStart(SearchSuggesterRepresentation $suggester, array $resourceTypes, array $fields): self
-    {
+    protected function processStart(
+        SearchSuggesterRepresentation $suggester,
+        array $resourceTypes,
+        array $fields
+    ): self {
         $bind = [
             'suggester_id' => $suggester->id(),
             'resource_types' => array_values($resourceTypes),
@@ -204,6 +228,7 @@ SELECT
             TRIM("_" FROM
             TRIM("#" FROM
             TRIM("?" FROM
+            TRIM("$" FROM
             # Cleaning replacements.
             TRIM("," FROM
             TRIM(";" FROM
@@ -227,7 +252,7 @@ SELECT
                     " ",
                     $numberWords
                 )
-            ))))))))))))))))))))))))
+            )))))))))))))))))))))))))
         ),
     1, 190)
 FROM `value` AS `value`
@@ -263,8 +288,11 @@ SQL;
         return $this;
     }
 
-    protected function processContain(SearchSuggesterRepresentation $suggester, array $resourceTypes, array $fields): self
-    {
+    protected function processContain(
+        SearchSuggesterRepresentation $suggester,
+        array $resourceTypes,
+        array $fields
+    ): self {
         $bind = [
             'suggester_id' => $suggester->id(),
             'resource_types' => array_values($resourceTypes),
@@ -302,13 +330,14 @@ SQL;
             // Don't "insert ignore and distinct", increment on duplicate.
             $sql .= <<<SQL
 # Create single words index (compute $column).
-# TODO Divide values by 1000 and use a while.
+# TODO Divide values by 1000 and use a loop.
 SET @pr = CONCAT(
     "INSERT INTO `_suggestions_temporary` (`text`) VALUES ('",
     REPLACE(
         (SELECT
             GROUP_CONCAT( DISTINCT
                 TRIM(
+                    REPLACE(
                     REPLACE(
                     REPLACE(
                     REPLACE(
@@ -334,6 +363,7 @@ SET @pr = CONCAT(
                     "_", " "),
                     "#", " "),
                     "?", " "),
+                    "$", " "),
                     # More common separators to avoid too long data.
                     ",", " "),
                     ";", " "),
@@ -414,6 +444,219 @@ DROP TABLE IF EXISTS `_suggestions_temporary`;
 SQL;
 
         $this->connection->executeQuery($sql, $bind, $types);
+
+        return $this;
+    }
+
+    protected function processByValue(
+        SearchSuggesterRepresentation $suggester,
+        array $resourceTypes,
+        array $fields,
+        string $mode
+    ): self {
+        $criteria = new Criteria;
+        $expr = $criteria->expr();
+
+        // Expr is not null does not exist.
+        $criteria
+            ->where($expr->neq('value', null));
+
+        /* // Cannot be added, because criteria does not match not-in memory.
+        if ($resourceTypes) {
+            // in() with string is messy.
+            // https://www.doctrine-project.org/projects/doctrine-orm/en/2.6/reference/inheritance-mapping.html#query-the-type
+            if (count($resourceTypes) === 1) {
+                $criteria
+                    ->andWhere($expr->memberOf('resource', $resourceTypes));
+            } elseif (count($resourceTypes) === 2) {
+                $resourceTypes = array_values($resourceTypes);
+                $criteria
+                    ->andWhere($expr->orX(
+                        $expr->memberOf('resource', $resourceTypes[0]),
+                        $expr->memberOf('resource', $resourceTypes[1])
+                    ));
+            }
+        }
+        */
+
+        if ($fields) {
+            $criteria
+                ->andWhere($expr->in('property', $fields));
+        }
+
+        $criteria
+            ->orderBy(['id' => 'ASC'])
+            ->setFirstResult(null)
+            ->setMaxResults(self::SQL_LIMIT);
+
+        $valueRepository = $this->entityManager->getRepository(\Omeka\Entity\Value::class);
+        $collection = $valueRepository->matching($criteria);
+
+        $totalToProcess = $collection->count();
+        $this->logger->notice(new Message(
+            'Indexing suggestions for %d resource values.', // @translate
+            $totalToProcess
+        ));
+
+        // The suggestions are empty.
+        $suggesterId = $suggester->id();
+        $suggester = $suggester->getEntity();
+        $suggestionRepository = $this->entityManager->getRepository(\AdvancedSearch\Entity\SearchSuggestion::class);
+
+        $replacements = [
+            // Security replacements.
+            "\n" => ' ',
+            "\r" => ' ',
+            "'" => ' ',
+            '"' => ' ',
+            '\\' => ' ',
+            '%' => ' ',
+            '_' => ' ',
+            '#' => ' ',
+            '?' => ' ',
+            '$' => ' ',
+            # Cleaning replacements.
+            ',' => ' ',
+            ';' => ' ',
+            '!' => ' ',
+            // Keep urls, ark/doi.
+            // ':' => ' ',
+            // '.' => ' ',
+            '[' => ' ',
+            ']' => ' ',
+            '<' => ' ',
+            '>' => ' ',
+            '(' => ' ',
+            ')' => ' ',
+            '{' => ' ',
+            '}' => ' ',
+            '=' => ' ',
+            '&' => ' ',
+            '’' => ' ',
+            '  ' => ' ',
+        ];
+
+        // Since the fixed medias are no more available in the database, the
+        // loop should take care of them, so a check is done on it.
+        // Some new values may have been added during process, so don't check
+        // the total to process, but the last id.
+        $lastId = 0;
+
+        $baseCriteria = $criteria;
+        $offset = 0;
+        $totalProcessed = 0;
+        while (true) {
+            $criteria = clone $baseCriteria;
+            $criteria
+                ->andWhere($expr->gt('id', $lastId));
+            $values = $valueRepository->matching($criteria);
+            if (!$values->count() || $offset >= $totalToProcess || $totalProcessed >= $totalToProcess) {
+                break;
+            }
+
+            if ($this->shouldStop()) {
+                $this->logger->warn(new Message(
+                    'Job stopped: %d/%d processed (index mode: %s.', // @translate
+                    $totalProcessed, $totalToProcess, $mode
+                ));
+                return $this;
+            }
+
+            if ($totalProcessed) {
+                $this->logger->info(new Message(
+                    '%d/%d values processed.', // @translate
+                    $totalProcessed, $totalToProcess
+                ));
+            }
+
+            // Get it each loop because of the entity manager clearing clearing.
+            $suggester = $this->entityManager->getRepository(\AdvancedSearch\Entity\SearchSuggester::class)->find($suggesterId);
+
+            $suggestionCriteria = new Criteria($expr->eq('suggester', $suggester));
+            $suggestions = $suggestionRepository->matching($suggestionCriteria);
+
+            /** @var \Omeka\Entity\Value $value */
+            foreach ($values as $value) {
+                $lastId = $value->getId();
+                ++$totalProcessed;
+
+                $resource = $value->getResource();
+                if (!isset($resourceTypes[$resource->getResourceName()])) {
+                    continue;
+                }
+
+                $string = $value->getValue();
+                $string = str_replace(array_keys($replacements), array_values($replacements), $string);
+
+                // TODO Skip words without meaning like "the".
+                $list = [];
+                if ($mode === 'contain') {
+                    foreach (array_filter(explode(' ', $string), 'strlen') as $part) {
+                        $part = trim($part, ".: \t\n\r\0\x0B");
+                        if (strlen($part) > 1) {
+                            $list[] = $part;
+                        }
+                    }
+                } else {
+                    $prevPart = '';
+                    foreach (array_filter(explode(' ', $string), 'strlen') as $part) {
+                        $part = trim($part, ".: \t\n\r\0\x0B");
+                        if (strlen($part) > 1) {
+                            $fullPart = $prevPart . $part;
+                            $list[] = $fullPart;
+                            if (count($list) >= 3) {
+                                break;
+                            }
+                            $prevPart = $fullPart . ' ';
+                        }
+                    }
+                }
+
+                if (!count($list)) {
+                    continue;
+                }
+
+                $list = array_unique($list);
+
+                // TODO Check if a double loop (all then public only) is quicker: it will avoid a load of resource.
+                $isPublic = $value->isPublic()
+                    && $resource->isPublic();
+
+                foreach ($list as $part) {
+                    $part = mb_substr($part, 0, 190);
+                    $suggestCriteria = clone $suggestionCriteria;
+                    $suggestCriteria
+                        ->andWhere($expr->eq('text', $part));
+
+                    $existingSuggestions = $suggestions->matching($suggestCriteria);
+                    if ($existingSuggestions->count()) {
+                        $suggestion = $existingSuggestions->first();
+                    } else {
+                        $suggestion = new SearchSuggestion();
+                        $suggestion
+                            ->setSuggester($suggester)
+                            ->setText($part);
+                        $suggestions->add($suggestion);
+                        $this->entityManager->persist($suggestion);
+                    }
+                    $suggestion->setTotalAll($suggestion->getTotalAll() + 1);
+                    if ($isPublic) {
+                        $suggestion->setTotalPublic($suggestion->getTotalPublic() + 1);
+                    }
+                }
+            }
+
+            $this->entityManager->flush();
+            $this->entityManager->clear();
+            unset($values);
+
+            $offset += self::SQL_LIMIT;
+        }
+
+        $this->logger->warn(new Message(
+            'End of process: %d/%d processed (index mode: %s).', // @translate
+            $totalProcessed, $totalToProcess, $mode
+        ));
 
         return $this;
     }

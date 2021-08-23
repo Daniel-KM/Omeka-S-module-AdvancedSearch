@@ -25,20 +25,23 @@ $this->form->setButtonLabel($translate('Confirm reindex'));
         <h3><?= sprintf($translate('Reindex "%s"'), $resource->name()) ?></h3>
         <p><?= $translate('Are you sure you would like to reindex this suggester?') ?></p>
         <p>
-        <?= $translate('All the suggestions will be cleared first, so the search will be unavailable for a short while (usually some seconds to some minutes).') ?>
+        <?= $translate('All the suggestions will be cleared first, so the search will be unavailable for a short while (usually some seconds for recent database, else some minutes).') ?>
         <?= $translate('You may redirect the users to a clone of the current suggester temporary.') ?>
         </p>
         <p>
         <?php if ($totalJobs): ?>
         <?= sprintf($translate('%d running indexings.'), $totalJobs) ?><br />
-         <input form="<?= $form->getName() ?>" name="force" type="checkbox" /><?= $translate('Force indexing') ?><br />
+        <input form="<?= $form->getName() ?>" name="force" type="checkbox" /><?= $translate('Force indexing') ?><br />
         <?php else: ?>
         <?= $translate('No running indexing: process can be launched.') ?>
         <?php endif; ?>
         </p>
         <p>
-         <input form="<?= $form->getName() ?>" name="foreground" type="checkbox" /><?= $translate('Index in foreground') ?><br />
-         </p>
+        <input form="<?= $form->getName() ?>" name="foreground" type="checkbox" /><?= $translate('Index in foreground') ?><br />
+        </p>
+        <p>
+        <input form="<?= $form->getName() ?>" name="by_value" type="checkbox" /><?= $translate('Old database or small memory') ?><br />
+        </p>
         <?= $this->form($form) ?>
     </div>
 <?php else: ?>

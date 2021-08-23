@@ -42,7 +42,7 @@ $this->form->setButtonLabel($translate('Confirm reindex'));
         <p>
         <?php if ($totalJobs): ?>
         <?= sprintf($translate('%d running indexings.'), $totalJobs) ?><br />
-         <input form="<?= $form->getName() ?>" name="force" type="checkbox" /><?= $translate('Force indexing') ?><br />
+        <input form="<?= $form->getName() ?>" name="force" type="checkbox" /><?= $translate('Force indexing') ?><br />
         <?php else: ?>
         <?= $translate('No running indexing: process can be launched.') ?>
         <?php endif; ?>

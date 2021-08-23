@@ -117,7 +117,7 @@ class IndexSearch extends AbstractJob
 
         $timeStart = microtime(true);
 
-        $this->logger->info(new Message('Search index #%d ("%s"): start of indexing', // @translate
+        $this->logger->notice(new Message('Search index #%d ("%s"): start of indexing', // @translate
             $searchEngine->id(), $searchEngine->name()));
 
         $rNames = $resourceNames;

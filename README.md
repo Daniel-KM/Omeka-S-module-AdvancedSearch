@@ -13,28 +13,22 @@ Furthermore, it adds some features to the standard advanced search form.
 
 Here is a live example:
 
-![example of search page](data/images/advancedsearch_config.png)
+![example of search page](data/images/search_page.png)
 
 It can be extended in two ways:
 
 - Forms that will build the search form and construct the query.
 - Adapters that will do the real work (indexing and querying).
 
-Two forms are provided by default.
-- The basic form is the simple field _à la_ Google: it contains one single main
-  search field without filters, that is enough in most of the cases for the end
-  users, especially because the results allow facets.
-- The advanced form is the full form that is used in Omeka advanced search, with
-  a full customization from the admin interface: with or without facets, sort
-  fields, collection selector, resource class selector, resource template
-  selector, and properties filters.
-- An advanced example of a full form is [Psl Search Form], that displays the
-  same fields, plus a range of dates and map locations. Note: some features of
-  this advanced form are not managed by the internal adapter currently, in
-  particular the queries on a range of dates.
+The default form answers to most of the common needs. It can be configured in
+the admin interface to make it a basic form _à la_ Google, or to build a
+complex form with or without auto-suggestion, advanced filters, sort fields,
+facets, collection selector, resource class selector, resource template
+selector, properties filters with various input elements, like numbers or date
+ranges.
 
-An internal adapter is provided too. It uses the internal Api of Omeka to search
-resources. So the search engine is the sql one, without indexer, so it is
+An internal adapter is provided too. It uses the internal sql api of Omeka to
+search resources. So the search engine is the sql one, without indexer, so it is
 limited strictly to the request like the standard Omeka S search engine (no
 wildcards, no management of singular/plural, etc.). Nevertheless, it provides
 the facets to improve the results (requires the module [Reference]).
@@ -93,8 +87,8 @@ See general end user documentation for [Installing a module].
 ### Optional dependencies
 
 - Module [Reference] to display facets in the results with the internal adapter.
-  It is not needed for external search engines. It should be at least version
-  3.4.16.
+  It is not needed for external search engines that can manage facets natively.
+  It should be at least version 3.4.16.
 - Module [Search Solr]. Note that this is not the module [Solr of Biblibre],
   that is named "Solr".
 
@@ -104,34 +98,34 @@ Quick start
 
 The default search engine is automatically added to the sites.
 
-The main admin menu `Search` allows to manage the search indexes and the search
-pages: an instance of Omeka can contain multiple indexes, for example to hide
-some fields in the public front-end, and multiple pages, for example a single
-field search and an advanced search with filters, or different parameters for
-different sites or different resource types (items or item sets).
+The main admin menu `Search` allows to manage the search engines and the search
+configs: an instance of Omeka can contain multiple engines, for example to hide
+some fields in the public front-end, and multiple configs or pages, for example
+a single field search and an advanced search with filters, or different
+parameters for different sites or different resource types (items or item sets).
 
-An index and a page for the internal adapter are automatically prepared during
-install. This search engine can be enabled in main settings and site settings.
-It can be removed too.
+An engine and a page for the internal adapter are automatically prepared
+during install. This search engine can be enabled in main settings and site
+settings. It can be removed too.
 
-To create a page with a search engine, follow these steps.
+To create a config for a page with a search engine, follow these steps.
 
-1. Create an index
-    1. Add a new index with name `Internal` or whatever you want, using the
-       `Internal` adapter. The index can be set for items and/or item sets.
-    2. The internal adapter doesn’t create any index, so you don’t need to
+1. Create an engine
+    1. Add a new engine with name `Internal` or whatever you want, using the
+       `Internal` adapter. The engine can be set for items and/or item sets.
+    2. The internal adapter doesn’t create any engine, so you don’t need to
        launch the indexation by clicking on the "reindex" button (two arrows
        forming a circle).
-2. Create a page
-    1. Add a page named `Internal search` or whatever you want, a path to access
-       it, for example `search` or `find`, the index that was created in the
-       previous step (`Internal` here), and a form adapter (`Main`) that will do
-       the mapping between the form and the index. Forms added by modules can
-       manage an advanced input field and/or filters.
-    2. In the page configuration, you can enable/disable facet and sort fields
+2. Create a config for a page
+    1. Add a page named `Internal search` or whatever you want, a path to
+       access it, for example `search` or `find`, the engine that was created in
+       the previous step (`Internal` here), and a form adapter (`Main`) that
+       will do the mapping between the form and the engine. Forms added by
+       modules can manage an advanced input field and/or filters.
+    2. In the config of the page, you can enable/disable facet and sort fields
        by drag-drop. The order of the fields will be the one that will be used
        for display. Note that some indexers may have fields that seem
-       duplicated, but they aren’t: some of them allow to prepare search indexes
+       duplicated, but they aren’t: some of them allow to prepare search engines
        and some other facets or sort indexes. Some of them may be used for all
        uses. This is not the case for the internal indexer, since there is no
        index.
@@ -177,6 +171,21 @@ you need two other modules.
 Standard advanced search form and api
 -------------------------------------
 
+The fields that are added to the advanced search form are available in the api
+and some other ones are available too.
+
+### Api
+
+- `datetime`, that is a list of arrays with keys `field` ("created" or "modified"),
+  `joiner` ("and" or "or), a `type` ("lt", "lte", "eq", "gte", "gt", "neq", "ex", "nex")
+  and a value ("2021-08-23 12:34:56"), partial or not.
+- `resource_class_term`, the term can be a single class term or a list. It is case sensitive for now.
+- `has_media` for items.
+- `has_original` for items and medias.
+- `has_thumbnails` for items and medias.
+- `item_set_id` for medias.
+- `media_types` for items.
+
 ### Exclude properties
 
 To exclude properties to search in, use key `except`. For example, to search
@@ -204,6 +213,8 @@ The visibility check may not working if the api url contains `&is_public=&`:
 `is_public` must not be a empty string. See the patch in https://github.com/omeka/omeka-s/pull/1671.
 This patch is integrated in module only for url, and for call to internal api.
 
+This fix has been integrated in Omeka v3.1.
+
 
 Search api
 ----------
@@ -213,11 +224,11 @@ any other views too where you the search of items need to be done quickly, for
 example the block layouts with a big database (more than 10000 to 100000 items,
 according to your server and your collections).
 
-To use this feature, a page should be created with the form `Api`. This form is
-not a true form, but it allows to map the Omeka metadata and properties with the
-fields indexed by the search engine. It allows to define a max number of results
-too, that is used when no paginator is enable. The argument `limit` cannot go
-further.
+To use this feature, a config should be created with the form `Api`. This form
+is not a true form, but it allows to map the Omeka metadata and properties with
+the fields indexed by the search engine. It allows to define a max number of
+results too, that is used when no paginator is enable. The argument `limit`
+cannot go further.
 
 When ready, the api search is available via multiple means.
 - Add `index=1` as query in the block layouts that use it, like [Browse preview].
@@ -229,8 +240,8 @@ When ready, the api search is available via multiple means.
   and `$this->api()->searchOne()`. The result is an Omeka Response.
 - Use the controller plugins `$this->apiSearch()` and `$this->apiSearchOne()`.
 - The main api manager understand these arguments too.
-- If the api page form is made available on a site, it will be a quick access to
-  the results at `/s/mysite/api_advancedsearch_config`.
+- If the api config is made available on a site, it will be a quick access to
+  the results at `/s/mysite/api_search_page`.
 
 Note that some features may be not available in the external search engine. In
 particular, some events are not triggered.
@@ -255,24 +266,28 @@ be some minutes with Solr, according to your configuration).
 TODO
 ----
 
+- [ ] Update to remove features integrated in Omeka S v 3.1.
 - [x] The override of a search query with "property" should be called even with
   "initialize = false" in the api.
 - [x] Remove distinction between advanced and basic form: they are just a list
   of elements.
 - [ ] Simplify the form with https://docs.laminas.dev/laminas-form/v3/form-creation/creation-via-factory/
   and js, storing the whole form one time. See UserProfile too.
-- [ ] Normalize the url query with a true standard (or the Omeka S one, or at the
-  choice of the admin, or the developer of the forms and queriers).
+- [ ] Normalize the url query with a true standard: Solr? Omeka S?, at the
+  choice of the admin or the developer of the forms and queriers? Avoid to
+  multiply query formats. Probably replace the custom one by the Solr/Lucene one.
 - [x] Genericize the name of the fields of be able for internal querier to use
   or convert the fields names.
 - [ ] Make the search arguments groupable to allow smart facets: always display all
   facets from the original queries, with "or" between facets of the same group,
   and "and" between groups. Require that the core api allows groups.
+- [ ] Integrate auto-suggestion (or short list) to any field.
+- [ ] Use the Laminas config (ini/json/xml) to allow complex form (see User Profile)
 - [ ] Use the standard view with tabs and property selector for the page creation,
   in order not to limit it to Dublin Core terms. The tabs may be "Filters",
   "Facets", and "Sort".
-- [ ] Create an internal index (see Omeka Classic) and move all related code into
-  another module (use the fulltext feature).
+- [ ] Create an internal index (see Omeka Classic) or use the fulltext feature
+- [ ] Move all code related to Internal (sql) into another module?
 - [ ] Allow to remove an index without removing pages.
 - [ ] Allow to import/export a mapping via json, for example the default one.
 - [ ] Add an option to use the search api by default (and an option `'index' => false`).
@@ -283,7 +298,7 @@ TODO
 - [ ] Updated index in batch, not one by one.
 - [ ] Add an option to replace the default Omeka search form.
 - [ ] Improve the internal autosuggester to return the list of next words when space.
-- [ ] Use a or for facets of each group.
+- [ ] Use a "or" for facets of each group.
 
 
 Warning
@@ -346,11 +361,11 @@ See commits for full list of contributors.
 * Copyright Daniel Berthereau, 2017-2021 (see [Daniel-KM])
 * Copyright Tomas Kirda 2017 (library jQuery-Autocomplete)
 
-This module is a merge of features from the deprecated modules [Advanced Search Plus]
-and [Search].
+This module is a merge of features from the deprecated modules [Advanced Search Plus],
+[Search] and [Psl Search Form] and derivative ones.
 
 The Psl search form and the Solr modules were initially built by [BibLibre] and
-are used by the [digital library of PSL], a French university. Next improvements
+were used by the [digital library of PSL], a French university. Next improvements
 were done for various projects. The auto-completion was build for future digital
 library of [Campus Condorcet].
 
@@ -368,7 +383,7 @@ library of [Campus Condorcet].
 [Psl Search Form]: https://github.com/Daniel-KM/Omeka-S-module-PslSearchForm
 [Solr of Biblibre]: https://github.com/BibLibre/Omeka-S-module-Solr
 [Browse preview]: https://omeka.org/s/docs/user-manual/sites/site_pages/#browse-preview
-[module issues]: https://github.com/BibLibre/Omeka-S-module-AdvancedSearch/issues
+[module issues]: https://github.com/Daniel-KM/Omeka-S-module-AdvancedSearch/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org

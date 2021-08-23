@@ -1,33 +1,5 @@
 <?php declare(strict_types=1);
 
-/*
- * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2020-2021
- *
- * This software is governed by the CeCILL license under French law and abiding
- * by the rules of distribution of free software.  You can use, modify and/ or
- * redistribute the software under the terms of the CeCILL license as circulated
- * by CEA, CNRS and INRIA at the following URL "http://www.cecill.info".
- *
- * As a counterpart to the access to the source code and rights to copy, modify
- * and redistribute granted by the license, users are provided only with a
- * limited warranty and the software's author, the holder of the economic
- * rights, and the successive licensors have only limited liability.
- *
- * In this respect, the user's attention is drawn to the risks associated with
- * loading, using, modifying and/or developing or reproducing the software by
- * the user in light of its specific status of free software, that may mean that
- * it is complicated to manipulate, and that also therefore means that it is
- * reserved for developers and experienced professionals having in-depth
- * computer knowledge. Users are therefore encouraged to load and test the
- * software's suitability as regards their requirements in conditions enabling
- * the security of their systems and/or data to be ensured and, more generally,
- * to use and operate it in the same conditions as regards security.
- *
- * The fact that you are presently reading this means that you have had
- * knowledge of the CeCILL license and that you accept its terms.
- */
-
 namespace AdvancedSearch\Entity;
 
 use DateTime;
@@ -40,7 +12,7 @@ use Omeka\Entity\AbstractEntity;
  * @Entity
  * @HasLifecycleCallbacks
  */
-class SearchEngine extends AbstractEntity
+class SearchSuggester extends AbstractEntity
 {
     /**
      * @var int
@@ -64,14 +36,18 @@ class SearchEngine extends AbstractEntity
     protected $name;
 
     /**
-     * @var string
+     * @var SearchEngine
      *
-     * @Column(
-     *     type="string",
-     *     length=190
+     * @ManyToOne(
+     *     targetEntity=SearchEngine::class,
+     *     inversedBy="searchSuggesters"
+     * )
+     * @JoinColumn(
+     *     nullable=false,
+     *     onDelete="CASCADE"
      * )
      */
-    protected $adapter;
+    protected $engine;
 
     /**
      * @var array
@@ -103,36 +79,19 @@ class SearchEngine extends AbstractEntity
     protected $modified;
 
     /**
-     * @var SearchConfig[]
-     *
      * @OneToMany(
-     *     targetEntity=SearchConfig::class,
-     *     mappedBy="engine",
+     *     targetEntity=SearchSuggestion::class,
+     *     mappedBy="suggester",
      *     orphanRemoval=true,
-     *     cascade={"persist", "remove"},
-     *     indexBy="id"
+     *     cascade={"persist", "remove"}
      * )
      */
-    protected $searchConfigs;
-
-    /**
-     * @var SearchSuggester[]
-     *
-     * @OneToMany(
-     *     targetEntity=SearchSuggester::class,
-     *     mappedBy="engine",
-     *     orphanRemoval=true,
-     *     cascade={"persist", "remove"},
-     *     indexBy="id"
-     * )
-     */
-    protected $suggesters;
+    protected $suggestions;
 
     public function __construct()
     {
         parent::__construct();
-        $this->searchConfigs = new ArrayCollection;
-        $this->suggesters = new ArrayCollection;
+        $this->suggests = new ArrayCollection;
     }
 
     public function getId()
@@ -151,15 +110,15 @@ class SearchEngine extends AbstractEntity
         return $this->name;
     }
 
-    public function setAdapter(string $adapter): self
+    public function setEngine(SearchEngine $engine): self
     {
-        $this->adapter = $adapter;
+        $this->engine = $engine;
         return $this;
     }
 
-    public function getAdapter(): string
+    public function getEngine(): SearchEngine
     {
-        return $this->adapter;
+        return $this->engine;
     }
 
     public function setSettings(?array $settings): self
@@ -193,6 +152,11 @@ class SearchEngine extends AbstractEntity
     public function getModified(): ?DateTime
     {
         return $this->modified;
+    }
+
+    public function getSuggestions(): ArrayCollection
+    {
+        return $this->suggestions;
     }
 
     /**

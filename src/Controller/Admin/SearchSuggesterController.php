@@ -131,7 +131,11 @@ class SearchSuggesterController extends AbstractActionController
         $jobArgs['search_suggester_id'] = $suggester->id();
         $jobArgs['force'] = $force;
         $dispatcher = $this->jobDispatcher();
-        $job = $dispatcher->dispatch(IndexSuggestions::class, $jobArgs);
+        if ($this->params()->fromPost('foreground')) {
+            $job = $dispatcher->dispatch(IndexSuggestions::class, $jobArgs, $suggester->getServiceLocator()->get('Omeka\Job\DispatchStrategy\Synchronous'));
+        } else {
+            $job = $dispatcher->dispatch(IndexSuggestions::class, $jobArgs);
+        }
 
         $urlHelper = $this->viewHelpers()->get('url');
         $message = new Message(

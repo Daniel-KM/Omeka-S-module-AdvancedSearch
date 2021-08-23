@@ -13,7 +13,7 @@ use Omeka\Form\ConfirmForm;
  * @todo Modify the core view helper to manage any action and partial.
  * @see \Omeka\View\Helper\DeleteConfirm
  */
-class SearchEngineConfirm extends AbstractHelper
+class SearchSuggesterConfirm extends AbstractHelper
 {
     protected $formElementManager;
 
@@ -42,7 +42,7 @@ class SearchEngineConfirm extends AbstractHelper
         $form->setAttribute('action', $resource->url('index'));
 
         return $this->getView()->partial(
-            'advanced-search/admin/search-engine/index-confirm',
+            'advanced-search/admin/search-suggester/index-confirm',
             [
                 'wrapSidebar' => $wrapSidebar,
                 'resource' => $resource,

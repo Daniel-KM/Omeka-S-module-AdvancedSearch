@@ -115,15 +115,19 @@ class MainSearchForm extends Form
             ])
         ;
 
-        if (!empty($this->formSettings['autosuggest']['enable'])) {
-            $autoSuggestUrl = empty($this->formSettings['autosuggest']['url'])
+        $autoSuggestUrl = $this->formSettings['autosuggest']['url'] ?? null;
+        if (!$autoSuggestUrl) {
+            $suggester = $this->formSettings['autosuggest']['suggester'] ?? null;
+            if ($suggester) {
                 // TODO Use url helper.
-                ? $this->basePath . ($this->site ? '/s/' . $this->site->slug() : '/admin') . '/' . ($searchConfig ? $searchConfig->path() : 'search') . '/suggest'
-                : $this->formSettings['autosuggest']['url'];
+                $autoSuggestUrl = $this->basePath . ($this->site ? '/s/' . $this->site->slug() : '/admin') . '/' . ($searchConfig ? $searchConfig->path() : 'search') . '/suggest';
+            }
+        }
+        if ($autoSuggestUrl) {
             $elementQ = $this->get('q')
                 ->setAttribute('class', 'autosuggest')
                 ->setAttribute('data-autosuggest-url', $autoSuggestUrl);
-            if (!empty($this->formSettings['autosuggest']['url_param_name'])) {
+            if (empty($suggester) && !empty($this->formSettings['autosuggest']['url_param_name'])) {
                 $elementQ
                     ->setAttribute('data-autosuggest-param-name', $this->formSettings['autosuggest']['url_param_name']);
             }

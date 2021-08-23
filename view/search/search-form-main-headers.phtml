@@ -12,7 +12,9 @@
 
 $assetUrl = $this->plugin('assetUrl');
 
-if ($searchPage->subSetting('autosuggest', 'enable')) {
+if ($searchPage->subSetting('autosuggest', 'suggester')
+    || $searchPage->subSetting('autosuggest', 'url')
+) {
     $this->headScript()
         ->appendFile($assetUrl('vendor/jquery-autocomplete/jquery.autocomplete.min.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
 }

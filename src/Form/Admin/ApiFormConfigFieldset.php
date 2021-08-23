@@ -329,7 +329,7 @@ class ApiFormConfigFieldset extends Fieldset
         return [
             'search',
             'autosuggest',
-            // The form is overwritten.
+            // The form is overwrittable.
             // 'form',
             'sort',
             'facet',

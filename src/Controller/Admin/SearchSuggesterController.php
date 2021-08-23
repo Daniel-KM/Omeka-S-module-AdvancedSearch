@@ -64,11 +64,12 @@ class SearchSuggesterController extends AbstractActionController
 
         $data = $suggester->jsonSerialize();
         $data['o:engine'] = $engine->id();
+        $isInternal = $searchAdapter instanceof \AdvancedSearch\Adapter\InternalAdapter;
 
         $form = $this->getForm(SearchSuggesterForm::class, [
             'add' => false,
             'engine' => $engine,
-            'is_internal' => $searchAdapter instanceof \AdvancedSearch\Adapter\InternalAdapter,
+            'is_internal' => $isInternal,
         ]);
         $form->setData($data);
 
@@ -94,7 +95,54 @@ class SearchSuggesterController extends AbstractActionController
             $suggester->name()
         ));
 
+        if ($isInternal) {
+            $this->messenger()->addWarning('Don’t forget to run the indexation of the suggester.'); // @translate
+        }
+
         return $this->redirect()->toRoute('admin/search');
+    }
+
+    public function indexConfirmAction()
+    {
+        $suggester = $this->api()->read('search_suggesters', $this->params('id'))->getContent();
+
+        $totalJobs = $this->totalJobs(\AdvancedSearch\Job\IndexSuggestions::class, true);
+
+        $view = new ViewModel([
+            'resourceLabel' => 'search suggester',
+            'resource' => $suggester,
+            'totalJobs' => $totalJobs,
+        ]);
+        return $view
+            ->setTerminal(true)
+            ->setTemplate('advanced-search/admin/search-suggester/index-confirm-details');
+    }
+
+    public function indexAction()
+    {
+        $suggesterId = (int) $this->params('id');
+        $suggester = $this->api()->read('search_suggesters', $suggesterId)->getContent();
+
+        $force = (bool) $this->params()->fromPost('force');
+
+        $jobArgs = [];
+        $jobArgs['search_suggester_id'] = $suggester->id();
+        $jobArgs['force'] = $force;
+        $job = $this->jobDispatcher()->dispatch(\AdvancedSearch\Job\IndexSuggestions::class, $jobArgs);
+
+        $urlHelper = $this->viewHelpers()->get('url');
+        $message = new Message(
+            'Indexing suggestions of suggester "%1$s" started in job %2$s#%3$d%4$s (%5$slogs%4$s)', // @translate
+            $suggester->name(),
+            sprintf('<a href="%1$s">', $urlHelper('admin/id', ['controller' => 'job', 'id' => $job->getId()])),
+            $job->getId(),
+            '</a>',
+            sprintf('<a href="%1$s">', class_exists('Log\Stdlib\PsrMessage') ? $urlHelper('admin/default', ['controller' => 'log'], ['query' => ['job_id' => $job->getId()]]) :  $urlHelper('admin/id', ['controller' => 'job', 'action' => 'log', 'id' => $job->getId()]))
+        );
+        $message->setEscapeHtml(false);
+        $this->messenger()->addSuccess($message);
+
+        return $this->redirect()->toRoute('admin/search', ['action' => 'browse'], true);
     }
 
     public function deleteConfirmAction()

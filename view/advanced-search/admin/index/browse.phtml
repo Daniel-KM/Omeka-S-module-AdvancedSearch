@@ -36,6 +36,7 @@
 
 $translate = $this->plugin('translate');
 $escape = $this->plugin('escapeHtml');
+$escapeAttr = $this->plugin('escapeHtmlAttr');
 $url = $this->plugin('url');
 ?>
 
@@ -62,11 +63,14 @@ $url = $this->plugin('url');
         </thead>
         <tbody>
             <?php foreach ($engines as $engine): ?>
+                <?php $searchAdapter = $engine->adapter();
+                $isInternal = $searchAdapter && $searchAdapter instanceof \AdvancedSearch\Adapter\InternalAdapter;
+                ?>
                 <tr>
                     <td>
                         <span><?= $engine->name() ?></span>
                         <ul class="actions">
-                            <?php if ($engine->adapter()): ?>
+                            <?php if ($searchAdapter): ?>
                                 <li>
                                     <?= $engine->link('', 'edit', [
                                         'class' => 'o-icon-edit',
@@ -75,11 +79,18 @@ $url = $this->plugin('url');
                                     ]) ?>
                                 </li>
                                 <li>
+                                <?php if ($isInternal): ?>
+                                    <span
+                                    class="o-icon- fa fa-refresh fa-sync sidebar-content disabled"
+                                    aria-label="<?= $escape($translate('No reindex for internal engine')) ?>"
+                                    title="<?= $escape($translate('No reindex for internal engine')) ?>"></span>
+                                <?php else: ?>
                                     <a href="#"
                                     data-sidebar-content-url="<?= $escape($engine->url('index-confirm')) ?>"
                                     class="o-icon- fa fa-refresh fa-sync sidebar-content"
-                                    aria-label="<?= $escape($translate('Reindex all')) ?>"
-                                    title="<?= $escape($translate('Reindex all')) ?>"></a>
+                                    aria-label="<?= $escape($translate('Reindex')) ?>"
+                                    title="<?= $escape($translate('Reindex')) ?>"></a>
+                                <?php endif; ?>
                                 </li>
                             <?php endif; ?>
                             <li>
@@ -171,25 +182,39 @@ $url = $this->plugin('url');
         </thead>
         <tbody>
             <?php foreach ($suggesters as $suggester): ?>
+                <?php $searchAdapter = $suggester->engine()->adapter();
+                $isInternal = $searchAdapter && $searchAdapter instanceof \AdvancedSearch\Adapter\InternalAdapter;
+                ?>
                 <tr>
                     <td>
                         <span><?= $suggester->name() ?></span>
                         <ul class="actions">
-                            <?php if ($suggester->engine()->adapter()): ?>
                             <li>
+                            <?php if ($searchAdapter): ?>
                                 <?= $suggester->link('', 'edit', [
                                     'class' => 'o-icon-edit',
                                     'title' => $translate('Edit'),
                                 ]) ?>
-                            </li>
                             <?php else: ?>
-                            <li>
                                 <?= $this->hyperlink('', '#', [
                                     'class' => 'o-icon-edit disabled',
                                     'title' => $translate('Edit disabled: search adapter not available'),
                                 ]) ?>
-                            </li>
                             <?php endif; ?>
+                            </li>
+                            <li>
+                            <?php if ($isInternal): ?>
+                                <a href="#"
+                                data-sidebar-content-url="<?= $escape($suggester->url('index-confirm')) ?>"
+                                class="o-icon- fa fa-refresh fa-sync sidebar-content"
+                                aria-label="<?= $escape($translate('Reindex')) ?>"
+                                title="<?= $escape($translate('Reindex')) ?>"></a>
+                            <?php else: ?>
+                                <span class="o-icon- fa fa-refresh fa-sync sidebar-content disabled"
+                                    title="<?= $escapeAttr($translate('Reindex disabled: search adapter does not support it.')) ?>"
+                                </span>
+                            <?php endif; ?>
+                            </li>
                             <li>
                                 <a href="#"
                                 data-sidebar-content-url="<?= $escape($suggester->url('delete-confirm')) ?>"

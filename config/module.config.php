@@ -49,6 +49,7 @@ return [
             'mediaTypeSelect' => Service\ViewHelper\MediaTypeSelectFactory::class,
             'searchEngineConfirm' => Service\ViewHelper\SearchEngineConfirmFactory::class,
             'searchRequestToResponse' => Service\ViewHelper\SearchRequestToResponseFactory::class,
+            'searchSuggesterConfirm' => Service\ViewHelper\SearchSuggesterConfirmFactory::class,
         ],
         'delegators' => [
             'Laminas\Form\View\Helper\FormElement' => [

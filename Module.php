@@ -986,14 +986,18 @@ class Module extends AbstractModule
             $basePath = $plugins->get('basePath');
             $assetUrl = $plugins->get('assetUrl');
             $searchUrl = $basePath('admin/' . $searchConfig->path());
-            if ($searchConfig->subSetting('autosuggest', 'enable')) {
-                $autoSuggestUrl = $searchConfig->subSetting('autosuggest', 'url') ?: $searchUrl . '/suggest';
+            $autosuggestUrl = $searchConfig->subSetting('autosuggest', 'url');
+            if (!$autosuggestUrl) {
+                $suggester = $searchConfig->subSetting('autosuggest', 'suggester');
+                if ($suggester) {
+                    $autoSuggestUrl = $searchUrl . '/suggest';
+                }
             }
             $plugins->get('headLink')
                 ->appendStylesheet($assetUrl('css/advanced-search-admin.css', 'AdvancedSearch'));
             $plugins->get('headScript')
                 ->appendScript(sprintf('var searchUrl = %s;', json_encode($searchUrl, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE))
-                   . (isset($autoSuggestUrl) ? sprintf("\nvar searchAutosuggestUrl=%s;", json_encode($autoSuggestUrl, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)) : '')
+                   . ($autoSuggestUrl ? sprintf("\nvar searchAutosuggestUrl=%s;", json_encode($autoSuggestUrl, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)) : '')
                 )
                 ->appendFile($assetUrl('js/advanced-search-admin.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
         }

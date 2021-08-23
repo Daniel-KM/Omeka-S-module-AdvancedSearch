@@ -100,4 +100,23 @@
     #search-filters .filter input {
         margin-right: 6px;
     }
+
+    .search-admin .actions .disabled {
+        color: currentColor;
+        cursor: not-allowed;
+        opacity: 0.5;
+        text-decoration: none;
+    }
+    .search-admin .actions span::before {
+        text-align: right;
+    }
+    .search-admin .actions span,
+    .actions span::before {
+        width: 24px;
+        height: 24px;
+        line-height: 24px;
+        vertical-align: top;
+        border: 0;
+        box-shadow: none;
+    }
 }

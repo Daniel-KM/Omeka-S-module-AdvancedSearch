@@ -1,7 +1,7 @@
 <?php
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
- * @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation $resource
+ * @var \AdvancedSearch\Api\Representation\SearchSuggesterRepresentation $resource
  * @var \Omeka\Form\ConfirmForm $form
  * @var string $wrapSidebar
  * @var string $resourceLabel
@@ -10,7 +10,7 @@
 
 $translate = $this->plugin('translate');
 
-$resourceNames = $resource->setting('resources', []);
+$resourceNames = $resource->engine()->setting('resources', []);
 
 $this->form->setAttribute('action', $resource->url('index'));
 $this->form->setButtonLabel($translate('Confirm reindex'));
@@ -23,21 +23,10 @@ $this->form->setButtonLabel($translate('Confirm reindex'));
 <?php if (count($resourceNames)): ?>
     <div id="sidebar-confirm">
         <h3><?= sprintf($translate('Reindex "%s"'), $resource->name()) ?></h3>
-        <p><?= $translate('Are you sure you would like to reindex this index?') ?></p>
+        <p><?= $translate('Are you sure you would like to reindex this suggester?') ?></p>
         <p>
-        <?= $translate('All the indexes will be cleared first, so the search will be unavailable for a while.') ?>
-        <?= $translate('You may redirect the users to a clone of the current index temporary.') ?>
-        </p>
-        <p>
-        <?= $translate('You may prefer to keep existing indexes and to start the indexing at the following resource id.') ?>
-        <?= $translate('Set "1" to reindex all resources without clearing the current index.') ?>
-        <input name="start_resource_id" placeholder="0" value="" type="number" form="confirmform" />
-        </p>
-        <p>
-        <?= $translate('You may want to limit the reindexing to a resource type.') ?>
-        <?php foreach ($resourceNames as $resourceName): ?>
-        <input name="resource_names[]" value="<?= $resourceName ?>" type="checkbox" checked="checked" form="confirmform" /><?= $resourceName ?>
-        <?php endforeach; ?>
+        <?= $translate('All the suggestions will be cleared first, so the search will be unavailable for a short while (usually some seconds to some minutes).') ?>
+        <?= $translate('You may redirect the users to a clone of the current suggester temporary.') ?>
         </p>
         <p>
         <?php if ($totalJobs): ?>

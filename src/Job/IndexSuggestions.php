@@ -188,7 +188,7 @@ SQL;
             'public' => 'AND `resource`.`is_public` = 1 AND `value`.`is_public` = 1',
         ];
         foreach ($sqlsVisibility as $column => $sqlVisibility) {
-            for ($numberWords = 2; $numberWords >= 1; $numberWords--) {
+            for ($numberWords = 3; $numberWords >= 1; $numberWords--) {
                 // Don't "insert ignore and distinct", increment on duplicate.
                 $sql .= <<<SQL
 # Create $numberWords words index (compute $column).

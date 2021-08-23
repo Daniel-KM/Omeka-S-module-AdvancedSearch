@@ -218,10 +218,20 @@ SQL;
                    ->setIsSuccess(true);
             }
             $sqlFields = 'AND `value`.`property_id` IN (:property_ids)';
-            $bind['property_ids'] = $this->listPropertyIds($fields);
+            $bind['property_ids'] = $ids;
             $types['property_ids'] = $connection::PARAM_INT_ARRAY;
         } else {
             $sqlFields = '';
+        }
+
+        $excludedFields = $this->query->getExcludedFields();
+        if ($excludedFields) {
+            $ids = $this->listPropertyIds($excludedFields);
+            if ($ids) {
+                $sqlFields .= ' AND `value`.`property_id` NOT IN (:excluded_property_ids)';
+                $bind['excluded_property_ids'] = $ids;
+                $types['excluded_property_ids'] = $connection::PARAM_INT_ARRAY;
+            }
         }
 
         // FIXME The sql for site doesn't manage site item sets.

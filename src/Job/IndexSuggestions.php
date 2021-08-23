@@ -155,15 +155,18 @@ class IndexSuggestions extends AbstractJob
 
         // FIXME Fields are not only properties, but titles, classes and templates.
         $fields = $suggester->setting('fields') ?: [];
+        $fields = $this->getPropertyIds($fields);
+        $excludedFields = $suggester->setting('excuded_fields') ?: [];
+        $excludedFields = $this->getPropertyIds($excludedFields);
 
         $modeIndex = $suggester->setting('mode_index') ?: 'start';
 
         if ($processMode === 'sql') {
             $modeIndex === 'contain' || $modeIndex === 'contain_full'
-                ? $this->processContain($suggester, $resourceNames, $fields, $modeIndex)
-                : $this->processStart($suggester, $resourceNames, $fields, $modeIndex);
+                ? $this->processContain($suggester, $resourceNames, $fields, $excludedFields, $modeIndex)
+                : $this->processStart($suggester, $resourceNames, $fields, $excludedFields, $modeIndex);
         } else {
-            $this->processOrm($suggester, $resourceNames, $fields, $modeIndex);
+            $this->processOrm($suggester, $resourceNames, $fields, $excludedFields, $modeIndex);
         }
 
         return $this;
@@ -173,6 +176,7 @@ class IndexSuggestions extends AbstractJob
         SearchSuggesterRepresentation $suggester,
         array $resourceTypes,
         array $fields,
+        array $excludedFields,
         string $modeIndex
     ): self {
         $bind = [
@@ -189,6 +193,12 @@ class IndexSuggestions extends AbstractJob
             $types['properties'] = $this->connection::PARAM_INT_ARRAY;
         } else {
             $sqlFields = '';
+        }
+
+        if ($excludedFields) {
+            $sqlFields .= ' AND `value`.`property_id` NOT IN (:excluded_property_ids)';
+            $bind['excluded_property_ids'] = $excludedFields;
+            $types['excluded_property_ids'] = $this->connection::PARAM_INT_ARRAY;
         }
 
         $sql = <<<'SQL'
@@ -295,6 +305,7 @@ SQL;
         SearchSuggesterRepresentation $suggester,
         array $resourceTypes,
         array $fields,
+        array $excludedFields,
         string $modeIndex
     ): self {
         $bind = [
@@ -311,6 +322,12 @@ SQL;
             $types['properties'] = $this->connection::PARAM_INT_ARRAY;
         } else {
             $sqlFields = '';
+        }
+
+        if ($excludedFields) {
+            $sqlFields .= ' AND `value`.`property_id` NOT IN (:excluded_property_ids)';
+            $bind['excluded_property_ids'] = $excludedFields;
+            $types['excluded_property_ids'] = $this->connection::PARAM_INT_ARRAY;
         }
 
         $sql = <<<'SQL'
@@ -491,6 +508,7 @@ SQL;
         SearchSuggesterRepresentation $suggester,
         array $resourceTypes,
         array $fields,
+        array $excludedFields,
         string $modeIndex
     ): self {
         $criteria = new Criteria;
@@ -521,6 +539,11 @@ SQL;
         if ($fields) {
             $criteria
                 ->andWhere($expr->in('property', $fields));
+        }
+
+        if ($excludedFields) {
+            $criteria
+                ->andWhere($expr->notIn('property', $excludedFields));
         }
 
         $criteria

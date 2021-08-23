@@ -125,7 +125,8 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
                 'mode_search' => $suggesterSettings['mode_search'] ?? 'start',
                 'length' => $suggesterSettings['length'] ?? 50,
             ])
-            ->setSuggestFields($suggesterSettings['fields'] ?? []);
+            ->setSuggestFields($suggesterSettings['fields'] ?? [])
+            ->setExcludedFields($suggesterSettings['excluded_fields'] ?? []);
 
         /** @var \AdvancedSearch\Querier\QuerierInterface $querier */
         $querier = $engine

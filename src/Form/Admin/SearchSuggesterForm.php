@@ -186,6 +186,22 @@ class SearchSuggesterForm extends Form
                     'data-placeholder' => 'Select fields…', // @translate
                 ],
             ])
+            ->add([
+                'name' => 'exclude_fields',
+                'type' => OptionalSelect::class,
+                'options' => [
+                    'label' => 'Exclude fields', // @translate
+                    'info' => 'Allow to skip the full text content, that may be useless for suggestions.', // @translate
+                    'value_options' => $this->getAvailableFields(),
+                    'empty_option' => '',
+                ],
+                'attributes' => [
+                    'id' => 'excluded_fields',
+                    'multiple' => true,
+                    'class' => 'chosen-select',
+                    'data-placeholder' => 'Select fields…', // @translate
+                ],
+            ])
         ;
     }
 

@@ -350,20 +350,6 @@ class Query implements \JsonSerializable
     }
 
     /**
-     * Exclude fields from main search query, for example to exclude full text.
-     */
-    public function setExcludedFields(array $excludedFields): self
-    {
-        $this->excludedFields = $excludedFields;
-        return $this;
-    }
-
-    public function getExcludedFields(): array
-    {
-        return $this->excludedFields;
-    }
-
-    /**
      * Available options are (internal engine when direct (without index)):
      * - suggester: id of the suggester
      * - direct: direct query without the index (default false)
@@ -391,6 +377,21 @@ class Query implements \JsonSerializable
     public function getSuggestFields(): array
     {
         return $this->suggestFields;
+    }
+
+    /**
+     * Exclude fields from main search query, for example to exclude full text.
+     * It is used for suggest queries too.
+     */
+    public function setExcludedFields(array $excludedFields): self
+    {
+        $this->excludedFields = $excludedFields;
+        return $this;
+    }
+
+    public function getExcludedFields(): array
+    {
+        return $this->excludedFields;
     }
 
     public function setSiteId(?int $siteId): self
@@ -421,9 +422,9 @@ class Query implements \JsonSerializable
             'facet_limit' => $this->getFacetLimit(),
             'facet_languages' => $this->getFacetLanguages(),
             'active_facets' => $this->getActiveFacets(),
-            'excluded_fields' => $this->getExcludedFields(),
             'suggest_options' => $this->getSuggestOptions(),
             'suggest_fields' => $this->getSuggestFields(),
+            'excluded_fields' => $this->getExcludedFields(),
             'site_id' => $this->getSiteId(),
         ];
     }

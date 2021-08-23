@@ -22,10 +22,7 @@ return [
     ],
 
     'autosuggest' => [
-        'enable' => true,
-        'mode' => 'start',
-        'limit' => 25,
-        'fields' => [],
+        'suggester' => 1,
         'url' => '',
         'url_param_name' => '',
     ],

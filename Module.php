@@ -1104,13 +1104,56 @@ INSERT INTO `search_engine`
 VALUES
 ('Internal (sql)', 'internal', ?, NOW());
 SQL;
-            $searchEngineSettings = ['resources' => ['items', 'item_sets']];
+            $searchEngineSettings = [
+                'resources' => ['items', 'item_sets'],
+            ];
             $connection->executeQuery($sql, [
                 json_encode($searchEngineSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
             ]);
             $searchEngineId = $connection->fetchColumn($sqlSearchEngineId);
             $message = new Message(
                 'The internal search engine (sql) is available. Configure it in the %ssearch manager%s.', // @translate
+                // Don't use the url helper, the route is not available during install.
+                sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager'),
+                '</a>'
+            );
+            $message->setEscapeHtml(false);
+            $messenger->addSuccess($message);
+        }
+
+        // Check if the internal suggester exists.
+        $sqlSuggesterId = <<<SQL
+SELECT `id`
+FROM `search_suggester`
+WHERE `engine_id` = $searchEngineId
+ORDER BY `id`
+LIMIT 1;
+SQL;
+        $suggesterId = (int) $connection->fetchColumn($sqlSuggesterId);
+
+        if (!$suggesterId) {
+            // Create the internal suggester.
+            $sql = <<<SQL
+INSERT INTO `search_suggester`
+(`engine_id`, `name`, `settings`, `created`)
+VALUES
+($searchEngineId, 'Internal suggester (sql)', ?, NOW());
+SQL;
+            $suggesterSettings = [
+                'direct' => true,
+                'mode_index' => 'start',
+                'mode_search' => 'start',
+                'limit' => 25,
+                'length' => 50,
+                'fields' => [],
+                'excluded_fields' => [],
+            ];
+            $connection->executeQuery($sql, [
+                json_encode($suggesterSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            ]);
+            // $suggesterId = $connection->fetchColumn($sqlSuggesterId);
+            $message = new Message(
+                'The internal suggester (sql) is available. Configure it in the %ssearch manager%s.', // @translate
                 // Don't use the url helper, the route is not available during install.
                 sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager'),
                 '</a>'

@@ -145,7 +145,7 @@ class IndexSuggestions extends AbstractJob
         // FIXME Fields are not only properties, but titles, classes and templates.
         $fields = $suggester->setting('fields') ?: [];
 
-        $mode = $suggester->setting('mode') === 'contain' ? 'contain' : 'start';
+        $mode = $suggester->setting('mode_index') === 'contain' ? 'contain' : 'start';
         $mode === 'start'
             ? $this->processStart($suggester, $resourceNames, $fields)
             : $this->processContain($suggester, $resourceNames, $fields);

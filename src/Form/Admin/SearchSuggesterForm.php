@@ -109,18 +109,34 @@ class SearchSuggesterForm extends Form
                 ],
             ])
             ->add([
-                'name' => 'mode',
+                'name' => 'mode_index',
                 'type' => OptionalRadio::class,
                 'options' => [
-                    'label' => 'Mode', // @translate
+                    'label' => 'Mode to index values', // @translate
                     'info' => 'Should be implemented in internal search engine.', // @translate
                     'value_options' => [
-                        'start' => 'Starts with', // @translate
-                        'contain' => 'Contains', // @translate
+                        'start' => 'First words of values', // @translate
+                        'contain' => 'Any', // @translate
                     ],
                 ],
                 'attributes' => [
-                    'id' => 'mode',
+                    'id' => 'mode_index',
+                    'required' => false,
+                    'value' => 'start',
+                ],
+            ])
+            ->add([
+                'name' => 'mode_search',
+                'type' => OptionalRadio::class,
+                'options' => [
+                    'label' => 'Mode to search suggestions', // @translate
+                    'value_options' => [
+                        'start' => 'Start of a word', // @translate
+                        'contain' => 'In word', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'mode_search',
                     'required' => false,
                     'value' => 'start',
                 ],

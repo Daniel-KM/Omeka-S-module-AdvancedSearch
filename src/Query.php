@@ -117,9 +117,11 @@ class Query implements \JsonSerializable
      * @var array
      */
     protected $suggestOptions = [
-        'mode' => 'start',
-        'length' => 50,
+        'suggester' => 0,
         'direct' => false,
+        'mode_index' => 'start',
+        'mode_search' => 'start',
+        'length' => 50,
     ];
 
     /**
@@ -365,7 +367,8 @@ class Query implements \JsonSerializable
      * Available options are (internal engine when direct (without index)):
      * - suggester: id of the suggester
      * - direct: direct query without the index (default false)
-     * - mode: "start" (default) or "contain"
+     * - mode_index: "start" (default) or "contain"
+     * - mode_search: "start" (default) or "contain"
      * - length: max size of a string (default 50)
      */
     public function setSuggestOptions(array $suggestOptions): self

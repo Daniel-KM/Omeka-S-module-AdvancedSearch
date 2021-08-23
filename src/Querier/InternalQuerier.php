@@ -118,7 +118,7 @@ class InternalQuerier extends AbstractQuerier
         // TODO Use the index full text?
         // TODO Manage site here?
 
-        // The mode, resource types, fields, and length are managed during
+        // The mode index, resource types, fields, and length are managed during
         // indexation.
 
         $suggester = (int) ($suggestOptions['suggester'] ?? 0);
@@ -130,13 +130,16 @@ class InternalQuerier extends AbstractQuerier
         $isPublic = $this->query->getIsPublic();
         $column = $isPublic ? 'public' : 'all';
 
+        $modeSearch = $suggestOptions['mode_search'] ?? 'start';
+
         /** @var \Doctrine\DBAL\Connection $connection */
         $connection = $this->getServiceLocator()->get('Omeka\Connection');
         $q = $this->query->getQuery();
         $bind = [
             'suggester' => $suggester,
             'limit' => $this->query->getLimit(),
-            'value_like' => str_replace(['%', '_'], ['\%', '\_'], $q) . '%',
+            'value_like' => ($modeSearch === 'contain' ? '%' : '')
+                . str_replace(['%', '_'], ['\%', '\_'], $q) . '%',
         ];
         $types = [
             'suggester' => \PDO::PARAM_INT,
@@ -229,7 +232,7 @@ SQL;
             $sqlSite = '';
         }
 
-        $mode = $this->query->getSuggestOptions()['mode'] === 'contain' ? 'contain' : 'start';
+        $mode = $this->query->getSuggestOptions()['mode_search'] === 'contain' ? 'contain' : 'start';
         if ($mode === 'contain') {
             // $bind['value'] = $q;
             // $bind['value_like'] = '%' . str_replace(['%', '_'], ['\%', '\_'], $q) . '%';

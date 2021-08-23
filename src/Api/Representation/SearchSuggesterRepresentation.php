@@ -121,7 +121,8 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
             ->setSuggestOptions([
                 'suggester' => $this->resource->getId(),
                 'direct' => !empty($suggesterSettings['direct']),
-                'mode' => $suggesterSettings['mode'] ?? 'start',
+                'mode_index' => $suggesterSettings['mode_index'] ?? 'start',
+                'mode_search' => $suggesterSettings['mode_search'] ?? 'start',
                 'length' => $suggesterSettings['length'] ?? 50,
             ])
             ->setSuggestFields($suggesterSettings['fields'] ?? []);

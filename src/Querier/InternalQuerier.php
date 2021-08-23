@@ -109,12 +109,16 @@ class InternalQuerier extends AbstractQuerier
                 ->setMessage('An issue occurred.'); // @translate
         }
 
-        /**
-         * @var \Omeka\Mvc\Controller\Plugin\Api $api
-         */
-        $plugins = $this->getServiceLocator()->get('ControllerPluginManager');
-        $api = $plugins->get('api');
+        if (!empty($this->query->getSuggestOptions()['direct'])) {
+            return $this->querySuggestionsDirect();
+        }
 
+        return $this->response
+            ->setMessage('TODO Index query'); // @translate
+    }
+
+    protected function querySuggestionsDirect(): Response
+    {
         // Only items and itemSets are managed currently.
         $resourceTypesToClasses = [
             // 'items' => \Omeka\Entity\Item::class,

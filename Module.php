@@ -410,6 +410,7 @@ class Module extends AbstractModule
     {
         $acl = $this->getServiceLocator()->get('Omeka\Acl');
         $acl
+            // Suggesters are available only for admins.
             // TODO This first rule duplicates the second, but is needed for a site.
             ->allow(
                 null,

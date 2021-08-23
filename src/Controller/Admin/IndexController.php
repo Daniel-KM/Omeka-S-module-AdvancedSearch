@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2020
+ * Copyright Daniel Berthereau, 2020-2021
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -38,12 +38,14 @@ class IndexController extends AbstractActionController
     public function browseAction()
     {
         $api = $this->api();
-        $search_engines = $api->search('search_engines', ['sort_by' => 'name'])->getContent();
-        $search_configs = $api->search('search_configs', ['sort_by' => 'name'])->getContent();
+        $engines = $api->search('search_engines', ['sort_by' => 'name'])->getContent();
+        $searchConfigs = $api->search('search_configs', ['sort_by' => 'name'])->getContent();
+        $suggesters = $api->search('search_suggesters', ['sort_by' => 'name'])->getContent();
 
         return new ViewModel([
-            'search_engines' => $search_engines,
-            'search_configs' => $search_configs,
+            'engines' => $engines,
+            'searchConfigs' => $searchConfigs,
+            'suggesters' => $suggesters,
         ]);
     }
 }

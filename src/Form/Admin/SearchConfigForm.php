@@ -30,6 +30,7 @@
 
 namespace AdvancedSearch\Form\Admin;
 
+use AdvancedSearch\Form\Element\OptionalRadio;
 use AdvancedSearch\FormAdapter\Manager as SearchFormAdapterManager;
 use Laminas\Form\Element;
 use Laminas\Form\Form;
@@ -58,6 +59,7 @@ class SearchConfigForm extends Form
                     'label' => 'Name', // @translate
                 ],
                 'attributes' => [
+                    'id' => 'name',
                     'required' => true,
                 ],
             ])
@@ -70,6 +72,7 @@ class SearchConfigForm extends Form
                     'info' => 'The path to the search form. The site path will be automatically prepended.',
                 ],
                 'attributes' => [
+                    'id' => 'path',
                     'required' => true,
                 ],
             ])
@@ -83,6 +86,7 @@ class SearchConfigForm extends Form
                     'empty_option' => 'Select a search engine below…', // @translate
                 ],
                 'attributes' => [
+                    'id' => 'engine',
                     'required' => true,
                 ],
             ])
@@ -96,6 +100,7 @@ class SearchConfigForm extends Form
                     'empty_option' => 'Select a form below…', // @translate
                 ],
                 'attributes' => [
+                    'id' => 'form',
                     'required' => true,
                 ],
             ])
@@ -121,7 +126,7 @@ class SearchConfigForm extends Form
             ])
             ->add([
                 'name' => 'manage_config_availability',
-                'type' => Element\Radio::class,
+                'type' => OptionalRadio::class,
                 'options' => [
                     'label' => 'Availability on sites', // @translate
                     'info' => 'The admin settings are not modified.', // @translate
@@ -142,10 +147,6 @@ class SearchConfigForm extends Form
             ->getInputFilter()
             ->add([
                 'name' => 'manage_config_default',
-                'required' => false,
-            ])
-            ->add([
-                'name' => 'manage_config_availability',
                 'required' => false,
             ])
         ;

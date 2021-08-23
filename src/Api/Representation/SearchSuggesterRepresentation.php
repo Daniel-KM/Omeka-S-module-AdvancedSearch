@@ -2,7 +2,12 @@
 
 namespace AdvancedSearch\Api\Representation;
 
+use AdvancedSearch\Querier\Exception\QuerierException;
+use AdvancedSearch\Query;
+use AdvancedSearch\Response;
 use Omeka\Api\Representation\AbstractEntityRepresentation;
+use Omeka\Api\Representation\SiteRepresentation;
+use Omeka\Stdlib\Message;
 
 class SearchSuggesterRepresentation extends AbstractEntityRepresentation
 {
@@ -77,5 +82,60 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
     public function getEntity(): \AdvancedSearch\Entity\SearchSuggester
     {
         return $this->resource;
+    }
+
+    /**
+     * @todo Remove site (but manage direct query).
+     * @todo Manage direct query here? Remove it?
+     */
+    public function suggest(string $q, ?SiteRepresentation $site = null): Response
+    {
+        $query = new Query();
+        $query->setQuery($q);
+
+        $user = $this->getServiceLocator()->get('Omeka\AuthenticationService')->getIdentity();
+        // TODO Manage roles from modules and visibility from modules (access resources).
+        $omekaRoles = [
+            \Omeka\Permissions\Acl::ROLE_GLOBAL_ADMIN,
+            \Omeka\Permissions\Acl::ROLE_SITE_ADMIN,
+            \Omeka\Permissions\Acl::ROLE_EDITOR,
+            \Omeka\Permissions\Acl::ROLE_REVIEWER,
+            \Omeka\Permissions\Acl::ROLE_AUTHOR,
+            \Omeka\Permissions\Acl::ROLE_RESEARCHER,
+        ];
+        if ($user && in_array($user->getRole(), $omekaRoles)) {
+            $query->setIsPublic(false);
+        }
+
+        if ($site) {
+            $query->setSiteId($site->id());
+        }
+
+        $engine = $this->engine();
+        $engineSettings = $engine->settings();
+        $suggesterSettings = $this->settings();
+
+        $query
+            ->setResources($engineSettings['resources'])
+            ->setLimitPage(1, empty($suggesterSettings['limit']) ? \Omeka\Stdlib\Paginator::PER_PAGE : (int) $suggesterSettings['limit'])
+            ->setSuggestOptions([
+                'mode' => $suggesterSettings['mode'] ?? 'start',
+                'length' => $suggesterSettings['length'] ?? 50,
+                'direct' => !empty($suggesterSettings['direct']),
+            ])
+            ->setSuggestFields($suggesterSettings['fields'] ?? []);
+
+        /** @var \AdvancedSearch\Querier\QuerierInterface $querier */
+        $querier = $engine
+            ->querier()
+            ->setQuery($query);
+        try {
+            return $querier->querySuggestions();
+        } catch (QuerierException $e) {
+            $message = new Message("Query error: %s\nQuery:%s", $e->getMessage(), json_encode($query->jsonSerialize(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)); // @translate
+            $this->logger()->err($message);
+            return (new Response)
+                ->setMessage($message);
+        }
     }
 }

@@ -77,6 +77,7 @@ return [
             Form\Admin\SearchConfigForm::class => Service\Form\SearchConfigFormFactory::class,
             Form\Admin\SearchEngineConfigureForm::class => Service\Form\SearchEngineConfigureFormFactory::class,
             Form\Admin\SearchEngineForm::class => Service\Form\SearchEngineFormFactory::class,
+            Form\Admin\SearchSuggesterForm::class => Service\Form\SearchSuggesterFormFactory::class,
             Form\Element\MediaTypeSelect::class => Service\Form\Element\MediaTypeSelectFactory::class,
             Form\Element\SearchConfigSelect::class => Service\Form\Element\SearchConfigSelectFactory::class,
             Form\SearchFilter\Advanced::class => Service\Form\StandardFactory::class,
@@ -94,6 +95,7 @@ return [
         'factories' => [
             Controller\Admin\SearchConfigController::class => Service\Controller\Admin\SearchConfigControllerFactory::class,
             Controller\Admin\SearchEngineController::class => Service\Controller\Admin\SearchEngineControllerFactory::class,
+            Controller\Admin\SearchSuggesterController::class => Service\Controller\Admin\SearchSuggesterControllerFactory::class,
         ],
     ],
     'controller_plugins' => [
@@ -206,6 +208,34 @@ return [
                                     'defaults' => [
                                         '__NAMESPACE__' => 'AdvancedSearch\Controller\Admin',
                                         'controller' => Controller\Admin\SearchConfigController::class,
+                                        'action' => 'show',
+                                    ],
+                                ],
+                            ],
+                            'suggester' => [
+                                'type' => \Laminas\Router\Http\Segment::class,
+                                'options' => [
+                                    'route' => '/suggester/:action',
+                                    'constraints' => [
+                                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                                    ],
+                                    'defaults' => [
+                                        '__NAMESPACE__' => 'AdvancedSearch\Controller\Admin',
+                                        'controller' => Controller\Admin\SearchSuggesterController::class,
+                                    ],
+                                ],
+                            ],
+                            'suggester-id' => [
+                                'type' => \Laminas\Router\Http\Segment::class,
+                                'options' => [
+                                    'route' => '/suggester/:id[/:action]',
+                                    'constraints' => [
+                                        'id' => '\d+',
+                                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                                    ],
+                                    'defaults' => [
+                                        '__NAMESPACE__' => 'AdvancedSearch\Controller\Admin',
+                                        'controller' => Controller\Admin\SearchSuggesterController::class,
                                         'action' => 'show',
                                     ],
                                 ],

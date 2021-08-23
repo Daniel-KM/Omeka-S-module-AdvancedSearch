@@ -73,8 +73,10 @@ class SearchSuggesterAdapter extends AbstractEntityAdapter
             && $this->shouldHydrate($request, 'o:engine')
         ) {
             $engine = $request->getValue('o:engine');
-            if (!is_object($engine)) {
-                $engine = $this->getAdapter('search_engines')->findEntity($engine);
+            if (is_array($engine)) {
+                $engine = $this->getAdapter('search_engines')->findEntity($engine['o:id'] ?? 0);
+            } elseif (is_numeric($engine)) {
+                $engine = $this->getAdapter('search_engines')->findEntity((int) $engine);
             }
             $entity->setEngine($engine);
         }

@@ -101,12 +101,12 @@ class SearchEngineController extends AbstractActionController
         $adapter = $this->searchAdapterManager->get($searchEngineAdapterName);
 
         $form = $this->getForm(SearchEngineConfigureForm::class, [
-            'advancedsearch_engine_id' => $id,
+            'search_engine_id' => $id,
         ]);
         $adapterFieldset = $adapter->getConfigFieldset();
         if ($adapterFieldset) {
             $adapterFieldset
-                ->setOption('advancedsearch_engine_id', $id)
+                ->setOption('search_engine_id', $id)
                 ->setName('adapter')
                 ->setLabel('Adapter settings') // @translate
                 ->init();
@@ -148,7 +148,7 @@ class SearchEngineController extends AbstractActionController
     {
         $engine = $this->api()->read('search_engines', $this->params('id'))->getContent();
 
-        $totalJobs = $this->totalJobs(\AdvancedSearch\Job\Indexing::class, true);
+        $totalJobs = $this->totalJobs(\AdvancedSearch\Job\IndexSearch::class, true);
 
         $view = new ViewModel([
             'resourceLabel' => 'search index',
@@ -170,11 +170,11 @@ class SearchEngineController extends AbstractActionController
         $force = (bool) $this->params()->fromPost('force');
 
         $jobArgs = [];
-        $jobArgs['advancedsearch_engine_id'] = $searchEngine->id();
+        $jobArgs['search_engine_id'] = $searchEngine->id();
         $jobArgs['start_resource_id'] = $startResourceId;
         $jobArgs['resource_names'] = $resourceNames;
         $jobArgs['force'] = $force;
-        $job = $this->jobDispatcher()->dispatch(\AdvancedSearch\Job\Indexing::class, $jobArgs);
+        $job = $this->jobDispatcher()->dispatch(\AdvancedSearch\Job\IndexSearch::class, $jobArgs);
 
         $urlHelper = $this->viewHelpers()->get('url');
         $message = new Message(

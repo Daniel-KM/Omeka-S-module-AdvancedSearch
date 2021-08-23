@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \AdvancedSearch\Form\Admin\SearchSuggesterForm $form
+ */
+
+$translate = $this->plugin('translate');
+$form->prepare();
+?>
+
+<?= $this->pageTitle($translate('Edit suggester')) ?>
+
+<?= $this->form()->openTag($form) ?>
+<div id="page-actions">
+    <button><?= $translate('Save') ?></button>
+</div>
+<?= $this->formCollection($form) ?>
+<?php $this->trigger('view.edit.form.after'); ?>
+<?= $this->form()->closeTag() ?>
+<?php $this->trigger('view.edit.after'); ?>

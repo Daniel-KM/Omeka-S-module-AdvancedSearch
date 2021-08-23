@@ -116,7 +116,9 @@ class SearchConfigController extends AbstractActionController
         $searchConfig = $this->api()->read('search_configs', ['id' => $id])->getContent();
 
         $data = $searchConfig->jsonSerialize();
+        $data = json_decode(json_encode($searchConfig), true);
         $data['manage_config_default'] = $this->sitesWithSearchConfig($searchConfig);
+        $data['o:engine'] = empty($data['o:engine']['o:id']) ? null : $data['o:engine']['o:id'];
 
         $form = $this->getForm(SearchConfigForm::class);
         $form->setData($data);

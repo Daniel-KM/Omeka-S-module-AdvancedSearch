@@ -29,8 +29,9 @@
 
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
- * @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $search_engines
- * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation[] $search_configs
+ * @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $engines
+ * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation[] $searchConfigs
+ * @var \AdvancedSearch\Api\Representation\SearchSuggesterRepresentation[] $suggesters
  */
 
 $translate = $this->plugin('translate');
@@ -44,13 +45,14 @@ $url = $this->plugin('url');
 
 <div id="page-actions">
     <a class="button" href="<?= $url('admin/search/engine', ['action' => 'add']) ?>"><?= $translate('Add new search engine') ?></a>
-    <?php if (!empty($search_engines)): ?>
+    <?php if (!empty($engines)): ?>
         <a class="button" href="<?= $url('admin/search/config', ['action' => 'add']) ?>"><?= $translate('Add new page') ?></a>
+        <a class="button" href="<?= $url('admin/search/suggester', ['action' => 'add']) ?>"><?= $translate('Add new suggester') ?></a>
     <?php endif; ?>
 </div>
 
 <h2><?= $translate('Search engines') ?></h2>
-<?php if (count($search_engines) > 0): ?>
+<?php if (count($engines) > 0): ?>
     <table class="tablesaw" data-tablesaw-mode="stack">
         <thead>
             <tr>
@@ -59,14 +61,14 @@ $url = $this->plugin('url');
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($search_engines as $search_index): ?>
+            <?php foreach ($engines as $engine): ?>
                 <tr>
                     <td>
-                        <span><?= $search_index->name() ?></span>
+                        <span><?= $engine->name() ?></span>
                         <ul class="actions">
-                            <?php if ($search_index->adapter()): ?>
+                            <?php if ($engine->adapter()): ?>
                                 <li>
-                                    <?= $search_index->link('', 'edit', [
+                                    <?= $engine->link('', 'edit', [
                                         'class' => 'o-icon-edit',
                                         'aria-label' => $translate('Edit'),
                                         'title' => $translate('Edit'),
@@ -74,7 +76,7 @@ $url = $this->plugin('url');
                                 </li>
                                 <li>
                                     <a href="#"
-                                    data-sidebar-content-url="<?= $escape($search_index->url('index-confirm')) ?>"
+                                    data-sidebar-content-url="<?= $escape($engine->url('index-confirm')) ?>"
                                     class="o-icon- fa fa-refresh fa-sync sidebar-content"
                                     aria-label="<?= $escape($translate('Reindex all')) ?>"
                                     title="<?= $escape($translate('Reindex all')) ?>"></a>
@@ -82,14 +84,14 @@ $url = $this->plugin('url');
                             <?php endif; ?>
                             <li>
                                 <a href="#"
-                                data-sidebar-content-url="<?= $escape($search_index->url('delete-confirm')) ?>"
+                                data-sidebar-content-url="<?= $escape($engine->url('delete-confirm')) ?>"
                                 class="o-icon-delete sidebar-content"
                                 aria-label="<?= $escape($translate('Delete')) ?>"
                                 title="<?= $escape($translate('Delete')) ?>"></a>
                             </li>
                         </ul>
                     </td>
-                    <td><?= $search_index->adapterLabel() ?></td>
+                    <td><?= $engine->adapterLabel() ?></td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
@@ -99,7 +101,7 @@ $url = $this->plugin('url');
 <?php endif; ?>
 
 <h2><?= $translate('Page configs') ?></h2>
-<?php if (count($search_configs) > 0): ?>
+<?php if (count($searchConfigs) > 0): ?>
     <table class="tablesaw" data-tablesaw-mode="stack">
         <thead>
             <tr>
@@ -110,20 +112,20 @@ $url = $this->plugin('url');
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($search_configs as $search_config): ?>
+            <?php foreach ($searchConfigs as $searchConfig): ?>
                 <tr>
                     <td>
-                        <span><?= $search_config->name() ?></span>
+                        <span><?= $searchConfig->name() ?></span>
                         <ul class="actions">
                             <li>
-                                <?= $search_config->link('', 'edit', [
+                                <?= $searchConfig->link('', 'edit', [
                                     'class' => 'o-icon-edit',
                                     'title' => $translate('Edit'),
                                 ]) ?>
                             </li>
-                            <?php if ($search_config->engine()->adapter()): ?>
+                            <?php if ($searchConfig->engine()->adapter()): ?>
                             <li>
-                                <?= $search_config->link('', 'configure', [
+                                <?= $searchConfig->link('', 'configure', [
                                     'class' => 'o-icon- fa fa-sliders fa-sliders-h',
                                     'title' => $translate('Configure facets and sort fields'),
                                 ]) ?>
@@ -131,22 +133,22 @@ $url = $this->plugin('url');
                             <?php endif; ?>
                             <li>
                                 <a href="#"
-                                data-sidebar-content-url="<?= $escape($search_config->url('delete-confirm')) ?>"
+                                data-sidebar-content-url="<?= $escape($searchConfig->url('delete-confirm')) ?>"
                                 class="o-icon-delete sidebar-content"
                                 aria-label="<?= $escape($translate('Delete')) ?>"
                                 title="<?= $escape($translate('Delete')) ?>"></a>
                             </li>
                         </ul>
                     </td>
-                    <td><?= $search_config->path() ?></td>
-                    <td><?= $search_config->engine()->name() ?></td>
+                    <td><?= $searchConfig->path() ?></td>
+                    <td><?= $searchConfig->engine()->name() ?></td>
                     <td>
                         <?php
-                            $formAdapter = $search_config->formAdapter();
+                            $formAdapter = $searchConfig->formAdapter();
                             if ($formAdapter) {
                                 echo $formAdapter->getLabel();
                             } else {
-                                echo $search_config->formAdapterName();
+                                echo $searchConfig->formAdapterName();
                             }
                         ?>
                     </td>
@@ -156,6 +158,54 @@ $url = $this->plugin('url');
     </table>
 <?php else: ?>
     <p><?= $translate('No search page configs created yet.') ?></p>
+<?php endif; ?>
+
+<h2><?= $translate('Suggesters') ?></h2>
+<?php if (count($suggesters) > 0): ?>
+    <table class="tablesaw" data-tablesaw-mode="stack">
+        <thead>
+            <tr>
+                <th><?= $translate('Name') ?></th>
+                <th><?= $translate('Search engine') ?></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($suggesters as $suggester): ?>
+                <tr>
+                    <td>
+                        <span><?= $suggester->name() ?></span>
+                        <ul class="actions">
+                            <?php if ($suggester->engine()->adapter()): ?>
+                            <li>
+                                <?= $suggester->link('', 'edit', [
+                                    'class' => 'o-icon-edit',
+                                    'title' => $translate('Edit'),
+                                ]) ?>
+                            </li>
+                            <?php else: ?>
+                            <li>
+                                <?= $this->hyperlink('', '#', [
+                                    'class' => 'o-icon-edit disabled',
+                                    'title' => $translate('Edit disabled: search adapter not available'),
+                                ]) ?>
+                            </li>
+                            <?php endif; ?>
+                            <li>
+                                <a href="#"
+                                data-sidebar-content-url="<?= $escape($suggester->url('delete-confirm')) ?>"
+                                class="o-icon-delete sidebar-content"
+                                aria-label="<?= $escape($translate('Delete')) ?>"
+                                title="<?= $escape($translate('Delete')) ?>"></a>
+                            </li>
+                        </ul>
+                    </td>
+                    <td><?= $suggester->engine()->name() ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+<?php else: ?>
+    <p><?= $translate('No search suggesters created yet.') ?></p>
 <?php endif; ?>
 
 <div class="sidebar">

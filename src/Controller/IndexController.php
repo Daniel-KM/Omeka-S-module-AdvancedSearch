@@ -31,14 +31,11 @@
 namespace AdvancedSearch\Controller;
 
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
-use AdvancedSearch\Querier\Exception\QuerierException;
 use AdvancedSearch\Query;
 use AdvancedSearch\Response;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
-use Omeka\Api\Representation\SiteRepresentation;
-use Omeka\Stdlib\Message;
 
 class IndexController extends AbstractActionController
 {
@@ -193,6 +190,17 @@ class IndexController extends AbstractActionController
             ]);
         }
 
+        $q = (string) $this->params()->fromQuery('q');
+        if (!strlen($q)) {
+            return new JsonModel([
+                'status' => 'success',
+                'data' => [
+                    'query' => '',
+                    'suggestions' => [],
+                ],
+            ]);
+        }
+
         $searchConfigId = (int) $this->params('id');
 
         $isPublic = $this->status()->isSiteRequest();
@@ -214,34 +222,27 @@ class IndexController extends AbstractActionController
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $this->api()->read('search_configs', $searchConfigId)->getContent();
 
-        /** @var \AdvancedSearch\FormAdapter\FormAdapterInterface $formAdapter */
-        $formAdapter = $searchConfig->formAdapter();
-        if (!$formAdapter) {
+        // The suggester may be the url, but in that case it's pure js and the
+        // query doesn't come here (for now).
+        $suggesterId = $searchConfig->subSetting('autosuggest', 'suggester');
+        if (!$suggesterId) {
             return new JsonModel([
                 'status' => 'error',
-                'message' => 'The search page has no querier.', // @translate
+                'message' => 'The search page has no suggester.', // @translate
             ]);
         }
 
-        if (!$searchConfig->subSetting('autosuggest', 'enable')) {
+        try {
+            /** @var \AdvancedSearch\Api\Representation\SearchSuggesterRepresentation $suggester */
+            $suggester = $this->api()->read('search_suggesters', $suggesterId)->getContent();
+        } catch (\Omeka\Api\Exception\NotFoundException $e) {
             return new JsonModel([
                 'status' => 'error',
-                'message' => 'Auto-suggestion is not enabled on this server.', // @translate
+                'message' => 'The search page has no more suggester.', // @translate
             ]);
         }
 
-        $q = (string) $this->params()->fromQuery('q');
-        if (!strlen($q)) {
-            return new JsonModel([
-                'status' => 'success',
-                'data' => [
-                    'query' => '',
-                    'suggestions' => [],
-                ],
-            ]);
-        }
-
-        $response = $this->processQuerySuggestions($searchConfig, $q, $site);
+        $response = $suggester->suggest($q, $site);
         if (!$response) {
             $this->getResponse()->setStatusCode(\Laminas\Http\Response::STATUS_CODE_500);
             return new JsonModel([
@@ -258,7 +259,7 @@ class IndexController extends AbstractActionController
             ]);
         }
 
-        /* @var \AdvancedSearch\Response $response */
+        /** @see \AdvancedSearch\Response $response */
         return new JsonModel([
             'status' => 'success',
             'data' => [
@@ -266,69 +267,6 @@ class IndexController extends AbstractActionController
                 'suggestions' => $response->getSuggestions(),
             ],
         ]);
-    }
-
-    protected function processQuerySuggestions(
-        SearchConfigRepresentation $searchConfig,
-        string $q,
-        ?SiteRepresentation $site
-    ): Response {
-        /** @var \AdvancedSearch\FormAdapter\FormAdapterInterface $formAdapter */
-        $formAdapter = $searchConfig->formAdapter();
-        $searchConfigSettings = $searchConfig->settings();
-        $searchFormSettings = $searchConfigSettings['form'] ?? [];
-        // Fix to be removed.
-        $searchFormSettings['resource_fields'] = $searchConfigSettings['resource_fields'] ?? [];
-
-        $autosuggestSettings = $searchConfig->setting('autosuggest', []);
-
-        // TODO Add a default query to manage any suggestion on any field and suggestions on item set page.
-
-        /** @var \AdvancedSearch\Query $query */
-        $query = $formAdapter->toQuery(['q' => $q], $searchFormSettings);
-
-        $searchEngine = $searchConfig->engine();
-        $engineSettings = $searchEngine->settings();
-
-        $user = $this->identity();
-        // TODO Manage roles from modules and visibility from modules (access resources).
-        $omekaRoles = [
-            \Omeka\Permissions\Acl::ROLE_GLOBAL_ADMIN,
-            \Omeka\Permissions\Acl::ROLE_SITE_ADMIN,
-            \Omeka\Permissions\Acl::ROLE_EDITOR,
-            \Omeka\Permissions\Acl::ROLE_REVIEWER,
-            \Omeka\Permissions\Acl::ROLE_AUTHOR,
-            \Omeka\Permissions\Acl::ROLE_RESEARCHER,
-        ];
-        if ($user && in_array($user->getRole(), $omekaRoles)) {
-            $query->setIsPublic(false);
-        }
-
-        if ($site) {
-            $query->setSiteId($site->id());
-        }
-
-        $query
-            ->setResources($engineSettings['resources'])
-            ->setLimitPage(1, empty($autosuggestSettings['limit']) ? \Omeka\Stdlib\Paginator::PER_PAGE : (int) $autosuggestSettings['limit'])
-            ->setSuggestOptions([
-                'mode' => $autosuggestSettings['mode'] ?? 'start',
-                'length' => $autosuggestSettings['length'] ?? 50,
-            ])
-            ->setSuggestFields($autosuggestSettings['fields'] ?? []);
-
-        /** @var \AdvancedSearch\Querier\QuerierInterface $querier */
-        $querier = $searchEngine
-            ->querier()
-            ->setQuery($query);
-        try {
-            return $querier->querySuggestions();
-        } catch (QuerierException $e) {
-            $message = new Message("Query error: %s\nQuery:%s", $e->getMessage(), json_encode($query->jsonSerialize(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)); // @translate
-            $this->logger()->err($message);
-            return (new Response)
-                ->setMessage($message);
-        }
     }
 
     /**

@@ -34,7 +34,7 @@ use Doctrine\ORM\EntityManager;
 use Omeka\Job\AbstractJob;
 use Omeka\Stdlib\Message;
 
-class Indexing extends AbstractJob
+class IndexSearch extends AbstractJob
 {
     const BATCH_SIZE = 100;
 
@@ -68,7 +68,7 @@ class Indexing extends AbstractJob
             $batchSize = self::BATCH_SIZE;
         }
 
-        $searchEngineId = $this->getArg('advancedsearch_engine_id');
+        $searchEngineId = $this->getArg('search_engine_id');
         $startResourceId = (int) $this->getArg('start_resource_id');
 
         /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation $searchEngine */
@@ -97,14 +97,14 @@ class Indexing extends AbstractJob
         if ($totalJobs > 1) {
             if (!$force) {
                 $this->logger->err(new Message(
-                    'Search index #%d ("%s"): There are already %d other jobs "Search Index" and the current one is not forced.', // @translate
+                    'Search index #%d ("%s"): There are already %d other jobs "Index Search" and the current one is not forced.', // @translate
                     $searchEngine->id(), $searchEngine->name(), $totalJobs - 1
                 ));
                 return;
             }
 
             $this->logger->warn(new Message(
-                'There are already %d other jobs "Indexing". Slowdowns may occur on the site.', // @translate
+                'There are already %d other jobs "Index Search". Slowdowns may occur on the site.', // @translate
                 $totalJobs - 1
             ));
         }

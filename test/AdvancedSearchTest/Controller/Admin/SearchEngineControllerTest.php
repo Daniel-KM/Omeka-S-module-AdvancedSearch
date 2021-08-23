@@ -49,7 +49,7 @@ class SearchEngineControllerTest extends SearchControllerTestCase
     {
         $forms = $this->getServiceLocator()->get('FormElementManager');
         $form = $forms->get(SearchEngineConfigureForm::class, [
-            'advancedsearch_engine_id' => $this->searchEngine->id(),
+            'search_engine_id' => $this->searchEngine->id(),
         ]);
 
         $this->dispatch($this->searchEngine->adminUrl('edit'), 'POST', [

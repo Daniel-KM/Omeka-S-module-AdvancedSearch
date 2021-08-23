@@ -44,6 +44,11 @@ class SearchConfigConfigureForm extends Form
 {
     protected $formElementManager;
 
+    /**
+     * @var array
+     */
+    protected $suggesters = [];
+
     public function init(): void
     {
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
@@ -214,70 +219,16 @@ class SearchConfigConfigureForm extends Form
             ])
             ->get('autosuggest')
             ->add([
-                'name' => 'enable',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'label' => 'Enable auto-suggestions', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'autosuggest_enable',
-                ],
-            ])
-            ->add([
-                'name' => 'mode',
-                'type' => OptionalRadio::class,
-                'options' => [
-                    'label' => 'Mode', // @translate
-                    'info' => 'Should be implemented in internal search engine.',
-                    'value_options' => [
-                        'start' => 'Start with', // @translate
-                        'contain' => 'Contains', // @translate
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'autosuggest_mode',
-                    'required' => false,
-                    'value' => 'start',
-                ],
-            ])
-            ->add([
-                'name' => 'limit',
-                'type' => Element\Number::class,
-                'options' => [
-                    'label' => 'Max number of results', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'autosuggest_limit',
-                    'required' => false,
-                    'value' => \Omeka\Stdlib\Paginator::PER_PAGE,
-                    'min' => '0',
-                ],
-            ])
-            ->add([
-                'name' => 'length',
-                'type' => Element\Number::class,
-                'options' => [
-                    'label' => 'Max number of characters of a result', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'autosuggest_length',
-                    'required' => false,
-                    'value' => '50',
-                    'min' => '1',
-                    'max' => '190',
-                ],
-            ])
-            ->add([
-                'name' => 'fields',
+                'name' => 'suggester',
                 'type' => OptionalSelect::class,
                 'options' => [
-                    'label' => 'Limit query to specific fields', // @translate
-                    'value_options' => $availableFields,
+                    'label' => 'Suggester', // @translate
+                    'value_options' => $this->suggesters,
                     'empty_option' => '',
                 ],
                 'attributes' => [
-                    'id' => 'autosuggest_fields',
-                    'multiple' => true,
+                    'id' => 'autosuggest_suggester',
+                    'multiple' => false,
                     'class' => 'chosen-select',
                     'data-placeholder' => ' ',
                 ],
@@ -286,9 +237,9 @@ class SearchConfigConfigureForm extends Form
                 'name' => 'url',
                 'type' => OptionalUrl::class,
                 'options' => [
-                    'label' => 'Optional direct endpoint', // @translate
+                    'label' => 'Direct endpoint', // @translate
                     // @see https://solr.apache.org/guide/suggester.html#suggest-request-handler-parameters
-                    'info' => 'This url allows to use an external endpoint to manage keywords and is generally quicker.', // @translate
+                    'info' => 'This url allows to use an external endpoint to manage keywords and is generally quicker. Needed params should be appended.', // @translate
                 ],
                 'attributes' => [
                     'id' => 'autosuggest_url',
@@ -760,15 +711,10 @@ advanced = Filters = Advanced',
         return $options;
     }
 
-    protected function getSearchAdapter(): ?\AdvancedSearch\Adapter\AdapterInterface
+    public function setSuggesters(array $suggesters): self
     {
-        static $searchAdapter = false;
-        if ($searchAdapter === false) {
-            $searchConfig = $this->getOption('search_config');
-            $searchEngine = $searchConfig->engine();
-            $searchAdapter = $searchEngine->adapter();
-        }
-        return $searchAdapter;
+        $this->suggesters = $suggesters;
+        return $this;
     }
 
     public function setFormElementManager($formElementManager): self

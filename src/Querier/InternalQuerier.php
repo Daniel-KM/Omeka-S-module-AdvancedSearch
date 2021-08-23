@@ -232,13 +232,31 @@ SQL;
             $sqlSite = '';
         }
 
-        $mode = $this->query->getSuggestOptions()['mode_search'] === 'contain' ? 'contain' : 'start';
+        // TODO Check the index mode for the direct search of suggestions.
+
+        $mode = $this->query->getSuggestOptions()['mode_search'] ?: 'start';
         if ($mode === 'contain') {
-            // $bind['value'] = $q;
-            // $bind['value_like'] = '%' . str_replace(['%', '_'], ['\%', '\_'], $q) . '%';
-            return $this->response
-                ->setMessage('This mode is currently not supported with the internal search engine.'); // @translate
-        } else {
+            // TODO Improve direct sql for full suggestions.
+            $sql = <<<SQL
+SELECT DISTINCT
+    SUBSTRING(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), 1, :length) AS "value",
+    COUNT(SUBSTRING(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), 1, :length)) AS "data"
+FROM `value` AS `value`
+INNER JOIN `resource` ON `resource`.`id` = `value`.`resource_id`
+$sqlSite
+WHERE `resource`.`resource_type` IN ($inClasses)
+    $sqlIsPublic
+    $sqlFields
+    AND `value`.`value` LIKE :value_like
+GROUP BY
+    SUBSTRING(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), 1, :length)
+ORDER BY data DESC
+LIMIT :limit
+;
+SQL;
+            $bind['value_like'] = '%' . str_replace(['%', '_'], ['\%', '\_'], $q) . '%';
+            $types['value_like'] = \PDO::PARAM_STR;
+        } elseif ($mode === 'start') {
             // Use keys "value" and "data" to get a well formatted output for
             // suggestions.
             // The query cuts the value to the first space. The end of line is
@@ -312,6 +330,9 @@ LIMIT :limit
 SQL;
             $bind['value_like'] = str_replace(['%', '_'], ['\%', '\_'], $q) . '%';
             $types['value_like'] = \PDO::PARAM_STR;
+        } else {
+            return $this->response
+                ->setMessage('This mode is currently not supported with the internal search engine.'); // @translate
         }
 
         try {

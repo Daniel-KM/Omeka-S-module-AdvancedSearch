@@ -116,19 +116,14 @@ class IndexSuggestions extends AbstractJob
 
         $timeStart = microtime(true);
 
-        $mode = $suggester->setting('mode_index') === 'contain' ? 'contain' : 'start';
+        $modeIndex = $suggester->setting('mode_index') ?: 'start';
 
-        $this->logger->notice(new Message('Suggester #%d ("%s"): start of indexing (index mode: %s)', // @translate
-            $suggester->id(), $suggester->name(), $mode));
+        $processMode = $this->getArg('process_mode') === 'sql' ? 'sql' : 'orm';
 
-        $byValue = (bool) $this->getArg('by_value');
-        if ($byValue) {
-            $this->logger->info(new Message('Suggester #%d ("%s"): processing by value', // @translate
-                $suggester->id(), $suggester->name()
-            ));
-        }
+        $this->logger->notice(new Message('Suggester #%d ("%s"): start of indexing (index mode: %s, process mode: %s).', // @translate
+            $suggester->id(), $suggester->name(), $modeIndex, $processMode));
 
-        $this->process($suggester, $byValue);
+        $this->process($suggester, $processMode);
 
         $timeTotal = (int) (microtime(true) - $timeStart);
 
@@ -139,7 +134,7 @@ class IndexSuggestions extends AbstractJob
         ));
     }
 
-    protected function process(SearchSuggesterRepresentation $suggester, bool $byValue = false): self
+    protected function process(SearchSuggesterRepresentation $suggester, string $processMode): self
     {
         $dql = 'DELETE FROM AdvancedSearch\Entity\SearchSuggestion s WHERE s.suggester = ' . $suggester->id();
         $query = $this->entityManager->createQuery($dql);
@@ -161,14 +156,14 @@ class IndexSuggestions extends AbstractJob
         // FIXME Fields are not only properties, but titles, classes and templates.
         $fields = $suggester->setting('fields') ?: [];
 
-        $mode = $suggester->setting('mode_index') === 'contain' ? 'contain' : 'start';
+        $modeIndex = $suggester->setting('mode_index') ?: 'start';
 
-        if ($byValue) {
-            $this->processByValue($suggester, $resourceNames, $fields, $mode);
+        if ($processMode === 'sql') {
+            $modeIndex === 'contain' || $modeIndex === 'contain_full'
+                ? $this->processContain($suggester, $resourceNames, $fields, $modeIndex)
+                : $this->processStart($suggester, $resourceNames, $fields, $modeIndex);
         } else {
-            $mode === 'start'
-                ? $this->processStart($suggester, $resourceNames, $fields)
-                : $this->processContain($suggester, $resourceNames, $fields);
+            $this->processOrm($suggester, $resourceNames, $fields, $modeIndex);
         }
 
         return $this;
@@ -177,7 +172,8 @@ class IndexSuggestions extends AbstractJob
     protected function processStart(
         SearchSuggesterRepresentation $suggester,
         array $resourceTypes,
-        array $fields
+        array $fields,
+        string $modeIndex
     ): self {
         $bind = [
             'suggester_id' => $suggester->id(),
@@ -211,10 +207,12 @@ SQL;
             'all' => '',
             'public' => 'AND `resource`.`is_public` = 1 AND `value`.`is_public` = 1',
         ];
-        foreach ($sqlsVisibility as $column => $sqlVisibility) {
-            for ($numberWords = 3; $numberWords >= 1; $numberWords--) {
-                // Don't "insert ignore and distinct", increment on duplicate.
-                $sql .= <<<SQL
+
+        if ($modeIndex === 'start' || $modeIndex === 'start_full') {
+            foreach ($sqlsVisibility as $column => $sqlVisibility) {
+                for ($numberWords = 3; $numberWords >= 1; $numberWords--) {
+                    // Don't "insert ignore and distinct", increment on duplicate.
+                    $sql .= <<<SQL
 # Create $numberWords words index (compute $column).
 INSERT INTO `_suggestions_temporary` (`text`)
 SELECT
@@ -265,7 +263,12 @@ WHERE `value`.`value` IS NOT NULL
 ON DUPLICATE KEY UPDATE `_suggestions_temporary`.`total_$column` = `_suggestions_temporary`.`total_$column` + 1;
 
 SQL;
+                }
             }
+        }
+
+        if ($modeIndex === 'full' || $modeIndex === 'start_full') {
+            $sql .= $this->appendSqlFull($sqlFields);
         }
 
         $sql .= <<<SQL
@@ -291,7 +294,8 @@ SQL;
     protected function processContain(
         SearchSuggesterRepresentation $suggester,
         array $resourceTypes,
-        array $fields
+        array $fields,
+        string $modeIndex
     ): self {
         $bind = [
             'suggester_id' => $suggester->id(),
@@ -325,10 +329,12 @@ SQL;
             'all' => '',
             'public' => 'AND `resource`.`is_public` = 1 AND `value`.`is_public` = 1',
         ];
-        foreach ($sqlsVisibility as $column => $sqlVisibility) {
-            // Only one word for now.
-            // Don't "insert ignore and distinct", increment on duplicate.
-            $sql .= <<<SQL
+
+        if ($modeIndex === 'contain' || $modeIndex === 'contain_full') {
+            foreach ($sqlsVisibility as $column => $sqlVisibility) {
+                // Only one word for now.
+                // Don't "insert ignore and distinct", increment on duplicate.
+                $sql .= <<<SQL
 # Create single words index (compute $column).
 # TODO Divide values by 1000 and use a loop.
 SET @pr = CONCAT(
@@ -390,6 +396,11 @@ PREPARE stmt1 FROM @pr;
 EXECUTE stmt1;
 
 SQL;
+            }
+        }
+
+        if ($modeIndex === 'full' || $modeIndex === 'contain_full') {
+            $sql .= $this->appendSqlFull($sqlFields);
         }
 
         $sql .= <<<SQL
@@ -448,11 +459,39 @@ SQL;
         return $this;
     }
 
-    protected function processByValue(
+    protected function appendSqlFull(string $sqlFields): string
+    {
+        $sql = '';
+        $sqlsVisibility = [
+            'all' => '',
+            'public' => 'AND `resource`.`is_public` = 1 AND `value`.`is_public` = 1',
+        ];
+        foreach ($sqlsVisibility as $column => $sqlVisibility) {
+            // Don't "insert ignore and distinct", increment on duplicate.
+            $sql .= <<<SQL
+# Create full value index (compute $column).
+INSERT INTO `_suggestions_temporary` (`text`)
+SELECT
+    TRIM(SUBSTRING(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " "), 1, 190))
+FROM `value` AS `value`
+JOIN `resource`
+    ON `resource`.`id` = `value`.`resource_id`
+    AND `resource`.`resource_type` IN (:resource_types)
+WHERE `value`.`value` IS NOT NULL
+    $sqlFields
+    $sqlVisibility
+ON DUPLICATE KEY UPDATE `_suggestions_temporary`.`total_$column` = `_suggestions_temporary`.`total_$column` + 1;
+
+SQL;
+        }
+        return $sql;
+    }
+
+    protected function processOrm(
         SearchSuggesterRepresentation $suggester,
         array $resourceTypes,
         array $fields,
-        string $mode
+        string $modeIndex
     ): self {
         $criteria = new Criteria;
         $expr = $criteria->expr();
@@ -535,6 +574,11 @@ SQL;
             '’' => ' ',
             '  ' => ' ',
         ];
+        $replacementsFull = [
+            "\n" => ' ',
+            "\r" => ' ',
+            '\\' => ' ',
+        ];
 
         // Since the fixed medias are no more available in the database, the
         // loop should take care of them, so a check is done on it.
@@ -556,8 +600,8 @@ SQL;
 
             if ($this->shouldStop()) {
                 $this->logger->warn(new Message(
-                    'Job stopped: %d/%d processed (index mode: %s.', // @translate
-                    $totalProcessed, $totalToProcess, $mode
+                    'Job stopped: %d/%d processed (index mode: %s).', // @translate
+                    $totalProcessed, $totalToProcess, $modeIndex
                 ));
                 return $this;
             }
@@ -585,19 +629,12 @@ SQL;
                     continue;
                 }
 
-                $string = $value->getValue();
-                $string = str_replace(array_keys($replacements), array_values($replacements), $string);
+                $stringValue = $value->getValue();
 
                 // TODO Skip words without meaning like "the".
                 $list = [];
-                if ($mode === 'contain') {
-                    foreach (array_filter(explode(' ', $string), 'strlen') as $part) {
-                        $part = trim($part, ".: \t\n\r\0\x0B");
-                        if (strlen($part) > 1) {
-                            $list[] = $part;
-                        }
-                    }
-                } else {
+                if ($modeIndex === 'start' || $modeIndex === 'start_full') {
+                    $string = str_replace(array_keys($replacements), array_values($replacements), strip_tags($stringValue));
                     $prevPart = '';
                     foreach (array_filter(explode(' ', $string), 'strlen') as $part) {
                         $part = trim($part, ".: \t\n\r\0\x0B");
@@ -610,6 +647,18 @@ SQL;
                             $prevPart = $fullPart . ' ';
                         }
                     }
+                } elseif ($modeIndex === 'contain' || $modeIndex === 'contain_full') {
+                    $string = str_replace(array_keys($replacements), array_values($replacements), strip_tags($stringValue));
+                    foreach (array_filter(explode(' ', $string), 'strlen') as $part) {
+                        $part = trim($part, ".: \t\n\r\0\x0B");
+                        if (strlen($part) > 1) {
+                            $list[] = $part;
+                        }
+                    }
+                }
+
+                if (strpos($modeIndex, 'full') !== false) {
+                    $list[] = str_replace(array_keys($replacementsFull), array_values($replacementsFull), strip_tags($stringValue));
                 }
 
                 if (!count($list)) {
@@ -655,7 +704,7 @@ SQL;
 
         $this->logger->warn(new Message(
             'End of process: %d/%d processed (index mode: %s).', // @translate
-            $totalProcessed, $totalToProcess, $mode
+            $totalProcessed, $totalToProcess, $modeIndex
         ));
 
         return $this;

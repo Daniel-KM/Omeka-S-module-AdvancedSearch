@@ -115,7 +115,10 @@ class SearchSuggesterForm extends Form
                     'label' => 'Mode to index values', // @translate
                     'value_options' => [
                         'start' => 'First words of values', // @translate
-                        'contain' => 'Any', // @translate
+                        'contain' => 'All words', // @translate
+                        'full' => 'Full value', // @translate
+                        'start_full' => 'First words of values and full value', // @translate
+                        'contain_full' => 'All words and full value', // @translate
                     ],
                 ],
                 'attributes' => [

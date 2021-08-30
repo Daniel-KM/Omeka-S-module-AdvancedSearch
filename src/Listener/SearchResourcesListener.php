@@ -229,7 +229,7 @@ class SearchResourcesListener
      */
     protected function buildPropertyQuery(QueryBuilder $qb, array $query): void
     {
-        if (!isset($query['property']) || !is_array($query['property'])) {
+        if (empty($query['property']) || !is_array($query['property'])) {
             return;
         }
 
@@ -317,7 +317,7 @@ class SearchResourcesListener
                     // no break.
                 case 'list':
                     $list = is_array($value) ? $value : explode("\n", $value);
-                    $list = array_filter(array_map('trim', array_map('strval', $list)), 'strlen');
+                    $list = array_unique(array_filter(array_map('trim', array_map('strval', $list)), 'strlen'));
                     if (empty($list)) {
                         continue 2;
                     }
@@ -1176,7 +1176,7 @@ class SearchResourcesListener
             // Fetch by key pair is not supported by doctrine 2.0.
             $resourceClasses = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             $resourceClasses = array_map('intval', array_column($resourceClasses, 'id', 'term'));
-            $this->tesourceClassesByTermsAndIds = array_replace($resourceClasses, array_combine($resourceClasses, $resourceClasses));
+            $this->resourceClassesByTermsAndIds = array_replace($resourceClasses, array_combine($resourceClasses, $resourceClasses));
 
             // $qb->innerJoin('resource_class', 'resource', 'resource', 'resource_class.id = resource.resource_class_id');
             // $stmt = $connection->executeQuery($qb);

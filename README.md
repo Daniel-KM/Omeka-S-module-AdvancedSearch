@@ -266,7 +266,8 @@ be some minutes with Solr, according to your configuration).
 TODO
 ----
 
-- [ ] Update to remove features integrated in Omeka S v 3.1.
+- [ ] Update to remove features integrated in Omeka S v 3.1 and remove dead fixes
+  for Omeka S beta.
 - [x] The override of a search query with "property" should be called even with
   "initialize = false" in the api.
 - [x] Remove distinction between advanced and basic form: they are just a list
@@ -370,7 +371,7 @@ were done for various projects. The auto-completion was build for future digital
 library of [Campus Condorcet].
 
 
-[Advanced Search]: https://github.com/Daniel-KM/Omeka-S-module-AdvancedSearch
+[Advanced Search]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch
 [Omeka S]: https://omeka.org/s
 [Solr]: https://solr.apache.org/
 [Search Solr]: https://gitlab.com/Daniel-KM/Omeka-S-module-SearchSolr
@@ -380,16 +381,16 @@ library of [Campus Condorcet].
 [jQuery-Autocomplete]: https://github.com/devbridge/jQuery-Autocomplete
 [Reference]: https://gitlab.com/Daniel-KM/Omeka-S-module-Reference
 [Advanced Search Plus]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearchPlus
-[Psl Search Form]: https://github.com/Daniel-KM/Omeka-S-module-PslSearchForm
+[Psl Search Form]: https://gitlab.com/Daniel-KM/Omeka-S-module-PslSearchForm
 [Solr of Biblibre]: https://github.com/BibLibre/Omeka-S-module-Solr
 [Browse preview]: https://omeka.org/s/docs/user-manual/sites/site_pages/#browse-preview
-[module issues]: https://github.com/Daniel-KM/Omeka-S-module-AdvancedSearch/issues
+[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org
 [OSI]: http://opensource.org
 [MIT]: https://github.com/devbridge/jQuery-Autocomplete/blob/master/license.txt
-[Search]: https://github.com/Daniel-KM/Omeka-S-module-Search
+[Search]: https://gitlab.com/Daniel-KM/Omeka-S-module-Search
 [BibLibre]: https://github.com/biblibre
 [GitLab]: https://gitlab.com/Daniel-KM
 [digital library of PSL]: https://bibnum.explore.univ-psl.fr

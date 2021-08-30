@@ -1,0 +1,36 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Laminas\Form\Form $form
+ */
+
+// This quick form displays only the field "q", similarly to the standard search form.
+
+$plugins = $this->getHelperPluginManager();
+$translate = $plugins->get('translate');
+$formHelper = $plugins->get('form');
+$formElement = $plugins->get('formElement');
+
+$params = $this->params()->fromQuery() ?: [];
+$form
+    ->setData($params)
+    ->prepare();
+
+if ($form->has('q')) {
+    $q = $form->get('q');
+} else {
+    foreach ($form->getElements() as $element) {
+        if (!($element instanceof \Laminas\Form\Element\Search)) continue;
+        $q = $element;
+        break;
+    }
+    if (empty($q)) return;
+}
+?>
+
+<?= $formHelper->openTag($form) ?>
+    <?= $formElement($q
+        ->setAttribute('placeholder', $translate('Search'))
+        ->setAttribute('aria-label', $translate('Search'))) ?>
+    <button><?= $translate('Search') ?></button>
+<?= $formHelper->closeTag() ?>

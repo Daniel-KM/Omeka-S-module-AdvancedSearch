@@ -454,59 +454,74 @@ class Module extends AbstractModule
             return;
         }
 
-        $api = $services->get('Omeka\ApiManager');
-        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation[] $searchConfigs */
-        $searchConfigs = $api->search('search_configs')->getContent();
+        $settings = $services->get('Omeka\Settings');
+        $searchConfigs = $settings->get('advancedsearch_all_configs', []);
 
         $isAdminRequest = $status->isAdminRequest();
         if ($isAdminRequest) {
-            $settings = $services->get('Omeka\Settings');
             $adminSearchConfigs = $settings->get('advancedsearch_configs', []);
-            foreach ($searchConfigs as $searchConfig) {
-                $searchConfigId = $searchConfig->id();
-                if (in_array($searchConfigId, $adminSearchConfigs)) {
-                    $router->addRoute(
-                        'search-admin-page-' . $searchConfigId,
-                        [
-                            'type' => \Laminas\Router\Http\Segment::class,
-                            'options' => [
-                                'route' => '/admin/' . $searchConfig->path(),
-                                'defaults' => [
-                                    '__NAMESPACE__' => 'AdvancedSearch\Controller',
-                                    '__ADMIN__' => true,
-                                    'controller' => \AdvancedSearch\Controller\IndexController::class,
-                                    'action' => 'search',
-                                    'id' => $searchConfigId,
-                                ],
+            $adminSearchConfigs = array_intersect_key($searchConfigs, array_flip($adminSearchConfigs));
+            foreach ($adminSearchConfigs as $searchConfigId => $searchConfigSlug) {
+                $router->addRoute(
+                    'search-admin-page-' . $searchConfigId,
+                    [
+                        'type' => \Laminas\Router\Http\Segment::class,
+                        'options' => [
+                            'route' => '/admin/' . $searchConfigSlug,
+                            'defaults' => [
+                                '__NAMESPACE__' => 'AdvancedSearch\Controller',
+                                '__ADMIN__' => true,
+                                'controller' => \AdvancedSearch\Controller\IndexController::class,
+                                'action' => 'search',
+                                'id' => $searchConfigId,
                             ],
-                            'may_terminate' => true,
-                            'child_routes' => [
-                                'suggest' => [
-                                    'type' => \Laminas\Router\Http\Literal::class,
-                                    'options' => [
-                                        'route' => '/suggest',
-                                        'defaults' => [
-                                            '__NAMESPACE__' => 'AdvancedSearch\Controller',
-                                            '__ADMIN__' => true,
-                                            'controller' => \AdvancedSearch\Controller\IndexController::class,
-                                            'action' => 'suggest',
-                                            'id' => $searchConfigId,
-                                        ],
+                        ],
+                        'may_terminate' => true,
+                        'child_routes' => [
+                            'suggest' => [
+                                'type' => \Laminas\Router\Http\Literal::class,
+                                'options' => [
+                                    'route' => '/suggest',
+                                    'defaults' => [
+                                        '__NAMESPACE__' => 'AdvancedSearch\Controller',
+                                        '__ADMIN__' => true,
+                                        'controller' => \AdvancedSearch\Controller\IndexController::class,
+                                        'action' => 'suggest',
+                                        'id' => $searchConfigId,
                                     ],
                                 ],
                             ],
                         ],
-                    );
-                }
+                    ],
+                );
             }
+            return;
         }
 
-        // Public search pages are required to manage them at site level.
-        // The urls use "search-page-" to simplify migration.
-        foreach ($searchConfigs as $searchConfig) {
-            $searchConfigId = $searchConfig->id();
-            $searchConfigSlug = $searchConfig->path();
+        $siteSlug = $status->getRouteParam('site-slug');
+        if (!$siteSlug) {
+            return;
+        }
+
+        // Use of the api requires to check authentication and roles, but roles
+        // are not yet all loaded (guest, annotator, etc.).
+        // Anyway, it's just a route and a check is done in the controller.
+        /** @var \Doctrine\ORM\EntityManager $entityManager */
+        $entityManager = $services->get('Omeka\EntityManager');
+        $site = $entityManager
+            ->getRepository(\Omeka\Entity\Site::class)
+            ->findOneBy(['slug' => $siteSlug]);
+        if (!$site) {
+            return;
+        }
+
+        $siteSettings = $services->get('Omeka\Settings\Site');
+        $siteSettings->setTargetId($site->getId());
+        $siteSearchConfigs = $siteSettings->get('advancedsearch_configs', []);
+        $siteSearchConfigs = array_intersect_key($searchConfigs, array_flip($siteSearchConfigs));
+        foreach ($siteSearchConfigs as $searchConfigId => $searchConfigSlug) {
             $router->addRoute(
+                // The urls use "search-page-" to simplify migration.
                 'search-page-' . $searchConfigId,
                 [
                     'type' => \Laminas\Router\Http\Segment::class,

@@ -42,6 +42,14 @@ class IndexController extends AbstractActionController
         $searchConfigs = $api->search('search_configs', ['sort_by' => 'name'])->getContent();
         $suggesters = $api->search('search_suggesters', ['sort_by' => 'name'])->getContent();
 
+        // For simplicity in settings management, the list of all search configs
+        // is stored one time here.
+        $searchConfigPaths = [];
+        foreach ($searchConfigs as $searchConfig) {
+            $searchConfigPaths[$searchConfig->id()] = $searchConfig->path();
+        }
+        $this->settings()->set('advancedsearch_all_configs', $searchConfigPaths);
+
         return new ViewModel([
             'engines' => $engines,
             'searchConfigs' => $searchConfigs,

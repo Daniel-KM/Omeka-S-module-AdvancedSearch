@@ -8,15 +8,17 @@ namespace AdvancedSearch;
  * @var string $oldVersion
  * @var string $newVersion
  *
- * @var \Omeka\Settings\Settings $settings
+ * @var \Doctrine\ORM\EntityManager $entityManager
  * @var \Doctrine\DBAL\Connection $connection
  * @var \Omeka\Api\Manager $api
  * @var array $config
+ * @var \Omeka\Settings\Settings $settings
  */
-$settings = $services->get('Omeka\Settings');
+// $entityManager = $services->get('Omeka\EntityManager');
 $connection = $services->get('Omeka\Connection');
-$api = $services->get('Omeka\ApiManager');
-$config = require dirname(__DIR__, 2) . '/config/module.config.php';
+// $api = $services->get('Omeka\ApiManager');
+// $config = require dirname(__DIR__, 2) . '/config/module.config.php';
+$settings = $services->get('Omeka\Settings');
 
 if (version_compare($oldVersion, '3.3.6.2', '<')) {
     $this->checkDependency();
@@ -52,4 +54,16 @@ SQL;
     foreach (array_filter(explode(";\n", $sqls)) as $sql) {
         $connection->exec($sql);
     }
+}
+
+if (version_compare($oldVersion, '3.3.6.3', '<')) {
+    // During upgrade, no search can be done via api or entity manager, so use
+    // connection.
+    // $searchConfigPaths = $api->search('search_configs', [], ['returnScalar' => 'path'])->getContent();
+    $sql = <<<'SQL'
+SELECT `id`, `path` FROM `search_config` ORDER BY `id`;
+SQL;
+    $searchConfigPaths = $connection->fetchAll($sql);
+    $searchConfigPaths = array_column($searchConfigPaths, 'path', 'id');
+    $settings->set('advancedsearch_all_configs', $searchConfigPaths);
 }

@@ -145,6 +145,7 @@ return [
         'routes' => [
             'admin' => [
                 'child_routes' => [
+                    // To simplify migration, the route is "search".
                     'search' => [
                         'type' => \Laminas\Router\Http\Literal::class,
                         'options' => [
@@ -286,6 +287,8 @@ return [
             'advancedsearch_configs' => [1],
             'advancedsearch_api_config' => '',
             'advancedsearch_batch_size' => 100,
+            // Hidden value.
+            'advancedsearch_all_configs' => [1 => 'find'],
         ],
         'site_settings' => [
             'advancedsearch_restrict_used_terms' => true,

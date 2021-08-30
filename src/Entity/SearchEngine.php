@@ -130,7 +130,6 @@ class SearchEngine extends AbstractEntity
 
     public function __construct()
     {
-        parent::__construct();
         $this->searchConfigs = new ArrayCollection;
         $this->suggesters = new ArrayCollection;
     }

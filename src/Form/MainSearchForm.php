@@ -111,6 +111,7 @@ class MainSearchForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'q',
+                    'data-type-field' => 'q',
                 ],
             ])
         ;
@@ -236,6 +237,7 @@ class MainSearchForm extends Form
         $element = new Element\Collection('filter');
         $element
             ->setLabel((string) $filter['label'])
+            ->setAttribute('data-field-type', 'filter')
             ->setOptions([
                 'label' => $filter['label'],
                 'count' => $filter['max_number'],
@@ -257,6 +259,7 @@ class MainSearchForm extends Form
         $element = new Element\Checkbox($filter['field']);
         $element
             ->setLabel($filter['label'])
+            ->setAttribute('data-field-type', 'checkbox')
         ;
         if (!empty($filter['options']) && count($filter['options']) === 2) {
             $element->setOptions([
@@ -272,9 +275,10 @@ class MainSearchForm extends Form
         $fieldset = new Fieldset($filter['field']);
         $fieldset
             ->setLabel($filter['label'])
+            ->setAttribute('data-field-type', 'daterange')
             ->add([
                 'name' => 'from',
-                'type' => Element\Text::class,
+                'type' => Element\Number::class,
                 'options' => [
                     'label' => 'From', // @translate
                 ],
@@ -284,7 +288,7 @@ class MainSearchForm extends Form
             ])
             ->add([
                 'name' => 'to',
-                'type' => Element\Text::class,
+                'type' => Element\Number::class,
                 'options' => [
                     'label' => 'To', // @translate
                 ],
@@ -312,6 +316,7 @@ class MainSearchForm extends Form
         $element = new OptionalMultiCheckbox($filter['field']);
         $element
             ->setLabel($filter['label'])
+            ->setAttribute('data-field-type', 'multicheckbox')
             ->setValueOptions($valueOptions)
         ;
         return $element;
@@ -320,13 +325,13 @@ class MainSearchForm extends Form
     protected function searchMultiSelect(array $filter): ?ElementInterface
     {
         $filter['attributes']['multiple'] = true;
-        return $this->searchSelect($filter);
+        return $this->searchSelect($filter, 'multiselect');
     }
 
     protected function searchMultiSelectFlat(array $filter): ?ElementInterface
     {
         $filter['attributes']['multiple'] = true;
-        return $this->searchSelectFlat($filter);
+        return $this->searchSelectFlat($filter, 'multiselectflat');
     }
 
     protected function searchNumber(array $filter): ?ElementInterface
@@ -334,6 +339,7 @@ class MainSearchForm extends Form
         $element = new Element\Number($filter['field']);
         $element
             ->setLabel($filter['label'])
+            ->setAttribute('data-field-type', 'number')
         ;
         return $element;
     }
@@ -344,12 +350,13 @@ class MainSearchForm extends Form
         $element = new OptionalRadio($filter['field']);
         $element
             ->setLabel($filter['label'])
+            ->setAttribute('data-field-type', 'radio')
             ->setValueOptions($valueOptions)
         ;
         return $element;
     }
 
-    protected function searchSelect(array $filter): ?ElementInterface
+    protected function searchSelect(array $filter, $fieldType = 'select'): ?ElementInterface
     {
         $valueOptions = $this->prepareValueOptions($filter['options']);
         $valueOptions = ['' => ''] + $valueOptions;
@@ -362,6 +369,7 @@ class MainSearchForm extends Form
         $element = new OptionalSelect($filter['field']);
         $element
             ->setLabel($filter['label'])
+            ->setAttribute('data-field-type', $fieldType)
             ->setOptions([
                 'value_options' => $valueOptions,
                 'empty_option' => '',
@@ -373,7 +381,7 @@ class MainSearchForm extends Form
 
     protected function searchSelectFlat(array $filter): ?ElementInterface
     {
-        return $this->searchSelect($filter);
+        return $this->searchSelect($filter, 'selectflat');
     }
 
     protected function searchText(array $filter): ?ElementInterface
@@ -381,6 +389,7 @@ class MainSearchForm extends Form
         $element = new Element\Text($filter['field']);
         $element
             ->setLabel($filter['label'])
+            ->setAttribute('data-field-type', 'text')
         ;
         return $element;
     }
@@ -397,6 +406,7 @@ class MainSearchForm extends Form
         $element
             ->setAttributes([
                 'id' => 'search-is-public',
+                'data-field-type', 'checkbox',
             ])
             ->setOptions([
                 'label' => $filter['label'], // @translate
@@ -418,6 +428,7 @@ class MainSearchForm extends Form
         $fieldset
             ->setAttributes([
                 'id' => 'search-item-sets',
+                'data-field-type', 'itemset',
             ])
             ->add([
                 'name' => 'id',
@@ -456,6 +467,7 @@ class MainSearchForm extends Form
         $fieldset = new Fieldset('class');
         $fieldset->setAttributes([
             'id' => 'search-classes',
+            'data-field-type', 'class',
         ]);
 
         /** @var \Omeka\Form\Element\ResourceClassSelect $element */
@@ -531,6 +543,7 @@ class MainSearchForm extends Form
         $fieldset = new Fieldset('template');
         $fieldset->setAttributes([
             'id' => 'search-templates',
+            'data-field-type', 'template',
         ]);
 
         /** @var \Omeka\Form\Element\ResourceTemplateSelect $element */
@@ -601,6 +614,7 @@ class MainSearchForm extends Form
         $fieldset
             ->setAttributes([
                 'id' => 'search-owners',
+                'data-field-type', 'owner',
             ])
             ->add([
                 'name' => 'id',

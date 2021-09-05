@@ -149,7 +149,7 @@ class Module extends AbstractModule
             } catch (\Exception $e) {
                 $message = new Message(
                     'An error occurred during migration of module "%s". Check the config and uninstall it manually.', // @translate
-                    'AdvancedSearchPlus',
+                    'AdvancedSearchPlus'
                 );
                 $messenger->addError($message);
             }
@@ -167,7 +167,7 @@ class Module extends AbstractModule
             } catch (\Exception $e) {
                 $message = new Message(
                     'An error occurred during migration of module "%s". Check the config and uninstall it manually.', // @translate
-                    'Search',
+                    'Search'
                 );
                 $messenger->addError($message);
             }
@@ -492,7 +492,7 @@ class Module extends AbstractModule
                                 ],
                             ],
                         ],
-                    ],
+                    ]
                 );
             }
             return;
@@ -555,7 +555,7 @@ class Module extends AbstractModule
                             ],
                         ],
                     ],
-                ],
+                ]
             );
         }
     }

@@ -29,6 +29,7 @@ $facetActive = $plugins->get('facetActive');
 $facetLabel = $plugins->get('facetLabel');
 // Facet checkbox can be used in any case anyway, the js checks it.
 $facetElements = $isFacetModeButton ? $plugins->get('facetCheckboxes') : $plugins->get('facetLinks');
+$facetSelect = $plugins->get('facetSelect');
 
 // Don't display facets for item sets when browsing an item set.
 if (!empty($itemSet)) {
@@ -71,7 +72,11 @@ $options = $searchPage->setting('facet', []);
             <?php foreach ($facets as $name => $facetValues): ?>
             <li class="search-facet">
                 <h4><?= $translate($facetLabel($name)) ?></h4>
+                <?php if (($options['facets'][$name]['type'] ?? 'Checkbox') === 'Select'): ?>
+                <?= $facetSelect($name, $facetValues, $options) ?>
+                <?php else: ?>
                 <?= $facetElements($name, $facetValues, $options) ?>
+                <?php endif; ?>
             </li>
             <?php endforeach; ?>
         </ul>

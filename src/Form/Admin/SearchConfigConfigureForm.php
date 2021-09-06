@@ -445,12 +445,13 @@ advanced = Filters = Advanced',
                 'type' => DataTextarea::class,
                 'options' => [
                     'label' => 'List of facets', // @translate
-                    'info' => 'List of facets that will be displayed in the search page. Format is "field = Label".', // @translate
+                    'info' => 'List of facets that will be displayed in the search page. Format is "field = Label" and optionnally " = Select".', // @translate
                     'as_key_value' => true,
                     'key_value_separator' => '=',
                     'data_keys' => [
                         'name',
                         'label',
+                        'type',
                     ],
                 ],
                 'attributes' => [

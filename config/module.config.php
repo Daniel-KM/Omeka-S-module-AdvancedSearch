@@ -38,6 +38,7 @@ return [
             'facetLabel' => View\Helper\FacetLabel::class,
             'facetLink' => View\Helper\FacetLink::class,
             'facetLinks' => View\Helper\FacetLinks::class,
+            'facetSelect' => View\Helper\FacetSelect::class,
             'formNote' => View\Helper\FormNote::class,
             'hiddenInputsFromFilteredQuery' => View\Helper\HiddenInputsFromFilteredQuery::class,
             'searchForm' => View\Helper\SearchForm::class,

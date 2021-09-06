@@ -121,11 +121,21 @@ $(document).ready(function() {
         $(this).closest('li').hide();
         var facetName = $(this).data('facetName');
         var facetValue = $(this).data('facetValue');
-        $('.search-facet-item input').each(function() {
+        $('.search-facet-item input:checked').each(function() {
             if ($(this).prop('name') === facetName
                 && $(this).prop('value') === String(facetValue)
             ) {
                 $(this).prop('checked', false);
+            }
+        });
+        $('select.search-facet-items option:selected').each(function() {
+            if ($(this).closest('select').prop('name') === facetName
+                && $(this).prop('value') === String(facetValue)
+            ) {
+                $(this).prop('selected', false);
+                if ($.isFunction($.fn.chosen)) {
+                    $(this).closest('select').trigger('chosen:updated');
+                }
             }
         });
     });
@@ -133,6 +143,19 @@ $(document).ready(function() {
     $('.search-facets').on('change', 'input[type=checkbox]', function() {
         if (!$('.apply-facets').length) {
             window.location = $(this).data('url');
+        }
+    });
+
+    $('.search-facets').on('change', 'select', function() {
+        if (!$('.apply-facets').length) {
+            // Replace the current select args by new ones.
+            let searchParams = new URLSearchParams(document.location.search);
+            let selectName = $(this).prop('name');
+            searchParams.delete(selectName);
+            $(this).val().forEach((element, index) => {
+                searchParams.set(selectName.substring(0, selectName.length - 2) + '[' + index + ']', element);
+            });
+            window.location = window.location.href + searchParams.toString();
         }
     });
 

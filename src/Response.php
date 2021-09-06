@@ -30,8 +30,18 @@
 
 namespace AdvancedSearch;
 
+use \Omeka\Api\Manager as ApiManager;
+
+/**
+ * @todo Manage resources as a whole with a global order.
+ */
 class Response implements \JsonSerializable
 {
+    /**
+     * @var \Omeka\Api\Manager
+     */
+    protected $api;
+
     /**
      * @var bool
      */
@@ -71,6 +81,12 @@ class Response implements \JsonSerializable
      * @var array
      */
     protected $suggestions = [];
+
+    public function setApi(ApiManager $api): self
+    {
+        $this->api = $api;
+        return $this;
+    }
 
     public function setIsSuccess(bool $isSuccess): self
     {
@@ -175,6 +191,51 @@ class Response implements \JsonSerializable
         return is_null($resourceType)
             ? $this->results
             : $this->results[$resourceType] ?? [];
+    }
+
+    /**
+     * Get resources for a resource type or all resource types.
+     *
+     *When the indexation is not up to date, some resources may be removed or
+     *privated, so the result may be different from getResults().
+     *
+     * @todo Create api search for mixed resources in order to keep global order.
+     *
+     * @param string|null $resourceType The resource type ("items", "item_sets"…).
+     * @return \Omeka\Api\Representation\AbstractResourceEntityRepresentation[]
+     * When resources types are set and unique, the key is the id (that is the
+     * case with item and item set, not pages).
+     */
+    public function getResources(string $resourceType = null): array
+    {
+        if (!$this->api) {
+            return [];
+        }
+
+        if (!$resourceType) {
+            $resources = [];
+            foreach (array_keys($this->results) as $resourceType) {
+                $resources = array_replace($resources, $this->getResources($resourceType));
+            }
+            return $resources;
+        }
+
+        // Extract results as a whole to avoid subquery for each resource.
+        $ids = array_column($this->getResults($resourceType), 'id', 'id');
+        if (!count($ids)) {
+            return [];
+        }
+
+        // The sort order is unknown, so in order to keep order of results, use
+        // the id as key and use array_replace(). This process avoids to do a
+        // single read() for each result.
+        $resources = [];
+        foreach ($this->api->search($resourceType, ['id' => $ids])->getContent() as $resource) {
+            $resources[$resource->id()] = $resource;
+        }
+        return count($resources)
+            ? array_replace(array_intersect_key($ids, $resources), $resources)
+            : [];
     }
 
     /**

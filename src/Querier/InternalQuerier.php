@@ -37,7 +37,11 @@ class InternalQuerier extends AbstractQuerier
 
     public function query(): Response
     {
+        /** @var \Omeka\Api\Manager $api */
+        $api = $this->services->get('Omeka\ApiManager');
+
         $this->response = new Response;
+        $this->response->setApi($api);
 
         $this->args = $this->getPreparedQuery();
         if (is_null($this->args)) {
@@ -45,11 +49,7 @@ class InternalQuerier extends AbstractQuerier
                 ->setMessage('An issue occurred.'); // @translate
         }
 
-        /**
-         * @var \Omeka\Mvc\Controller\Plugin\Api $api
-         */
-        $plugins = $this->getServiceLocator()->get('ControllerPluginManager');
-        $api = $plugins->get('api');
+        $plugins = $this->services->get('ControllerPluginManager');
         $hasReferences = $plugins->has('references');
 
         // The standard api way implies a double query, because scalar doesn't
@@ -102,6 +102,7 @@ class InternalQuerier extends AbstractQuerier
     public function querySuggestions(): Response
     {
         $this->response = new Response;
+        $this->response->setApi($this->services->get('Omeka\ApiManager'));
 
         $this->args = $this->getPreparedQuery();
         if (is_null($this->args)) {
@@ -133,7 +134,7 @@ class InternalQuerier extends AbstractQuerier
         $modeSearch = $suggestOptions['mode_search'] ?? 'start';
 
         /** @var \Doctrine\DBAL\Connection $connection */
-        $connection = $this->getServiceLocator()->get('Omeka\Connection');
+        $connection = $this->services->get('Omeka\Connection');
         $q = $this->query->getQuery();
         $bind = [
             'suggester' => $suggester,
@@ -164,7 +165,7 @@ SQL;
                 ->executeQuery($sql, $bind, $types)
                 ->fetchAll();
         } catch (\Doctrine\DBAL\DBALException $e) {
-            $this->getServiceLocator()->get('Omeka\Logger')->err($e->getMessage());
+            $this->logger->err($e->getMessage());
             return $this->response
                 ->setMessage('An internal issue in database occurred.'); // @translate
         }
@@ -194,7 +195,7 @@ SQL;
         // TODO Use the full text search table.
 
         /** @var \Doctrine\DBAL\Connection $connection */
-        $connection = $this->getServiceLocator()->get('Omeka\Connection');
+        $connection = $this->services->get('Omeka\Connection');
         $q = $this->query->getQuery();
         $bind = [
             // 'resource_types' => $classes,
@@ -350,7 +351,7 @@ SQL;
                 ->executeQuery($sql, $bind, $types)
                 ->fetchAll();
         } catch (\Doctrine\DBAL\DBALException $e) {
-            $this->getServiceLocator()->get('Omeka\Logger')->err($e->getMessage());
+            $this->logger->err($e->getMessage());
             return $this->response
                 ->setMessage('An internal issue in database occurred.'); // @translate
         }
@@ -413,26 +414,24 @@ SQL;
         if (!empty($this->args['property'])
             && count($this->args['property']) > self::REQUEST_MAX_ARGS
         ) {
-            $services = $this->getServiceLocator();
-            $params = $services->get('ControllerPluginManager')->get('params');
+            $params = $this->services->get('ControllerPluginManager')->get('params');
             $req = $params->fromQuery();
             unset($req['csrf']);
             $req = urldecode(http_build_query(array_filter($req), '', '&', PHP_QUERY_RFC3986));
             $messenger = new Messenger;
-            $logger = $this->getServiceLocator()->get('Omeka\Logger');
             if ($this->query->getExcludedFields()) {
                 $message = new Message('The query "%1$s" uses %2$d properties, that is more than the %3$d supported currently. Excluded fields are removed.', // @translate
                     $req, count($this->args['property']), self::REQUEST_MAX_ARGS);
                 $this->query->setExcludedFields([]);
                 $messenger->addWarning($message);
-                $logger->warn($message);
+                $this->logger->warn($message);
                 return $this->getPreparedQuery();
             }
 
             $message = new Message('The query "%1$s" uses %2$d properties, that is more than the %3$d supported currently. Request is troncated.', // @translate
                 $req, count($this->args['property']), self::REQUEST_MAX_ARGS);
             $messenger->addWarning($message);
-            $logger->warn($message);
+            $this->logger->warn($message);
             $this->args['property'] = array_slice($this->args['property'], 0, self::REQUEST_MAX_ARGS);
         }
 
@@ -713,7 +712,7 @@ SQL;
         $this->response->setActiveFacets($this->query->getActiveFacets());
 
         /** @var \Reference\Mvc\Controller\Plugin\References $references */
-        $references = $this->getServiceLocator()->get('ControllerPluginManager')->get('references');
+        $references = $this->services->get('ControllerPluginManager')->get('references');
 
         $facetFields = $this->query->getFacetFields();
         $facetLimit = $this->query->getFacetLimit();
@@ -821,7 +820,7 @@ SQL;
 
         if (is_null($vocabularies)) {
             /** @var \Doctrine\DBAL\Connection $connection */
-            $connection = $this->getServiceLocator()->get('Omeka\Connection');
+            $connection = $this->services->get('Omeka\Connection');
             $qb = $connection->createQueryBuilder();
             $qb
                 ->select([
@@ -865,7 +864,7 @@ SQL;
 
         if (is_null($properties)) {
             /** @var \Doctrine\DBAL\Connection $connection */
-            $connection = $this->getServiceLocator()->get('Omeka\Connection');
+            $connection = $this->services->get('Omeka\Connection');
             $qb = $connection->createQueryBuilder();
             $qb
             ->select([
@@ -902,7 +901,7 @@ SQL;
 
         if (is_null($properties)) {
             /** @var \Doctrine\DBAL\Connection $connection */
-            $connection = $this->getServiceLocator()->get('Omeka\Connection');
+            $connection = $this->services->get('Omeka\Connection');
             $qb = $connection->createQueryBuilder();
             $qb
                 ->select([
@@ -935,7 +934,7 @@ SQL;
 
         if (is_null($properties)) {
             /** @var \Doctrine\DBAL\Connection $connection */
-            $connection = $this->getServiceLocator()->get('Omeka\Connection');
+            $connection = $this->services->get('Omeka\Connection');
             $qb = $connection->createQueryBuilder();
             $qb
                 ->select([
@@ -983,7 +982,7 @@ SQL;
 
         if (is_null($resourceClasses)) {
             /** @var \Doctrine\DBAL\Connection $connection */
-            $connection = $this->getServiceLocator()->get('Omeka\Connection');
+            $connection = $this->services->get('Omeka\Connection');
             $qb = $connection->createQueryBuilder();
             $qb
                 ->select([
@@ -1025,7 +1024,7 @@ SQL;
 
         if (is_null($resourceTemplates)) {
             /** @var \Doctrine\DBAL\Connection $connection */
-            $connection = $this->getServiceLocator()->get('Omeka\Connection');
+            $connection = $this->services->get('Omeka\Connection');
             $qb = $connection->createQueryBuilder();
             $qb
                 ->select([

@@ -43,7 +43,7 @@ abstract class AbstractQuerier implements QuerierInterface
     /**
      * @var ServiceLocatorInterface
      */
-    protected $serviceLocator;
+    protected $services;
 
     /**
      * @var SearchEngineRepresentation $engine
@@ -55,15 +55,10 @@ abstract class AbstractQuerier implements QuerierInterface
      */
     protected $query;
 
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): QuerierInterface
+    public function setServiceLocator(ServiceLocatorInterface $services): QuerierInterface
     {
-        $this->serviceLocator = $serviceLocator;
+        $this->services = $services;
         return $this;
-    }
-
-    protected function getServiceLocator(): ServiceLocatorInterface
-    {
-        return $this->serviceLocator;
     }
 
     public function setSearchEngine(SearchEngineRepresentation $engine): QuerierInterface

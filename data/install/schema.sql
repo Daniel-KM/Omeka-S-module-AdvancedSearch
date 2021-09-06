@@ -1,4 +1,4 @@
-CREATE TABLE `search_engine` (
+CREATE TABLE IF NOT EXISTS `search_engine` (
     `id` INT AUTO_INCREMENT NOT NULL,
     `name` VARCHAR(190) NOT NULL,
     `adapter` VARCHAR(190) NOT NULL,
@@ -8,7 +8,7 @@ CREATE TABLE `search_engine` (
     PRIMARY KEY(`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
 
-CREATE TABLE `search_config` (
+CREATE TABLE IF NOT EXISTS `search_config` (
     `id` INT AUTO_INCREMENT NOT NULL,
     `engine_id` INT NOT NULL,
     `name` VARCHAR(190) NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE `search_config` (
     PRIMARY KEY(`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
 
-CREATE TABLE `search_suggester` (
+CREATE TABLE IF NOT EXISTS `search_suggester` (
     `id` INT AUTO_INCREMENT NOT NULL,
     `engine_id` INT NOT NULL,
     `name` VARCHAR(190) NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE `search_suggester` (
     PRIMARY KEY(`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
 
-CREATE TABLE `search_suggestion` (
+CREATE TABLE IF NOT EXISTS `search_suggestion` (
     `id` INT AUTO_INCREMENT NOT NULL,
     `suggester_id` INT NOT NULL,
     `text` VARCHAR(190) NOT NULL,

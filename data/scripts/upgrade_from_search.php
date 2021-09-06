@@ -81,7 +81,7 @@ SQL;
 $sqls = array_filter(array_map('trim', explode(";\n", $sql)));
 foreach ($sqls as $sql) {
     try {
-        $connection->executeUpdate($sql);
+        $connection->executeStatement($sql);
     } catch (\Exception $e) {
         $messenger->addError($e->getMessage());
     }
@@ -103,7 +103,7 @@ WHERE
         "search_batch_size"
     );
 SQL;
-$connection->executeUpdate($sql);
+$connection->executeStatement($sql);
 
 // Convert the site settings.
 
@@ -121,7 +121,7 @@ WHERE
         "search_api_page"
     );
 SQL;
-$connection->executeUpdate($sql);
+$connection->executeStatement($sql);
 
 // Do some renaming for settings.
 
@@ -149,7 +149,7 @@ WHERE
         "advancedsearch_api_page"
     );
 SQL;
-$connection->executeUpdate($sql);
+$connection->executeStatement($sql);
 
 // Do some renaming for site settings.
 
@@ -178,7 +178,7 @@ WHERE
         "advancedsearch_api_page"
     );
 SQL;
-$connection->executeUpdate($sql);
+$connection->executeStatement($sql);
 
 // Remove original data and module.
 
@@ -217,7 +217,7 @@ SQL;
 $sqls = array_filter(array_map('trim', explode(";\n", $sql)));
 foreach ($sqls as $sql) {
     try {
-        $connection->executeUpdate($sql);
+        $connection->executeStatement($sql);
     } catch (\Exception $e) {
         $messenger->addError($e->getMessage());
     }
@@ -329,7 +329,7 @@ UPDATE `search_config`
 SET `settings` = $searchConfigSettings
 WHERE `id` = $id;
 SQL;
-    $connection->executeUpdate($sql);
+    $connection->executeStatement($sql);
 
     // All old adapters are now managed by the main one, unless the api.
     // They should be updated manually.
@@ -338,7 +338,7 @@ UPDATE `search_config`
 SET `form_adapter` = "main"
 WHERE `form_adapter` NOT IN ("api");
 SQL;
-    $connection->executeUpdate($sql);
+    $connection->executeStatement($sql);
 }
 
 $message = new Message(

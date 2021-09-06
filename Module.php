@@ -203,7 +203,7 @@ class Module extends AbstractModule
         if ($module) {
             $sql = 'DELETE FROM `module` WHERE `id` = "PslSearchForm";';
             $connection = $services->get('Omeka\Connection');
-            $connection->executeUpdate($sql);
+            $connection->executeStatement($sql);
             $message = new Message(
                 'The module "%s" was upgraded by module "%s" and uninstalled.', // @translate
                 'PslSearchForm', 'Advanced Search'

@@ -34,10 +34,17 @@
  * @var \AdvancedSearch\Api\Representation\SearchSuggesterRepresentation[] $suggesters
  */
 
-$translate = $this->plugin('translate');
-$escape = $this->plugin('escapeHtml');
-$escapeAttr = $this->plugin('escapeHtmlAttr');
-$url = $this->plugin('url');
+$plugins = $this->getHelperPluginManager();
+$translate = $plugins->get('translate');
+$escape = $plugins->get('escapeHtml');
+$escapeAttr = $plugins->get('escapeHtmlAttr');
+$url = $plugins->get('url');
+$assetUrl = $plugins->get('assetUrl');
+
+$this->headLink()
+    ->appendStylesheet($assetUrl('css/advanced-search-configure.css', 'AdvancedSearch'));
+$this->headScript()
+    ->appendFile($assetUrl('js/advanced-search-configure.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
 ?>
 
 <?php $this->htmlElement('body')->appendAttribute('class', 'search-admin resource browse'); ?>

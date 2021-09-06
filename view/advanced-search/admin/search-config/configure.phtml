@@ -33,8 +33,9 @@
  * @var \AdvancedSearch\Form\Admin\SearchConfigConfigureForm $form
  */
 
-$translate = $this->plugin('translate');
-$assetUrl = $this->plugin('assetUrl');
+$plugins = $this->getHelperPluginManager();
+$translate = $plugins->get('translate');
+$assetUrl = $plugins->get('assetUrl');
 
 $this->headLink()
     ->appendStylesheet($assetUrl('css/advanced-search-configure.css', 'AdvancedSearch'));

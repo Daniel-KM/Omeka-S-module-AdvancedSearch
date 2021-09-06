@@ -520,7 +520,8 @@ class SearchConfigController extends AbstractActionController
             'text' => 'Text',
         ];
 
-        // Include advanced fields in filters..
+        // The field "advanced" is only for display, so save it with filters.
+        // TODO No more include advanced fields in filters, but still cleaning.
         $params['form']['filters'] = $params['form']['filters'] ?? [];
         $advanced = $params['form']['advanced'] ?? [];
         $keyAdvanced = false;

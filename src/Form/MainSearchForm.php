@@ -138,6 +138,9 @@ class MainSearchForm extends Form
             if (empty($filter['field']) || empty($filter['type'])) {
                 continue;
             }
+            if (!isset($filter['options'])) {
+                $filter['options'] = [];
+            }
 
             $field = $filter['field'];
             $type = $filter['type'];

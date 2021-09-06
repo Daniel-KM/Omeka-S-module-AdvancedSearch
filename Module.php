@@ -408,32 +408,33 @@ class Module extends AbstractModule
 
     protected function addAclRules(): void
     {
+        /** @var \Omeka\Permissions\Acl $acl */
         $acl = $this->getServiceLocator()->get('Omeka\Acl');
         $acl
-            // Suggesters are available only for admins.
-            // TODO This first rule duplicates the second, but is needed for a site.
+            // All can search and suggest, only admins can admin (by default).
             ->allow(
                 null,
                 [
                     \AdvancedSearch\Controller\IndexController::class,
+                ]
+            )
+            // To search require read/search access to adapter.
+            ->allow(
+                null,
+                [
                     \AdvancedSearch\Api\Adapter\SearchConfigAdapter::class,
                     \AdvancedSearch\Api\Adapter\SearchEngineAdapter::class,
+                    \AdvancedSearch\Api\Adapter\SearchSuggesterAdapter::class,
                 ],
                 ['read', 'search']
             )
-            ->allow(
-                null,
-                [
-                    \AdvancedSearch\Controller\IndexController::class,
-                    \AdvancedSearch\Api\Adapter\SearchConfigAdapter::class,
-                    \AdvancedSearch\Api\Adapter\SearchEngineAdapter::class,
-                ]
-            )
+            // To search require read access to entities.
             ->allow(
                 null,
                 [
                     \AdvancedSearch\Entity\SearchConfig::class,
                     \AdvancedSearch\Entity\SearchEngine::class,
+                    \AdvancedSearch\Entity\SearchSuggester::class,
                 ],
                 ['read']
             );
@@ -1022,8 +1023,8 @@ class Module extends AbstractModule
             $basePath = $plugins->get('basePath');
             $assetUrl = $plugins->get('assetUrl');
             $searchUrl = $basePath('admin/' . $searchConfig->path());
-            $autosuggestUrl = $searchConfig->subSetting('autosuggest', 'url');
-            if (!$autosuggestUrl) {
+            $autoSuggestUrl = $searchConfig->subSetting('autosuggest', 'url');
+            if (!$autoSuggestUrl) {
                 $suggester = $searchConfig->subSetting('autosuggest', 'suggester');
                 if ($suggester) {
                     $autoSuggestUrl = $searchUrl . '/suggest';

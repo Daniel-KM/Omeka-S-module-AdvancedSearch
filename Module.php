@@ -457,13 +457,22 @@ class Module extends AbstractModule
         $settings = $services->get('Omeka\Settings');
         $searchConfigs = $settings->get('advancedsearch_all_configs', []);
 
+        // A specific check to manage site admin or public site.
+        $siteSlug = $status->getRouteParam('site-slug');
+
         $isAdminRequest = $status->isAdminRequest();
         if ($isAdminRequest) {
+            $baseRoutes = ['search-admin-page-'];
+            // Quick check if this is a site admin page. The list is required to
+            // create the navigation.
+            if ($siteSlug) {
+                $baseRoutes[] = 'search-page-';
+            }
             $adminSearchConfigs = $settings->get('advancedsearch_configs', []);
             $adminSearchConfigs = array_intersect_key($searchConfigs, array_flip($adminSearchConfigs));
-            foreach ($adminSearchConfigs as $searchConfigId => $searchConfigSlug) {
+            foreach ($baseRoutes as $baseRoute) foreach ($adminSearchConfigs as $searchConfigId => $searchConfigSlug) {
                 $router->addRoute(
-                    'search-admin-page-' . $searchConfigId,
+                    $baseRoute . $searchConfigId,
                     [
                         'type' => \Laminas\Router\Http\Segment::class,
                         'options' => [
@@ -498,7 +507,6 @@ class Module extends AbstractModule
             return;
         }
 
-        $siteSlug = $status->getRouteParam('site-slug');
         if (!$siteSlug) {
             return;
         }

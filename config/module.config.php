@@ -34,8 +34,10 @@ return [
         'invokables' => [
             'facetActive' => View\Helper\FacetActive::class,
             'facetCheckbox' => View\Helper\FacetCheckbox::class,
+            'facetCheckboxes' => View\Helper\FacetCheckboxes::class,
             'facetLabel' => View\Helper\FacetLabel::class,
             'facetLink' => View\Helper\FacetLink::class,
+            'facetLinks' => View\Helper\FacetLinks::class,
             'formNote' => View\Helper\FormNote::class,
             'hiddenInputsFromFilteredQuery' => View\Helper\HiddenInputsFromFilteredQuery::class,
             'searchForm' => View\Helper\SearchForm::class,

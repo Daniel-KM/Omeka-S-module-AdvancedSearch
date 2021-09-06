@@ -1,0 +1,25 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var string $name
+ * @var array $facetValues With value, count, active, label and url when needed.
+ * @var array $options
+ */
+
+$plugins = $this->getHelperPluginManager();
+$escape = $plugins->get('escapeHtml');
+$escapeAttr = $plugins->get('escapeHtmlAttr');
+
+$displayCount = !empty($options['display_count']);
+?>
+
+<ul class="search-facet-items">
+    <?php foreach ($facetValues as $facetValue): ?>
+    <span class="<?= $facetValue['active'] ? 'active' : 'inactive' ?>">
+        <a href="<?= $escapeAttr($facetValue['url']) ?>"><?= $escape($facetValue['label']) ?></a>
+        <?php if ($displayCount): ?>
+        (<span class="count"><?= $facetValue['count'] ?></span>)
+        <?php endif; ?>
+    </span>
+    <?php endforeach; ?>
+</ul>

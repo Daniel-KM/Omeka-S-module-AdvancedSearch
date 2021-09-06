@@ -923,7 +923,7 @@ class Module extends AbstractModule
     }
 
     /**
-     * Delete the search engine for a resource.
+     * Delete the index for the resource in search engine.
      *
      * @param IndexerInterface $indexer
      * @param string $resourceName
@@ -937,19 +937,19 @@ class Module extends AbstractModule
             $services = $this->getServiceLocator();
             $logger = $services->get('Omeka\Logger');
             $logger->err(new Message(
-                'Unable to delete the search engine for resource #%d: %s', // @translate
+                'Unable to delete the search index for resource #%d: %s', // @translate
                 $id, $e->getMessage()
             ));
             $messenger = $services->get('ControllerPluginManager')->get('messenger');
             $messenger->addWarning(new Message(
-                'Unable to delete the search engine for the deleted resource #%d: see log.', // @translate
+                'Unable to delete the search index for the deleted resource #%d: see log.', // @translate
                 $id
             ));
         }
     }
 
     /**
-     * Update the search engine for a resource.
+     * Update the index in search engine for a resource.
      *
      * @param IndexerInterface $indexer
      * @param Resource $resource
@@ -967,7 +967,7 @@ class Module extends AbstractModule
             ));
             $messenger = $services->get('ControllerPluginManager')->get('messenger');
             $messenger->addWarning(new Message(
-                'Unable to update the search engine for resource #%d: see log.', // @translate
+                'Unable to update the search index for resource #%d: see log.', // @translate
                 $resource->getId()
             ));
         }

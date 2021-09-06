@@ -2,7 +2,6 @@
 
 namespace AdvancedSearch\View\Helper;
 
-use Laminas\Mvc\Application;
 use Laminas\View\Helper\AbstractHelper;
 
 class AbstractFacetElement extends AbstractHelper
@@ -13,17 +12,12 @@ class AbstractFacetElement extends AbstractHelper
     protected $partial;
 
     /**
-     * @var Application $application
-     */
-    protected $application;
-
-    /**
      * @var \Omeka\View\Helper\Api
      */
     protected $api;
 
     /**
-     * @var \Laminas\I18n\View\Helper\Translate}
+     * @var \Laminas\I18n\View\Helper\Translate
      */
     protected $translate;
 
@@ -31,14 +25,6 @@ class AbstractFacetElement extends AbstractHelper
      * @var int
      */
     protected $siteId;
-
-    /**
-     * @param Application $application
-     */
-    public function __construct(Application $application)
-    {
-        $this->application = $application;
-    }
 
     /**
      * Create one facet as link, checkbox or button.
@@ -54,12 +40,7 @@ class AbstractFacetElement extends AbstractHelper
         static $partialHelper;
         static $escapeHtml;
         static $escapeHtmlAttr;
-        static $translate;
         static $facetLabel;
-
-        static $mvcEvent;
-        static $routeMatch;
-        static $request;
 
         static $route;
         static $params;
@@ -67,25 +48,21 @@ class AbstractFacetElement extends AbstractHelper
 
         static $facetsData = [];
 
-        if (is_null($mvcEvent)) {
-            $plugins = $this->getView()->getHelperPluginManager();
+        if (is_null($route)) {
+            $view = $this->getView();
+            $plugins = $view->getHelperPluginManager();
             $urlHelper = $plugins->get('url');
             $partialHelper = $plugins->get('partial');
             $escapeHtml = $plugins->get('escapeHtml');
             $escapeHtmlAttr = $plugins->get('escapeHtmlAttr');
-            $translate = $plugins->get('translate');
             $facetLabel = $plugins->get('facetLabel');
 
             $this->api = $plugins->get('api');
-            $this->translate = $translate;
+            $this->translate = $plugins->get('translate');
 
-            $mvcEvent = $this->application->getMvcEvent();
-            $routeMatch = $mvcEvent->getRouteMatch();
-            $request = $mvcEvent->getRequest();
-
-            $route = $routeMatch->getMatchedRouteName();
-            $params = $routeMatch->getParams();
-            $queryBase = $request->getQuery()->toArray();
+            $route = $plugins->get('matchedRouteName')();
+            $params = $view->params()->fromRoute();
+            $queryBase = $view->params()->fromQuery();
 
             $isSiteRequest = $plugins->get('status')->isSiteRequest();
             if ($isSiteRequest) {
@@ -134,7 +111,7 @@ class AbstractFacetElement extends AbstractHelper
                 // To speed up process.
                 'escapeHtml' => $escapeHtml,
                 'escapeHtmlAttr' => $escapeHtmlAttr,
-                'translate' => $translate,
+                'translate' => $this->translate,
                 'facetLabel' => $facetLabel,
             ];
         } elseif (isset($facet['count'])) {
@@ -200,7 +177,6 @@ class AbstractFacetElement extends AbstractHelper
             case 'resourceClass':
             case 'resource_class_id':
             case 'resource_class_id_field':
-                $translate = $this->translate;
                 if (is_numeric($facetValue)) {
                     try {
                         /** @var \Omeka\Api\Representation\ResourceClassRepresentation $resource */
@@ -208,11 +184,11 @@ class AbstractFacetElement extends AbstractHelper
                     } catch (\Exception $e) {
                         return null;
                     }
-                    return $translate($resource->label());
+                    return $this->translate->__invoke($resource->label());
                 }
                 $resource = $this->api->searchOne('resource_classes', ['term' => $facetValue])->getContent();
                 return $resource
-                    ? $translate($resource->label())
+                    ? $this->translate->__invoke($resource->label())
                     // Manage the case where a resource was indexed but removed.
                     : null;
                 break;

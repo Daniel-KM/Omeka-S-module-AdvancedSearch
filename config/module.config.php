@@ -32,7 +32,10 @@ return [
     ],
     'view_helpers' => [
         'invokables' => [
+            'facetActive' => View\Helper\FacetActive::class,
+            'facetCheckbox' => View\Helper\FacetCheckbox::class,
             'facetLabel' => View\Helper\FacetLabel::class,
+            'facetLink' => View\Helper\FacetLink::class,
             'formNote' => View\Helper\FormNote::class,
             'hiddenInputsFromFilteredQuery' => View\Helper\HiddenInputsFromFilteredQuery::class,
             'searchForm' => View\Helper\SearchForm::class,
@@ -43,9 +46,7 @@ return [
         'factories' => [
             'apiSearch' => Service\ViewHelper\ApiSearchFactory::class,
             'apiSearchOne' => Service\ViewHelper\ApiSearchOneFactory::class,
-            'facetActive' => Service\ViewHelper\FacetActiveFactory::class,
-            'facetCheckbox' => Service\ViewHelper\FacetCheckboxFactory::class,
-            'facetLink' => Service\ViewHelper\FacetLinkFactory::class,
+            'matchedRouteName' => Service\ViewHelper\MatchedRouteNameFactory::class,
             'mediaTypeSelect' => Service\ViewHelper\MediaTypeSelectFactory::class,
             'searchEngineConfirm' => Service\ViewHelper\SearchEngineConfirmFactory::class,
             'searchRequestToResponse' => Service\ViewHelper\SearchRequestToResponseFactory::class,

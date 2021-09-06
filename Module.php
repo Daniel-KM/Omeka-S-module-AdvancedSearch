@@ -996,8 +996,13 @@ class Module extends AbstractModule
             return;
         }
 
-        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
-        $searchConfig = $plugins->get('api')->searchOne('search_configs', ['id' => $searchConfig])->getContent();
+        // A try/catch is required to bypass issues during upgrade.
+        try {
+            /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
+            $searchConfig = $plugins->get('api')->read('search_configs', ['id' => $searchConfig])->getContent();
+        } catch (\Exception $e) {
+            return;
+        }
         if (!$searchConfig) {
             return;
         }

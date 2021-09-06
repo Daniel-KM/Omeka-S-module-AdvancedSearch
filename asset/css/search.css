@@ -80,6 +80,29 @@
         padding: 0 0.5em;
         min-width: 240px;
     }
+
+    .search-facets-active {
+        list-style: none;
+        padding-left: 0;
+    }
+    .search-facets-active li {
+        list-style: none;
+        margin: 4px 0
+    }
+    .search-facets-active li a {
+        color: #4D4D4D;
+        font-size: 0.75em;
+        display: inline-block;
+        padding: 9px 12px 9px 8px;
+        background: #ecebeb;
+        margin-right: 9px;
+    }
+    .search-facets-active li a::after {
+        content: "x";
+        float: right;
+        padding-left: 9px;
+    }
+
     .search-facets .search-facets-list {
         padding-left: 0;
     }
@@ -90,10 +113,13 @@
         margin-bottom: 0.5em;
     }
     .search-facet-items {
-        padding-left: 1em;
+        padding-left: 0;
     }
     .search-facet-item {
         display: block;
+    }
+    .search-facet-item input[type=checkbox] {
+        vertical-align: initial;
     }
     .search-facet-item a::before {
         display: inline-block;
@@ -103,10 +129,6 @@
     }
     .search-facet-item .active a::before {
         content: "\f14a";
-    }
-
-    .search-facets-active {
-        list-style: square;
     }
 
     .search-results .resource-list {
@@ -127,30 +149,33 @@
         flex: 0 0 auto;
         margin: 6px;
     }
-    .search-results .resource-list .resource {
-        padding: 6px 12px 5px;
-        border-bottom: 1px solid rgba(0,0,0,.08);
-        position: relative;
-        width: 100%;
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        word-wrap: break-word;
-    }
     .search-results .resource-list.grid .resource {
         width: auto;
         display: initial;
+        padding-top: 29px;
+        padding-right: 29px;
     }
-    .search-results .resource-list.grid .description {
-        display: none;
+    .search-results ul.resource-list.grid .resource:first-child {
+        border-top: none;
     }
-    .search-results .resource-list.grid .resource-thumbnail,
-    .search-results .resource-list.grid .resource-metadata {
-        min-width: 200px;
-        max-width: 200px;
+    .search-results .resource-list.grid .resource-thumbnail {
+        display: flex;
+        justify-content: center;
+        padding: 29px 0;
     }
     .search-results .resource-list.grid .resource-thumbnail img {
         height: auto;
+        max-height: 200px;
+        width: 100%;
+        max-width: 200px;
+        margin: 0;
+        padding: 0;
+    }
+    .search-results .resource-list.grid .resource-metadata {
+        max-width: 224px;
+    }
+    .search-results .resource-list.grid .description {
+        display: none;
     }
 
     .autocomplete-suggestions {

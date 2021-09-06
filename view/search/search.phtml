@@ -54,13 +54,13 @@ $partial = $plugins->get('partial');
 $api = $plugins->get('api');
 $vars = $this->vars();
 
-$isPartial = !$site;
-$skipFormAction = !empty($skipFormAction);
-
 // Used in case of a redirect of item-set/show to search, when used like item/browse.
 $itemSetId = $this->params()->fromRoute('item-set-id');
 // TODO Use site item set ?
 $itemSet = $itemSetId ? $api->searchOne('item_sets', ['id' => $itemSetId])->getContent() : null;
+
+$isPartial = !$site;
+$skipFormAction = !empty($skipFormAction);
 
 $this->headLink()->appendStylesheet($assetUrl('css/search.css', 'AdvancedSearch'));
 $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
@@ -95,37 +95,50 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'te
 
 <?= $this->searchForm($searchPage, null, $skipFormAction) ?>
 
-<?php if (isset($response)): ?>
+<?php if (isset($response)):
+$documentCount = $response->getTotalResults();
+?>
 <div class="search-results-wrapper">
     <div class="search-results">
 
-        <?php if ($response->getTotalResults()): ?>
+        <?php if ($documentCount):
+            $itemSetsCount = $response->getResourceTotalResults('item_sets');
+            $itemsCount = $response->getResourceTotalResults('items');
+            $pagination = (string) $this->pagination('common/pagination');
+            ?>
+
             <?= $partial('search/results-header', [
                 'searchPage' => $searchPage,
                 'query' => $query,
                 'response' => $response,
+                'itemSet' => $itemSet,
+                'documentCount' => $documentCount,
+                'pagination' => $pagination,
             ]) ?>
 
-            <?php $itemSetsCount = $response->getResourceTotalResults('item_sets'); ?>
+            <?php if ($itemSetsCount): ?>
             <?= $partial('search/resource-list', [
                 'site' => $site,
                 'title' => sprintf($translatePlural('%s item set', '%s item sets', $itemSetsCount), $itemSetsCount),
                 'response' => $response,
                 'resourceName' => 'item_sets',
             ]) ?>
+            <?php endif; ?>
 
-            <?php $itemsCount = $response->getResourceTotalResults('items'); ?>
+            <?php if ($itemsCount): ?>
             <?= $partial('search/resource-list', [
                 'site' => $site,
                 'title' => sprintf($translatePlural('%s item', '%s items', $itemsCount), $itemsCount),
                 'response' => $response,
                 'resourceName' => 'items',
             ]) ?>
+            <?php endif; ?>
 
             <?= $partial('search/results-footer', [
                 'searchPage' => $searchPage,
                 'query' => $query,
                 'response' => $response,
+                'pagination' => $pagination,
             ]) ?>
 
         <?php else: ?>

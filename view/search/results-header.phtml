@@ -4,14 +4,19 @@
  * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchPage
  * @var \AdvancedSearch\Query $query
  * @var \AdvancedSearch\Response $response
+ * @var \Omeka\Api\Representation\ItemSetRepresentation $itemSet
+ * @var int $documentCount
+ * @var string $pagination
  */
 
-$translate = $this->plugin('translate');
+$plugins = $this->getHelperPluginManager();
+$translate = $plugins->get('translate');
+$translatePlural = $plugins->get('translatePlural');
 ?>
 
 <div class="search-results-header">
     <div class="search-results-count">
-        <?= $this->pagination() ?>
+        <?= $pagination ?>
     </div>
     <?= $this->searchSortSelector($query, $searchPage->subSetting('sort', 'fields')) ?>
     <div>

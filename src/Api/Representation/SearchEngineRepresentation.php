@@ -107,20 +107,17 @@ class SearchEngineRepresentation extends AbstractEntityRepresentation
 
     public function setting(string $name, $default = null)
     {
-        $settings = $this->resource->getSettings();
-        return $settings[$name] ?? $default;
+        return $this->resource->getSettings()[$name] ?? $default;
     }
 
     public function subSetting(string $mainName, string $name, $default = null)
     {
-        $settings = $this->resource->getSettings();
-        return $settings[$mainName][$name] ?? $default;
+        return $this->resource->getSettings()[$mainName][$name] ?? $default;
     }
 
     public function settingAdapter(string $name, $default = null)
     {
-        $settings = $this->resource->getSettings();
-        return $settings['adapter'][$name] ?? $default;
+        return $this->resource->getSettings()['adapter'][$name] ?? $default;
     }
 
     public function created(): \DateTime

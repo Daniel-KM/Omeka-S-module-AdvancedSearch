@@ -78,30 +78,4 @@ abstract class AbstractQuerier implements QuerierInterface
     abstract public function querySuggestions(): Response;
 
     abstract public function getPreparedQuery();
-
-    /**
-     * Get a setting of the search engine.
-     *
-     * @param string $name
-     * @param mixed $default
-     * @return mixed
-     */
-    protected function getSetting(string $name, $default = null)
-    {
-        $settings = $this->engine->settings();
-        return $settings[$name] ?? $default;
-    }
-
-    /**
-     * Get a setting of the search adapter.
-     *
-     * @param string $name
-     * @param mixed $default
-     * @return mixed
-     */
-    protected function getAdapterSetting(string $name, $default = null)
-    {
-        $adapterSettings = $this->getSetting('adapter', []);
-        return $adapterSettings[$name] ?? $default;
-    }
 }

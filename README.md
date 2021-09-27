@@ -9,7 +9,7 @@ Advanced Search (module for Omeka S)
 public interface of Omeka S, in particular search autocompletion, filters and
 facets. Furthermore, it provides a common interface for other modules to extend
 it (forms, indexers, queriers). It can be displayed as a block on any page too.
-Furthermore, it adds some features to the standard advanced search form.
+Besides, it adds some features to the standard advanced search form.
 
 Here is a live example:
 

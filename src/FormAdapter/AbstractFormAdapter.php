@@ -258,7 +258,21 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                     if (is_string($value)
                         || $isSimpleList($value)
                     ) {
-                        $query->addFilter($name, $value);
+                        // Manage simple field "Text", that should not be
+                        // "equals" ("eq"), but "contains" ("in"), and that is
+                        // managed in the form as a simple filter, not an
+                        // advanced filter query.
+                        // Other fields are predefined.
+                        // TODO Don't check form, but settings['filters'] with field = name and type.
+                        if ($this->form
+                            && $this->form->has($name)
+                            && ($element = $this->form->get($name)) instanceof \Laminas\Form\Element\Text
+                            && !($element instanceof \AdvancedSearch\Form\Element\TextExact)
+                        ) {
+                            $query->addFilterQuery($name, $value);
+                        } else {
+                            $query->addFilter($name, $value);
+                        }
                         continue 2;
                     }
 

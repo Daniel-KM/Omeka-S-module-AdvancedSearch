@@ -39,6 +39,26 @@ var Search = (function() {
     };
 
     /**
+     * Check if the current query is an advanced search one.
+     */
+    self.isAdvancedSearchQuery = function () {
+        let searchParams = new URLSearchParams(document.location.search);
+        let  params = Array.from(searchParams.entries());
+        for (let i in params) {
+            let k = params[i][0];
+            let v = params[i][1];
+            if (v !== ''
+                && !['q', 'search', 'fulltext_search', 'sort', 'sort_by', 'sort_order', 'page', 'per_page', 'limit', 'offset', 'csrf'].includes(k)
+                && !k.startsWith('facet[')
+                && !k.startsWith('facet%5B')
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Chosen default options.
      * @see https://harvesthq.github.io/chosen/
      */
@@ -95,6 +115,21 @@ var Search = (function() {
 })();
 
 $(document).ready(function() {
+
+    /**
+     * When the simple and the advanced form are the same form.
+     */
+    $('.advanced-search-form-toggle a').on('click', function(e) {
+        e.preventDefault();
+        $('.advanced-search-form, .advanced-search-form-toggle').toggleClass('open');
+        if ($('.advanced-search-form').hasClass('open')) {
+            $('.advanced-search-form-toggle a').text($('.advanced-search-form-toggle').data('msgOpen'));
+        } else {
+            $('.advanced-search-form-toggle a').text($('.advanced-search-form-toggle').data('msgClosed'));
+        }
+        // TODO Don't open autosuggestion when toggle.
+        // $('#search-form [name=q]').focus();
+    });
 
     /* Sort selector links (depending if server of client build) */
     $('.search-sort select').on('change', function(e) {
@@ -165,12 +200,26 @@ $(document).ready(function() {
         $('.search-view-type').removeClass('active');
         $(this).addClass('active');
     });
+
     $('.search-view-type-grid').on('click', function(e) {
         e.preventDefault();
         Search.setViewType('grid');
         $('.search-view-type').removeClass('active');
         $(this).addClass('active');
     });
+
+    /**********
+     * Initialisation.
+     */
+
+    /**
+     * Open advanced search when it is used according to the query.
+     * @todo Check if we are on the advanced search page first.
+     * @todo Use focus on load, but don't open autosuggestion on focus.
+     */
+    if (Search.isAdvancedSearchQuery()) {
+        $('.advanced-search-form-toggle a').click();
+    }
 
     var view_type = localStorage.getItem('search_view_type');
     if (!view_type) {

@@ -133,7 +133,7 @@ class SearchRequestToResponse extends AbstractPlugin
         $sort = $query->getSort();
         $sortOptions = $this->getSortOptions();
         if ($sort) {
-            if (!isset($sortOptions[$request['sort']])) {
+            if (empty($request['sort']) || !isset($sortOptions[$request['sort']])) {
                 reset($sortOptions);
                 $sort = key($sortOptions);
                 $query->setSort($sort);

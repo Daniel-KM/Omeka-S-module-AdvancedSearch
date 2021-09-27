@@ -184,13 +184,14 @@ $(document).ready(function() {
     $('.search-facets').on('change', 'select', function() {
         if (!$('.apply-facets').length) {
             // Replace the current select args by new ones.
-            let searchParams = new URLSearchParams(document.location.search);
+            // Names in facets have no index in array ("[]").
+            let url = new URL(window.location.href);
             let selectName = $(this).prop('name');
-            searchParams.delete(selectName);
+            url.searchParams.delete(selectName);
             $(this).val().forEach((element, index) => {
-                searchParams.set(selectName.substring(0, selectName.length - 2) + '[' + index + ']', element);
+                url.searchParams.set(selectName.substring(0, selectName.length - 2) + '[' + index + ']', element);
             });
-            window.location = window.location.href + searchParams.toString();
+            window.location = url.toString();
         }
     });
 

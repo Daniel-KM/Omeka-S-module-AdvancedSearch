@@ -68,6 +68,7 @@ return [
     ],
     'form_elements' => [
         'invokables' => [
+            Form\Admin\InternalConfigFieldset::class => Form\Admin\InternalConfigFieldset::class,
             Form\Element\ArrayText::class => Form\Element\ArrayText::class,
             Form\Element\DataTextarea::class => Form\Element\DataTextarea::class,
             Form\Element\Note::class => Form\Element\Note::class,

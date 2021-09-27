@@ -483,13 +483,19 @@ SQL;
             $q = trim($q, '" ');
         }
 
-        // TODO Use fulltext_search, but when more than 50% results, no results, not understandable by end user (or use boolean mode).
-        $this->args['property'][] = [
-            'joiner' => 'and',
-            'property' => '',
-            'type' => 'in',
-            'text' => $q,
-        ];
+        if ($this->engine->settingAdapter('default_search_partial_word', false)) {
+            $this->args['property'][] = [
+                'joiner' => 'and',
+                'property' => '',
+                'type' => 'in',
+                'text' => $q,
+            ];
+            return;
+        }
+
+        // Full text search is the default Omeka mode.
+        // TODO It uses fulltext_search, but when more than 50% results, no results, not understandable by end user (or use boolean mode).
+        $this->args['fulltext_search'] = $q;
     }
 
     /**
@@ -508,13 +514,20 @@ SQL;
             $q = trim($q, '" ');
         }
 
-        $this->args['property'][] = [
-            'joiner' => 'and',
-            'property' => '',
-            'except' => $excludedFields,
-            'type' => 'in',
-            'text' => $q,
-        ];
+        if ($this->engine->settingAdapter('default_search_partial_word', false)) {
+            $this->args['property'][] = [
+                'joiner' => 'and',
+                'property' => '',
+                'except' => $excludedFields,
+                'type' => 'in',
+                'text' => $q,
+            ];
+            return;
+        }
+
+        // Full text search is the default Omeka mode. Exclusion is not possible.
+        // TODO It uses fulltext_search, but when more than 50% results, no results, not understandable by end user (or use boolean mode).
+        $this->args['fulltext_search'] = $q;
     }
 
     /**

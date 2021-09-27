@@ -13,7 +13,7 @@ class InternalAdapter extends AbstractAdapter
 
     public function getConfigFieldset(): ?\Laminas\Form\Fieldset
     {
-        return null;
+        return new \AdvancedSearch\Form\Admin\InternalConfigFieldset;
     }
 
     public function getIndexerClass(): string

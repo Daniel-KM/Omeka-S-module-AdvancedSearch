@@ -32,6 +32,8 @@ namespace AdvancedSearch\Form;
 use AdvancedSearch\Form\Element\OptionalMultiCheckbox;
 use AdvancedSearch\Form\Element\OptionalRadio;
 use AdvancedSearch\Form\Element\OptionalSelect;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query\Expr\Join;
 use Laminas\Form\Element;
 use Laminas\Form\ElementInterface;
 use Laminas\Form\Fieldset;
@@ -40,6 +42,7 @@ use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Form\Element\ResourceClassSelect;
 use Omeka\Form\Element\ResourceTemplateSelect;
 use Omeka\View\Helper\Setting;
+use Reference\Mvc\Controller\Plugin\References;
 
 class MainSearchForm extends Form
 {
@@ -62,6 +65,16 @@ class MainSearchForm extends Form
      * @var \Laminas\Form\FormElementManager\FormElementManagerV3Polyfill
      */
     protected $formElementManager;
+
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    protected $entityManager;
+
+    /**
+     * @var \Reference\Mvc\Controller\Plugin\References|null
+     */
+    protected $references;
 
     /**
      * @var array
@@ -315,7 +328,7 @@ class MainSearchForm extends Form
 
     protected function searchMultiCheckbox(array $filter): ?ElementInterface
     {
-        $valueOptions = $this->prepareValueOptions($filter['options']);
+        $valueOptions = $this->prepareValueOptions($filter);
         $element = new OptionalMultiCheckbox($filter['field']);
         $element
             ->setLabel($filter['label'])
@@ -349,7 +362,7 @@ class MainSearchForm extends Form
 
     protected function searchRadio(array $filter): ?ElementInterface
     {
-        $valueOptions = $this->prepareValueOptions($filter['options']);
+        $valueOptions = $this->prepareValueOptions($filter);
         $element = new OptionalRadio($filter['field']);
         $element
             ->setLabel($filter['label'])
@@ -361,7 +374,7 @@ class MainSearchForm extends Form
 
     protected function searchSelect(array $filter, $fieldType = 'select'): ?ElementInterface
     {
-        $valueOptions = $this->prepareValueOptions($filter['options']);
+        $valueOptions = $this->prepareValueOptions($filter);
         $valueOptions = ['' => ''] + $valueOptions;
 
         $attributes = $filter['attributes'] ?? [];
@@ -673,9 +686,13 @@ class MainSearchForm extends Form
     /**
      * @todo Improve DataTextarea or explode options here with a ":".
      */
-    protected function prepareValueOptions($options): array
+    protected function prepareValueOptions($filter): array
     {
+        $options = $filter['options'];
         if ($options === null || $options === [] || $options === '') {
+            if (preg_match('~[\w-]+:[\w-]+~', $filter['field'])) {
+                return $this->listValuesForProperty($filter['field']);
+            }
             return [];
         }
         if (is_string($options)) {
@@ -686,6 +703,54 @@ class MainSearchForm extends Form
         // Avoid issue with duplicates.
         $options = array_filter(array_keys(array_flip($options)), 'strlen');
         return array_combine($options, $options);
+    }
+
+    /**
+     * Get an associative list of all unique values of a property.
+     *
+     * @todo Use the real search engine, not the internal one.
+     * @todo Use a suggester for big lists.
+     * @todo Support any resources, not only item.
+     */
+    protected function listValuesForProperty(string $field): array
+    {
+        if ($this->references) {
+            $list = $this->references->__invoke(
+                [$field],
+                $this->site ? ['site_id' => $this->site->id()] : [],
+                ['output' => 'associative']
+            )->list();
+            $list = array_keys(reset($list)['o:references']);
+        } else {
+            // Simplified from References::listDataForProperty().
+            $vocabulary = $this->entityManager->getRepository(\Omeka\Entity\Vocabulary::class)->findOneBy(['prefix' => strtok($field, ':')]);
+            if (!$vocabulary) {
+                return [];
+            }
+            $property = $this->entityManager->getRepository(\Omeka\Entity\Property::class)->findOneBy(['vocabulary' => $vocabulary->getId(), 'localName' => strtok(':')]);
+            if (!$property) {
+                return [];
+            }
+            $qb = $this->entityManager->createQueryBuilder();
+            $expr = $qb->expr();
+            $qb
+                ->select('COALESCE(value.value, valueResource.title, value.uri) AS val')
+                ->from(\Omeka\Entity\Value::class, 'value')
+                // This join allow to check visibility automatically too.
+                ->innerJoin(\Omeka\Entity\Item::class, 'resource', Join::WITH, $expr->eq('value.resource', 'resource'))
+                // The values should be distinct for each type.
+                ->leftJoin(\Omeka\Entity\Item::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'))
+                ->andWhere($expr->eq('value.property', ':property'))
+                ->setParameter('property', $property->getId())
+                ->groupBy('val')
+                ->orderBy('val', 'asc')
+            ;
+            $list = array_column($qb->getQuery()->getScalarResult(), 'val', 'val');
+            // Fix false empty duplicate or values without title.
+            $list = array_keys(array_flip($list));
+            unset($list['']);
+        }
+        return array_combine($list, $list);
     }
 
     protected function getItemSetsOptions($byOwner = false): array
@@ -736,6 +801,18 @@ class MainSearchForm extends Form
     public function setFormElementManager($formElementManager): Form
     {
         $this->formElementManager = $formElementManager;
+        return $this;
+    }
+
+    public function setEntityManager(EntityManager $entityManager): Form
+    {
+        $this->entityManager = $entityManager;
+        return $this;
+    }
+
+    public function setReferences(?References $references): Form
+    {
+        $this->references = $references;
         return $this;
     }
 }

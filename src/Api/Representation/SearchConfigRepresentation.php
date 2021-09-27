@@ -35,9 +35,19 @@ use Omeka\Api\Representation\AbstractEntityRepresentation;
 class SearchConfigRepresentation extends AbstractEntityRepresentation
 {
     /**
+     * @var bool
+     */
+    private $isFormInit = false;
+
+    /**
      * @var \AdvancedSearch\FormAdapter\FormAdapterInterface
      */
     protected $formAdapter;
+
+    /**
+     * @var \Laminas\Form\Form|null
+     */
+    protected $form;
 
     public function getJsonLdType()
     {
@@ -123,35 +133,18 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
 
     public function formAdapter(): ?\AdvancedSearch\FormAdapter\FormAdapterInterface
     {
-        if (!$this->formAdapter) {
-            $formAdapterManager = $this->getServiceLocator()->get('Search\FormAdapterManager');
-            $formAdapterName = $this->formAdapterName();
-            if ($formAdapterManager->has($formAdapterName)) {
-                $this->formAdapter = $formAdapterManager->get($formAdapterName);
-            }
+        if (!$this->isFormInit) {
+            $this->formInit();
         }
-
         return $this->formAdapter;
     }
 
     public function form(): ?\Laminas\Form\Form
     {
-        $formAdapter = $this->formAdapter();
-        if (empty($formAdapter)) {
-            return null;
+        if (!$this->isFormInit) {
+            $this->formInit();
         }
-
-        $formClass = $formAdapter->getFormClass();
-        if (empty($formClass)) {
-            return null;
-        }
-
-        return $this->getServiceLocator()
-            ->get('FormElementManager')
-            ->get($formClass, [
-                'search_config' => $this,
-            ])
-            ->setAttribute('method', 'GET');
+        return $this->form;
     }
 
     public function settings(): array
@@ -182,5 +175,33 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
     public function getEntity(): \AdvancedSearch\Entity\SearchConfig
     {
         return $this->resource;
+    }
+
+    private function formInit(): self
+    {
+        $this->isFormInit = true;
+
+        $formAdapterManager = $this->getServiceLocator()->get('Search\FormAdapterManager');
+        $formAdapterName = $this->formAdapterName();
+        if (!$formAdapterManager->has($formAdapterName)) {
+            return $this;
+        }
+
+        $this->formAdapter = $formAdapterManager->get($formAdapterName);
+        $formClass = $this->formAdapter->getFormClass();
+        if (empty($formClass)) {
+            return $this;
+        }
+
+        $this->form = $this->getServiceLocator()
+            ->get('FormElementManager')
+            ->get($formClass, [
+                'search_config' => $this,
+            ])
+            ->setAttribute('method', 'GET');
+
+        $this->formAdapter->setForm($this->form);
+
+        return $this;
     }
 }

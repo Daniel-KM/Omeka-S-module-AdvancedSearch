@@ -30,6 +30,16 @@ class ApiFormAdapter implements FormAdapterInterface
         return 'Api'; // @translate
     }
 
+    public function setForm(?\Laminas\Form\Form $form): \AdvancedSearch\FormAdapter\FormAdapterInterface
+    {
+        return $this;
+    }
+
+    public function getForm(): ?\Laminas\Form\Form
+    {
+        return null;
+    }
+
     public function getFormClass(): ?string
     {
         return null;

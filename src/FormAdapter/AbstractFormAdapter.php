@@ -33,7 +33,20 @@ use AdvancedSearch\Query;
 
 abstract class AbstractFormAdapter implements FormAdapterInterface
 {
+    protected $form;
+
     abstract public function getLabel(): string;
+
+    public function setForm(?\Laminas\Form\Form $form): \AdvancedSearch\FormAdapter\FormAdapterInterface
+    {
+        $this->form = $form;
+        return $this;
+    }
+
+    public function getForm(): ?\Laminas\Form\Form
+    {
+        return $this->form;
+    }
 
     public function getFormPartialHeaders(): ?string
     {

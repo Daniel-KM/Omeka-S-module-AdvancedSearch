@@ -34,6 +34,13 @@ interface FormAdapterInterface
 {
     public function getLabel(): string;
 
+    public function setForm(?\Laminas\Form\Form $form): \AdvancedSearch\FormAdapter\FormAdapterInterface;
+
+    public function getForm(): ?\Laminas\Form\Form;
+
+    /**
+     * The form class to use to build the search form, if any.
+     */
     public function getFormClass(): ?string;
 
     /**

@@ -6,6 +6,9 @@ use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use Laminas\Form\Form;
 use Laminas\View\Helper\AbstractHelper;
 
+/**
+ * @todo Remove this view helper and use SearchConfigRepresentation::form() only.
+ */
 class SearchForm extends AbstractHelper
 {
     /**

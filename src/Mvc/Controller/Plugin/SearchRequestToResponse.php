@@ -44,10 +44,19 @@ class SearchRequestToResponse extends AbstractPlugin
         $services = $searchConfig->getServiceLocator();
         $plugins = $services->get('ControllerPluginManager');
 
+        $formAdapterName = $searchConfig->formAdapterName();
+        if (!$formAdapterName) {
+            $message = new Message('This search config has no form adapter.'); // @translate
+            $plugins->get('logger')()->err($message);
+            return [
+                'status' => 'error',
+                'message' => $message,
+            ];
+        }
+
         /** @var \AdvancedSearch\FormAdapter\FormAdapterInterface $formAdapter */
         $formAdapter = $searchConfig->formAdapter();
         if (!$formAdapter) {
-            $formAdapterName = $searchConfig->formAdapterName();
             $message = new Message('Form adapter "%s" not found.', $formAdapterName); // @translate
             $plugins->get('logger')()->err($message);
             return [

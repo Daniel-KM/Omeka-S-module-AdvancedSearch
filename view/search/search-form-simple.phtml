@@ -32,5 +32,5 @@ if ($form->has('q')) {
     <?= $formElement($q
         ->setAttribute('placeholder', $translate('Search'))
         ->setAttribute('aria-label', $translate('Search'))) ?>
-    <button><?= $translate('Search') ?></button>
+    <button type="submit"><?= $translate('Search') ?></button>
 <?= $formHelper->closeTag() ?>

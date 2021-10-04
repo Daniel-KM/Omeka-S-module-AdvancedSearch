@@ -30,31 +30,35 @@
 
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\SiteRepresentation $site
  * @var \Omeka\Site\Navigation\Link\LinkInterface $link
- * @var array $data
+ * @var ?array $data
  */
-$translate = $this->plugin('translate');
-$escape = $this->plugin('escapeHtml');
 
+$plugins = $this->getHelperPluginManager();
+$translate = $plugins->get('translate');
+$escape = $plugins->get('escapeHtml');
+
+$data = empty($data) ? [] : $data;
 $label = $data['label'] ?? null;
 $searchConfigId = $data['advancedsearch_config_id'] ?? null;
 
 $searchConfigs = $this->api()->search('search_configs')->getContent();
 ?>
 
-<label><?php $translate('Type'); ?>
-    <input type="text" value="<?php echo $escape($link->getName()); ?>" disabled="disabled">
+<label><?= $translate('Type') ?>
+    <input type="text" value="<?= $escape($translate($link->getName())) ?>" disabled="disabled"/>
 </label>
-<label><?php $translate('Label'); ?>
-    <input type="text" data-name="label" value="<?php echo $escape($label); ?>">
+<label><?= $translate('Label') ?>
+    <input type="text" data-name="label" value="<?= $escape($label) ?>"/>
 </label>
 <label>
-    <?php echo $translate('Page'); ?>
+    <?= $translate('Page') ?>
     <select data-name="advancedsearch_config_id">
         <?php foreach ($searchConfigs as $searchConfig): ?>
             <?php $selected = $searchConfigId && $searchConfigId == $searchConfig->id(); ?>
-            <option value="<?php echo $searchConfig->id(); ?>" <?php echo ($selected) ? 'selected="selected"' : ''; ?>>
-                <?php echo $searchConfig->name(); ?>
+            <option value="<?= $searchConfig->id() ?>"<?= $selected ? ' selected="selected"' : '' ?>>
+                <?= $searchConfig->name() ?>
             </option>
         <?php endforeach; ?>
     </select>

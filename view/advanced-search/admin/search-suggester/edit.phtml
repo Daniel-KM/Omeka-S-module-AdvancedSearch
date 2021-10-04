@@ -13,7 +13,7 @@ $form->prepare();
 
 <?= $this->form()->openTag($form) ?>
 <div id="page-actions">
-    <button><?= $translate('Save') ?></button>
+    <button type="submit"><?= $translate('Save') ?></button>
 </div>
 <?= $this->formCollection($form) ?>
 <?php $this->trigger('view.edit.form.after'); ?>

@@ -40,7 +40,7 @@ $form->prepare();
 
 <?= $this->form()->openTag($form) ?>
 <div id="page-actions">
-    <button><?= $translate('Add and configure') ?></button>
+    <button type="submit"><?= $translate('Add and configure') ?></button>
 </div>
 <?= $this->formCollection($form, false) ?>
 <?php $this->trigger('view.add.form.after'); ?>

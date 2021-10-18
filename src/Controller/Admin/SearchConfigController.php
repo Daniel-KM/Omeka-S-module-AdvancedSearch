@@ -493,7 +493,7 @@ class SearchConfigController extends AbstractActionController
 
         // Add a warning because it may be a hard to understand issue.
         if (isset($params['facet']['languages'])) {
-            $params['facet']['languages'] = array_unique(array_map('trim', $params['facet']['languages']));
+            $params['facet']['languages'] = array_values(array_unique(array_map('trim', $params['facet']['languages'])));
             if (!empty($params['facet']['languages']) && !in_array('', $params['facet']['languages'])) {
                 $this->messenger()->addWarning(
                     'Note that you didn’t set a trailing "|", so all values without language will be removed.' // @translate

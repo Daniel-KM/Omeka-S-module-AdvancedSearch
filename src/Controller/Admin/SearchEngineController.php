@@ -132,7 +132,8 @@ class SearchEngineController extends AbstractActionController
             $searchEngine
                 ->setName($name)
                 ->setSettings($formData);
-            $this->entityManager->flush($searchEngine);
+            $this->entityManager->persist($searchEngine);
+            $this->entityManager->flush();
             $this->messenger()->addSuccess(new Message(
                 'Search index "%s" successfully configured.',  // @translate
                 $searchEngine->getName()

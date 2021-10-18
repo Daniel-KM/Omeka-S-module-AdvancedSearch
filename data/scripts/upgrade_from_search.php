@@ -180,6 +180,17 @@ WHERE
 SQL;
 $connection->executeStatement($sql);
 
+$sql = <<<'SQL'
+REPLACE INTO `site` (`navigation`)
+SELECT
+    REPLACE(`site`.`navigation`,
+        "search_page_id",
+        "advancedsearch_config_id"
+    )
+FROM `site`
+SQL;
+$connection->executeStatement($sql);
+
 // Remove original data and module.
 
 $sql = <<<'SQL'

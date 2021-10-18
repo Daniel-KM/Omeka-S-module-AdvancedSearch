@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace AdvancedSearch\Service\Form\Element;
 
 use AdvancedSearch\Form\Element\MediaTypeSelect;
@@ -19,10 +20,16 @@ class MediaTypeSelectFactory implements FactoryInterface
 
     protected function listMediaTypes(ContainerInterface $services)
     {
+        /** @var \Doctrine\DBAL\Connection $connection */
         $connection = $services->get('Omeka\Connection');
-        $sql = 'SELECT DISTINCT(media_type) FROM media WHERE media_type IS NOT NULL AND media_type != "" ORDER BY media_type';
-        $stmt = $connection->executeQuery($sql);
-        $result = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+        $sql = <<<'SQL'
+SELECT DISTINCT(media_type)
+FROM media
+WHERE media_type IS NOT NULL
+    AND media_type != ""
+ORDER BY media_type;
+SQL;
+        $result = $connection->executeQuery($sql)->fetchFirstColumn();
         return array_combine($result, $result);
     }
 }

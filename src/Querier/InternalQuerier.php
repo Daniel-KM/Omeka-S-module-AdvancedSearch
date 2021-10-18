@@ -349,7 +349,7 @@ SQL;
             $results = $connection
                 ->executeQuery($sql, $bind, $types)
                 ->fetchAll();
-        } catch (\Doctrine\DBAL\DBALException $e) {
+        } catch (\Doctrine\DBAL\Exception $e) {
             $this->logger->err($e->getMessage());
             return $this->response
                 ->setMessage('An internal issue in database occurred.'); // @translate
@@ -835,17 +835,14 @@ SQL;
             $connection = $this->services->get('Omeka\Connection');
             $qb = $connection->createQueryBuilder();
             $qb
-                ->select([
+                ->select(
                     'vocabulary.id AS id',
-                    'vocabulary.prefix AS prefix',
-                ])
+                    'vocabulary.prefix AS prefix'
+                )
                 ->from('vocabulary', 'vocabulary')
                 ->orderBy('vocabulary.id)', 'ASC')
             ;
-            $stmt = $connection->executeQuery($qb);
-            // Fetch by key pair is not supported by doctrine 2.0.
-            $vocabularies = $stmt->fetchAll(\Doctrine\DBAL\FetchMode::COLUMN);
-            $vocabularies = array_column($vocabularies, 'prefix', 'id');
+            $vocabularies = $connection->executeQuery($qb)->fetchAllKeyValue();
         }
 
         return $vocabularies;
@@ -868,7 +865,7 @@ SQL;
     /**
      * Get all property terms by id, ordered by descendant total values.
      *
-     * @return array Associative array of ids by term.
+     * @return array Associative array of terms by ids.
      */
     protected function getUsedPropertyByIds(): array
     {
@@ -879,21 +876,18 @@ SQL;
             $connection = $this->services->get('Omeka\Connection');
             $qb = $connection->createQueryBuilder();
             $qb
-            ->select([
-                'DISTINCT property.id AS id',
-                "CONCAT(vocabulary.prefix, ':', property.local_name) AS term",
-                // 'COUNT(value.id) AS total',
-            ])
-            ->from('property', 'property')
-            ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
-            ->innerJoin('property', 'value', 'value', 'property.id = value.property_id')
-            ->addGroupBy('id')
-            ->orderBy('COUNT(value.id)', 'DESC')
+                ->select(
+                    'property.id AS id',
+                    'CONCAT(vocabulary.prefix, ":", property.local_name) AS term'
+                    // 'COUNT(value.id) AS total'
+                )
+                ->from('property', 'property')
+                ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
+                ->innerJoin('property', 'value', 'value', 'property.id = value.property_id')
+                ->groupBy('id')
+                ->orderBy('COUNT(value.id)', 'DESC')
             ;
-            $stmt = $connection->executeQuery($qb);
-            // Fetch by key pair is not supported by doctrine 2.0.
-            $properties = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            $properties = array_column($properties, 'term', 'id');
+            $properties = $connection->executeQuery($qb)->fetchAllKeyValue();
         }
 
         return $properties;
@@ -916,18 +910,15 @@ SQL;
             $connection = $this->services->get('Omeka\Connection');
             $qb = $connection->createQueryBuilder();
             $qb
-                ->select([
-                    "CONCAT(vocabulary.prefix, '_', property.local_name) AS key",
-                    "CONCAT(vocabulary.prefix, ':', property.local_name) AS term",
-                ])
+                ->select(
+                    'CONCAT(vocabulary.prefix, "_", property.local_name) AS key',
+                    'CONCAT(vocabulary.prefix, ":", property.local_name) AS term'
+                )
                 ->from('property', 'property')
                 ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
                 ->innerJoin('property', 'value', 'value', 'property.id = value.property_id')
             ;
-            $stmt = $connection->executeQuery($qb);
-            // Fetch by key pair is not supported by doctrine 2.0.
-            $properties = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            $properties = array_column($properties, 'term', 'key');
+            $properties = $connection->executeQuery($qb)->fetchAllKeyValue();
         }
 
         return $properties;
@@ -949,19 +940,16 @@ SQL;
             $connection = $this->services->get('Omeka\Connection');
             $qb = $connection->createQueryBuilder();
             $qb
-                ->select([
+                ->select(
                     'CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
-                    'property.id AS id',
-                ])
+                    'property.id AS id'
+                )
                 ->from('property', 'property')
                 ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
                 ->orderBy('vocabulary.id', 'asc')
                 ->addOrderBy('property.id', 'asc')
-                ->addGroupBy('property.id')
             ;
-            $stmt = $connection->executeQuery($qb);
-            $properties = $stmt->fetchAll(\PDO::FETCH_KEY_PAIR);
-            $properties = array_map('intval', $properties);
+            $properties = array_map('intval', $connection->executeQuery($qb)->fetchAllKeyValue());
         }
 
         return $properties;
@@ -997,17 +985,15 @@ SQL;
             $connection = $this->services->get('Omeka\Connection');
             $qb = $connection->createQueryBuilder();
             $qb
-                ->select([
-                    "CONCAT(vocabulary.prefix, ':', resource_class.local_name) AS term",
-                    'resource_class.id AS id',
-                ])
+                ->select(
+                    'CONCAT(vocabulary.prefix, ":", resource_class.local_name) AS term',
+                    'resource_class.id AS id'
+                )
                 ->from('resource_class', 'resource_class')
                 ->innerJoin('resource_class', 'vocabulary', 'vocabulary', 'resource_class.vocabulary_id = vocabulary.id')
+                ->orderBy('term', 'asc')
             ;
-            $stmt = $connection->executeQuery($qb);
-            // Fetch by key pair is not supported by doctrine 2.0.
-            $resourceClasses = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            $resourceClasses = array_map('intval', array_column($resourceClasses, 'id', 'term'));
+            $resourceClasses = array_map('intval', $connection->executeQuery($qb)->fetchAllKeyValue());
         }
 
         return $resourceClasses;
@@ -1039,16 +1025,14 @@ SQL;
             $connection = $this->services->get('Omeka\Connection');
             $qb = $connection->createQueryBuilder();
             $qb
-                ->select([
+                ->select(
                     'resource_template.label AS label',
-                    'resource_template.id AS id',
-                ])
+                    'resource_template.id AS id'
+                )
                 ->from('resource_template', 'resource_template')
+                ->orderBy('id', 'asc')
             ;
-            $stmt = $connection->executeQuery($qb);
-            // Fetch by key pair is not supported by doctrine 2.0.
-            $resourceTemplates = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            $resourceTemplates = array_map('intval', array_column($resourceTemplates, 'id', 'label'));
+            $resourceTemplates = array_map('intval', $connection->executeQuery($qb)->fetchAllKeyValue());
         }
 
         return $resourceTemplates;

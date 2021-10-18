@@ -747,31 +747,23 @@ SQL;
     }
 
     /**
-     * Prepare the list of properties and used properties.
+     * Prepare the list of property ids by term and by id.
      */
     protected function prepareProperties(): void
     {
         if (is_null($this->propertiesByTermsAndIds)) {
             $qb = $this->connection->createQueryBuilder();
             $qb
-                ->select([
-                    'DISTINCT property.id AS id',
+                ->select(
                     'CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
-                    // Only the two first selects are needed, but some databases
-                    // require "order by" or "group by" value to be in the select.
-                    'vocabulary.id',
-                    'property.id',
-                ])
+                    'property.id AS id'
+                )
                 ->from('property', 'property')
                 ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
                 ->orderBy('vocabulary.id', 'asc')
-                ->addOrderBy('property.id', 'asc')
-                ->addGroupBy('property.id')
+                ->addOrderBy('property.id', 'asc');
             ;
-            $stmt = $this->connection->executeQuery($qb);
-            // Fetch by key pair is not supported by doctrine 2.0.
-            $properties = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-            $properties = array_map('intval', array_column($properties, 'id', 'term'));
+            $properties = array_map('intval', $this->connection->executeQuery($qb)->fetchAllKeyValue());
             $this->propertiesByTermsAndIds = array_replace($properties, array_combine($properties, $properties));
         }
     }

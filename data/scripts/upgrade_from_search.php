@@ -251,8 +251,7 @@ $inputs = [
 $sql = <<<'SQL'
 SELECT `id`, `settings` FROM `search_config`;
 SQL;
-$stmt = $connection->executeQuery($sql);
-$result = $stmt->fetchAll(\PDO::FETCH_KEY_PAIR) ?: [];
+$result = $connection->executeQuery($sql)->fetchAllKeyValue() ?: [];
 foreach ($result as $id => $searchConfigSettings) {
     $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
     $searchConfigSettings['resource_fields'] = [

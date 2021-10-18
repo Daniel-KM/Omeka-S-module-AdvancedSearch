@@ -379,24 +379,21 @@ class ApiFormConfigFieldset extends Fieldset
     {
         static $properties;
 
-        if (isset($properties)) {
-            return $properties;
+        if (is_null($properties)) {
+            $qb = $this->connection->createQueryBuilder();
+            $qb
+                ->select(
+                    'CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
+                    'property.id AS id'
+                )
+                ->from('property', 'property')
+                ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
+                ->orderBy('vocabulary.id', 'asc')
+                ->addOrderBy('property.id', 'asc')
+            ;
+            $properties = array_map('intval', $this->connection->executeQuery($qb)->fetchAllKeyValue());
         }
 
-        $qb = $this->connection->createQueryBuilder();
-        $qb
-            ->select([
-                'CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
-                'property.id AS id',
-            ])
-            ->from('property', 'property')
-            ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
-            ->orderBy('vocabulary.id', 'asc')
-            ->addOrderBy('property.id', 'asc')
-            ->addGroupBy('property.id')
-        ;
-        $stmt = $this->connection->executeQuery($qb);
-        $properties = $stmt->fetchAll(\PDO::FETCH_KEY_PAIR);
         return $properties;
     }
 

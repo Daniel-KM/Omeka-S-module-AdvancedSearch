@@ -87,9 +87,8 @@ class InternalQuerier extends AbstractQuerier
             $this->response->addResults($resourceType, $result);
         }
 
-        $this->response->setTotalResults(
-            array_sum($this->response->getResourceTotalResults())
-        );
+        $totalResults = array_sum($this->response->getResourceTotalResults());
+        $this->response->setTotalResults($totalResults);
 
         if ($hasReferences) {
             $this->fillFacetResponse();

@@ -12,10 +12,10 @@ $resources = $response->getResources($resourceName);
 if (!$resources) return;
 
 $plugins = $this->getHelperPluginManager();
+$escape = $plugins->get('escapeHtml');
+$assetUrl = $plugins->get('assetUrl');
 $translate = $plugins->get('translate');
 $hyperlink = $plugins->get('hyperlink');
-$assetUrl = $plugins->get('assetUrl');
-$escape = $plugins->get('escapeHtml');
 $thumbnailHelper = $plugins->get('thumbnail');
 
 $setting = $plugins->get($site ? 'siteSetting' : 'setting');

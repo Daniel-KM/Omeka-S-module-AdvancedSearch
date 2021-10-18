@@ -25,7 +25,7 @@ $escape = $this->plugin('escapeHtml');
 
 <?php if (!empty($heading)): ?>
 <div class="block-search">
-    <h2><?= $this->escapeHtml($heading) ?></h2>
+    <h2><?= $escape($heading) ?></h2>
 </div>
 <?php endif; ?>
 

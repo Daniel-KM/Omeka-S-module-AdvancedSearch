@@ -105,6 +105,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
             if ($value === '' || $value === [] || $value === null) {
                 continue;
             }
+            $name = (string) $name;
             switch ($name) {
                 case 'q':
                     $query->setQuery($request['q']);

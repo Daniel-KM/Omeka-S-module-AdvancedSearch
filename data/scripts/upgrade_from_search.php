@@ -275,7 +275,7 @@ foreach ($result as $id => $searchConfigSettings) {
         case 'itemSet':
             if (!empty($inputs[strtolower($form['item_set_filter_type'] ?? '')])) {
                 $searchConfigSettings['form']['filters'][] = [
-                    'field' => $form['items_set_id_field'] ?? 'items_set_id_field',
+                    'field' => $form['item_set_id_field'] ?? 'item_set_id_field',
                     'label' => 'Collection',
                     'type' => $inputs[strtolower($form['item_set_filter_type'])] ?? 'Select',
                 ];

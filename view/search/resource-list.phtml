@@ -39,7 +39,7 @@ if ($bodyTerm) {
     $bodyOptions = $filterLocale ? [$lang, ''] : null;
 }
 
-$defaultThumbnail = '<img src="' . $assetUrl('thumbnails/default.png', 'Omeka') . '" title="' . $translate('No media') . '"/>';
+$defaultThumbnail = '<img src="' . $assetUrl('thumbnails/default.png', 'Omeka', true) . '" title="' . $translate('No media') . '"/>';
 ?>
 
 <?php if ($title): ?>

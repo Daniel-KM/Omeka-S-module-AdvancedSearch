@@ -121,6 +121,14 @@ class Module extends AbstractModule
                 'To be automatically upgraded and replaced by this module, the module "Search" should be updated first to version 3.5.23.3 or greater.' // @translate
             );
         }
+
+        $module = $moduleManager->getModule('AdvancedSearch');
+        $version = $module ? $module->getIni('version') : null;
+        if (version_compare($version, '3.3.6.6', '>')) {
+            throw new \Omeka\Module\Exception\ModuleCannotInstallException(
+                'To be automatically upgraded and replaced by this module, use version 3.3.6.6 or below.' // @translate
+            );
+        }
     }
 
     protected function postInstall(): void
@@ -136,6 +144,13 @@ class Module extends AbstractModule
         $moduleManager = $services->get('Omeka\ModuleManager');
 
         // Upgrade from old modules AdvancedSearchPlus and Search.
+
+        $module = $moduleManager->getModule('AdvancedSearch');
+        $version = $module ? $module->getIni('version') : null;
+        if (version_compare($version, '3.3.6.6', '>')) {
+            $messenger->addWarning('The modules Search, Advanced Search Plus, PSL Search Form, Search Solr cannot be upgraded with a version of Advanced Search greater than 3.3.6.6.'); // @translate
+            return;
+        }
 
         $module = $moduleManager->getModule('AdvancedSearchPlus');
         if ($module && in_array($module->getState(), [

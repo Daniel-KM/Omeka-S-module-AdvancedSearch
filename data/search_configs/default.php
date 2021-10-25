@@ -141,6 +141,18 @@ return [
         ],
     ],
 
+    'pagination' => [
+        'per_pages' => [
+            // For translation only.
+            10 => 'Results by %d', // @translate
+            10 => 'Results by 10', // @translate
+            // This is the default for Omeka.
+            25 => 'Results by 25', // @translate
+            50 => 'Results by 50', // @translate
+            100 => 'Results by 100', // @translate
+        ],
+    ],
+
     'sort' => [
         'fields' => [
             'dcterms:title asc' => [

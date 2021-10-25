@@ -10,6 +10,7 @@
  */
 
 $plugins = $this->getHelperPluginManager();
+$escape = $plugins->get('escapeHtml');
 $translate = $plugins->get('translate');
 $translatePlural = $plugins->get('translatePlural');
 ?>
@@ -18,6 +19,23 @@ $translatePlural = $plugins->get('translatePlural');
     <div class="search-results-count">
         <?= $pagination ?>
     </div>
+    <?php if ($perPages = $searchPage->subSetting('pagination', 'per_pages')):
+    // Don't display unmanaged per page from the query, but set the default Omeka per page.
+    // Can be simplified in a theme.
+    $setting = $plugins->get('setting');
+    $defaultPerPage = $this->status()->isSiteRequest() ? ($plugins->get('siteSetting')('pagination_per_page') ?: $setting('pagination_per_page', 25)) : $setting('pagination_per_page', 25);
+    $perPages = array_replace([(int) $defaultPerPage => sprintf($translate('Results by %d'), $defaultPerPage)], $perPages);
+    ksort($perPages);
+    $perPage = $query->getPerPage() ?: null;
+    ?>
+    <div class="search-per-page">
+        <select name="per_page">
+            <?php foreach ($perPages as $per => $label): ?>
+            <?= sprintf('<option value="%d"%s>%s</option>', (int) $per, $per === $perPage ? ' selected="selected"' : '', $escape($label)) ?>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <?php endif; ?>
     <?= $this->searchSortSelector($query, $searchPage->subSetting('sort', 'fields')) ?>
     <div>
         <a class="search-view-type search-view-type-list" href="#"><?= $translate('list') ?></a>

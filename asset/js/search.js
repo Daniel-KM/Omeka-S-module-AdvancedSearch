@@ -131,7 +131,24 @@ $(document).ready(function() {
         // $('#search-form [name=q]').focus();
     });
 
-    /* Sort selector links (depending if server of client build) */
+    /* Per-page selector links (depending if server or client build) */
+    $('.search-per-page select').on('change', function(e) {
+        // Per-page fields don't look like a url.
+        e.preventDefault();
+        var perPage = $(this).val();
+        if (perPage.substring(0, 6) === 'https:' || perPage.substring(0, 5) === 'http:') {
+            window.location = perPage;
+        } else if (perPage.substring(0, 1) === '/') {
+            window.location = window.location.origin + perPage;
+        } else {
+            var searchParams = new URLSearchParams(window.location.search);
+            searchParams.set('page', 1);
+            searchParams.set('per_page', $(this).val());
+            window.location.search = searchParams.toString();
+        }
+    });
+
+    /* Sort selector links (depending if server or client build) */
     $('.search-sort select').on('change', function(e) {
         // Sort fields don't look like a url.
         e.preventDefault();

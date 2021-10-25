@@ -372,9 +372,41 @@ advanced = Filters = Advanced',
             ])
         ;
 
-        // Settings for the results (sorting).
+        // Settings for the results (pagination).
 
-        // TODO Add the style of pagination.
+        // TODO Add the style of pagination (prev/next or list of pages).
+
+        $this
+            ->add([
+                'name' => 'pagination',
+                'type' => Fieldset::class,
+                'options' => [
+                    'label' => 'Pagination', // @translate
+                ],
+            ])
+            ->get('pagination')
+            ->add([
+                'name' => 'per_pages',
+                'type' => OmekaElement\ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Results per page', // @translate
+                    'info' => 'If any, the search page will display a select to paginate results.', // @translate
+                    'as_key_value' => true,
+                    'key_value_separator' => '=',
+                ],
+                'attributes' => [
+                    'id' => 'per_pages',
+                    'placeholder' => '10 = Results by 10
+25 = Results by 25
+50 = Results by 50
+100 = Results by 100
+',
+                    'rows' => 6,
+                ],
+            ])
+        ;
+
+        // Settings for the results (sorting).
 
         $this
             ->add([

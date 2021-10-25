@@ -30,15 +30,11 @@
 
 namespace AdvancedSearch\Form\Admin;
 
-use AdvancedSearch\Form\Element\ArrayText;
-use AdvancedSearch\Form\Element\DataTextarea;
-use AdvancedSearch\Form\Element\OptionalRadio;
-use AdvancedSearch\Form\Element\OptionalSelect;
-use AdvancedSearch\Form\Element\OptionalUrl;
+use AdvancedSearch\Form\Element as AdvancedSearchElement;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
-use Omeka\Form\Element\ArrayTextarea;
+use Omeka\Form\Element as OmekaElement;
 
 class SearchConfigConfigureForm extends Form
 {
@@ -220,7 +216,7 @@ class SearchConfigConfigureForm extends Form
             ->get('autosuggest')
             ->add([
                 'name' => 'suggester',
-                'type' => OptionalSelect::class,
+                'type' => AdvancedSearchElement\OptionalSelect::class,
                 'options' => [
                     'label' => 'Suggester', // @translate
                     'value_options' => $this->suggesters,
@@ -235,7 +231,7 @@ class SearchConfigConfigureForm extends Form
             ])
             ->add([
                 'name' => 'url',
-                'type' => OptionalUrl::class,
+                'type' => AdvancedSearchElement\OptionalUrl::class,
                 'options' => [
                     'label' => 'Direct endpoint', // @translate
                     // @see https://solr.apache.org/guide/suggester.html#suggest-request-handler-parameters
@@ -272,7 +268,7 @@ class SearchConfigConfigureForm extends Form
 
             ->add([
                 'name' => 'filters',
-                'type' => DataTextarea::class,
+                'type' => AdvancedSearchElement\DataTextarea::class,
                 'options' => [
                     'label' => 'Filters', // @translate
                     'info' => 'List of filters that will be displayed in the search form. Format is "field = Label = Type = options". The field should exist in all resources fields.', // @translate
@@ -302,7 +298,7 @@ advanced = Filters = Advanced',
             ])
             ->add([
                 'name' => 'available_filters',
-                'type' => ArrayTextarea::class,
+                'type' => OmekaElement\ArrayTextarea::class,
                 'options' => [
                     'label' => 'Available filters', // @translate
                     'info' => 'List of all available filters, among which some can be copied above.', // @translate
@@ -318,7 +314,7 @@ advanced = Filters = Advanced',
             ])
             ->add([
                 'name' => 'advanced',
-                'type' => DataTextarea::class,
+                'type' => AdvancedSearchElement\DataTextarea::class,
                 'options' => [
                     'label' => 'Advanced filters', // @translate
                     'info' => 'List of filters that will be displayed in the search form. Format is "term = Label". The field should exist in all resources fields.', // @translate
@@ -392,7 +388,7 @@ advanced = Filters = Advanced',
             // field (term + asc/desc) = label (+ asc/desc) (order means weight).
             ->add([
                 'name' => 'fields',
-                'type' => DataTextarea::class,
+                'type' => AdvancedSearchElement\DataTextarea::class,
                 'options' => [
                     'label' => 'Sort fields', // @translate
                     'info' => 'List of sort fields that will be displayed in the search page. Format is "term dir = Label".', // @translate
@@ -411,7 +407,7 @@ advanced = Filters = Advanced',
             ])
             ->add([
                 'name' => 'available_sort_fields',
-                'type' => ArrayTextarea::class,
+                'type' => OmekaElement\ArrayTextarea::class,
                 'options' => [
                     'label' => 'Available sort fields', // @translate
                     'info' => 'List of all available sort fields, among which some can be copied above.', // @translate
@@ -442,7 +438,7 @@ advanced = Filters = Advanced',
             // field (term) = label (order means weight).
             ->add([
                 'name' => 'facets',
-                'type' => DataTextarea::class,
+                'type' => AdvancedSearchElement\DataTextarea::class,
                 'options' => [
                     'label' => 'List of facets', // @translate
                     'info' => 'List of facets that will be displayed in the search page. Format is "field = Label" and optionnally " = Select".', // @translate
@@ -462,7 +458,7 @@ advanced = Filters = Advanced',
             ])
             ->add([
                 'name' => 'available_facets',
-                'type' => ArrayTextarea::class,
+                'type' => OmekaElement\ArrayTextarea::class,
                 'options' => [
                     'label' => 'Available facets', // @translate
                     'info' => 'List of all available facets, among which some can be copied above.', // @translate
@@ -492,7 +488,7 @@ advanced = Filters = Advanced',
             ])
             ->add([
                 'name' => 'order',
-                'type' => OptionalRadio::class,
+                'type' => AdvancedSearchElement\OptionalRadio::class,
                 'options' => [
                     'label' => 'Order of facet items', // @translate
                     'value_options' => [
@@ -510,7 +506,7 @@ advanced = Filters = Advanced',
             ])
             ->add([
                 'name' => 'languages',
-                'type' => ArrayText::class,
+                'type' => AdvancedSearchElement\ArrayText::class,
                 'options' => [
                     'label' => 'Get facets from specific languages', // @translate
                     'info' => 'Generally, facets are translated in the view, but in some cases, facet values may be translated directly in a multivalued property. Use "|" to separate multiple languages. Use a trailing "|" for values without language. When fields with languages (like subjects) and fields without language (like date) are facets, the empty language must be set to get results.', // @translate
@@ -523,7 +519,7 @@ advanced = Filters = Advanced',
             ])
             ->add([
                 'name' => 'mode',
-                'type' => OptionalRadio::class,
+                'type' => AdvancedSearchElement\OptionalRadio::class,
                 'options' => [
                     'label' => 'Facet mode', // @translate
                     'value_options' => [
@@ -539,7 +535,7 @@ advanced = Filters = Advanced',
             ])
             ->add([
                 'name' => 'display_button',
-                'type' => OptionalRadio::class,
+                'type' => AdvancedSearchElement\OptionalRadio::class,
                 'options' => [
                     'label' => 'Position of the button "Apply filters"', // @translate
                     'value_options' => [

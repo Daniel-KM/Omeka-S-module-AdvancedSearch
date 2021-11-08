@@ -911,8 +911,8 @@ SQL;
             $qb = $connection->createQueryBuilder();
             $qb
                 ->select(
-                    'CONCAT(vocabulary.prefix, "_", property.local_name) AS key',
-                    'CONCAT(vocabulary.prefix, ":", property.local_name) AS term'
+                    'CONCAT(vocabulary.prefix, "_", property.local_name) AS "key"',
+                    'CONCAT(vocabulary.prefix, ":", property.local_name) AS "term"'
                 )
                 ->from('property', 'property')
                 ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')

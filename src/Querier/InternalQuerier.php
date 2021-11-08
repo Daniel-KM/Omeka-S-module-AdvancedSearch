@@ -744,6 +744,10 @@ SQL;
             : null;
     }
 
+    /**
+     * @todo Factorize with \AdvancedSearch\Form\MainSearchForm::listValuesForProperty()
+     * @see \AdvancedSearch\Form\MainSearchForm::listValuesForProperty()
+     */
     protected function fillFacetResponse(): void
     {
         $this->response->setActiveFacets($this->query->getActiveFacets());
@@ -837,9 +841,7 @@ SQL;
                 ->list();
 
             foreach (array_keys($fields) as $facetField) {
-                // Manage the exceptions.
-                $referenceKey = $metadataFieldsToNames[$facetField] ?? $facetField;
-                foreach ($values[$referenceKey]['o:references'] ?? [] as $value => $count) {
+                foreach ($values[$facetField]['o:references'] ?? [] as $value => $count) {
                     if (empty($facetCountsByField[$facetField][$value])) {
                         $facetCountsByField[$facetField][$value] = [
                             'value' => $value,

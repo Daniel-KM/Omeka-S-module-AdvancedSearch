@@ -762,14 +762,11 @@ class MainSearchForm extends Form
     /**
      * @todo Improve DataTextarea or explode options here with a ":".
      */
-    protected function prepareValueOptions($filter): array
+    protected function prepareValueOptions(array $filter): array
     {
         $options = $filter['options'];
         if ($options === null || $options === [] || $options === '') {
-            if (preg_match('~[\w-]+:[\w-]+~', $filter['field'])) {
-                return $this->listValuesForProperty($filter['field']);
-            }
-            return [];
+            return $this->listValuesForProperty($filter['field']);
         }
         if (is_string($options)) {
             $options = array_filter(array_map('trim', explode($options)), 'strlen');
@@ -787,24 +784,51 @@ class MainSearchForm extends Form
      * @todo Use the real search engine, not the internal one.
      * @todo Use a suggester for big lists.
      * @todo Support any resources, not only item.
+     *
+     * @todo Factorize with \AdvancedSearch\Querier\InternalQuerier::fillFacetResponse()
+     * @see \AdvancedSearch\Querier\InternalQuerier::fillFacetResponse()
      */
     protected function listValuesForProperty(string $field): array
     {
+        // Check if the field is a special or a multifield.
+
+        $searchEngine = $this->getOption('search_config')->engine();
+
+        $metadataFieldsToNames = [
+            'resource_name' => 'resource_type',
+            'resource_type' => 'resource_type',
+            'is_public' => 'is_public',
+            'owner_id' => 'o:owner',
+            'site_id' => 'o:site',
+            'resource_class_id' => 'o:resource_class',
+            'resource_template_id' => 'o:resource_template',
+            'item_set_id' => 'o:item_set',
+        ];
+
+        // Convert multi-fields into a list of property terms.
+        // Normalize search query keys as omeka keys for items and item sets.
+        $multifields = $searchEngine->settingAdapter('multifields', []);
+        $fields = [];
+        $fields[$field] = $metadataFieldsToNames[$field]
+            ?? $this->getPropertyTerm($field)
+            ?? $multifields[$field]['fields']
+            ?? $field;
+
         if ($this->references) {
             $list = $this->references->__invoke(
-                [$field],
+                $fields,
                 $this->site ? ['site_id' => $this->site->id()] : [],
                 ['output' => 'associative']
             )->list();
             $list = array_keys(reset($list)['o:references']);
         } else {
             // Simplified from References::listDataForProperty().
-            $vocabulary = $this->entityManager->getRepository(\Omeka\Entity\Vocabulary::class)->findOneBy(['prefix' => strtok($field, ':')]);
-            if (!$vocabulary) {
-                return [];
+            $fields = reset($fields);
+            if (!is_array($fields)) {
+                $fields = [$fields];
             }
-            $property = $this->entityManager->getRepository(\Omeka\Entity\Property::class)->findOneBy(['vocabulary' => $vocabulary->getId(), 'localName' => strtok(':')]);
-            if (!$property) {
+            $propertyIds = array_intersect_key($this->getPropertyIds(), array_flip($fields));
+            if (!$propertyIds) {
                 return [];
             }
             $qb = $this->entityManager->createQueryBuilder();
@@ -816,8 +840,8 @@ class MainSearchForm extends Form
                 ->innerJoin(\Omeka\Entity\Item::class, 'resource', Join::WITH, $expr->eq('value.resource', 'resource'))
                 // The values should be distinct for each type.
                 ->leftJoin(\Omeka\Entity\Item::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'))
-                ->andWhere($expr->eq('value.property', ':property'))
-                ->setParameter('property', $property->getId())
+                ->andWhere($expr->in('value.property', ':properties'))
+                ->setParameter('properties', implode(',', $propertyIds))
                 ->groupBy('val')
                 ->orderBy('val', 'asc')
             ;
@@ -878,6 +902,55 @@ class MainSearchForm extends Form
             $options[$name] = $field['label'] ?? $name;
         }
         return $options;
+    }
+
+    /**
+     * Check a property term or id.
+     *
+     * @see \Bulk\Mvc\Controller\Plugin\Bulk::getPropertyTerm()
+     * @todo Factorize with \AdvancedSearch\Querier\InternalQuerier::getPropertyTerm()
+     * @see \AdvancedSearch\Querier\InternalQuerier::getPropertyTerm()
+     */
+    protected function getPropertyTerm($termOrId): ?string
+    {
+        $ids = $this->getPropertyIds();
+        return is_numeric($termOrId)
+            ? (array_search($termOrId, $ids) ?: null)
+            : (array_key_exists($termOrId, $ids) ? $termOrId : null);
+    }
+
+    /**
+     * Get all property ids by term.
+     *
+     * @see \BulkImport\Mvc\Controller\Plugin\Bulk::getPropertyIds()
+     * @todo Factorize with \AdvancedSearch\Querier\InternalQuerier::getPropertyIds()
+     * @see \AdvancedSearch\Querier\InternalQuerier::getPropertyIds()
+     *
+     * @return array Associative array of ids by term.
+     */
+    protected function getPropertyIds(): array
+    {
+        static $properties;
+
+        if (is_null($properties)) {
+            /** @var \Doctrine\DBAL\Connection $connection */
+            $services = $this->getOption('search_config')->getServiceLocator();
+            $connection = $services->get('Omeka\Connection');
+            $qb = $connection->createQueryBuilder();
+            $qb
+                ->select(
+                    'CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
+                    'property.id AS id'
+                )
+                ->from('property', 'property')
+                ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
+                ->orderBy('vocabulary.id', 'asc')
+                ->addOrderBy('property.id', 'asc')
+            ;
+            $properties = array_map('intval', $connection->executeQuery($qb)->fetchAllKeyValue());
+        }
+
+        return $properties;
     }
 
     public function setBasePath(string $basePath): Form

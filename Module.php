@@ -1118,6 +1118,9 @@ class Module extends AbstractModule
         $this->createDefaultSearchConfig();
     }
 
+    /**
+     * @todo Replace this method by the standard InstallResources() when the upgrade from Search will be removed.
+     */
     protected function createDefaultSearchConfig(): int
     {
         // Note: during installation or upgrade, the api may not be available
@@ -1146,13 +1149,13 @@ SQL;
 INSERT INTO `search_engine`
 (`name`, `adapter`, `settings`, `created`)
 VALUES
-('Internal (sql)', 'internal', ?, NOW());
+(?, ?, ?, NOW());
 SQL;
-            $searchEngineSettings = [
-                'resources' => ['items', 'item_sets'],
-            ];
+            $searchEngineConfig = require __DIR__ . '/data/search_engines/internal.php';
             $connection->executeQuery($sql, [
-                json_encode($searchEngineSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+                $searchEngineConfig['o:name'],
+                $searchEngineConfig['o:adapter'],
+                json_encode($searchEngineConfig['o:settings'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
             ]);
             $searchEngineId = $connection->fetchColumn($sqlSearchEngineId);
             $message = new Message(

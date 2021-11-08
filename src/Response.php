@@ -194,6 +194,25 @@ class Response implements \JsonSerializable
     }
 
     /**
+     * Get resources ids for a resource type or all resource types.
+     *
+     * @param string|null $resourceType The resource type ("items", "item_sets"…).
+     * @return int[]
+     */
+    public function getResourceIds(string $resourceType = null): array
+    {
+        if ($resourceType) {
+            return array_column($this->getResults($resourceType), 'id');
+        }
+
+        $resources = [];
+        foreach (array_keys($this->results) as $resourceType) {
+            $resources = array_merge($resources, array_column($this->getResults($resourceType), 'id', 'id'));
+        }
+        return array_values($resources);
+    }
+
+    /**
      * Get resources for a resource type or all resource types.
      *
      *When the indexation is not up to date, some resources may be removed or

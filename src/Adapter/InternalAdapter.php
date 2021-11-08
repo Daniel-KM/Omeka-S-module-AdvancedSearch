@@ -34,7 +34,8 @@ class InternalAdapter extends AbstractAdapter
             return $availableFields;
         }
 
-        $fields = [];
+        // Display specific fields first.
+        $fields = $engine->settingAdapter('multifields', []);
 
         // Special fields of Omeka.
         // The mapping is set by default.

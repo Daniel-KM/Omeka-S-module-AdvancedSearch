@@ -167,6 +167,8 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                         }
                     }
 
+                    // TODO The filter field can be multiple.
+
                     if (empty($joiner)) {
                         if (empty($operator)) {
                             foreach ($value as $filter) {

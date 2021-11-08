@@ -184,6 +184,7 @@ class Query implements \JsonSerializable
     }
 
     /**
+     * @todo Support multi-fields (name).
      * @param array|string $value
      */
     public function addFilter(string $name, $value): self
@@ -197,6 +198,9 @@ class Query implements \JsonSerializable
         return $this->filters;
     }
 
+    /**
+     * @todo Support multi-fields (name).
+     */
     public function addDateRangeFilter(string $name, string $from, string $to): self
     {
         $this->dateRangeFilters[$name][] = [
@@ -215,6 +219,7 @@ class Query implements \JsonSerializable
      * Add advanced filters, that work similarly to Omeka ones.
      *
      * Note: Some types and joiners may not be managed by the querier.
+     * @todo Support multi-fields (name).
      */
     public function addFilterQuery(string $name, $value, ?string $type = 'in', ?string $join = 'and'): self
     {

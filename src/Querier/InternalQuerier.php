@@ -546,13 +546,18 @@ SQL;
         // Don't use excluded fields for filters.
         $this->filterQueryValues($this->query->getFilters());
 
+        $multifields = $this->engine->settingAdapter('multifields', []);
+
         $dateRangeFilters = $this->query->getDateRangeFilters();
-        foreach ($dateRangeFilters as $name => $filterValues) {
-            if ($name === 'created' || $name === 'modified') {
+        foreach ($dateRangeFilters as $field => $filterValues) {
+            if ($field === 'created' || $field === 'modified') {
                 $argName = 'datetime';
             } else {
-                $name = $this->underscoredNameToTerm($name);
-                if (!$name) {
+                $field = $this->getPropertyTerm($field)
+                    ?? $multifields[$field]['fields']
+                    ?? $this->underscoredNameToTerm($field)
+                    ?? null;
+                if (!$field) {
                     continue;
                 }
                 $argName = 'property';
@@ -561,7 +566,7 @@ SQL;
                 if (strlen($filterValue['from'])) {
                     $this->args[$argName][] = [
                         'joiner' => 'and',
-                        'property' => $name,
+                        'property' => $field,
                         'type' => 'gte',
                         'text' => $filterValue['from'],
                     ];
@@ -569,7 +574,7 @@ SQL;
                 if (strlen($filterValue['to'])) {
                     $this->args[$argName][] = [
                         'joiner' => 'and',
-                        'property' => $name,
+                        'property' => $field,
                         'type' => 'lte',
                         'text' => $filterValue['to'],
                     ];
@@ -578,15 +583,18 @@ SQL;
         }
 
         $filters = $this->query->getFilterQueries();
-        foreach ($filters as $name => $values) {
-            $name = $this->underscoredNameToTerm($name);
-            if (!$name) {
+        foreach ($filters as $field => $values) {
+            $field = $this->getPropertyTerm($field)
+                ?? $multifields[$field]['fields']
+                ?? $this->underscoredNameToTerm($field)
+                ?? null;
+            if (!$field) {
                 continue;
             }
             foreach ($values as $value) {
                 $this->args['property'][] = [
                     'joiner' => $value['join'],
-                    'property' => $name,
+                    'property' => $field,
                     'type' => $value['type'],
                     'text' => $value['value'],
                 ];
@@ -600,8 +608,10 @@ SQL;
 
     protected function filterQueryValues(array $filters, bool $inList = false): void
     {
-        foreach ($filters as $name => $values) {
-            switch ($name) {
+        $multifields = $this->engine->settingAdapter('multifields', []);
+
+        foreach ($filters as $field => $values) {
+            switch ($field) {
                 // "is_public" is automatically managed by this internal adapter
                 // TODO Improve is_public to search public/private only.
                 case 'is_public':
@@ -652,15 +662,18 @@ SQL;
                     continue 2;
 
                 default:
-                    $name = $this->underscoredNameToTerm($name);
-                    if (!$name) {
+                    $field = $this->getPropertyTerm($field)
+                        ?? $multifields[$field]['fields']
+                        ?? $this->underscoredNameToTerm($field)
+                        ?? null;
+                    if (!$field) {
                         break;
                     }
                     // "In list" is used for facets.
                     if ($inList) {
                         $this->args['property'][] = [
                             'joiner' => 'and',
-                            'property' => $name,
+                            'property' => $field,
                             'type' => 'list',
                             'text' => is_array($values) ? $values : [$values],
                         ];
@@ -670,14 +683,14 @@ SQL;
                         if (is_array($value)) {
                             $this->args['property'][] = [
                                 'joiner' => 'and',
-                                'property' => $name,
+                                'property' => $field,
                                 'type' => 'list',
                                 'text' => $value,
                             ];
                         } else {
                             $this->args['property'][] = [
                                 'joiner' => 'and',
-                                'property' => $name,
+                                'property' => $field,
                                 'type' => 'eq',
                                 'text' => $value,
                             ];
@@ -707,7 +720,7 @@ SQL;
             return $name;
         }
 
-        // A common name.
+        // A common name for Omeka resources.
         if ($name === 'title') {
             return 'dcterms:title';
         }
@@ -850,6 +863,19 @@ SQL;
         }
 
         return $vocabularies;
+    }
+
+    /**
+     * Check a property term or id.
+     *
+     * @see \Bulk\Mvc\Controller\Plugin\Bulk::getPropertyTerm()
+     */
+    protected function getPropertyTerm($termOrId): ?string
+    {
+        $ids = $this->getPropertyIds();
+        return is_numeric($termOrId)
+            ? (array_search($termOrId, $ids) ?: null)
+            : (array_key_exists($termOrId, $ids) ? $termOrId : null);
     }
 
     /**

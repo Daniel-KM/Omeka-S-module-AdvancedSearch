@@ -122,7 +122,7 @@ class Advanced extends Fieldset
     }
 
     /**
-     * TODO The fields should be checked in
+     * TODO The fields should be checked early, not here.
      */
     protected function getFilterFields(): array
     {

@@ -20,24 +20,13 @@ $thumbnailHelper = $plugins->get('thumbnail');
 
 $setting = $plugins->get($site ? 'siteSetting' : 'setting');
 
-$filterLocale = (bool) $setting('filter_locale_values');
-$lang = $this->lang();
+$filterLocale = (bool) $siteSetting('filter_locale_values');
+$siteLang = $plugins->get('lang')();
+$lang = $filterLocale ? $siteLang : null;
+$langValue = $filterLocale ? [$siteLang, ''] : null;
 
 $headingTerm = $setting('browse_heading_property_term');
 $bodyTerm = $setting('browse_body_property_term');
-if ($headingTerm) {
-    $headingOptions = [
-        'default' => $translate('[Untitled]'),
-        'lang' => ($filterLocale ? [$lang, ''] : null)
-    ];
-} else {
-    $headingOptions = $filterLocale ? [$lang, ''] : null;
-}
-if ($bodyTerm) {
-    $bodyOptions = ['lang' => ($filterLocale ? [$lang, ''] : null)];
-} else {
-    $bodyOptions = $filterLocale ? [$lang, ''] : null;
-}
 
 $defaultThumbnail = '<img src="' . $assetUrl('thumbnails/default.png', 'Omeka', true) . '" title="' . $translate('No media') . '"/>';
 ?>
@@ -51,8 +40,10 @@ $defaultThumbnail = '<img src="' . $assetUrl('thumbnails/default.png', 'Omeka', 
         $resourceType = $resource->resourceName();
         $media = $resource->primaryMedia();
         $thumbnail = $media ? $thumbnailHelper($media, 'medium') : $defaultThumbnail;
-        $heading = $headingTerm ? $resource->value($headingTerm, $headingOptions) : $resource->displayTitle(null, $headingOptions);
-        $body = $bodyTerm ? $resource->value($bodyTerm, $bodyOptions) : $resource->displayDescription(null, $bodyOptions);
+        if ($headingTerm) $heading = $resource->value($headingTerm, ['lang' => $langValue]);
+        if (empty($heading)) $heading = $resource->displayTitle($translate('[Untitled]'), $lang);
+        if ($bodyTerm) $body = $resource->value($bodyTerm, ['lang' => $langValue]);
+        if (empty($body)) $body = $resource->displayDescription(null, $lang);
     ?>
 
     <li class="resource <?= $resourceType ?>">

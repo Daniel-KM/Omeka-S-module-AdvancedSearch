@@ -29,9 +29,7 @@
 
 namespace AdvancedSearch\Form;
 
-use AdvancedSearch\Form\Element\OptionalMultiCheckbox;
-use AdvancedSearch\Form\Element\OptionalRadio;
-use AdvancedSearch\Form\Element\OptionalSelect;
+use AdvancedSearch\Form\Element as AdvancedSearchElement;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr\Join;
 use Laminas\Form\Element;
@@ -39,8 +37,7 @@ use Laminas\Form\ElementInterface;
 use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
 use Omeka\Api\Representation\SiteRepresentation;
-use Omeka\Form\Element\ResourceClassSelect;
-use Omeka\Form\Element\ResourceTemplateSelect;
+use Omeka\Form\Element as OmekaElement;
 use Omeka\View\Helper\Setting;
 use Reference\Mvc\Controller\Plugin\References;
 
@@ -329,7 +326,7 @@ class MainSearchForm extends Form
     protected function searchMultiCheckbox(array $filter): ?ElementInterface
     {
         $valueOptions = $this->prepareValueOptions($filter);
-        $element = new OptionalMultiCheckbox($filter['field']);
+        $element = new AdvancedSearchElement\OptionalMultiCheckbox($filter['field']);
         $element
             ->setLabel($filter['label'])
             ->setAttribute('data-field-type', 'multicheckbox')
@@ -363,7 +360,7 @@ class MainSearchForm extends Form
     protected function searchRadio(array $filter): ?ElementInterface
     {
         $valueOptions = $this->prepareValueOptions($filter);
-        $element = new OptionalRadio($filter['field']);
+        $element = new AdvancedSearchElement\OptionalRadio($filter['field']);
         $element
             ->setLabel($filter['label'])
             ->setAttribute('data-field-type', 'radio')
@@ -382,7 +379,7 @@ class MainSearchForm extends Form
         $attributes['placeholder'] = $attributes['placeholder'] ?? '';
         $attributes['data-placeholder'] = $attributes['data-placeholder'] ?? ' ';
 
-        $element = new OptionalSelect($filter['field']);
+        $element = new AdvancedSearchElement\OptionalSelect($filter['field']);
         $element
             ->setLabel($filter['label'])
             ->setAttribute('data-field-type', $fieldType)
@@ -449,8 +446,8 @@ class MainSearchForm extends Form
             ->add([
                 'name' => 'id',
                 'type' => $filter['type'] === 'MultiCheckbox'
-                    ? OptionalMultiCheckbox::class
-                    : OptionalSelect::class,
+                    ? AdvancedSearchElement\OptionalMultiCheckbox::class
+                    : AdvancedSearchElement\OptionalSelect::class,
                 'options' => [
                     'label' => $filter['label'], // @translate
                     'value_options' => $this->getItemSetsOptions($filter['type'] !== 'MultiCheckbox'),
@@ -487,7 +484,7 @@ class MainSearchForm extends Form
         ]);
 
         /** @var \Omeka\Form\Element\ResourceClassSelect $element */
-        $element = $this->formElementManager->get(ResourceClassSelect::class);
+        $element = $this->formElementManager->get(OmekaElement\ResourceClassSelect::class);
         $element
             ->setOptions([
                 'label' => $filter['label'], // @translate
@@ -519,7 +516,7 @@ class MainSearchForm extends Form
                 }
             }
             natcasesort($result);
-            $element = new OptionalSelect;
+            $element = new AdvancedSearchElement\OptionalSelect;
             $element
                 ->setOptions([
                     'label' => $filter['label'], // @translate
@@ -563,7 +560,7 @@ class MainSearchForm extends Form
         ]);
 
         /** @var \Omeka\Form\Element\ResourceTemplateSelect $element */
-        $element = $this->formElementManager->get(ResourceTemplateSelect::class);
+        $element = $this->formElementManager->get(OmekaElement\ResourceTemplateSelect::class);
         $element
             ->setName('id')
             ->setOptions([
@@ -590,7 +587,7 @@ class MainSearchForm extends Form
                     $fieldset
                         ->add([
                             'name' => 'id',
-                            'type' => OptionalSelect::class,
+                            'type' => AdvancedSearchElement\OptionalSelect::class,
                             'options' => [
                                 'label' => $filter['label'], // @translate
                                 'value_options' => $values,
@@ -635,8 +632,8 @@ class MainSearchForm extends Form
             ->add([
                 'name' => 'id',
                 'type' => $filter['type'] === 'MultiCheckbox'
-                    ? OptionalMultiCheckbox::class
-                    : OptionalSelect::class,
+                    ? AdvancedSearchElement\OptionalMultiCheckbox::class
+                    : AdvancedSearchElement\OptionalSelect::class,
                 'options' => [
                     'label' => $filter['label'], // @translate
                     'value_options' => $this->getOwnerOptions(),

@@ -759,10 +759,16 @@ SQL;
             'resource_template_id_field' => 'o:resource_template',
         ];
 
+        // Convert multi-fields into a list of property terms.
         // Normalize search query keys as omeka keys for items and item sets.
-        $fields = array_combine($facetFields, array_map(function ($v) use ($metadataFieldsToNames) {
-            return $metadataFieldsToNames[$v] ?? $v;
-        }, $facetFields));
+        $multifields = $this->engine->settingAdapter('multifields', []);
+        $fields = [];
+        foreach ($facetFields as $facetField) {
+            $fields[$facetField] = $metadataFieldsToNames[$facetField]
+                ?? $this->getPropertyTerm($facetField)
+                ?? $multifields[$facetField]['fields']
+                ?? $facetField;
+        }
 
         // Facet counts don't make a distinction by resource type, so they
         // should be merged here. This is needed as long as there is no single
@@ -817,22 +823,26 @@ SQL;
             ];
 
             $values = $references
-                ->setMetadata(array_values($fields))
+                ->setMetadata($fields)
                 ->setQuery($facetData)
                 ->setOptions($options)
                 ->list();
 
-            foreach ($facetFields as $facetField) {
-                foreach ($values[$fields[$facetField]]['o:references'] ?? [] as $value => $count) {
-                    empty($facetCountsByField[$facetField][$value])
-                        ? $facetCountsByField[$facetField][$value] = [
+            foreach (array_keys($fields) as $facetField) {
+                // Manage the exceptions.
+                $referenceKey = $metadataFieldsToNames[$facetField] ?? $facetField;
+                foreach ($values[$referenceKey]['o:references'] ?? [] as $value => $count) {
+                    if (empty($facetCountsByField[$facetField][$value])) {
+                        $facetCountsByField[$facetField][$value] = [
                             'value' => $value,
                             'count' => $count,
-                        ]
-                        : $facetCountsByField[$facetField][$value] = [
+                        ];
+                    } else {
+                        $facetCountsByField[$facetField][$value] = [
                             'value' => $value,
                             'count' => $count + $facetCountsByField[$facetField][$value]['count'],
                         ];
+                    }
                 }
             }
         }

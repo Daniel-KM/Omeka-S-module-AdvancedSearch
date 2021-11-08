@@ -14,28 +14,40 @@ $escape = $plugins->get('escapeHtml');
 $translate = $plugins->get('translate');
 $translatePlural = $plugins->get('translatePlural');
 
-$display = $searchPage->setting('display', []);
+// Default values of the module.
+$displayParts = [
+    'search_filters' => 'header',
+    'paginator' => 'header',
+    'per_pages' => 'header',
+    'sort' => 'header',
+    'grid_list' => 'header',
+    'grid_list_mode' => 'auto',
+];
+$displayParts = $searchPage ? $searchPage->setting('display', $displayParts) : $displayParts;
+$displayParts = array_filter($displayParts, function ($v) use ($resultPart) { return in_array($v, [$resultPart, 'both']); });
+
+if (isset($displayParts['per_pages']) && $perPages = $searchPage->subSetting('pagination', 'per_pages')) {
+    // Don't display unmanaged per page from the query, but set the default Omeka per page.
+    // Can be simplified in a theme.
+    $setting = $plugins->get('setting');
+    $defaultPerPage = $this->status()->isSiteRequest() ? ($plugins->get('siteSetting')('pagination_per_page') ?: $setting('pagination_per_page', 25)) : $setting('pagination_per_page', 25);
+    $perPages = array_replace([(int) $defaultPerPage => sprintf($translate('Results by %d'), $defaultPerPage)], $perPages);
+    ksort($perPages);
+    $perPage = $query->getPerPage() ?: null;
+}
 ?>
 
-<?php if (in_array($display['search_filters'] ?? 'header', [$resultPart, 'both'])): ?>
+<?php if (isset($displayParts['search_filters'])): ?>
 <?= $this->searchingFilters($searchPage, $query) ?>
 <?php endif; ?>
 
-<?php if (in_array($display['paginator'] ?? 'header', [$resultPart, 'both'])): ?>
+<?php if (isset($displayParts['paginator'])): ?>
 <div class="search-results-count">
     <?= $this->pagination('common/pagination') ?>
 </div>
 <?php endif; ?>
 
-<?php if (in_array($display['per_pages'] ?? 'header', [$resultPart, 'both']) && $perPages = $searchPage->subSetting('pagination', 'per_pages')):
-// Don't display unmanaged per page from the query, but set the default Omeka per page.
-// Can be simplified in a theme.
-$setting = $plugins->get('setting');
-$defaultPerPage = $this->status()->isSiteRequest() ? ($plugins->get('siteSetting')('pagination_per_page') ?: $setting('pagination_per_page', 25)) : $setting('pagination_per_page', 25);
-$perPages = array_replace([(int) $defaultPerPage => sprintf($translate('Results by %d'), $defaultPerPage)], $perPages);
-ksort($perPages);
-$perPage = $query->getPerPage() ?: null;
-?>
+<?php if (!empty($perPages)): ?>
 <div class="search-results-per-page">
     <select name="per_page">
         <?php foreach ($perPages as $per => $label): ?>
@@ -45,14 +57,14 @@ $perPage = $query->getPerPage() ?: null;
 </div>
 <?php endif; ?>
 
-<?php if (in_array($display['sort'] ?? 'header', [$resultPart, 'both']) && $sortFields = $searchPage->subSetting('sort', 'fields')): ?>
+<?php if (isset($displayParts['sort']) && $sortFields = $searchPage->subSetting('sort', 'fields')): ?>
 <?= $this->searchSortSelector($query, $sortFields) ?>
 <?php endif; ?>
 
-<?php if (in_array($display['grid_list'] ?? 'header', [$resultPart, 'both'])): ?>
+<?php if (isset($displayParts['grid_list']) && ($gridListMode = $searchPage->subSetting('display', 'grid_list_mode', 'auto')) && !in_array($gridListMode, ['list_only', 'grid_only'])): ?>
 <div class="search-results-display">
-    <a class="search-view-type search-view-type-list" href="#"><?= $translate('list') ?></a>
+    <a class="search-view-type search-view-type-list<?= $gridListMode === 'list' ? ' active' : '' ?>" href="#"><?= $translate('list') ?></a>
     |
-    <a class="search-view-type search-view-type-grid" href="#"><?= $translate('grid') ?></a>
+    <a class="search-view-type search-view-type-grid<?= $gridListMode === 'grid' ? ' active' : '' ?>" href="#"><?= $translate('grid') ?></a>
 </div>
 <?php endif; ?>

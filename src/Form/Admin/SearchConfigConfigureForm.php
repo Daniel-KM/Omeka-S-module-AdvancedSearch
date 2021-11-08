@@ -502,6 +502,24 @@ nres = is not resource with ID
                     'value' => 'header',
                 ],
             ])
+            ->add([
+                'name' => 'grid_list_mode',
+                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Grid / list default mode', // @translate
+                    'value_options' => [
+                        'auto' => 'Auto (previous user choice)', // @translate
+                        'grid' => 'Grid', // @translate
+                        'list' => 'List', // @translate
+                        'grid_only' => 'Only grid', // @translate
+                        'list_only' => 'Only list', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'grid_list_mode',
+                    'value' => 'auto',
+                ],
+            ])
         ;
 
         // Settings for the results (pagination).

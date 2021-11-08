@@ -149,7 +149,8 @@
         flex-direction: row;
         justify-content: start;
         align-items: stretch;
-        align-content: start
+        align-content: start;
+        padding-left: 0;
     }
     .search-results .resource-list.grid > * {
         flex: 0 0 auto;

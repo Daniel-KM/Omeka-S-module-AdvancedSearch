@@ -132,7 +132,7 @@ $(document).ready(function() {
     });
 
     /* Per-page selector links (depending if server or client build) */
-    $('.search-per-page select').on('change', function(e) {
+    $('.search-results-per-page select').on('change', function(e) {
         // Per-page fields don't look like a url.
         e.preventDefault();
         var perPage = $(this).val();
@@ -216,14 +216,14 @@ $(document).ready(function() {
         e.preventDefault();
         Search.setViewType('list');
         $('.search-view-type').removeClass('active');
-        $(this).addClass('active');
+        $('.search-view-type-list').addClass('active');
     });
 
     $('.search-view-type-grid').on('click', function(e) {
         e.preventDefault();
         Search.setViewType('grid');
         $('.search-view-type').removeClass('active');
-        $(this).addClass('active');
+        $('.search-view-type-grid').addClass('active');
     });
 
     /**********

@@ -184,6 +184,7 @@ return [
             'per_pages' => 'header',
             'sort' => 'header',
             'grid_list' => 'header',
+            'grid_list_mode' => 'auto',
         ],
 
         'pagination' => [

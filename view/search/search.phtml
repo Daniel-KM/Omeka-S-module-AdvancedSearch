@@ -170,7 +170,7 @@ $documentCount = $response->getTotalResults();
                 <?php else: ?>
                 <?php if (in_array($searchPage->subSetting('display', 'search_filters', 'header'), ['header', 'both'])): ?>
                 <div class="search-results-part search-results-header">
-                    <?= $this->searchingFilters($searchPage, $query) ?>
+                    <?= $this->searchingFilters($searchPage, $query, ['template' => 'common/search-filters-links']) ?>
                 </div>
                 <?php endif; ?>
                 <?= $translate('Your query returned no results') ?>

@@ -38,7 +38,7 @@ if (isset($displayParts['per_pages']) && $perPages = $searchPage->subSetting('pa
 ?>
 
 <?php if (isset($displayParts['search_filters'])): ?>
-<?= $this->searchingFilters($searchPage, $query) ?>
+<?= $this->searchingFilters($searchPage, $query, ['template' => 'common/search-filters-links']) ?>
 <?php endif; ?>
 
 <?php if (isset($displayParts['paginator'])): ?>

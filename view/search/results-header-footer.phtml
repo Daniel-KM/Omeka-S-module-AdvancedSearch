@@ -1,0 +1,58 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchPage
+ * @var \AdvancedSearch\Query $query
+ * @var \AdvancedSearch\Response $response
+ * @var \Omeka\Api\Representation\ItemSetRepresentation $itemSet
+ * @var string $resultPart
+ * @var int $documentCount
+ */
+
+$plugins = $this->getHelperPluginManager();
+$escape = $plugins->get('escapeHtml');
+$translate = $plugins->get('translate');
+$translatePlural = $plugins->get('translatePlural');
+
+$display = $searchPage->setting('display', []);
+?>
+
+<?php if (in_array($display['search_filters'] ?? 'header', [$resultPart, 'both'])): ?>
+<?= $this->searchingFilters($searchPage, $query) ?>
+<?php endif; ?>
+
+<?php if (in_array($display['paginator'] ?? 'header', [$resultPart, 'both'])): ?>
+<div class="search-results-count">
+    <?= $this->pagination('common/pagination') ?>
+</div>
+<?php endif; ?>
+
+<?php if (in_array($display['per_pages'] ?? 'header', [$resultPart, 'both']) && $perPages = $searchPage->subSetting('pagination', 'per_pages')):
+// Don't display unmanaged per page from the query, but set the default Omeka per page.
+// Can be simplified in a theme.
+$setting = $plugins->get('setting');
+$defaultPerPage = $this->status()->isSiteRequest() ? ($plugins->get('siteSetting')('pagination_per_page') ?: $setting('pagination_per_page', 25)) : $setting('pagination_per_page', 25);
+$perPages = array_replace([(int) $defaultPerPage => sprintf($translate('Results by %d'), $defaultPerPage)], $perPages);
+ksort($perPages);
+$perPage = $query->getPerPage() ?: null;
+?>
+<div class="search-results-per-page">
+    <select name="per_page">
+        <?php foreach ($perPages as $per => $label): ?>
+        <?= sprintf('<option value="%d"%s>%s</option>', (int) $per, $per === $perPage ? ' selected="selected"' : '', $escape($label)) ?>
+        <?php endforeach; ?>
+    </select>
+</div>
+<?php endif; ?>
+
+<?php if (in_array($display['sort'] ?? 'header', [$resultPart, 'both']) && $sortFields = $searchPage->subSetting('sort', 'fields')): ?>
+<?= $this->searchSortSelector($query, $sortFields) ?>
+<?php endif; ?>
+
+<?php if (in_array($display['grid_list'] ?? 'header', [$resultPart, 'both'])): ?>
+<div class="search-results-display">
+    <a class="search-view-type search-view-type-list" href="#"><?= $translate('list') ?></a>
+    |
+    <a class="search-view-type search-view-type-grid" href="#"><?= $translate('grid') ?></a>
+</div>
+<?php endif; ?>

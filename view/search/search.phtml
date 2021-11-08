@@ -47,11 +47,12 @@ if ($this->resolver('search/index/search.phtml')) {
 }
 
 $plugins = $this->getHelperPluginManager();
+$api = $plugins->get('api');
+$partial = $plugins->get('partial');
+$assetUrl = $plugins->get('assetUrl');
 $translate = $plugins->get('translate');
 $translatePlural = $plugins->get('translatePlural');
-$assetUrl = $plugins->get('assetUrl');
-$partial = $plugins->get('partial');
-$api = $plugins->get('api');
+
 $vars = $this->vars();
 
 // Used in case of a redirect of item-set/show to search, when used like item/browse.
@@ -104,23 +105,32 @@ $documentCount = $response->getTotalResults();
         <?php if ($documentCount):
             $itemSetsCount = $response->getResourceTotalResults('item_sets');
             $itemsCount = $response->getResourceTotalResults('items');
-            $pagination = (string) $this->pagination('common/pagination');
+            $displayParts = $searchPage->setting('display', []);
+            $displayPartsHeader = array_filter($displayParts, function ($v) { return in_array($v, ['header', 'both']); });
+            $displayPartsFooter = array_filter($displayParts, function ($v) { return in_array($v, ['footer', 'both']); });
             ?>
 
-            <?= $partial('search/results-header', [
+        <?php if ($displayPartsHeader): ?>
+        <div class="search-results-part search-results-header">
+            <?= $partial('search/results-header-footer', [
                 'searchPage' => $searchPage,
                 'query' => $query,
                 'response' => $response,
                 'itemSet' => $itemSet,
+                'resultPart' => 'header',
                 'documentCount' => $documentCount,
-                'pagination' => $pagination,
             ]) ?>
+        </div>
+        <?php endif; ?>
 
+        <div class="search-results-part search-results-list">
             <?php if ($itemSetsCount): ?>
             <?= $partial('search/resource-list', [
                 'site' => $site,
-                'title' => sprintf($translatePlural('%s item set', '%s item sets', $itemSetsCount), $itemSetsCount),
+                'searchPage' => $searchPage,
+                'query' => $query,
                 'response' => $response,
+                'title' => sprintf($translatePlural('%s item set', '%s item sets', $itemSetsCount), $itemSetsCount),
                 'resourceName' => 'item_sets',
             ]) ?>
             <?php endif; ?>
@@ -128,20 +138,27 @@ $documentCount = $response->getTotalResults();
             <?php if ($itemsCount): ?>
             <?= $partial('search/resource-list', [
                 'site' => $site,
-                'title' => sprintf($translatePlural('%s item', '%s items', $itemsCount), $itemsCount),
+                'searchPage' => $searchPage,
+                'query' => $query,
                 'response' => $response,
+                'title' => sprintf($translatePlural('%s item', '%s items', $itemsCount), $itemsCount),
                 'resourceName' => 'items',
             ]) ?>
             <?php endif; ?>
+        </div>
 
-            <?= $partial('search/results-footer', [
+        <?php if ($displayPartsFooter): ?>
+        <div class="search-results-part search-results-footer">
+            <?= $partial('search/results-header-footer', [
                 'searchPage' => $searchPage,
                 'query' => $query,
                 'response' => $response,
                 'itemSet' => $itemSet,
+                'resultPart' => 'footer',
                 'documentCount' => $documentCount,
-                'pagination' => $pagination,
             ]) ?>
+        </div>
+        <?php endif; ?>
 
         <?php else: ?>
 
@@ -151,8 +168,8 @@ $documentCount = $response->getTotalResults();
                 <?php elseif (empty($query) && $itemSet): ?>
                 <?= $translate('This item set has no items.') ?>
                 <?php else: ?>
-                <?php if (in_array($searchPage->subSetting('display', 'request_filters', 'header'), ['header', 'both'])): ?>
-                <div class="search-results-header">
+                <?php if (in_array($searchPage->subSetting('display', 'search_filters', 'header'), ['header', 'both'])): ?>
+                <div class="search-results-part search-results-header">
                     <?= $this->searchingFilters($searchPage, $query) ?>
                 </div>
                 <?php endif; ?>

@@ -4,15 +4,13 @@
  * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchPage
  * @var \AdvancedSearch\Query $query
  * @var \AdvancedSearch\Response $response
+ * @var \Omeka\Api\Representation\ItemSetRepresentation $itemSet
+ * @var string $resultPart
+ * @var int $documentCount
  * @var string $pagination
  */
-?>
 
-<div class="search-results-footer">
-    <?php if (in_array($searchPage->subSetting('display', 'request_filters', 'header'), ['footer', 'both'])): ?>
-    <?= $this->searchingFilters($searchPage, $query) ?>
-    <?php endif; ?>
-    <div class="search-results-count">
-        <?= $pagination ?>
-    </div>
-</div>
+// Kept for compatibility with old themes.
+
+$this->vars()->offsetSet('resultPart', 'footer');
+echo $this->partial('search/results-header-footer');

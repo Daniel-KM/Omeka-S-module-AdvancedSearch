@@ -179,7 +179,11 @@ return [
         ],
 
         'display' => [
-            'request_filters' => 'header',
+            'search_filters' => 'header',
+            'paginator' => 'header',
+            'per_pages' => 'header',
+            'sort' => 'header',
+            'grid_list' => 'header',
         ],
 
         'pagination' => [

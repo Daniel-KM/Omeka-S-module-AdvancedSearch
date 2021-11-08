@@ -413,12 +413,12 @@ nres = is not resource with ID
                 'name' => 'display',
                 'type' => Fieldset::class,
                 'options' => [
-                    'label' => 'Results display', // @translate
+                    'label' => 'Results display (when supported by theme)', // @translate
                 ],
             ])
             ->get('display')
             ->add([
-                'name' => 'request_filters',
+                'name' => 'search_filters',
                 'type' => AdvancedSearchElement\OptionalRadio::class,
                 'options' => [
                     'label' => 'List of query filters', // @translate
@@ -430,7 +430,75 @@ nres = is not resource with ID
                     ],
                 ],
                 'attributes' => [
-                    'id' => 'request_filters',
+                    'id' => 'search_filters',
+                    'value' => 'header',
+                ],
+            ])
+            ->add([
+                'name' => 'paginator',
+                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Paginator', // @translate
+                    'value_options' => [
+                        'none' => 'No', // @translate
+                        'header' => 'Results header', // @translate
+                        'footer' => 'Results footer', // @translate
+                        'both' => 'Both', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'paginator',
+                    'value' => 'header',
+                ],
+            ])
+            ->add([
+                'name' => 'per_pages',
+                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Pagination per page', // @translate
+                    'value_options' => [
+                        'none' => 'No', // @translate
+                        'header' => 'Results header', // @translate
+                        'footer' => 'Results footer', // @translate
+                        'both' => 'Both', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'per_pages',
+                    'value' => 'header',
+                ],
+            ])
+            ->add([
+                'name' => 'sort',
+                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Sort', // @translate
+                    'value_options' => [
+                        'none' => 'No', // @translate
+                        'header' => 'Results header', // @translate
+                        'footer' => 'Results footer', // @translate
+                        'both' => 'Both', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'sort',
+                    'value' => 'header',
+                ],
+            ])
+            ->add([
+                'name' => 'grid_list',
+                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Grid / list', // @translate
+                    'value_options' => [
+                        'none' => 'No', // @translate
+                        'header' => 'Results header', // @translate
+                        'footer' => 'Results footer', // @translate
+                        'both' => 'Both', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'grid_list',
                     'value' => 'header',
                 ],
             ])

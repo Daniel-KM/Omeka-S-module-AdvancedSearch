@@ -2,9 +2,7 @@
 
 namespace AdvancedSearch\Form\Admin;
 
-use AdvancedSearch\Form\Element\Note;
-use AdvancedSearch\Form\Element\OptionalRadio;
-use AdvancedSearch\Form\Element\OptionalSelect;
+use AdvancedSearch\Form\Element as AdvancedSearchElement;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
@@ -57,7 +55,7 @@ class SearchSuggesterForm extends Form
         $this
             ->add([
                 'name' => 'o:engine',
-                'type' => OptionalSelect::class,
+                'type' => AdvancedSearchElement\OptionalSelect::class,
                 'options' => [
                     'label' => 'Search engine', // @translate
                     'value_options' => $this->getEnginesOptions(),
@@ -86,7 +84,7 @@ class SearchSuggesterForm extends Form
             $fieldset
                 ->add([
                     'name' => 'note',
-                    'type' => Note::class,
+                    'type' => AdvancedSearchElement\Note::class,
                     'options' => [
                         'text' => 'Only the internal adapter can have settings for now. For external suggesters, use the direct url in the search config.', // @translate
                     ],
@@ -110,7 +108,7 @@ class SearchSuggesterForm extends Form
             ])
             ->add([
                 'name' => 'mode_index',
-                'type' => OptionalRadio::class,
+                'type' => AdvancedSearchElement\OptionalRadio::class,
                 'options' => [
                     'label' => 'Mode to index values', // @translate
                     'value_options' => [
@@ -129,7 +127,7 @@ class SearchSuggesterForm extends Form
             ])
             ->add([
                 'name' => 'mode_search',
-                'type' => OptionalRadio::class,
+                'type' => AdvancedSearchElement\OptionalRadio::class,
                 'options' => [
                     'label' => 'Mode to search suggestions', // @translate
                     'value_options' => [
@@ -172,7 +170,7 @@ class SearchSuggesterForm extends Form
             ])
             ->add([
                 'name' => 'fields',
-                'type' => OptionalSelect::class,
+                'type' => AdvancedSearchElement\OptionalSelect::class,
                 'options' => [
                     'label' => 'Limit query to specific fields', // @translate
                     'info' => 'With the internal search engine, it is not recommended to use full text content.', // @translate
@@ -188,7 +186,7 @@ class SearchSuggesterForm extends Form
             ])
             ->add([
                 'name' => 'exclude_fields',
-                'type' => OptionalSelect::class,
+                'type' => AdvancedSearchElement\OptionalSelect::class,
                 'options' => [
                     'label' => 'Exclude fields', // @translate
                     'info' => 'Allow to skip the full text content, that may be useless for suggestions.', // @translate
@@ -233,15 +231,8 @@ class SearchSuggesterForm extends Form
         }
 
         $searchAdapter = $engine->adapter();
-        if (empty($searchAdapter)) {
-            return [];
-        }
-
-        $options = [];
-        $fields = $searchAdapter->getAvailableFields($engine);
-        foreach ($fields as $name => $field) {
-            $options[$name] = $field['label'] ?? $name;
-        }
-        return $options;
+        return empty($searchAdapter)
+            ? []
+            : $searchAdapter->getAvailableFieldsForSelect($engine);
     }
 }

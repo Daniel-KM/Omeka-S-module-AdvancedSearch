@@ -61,6 +61,16 @@ abstract class AbstractAdapter implements AdapterInterface
         return [];
     }
 
+    public function getAvailableFieldsForSelect(SearchEngineRepresentation $engine): array
+    {
+        $fields = $this->getAvailableFields($engine);
+        // Manage the case when there is no label.
+        return array_replace(
+            array_column($fields, 'name', 'name'),
+            array_filter(array_column($fields, 'label', 'name'))
+        );
+    }
+
     protected function getServiceLocator(): ServiceLocatorInterface
     {
         return $this->serviceLocator;

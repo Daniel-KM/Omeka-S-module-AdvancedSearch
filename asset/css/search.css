@@ -69,6 +69,11 @@
     .search-results-header {
         display: flex;
         justify-content: space-between;
+        flex-wrap: wrap;
+    }
+    .search-filters {
+        width: 100%;
+        flex: 0 0 100%;
     }
     .search-view-type.active {
         font-weight: bold;
@@ -80,7 +85,6 @@
         padding: 0 0.5em;
         min-width: 240px;
     }
-
     .search-facets-active {
         list-style: none;
         padding-left: 0;

@@ -149,6 +149,9 @@ $documentCount = $response->getTotalResults();
                 <?php elseif (empty($query) && $itemSet): ?>
                 <?= $translate('This item set has no items.') ?>
                 <?php else: ?>
+                <div class="search-results-header">
+                    <?= $this->searchingFilters($searchPage, $query) ?>
+                </div>
                 <?= $translate('Your query returned no results') ?>
                 <?php endif; ?>
             </div>

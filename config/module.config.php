@@ -44,6 +44,7 @@ return [
             'searchForm' => View\Helper\SearchForm::class,
             'searchingForm' => View\Helper\SearchingForm::class,
             'searchFilters' => View\Helper\SearchFilters::class,
+            'searchingFilters' => View\Helper\SearchingFilters::class,
             'searchingUrl' => View\Helper\SearchingUrl::class,
             'searchSortSelector' => View\Helper\SearchSortSelector::class,
         ],

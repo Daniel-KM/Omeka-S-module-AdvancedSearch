@@ -43,7 +43,9 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
         unset(
             $this->query['page'],
             $this->query['offset'],
-            $this->query['submit']
+            $this->query['submit'],
+            $this->query['__searchConfig'],
+            $this->query['__searchQuery']
         );
 
         $queryTypes = [

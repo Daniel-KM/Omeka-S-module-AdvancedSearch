@@ -16,6 +16,7 @@ $translatePlural = $plugins->get('translatePlural');
 ?>
 
 <div class="search-results-header">
+    <?= $this->searchingFilters($searchPage, $query) ?>
     <div class="search-results-count">
         <?= $pagination ?>
     </div>

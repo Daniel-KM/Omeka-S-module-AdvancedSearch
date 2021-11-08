@@ -69,6 +69,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
 
         // TODO Manage the "browse_attached_items" / "site_attachments_only".
 
+        // This function fixes some forms that add an array level.
         // This function manages only one level, so check value when needed.
         $flatArray = function ($value): array {
             if (!is_array($value)) {
@@ -130,12 +131,6 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                     $query->addFilter('id', $valueArray);
                     continue 2;
 
-                case 'item_set':
-                    $nameFilter = empty($formSettings['resource_fields']['item_set_id_field']) ? 'item_set_id': $formSettings['resource_fields']['item_set_id_field'];
-                    $valueArray = $flatArray($value);
-                    $query->addFilter($nameFilter, $valueArray);
-                    continue 2;
-
                 case 'class':
                     $nameFilter = empty($formSettings['resource_fields']['resource_class_id_field']) ? 'resource_class_id': $formSettings['resource_fields']['resource_class_id_field'];
                     $valueArray = $flatArray($value);
@@ -151,6 +146,12 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                 // TODO Manage query on owner (only one in core).
                 case 'owner':
                     $nameFilter = empty($formSettings['resource_fields']['owner_id_field']) ? 'owner_id': $formSettings['resource_fields']['owner_id_field'];
+                    $valueArray = $flatArray($value);
+                    $query->addFilter($nameFilter, $valueArray);
+                    continue 2;
+
+                case 'item_set':
+                    $nameFilter = empty($formSettings['resource_fields']['item_set_id_field']) ? 'item_set_id': $formSettings['resource_fields']['item_set_id_field'];
                     $valueArray = $flatArray($value);
                     $query->addFilter($nameFilter, $valueArray);
                     continue 2;

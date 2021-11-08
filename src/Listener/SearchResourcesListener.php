@@ -117,7 +117,7 @@ class SearchResourcesListener
                 if (empty($queryRow['joiner'])) {
                     $queryRow['joiner'] = 'and';
                 } else {
-                    if (!in_array($queryRow['joiner'], ['and', 'or'])) {
+                    if (!in_array($queryRow['joiner'], ['and', 'or', 'not'])) {
                         unset($query['datetime'][$key]);
                         continue;
                     }
@@ -510,7 +510,7 @@ class SearchResourcesListener
 
             if ($where == '') {
                 $where = $whereClause;
-            } elseif ($joiner == 'or') {
+            } elseif ($joiner === 'or') {
                 $where .= " OR $whereClause";
             } else {
                 $where .= " AND $whereClause";

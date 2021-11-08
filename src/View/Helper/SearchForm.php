@@ -13,6 +13,8 @@ class SearchForm extends AbstractHelper
 {
     /**
      * The default partial view script.
+     *
+     * With the default form, this is search/search-form-main.
      */
     const PARTIAL_NAME = 'search/search-form';
 

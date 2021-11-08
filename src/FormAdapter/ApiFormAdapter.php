@@ -97,7 +97,21 @@ class ApiFormAdapter implements FormAdapterInterface
             return;
         }
 
+        // Copied from \Omeka\Api\Adapter\ItemAdapter::buildQuery(), etc.
+
+        if (isset($metadata['is_public']) && isset($request['is_public'])) {
+            $query->addFilter($metadata['is_public'], (bool) $request['is_public']);
+        }
+
+        if (isset($metadata['id']) && !empty($request['id'])) {
+            $this->addIntegersFilterToQuery($query, $metadata['id'], $request['id']);
+        }
+
         if (isset($metadata['owner_id']) && !empty($request['owner_id'])) {
+            $this->addIntegersFilterToQuery($query, $metadata['owner_id'], $request['owner_id']);
+        }
+
+        if (isset($metadata['site_id']) && !empty($request['site_id'])) {
             $this->addIntegersFilterToQuery($query, $metadata['owner_id'], $request['owner_id']);
         }
 
@@ -123,17 +137,9 @@ class ApiFormAdapter implements FormAdapterInterface
             $this->addIntegersFilterToQuery($query, $metadata['resource_template_id'], $request['resource_template_id']);
         }
 
-        // Copied from \Omeka\Api\Adapter\ItemAdapter::buildQuery()
-
-        if (isset($metadata['id']) && !empty($request['id'])) {
-            $this->addIntegersFilterToQuery($query, $metadata['id'], $request['id']);
-        }
-
         if (isset($metadata['item_set_id']) && !empty($request['item_set_id'])) {
             $this->addIntegersFilterToQuery($query, $metadata['item_set_id'], $request['item_set_id']);
         }
-
-        // Copied from \Omeka\Api\Adapter\ItemSetAdapter::buildQuery()
 
         if (isset($metadata['is_open']) && isset($request['is_open'])) {
             $query->addFilter($metadata['is_open'], (bool) $request['is_open']);

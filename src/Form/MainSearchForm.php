@@ -185,11 +185,11 @@ class MainSearchForm extends Form
                     case 'is_public':
                         $element = $this->searchIsPublic($filter);
                         break;
-                    case 'site_id':
-                        $element = $this->searchSite($filter);
-                        break;
                     case 'owner_id':
                         $element = $this->searchOwner($filter);
+                        break;
+                    case 'site_id':
+                        $element = $this->searchSite($filter);
                         break;
                     case 'resource_class_id':
                         $element = $this->searchResourceClass($filter);
@@ -501,37 +501,6 @@ class MainSearchForm extends Form
         return $element;
     }
 
-    protected function searchSite(array $filter): ?ElementInterface
-    {
-        $fieldset = new Fieldset('site');
-        $fieldset
-            ->setAttributes([
-                'id' => 'search-sites',
-                'data-field-type', 'site',
-            ])
-            ->add([
-                'name' => 'id',
-                'type' => $filter['type'] === 'MultiCheckbox'
-                    ? AdvancedSearchElement\OptionalMultiCheckbox::class
-                    : AdvancedSearchElement\OptionalSelect::class,
-                'options' => [
-                    'label' => $filter['label'], // @translate
-                    'value_options' => $this->getSiteOptions(),
-                    'empty_option' => '',
-                ],
-                'attributes' => [
-                    'id' => 'search-site-id',
-                    'multiple' => true,
-                    'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
-                    // End users understand "collections" more than "item sets".
-                    'data-placeholder' => 'Select sites…', // @translate
-                ],
-            ])
-        ;
-
-        return $fieldset;
-    }
-
     protected function searchOwner(array $filter): ?ElementInterface
     {
         $fieldset = new Fieldset('owner');
@@ -556,6 +525,37 @@ class MainSearchForm extends Form
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
                     // End users understand "collections" more than "item sets".
                     'data-placeholder' => 'Select owners…', // @translate
+                ],
+            ])
+        ;
+
+        return $fieldset;
+    }
+
+    protected function searchSite(array $filter): ?ElementInterface
+    {
+        $fieldset = new Fieldset('site');
+        $fieldset
+            ->setAttributes([
+                'id' => 'search-sites',
+                'data-field-type', 'site',
+            ])
+            ->add([
+                'name' => 'id',
+                'type' => $filter['type'] === 'MultiCheckbox'
+                    ? AdvancedSearchElement\OptionalMultiCheckbox::class
+                    : AdvancedSearchElement\OptionalSelect::class,
+                'options' => [
+                    'label' => $filter['label'], // @translate
+                    'value_options' => $this->getSiteOptions(),
+                    'empty_option' => '',
+                ],
+                'attributes' => [
+                    'id' => 'search-site-id',
+                    'multiple' => true,
+                    'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
+                    // End users understand "collections" more than "item sets".
+                    'data-placeholder' => 'Select sites…', // @translate
                 ],
             ])
         ;
@@ -850,16 +850,16 @@ class MainSearchForm extends Form
         return $valueOptions;
     }
 
-    protected function getSiteOptions(): array
-    {
-        $select = $this->formElementManager->get(\Omeka\Form\Element\SiteSelect::class, []);
-        return $select->getValueOptions();
-    }
-
     protected function getOwnerOptions(): array
     {
         $select = $this->formElementManager->get(\Omeka\Form\Element\UserSelect::class, []);
         return $select->getValueOptions();
+    }
+
+    protected function getSiteOptions(): array
+    {
+        $select = $this->formElementManager->get(\Omeka\Form\Element\SiteSelect::class, []);
+        return $select->setOption('disable_group_by_owner', true)->getValueOptions();
     }
 
     protected function getAvailableFields(): array

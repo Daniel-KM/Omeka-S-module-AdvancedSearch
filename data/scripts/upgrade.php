@@ -96,11 +96,11 @@ SET
         '"is_public_field"',
         '"is_public"'
         ),
-        '"site_id_field"',
-        '"site_id"'
-        ),
         '"owner_id_field"',
         '"owner_id"'
+        ),
+        '"site_id_field"',
+        '"site_id"'
         ),
         '"resource_class_id_field"',
         '"resource_class_id"'

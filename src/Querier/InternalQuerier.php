@@ -637,19 +637,19 @@ SQL;
                     $this->args['id'] = array_filter(array_map('intval', $flatArray($values)));
                     continue 2;
 
+                case 'owner_id':
+                    $values = $flatArray($values);
+                    $this->args['owner_id'] = is_numeric(reset($values))
+                        ? array_filter(array_map('intval', $values))
+                        : $this->listUserIds($values);
+                    continue 2;
+
                 case 'site_id':
                     $values = $flatArray($values);
                     $this->args['site_id'] = is_numeric(reset($values))
                         ? array_filter(array_map('intval', $values))
                         : $this->listSiteIds($values);
                     continue 2;
-
-                case 'owner_id':
-                    $values = $flatArray($values);
-                    $this->args['owner_id'] = is_numeric(reset($values))
-                        ? array_filter(array_map('intval', $values))
-                        : $this->listUserIds($values);
-                continue 2;
 
                 case 'resource_class_id':
                     $values = $flatArray($values);
@@ -760,8 +760,8 @@ SQL;
             'resource_name' => 'resource_type',
             'resource_type' => 'resource_type',
             'is_public' => 'is_public',
-            'site_id' => 'o:site',
             'owner_id' => 'o:owner',
+            'site_id' => 'o:site',
             'resource_class_id' => 'o:resource_class',
             'resource_template_id' => 'o:resource_template',
             'item_set_id' => 'o:item_set',

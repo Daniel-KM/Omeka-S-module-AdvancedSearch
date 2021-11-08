@@ -89,9 +89,4 @@ class SearchEngineConfigureForm extends Form implements TranslatorAwareInterface
         $this->apiManager = $apiManager;
         return $this;
     }
-
-    public function getApiManager(): \Omeka\Api\Manager
-    {
-        return $this->apiManager;
-    }
 }

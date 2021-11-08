@@ -610,55 +610,46 @@ SQL;
     {
         $multifields = $this->engine->settingAdapter('multifields', []);
 
+        $flatArray = function ($values): array {
+            if (!is_array($values)) {
+                return [$values];
+            } elseif (is_array(reset($values))) {
+                return array_merge(...$values);
+            }
+            return $values;
+        };
+
+        // Empty values are already filtered by the form adapter.
         foreach ($filters as $field => $values) {
             switch ($field) {
                 // "is_public" is automatically managed by this internal adapter
                 // TODO Improve is_public to search public/private only.
                 case 'is_public':
-                case 'is_public_field':
                     continue 2;
 
                 case 'id':
-                    if (!is_array($values)) {
-                        $values = [$values];
-                    } elseif (is_array(reset($values))) {
-                        $values = array_merge(...$values);
-                    }
-                    $this->args['id'] = array_filter(array_map('intval', $values));
-                    continue 2;
-
-                case 'item_set_id':
-                case 'item_set_id_field':
-                    if (!is_array($values)) {
-                        $values = [$values];
-                    } elseif (is_array(reset($values))) {
-                        $values = array_merge(...$values);
-                    }
-                    $this->args['item_set_id'] = array_filter(array_map('intval', $values));
+                    $this->args['id'] = array_filter(array_map('intval', $flatArray($values)));
                     continue 2;
 
                 case 'resource_class_id':
-                case 'resource_class_id_field':
-                    if (!is_array($values)) {
-                        $values = [$values];
-                    } elseif (is_array(reset($values))) {
-                        $values = array_merge(...$values);
-                    }
+                case 'resource_class/o:id':
+                    $values = $flatArray($values);
                     $this->args['resource_class_id'] = is_numeric(reset($values))
                         ? array_filter(array_map('intval', $values))
                         : $this->listResourceClassIds($values);
                     continue 2;
 
                 case 'resource_template_id':
-                case 'resource_template_id_field':
-                    if (!is_array($values)) {
-                        $values = [$values];
-                    } elseif (is_array(reset($values))) {
-                        $values = array_merge(...$values);
-                    }
+                case 'resource_template/o:id':
+                    $values = $flatArray($values);
                     $this->args['resource_template_id'] = is_numeric(reset($values))
                         ? array_filter(array_map('intval', $values))
                         : $this->listResourceTemplateIds($values);
+                    continue 2;
+
+                case 'item_set_id':
+                case 'item_set/o:id':
+                    $this->args['item_set_id'] = array_filter(array_map('intval', $flatArray($values)));
                     continue 2;
 
                 default:
@@ -675,7 +666,7 @@ SQL;
                             'joiner' => 'and',
                             'property' => $field,
                             'type' => 'list',
-                            'text' => is_array($values) ? $values : [$values],
+                            'text' => $flatArray($values),
                         ];
                         break;
                     }
@@ -750,13 +741,12 @@ SQL;
 
         $metadataFieldsToNames = [
             'is_public' => 'is_public',
-            'is_public_field' => 'is_public',
-            'item_set_id' => 'o:item_set',
-            'item_set_id_field' => 'o:item_set',
             'resource_class_id' => 'o:resource_class',
-            'resource_class_id_field' => 'o:resource_class',
+            'resource_class/o:id' => 'o:resource_class',
             'resource_template_id' => 'o:resource_template',
-            'resource_template_id_field' => 'o:resource_template',
+            'resource_template/o:id' => 'o:resource_template',
+            'item_set_id' => 'o:item_set',
+            'item_set/o:id' => 'o:item_set',
         ];
 
         // Convert multi-fields into a list of property terms.
@@ -895,7 +885,7 @@ SQL;
      *
      * @param array $values
      * @return array Only values that are terms are converted into ids, the
-     * other are removed.
+     * other ones are removed.
      */
     protected function listPropertyIds(array $values): array
     {
@@ -1002,7 +992,7 @@ SQL;
      *
      * @param array $values
      * @return array Only values that are terms are converted into ids, the
-     * other are removed.
+     * other ones are removed.
      */
     protected function listResourceClassIds(array $values): array
     {
@@ -1044,7 +1034,7 @@ SQL;
      *
      * @param array $values
      * @return array Only values that are labels are converted into ids, the
-     * other are removed.
+     * other ones are removed.
      */
     protected function listResourceTemplateIds(array $values): array
     {

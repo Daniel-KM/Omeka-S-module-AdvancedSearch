@@ -56,25 +56,11 @@ class SearchConfigConfigureForm extends Form
 
         // This is the settings for the search config, not the search form one.
 
-        // TODO Simplify the form with js, storing the whole form one time. See UserProfile and https://docs.laminas.dev/laminas-form/v3/form-creation/creation-via-factory/
+        // TODO Simplify the form with js, storing the whole form one time.
+        // TODO See UserProfile and https://docs.laminas.dev/laminas-form/v3/form-creation/creation-via-factory/
 
         // These fields may be overridden by the available fields.
         $availableFields = $this->getAvailableFields();
-        $specialOptions = [
-            'is_public_field' => 'Is public', // @translate
-            // TODO Create a default field for item set, resource class and resource template for Solr.
-            'item_set_id_field' => 'Item set id (if available in fields)', // @translate
-            'resource_class_id_field' => 'Resource class id (if available in fields)', // @translate
-            'resource_template_id_field' => 'Resource template id (if available in fields)', // @translate
-            'owner_id_field' => 'Owner id (if available in fields)', // @translate
-        ] + $availableFields;
-
-        // Remove some of the available fields used by the internal adapter,
-        // because here, it's about special options and for any adapter.
-        unset($specialOptions['item_set_id']);
-        unset($specialOptions['resource_class_id']);
-        unset($specialOptions['resource_template_id']);
-        unset($specialOptions['owner_id']);
 
         $this
             ->setAttribute('id', 'search-form-configure');
@@ -116,91 +102,6 @@ class SearchConfigConfigureForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'default_query',
-                ],
-            ])
-        ;
-
-        $this
-            ->add([
-                'name' => 'resource_fields',
-                'type' => Fieldset::class,
-                'options' => [
-                    'label' => 'Resources fields for external search engines', // @translate
-                ],
-            ])
-            ->get('resource_fields')
-            ->add([
-                'name' => 'is_public_field',
-                'type' => Element\Select::class,
-                'options' => [
-                    'label' => 'Is public field', // @translate
-                    'value_options' => $specialOptions,
-                    'empty_option' => 'None', // @translate
-                ],
-                'attributes' => [
-                    'required' => false,
-                    'class' => 'chosen-select',
-                    'value' => 'is_public_field',
-                ],
-            ])
-            ->add([
-                'name' => 'item_set_id_field',
-                'type' => Element\Select::class,
-                'options' => [
-                    'label' => 'Item set id field', // @translate
-                    'value_options' => $specialOptions,
-                    'empty_option' => 'None', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'item_set_id_field',
-                    'required' => false,
-                    'class' => 'chosen-select',
-                    'value' => 'item_set_id_field',
-                ],
-            ])
-            ->add([
-                'name' => 'resource_class_id_field',
-                'type' => Element\Select::class,
-                'options' => [
-                    'label' => 'Resource class id field', // @translate
-                    'value_options' => $specialOptions,
-                    'empty_option' => 'None', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'resource_class_id_field',
-                    'required' => false,
-                    'class' => 'chosen-select',
-                    'value' => 'resource_class_id_field',
-                ],
-            ])
-            ->add([
-                'name' => 'resource_template_id_field',
-                'type' => Element\Select::class,
-                'options' => [
-                    'label' => 'Resource template id field', // @translate
-                    'value_options' => $specialOptions,
-                    'empty_option' => 'None', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'resource_template_id_field',
-                    'required' => false,
-                    'class' => 'chosen-select',
-                    'value' => 'resource_template_id_field',
-                ],
-            ])
-            ->add([
-                'name' => 'owner_id_field',
-                'type' => Element\Select::class,
-                'options' => [
-                    'label' => 'Owner id field', // @translate
-                    'value_options' => $specialOptions,
-                    'empty_option' => 'None', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'owner_id_field',
-                    'required' => false,
-                    'class' => 'chosen-select',
-                    'value' => 'owner_id_field',
                 ],
             ])
         ;

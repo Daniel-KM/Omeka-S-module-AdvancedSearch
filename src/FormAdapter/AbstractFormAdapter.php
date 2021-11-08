@@ -112,46 +112,33 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                     $query->setQuery($request['q']);
                     continue 2;
 
-                case 'resource_type':
-                    if (!is_array($value)) {
-                        $value = [$value];
-                    }
-                    $query->setResources($value);
-                    break;
-
                 case 'is_public':
                     if (is_string($value) && strlen($value)) {
-                        $nameFilter = empty($formSettings['resource_fields']['is_public_field']) ? 'is_public': $formSettings['resource_fields']['is_public_field'];
+                        $nameFilter = empty($formSettings['resource_fields']['is_public']) ? 'is_public': $formSettings['resource_fields']['is_public'];
                         $query->addFilter($nameFilter, (bool) $value);
                     }
                     continue 2;
 
-                case 'resource':
-                    $valueArray = $flatArray($value);
-                    $query->addFilter('id', $valueArray);
-                    continue 2;
-
                 case 'class':
-                    $nameFilter = empty($formSettings['resource_fields']['resource_class_id_field']) ? 'resource_class_id': $formSettings['resource_fields']['resource_class_id_field'];
+                    $nameFilter = empty($formSettings['resource_fields']['resource_class/o:id']) ? 'resource_class_id': $formSettings['resource_fields']['resource_class/o:id'];
                     $valueArray = $flatArray($value);
                     $query->addFilter($nameFilter, $valueArray);
                     continue 2;
 
                 case 'template':
-                    $nameFilter = empty($formSettings['resource_fields']['resource_template_id_field']) ? 'resource_class_id': $formSettings['resource_fields']['resource_template_id_field'];
+                    $nameFilter = empty($formSettings['resource_fields']['resource_template/o:id']) ? 'resource_template_id': $formSettings['resource_fields']['resource_template/o:id'];
                     $valueArray = $flatArray($value);
                     $query->addFilter($nameFilter, $valueArray);
                     continue 2;
 
-                // TODO Manage query on owner (only one in core).
                 case 'owner':
-                    $nameFilter = empty($formSettings['resource_fields']['owner_id_field']) ? 'owner_id': $formSettings['resource_fields']['owner_id_field'];
+                    $nameFilter = empty($formSettings['resource_fields']['owner/o:id']) ? 'owner_id': $formSettings['resource_fields']['owner/o:id'];
                     $valueArray = $flatArray($value);
                     $query->addFilter($nameFilter, $valueArray);
                     continue 2;
 
                 case 'item_set':
-                    $nameFilter = empty($formSettings['resource_fields']['item_set_id_field']) ? 'item_set_id': $formSettings['resource_fields']['item_set_id_field'];
+                    $nameFilter = empty($formSettings['resource_fields']['item_set/o:id']) ? 'item_set_id': $formSettings['resource_fields']['item_set/o:id'];
                     $valueArray = $flatArray($value);
                     $query->addFilter($nameFilter, $valueArray);
                     continue 2;

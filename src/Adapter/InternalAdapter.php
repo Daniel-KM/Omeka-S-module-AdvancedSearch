@@ -34,34 +34,14 @@ class InternalAdapter extends AbstractAdapter
             return $availableFields;
         }
 
-        // Display specific fields first.
-        $fields = $this->searchEngine
-            ? $this->searchEngine->settingAdapter('multifields', [])
-            : [];
-
         // Special fields of Omeka.
         // The mapping is set by default.
+        $fields = $this->getDefaultFields();
 
-        // Public field cannot be managed with internal adapter.
-        $fields['item_set_id_field'] = [
-            'name' => 'item_set_id_field',
-            'label' => 'Item set',
-        ];
-        $fields['resource_class_id_field'] = [
-            'name' => 'resource_class_id_field',
-            'label' => 'Resource class',
-        ];
-        $fields['resource_template_id_field'] = [
-            'name' => 'resource_template_id_field',
-            'label' => 'Resource template',
-        ];
-        // TODO Manage query on owner (only one in core).
-        /*
-        $fields['owner_id'] = [
-            'name' => 'owner_id',
-            'label' => 'Owner',
-        ];
-        */
+        // Display specific fields first, but keep standard fields.
+        $multiFields = $this->searchEngine ? $this->searchEngine->settingAdapter('multifields', []) : [];
+        // Don't bypass default fields with the specific ones.
+        $fields = array_merge($fields, $multiFields);
 
         // A direct query avoids memory overload when vocabularies are numerous.
         /** @var \Doctrine\DBAL\Connection $connection */
@@ -151,19 +131,11 @@ class InternalAdapter extends AbstractAdapter
             ];
         }
 
-        // Special fields of Omeka.
-        // The mapping is set by default.
-
-        // Public field cannot be managed with internal adapter.
+        // Display generic fields second, so they cannot be bypassed.
+        $defaultFields = $this->getDefaultFields();
         $fields['generic'] = [
             'label' => 'Generic', // @translate
-            'options' => [
-                'item_set_id_field' => 'Item set',
-                'resource_class_id_field' => 'Resource class',
-                'resource_template_id_field' => 'Resource template',
-                // TODO Manage query on owner (only one in core).
-                // 'owner_id' => 'Owner',
-            ],
+            'options' => array_column($defaultFields, 'label', 'name'),
         ];
 
         // A direct query avoids memory overload when vocabularies are numerous.
@@ -198,5 +170,41 @@ class InternalAdapter extends AbstractAdapter
         }
 
         return $fields;
+    }
+
+    protected function getDefaultFields(): array
+    {
+        // Field names are directly managed by the form adapter and the querier.
+        // It's always possible to use the standard names anyway.
+
+        return [
+            // Public field cannot be managed with internal adapter.
+            /*
+            'is_public' => [
+                'name' => 'is_public',
+                'label' => 'Public',
+                'from' => 'is_public',
+                'to' => 'is_public',
+            ],
+            */
+            'resource_class/o:id' => [
+                'name' => 'resource_class/o:id',
+                'label' => 'Resource class',
+                'from' => 'resource_class/o:id',
+                'to' => 'resource_class_id',
+            ],
+            'resource_template/o:id' => [
+                'name' => 'resource_template/o:id',
+                'label' => 'Resource template',
+                'from' => 'resource_template/o:id',
+                'to' => 'resource_template_id',
+            ],
+            'item_set/o:id' => [
+                'name' => 'item_set/o:id',
+                'label' => 'Item set',
+                'from' => 'item_set/o:id',
+                'to' => 'item_set_id',
+            ],
+        ];
     }
 }

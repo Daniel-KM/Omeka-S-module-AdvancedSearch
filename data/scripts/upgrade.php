@@ -81,21 +81,41 @@ SET
         REPLACE(
         REPLACE(
         REPLACE(
+        REPLACE(
+        REPLACE(
+        REPLACE(
+        REPLACE(
+        REPLACE(
             `settings`,
-        '"item_set_id"',
-        '"item_set_id_field"'
+        '"resource_name"',
+        '"resource_type"'
         ),
-        '"items_set_id"',
-        '"item_set_id_field"'
+        '"is_public_field"',
+        '"is_public"'
         ),
-        '"items_set_id_field"',
-        '"item_set_id_field"'
+        '"resource_class_id_field"',
+        '"resource_class/o:id"'
         ),
         '"resource_class_id"',
-        '"resource_class_id_field"'
+        '"resource_class/o:id"'
+        ),
+        '"resource_template_id_field"',
+        '"resource_template/o:id"'
         ),
         '"resource_template_id"',
-        '"resource_template_id_field"'
+        '"resource_template/o:id"'
+        ),
+        '"items_set_id_field"',
+        '"item_set/o:id"'
+        ),
+        '"item_set_id_field"',
+        '"item_set/o:id"'
+        ),
+        '"item_set_id"',
+        '"item_set/o:id"'
+        ),
+        '"items_set_id"',
+        '"item_set/o:id"'
         )
     ;
 SQL;

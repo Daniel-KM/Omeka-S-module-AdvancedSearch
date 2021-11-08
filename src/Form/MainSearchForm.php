@@ -168,32 +168,32 @@ class MainSearchForm extends Form
             // TODO Add special types for these special inputs. Or use them only with name "field".
             // TODO In fact, they are standard field with autosuggestion, so it will be fixed when autosuggestion (or short list) will be added.
             switch ($field) {
-                case 'is_public_field':
+                case 'is_public':
                     $element = $this->searchIsPublic($filter);
                     if ($element) {
                         $this->add($element);
                     }
                     continue 2;
-                case 'item_set_id_field':
-                    $element = $this->searchItemSet($filter);
+                case 'owner/o:id':
+                    $element = $this->searchOwner($filter);
                     if ($element) {
                         $this->add($element);
                     }
                     continue 2;
-                case 'resource_class_id_field':
+                case 'resource_class/o:id':
                     $element = $this->searchResourceClass($filter);
                     if ($element) {
                         $this->add($element);
                     }
                     continue 2;
-                case 'resource_template_id_field':
+                case 'resource_template/o:id':
                     $element = $this->searchResourceTemplate($filter);
                     if ($element) {
                         $this->add($element);
                     }
                     continue 2;
-                case 'owner_id_field':
-                    $element = $this->searchOwner($filter);
+                case 'item_set/o:id':
+                    $element = $this->searchItemSet($filter);
                     if ($element) {
                         $this->add($element);
                     }
@@ -453,19 +453,19 @@ class MainSearchForm extends Form
         return $element;
     }
 
-    protected function searchItemSet(array $filter): ?ElementInterface
+    protected function searchOwner(array $filter): ?ElementInterface
     {
-        if ($filter['field'] === 'item_set_id_field'
-            && empty($this->formSettings['resource_fields']['item_set_id_field'])
+        if ($filter['field'] === 'owner/o:id'
+            && empty($this->formSettings['resource_fields']['owner/o:id'])
         ) {
             return null;
         }
 
-        $fieldset = new Fieldset('item_set');
+        $fieldset = new Fieldset('owner');
         $fieldset
             ->setAttributes([
-                'id' => 'search-item-sets',
-                'data-field-type', 'itemset',
+                'id' => 'search-owners',
+                'data-field-type', 'owner',
             ])
             ->add([
                 'name' => 'id',
@@ -474,15 +474,15 @@ class MainSearchForm extends Form
                     : AdvancedSearchElement\OptionalSelect::class,
                 'options' => [
                     'label' => $filter['label'], // @translate
-                    'value_options' => $this->getItemSetsOptions($filter['type'] !== 'MultiCheckbox'),
+                    'value_options' => $this->getOwnerOptions(),
                     'empty_option' => '',
                 ],
                 'attributes' => [
-                    'id' => 'item-set-id',
+                    'id' => 'search-owner-id',
                     'multiple' => true,
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
                     // End users understand "collections" more than "item sets".
-                    'data-placeholder' => 'Select collections…', // @translate
+                    'data-placeholder' => 'Select owners…', // @translate
                 ],
             ])
         ;
@@ -492,8 +492,8 @@ class MainSearchForm extends Form
 
     protected function searchResourceClass(array $filter): ?ElementInterface
     {
-        if ($filter['field'] === 'resource_class_id_field'
-            && empty($this->formSettings['resource_fields']['resource_class_id_field'])
+        if ($filter['field'] === 'resource_class/o:id'
+            && empty($this->formSettings['resource_fields']['resource_class/o:id'])
         ) {
             return null;
         }
@@ -552,7 +552,7 @@ class MainSearchForm extends Form
         $element
             ->setName('id')
             ->setAttributes([
-                'id' => 'class-id',
+                'id' => 'search-class-id',
                 'multiple' => true,
                 'class' => 'chosen-select',
                 'data-placeholder' => 'Select classes…', // @translate
@@ -568,8 +568,8 @@ class MainSearchForm extends Form
 
     protected function searchResourceTemplate(array $filter): ?ElementInterface
     {
-        if ($filter['field'] === 'resource_template_id_field'
-            && empty($this->formSettings['resource_fields']['resource_template_id_field'])
+        if ($filter['field'] === 'resource_template/o:id'
+            && empty($this->formSettings['resource_fields']['resource_template/o:id'])
         ) {
             return null;
         }
@@ -595,7 +595,7 @@ class MainSearchForm extends Form
                 'query' => ['used' => true],
             ])
             ->setAttributes([
-                'id' => 'template-id',
+                'id' => 'search-template-id',
                 'multiple' => true,
                 'class' => 'chosen-select',
                 'data-placeholder' => 'Select templates…', // @translate
@@ -618,7 +618,7 @@ class MainSearchForm extends Form
                                 'empty_option' => '',
                             ],
                             'attributes' => [
-                                'id' => 'template-id',
+                                'id' => 'search-template-id',
                                 'multiple' => true,
                                 'class' => 'chosen-select',
                                 'data-placeholder' => 'Select templates…', // @translate
@@ -639,19 +639,19 @@ class MainSearchForm extends Form
         return $fieldset;
     }
 
-    protected function searchOwner(array $filter): ?ElementInterface
+    protected function searchItemSet(array $filter): ?ElementInterface
     {
-        if ($filter['field'] === 'owner_id_field'
-            && empty($this->formSettings['resource_fields']['owner_id_field'])
+        if ($filter['field'] === 'item_set/o:id'
+            && empty($this->formSettings['resource_fields']['item_set/o:id'])
         ) {
             return null;
         }
 
-        $fieldset = new Fieldset('owner');
+        $fieldset = new Fieldset('item_set');
         $fieldset
             ->setAttributes([
-                'id' => 'search-owners',
-                'data-field-type', 'owner',
+                'id' => 'search-item-sets',
+                'data-field-type', 'itemset',
             ])
             ->add([
                 'name' => 'id',
@@ -660,15 +660,15 @@ class MainSearchForm extends Form
                     : AdvancedSearchElement\OptionalSelect::class,
                 'options' => [
                     'label' => $filter['label'], // @translate
-                    'value_options' => $this->getOwnerOptions(),
+                    'value_options' => $this->getItemSetsOptions($filter['type'] !== 'MultiCheckbox'),
                     'empty_option' => '',
                 ],
                 'attributes' => [
-                    'id' => 'owner-id',
+                    'id' => 'search-item-set-id',
                     'multiple' => true,
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
                     // End users understand "collections" more than "item sets".
-                    'data-placeholder' => 'Select owners…', // @translate
+                    'data-placeholder' => 'Select collections…', // @translate
                 ],
             ])
         ;

@@ -3,6 +3,8 @@
 /**
  * Example of a generic config with the internal adapter and the main form.
  *
+ * Some form fields are useless, they are added as an example.
+ *
  * When created, it can be modified in the admin board.
  */
 return [
@@ -20,16 +22,6 @@ return [
             'default_query' => '',
         ],
 
-        // Specific fields for external search engines.
-        // TODO To be moved to Internal and Solr.
-        'resource_fields' => [
-            'is_public_field' => 'is_public_field',
-            'item_set_id_field' => 'item_set_id_field',
-            'resource_class_id_field' => 'resource_class_id_field',
-            'resource_template_id_field' => 'resource_template_id_field',
-            'owner_id_field' => 'owner_id_field',
-        ],
-
         'autosuggest' => [
             'suggester' => 1,
             'url' => '',
@@ -42,17 +34,17 @@ return [
             'filters' => [
                 // Ordered list of specific filters.
                 [
-                    'field' => 'item_set_id_field',
+                    'field' => 'item_set/o:id',
                     'label' => 'Collection',
                     'type' => 'Select',
                 ],
                 [
-                    'field' => 'resource_class_id_field',
+                    'field' => 'resource_class/o:id',
                     'label' => 'Class',
                     'type' => 'SelectFlat',
                 ],
                 [
-                    'field' => 'resource_template_id_field',
+                    'field' => 'resource_template/o:id',
                     'label' => 'Template',
                     'type' => 'Radio',
                 ],
@@ -101,7 +93,7 @@ return [
                             'label' => 'Description',
                         ],
                         'resource_class_id' => [
-                            'value' => 'resource_class_id_field',
+                            'value' => 'resource_class_id',
                             'label' => 'Class',
                         ],
                     ],
@@ -222,12 +214,12 @@ return [
 
         'facet' => [
             'facets' => [
-                'item_set_id_field' => [
-                    'name' => 'item_set_id_field',
+                'item_set_id' => [
+                    'name' => 'item_set_id',
                     'label' => 'Collections',
                 ],
-                'resource_class_id_field' => [
-                    'name' => 'resource_class_id_field',
+                'resource_class_id' => [
+                    'name' => 'resource_class_id',
                     'label' => 'Classes',
                 ],
                 'dcterms:subject' => [

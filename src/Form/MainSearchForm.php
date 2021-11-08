@@ -168,8 +168,27 @@ class MainSearchForm extends Form
             // TODO Add special types for these special inputs. Or use them only with name "field".
             // TODO In fact, they are standard field with autosuggestion, so it will be fixed when autosuggestion (or short list) will be added.
             switch ($field) {
+                case 'resource_name':
+                case 'resource_type':
+                    $element = $this->searchResourceType($filter);
+                    if ($element) {
+                        $this->add($element);
+                    }
+                    continue 2;
+                case 'resource':
+                    $element = $this->searchResource($filter);
+                    if ($element) {
+                        $this->add($element);
+                    }
+                    continue 2;
                 case 'is_public':
                     $element = $this->searchIsPublic($filter);
+                    if ($element) {
+                        $this->add($element);
+                    }
+                    continue 2;
+                case 'site/o:id':
+                    $element = $this->searchSite($filter);
                     if ($element) {
                         $this->add($element);
                     }
@@ -431,6 +450,69 @@ class MainSearchForm extends Form
         return $element;
     }
 
+    /**
+     * The resource type is the main type for end user, but the name in omeka.
+     */
+    protected function searchResourceType(array $filter): ?ElementInterface
+    {
+        if ($filter['field'] === 'resource_type'
+            && empty($this->formSettings['resource_fields']['resource_type'])
+        ) {
+            return null;
+        }
+
+        $this
+            ->add([
+                'name' => 'resource_type',
+                'type' => $filter['type'] === 'MultiCheckbox'
+                    ? AdvancedSearchElement\OptionalMultiCheckbox::class
+                    : AdvancedSearchElement\OptionalSelect::class,
+                'options' => [
+                    'label' => $filter['label'], // @translate
+                    'value_options' => [
+                        'items' => 'Items',
+                        'item_sets' => 'Item sets',
+                    ],
+                    'empty_option' => '',
+                ],
+                'attributes' => [
+                    'id' => 'search-resource-type',
+                    'multiple' => true,
+                    'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
+                    'data-placeholder' => 'Select resource type…', // @translate
+                ],
+            ])
+        ;
+
+        return $this;
+    }
+
+    protected function searchResource(array $filter): ?ElementInterface
+    {
+        if ($filter['field'] === 'resource'
+            && empty($this->formSettings['resource_fields']['resource'])
+        ) {
+            return null;
+        }
+
+        $this
+            ->add([
+                'name' => 'resource',
+                'type' => $filter['type'] === 'MultiText'
+                    ? AdvancedSearchElement\MultiText::class
+                    : Element\Text::class,
+                'options' => [
+                    'label' => $filter['label'], // @translate
+                ],
+                'attributes' => [
+                    'id' => 'search-resource',
+                ],
+            ])
+        ;
+
+        return $this;
+    }
+
     protected function searchIsPublic(array $filter): ?ElementInterface
     {
         if ($filter['field'] === 'is_public'
@@ -451,6 +533,43 @@ class MainSearchForm extends Form
         ;
 
         return $element;
+    }
+
+    protected function searchSite(array $filter): ?ElementInterface
+    {
+        if ($filter['field'] === 'site/o:id'
+            && empty($this->formSettings['resource_fields']['site/o:id'])
+        ) {
+            return null;
+        }
+
+        $fieldset = new Fieldset('site');
+        $fieldset
+            ->setAttributes([
+                'id' => 'search-sites',
+                'data-field-type', 'site',
+            ])
+            ->add([
+                'name' => 'id',
+                'type' => $filter['type'] === 'MultiCheckbox'
+                    ? AdvancedSearchElement\OptionalMultiCheckbox::class
+                    : AdvancedSearchElement\OptionalSelect::class,
+                'options' => [
+                    'label' => $filter['label'], // @translate
+                    'value_options' => $this->getSiteOptions(),
+                    'empty_option' => '',
+                ],
+                'attributes' => [
+                    'id' => 'search-site-id',
+                    'multiple' => true,
+                    'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
+                    // End users understand "collections" more than "item sets".
+                    'data-placeholder' => 'Select sites…', // @translate
+                ],
+            ])
+        ;
+
+        return $fieldset;
     }
 
     protected function searchOwner(array $filter): ?ElementInterface
@@ -793,6 +912,12 @@ class MainSearchForm extends Form
             $valueOptions = $select->getValueOptions();
         }
         return $valueOptions;
+    }
+
+    protected function getSiteOptions(): array
+    {
+        $select = $this->formElementManager->get(\Omeka\Form\Element\SiteSelect::class, []);
+        return $select->getValueOptions();
     }
 
     protected function getOwnerOptions(): array

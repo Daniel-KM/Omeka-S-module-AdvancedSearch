@@ -115,6 +115,15 @@ class AbstractFacet extends AbstractHelper
         }
 
         switch ($name) {
+            case 'resource_name':
+            case 'resource_type':
+                return $value;
+
+            case 'is_public':
+                return $value
+                    ? 'Private'
+                    : 'Public';
+
             case 'id':
             case 'resource':
                 $data = ['id' => $value];
@@ -133,6 +142,29 @@ class AbstractFacet extends AbstractHelper
                     // Manage the case where a resource was indexed but removed.
                     // In public side, the item set should belong to a site too.
                     : null;
+
+            case 'site':
+            case 'site_id':
+            case 'site/o:id':
+                /** @var \Omeka\Api\Representation\UserRepresentation $resource */
+                try {
+                    $resource = $this->api->searchOne('sites', ['id' => $value])->getContent();
+                } catch (\Exception $e) {
+                    return null;
+                }
+                return $resource ? (string) $resource->title() : null;
+
+            case 'owner':
+            case 'owner_id':
+            case 'owner/o:id':
+                /** @var \Omeka\Api\Representation\UserRepresentation $resource */
+                // Only allowed users can read and search users.
+                try {
+                    $resource = $this->api->searchOne('users', ['id' => $value])->getContent();
+                } catch (\Exception $e) {
+                    return null;
+                }
+                return $resource ? (string) $resource->name() : null;
 
             case 'class':
             case 'resource_class_id':

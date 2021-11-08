@@ -622,14 +622,37 @@ SQL;
         // Empty values are already filtered by the form adapter.
         foreach ($filters as $field => $values) {
             switch ($field) {
+                // "resource_type" is used externally and "resource_name" internally.
+                case 'resource_name':
+                case 'resource_type':
+                    $this->args['resource_name'] = $flatArray($values);
+                    continue 2;
+
                 // "is_public" is automatically managed by this internal adapter
                 // TODO Improve is_public to search public/private only.
                 case 'is_public':
                     continue 2;
 
                 case 'id':
+                case 'resource':
                     $this->args['id'] = array_filter(array_map('intval', $flatArray($values)));
                     continue 2;
+
+                case 'site_id':
+                case 'site/o:id':
+                    $values = $flatArray($values);
+                    $this->args['site_id'] = is_numeric(reset($values))
+                        ? array_filter(array_map('intval', $values))
+                        : $this->listSiteIds($values);
+                    continue 2;
+
+                case 'owner_id':
+                case 'owner/o:id':
+                    $values = $flatArray($values);
+                    $this->args['owner_id'] = is_numeric(reset($values))
+                        ? array_filter(array_map('intval', $values))
+                        : $this->listUserIds($values);
+                continue 2;
 
                 case 'resource_class_id':
                 case 'resource_class/o:id':
@@ -740,7 +763,13 @@ SQL;
         $facetLanguages = $this->query->getFacetLanguages();
 
         $metadataFieldsToNames = [
+            'resource_name' => 'resource_type',
+            'resource_type' => 'resource_type',
             'is_public' => 'is_public',
+            'site_id' => 'o:site',
+            'site/o:id' => 'o:site',
+            'owner_id' => 'o:owner',
+            'owner/o:id' => 'o:owner',
             'resource_class_id' => 'o:resource_class',
             'resource_class/o:id' => 'o:resource_class',
             'resource_template_id' => 'o:resource_template',
@@ -838,6 +867,84 @@ SQL;
         }
 
         $this->response->setFacetCounts(array_map('array_values', $facetCountsByField));
+    }
+
+    /**
+     * Convert a list of site slug into a list of site ids.
+     *
+     * @param array $values
+     * @return array Only values that are slugs are converted into ids, the
+     * other ones are removed.
+     */
+    protected function listSiteIds(array $values): array
+    {
+        return array_values(array_intersect_key($this->getSiteIds(), array_fill_keys($values, null)));
+    }
+
+    /**
+     * Get all site ids by slug.
+     *
+     * @return array Associative array of ids by slug.
+     */
+    protected function getSiteIds(): array
+    {
+        static $sites;
+
+        if (is_null($sites)) {
+            /** @var \Doctrine\DBAL\Connection $connection */
+            $connection = $this->services->get('Omeka\Connection');
+            $qb = $connection->createQueryBuilder();
+            $qb
+                ->select(
+                    'site.slug AS slug',
+                    'site.id AS id'
+                )
+                ->from('site', 'site')
+                ->orderBy('id', 'asc')
+            ;
+            $sites = array_map('intval', $connection->executeQuery($qb)->fetchAllKeyValue());
+        }
+
+        return $sites;
+    }
+
+    /**
+     * Convert a list of user names into a list of ids.
+     *
+     * @param array $values
+     * @return array Only values that are user name are converted into ids, the
+     * other ones are removed.
+     */
+    protected function listUserIds(array $values): array
+    {
+        return array_values(array_intersect_key($this->getUserIds(), array_fill_keys($values, null)));
+    }
+
+    /**
+     * Get all user ids by name.
+     *
+     * @return array Associative array of ids by user name.
+     */
+    protected function getUserIds(): array
+    {
+        static $users;
+
+        if (is_null($resourceTemplates)) {
+            /** @var \Doctrine\DBAL\Connection $connection */
+            $connection = $this->services->get('Omeka\Connection');
+            $qb = $connection->createQueryBuilder();
+            $qb
+                ->select(
+                    'user.name AS name',
+                    'user.id AS id'
+                )
+                ->from('user', 'user')
+                ->orderBy('id', 'asc')
+            ;
+            $users = array_map('intval', $connection->executeQuery($qb)->fetchAllKeyValue());
+        }
+
+        return $users;
     }
 
     /**

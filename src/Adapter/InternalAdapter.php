@@ -178,6 +178,19 @@ class InternalAdapter extends AbstractAdapter
         // It's always possible to use the standard names anyway.
 
         return [
+            // The resource name: "items", "item_sets", etc.
+            'resource_type' => [
+                'name' => 'resource_type',
+                'label' => 'Resource type', // @translate
+                'from' => 'resource_type',
+                'to' => 'resource_type',
+            ],
+              'resource' => [
+                'name' => 'resource',
+                'label' => 'Resource id', // @translate
+                'from' => 'id',
+                'to' => 'id',
+            ],
             // Public field cannot be managed with internal adapter.
             /*
             'is_public' => [
@@ -187,6 +200,19 @@ class InternalAdapter extends AbstractAdapter
                 'to' => 'is_public',
             ],
             */
+            'site/o:id' => [
+                'name' => 'site/o:id',
+                'label' => 'Site',
+                'from' => 'site/o:id',
+                'to' => 'site_id',
+            ],
+            // TODO Manage query on owner (only one in core).
+            'owner/o:id' => [
+                'name' => 'owner/o:id',
+                'label' => 'Owner',
+                'from' => 'owner/o:id',
+                'to' => 'owner_id',
+            ],
             'resource_class/o:id' => [
                 'name' => 'resource_class/o:id',
                 'label' => 'Resource class',

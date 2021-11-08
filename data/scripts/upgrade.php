@@ -86,12 +86,32 @@ SET
         REPLACE(
         REPLACE(
         REPLACE(
+        REPLACE(
+        REPLACE(
+        REPLACE(
+        REPLACE(
+        REPLACE(
             `settings`,
         '"resource_name"',
         '"resource_type"'
         ),
+        '"resource_field"',
+        '"resource"'
+        ),
         '"is_public_field"',
         '"is_public"'
+        ),
+        '"site_id_field"',
+        '"site/o:id"'
+        ),
+        '"site_id"',
+        '"site/o:id"'
+        ),
+        '"owner_id_field"',
+        '"owner/o:id"'
+        ),
+        '"owner_id"',
+        '"owner/o:id"'
         ),
         '"resource_class_id_field"',
         '"resource_class/o:id"'

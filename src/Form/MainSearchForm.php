@@ -145,8 +145,11 @@ class MainSearchForm extends Form
         }
 
         foreach ($this->formSettings['form']['filters'] ?? [] as $filter) {
-            if (empty($filter['field']) || empty($filter['type'])) {
+            if (empty($filter['field'])) {
                 continue;
+            }
+            if (!isset($filter['type'])) {
+                $filter['type'] = '';
             }
             if (!isset($filter['options'])) {
                 $filter['options'] = [];
@@ -230,9 +233,17 @@ class MainSearchForm extends Form
         $this->appendInputFilters();
     }
 
+    /**
+     * Add a default input element, represented as a text input.
+     */
     protected function searchElement(array $filter): ?ElementInterface
     {
-        return null;
+        $element = new Element($filter['field']);
+        $element
+            ->setLabel($filter['label'])
+            ->setAttribute('data-field-type', $filter['type'])
+        ;
+        return $element;
     }
 
     protected function searchAdvanced(array $filter): ?ElementInterface

@@ -60,6 +60,8 @@ class InternalQuerier extends AbstractQuerier
         $offset = empty($dataQuery['offset']) ? 0 : (int) $dataQuery['offset'];
         unset($dataQuery['limit'], $dataQuery['offset']);
 
+        // TODO Inverse logic: search all resources (store id and type), and return by type only when needed (rarely).
+
         foreach ($this->resourceTypes as $resourceType) {
             try {
                 // Return scalar doesn't allow to get the total of results.
@@ -69,6 +71,8 @@ class InternalQuerier extends AbstractQuerier
                 $apiResponse = $api->search($resourceType, $dataQuery, ['returnScalar' => 'id']);
                 $totalResults = $apiResponse->getTotalResults();
                 $result = $apiResponse->getContent();
+                // TODO Currently experimental. To replace by a query + arg "querier=internal".
+                $this->response->setAllResourceIdsForResourceType($resourceType, $result ?: []);
                 if ($result && ($offset || $limit)) {
                     $result = array_slice($result, $offset, $limit ?: null);
                     // $apiResponse->setContent($result);

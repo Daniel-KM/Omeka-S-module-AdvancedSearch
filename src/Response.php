@@ -68,6 +68,14 @@ class Response implements \JsonSerializable
     protected $results = [];
 
     /**
+     * List of result ids for all pages, if stored by the querier.
+     * @todo Inverse process: manage output as a whole and if needed, order it by type.
+     *
+     * @var ?array
+     */
+    protected $allResouceIdsByResourceType = [];
+
+    /**
      * @var array
      */
     protected $activeFacets = [];
@@ -194,10 +202,54 @@ class Response implements \JsonSerializable
     }
 
     /**
+     * Store all results ids for all resources, by type.
+     *
+     * @internal Currently experimental.
+     */
+    public function setAllResourceIds(array $idsByResourceType): self
+    {
+        $this->allResouceIdsByResourceType = $idsByResourceType;
+        return $this;
+    }
+
+    /**
+     * Store all results ids for a resource type.
+     *
+     * @param string|null $resourceType The resource type ("items", "item_sets"…).
+     * @param int[] $ids
+     * @internal Currently experimental.
+     */
+    public function setAllResourceIdsForResourceType(string $resourceType, array $ids): self
+    {
+        $this->allResouceIdsByResourceType[$resourceType] = array_values($ids);
+        return $this;
+    }
+
+    /**
+     * Get all resources ids for a resource type or all resource types.
+     *
+     * @param string|null $resourceType The resource type ("items", "item_sets"…).
+     * @return int[]|array
+     * @internal Currently experimental.
+     */
+    public function getAllResourceIds(string $resourceType = null): array
+    {
+        // When the querier doesn't fill whole list, return current page list.
+        if (!count($this->allResouceIdsByResourceType)) {
+            return $this->getResourceIds($resourceType);
+        }
+
+        return is_null($resourceType)
+            ? $this->allResouceIdsByResourceType
+            : $this->allResouceIdsByResourceType[$resourceType] ?? [];
+    }
+
+    /**
      * Get resources ids for a resource type or all resource types.
      *
      * @param string|null $resourceType The resource type ("items", "item_sets"…).
      * @return int[]
+     * @internal Currently experimental.
      */
     public function getResourceIds(string $resourceType = null): array
     {

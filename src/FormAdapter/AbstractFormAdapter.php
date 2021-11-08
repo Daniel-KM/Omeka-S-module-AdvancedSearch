@@ -268,14 +268,28 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                         // advanced filter query.
                         // Other fields are predefined.
                         // TODO Don't check form, but settings['filters'] with field = name and type.
+                        // TODO Simplify these checks (or support multi-values anywhere).
+                        $valueArray = $flatArray($value);
                         if ($this->form
                             && $this->form->has($name)
                             && ($element = $this->form->get($name)) instanceof \Laminas\Form\Element\Text
-                            && !($element instanceof \AdvancedSearch\Form\Element\TextExact)
                         ) {
-                            $query->addFilterQuery($name, $value);
+                            if ($element instanceof \AdvancedSearch\Form\Element\TextExact
+                                || $element instanceof \AdvancedSearch\Form\Element\MultiText
+                            ) {
+                                foreach ($valueArray as $val) {
+                                    $query->addFilter($name, $val);
+                                }
+                            } else {
+                                // Included \AdvancedSearch\Form\Element\MultiText.
+                                foreach ($valueArray as $val) {
+                                    $query->addFilterQuery($name, $val);
+                                }
+                            }
                         } else {
-                            $query->addFilter($name, $value);
+                            foreach ($valueArray as $val) {
+                                $query->addFilter($name, $val);
+                            }
                         }
                         continue 2;
                     }

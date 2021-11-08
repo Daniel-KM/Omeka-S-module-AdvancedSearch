@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace AdvancedSearch\View\Helper;
+namespace AdvancedSearch\Form\View\Helper;
 
 use Laminas\Form\ElementInterface;
 use Laminas\Form\View\Helper\AbstractHelper;

@@ -358,6 +358,19 @@ class MainSearchForm extends Form
         return $this->searchSelectFlat($filter, 'multiselectflat');
     }
 
+    /**
+     * Simplify the creation of repeatable text input fields.
+     */
+    protected function searchMultiText(array $filter): ?ElementInterface
+    {
+        $element = new AdvancedSearchElement\MultiText($filter['field']);
+        $element
+            ->setLabel($filter['label'])
+            ->setAttribute('data-field-type', 'multitext')
+        ;
+        return $element;
+    }
+
     protected function searchNumber(array $filter): ?ElementInterface
     {
         $element = new Element\Number($filter['field']);

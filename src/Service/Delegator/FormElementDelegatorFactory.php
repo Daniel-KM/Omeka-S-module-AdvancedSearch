@@ -13,6 +13,8 @@ class FormElementDelegatorFactory implements DelegatorFactoryInterface
         /** @var \Laminas\Form\View\Helper\FormElement $formElement */
         $formElement = $callback();
         return $formElement
-            ->addType('note', 'formNote');
+            ->addType('note', 'formNote')
+            ->addClass(\AdvancedSearch\Form\Element\MultiText::class, 'formMultiText')
+        ;
     }
 }

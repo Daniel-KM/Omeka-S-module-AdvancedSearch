@@ -910,6 +910,34 @@ class Module extends AbstractModule
                     }
                     break;
 
+                case 'site':
+                    $filterLabel = $translate('Site');
+                    $isId = is_array($value) && key($value) === 'id';
+                    foreach (array_filter($flatArray($value), 'is_numeric') as $subKey => $subValue) {
+                        try {
+                            $filterValue = $api->read('sites', $subValue)->getContent()->title();
+                        } catch (NotFoundException $e) {
+                            $filterValue = $translate('Unknown site');
+                        }
+                        $urlQuery = $isId ? $this->urlQueryId($key, $subKey) : $this->urlQuery($key, $subKey);
+                        $filters[$filterLabel][$urlQuery] = $filterValue;
+                    }
+                    break;
+
+                case 'owner':
+                    $filterLabel = $translate('User');
+                    $isId = is_array($value) && key($value) === 'id';
+                    foreach (array_filter($flatArray($value), 'is_numeric') as $subKey => $subValue) {
+                        try {
+                            $filterValue = $api->read('users', $subValue)->getContent()->name();
+                        } catch (NotFoundException $e) {
+                            $filterValue = $translate('Unknown user');
+                        }
+                        $urlQuery = $isId ? $this->urlQueryId($key, $subKey) : $this->urlQuery($key, $subKey);
+                        $filters[$filterLabel][$urlQuery] = $filterValue;
+                    }
+                    break;
+
                 case 'class':
                     $filterLabel = $translate('Class'); // @translate
                     $isId = is_array($value) && key($value) === 'id';
@@ -942,34 +970,6 @@ class Module extends AbstractModule
                         } else {
                             $filterValue = $translate($api->searchOne('resource_templates', ['label' => $subValue])->getContent());
                             $filterValue = $filterValue ? $filterValue->label() : $translate('Unknown template');
-                        }
-                        $urlQuery = $isId ? $this->urlQueryId($key, $subKey) : $this->urlQuery($key, $subKey);
-                        $filters[$filterLabel][$urlQuery] = $filterValue;
-                    }
-                    break;
-
-                case 'owner':
-                    $filterLabel = $translate('User');
-                    $isId = is_array($value) && key($value) === 'id';
-                    foreach (array_filter($flatArray($value), 'is_numeric') as $subKey => $subValue) {
-                        try {
-                            $filterValue = $api->read('users', $subValue)->getContent()->name();
-                        } catch (NotFoundException $e) {
-                            $filterValue = $translate('Unknown user');
-                        }
-                        $urlQuery = $isId ? $this->urlQueryId($key, $subKey) : $this->urlQuery($key, $subKey);
-                        $filters[$filterLabel][$urlQuery] = $filterValue;
-                    }
-                    break;
-
-                case 'site':
-                    $filterLabel = $translate('Site');
-                    $isId = is_array($value) && key($value) === 'id';
-                    foreach (array_filter($flatArray($value), 'is_numeric') as $subKey => $subValue) {
-                        try {
-                            $filterValue = $api->read('sites', $subValue)->getContent()->title();
-                        } catch (NotFoundException $e) {
-                            $filterValue = $translate('Unknown site');
                         }
                         $urlQuery = $isId ? $this->urlQueryId($key, $subKey) : $this->urlQuery($key, $subKey);
                         $filters[$filterLabel][$urlQuery] = $filterValue;

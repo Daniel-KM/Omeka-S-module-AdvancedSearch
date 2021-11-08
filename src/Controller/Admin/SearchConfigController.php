@@ -518,6 +518,7 @@ class SearchConfigController extends AbstractActionController
             'noop' => 'Noop',
             'number' => 'Number',
             // 'numberrange' => 'NumberRange',
+            'omeka' => 'Omeka',
             // 'place' => 'Place',
             'radio' => 'Radio',
             'select' => 'Select',
@@ -535,8 +536,13 @@ class SearchConfigController extends AbstractActionController
                 unset($params['form']['filters'][$keyFilter]);
                 continue;
             }
-            $filterField = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '', $filter['type'] ?? 'Noop'));
-            $params['form']['filters'][$keyFilter]['type'] = $inputTypes[$filterField] ?? ucfirst($filterField);
+            $filterType = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '', $filter['type'] ?? 'Noop'));
+            if (substr($filterType, 0, 5) === 'Omeka') {
+                $subFilterType = trim(substr($filterType, 5), '/ ');
+                $params['form']['filters'][$keyFilter]['type'] = trim('Omeka/' . $inputTypes[$subFilterType] ?? ucfirst($subFilterType), '/');
+            } else {
+                $params['form']['filters'][$keyFilter]['type'] = $inputTypes[$filterType] ?? ucfirst($filterType);
+            }
             if ($filter['type'] === 'Advanced') {
                 if ($keyAdvanced !== false) {
                     unset($params['form']['filters'][$keyAdvanced]);

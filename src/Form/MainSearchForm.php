@@ -154,77 +154,60 @@ class MainSearchForm extends Form
             if (!isset($filter['options'])) {
                 $filter['options'] = [];
             }
-
-            $field = $filter['field'];
-            $type = $filter['type'];
             if (!isset($filter['label'])) {
                 $filter['label'] = '';
             }
 
+            $field = $filter['field'];
+            $type = $filter['type'];
+
             $element = null;
 
-            // Manage exceptions.
-            // TODO These exception should be removed: the search engine will manage them.
-            // TODO Add special types for these special inputs. Or use them only with name "field".
+            // Manage exceptions for special fields, mostly for internal engine.
             // TODO In fact, they are standard field with autosuggestion, so it will be fixed when autosuggestion (or short list) will be added.
-            switch ($field) {
-                case 'resource_name':
-                case 'resource_type':
-                    $element = $this->searchResourceType($filter);
-                    if ($element) {
-                        $this->add($element);
-                    }
-                    continue 2;
-                case 'resource':
-                    $element = $this->searchResource($filter);
-                    if ($element) {
-                        $this->add($element);
-                    }
-                    continue 2;
-                case 'is_public':
-                    $element = $this->searchIsPublic($filter);
-                    if ($element) {
-                        $this->add($element);
-                    }
-                    continue 2;
-                case 'site/o:id':
-                    $element = $this->searchSite($filter);
-                    if ($element) {
-                        $this->add($element);
-                    }
-                    continue 2;
-                case 'owner/o:id':
-                    $element = $this->searchOwner($filter);
-                    if ($element) {
-                        $this->add($element);
-                    }
-                    continue 2;
-                case 'resource_class/o:id':
-                    $element = $this->searchResourceClass($filter);
-                    if ($element) {
-                        $this->add($element);
-                    }
-                    continue 2;
-                case 'resource_template/o:id':
-                    $element = $this->searchResourceTemplate($filter);
-                    if ($element) {
-                        $this->add($element);
-                    }
-                    continue 2;
-                case 'item_set/o:id':
-                    $element = $this->searchItemSet($filter);
-                    if ($element) {
-                        $this->add($element);
-                    }
-                    continue 2;
-                default:
-                    break;
+            $isSpecialField = substr($filter['type'], 0, 5) === 'Omeka';
+            if ($isSpecialField) {
+                $filter['type'] = trim(substr($filter['type'], 5), '/');
+                switch ($field) {
+                    case 'resource_name':
+                    case 'resource_type':
+                        $element = $this->searchResourceType($filter);
+                        break;
+                    case 'resource':
+                        $element = $this->searchResource($filter);
+                        break;
+                    case 'is_public':
+                        $element = $this->searchIsPublic($filter);
+                        break;
+                    case 'site_id':
+                        $element = $this->searchSite($filter);
+                        break;
+                    case 'owner_id':
+                        $element = $this->searchOwner($filter);
+                        break;
+                    case 'resource_class_id':
+                        $element = $this->searchResourceClass($filter);
+                        break;
+                    case 'resource_template_id':
+                        $element = $this->searchResourceTemplate($filter);
+                        break;
+                    case 'item_set_id':
+                        $element = $this->searchItemSet($filter);
+                        break;
+                    default:
+                        $method = 'search' . $type;
+                        $element = method_exists($this, $method)
+                            ? $this->$method($filter)
+                            : $this->searchElement($filter);
+                        break;
+                }
+            } else {
+                $method = 'search' . $type;
+                $element = method_exists($this, $method)
+                    ? $this->$method($filter)
+                    : $this->searchElement($filter);
             }
 
-            $method = 'search' . $type;
-            $element = method_exists($this, $method)
-                ? $this->$method($filter)
-                : $this->searchElement($filter);
             if ($element) {
                 $this
                     ->add($element);
@@ -461,30 +444,27 @@ class MainSearchForm extends Form
             return null;
         }
 
-        $this
-            ->add([
-                'name' => 'resource_type',
-                'type' => $filter['type'] === 'MultiCheckbox'
-                    ? AdvancedSearchElement\OptionalMultiCheckbox::class
-                    : AdvancedSearchElement\OptionalSelect::class,
-                'options' => [
-                    'label' => $filter['label'], // @translate
-                    'value_options' => [
-                        'items' => 'Items',
-                        'item_sets' => 'Item sets',
-                    ],
-                    'empty_option' => '',
+        $element = $filter['type'] === 'MultiCheckbox'
+            ? AdvancedSearchElement\OptionalMultiCheckbox('resource_type')
+            : AdvancedSearchElement\OptionalSelect('resource_type');
+        $element
+            ->setAttributes([
+                'id' => 'search-resource-type',
+                'multiple' => true,
+                'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
+                'data-placeholder' => 'Select resource type…', // @translate
+            ])
+            ->setOptions([
+                'label' => $filter['label'], // @translate
+                'value_options' => [
+                    'items' => 'Items',
+                    'item_sets' => 'Item sets',
                 ],
-                'attributes' => [
-                    'id' => 'search-resource-type',
-                    'multiple' => true,
-                    'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
-                    'data-placeholder' => 'Select resource type…', // @translate
-                ],
+                'empty_option' => '',
             ])
         ;
 
-        return $this;
+        return $element;
     }
 
     protected function searchResource(array $filter): ?ElementInterface
@@ -495,22 +475,20 @@ class MainSearchForm extends Form
             return null;
         }
 
-        $this
-            ->add([
-                'name' => 'resource',
-                'type' => $filter['type'] === 'MultiText'
-                    ? AdvancedSearchElement\MultiText::class
-                    : Element\Text::class,
-                'options' => [
-                    'label' => $filter['label'], // @translate
-                ],
-                'attributes' => [
-                    'id' => 'search-resource',
-                ],
+        $element = $filter['type'] === 'MultiText'
+            ? new AdvancedSearchElement\MultiText('resource')
+            : new Element\Text('resource');
+        $element
+            ->setAttributes([
+                'id' => 'search-resource',
+                'data-field-type', $filter['type'] === 'MultiText' ? 'multitext' : 'text',
+            ])
+            ->setOptions([
+                'label' => $filter['label'], // @translate
             ])
         ;
 
-        return $this;
+        return $element;
     }
 
     protected function searchIsPublic(array $filter): ?ElementInterface
@@ -537,8 +515,8 @@ class MainSearchForm extends Form
 
     protected function searchSite(array $filter): ?ElementInterface
     {
-        if ($filter['field'] === 'site/o:id'
-            && empty($this->formSettings['resource_fields']['site/o:id'])
+        if ($filter['field'] === 'site_id'
+            && empty($this->formSettings['resource_fields']['site_id'])
         ) {
             return null;
         }
@@ -574,8 +552,8 @@ class MainSearchForm extends Form
 
     protected function searchOwner(array $filter): ?ElementInterface
     {
-        if ($filter['field'] === 'owner/o:id'
-            && empty($this->formSettings['resource_fields']['owner/o:id'])
+        if ($filter['field'] === 'owner_id'
+            && empty($this->formSettings['resource_fields']['owner_id'])
         ) {
             return null;
         }
@@ -611,8 +589,8 @@ class MainSearchForm extends Form
 
     protected function searchResourceClass(array $filter): ?ElementInterface
     {
-        if ($filter['field'] === 'resource_class/o:id'
-            && empty($this->formSettings['resource_fields']['resource_class/o:id'])
+        if ($filter['field'] === 'resource_class_id'
+            && empty($this->formSettings['resource_fields']['resource_class_id'])
         ) {
             return null;
         }
@@ -687,8 +665,8 @@ class MainSearchForm extends Form
 
     protected function searchResourceTemplate(array $filter): ?ElementInterface
     {
-        if ($filter['field'] === 'resource_template/o:id'
-            && empty($this->formSettings['resource_fields']['resource_template/o:id'])
+        if ($filter['field'] === 'resource_template_id'
+            && empty($this->formSettings['resource_fields']['resource_template_id'])
         ) {
             return null;
         }
@@ -760,8 +738,8 @@ class MainSearchForm extends Form
 
     protected function searchItemSet(array $filter): ?ElementInterface
     {
-        if ($filter['field'] === 'item_set/o:id'
-            && empty($this->formSettings['resource_fields']['item_set/o:id'])
+        if ($filter['field'] === 'item_set_id'
+            && empty($this->formSettings['resource_fields']['item_set_id'])
         ) {
             return null;
         }

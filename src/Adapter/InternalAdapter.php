@@ -200,33 +200,33 @@ class InternalAdapter extends AbstractAdapter
                 'to' => 'is_public',
             ],
             */
-            'site/o:id' => [
-                'name' => 'site/o:id',
+            'site_id' => [
+                'name' => 'site_id',
                 'label' => 'Site',
                 'from' => 'site/o:id',
                 'to' => 'site_id',
             ],
             // TODO Manage query on owner (only one in core).
-            'owner/o:id' => [
-                'name' => 'owner/o:id',
+            'owner_id' => [
+                'name' => 'owner_id',
                 'label' => 'Owner',
                 'from' => 'owner/o:id',
                 'to' => 'owner_id',
             ],
-            'resource_class/o:id' => [
-                'name' => 'resource_class/o:id',
+            'resource_class_id' => [
+                'name' => 'resource_class_id',
                 'label' => 'Resource class',
                 'from' => 'resource_class/o:id',
                 'to' => 'resource_class_id',
             ],
-            'resource_template/o:id' => [
-                'name' => 'resource_template/o:id',
+            'resource_template_id' => [
+                'name' => 'resource_template_id',
                 'label' => 'Resource template',
                 'from' => 'resource_template/o:id',
                 'to' => 'resource_template_id',
             ],
-            'item_set/o:id' => [
-                'name' => 'item_set/o:id',
+            'item_set_id' => [
+                'name' => 'item_set_id',
                 'label' => 'Item set',
                 'from' => 'item_set/o:id',
                 'to' => 'item_set_id',

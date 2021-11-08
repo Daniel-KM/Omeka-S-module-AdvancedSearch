@@ -107,6 +107,8 @@ class AbstractFacet extends AbstractHelper
 
     /**
      * The facets may be indexed by the search engine.
+     *
+     * @todo Remove search of facet labels: use values from the response.
      */
     protected function facetValueLabel(string $name, string $value): ?string
     {
@@ -145,7 +147,6 @@ class AbstractFacet extends AbstractHelper
 
             case 'site':
             case 'site_id':
-            case 'site/o:id':
                 /** @var \Omeka\Api\Representation\UserRepresentation $resource */
                 try {
                     $resource = $this->api->searchOne('sites', ['id' => $value])->getContent();
@@ -156,7 +157,6 @@ class AbstractFacet extends AbstractHelper
 
             case 'owner':
             case 'owner_id':
-            case 'owner/o:id':
                 /** @var \Omeka\Api\Representation\UserRepresentation $resource */
                 // Only allowed users can read and search users.
                 try {
@@ -168,7 +168,6 @@ class AbstractFacet extends AbstractHelper
 
             case 'class':
             case 'resource_class_id':
-            case 'resource_class/o:id':
             case 'resource_class':
                 if (is_numeric($value)) {
                     try {
@@ -187,7 +186,6 @@ class AbstractFacet extends AbstractHelper
 
             case 'template':
             case 'resource_template_id':
-            case 'resource_template/o:id':
             case 'resource_template':
                 if (is_numeric($value)) {
                     try {
@@ -206,7 +204,6 @@ class AbstractFacet extends AbstractHelper
 
             case 'item_set':
             case 'item_set_id':
-            case 'item_set/o:id':
             case 'item_set':
                 $data = ['id' => $value];
                 // The site id is required in public.

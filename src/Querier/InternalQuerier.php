@@ -639,7 +639,6 @@ SQL;
                     continue 2;
 
                 case 'site_id':
-                case 'site/o:id':
                     $values = $flatArray($values);
                     $this->args['site_id'] = is_numeric(reset($values))
                         ? array_filter(array_map('intval', $values))
@@ -647,7 +646,6 @@ SQL;
                     continue 2;
 
                 case 'owner_id':
-                case 'owner/o:id':
                     $values = $flatArray($values);
                     $this->args['owner_id'] = is_numeric(reset($values))
                         ? array_filter(array_map('intval', $values))
@@ -655,7 +653,6 @@ SQL;
                 continue 2;
 
                 case 'resource_class_id':
-                case 'resource_class/o:id':
                     $values = $flatArray($values);
                     $this->args['resource_class_id'] = is_numeric(reset($values))
                         ? array_filter(array_map('intval', $values))
@@ -663,7 +660,6 @@ SQL;
                     continue 2;
 
                 case 'resource_template_id':
-                case 'resource_template/o:id':
                     $values = $flatArray($values);
                     $this->args['resource_template_id'] = is_numeric(reset($values))
                         ? array_filter(array_map('intval', $values))
@@ -671,7 +667,6 @@ SQL;
                     continue 2;
 
                 case 'item_set_id':
-                case 'item_set/o:id':
                     $this->args['item_set_id'] = array_filter(array_map('intval', $flatArray($values)));
                     continue 2;
 
@@ -767,15 +762,10 @@ SQL;
             'resource_type' => 'resource_type',
             'is_public' => 'is_public',
             'site_id' => 'o:site',
-            'site/o:id' => 'o:site',
             'owner_id' => 'o:owner',
-            'owner/o:id' => 'o:owner',
             'resource_class_id' => 'o:resource_class',
-            'resource_class/o:id' => 'o:resource_class',
             'resource_template_id' => 'o:resource_template',
-            'resource_template/o:id' => 'o:resource_template',
             'item_set_id' => 'o:item_set',
-            'item_set/o:id' => 'o:item_set',
         ];
 
         // Convert multi-fields into a list of property terms.

@@ -133,31 +133,31 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                     continue 2;
 
                 case 'site':
-                    $nameFilter = empty($formSettings['resource_fields']['site/o:id']) ? 'site_id': $formSettings['resource_fields']['site/o:id'];
+                    $nameFilter = empty($formSettings['resource_fields']['site_id']) ? 'site_id': $formSettings['resource_fields']['site_id'];
                     $valueArray = $flatArray($value);
                     $query->addFilter($nameFilter, $valueArray);
                     continue 2;
 
                 case 'owner':
-                    $nameFilter = empty($formSettings['resource_fields']['owner/o:id']) ? 'owner_id': $formSettings['resource_fields']['owner/o:id'];
+                    $nameFilter = empty($formSettings['resource_fields']['owner_id']) ? 'owner_id': $formSettings['resource_fields']['owner_id'];
                     $valueArray = $flatArray($value);
                     $query->addFilter($nameFilter, $valueArray);
                     continue 2;
 
                 case 'class':
-                    $nameFilter = empty($formSettings['resource_fields']['resource_class/o:id']) ? 'resource_class_id': $formSettings['resource_fields']['resource_class/o:id'];
+                    $nameFilter = empty($formSettings['resource_fields']['resource_class_id']) ? 'resource_class_id': $formSettings['resource_fields']['resource_class_id'];
                     $valueArray = $flatArray($value);
                     $query->addFilter($nameFilter, $valueArray);
                     continue 2;
 
                 case 'template':
-                    $nameFilter = empty($formSettings['resource_fields']['resource_template/o:id']) ? 'resource_template_id': $formSettings['resource_fields']['resource_template/o:id'];
+                    $nameFilter = empty($formSettings['resource_fields']['resource_template_id']) ? 'resource_template_id': $formSettings['resource_fields']['resource_template_id'];
                     $valueArray = $flatArray($value);
                     $query->addFilter($nameFilter, $valueArray);
                     continue 2;
 
                 case 'item_set':
-                    $nameFilter = empty($formSettings['resource_fields']['item_set/o:id']) ? 'item_set_id': $formSettings['resource_fields']['item_set/o:id'];
+                    $nameFilter = empty($formSettings['resource_fields']['item_set_id']) ? 'item_set_id': $formSettings['resource_fields']['item_set_id'];
                     $valueArray = $flatArray($value);
                     $query->addFilter($nameFilter, $valueArray);
                     continue 2;

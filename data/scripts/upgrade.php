@@ -86,11 +86,6 @@ SET
         REPLACE(
         REPLACE(
         REPLACE(
-        REPLACE(
-        REPLACE(
-        REPLACE(
-        REPLACE(
-        REPLACE(
             `settings`,
         '"resource_name"',
         '"resource_type"'
@@ -102,44 +97,65 @@ SET
         '"is_public"'
         ),
         '"site_id_field"',
-        '"site/o:id"'
-        ),
-        '"site_id"',
-        '"site/o:id"'
+        '"site_id"'
         ),
         '"owner_id_field"',
-        '"owner/o:id"'
-        ),
-        '"owner_id"',
-        '"owner/o:id"'
+        '"owner_id"'
         ),
         '"resource_class_id_field"',
-        '"resource_class/o:id"'
-        ),
-        '"resource_class_id"',
-        '"resource_class/o:id"'
+        '"resource_class_id"'
         ),
         '"resource_template_id_field"',
-        '"resource_template/o:id"'
-        ),
-        '"resource_template_id"',
-        '"resource_template/o:id"'
+        '"resource_template_id"'
         ),
         '"items_set_id_field"',
-        '"item_set/o:id"'
+        '"item_set_id"'
         ),
         '"item_set_id_field"',
-        '"item_set/o:id"'
-        ),
-        '"item_set_id"',
-        '"item_set/o:id"'
+        '"item_set_id"'
         ),
         '"items_set_id"',
-        '"item_set/o:id"'
+        '"item_set_id"'
         )
     ;
 SQL;
     $connection->executeStatement($sql);
+
+    // Add the core type when needed.
+    $qb = $connection->createQueryBuilder();
+    $qb
+        ->select('search_config.id', 'search_config.settings')
+        ->from('search_config', 'search_config')
+        ->innerJoin('search_config', 'search_engine', 'search_engine', 'search_engine.id = search_config.engine_id')
+        ->where('search_engine.adapter = "internal"')
+        ->orderBy('search_config.id', 'asc');
+    $searchConfigsSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    foreach ($searchConfigsSettings as $id => $searchConfigSettings) {
+        $searchConfigSettings = json_decode($searchConfigSettings,  true) ?: [];
+        foreach ($searchConfigSettings['form']['filters'] ?? [] as $key => $filter) {
+            if (in_array($filter['field'], [
+                'site_id',
+                'owner_id',
+                'resource_class_id',
+                'resource_template_id',
+                'item_set_id',
+            ])) {
+                $searchConfigSettings['form']['filters'][$key]['type'] = trim('Omeka/' . $filter['type'], '/');
+            }
+        }
+        $sql = <<<'SQL'
+UPDATE `search_config`
+SET
+    `settings` = ?
+WHERE
+    `id` = ?
+;
+SQL;
+        $connection->executeStatement($sql, [
+            json_encode($searchConfigSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            $id,
+        ]);
+    }
 
     // Add the default search partial process for internal engine.
     // Add the default multi-fields to internal engine.
@@ -207,4 +223,9 @@ SQL;
         'It is now possible to display the used search filters in the results header.' // @translate
     );
     $messenger->addSuccess($message);
+
+    $message = new Message(
+        'Some field types have been renamed for filters in the form. To use the core input elements, the type should be "Omeka" (or prepend "Omeka/" if needed). See the default config page.' // @translate
+    );
+    $messenger->addWarning($message);
 }

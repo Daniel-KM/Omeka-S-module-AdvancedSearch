@@ -34,19 +34,19 @@ return [
             'filters' => [
                 // Ordered list of specific filters.
                 [
-                    'field' => 'item_set/o:id',
+                    'field' => 'item_set_id',
                     'label' => 'Collection',
-                    'type' => 'Select',
+                    'type' => 'Omeka/MultiSelect',
                 ],
                 [
-                    'field' => 'resource_class/o:id',
+                    'field' => 'resource_class_id',
                     'label' => 'Class',
-                    'type' => 'SelectFlat',
+                    'type' => 'Omeka/MultiSelectFlat',
                 ],
                 [
-                    'field' => 'resource_template/o:id',
+                    'field' => 'resource_template_id',
                     'label' => 'Template',
-                    'type' => 'Radio',
+                    'type' => 'Omeka/Radio',
                 ],
                 [
                     'field' => 'title',

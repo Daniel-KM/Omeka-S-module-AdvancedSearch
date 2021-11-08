@@ -417,6 +417,18 @@ class Query implements \JsonSerializable
         return $this->siteId;
     }
 
+    /**
+     * Check if the query is filled, except public, pagination, sort and facets.
+     */
+    public function isSearchQuery(): bool
+    {
+        return $this->getQuery() !== ''
+            || $this->getFilters() !== []
+            || $this->getDateRangeFilters() !== []
+            || $this->getFilterQueries() !== []
+        ;
+    }
+
     public function jsonSerialize(): array
     {
         return [

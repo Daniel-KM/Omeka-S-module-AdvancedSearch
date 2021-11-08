@@ -162,6 +162,11 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         return $this->resource->getSettings()[$mainName][$name] ?? $default;
     }
 
+    public function subSubSetting(string $mainName, string $name, string $subName, $default = null)
+    {
+        return $this->resource->getSettings()[$mainName][$name][$subName] ?? $default;
+    }
+
     public function created(): \DateTime
     {
         return $this->resource->getCreated();

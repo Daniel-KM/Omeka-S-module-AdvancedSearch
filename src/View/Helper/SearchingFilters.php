@@ -30,7 +30,37 @@ class SearchingFilters extends AbstractHelper
         $template = $options['template'] ?? null;
 
         // TODO Use the managed query to get a clean query.
-        $request = $view->params()->fromQuery();
+        $params = $view->params();
+        $request = $params->fromQuery();
+
+        // Don't display the current item set argument on item set page.
+        $currentItemSet = (int) $view->params()->fromRoute('item-set-id');
+        if ($currentItemSet) {
+            foreach ($request as $key => $value) {
+                // TODO Use the form adapter to get the real arg for the item set.
+                if ($value && $key === 'item_set_id' || $key === 'item_set') {
+                    if (is_array($value)) {
+                        // Check if this is not a sub array (item_set[id][]).
+                        $first = reset($value);
+                        if (is_array($first)) {
+                            $value = $first;
+                        }
+                        $pos = array_search($currentItemSet, $value);
+                        if ($pos !== false) {
+                            if (count($request[$key]) <= 1) {
+                                unset($request[$key]);
+                            } else {
+                                unset($request[$key][$pos]);
+                            }
+                        }
+                    } elseif ((int) $value === $currentItemSet) {
+                        unset($request[$key]);
+                    }
+                    break;
+                }
+            }
+        }
+
         $request['__searchConfig'] = $searchConfig;
         $request['__searchQuery'] = $query;
 

@@ -79,6 +79,7 @@ return [
                 ],
                 'max_number' => '5',
                 'field_joiner' => true,
+                'field_joiner_not' => true,
                 'field_operator' => true,
             ],
             [

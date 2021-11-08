@@ -198,7 +198,7 @@ class SearchResourcesListener
      *
      * Query format:
      *
-     * - property[{index}][joiner]: "and" OR "or" joiner with previous query
+     * - property[{index}][joiner]: "and" OR "or" OR "not" joiner with previous query
      * - property[{index}][property]: property ID
      * - property[{index}][text]: search text
      * - property[{index}][type]: search type
@@ -214,8 +214,8 @@ class SearchResourcesListener
      *   - nsw: does not start with
      *   - ew: ends with
      *   - new: does not end with
-     *   - res: has resource
-     *   - nres: has no resource
+     *   - res: has resource (core)
+     *   - nres: has no resource (core)
      *   For date time only for now (a check is done to have a meaningful answer):
      *   TODO Remove the check for valid date time? Add another key (before/after)?
      *   Of course, it's better to use Numeric Data Types.
@@ -243,6 +243,27 @@ class SearchResourcesListener
 
         $entityManager = $this->adapter->getEntityManager();
 
+        $reciprocalQueryTypes = [
+            'eq' => 'neq',
+            'neq' => 'eq',
+            'in' => 'nin',
+            'nin' => 'in',
+            'ex' => 'nex',
+            'nex' => 'ex',
+            'list' => 'nlist',
+            'nlist' => 'list',
+            'sw' => 'nsw',
+            'nsw' => 'sw',
+            'ew' => 'new',
+            'new' => 'ew',
+            'res' => 'nres',
+            'nres' => 'res',
+            'gt' => 'lte',
+            'gte' => 'lt',
+            'lte' => 'gt',
+            'lt' => 'gte',
+        ];
+
         foreach ($query['property'] as $queryRow) {
             if (!(
                 is_array($queryRow)
@@ -256,6 +277,10 @@ class SearchResourcesListener
             $joiner = $queryRow['joiner'] ?? '';
             $value = $queryRow['text'] ?? '';
 
+            if (!isset($reciprocalQueryTypes[$queryType])) {
+                continue;
+            }
+
             // A value can be an array with types "list" and "nlist".
             if (!is_array($value)
                 && !strlen((string) $value)
@@ -263,6 +288,12 @@ class SearchResourcesListener
                 && $queryType !== 'ex'
             ) {
                 continue;
+            }
+
+            // Invert the query type for joiner "not".
+            if ($joiner === 'not') {
+                $joiner = 'and';
+                $queryType = $reciprocalQueryTypes[$queryType];
             }
 
             $propertyId = $queryRow['property'];

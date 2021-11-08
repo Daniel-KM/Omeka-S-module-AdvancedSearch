@@ -190,7 +190,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                         if (empty($operator)) {
                             foreach ($value as $filter) {
                                 if (isset($filter['field']) && isset($filter['value']) && trim($filter['value']) !== '') {
-                                    $join = isset($filter['join']) && $filter['join'] === 'or' ? 'or' : 'and';
+                                    $join = isset($filter['join']) && in_array($filter['join'], ['or', 'not']) ? $filter['join'] : 'and';
                                     $query->addFilterQuery($filter['field'], $filter['value'], $type, $join);
                                 }
                             }
@@ -199,10 +199,10 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                                 if (isset($filter['field'])) {
                                     $type = empty($filter['type']) ? 'in' : $filter['type'];
                                     if ($type === 'ex' || $type === 'nex') {
-                                        $join = isset($filter['join']) && $filter['join'] === 'or' ? 'or' : 'and';
+                                        $join = isset($filter['join']) && in_array($filter['join'], ['or', 'not']) ? $filter['join'] : 'and';
                                         $query->addFilterQuery($filter['field'], null, $type, $join);
                                     } elseif (isset($filter['value']) && trim($filter['value']) !== '') {
-                                        $join = isset($filter['join']) && $filter['join'] === 'or' ? 'or' : 'and';
+                                        $join = isset($filter['join']) && in_array($filter['join'], ['or', 'not']) ? $filter['join'] : 'and';
                                         $query->addFilterQuery($filter['field'], $filter['value'], $type, $join);
                                     }
                                 }

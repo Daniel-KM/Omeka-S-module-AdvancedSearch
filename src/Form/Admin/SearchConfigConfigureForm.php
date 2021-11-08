@@ -359,6 +359,16 @@ advanced = Filters = Advanced',
                     'id' => 'field_joiner',
                 ],
             ])
+            ->add([
+                'name' => 'field_joiner_not',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Add the joiner "not" to the advanced filters', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'field_joiner_not',
+                ],
+            ])
             // TODO List value type (rename/remove).
             ->add([
                 'name' => 'field_operator',

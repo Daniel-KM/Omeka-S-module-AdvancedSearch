@@ -47,17 +47,22 @@ class Advanced extends Fieldset
                 'class' => 'filter',
             ]);
 
-        $joiner = $this->getOption('field_joiner');
+        $joiner = (bool) $this->getOption('field_joiner');
+        $joinerNot = (bool) $this->getOption('field_joiner_not');
         if ($joiner) {
+            $valueOptions = [
+                'and' => 'and', // @translate
+                'or' => 'or', // @translate
+            ];
+            if ($joinerNot) {
+                $valueOptions['not'] = 'not'; // @translate
+            }
             $this
                 ->add([
                     'name' => 'join',
                     'type' => Element\Select::class,
                     'options' => [
-                        'value_options' => [
-                            'and' => 'and', // @translate
-                            'or' => 'or', // @translate
-                        ],
+                        'value_options' => $valueOptions,
                         'label_attributes' => [
                             'class' => 'search-boolean-label',
                         ],
@@ -85,23 +90,38 @@ class Advanced extends Fieldset
                 ],
             ]);
 
-        $operator = $this->getOption('field_operator');
+        $operator = (bool) $this->getOption('field_operator');
         if ($operator) {
+            $operators = [
+                'eq' => 'is exactly', // @translate
+                'neq' => 'is not exactly', // @translate
+                'in' => 'contains', // @translate
+                'nin' => 'does not contain', // @translate
+                'sw' => 'starts with', // @translate
+                'nsw' => 'does not start with', // @translate
+                'ew' => 'ends with', // @translate
+                'new' => 'does not end with', // @translate
+                'ex' => 'has any value', // @translate
+                'nex' => 'has no values', // @translate
+                'res' => 'is resource with ID', // @translate
+                'nres' => 'is not resource with ID', // @translate
+            ];
+            if ($joiner && $joinerNot) {
+                unset(
+                    $operators['neq'],
+                    $operators['nin'],
+                    $operators['nsw'],
+                    $operators['new'],
+                    $operators['nex'],
+                    $operators['nres']
+                );
+            }
             $this
                 ->add([
                     'name' => 'type',
                     'type' => Element\Select::class,
                     'options' => [
-                        'value_options' => [
-                            'eq' => 'is exactly', // @translate
-                            'neq' => 'is not exactly', // @translate
-                            'in' => 'contains', // @translate
-                            'nin' => 'does not contain', // @translate
-                            'res' => 'is resource with ID', // @translate
-                            'nres' => 'is not resource with ID', // @translate
-                            'ex' => 'has any value', // @translate
-                            'nex' => 'has no values', // @translate
-                        ],
+                        'value_options' => $operators,
                         'label_attributes' => [
                             'class' => 'search-type-label',
                         ],

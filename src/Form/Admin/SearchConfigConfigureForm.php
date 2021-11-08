@@ -408,6 +408,34 @@ nres = is not resource with ID
             ])
         ;
 
+        $this
+            ->add([
+                'name' => 'display',
+                'type' => Fieldset::class,
+                'options' => [
+                    'label' => 'Results display', // @translate
+                ],
+            ])
+            ->get('display')
+            ->add([
+                'name' => 'request_filters',
+                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'List of query filters', // @translate
+                    'value_options' => [
+                        'none' => 'No', // @translate
+                        'header' => 'Results header', // @translate
+                        'footer' => 'Results footer', // @translate
+                        'both' => 'Both', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'request_filters',
+                    'value' => 'header',
+                ],
+            ])
+        ;
+
         // Settings for the results (pagination).
 
         // TODO Add the style of pagination (prev/next or list of pages).

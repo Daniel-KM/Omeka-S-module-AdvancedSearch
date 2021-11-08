@@ -8,4 +8,11 @@
  */
 ?>
 
-<?= $pagination ?>
+<div class="search-results-footer">
+    <?php if (in_array($searchPage->subSetting('display', 'request_filters', 'header'), ['footer', 'both'])): ?>
+    <?= $this->searchingFilters($searchPage, $query) ?>
+    <?php endif; ?>
+    <div class="search-results-count">
+        <?= $pagination ?>
+    </div>
+</div>

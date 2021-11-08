@@ -138,6 +138,8 @@ $documentCount = $response->getTotalResults();
                 'searchPage' => $searchPage,
                 'query' => $query,
                 'response' => $response,
+                'itemSet' => $itemSet,
+                'documentCount' => $documentCount,
                 'pagination' => $pagination,
             ]) ?>
 
@@ -149,9 +151,11 @@ $documentCount = $response->getTotalResults();
                 <?php elseif (empty($query) && $itemSet): ?>
                 <?= $translate('This item set has no items.') ?>
                 <?php else: ?>
+                <?php if (in_array($searchPage->subSetting('display', 'request_filters', 'header'), ['header', 'both'])): ?>
                 <div class="search-results-header">
                     <?= $this->searchingFilters($searchPage, $query) ?>
                 </div>
+                <?php endif; ?>
                 <?= $translate('Your query returned no results') ?>
                 <?php endif; ?>
             </div>

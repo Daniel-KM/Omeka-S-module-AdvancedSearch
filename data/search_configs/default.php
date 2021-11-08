@@ -178,6 +178,10 @@ return [
             ],
         ],
 
+        'display' => [
+            'request_filters' => 'header',
+        ],
+
         'pagination' => [
             'per_pages' => [
                 // For translation only.

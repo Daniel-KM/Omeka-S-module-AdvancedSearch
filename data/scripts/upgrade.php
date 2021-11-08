@@ -135,6 +135,19 @@ SQL;
     }
 
     $messenger = new Messenger();
+
+    /** @var \Omeka\Module\Manager $moduleManager */
+    $moduleManager = $services->get('Omeka\ModuleManager');
+    $module = $moduleManager->getModule('Reference');
+    $version = $module ? $module->getIni('version') : null;
+    if ($version && version_compare($version, '3.4.32.3', '<')) {
+        $message = new Message(
+            'The module %s should be updated to version %s.', // @translate
+            'Reference', '3.4.32.3'
+        );
+        $messenger->addWarning($message);
+    }
+
     $message = new Message(
         'It is now possible to aggregate properties with the internal (sql) adapter. See config of the internal search engine.' // @translate
     );
@@ -142,6 +155,16 @@ SQL;
 
     $message = new Message(
         'It is now possible to add a pagination per-page to the search page.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new Message(
+        'It is now possible to use "not" in advanced filters.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new Message(
+        'It is now possible to display the used search filters in the results header.' // @translate
     );
     $messenger->addSuccess($message);
 }

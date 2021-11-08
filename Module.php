@@ -1152,7 +1152,7 @@ VALUES
 (?, ?, ?, NOW());
 SQL;
             $searchEngineConfig = require __DIR__ . '/data/search_engines/internal.php';
-            $connection->executeQuery($sql, [
+            $connection->executeStatement($sql, [
                 $searchEngineConfig['o:name'],
                 $searchEngineConfig['o:adapter'],
                 json_encode($searchEngineConfig['o:settings'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
@@ -1195,7 +1195,7 @@ SQL;
                 'fields' => [],
                 'excluded_fields' => [],
             ];
-            $connection->executeQuery($sql, [
+            $connection->executeStatement($sql, [
                 json_encode($suggesterSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
             ]);
             // $suggesterId = $connection->fetchColumn($sqlSuggesterId);
@@ -1223,11 +1223,14 @@ SQL;
 INSERT INTO `search_config`
 (`engine_id`, `name`, `path`, `form_adapter`, `settings`, `created`)
 VALUES
-($searchEngineId, 'Default', 'find', 'main', ?, NOW());
+($searchEngineId, ?, ?, ?, ?, NOW());
 SQL;
-            $searchConfigSettings = require __DIR__ . '/data/search_configs/default.php';
-            $connection->executeQuery($sql, [
-                json_encode($searchConfigSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            $searchConfigConfig = require __DIR__ . '/data/search_configs/default.php';
+            $connection->executeStatement($sql, [
+                $searchConfigConfig['o:name'],
+                $searchConfigConfig['o:path'],
+                $searchConfigConfig['o:form'],
+                json_encode($searchConfigConfig['o:settings'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
             ]);
 
             $message = new Message(

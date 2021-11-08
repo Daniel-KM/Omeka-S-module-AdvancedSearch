@@ -2,6 +2,9 @@
 
 namespace AdvancedSearch;
 
+use Omeka\Stdlib\Message;
+use Omeka\Mvc\Controller\Plugin\Messenger;
+
 /**
  * @var Module $this
  * @var \Laminas\ServiceManager\ServiceLocatorInterface $services
@@ -97,4 +100,48 @@ SET
     ;
 SQL;
     $connection->executeStatement($sql);
+
+    // Add the default search partial process for internal engine.
+    // Add the default multi-fields to internal engine.
+    $searchEngineConfig = require __DIR__ . '/../../data/search_engines/internal.php';
+    $defaultAdapterSettings = $searchEngineConfig['o:settings']['adapter']
+        ?? ['default_search_partial_word' => false, 'multifields' => []];
+    $qb = $connection->createQueryBuilder();
+    $qb
+        ->select('id', 'settings')
+        ->from('search_engine', 'search_engine')
+        ->where('adapter = "internal"')
+        ->orderBy('id', 'asc');
+    $searchEnginesSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    foreach ($searchEnginesSettings as $id => $searchEngineSettings) {
+        $searchEngineSettings = json_decode($searchEngineSettings,  true) ?: [];
+        $searchEngineSettings['adapter'] = array_replace(
+            $defaultAdapterSettings,
+            $searchEngineSettings['adapter'] ?? []
+        );
+
+        $sql = <<<'SQL'
+UPDATE `search_engine`
+SET
+    `settings` = ?
+WHERE
+    `id` = ?
+;
+SQL;
+        $connection->executeStatement($sql, [
+            json_encode($searchEngineSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+            $id,
+        ]);
+    }
+
+    $messenger = new Messenger();
+    $message = new Message(
+        'It is now possible to aggregate properties with the internal (sql) adapter. See config of the internal search engine.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new Message(
+        'It is now possible to add a pagination per-page to the search page.' // @translate
+    );
+    $messenger->addSuccess($message);
 }

@@ -33,7 +33,7 @@ return [
         'filters' => [
             // Ordered list of specific filters.
             [
-                'field' => 'items_set_id_field',
+                'field' => 'item_set_id_field',
                 'label' => 'Collection',
                 'type' => 'Select',
             ],
@@ -73,7 +73,7 @@ return [
                         'label' => 'Description',
                     ],
                     'resource_class_id' => [
-                        'value' => 'resource_class_id',
+                        'value' => 'resource_class_id_field',
                         'label' => 'Class',
                     ],
                 ],
@@ -176,12 +176,12 @@ return [
 
     'facet' => [
         'facets' => [
-            'item_set_id' => [
-                'name' => 'item_set_id',
+            'item_set_id_field' => [
+                'name' => 'item_set_id_field',
                 'label' => 'Collections',
             ],
-            'resource_class_id' => [
-                'name' => 'resource_class_id',
+            'resource_class_id_field' => [
+                'name' => 'resource_class_id_field',
                 'label' => 'Classes',
             ],
             'dcterms:subject' => [

@@ -34,8 +34,33 @@ class InternalAdapter extends AbstractAdapter
             return $availableFields;
         }
 
-        // Use a direct query to avoid a memory overload when there are many
-        // vocabularies.
+        $fields = [];
+
+        // Special fields of Omeka.
+        // The mapping is set by default.
+
+        // Public field cannot be managed with internal adapter.
+        $fields['item_set_id_field'] = [
+            'name' => 'resource_template_id_field',
+            'label' => 'Item set',
+        ];
+        $fields['resource_class_id_field'] = [
+            'name' => 'resource_template_id_field',
+            'label' => 'Resource class',
+        ];
+        $fields['resource_template_id_field'] = [
+            'name' => 'resource_template_id_field',
+            'label' => 'Resource template',
+        ];
+        // TODO Manage query on owner (only one in core).
+        /*
+        $fields['owner_id'] = [
+            'name' => 'owner_id',
+            'label' => 'Owner',
+        ];
+        */
+
+        // A direct query avoids memory overload when vocabularies are numerous.
         /** @var \Doctrine\DBAL\Connection $connection */
         $connection = $this->getServiceLocator()->get('Omeka\Connection');
 
@@ -50,30 +75,8 @@ class InternalAdapter extends AbstractAdapter
             ->addOrderBy('vocabulary.id', 'ASC')
             ->addOrderBy('property.local_name', 'ASC');
 
-        $stmt = $connection->executeQuery($qb);
-        $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $result = $connection->executeQuery($qb)->fetchAll(\PDO::FETCH_ASSOC);
 
-        // Public field cannot be managed with internal adapter.
-        $fields = [];
-        $fields['item_set_id'] = [
-            'name' => 'item_set_id',
-            'label' => 'Item set',
-        ];
-        $fields['resource_class_id'] = [
-            'name' => 'resource_class_id',
-            'label' => 'Resource class',
-        ];
-        $fields['resource_template_id'] = [
-            'name' => 'resource_template_id',
-            'label' => 'Resource template',
-        ];
-        // TODO Manage query on owner (only one in core).
-        /*
-        $fields['owner_id'] = [
-            'name' => 'owner_id',
-            'label' => 'Owner',
-        ];
-        */
         foreach ($result as $field) {
             $fields[$field['name']] = $field;
         }

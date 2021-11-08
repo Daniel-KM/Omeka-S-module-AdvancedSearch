@@ -67,3 +67,34 @@ SQL;
     $searchConfigPaths = array_column($searchConfigPaths, 'path', 'id');
     $settings->set('advancedsearch_all_configs', $searchConfigPaths);
 }
+
+if (version_compare($oldVersion, '3.3.6.7', '<')) {
+    $sql = <<<SQL
+UPDATE `search_config`
+SET
+    `settings` =
+        REPLACE(
+        REPLACE(
+        REPLACE(
+        REPLACE(
+        REPLACE(
+            `settings`,
+        '"item_set_id"',
+        '"item_set_id_field"'
+        ),
+        '"items_set_id"',
+        '"item_set_id_field"'
+        ),
+        '"items_set_id_field"',
+        '"item_set_id_field"'
+        ),
+        '"resource_class_id"',
+        '"resource_class_id_field"'
+        ),
+        '"resource_template_id"',
+        '"resource_template_id_field"'
+        )
+    ;
+SQL;
+    $connection->executeStatement($sql);
+}

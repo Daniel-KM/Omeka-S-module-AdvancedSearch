@@ -127,7 +127,6 @@ class AbstractFacet extends AbstractHelper
                     : 'Public';
 
             case 'id':
-            case 'resource':
                 $data = ['id' => $value];
                 // The site id is required in public.
                 if ($this->siteId) {

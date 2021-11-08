@@ -173,8 +173,8 @@ class MainSearchForm extends Form
                     case 'resource_type':
                         $element = $this->searchResourceType($filter);
                         break;
-                    case 'resource':
-                        $element = $this->searchResource($filter);
+                    case 'id':
+                        $element = $this->searchId($filter);
                         break;
                     case 'is_public':
                         $element = $this->searchIsPublic($filter);
@@ -467,20 +467,20 @@ class MainSearchForm extends Form
         return $element;
     }
 
-    protected function searchResource(array $filter): ?ElementInterface
+    protected function searchId(array $filter): ?ElementInterface
     {
-        if ($filter['field'] === 'resource'
-            && empty($this->formSettings['resource_fields']['resource'])
+        if ($filter['field'] === 'id'
+            && empty($this->formSettings['resource_fields']['id'])
         ) {
             return null;
         }
 
         $element = $filter['type'] === 'MultiText'
-            ? new AdvancedSearchElement\MultiText('resource')
-            : new Element\Text('resource');
+            ? new AdvancedSearchElement\MultiText('id')
+            : new Element\Text('id');
         $element
             ->setAttributes([
-                'id' => 'search-resource',
+                'id' => 'search-id',
                 'data-field-type', $filter['type'] === 'MultiText' ? 'multitext' : 'text',
             ])
             ->setOptions([

@@ -634,7 +634,6 @@ SQL;
                     continue 2;
 
                 case 'id':
-                case 'resource':
                     $this->args['id'] = array_filter(array_map('intval', $flatArray($values)));
                     continue 2;
 

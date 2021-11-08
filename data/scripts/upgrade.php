@@ -91,7 +91,7 @@ SET
         '"resource_type"'
         ),
         '"resource_field"',
-        '"resource"'
+        '"id"'
         ),
         '"is_public_field"',
         '"is_public"'

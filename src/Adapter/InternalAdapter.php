@@ -185,8 +185,8 @@ class InternalAdapter extends AbstractAdapter
                 'from' => 'resource_type',
                 'to' => 'resource_type',
             ],
-              'resource' => [
-                'name' => 'resource',
+              'id' => [
+                'name' => 'id',
                 'label' => 'Resource id', // @translate
                 'from' => 'id',
                 'to' => 'id',

@@ -903,8 +903,8 @@ class Module extends AbstractModule
                     break;
 
                 // Resource id.
-                case 'resource':
-                    $filterLabel = $translate('Resource'); // @translate
+                case 'id':
+                    $filterLabel = $translate('Resource id'); // @translate
                     foreach (array_filter(array_map('intval', $flatArray($value))) as $subKey => $subValue) {
                         $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $subValue;
                     }

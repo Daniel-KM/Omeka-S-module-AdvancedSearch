@@ -120,7 +120,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                     $query->setResources($value);
                     break;
 
-                case 'resource':
+                case 'id':
                     $valueArray = $flatArray($value);
                     $query->addFilter('id', $valueArray);
                     continue 2;

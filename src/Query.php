@@ -149,9 +149,18 @@ class Query implements \JsonSerializable
     /**
      * @param string[] $resources The types are generally "items" and "item_sets".
      */
-    public function setResources($resources): self
+    public function setResources(array $resources): self
     {
         $this->resources = $resources;
+        return $this;
+    }
+
+    /**
+     * @param string $resources Generally "items" or "item_sets".
+     */
+    public function addResource(string $resource): self
+    {
+        $this->resources[] = $resource;
         return $this;
     }
 

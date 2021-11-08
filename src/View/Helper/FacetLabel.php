@@ -25,7 +25,7 @@ class FacetLabel extends AbstractHelper
         return $this->view->searchConfig;
     }
 
-    protected function getAvailableFacetFields(): string
+    protected function getAvailableFacetFields(): array
     {
         static $availableFacetFields;
         if (!isset($availableFacetFields)) {

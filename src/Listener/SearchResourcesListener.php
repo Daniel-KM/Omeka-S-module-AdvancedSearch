@@ -296,9 +296,9 @@ class SearchResourcesListener
                 $queryType = $reciprocalQueryTypes[$queryType];
             }
 
-            $propertyId = $queryRow['property'];
-            if ($propertyId) {
-                $propertyId = $this->getPropertyId($propertyId);
+            $propertyIds = $queryRow['property'];
+            if ($propertyIds) {
+                $propertyIds = $this->getPropertyIds(is_array($propertyIds) ? $propertyIds : [$propertyIds]);
             }
             $excludePropertyIds = $queryRow['property'] || empty($queryRow['except']) ? false : $queryRow['except'];
 
@@ -471,9 +471,13 @@ class SearchResourcesListener
 
             $joinConditions = [];
             // Narrow to specific property, if one is selected.
-            // The check is done against the requested property, like in core.
+            // The check is done against the requested property, like in core:
+            // when user request is invalid, return an empty result.
             if ($queryRow['property']) {
-                $joinConditions[] = $expr->eq("$valuesAlias.property", (int) $propertyId);
+                $joinConditions[] = count($propertyIds) < 2
+                    // There may be 0 or 1 property id.
+                    ? $expr->eq("$valuesAlias.property", (int) reset($propertyIds))
+                    : $expr->in("$valuesAlias.property", $propertyIds);
             } elseif ($excludePropertyIds) {
                 $excludePropertyIds = $this->getPropertyIds(is_array($excludePropertyIds) ? $excludePropertyIds : [$excludePropertyIds]);
                 // Use standard query if nothing to exclude, else limit search.
@@ -485,7 +489,7 @@ class SearchResourcesListener
                 }
             }
 
-            // Avoid to get results with an incorrect query.
+            // Avoid to get results when the query is incorrect.
             if ($incorrectValue) {
                 $where = $expr->eq('omeka_root.id', 0);
                 break;

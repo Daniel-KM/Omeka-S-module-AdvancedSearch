@@ -467,6 +467,7 @@ class SearchConfigController extends AbstractActionController
         $settings['form']['field_joiner'] = (bool) $advanced['field_joiner'];
         $settings['form']['field_joiner_not'] = (bool) ($advanced['field_joiner_not'] ?? false);
         $settings['form']['field_operator'] = (bool) $advanced['field_operator'];
+        $settings['form']['field_operators'] = $advanced['field_operators'] ?? [];
         $settings['form']['filters'][$keyAdvancedFilter] = [
             'field' => 'advanced',
             'label' => 'Filters',
@@ -549,7 +550,8 @@ class SearchConfigController extends AbstractActionController
                     $params['form']['max_number'],
                     $params['form']['field_joiner'],
                     $params['form']['field_joiner_not'],
-                    $params['form']['field_operator']
+                    $params['form']['field_operator'],
+                    $params['form']['field_operators']
                 );
                 return $params;
             }
@@ -566,12 +568,14 @@ class SearchConfigController extends AbstractActionController
         $params['form']['filters'][$keyAdvanced]['field_joiner'] = $params['form']['field_joiner'] ?? false;
         $params['form']['filters'][$keyAdvanced]['field_joiner_not'] = $params['form']['field_joiner_not'] ?? false;
         $params['form']['filters'][$keyAdvanced]['field_operator'] = $params['form']['field_operator'] ?? false;
+        $params['form']['filters'][$keyAdvanced]['field_operators'] = $params['form']['field_operators'] ?? [];
         unset(
             $params['form']['advanced'],
             $params['form']['max_number'],
             $params['form']['field_joiner'],
             $params['form']['field_joiner_not'],
-            $params['form']['field_operator']
+            $params['form']['field_operator'],
+            $params['form']['field_operators']
         );
 
         // TODO Store the final form as an array to be created via factory. https://docs.laminas.dev/laminas-form/v3/form-creation/creation-via-factory/

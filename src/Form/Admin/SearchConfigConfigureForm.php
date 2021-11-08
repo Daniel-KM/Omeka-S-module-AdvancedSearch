@@ -369,7 +369,6 @@ advanced = Filters = Advanced',
                     'id' => 'field_joiner_not',
                 ],
             ])
-            // TODO List value type (rename/remove).
             ->add([
                 'name' => 'field_operator',
                 'type' => Element\Checkbox::class,
@@ -378,6 +377,33 @@ advanced = Filters = Advanced',
                 ],
                 'attributes' => [
                     'id' => 'field_operator',
+                ],
+            ])
+            ->add([
+                'name' => 'field_operators',
+                'type' => OmekaElement\ArrayTextarea::class,
+                'options' => [
+                    'label' => 'List of operators', // @translate
+                    'info' => 'The default list is: eq, neq, in, nin, sw, nsw, ew, new, ex, nex, res, nres. Negative operators are removed when the joiner "not" is used. The default operators are used when empty.', // @translate
+                    'as_key_value' => true,
+                    'key_value_separator' => '=',
+                ],
+                'attributes' => [
+                    'id' => 'field_operators',
+                    'placeholder' => 'eq = is exactly
+neq = is not exactly
+in = contains
+nin = does not contain
+sw = starts with
+nsw = does not start with
+ew = ends with
+new = does not end with
+ex = has any value
+nex = has no values
+res = is resource with ID
+nres = is not resource with ID
+',
+                    'rows' => 12,
                 ],
             ])
         ;

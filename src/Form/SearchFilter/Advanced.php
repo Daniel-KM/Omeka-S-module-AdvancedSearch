@@ -92,7 +92,7 @@ class Advanced extends Fieldset
 
         $operator = (bool) $this->getOption('field_operator');
         if ($operator) {
-            $operators = [
+            $operators = $this->getOption('field_operators') ?: [
                 'eq' => 'is exactly', // @translate
                 'neq' => 'is not exactly', // @translate
                 'in' => 'contains', // @translate

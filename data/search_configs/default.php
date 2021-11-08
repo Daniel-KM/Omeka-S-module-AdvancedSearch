@@ -81,6 +81,14 @@ return [
                 'field_joiner' => true,
                 'field_joiner_not' => true,
                 'field_operator' => true,
+                'field_operators' => [
+                    'eq' => 'is exactly', // @translate
+                    'in' => 'contains', // @translate
+                    'sw' => 'starts with', // @translate
+                    'ew' => 'ends with', // @translate
+                    'ex' => 'has any value', // @translate
+                    'res' => 'is resource with ID', // @translate
+                ],
             ],
             [
                 'field' => 'dcterms:date',

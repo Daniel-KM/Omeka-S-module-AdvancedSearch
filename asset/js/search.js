@@ -33,7 +33,8 @@ var Search = (function() {
         var resourceLists = document.querySelectorAll('.search-results .resource-list');
         for (var i = 0; i < resourceLists.length; i++) {
             var resourceItem = resourceLists[i];
-            resourceItem.className = 'resource-list ' + viewType;
+            resourceItem.className = resourceItem.className.replace(' grid', '').replace(' list', '')
+                + ' ' + viewType;
         }
         localStorage.setItem('search_view_type', viewType);
     };

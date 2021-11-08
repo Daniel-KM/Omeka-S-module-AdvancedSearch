@@ -76,6 +76,15 @@ class SearchRequestToResponse extends AbstractPlugin
 
         $searchFormSettings = $searchConfigSettings['form'] ?? [];
 
+        $searchEngine = $searchConfig->engine();
+        $searchAdapter = $searchEngine ? $searchEngine->adapter() : null;
+        if ($searchAdapter) {
+            $availableFields = $searchAdapter->setSearchEngine($searchEngine)->getAvailableFields();
+            $searchFormSettings['available_fields'] = array_combine(array_keys($availableFields), array_keys($availableFields));
+        } else {
+            $searchFormSettings['available_fields'] = [];
+        }
+
         // TODO Copy the option for per page in the search config form (keeping the default).
         // TODO Add a max per_page.
         if ($site) {
@@ -87,9 +96,6 @@ class SearchRequestToResponse extends AbstractPlugin
             $settings = $plugins->get('settings')();
             $perPage = (int) $settings->get('pagination_per_page', Paginator::PER_PAGE);
         }
-
-        // Fix to be removed.
-        $searchFormSettings['resource_fields'] = $searchConfigSettings['resource_fields'] ?? [];
         $searchFormSettings['search']['per_page'] = $perPage ?: Paginator::PER_PAGE;
 
         /** @var \AdvancedSearch\Query $query */

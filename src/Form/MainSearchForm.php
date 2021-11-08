@@ -109,6 +109,9 @@ class MainSearchForm extends Form
         $searchConfig = $this->getOption('search_config');
         $this->formSettings = $searchConfig ? $searchConfig->settings() : [];
 
+        // Check specific fields against all available fields.
+        $availableFields = $this->getAvailableFields();
+
         // The main query is always the first element and submit the last one.
         // TODO Allow to order and to skip "q" (include it as a standard filter).
 
@@ -167,6 +170,9 @@ class MainSearchForm extends Form
             // TODO In fact, they are standard field with autosuggestion, so it will be fixed when autosuggestion (or short list) will be added.
             $isSpecialField = substr($filter['type'], 0, 5) === 'Omeka';
             if ($isSpecialField) {
+                if (!isset($availableFields[$field])) {
+                    continue;
+                }
                 $filter['type'] = trim(substr($filter['type'], 5), '/');
                 switch ($field) {
                     case 'resource_name':
@@ -438,12 +444,6 @@ class MainSearchForm extends Form
      */
     protected function searchResourceType(array $filter): ?ElementInterface
     {
-        if ($filter['field'] === 'resource_type'
-            && empty($this->formSettings['resource_fields']['resource_type'])
-        ) {
-            return null;
-        }
-
         $element = $filter['type'] === 'MultiCheckbox'
             ? AdvancedSearchElement\OptionalMultiCheckbox('resource_type')
             : AdvancedSearchElement\OptionalSelect('resource_type');
@@ -469,12 +469,6 @@ class MainSearchForm extends Form
 
     protected function searchId(array $filter): ?ElementInterface
     {
-        if ($filter['field'] === 'id'
-            && empty($this->formSettings['resource_fields']['id'])
-        ) {
-            return null;
-        }
-
         $element = $filter['type'] === 'MultiText'
             ? new AdvancedSearchElement\MultiText('id')
             : new Element\Text('id');
@@ -493,12 +487,6 @@ class MainSearchForm extends Form
 
     protected function searchIsPublic(array $filter): ?ElementInterface
     {
-        if ($filter['field'] === 'is_public'
-            && empty($this->formSettings['resource_fields']['is_public'])
-        ) {
-            return null;
-        }
-
         $element = new Element\Checkbox('is_public');
         $element
             ->setAttributes([
@@ -515,12 +503,6 @@ class MainSearchForm extends Form
 
     protected function searchSite(array $filter): ?ElementInterface
     {
-        if ($filter['field'] === 'site_id'
-            && empty($this->formSettings['resource_fields']['site_id'])
-        ) {
-            return null;
-        }
-
         $fieldset = new Fieldset('site');
         $fieldset
             ->setAttributes([
@@ -552,12 +534,6 @@ class MainSearchForm extends Form
 
     protected function searchOwner(array $filter): ?ElementInterface
     {
-        if ($filter['field'] === 'owner_id'
-            && empty($this->formSettings['resource_fields']['owner_id'])
-        ) {
-            return null;
-        }
-
         $fieldset = new Fieldset('owner');
         $fieldset
             ->setAttributes([
@@ -589,12 +565,6 @@ class MainSearchForm extends Form
 
     protected function searchResourceClass(array $filter): ?ElementInterface
     {
-        if ($filter['field'] === 'resource_class_id'
-            && empty($this->formSettings['resource_fields']['resource_class_id'])
-        ) {
-            return null;
-        }
-
         // For an unknown reason, the ResourceClassSelect can not be added
         // directly to a fieldset (factory is not used).
 
@@ -665,12 +635,6 @@ class MainSearchForm extends Form
 
     protected function searchResourceTemplate(array $filter): ?ElementInterface
     {
-        if ($filter['field'] === 'resource_template_id'
-            && empty($this->formSettings['resource_fields']['resource_template_id'])
-        ) {
-            return null;
-        }
-
         // For an unknown reason, the ResourceTemplateSelect can not be added
         // directly to a fieldset (factory is not used).
 
@@ -738,12 +702,6 @@ class MainSearchForm extends Form
 
     protected function searchItemSet(array $filter): ?ElementInterface
     {
-        if ($filter['field'] === 'item_set_id'
-            && empty($this->formSettings['resource_fields']['item_set_id'])
-        ) {
-            return null;
-        }
-
         $fieldset = new Fieldset('item_set');
         $fieldset
             ->setAttributes([
@@ -902,6 +860,24 @@ class MainSearchForm extends Form
     {
         $select = $this->formElementManager->get(\Omeka\Form\Element\UserSelect::class, []);
         return $select->getValueOptions();
+    }
+
+    protected function getAvailableFields(): array
+    {
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
+        $searchConfig = $this->getOption('search_config');
+        $searchEngine = $searchConfig->engine();
+        $searchAdapter = $searchEngine->adapter();
+        if (empty($searchAdapter)) {
+            return [];
+        }
+
+        $options = [];
+        $fields = $searchAdapter->setSearchEngine($searchEngine)->getAvailableFields();
+        foreach ($fields as $name => $field) {
+            $options[$name] = $field['label'] ?? $name;
+        }
+        return $options;
     }
 
     public function setBasePath(string $basePath): Form

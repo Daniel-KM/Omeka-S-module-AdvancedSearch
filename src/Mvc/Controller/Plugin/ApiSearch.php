@@ -283,7 +283,14 @@ class ApiSearch extends AbstractPlugin
         ];
         $searchFormSettings['resource'] = $resource;
         // Fix to be removed.
-        $searchFormSettings['resource_fields'] = $searchConfigSettings['resource_fields'] ?? [];
+        $searchEngine = $searchConfig->engine();
+        $searchAdapter = $searchEngine ? $searchEngine->adapter() : null;
+        if ($searchAdapter) {
+            $availableFields = $searchAdapter->setSearchEngine($searchEngine)->getAvailableFields();
+            $searchFormSettings['available_fields'] = array_combine(array_keys($availableFields), array_keys($availableFields));
+        } else {
+            $searchFormSettings['available_fields'] = [];
+        }
         $searchQuery = $this->apiFormAdapter->toQuery($query, $searchFormSettings);
         $searchQuery->setResources([$resource]);
 

@@ -437,7 +437,6 @@ class SearchConfigController extends AbstractActionController
     protected function prepareDataForForm(array $settings): array
     {
         // Ok search.
-        // Ok resource_fields.
         // Ok autosuggest.
         // Ok sort.
         // Ok facet.

@@ -27,7 +27,8 @@ class InternalConfigFieldset extends Fieldset
                 'type' => AdvancedSearchElement\DataTextarea::class,
                 'options' => [
                     'label' => 'Multi-fields (filters and facets)', // @translate
-                    'info' => 'List of fields that refers to multiple properties, formatted "name = label = property, property… The name must not be a property term or a reserved keyword.', // @translate
+                    'info' => 'List of fields that refers to multiple properties, formatted "name = label", then the list of properties and an empty line. The name must not be a property term or a reserved keyword.', // @translate
+                    'documentation' => 'https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch/-/blob/master/data/search_engines/internal.php',
                     'as_key_value' => true,
                     'key_value_separator' => '=',
                     'data_keys' => [
@@ -37,13 +38,24 @@ class InternalConfigFieldset extends Fieldset
                     ],
                     'data_array_keys' => [
                         'fields' => ',',
-                    ]
+                    ],
+                    'data_text_mode' => 'last_is_list',
+
                 ],
                 'attributes' => [
                     'id' => 'multifields',
-                    'placeholder' => 'author = Author = dcterms:creator, dcterms:contributor
-title = Title = dcterms:title, dcterms:alternative
-date = Date = dcterms:date, dcterms:created, dcterms:issued
+                    'placeholder' => 'author = Author
+dcterms:creator
+dcterms:contributor
+
+title = Title
+dcterms:title
+dcterms:alternative
+
+date = Date
+dcterms:date
+dcterms:created
+dcterms:issued
 ',
                     'rows' => 12,
                 ],

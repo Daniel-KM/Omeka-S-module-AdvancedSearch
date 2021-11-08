@@ -1524,7 +1524,7 @@ VALUES
 ($searchEngineId, 'Internal suggester (sql)', ?, NOW());
 SQL;
             $suggesterSettings = [
-                'direct' => true,
+                'direct' => false,
                 'mode_index' => 'start',
                 'mode_search' => 'start',
                 'limit' => 25,
@@ -1537,7 +1537,7 @@ SQL;
             ]);
             // $suggesterId = $connection->fetchColumn($sqlSuggesterId);
             $message = new Message(
-                'The internal suggester (sql) is available. Configure it in the %ssearch manager%s.', // @translate
+                'The internal suggester (sql) will be available after indexation. Configure it in the %ssearch manager%s.', // @translate
                 // Don't use the url helper, the route is not available during install.
                 sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager'),
                 '</a>'
@@ -1573,7 +1573,7 @@ SQL;
             $message = new Message(
                 'The default search page is available. Configure it in the %ssearch manager%s, in the main settings (for admin) and in site settings (for public).', // @translate
                 // Don't use the url helper, the route is not available during install.
-                sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager'),
+                sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager/suggester/1/edit'),
                 '</a>'
             );
             $message->setEscapeHtml(false);

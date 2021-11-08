@@ -43,6 +43,7 @@ return [
             'hiddenInputsFromFilteredQuery' => View\Helper\HiddenInputsFromFilteredQuery::class,
             'searchForm' => View\Helper\SearchForm::class,
             'searchingForm' => View\Helper\SearchingForm::class,
+            'searchFilters' => View\Helper\SearchFilters::class,
             'searchingUrl' => View\Helper\SearchingUrl::class,
             'searchSortSelector' => View\Helper\SearchSortSelector::class,
         ],

@@ -847,7 +847,7 @@ nres = is not resource with ID
         }
 
         $options = [];
-        $fields = $searchAdapter->getAvailableFields($searchEngine);
+        $fields = $searchAdapter->setSearchEngine($searchEngine)->getAvailableFields();
         foreach ($fields as $name => $field) {
             $options[$name] = $field['label'] ?? $name;
         }
@@ -865,7 +865,7 @@ nres = is not resource with ID
         }
 
         $options = [];
-        $fields = $searchAdapter->getAvailableSortFields($searchEngine);
+        $fields = $searchAdapter->setSearchEngine($searchEngine)->getAvailableSortFields();
         foreach ($fields as $name => $field) {
             $options[$name] = $field['label'] ?? $name;
         }
@@ -883,7 +883,7 @@ nres = is not resource with ID
         }
 
         $options = [];
-        $fields = $searchAdapter->getAvailableFacetFields($searchEngine);
+        $fields = $searchAdapter->setSearchEngine($searchEngine)->getAvailableFacetFields();
         foreach ($fields as $name => $field) {
             $options[$name] = $field['label'] ?? $name;
         }

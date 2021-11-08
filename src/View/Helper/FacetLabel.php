@@ -29,9 +29,16 @@ class FacetLabel extends AbstractHelper
     {
         static $availableFacetFields;
         if (!isset($availableFacetFields)) {
-            $engine = $this->getSearchConfig()->engine();
-            $availableFacetFields = $engine->adapter()
-                ->getAvailableFacetFields($engine);
+            $availableFacetFields = [];
+            $searchEngine = $this->getSearchConfig()->engine();
+            if ($searchEngine) {
+                $adapter = $searchEngine->adapter();
+                if ($adapter) {
+                    $availableFacetFields = $adapter
+                        ->setSearchEngine($searchEngine)
+                        ->getAvailableFacetFields();
+                }
+            }
         }
         return $availableFacetFields;
     }

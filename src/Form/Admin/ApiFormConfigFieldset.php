@@ -345,7 +345,7 @@ class ApiFormConfigFieldset extends Fieldset
         if (empty($searchAdapter)) {
             return [];
         }
-        $fields = $searchAdapter->getAvailableFields($searchEngine);
+        $fields = $searchAdapter->setSearchEngine($searchEngine)->getAvailableFields();
         foreach ($fields as $name => $field) {
             $options[$name] = $field['label'] ?? $name;
         }
@@ -361,7 +361,7 @@ class ApiFormConfigFieldset extends Fieldset
         if (empty($searchAdapter)) {
             return [];
         }
-        $fields = $searchAdapter->getAvailableSortFields($searchEngine);
+        $fields = $searchAdapter->setSearchEngine($searchEngine)->getAvailableSortFields();
         foreach ($fields as $name => $field) {
             $options[$name] = $field['label'] ?? $name;
         }

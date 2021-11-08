@@ -26,7 +26,7 @@ class InternalAdapter extends AbstractAdapter
         return \AdvancedSearch\Querier\InternalQuerier::class;
     }
 
-    public function getAvailableFields(SearchEngineRepresentation $engine): array
+    public function getAvailableFields(): array
     {
         static $availableFields;
 
@@ -35,7 +35,9 @@ class InternalAdapter extends AbstractAdapter
         }
 
         // Display specific fields first.
-        $fields = $engine->settingAdapter('multifields', []);
+        $fields = $this->searchEngine
+            ? $this->searchEngine->settingAdapter('multifields', [])
+            : [];
 
         // Special fields of Omeka.
         // The mapping is set by default.
@@ -85,7 +87,7 @@ class InternalAdapter extends AbstractAdapter
         return $availableFields = $fields;
     }
 
-    public function getAvailableSortFields(SearchEngineRepresentation $engine): array
+    public function getAvailableSortFields(): array
     {
         static $sortFields;
 
@@ -93,7 +95,7 @@ class InternalAdapter extends AbstractAdapter
             return $sortFields;
         }
 
-        $availableFields = $this->getAvailableFields($engine);
+        $availableFields = $this->getAvailableFields();
 
         // There is no default score sort.
         $sortFields = [];
@@ -120,12 +122,12 @@ class InternalAdapter extends AbstractAdapter
         return $sortFields;
     }
 
-    public function getAvailableFacetFields(SearchEngineRepresentation $engine): array
+    public function getAvailableFacetFields(): array
     {
-        return $this->getAvailableFields($engine);
+        return $this->getAvailableFields();
     }
 
-    public function getAvailableFieldsForSelect(SearchEngineRepresentation $engine): array
+    public function getAvailableFieldsForSelect(): array
     {
         static $availableFields;
 
@@ -133,10 +135,12 @@ class InternalAdapter extends AbstractAdapter
             return $availableFields;
         }
 
-        // Display specific fields first.
         $fields = [];
 
-        $multifields = $engine->settingAdapter('multifields', []);
+        // Display specific fields first.
+        $multifields = $this->searchEngine
+            ? $this->searchEngine->settingAdapter('multifields', [])
+            : [];
         if ($multifields) {
             $fields['multifieds'] = [
                 'label' => 'Multi-fields', // @translate

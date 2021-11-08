@@ -236,7 +236,7 @@ class SearchRequestToResponse extends AbstractPlugin
                 // @see \Omeka\Api\Adapter\AbstractEntityAdapter::search().
                 'sort_by' => null,
                 'sort_order' => null,
-                // Used by Search.
+                // Used by Advanced Search.
                 'resource_type' => null,
                 'sort' => null,
             ]
@@ -279,7 +279,7 @@ class SearchRequestToResponse extends AbstractPlugin
         if (empty($engineAdapter)) {
             return [];
         }
-        $availableSortFields = $engineAdapter->getAvailableSortFields($this->searchEngine);
+        $availableSortFields = $engineAdapter->setSearchEngine($this->searchEngine)->getAvailableSortFields();
         return array_intersect_key($sortFieldsSettings, $availableSortFields);
     }
 }

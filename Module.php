@@ -855,7 +855,9 @@ class Module extends AbstractModule
         $searchConfig = $query['__searchConfig'];
         $searchEngine = $searchConfig->engine();
         $searchAdapter = $searchEngine->adapter();
-        $availableFields = empty($searchAdapter) ? [] : $searchAdapter->getAvailableFields($searchEngine);
+        $availableFields = empty($searchAdapter)
+            ? []
+            : $searchAdapter->setSearchEngine($searchEngine)->getAvailableFields();
         $searchFormSettings = $searchConfig->setting('form') ?: [];
 
         // Manage all fields, included those not in the form in order to support

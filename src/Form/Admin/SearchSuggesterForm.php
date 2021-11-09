@@ -185,7 +185,7 @@ class SearchSuggesterForm extends Form
                 ],
             ])
             ->add([
-                'name' => 'exclude_fields',
+                'name' => 'excluded_fields',
                 'type' => AdvancedSearchElement\OptionalSelect::class,
                 'options' => [
                     'label' => 'Exclude fields', // @translate

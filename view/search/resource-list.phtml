@@ -22,7 +22,7 @@ $thumbnailHelper = $plugins->get('thumbnail');
 
 $setting = $plugins->get($site ? 'siteSetting' : 'setting');
 
-$filterLocale = (bool) $siteSetting('filter_locale_values');
+$filterLocale = (bool) $setting('filter_locale_values');
 $siteLang = $plugins->get('lang')();
 $lang = $filterLocale ? $siteLang : null;
 $langValue = $filterLocale ? [$siteLang, ''] : null;

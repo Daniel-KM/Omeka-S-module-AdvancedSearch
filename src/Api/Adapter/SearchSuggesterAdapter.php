@@ -45,7 +45,7 @@ class SearchSuggesterAdapter extends AbstractEntityAdapter
                 $searchEngineAlias,
                 \Doctrine\ORM\Query\Expr\Join::WITH,
                 $expr->andX(
-                    $expr->eq($searchEngineAlias . '.id', 'omeka_root.index'),
+                    $expr->eq($searchEngineAlias . '.id', 'omeka_root.engine'),
                     $expr->in(
                         $searchEngineAlias . '.id',
                         $this->createNamedParameter($qb, $query['engine_id'])

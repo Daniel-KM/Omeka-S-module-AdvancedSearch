@@ -188,8 +188,8 @@ class SearchConfigConfigureForm extends Form
                 'attributes' => [
                     'id' => 'filters',
                     // field (term) = label = type = options
-                    'placeholder' => 'item_set_id_field = Collection = Select
-resource_class_id_field = Class = SelectFlat
+                    'placeholder' => 'item_set_id = Collection = Select
+resource_class_id = Class = SelectFlat
 dcterms:title = Title = Text
 dcterms:date = Date = DateRange
 dcterms:subject = Subject = MultiCheckbox = alpha | beta | gamma

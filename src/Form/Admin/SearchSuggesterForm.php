@@ -230,7 +230,7 @@ class SearchSuggesterForm extends Form
             return [];
         }
 
-        $searchAdapter = $engine->adapter();
+        $searchAdapter = $searchEngine->adapter();
         return empty($searchAdapter)
             ? []
             : $searchAdapter->setSearchEngine($searchEngine)->getAvailableFieldsForSelect();

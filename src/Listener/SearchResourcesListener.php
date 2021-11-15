@@ -217,6 +217,8 @@ class SearchResourcesListener
      *   - new: does not end with
      *   - res: has resource (core)
      *   - nres: has no resource (core)
+     *   - dtp: has data type
+     *   - ndtp: does not have data type
      *   For date time only for now (a check is done to have a meaningful answer):
      *   TODO Remove the check for valid date time? Add another key (before/after)?
      *   Of course, it's better to use Numeric Data Types.
@@ -259,6 +261,8 @@ class SearchResourcesListener
             'new' => 'ew',
             'res' => 'nres',
             'nres' => 'res',
+            'dtp' => 'ndtp',
+            'ndtp' => 'dtp',
             'gt' => 'lte',
             'gte' => 'lt',
             'lte' => 'gt',
@@ -419,6 +423,20 @@ class SearchResourcesListener
                     // no break.
                 case 'ex':
                     $predicateExpr = $expr->isNotNull("$valuesAlias.id");
+                    break;
+
+                case 'dtp':
+                    $positive = false;
+                    // no break.
+                case 'ndtp':
+                    if (is_array($value)) {
+                        $dataTypeAlias = $this->adapter->createAlias();
+                        $qb->setParameter($dataTypeAlias, $value, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
+                        $predicateExpr = $expr->in("$valuesAlias.type", $dataTypeAlias);
+                    } else {
+                        $dataTypeAlias = $this->adapter->createNamedParameter($qb, $value);
+                        $predicateExpr = $expr->eq("$valuesAlias.type", $dataTypeAlias);
+                    }
                     break;
 
                 // TODO Manage uri and resources with gt, gte, lte, lt (it has a meaning at least for resource ids, but separate).

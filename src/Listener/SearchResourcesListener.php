@@ -202,6 +202,7 @@ class SearchResourcesListener
      * - property[{index}][property]: property ID
      * - property[{index}][text]: search text
      * - property[{index}][type]: search type
+     * - property[{index}][datatype]: filter on data type(s)
      *   - eq: is exactly (core)
      *   - neq: is not exactly (core)
      *   - in: contains (core)
@@ -276,6 +277,7 @@ class SearchResourcesListener
             $queryType = $queryRow['type'];
             $joiner = $queryRow['joiner'] ?? '';
             $value = $queryRow['text'] ?? '';
+            $dataType = $queryRow['datatype'] ?? '';
 
             if (!isset($reciprocalQueryTypes[$queryType])) {
                 continue;
@@ -493,6 +495,23 @@ class SearchResourcesListener
             if ($incorrectValue) {
                 $where = $expr->eq('omeka_root.id', 0);
                 break;
+            }
+
+            if ($dataType) {
+                if (is_array($dataType)) {
+                    $dataTypeAlias = $this->adapter->createAlias();
+                    $qb->setParameter($dataTypeAlias, $dataType, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
+                    $predicateExpr = $expr->andX(
+                        $predicateExpr,
+                        $expr->in("$valuesAlias.type", ':' . $dataTypeAlias)
+                    );
+                } else {
+                    $dataTypeAlias = $this->adapter->createNamedParameter($qb, $dataType);
+                    $predicateExpr = $expr->andX(
+                        $predicateExpr,
+                        $expr->eq("$valuesAlias.type", $dataTypeAlias)
+                    );
+                }
             }
 
             if ($positive) {

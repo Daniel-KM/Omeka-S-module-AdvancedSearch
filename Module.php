@@ -147,46 +147,44 @@ class Module extends AbstractModule
 
         $module = $moduleManager->getModule('AdvancedSearch');
         $version = $module ? $module->getIni('version') : null;
-        if (version_compare($version, '3.3.6.6', '>')) {
-            $messenger->addWarning('The modules Search, Advanced Search Plus, PSL Search Form, Search Solr cannot be upgraded with a version of Advanced Search greater than 3.3.6.6.'); // @translate
-            return;
-        }
-
-        $module = $moduleManager->getModule('AdvancedSearchPlus');
-        if ($module && in_array($module->getState(), [
-            \Omeka\Module\Manager::STATE_ACTIVE,
-            \Omeka\Module\Manager::STATE_NOT_ACTIVE,
-            \Omeka\Module\Manager::STATE_NEEDS_UPGRADE,
-        ])) {
-            try {
-                $filepath = $this->modulePath() . '/data/scripts/upgrade_from_advancedsearchplus.php';
-                require_once $filepath;
-            } catch (\Exception $e) {
-                $message = new Message(
-                    'An error occurred during migration of module "%s". Check the config and uninstall it manually.', // @translate
-                    'AdvancedSearchPlus'
-                );
-                $messenger->addError($message);
+        if (version_compare($version, '3.3.6.6', '<=')) {
+            $module = $moduleManager->getModule('AdvancedSearchPlus');
+            if ($module && in_array($module->getState(), [
+                \Omeka\Module\Manager::STATE_ACTIVE,
+                \Omeka\Module\Manager::STATE_NOT_ACTIVE,
+                \Omeka\Module\Manager::STATE_NEEDS_UPGRADE,
+            ])) {
+                try {
+                    $filepath = $this->modulePath() . '/data/scripts/upgrade_from_advancedsearchplus.php';
+                    require_once $filepath;
+                } catch (\Exception $e) {
+                    $message = new Message(
+                        'An error occurred during migration of module "%s". Check the config and uninstall it manually.', // @translate
+                        'AdvancedSearchPlus'
+                    );
+                    $messenger->addError($message);
+                }
             }
-        }
 
-        $module = $moduleManager->getModule('Search');
-        if ($module && in_array($module->getState(), [
-            \Omeka\Module\Manager::STATE_ACTIVE,
-            \Omeka\Module\Manager::STATE_NOT_ACTIVE,
-            \Omeka\Module\Manager::STATE_NEEDS_UPGRADE,
-        ])) {
-            try {
-                $filepath = $this->modulePath() . '/data/scripts/upgrade_from_search.php';
-                require_once $filepath;
-            } catch (\Exception $e) {
-                $message = new Message(
-                    'An error occurred during migration of module "%s". Check the config and uninstall it manually.', // @translate
-                    'Search'
-                );
-                $messenger->addError($message);
+            $module = $moduleManager->getModule('Search');
+            if ($module && in_array($module->getState(), [
+                \Omeka\Module\Manager::STATE_ACTIVE,
+                \Omeka\Module\Manager::STATE_NOT_ACTIVE,
+                \Omeka\Module\Manager::STATE_NEEDS_UPGRADE,
+            ])) {
+                try {
+                    $filepath = $this->modulePath() . '/data/scripts/upgrade_from_search.php';
+                    require_once $filepath;
+                } catch (\Exception $e) {
+                    $message = new Message(
+                        'An error occurred during migration of module "%s". Check the config and uninstall it manually.', // @translate
+                        'Search'
+                    );
+                    $messenger->addError($message);
+                }
             }
         } else {
+            $messenger->addWarning('The modules Search, Advanced Search Plus, PSL Search Form, Search Solr cannot be upgraded with a version of Advanced Search greater than 3.3.6.6.'); // @translate
             $this->installResources();
         }
 

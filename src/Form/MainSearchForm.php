@@ -170,34 +170,39 @@ class MainSearchForm extends Form
             // TODO In fact, they are standard field with autosuggestion, so it will be fixed when autosuggestion (or short list) will be added.
             $isSpecialField = substr($filter['type'], 0, 5) === 'Omeka';
             if ($isSpecialField) {
-                if (!isset($availableFields[$field])) {
+                if (!isset($availableFields[$field]['from'])) {
                     continue;
                 }
                 $filter['type'] = trim(substr($filter['type'], 5), '/');
-                switch ($field) {
+                switch ($availableFields[$field]['from']) {
                     case 'resource_name':
                     case 'resource_type':
                         $element = $this->searchResourceType($filter);
                         break;
                     case 'id':
+                    case 'o:id':
                         $element = $this->searchId($filter);
                         break;
                     case 'is_public':
                         $element = $this->searchIsPublic($filter);
                         break;
-                    case 'owner_id':
+                    case 'owner/o:id':
                         $element = $this->searchOwner($filter);
                         break;
-                    case 'site_id':
+                    case 'site/o:id':
                         $element = $this->searchSite($filter);
                         break;
-                    case 'resource_class_id':
+                    // The select and module Search Solr use term by default,
+                    // but the internal adapter manages terms automatically.
+                    // TODO Clarify the select for resource class for internal.
+                    case 'resource_class/o:id':
+                    case 'resource_class/o:term':
                         $element = $this->searchResourceClass($filter);
                         break;
-                    case 'resource_template_id':
+                    case 'resource_template/o:id':
                         $element = $this->searchResourceTemplate($filter);
                         break;
-                    case 'item_set_id':
+                    case 'item_set/o:id':
                         $element = $this->searchItemSet($filter);
                         break;
                     default:
@@ -895,13 +900,7 @@ class MainSearchForm extends Form
         if (empty($searchAdapter)) {
             return [];
         }
-
-        $options = [];
-        $fields = $searchAdapter->setSearchEngine($searchEngine)->getAvailableFields();
-        foreach ($fields as $name => $field) {
-            $options[$name] = $field['label'] ?? $name;
-        }
-        return $options;
+        return $searchAdapter->setSearchEngine($searchEngine)->getAvailableFields();
     }
 
     /**

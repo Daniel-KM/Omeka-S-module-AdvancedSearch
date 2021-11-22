@@ -80,11 +80,11 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
                     if (!is_array($value)) {
                         $value = [$value];
                     }
+                    $filterLabel = $translate('Class');
                     foreach ($value as $subKey => $subValue) {
                         if (!is_numeric($subValue)) {
                             continue;
                         }
-                        $filterLabel = $translate('Class');
                         try {
                             $filterValue = $translate($api->read('resource_classes', $subValue)->getContent()->label());
                         } catch (NotFoundException $e) {
@@ -160,11 +160,11 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
                     if (!is_array($value)) {
                         $value = [$value];
                     }
+                    $filterLabel = $translate('Template');
                     foreach ($value as $subKey => $subValue) {
                         if (!is_numeric($subValue)) {
                             continue;
                         }
-                        $filterLabel = $translate('Template');
                         try {
                             $filterValue = $api->read('resource_templates', $subValue)->getContent()->label();
                         } catch (NotFoundException $e) {
@@ -179,11 +179,11 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
                     if (!is_array($value)) {
                         $value = [$value];
                     }
+                    $filterLabel = $translate('Item set');
                     foreach ($value as $subKey => $subValue) {
                         if (!is_numeric($subValue)) {
                             continue;
                         }
-                        $filterLabel = $translate('Item set');
                         try {
                             $filterValue = $api->read('item_sets', $subValue)->getContent()->displayTitle();
                         } catch (NotFoundException $e) {
@@ -206,13 +206,21 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
 
                 // Search site
                 case 'site_id':
-                    $filterLabel = $translate('Site');
-                    try {
-                        $filterValue = $api->read('sites', $value)->getContent()->title();
-                    } catch (NotFoundException $e) {
-                        $filterValue = $translate('Unknown site');
+                    if (!is_array($value)) {
+                        $value = [$value];
                     }
-                    $filters[$filterLabel][$this->urlQuery($key)] = $filterValue;
+                    $filterLabel = $translate('Site');
+                    foreach ($value as $subKey => $subValue) {
+                        if (!is_numeric($subValue)) {
+                            continue;
+                        }
+                        try {
+                            $filterValue = $api->read('sites', ['id' => $subValue])->getContent()->title();
+                        } catch (NotFoundException $e) {
+                            $filterValue = $translate('Unknown site');
+                        }
+                        $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $filterValue;
+                    }
                     break;
 
                 default:

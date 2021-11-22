@@ -536,9 +536,9 @@ class SearchConfigController extends AbstractActionController
                 continue;
             }
             $filterType = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '', $filter['type'] ?? 'Noop'));
-            if (substr($filterType, 0, 5) === 'Omeka') {
+            if (substr($filterType, 0, 5) === 'omeka') {
                 $subFilterType = trim(substr($filterType, 5), '/ ');
-                $params['form']['filters'][$keyFilter]['type'] = trim('Omeka/' . $inputTypes[$subFilterType] ?? ucfirst($subFilterType), '/');
+                $params['form']['filters'][$keyFilter]['type'] = trim('Omeka/' . ($inputTypes[$subFilterType] ?? ucfirst($subFilterType)), '/');
             } else {
                 $params['form']['filters'][$keyFilter]['type'] = $inputTypes[$filterType] ?? ucfirst($filterType);
             }

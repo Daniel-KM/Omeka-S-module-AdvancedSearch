@@ -80,7 +80,28 @@ class SearchRequestToResponse extends AbstractPlugin
         $searchAdapter = $searchEngine ? $searchEngine->adapter() : null;
         if ($searchAdapter) {
             $availableFields = $searchAdapter->setSearchEngine($searchEngine)->getAvailableFields();
-            $searchFormSettings['available_fields'] = array_combine(array_keys($availableFields), array_keys($availableFields));
+            // Include the specific fields to simplify querying with the form.
+            $searchFormSettings['available_fields'] = $availableFields;
+            $specialFieldsToInputFields = [
+                'resource_type' => 'resource_type',
+                'is_public' => 'is_public',
+                'owner/o:id' => 'owner',
+                'site/o:id' => 'site',
+                'resource_class/o:id' => 'class',
+                'resource_template/o:id' => 'template',
+                'item_set/o:id' => 'item_set',
+            ];
+            foreach ($availableFields as $field) {
+                if (!empty($field['from'])
+                    && isset($specialFieldsToInputFields[$field['from']])
+                    && empty($availableFields[$specialFieldsToInputFields[$field['from']]])
+                ) {
+                    $searchFormSettings['available_fields'][$specialFieldsToInputFields[$field['from']]] = [
+                        'name' => $specialFieldsToInputFields[$field['from']],
+                        'to' => $field['name'],
+                    ];
+                }
+            }
         } else {
             $searchFormSettings['available_fields'] = [];
         }

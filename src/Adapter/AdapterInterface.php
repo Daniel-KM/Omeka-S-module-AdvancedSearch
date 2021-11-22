@@ -73,7 +73,9 @@ interface AdapterInterface
      * The available fields are used for filters.
      *
      * @return array Associative array with field name as key and an array with
-     * field name and field label as value.
+     * field name and field label and optionnaly field source (from) and field
+     * destination (to) as value, in particular for main omeka metadata, for
+     * example item_set/o:id / item_set_id.
      */
     public function getAvailableFields(): array;
 

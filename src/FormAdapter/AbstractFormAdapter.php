@@ -128,42 +128,26 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                     $query->addFilter('id', $valueArray);
                     continue 2;
 
+                // Specific fields.
 
                 case 'is_public':
-                    if (is_string($value) && strlen($value)) {
-                        $nameFilter = $avalableFields['available_fields'][$name] ?? 'is_public';
-                        $query->addFilter($nameFilter, (bool) $value);
+                    if (is_string($value)
+                        && strlen($value)
+                        && isset($formSettings['available_fields'][$name]['to'])
+                    ) {
+                        $query->addFilter($formSettings['available_fields'][$name]['to'], (bool) $value);
                     }
                     continue 2;
 
                 case 'site':
-                    $nameFilter = $avalableFields['available_fields'][$name] ?? 'site_id';
-                    $valueArray = $flatArray($value);
-                    $query->addFilter($nameFilter, $valueArray);
-                    continue 2;
-
                 case 'owner':
-                    $nameFilter = $avalableFields['available_fields'][$name] ?? 'owner_id';
-                    $valueArray = $flatArray($value);
-                    $query->addFilter($nameFilter, $valueArray);
-                    continue 2;
-
                 case 'class':
-                    $nameFilter = $avalableFields['available_fields'][$name] ?? 'resource_class_id';
-                    $valueArray = $flatArray($value);
-                    $query->addFilter($nameFilter, $valueArray);
-                    continue 2;
-
                 case 'template':
-                    $nameFilter = $avalableFields['available_fields'][$name] ?? 'resource_template_id';
-                    $valueArray = $flatArray($value);
-                    $query->addFilter($nameFilter, $valueArray);
-                    continue 2;
-
                 case 'item_set':
-                    $nameFilter = $avalableFields['available_fields'][$name] ?? 'item_set_id';
-                    $valueArray = $flatArray($value);
-                    $query->addFilter($nameFilter, $valueArray);
+                    if (isset($formSettings['available_fields'][$name]['to'])) {
+                        $valueArray = $flatArray($value);
+                        $query->addFilter($formSettings['available_fields'][$name]['to'], $valueArray);
+                    }
                     continue 2;
 
                 case 'filter':

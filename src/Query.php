@@ -29,6 +29,9 @@
  */
 namespace AdvancedSearch;
 
+/**
+ * @todo Replace by the solarium query, that manages everything and can be used by mysql too!
+ */
 class Query implements \JsonSerializable
 {
     /**

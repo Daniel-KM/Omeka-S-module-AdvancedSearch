@@ -983,7 +983,7 @@ class Module extends AbstractModule
                         try {
                             $filterValue = $api->read('item_sets', $subValue)->getContent()->displayTitle();
                         } catch (NotFoundException $e) {
-                            $filterValue = $translate('Unknown site');
+                            $filterValue = $translate('Unknown item set');
                         }
                         $urlQuery = $isId ? $this->urlQueryId($key, $subKey) : $this->urlQuery($key, $subKey);
                         $filters[$filterLabel][$urlQuery] = $filterValue;
@@ -1090,7 +1090,9 @@ class Module extends AbstractModule
                     break;
 
                 default:
-                    if (isset($fieldLabels[$key])) {
+                    // Append only fields that are not yet processed somewhere
+                    // else, included searchFilters helper.
+                    if (isset($fieldLabels[$key]) && !isset($filters[$fieldLabels[$key]])) {
                         $filterLabel = $fieldLabels[$key];
                         foreach (array_filter(array_map('trim', array_map('strval', $flatArray($value))), 'strlen') as $subKey => $subValue) {
                             $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $subValue;

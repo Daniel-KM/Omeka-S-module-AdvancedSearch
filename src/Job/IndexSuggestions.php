@@ -755,7 +755,7 @@ SQL;
             $qb = $this->connection->createQueryBuilder();
             $qb
                 ->select(
-                    'CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
+                    'DISTINCT CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
                     'property.id AS id'
                 )
                 ->from('property', 'property')

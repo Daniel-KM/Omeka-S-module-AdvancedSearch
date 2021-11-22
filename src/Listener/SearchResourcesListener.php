@@ -1253,7 +1253,7 @@ class SearchResourcesListener
             $qb = $connection->createQueryBuilder();
             $qb
                 ->select(
-                    'CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
+                    'DISTINCT CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
                     'property.id AS id'
                 )
                 ->from('property', 'property')
@@ -1299,12 +1299,12 @@ class SearchResourcesListener
      */
     protected function prepareResourceClasses(): self
     {
-        if (is_null($this->propertiesByTermsAndIds)) {
+        if (is_null($this->resourceClassesByTermsAndIds)) {
             $connection = $this->adapter->getServiceLocator()->get('Omeka\Connection');
             $qb = $connection->createQueryBuilder();
             $qb
                 ->select(
-                    'CONCAT(vocabulary.prefix, ":", resource_class.local_name) AS term',
+                    'DISTINCT CONCAT(vocabulary.prefix, ":", resource_class.local_name) AS term',
                     'resource_class.id AS id'
                 )
                 ->from('resource_class', 'resource_class')

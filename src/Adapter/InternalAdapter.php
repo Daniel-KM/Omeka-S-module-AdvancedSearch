@@ -50,7 +50,7 @@ class InternalAdapter extends AbstractAdapter
         $qb = $connection->createQueryBuilder();
         $qb
             ->select(
-                'CONCAT(vocabulary.prefix, ":", property.local_name) AS "name"',
+                'DISTINCT CONCAT(vocabulary.prefix, ":", property.local_name) AS "name"',
                 'property.label AS "label"'
             )
             ->from('property', 'property')
@@ -145,7 +145,7 @@ class InternalAdapter extends AbstractAdapter
         $qb = $connection->createQueryBuilder();
         $qb
             ->select(
-                'CONCAT(vocabulary.prefix, ":", property.local_name) AS "name"',
+                'DISTINCT CONCAT(vocabulary.prefix, ":", property.local_name) AS "name"',
                 'property.label AS "label"',
                 'vocabulary.prefix AS "prefix"',
                 'vocabulary.label AS "vocabulary"'

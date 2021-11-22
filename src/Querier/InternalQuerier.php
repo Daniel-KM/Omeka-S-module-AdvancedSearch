@@ -10,8 +10,8 @@ use Omeka\Stdlib\Message;
 class InternalQuerier extends AbstractQuerier
 {
     /**
-     * MariaDB can only use 61 tables in a join and Omeka adds a join for each
-     * property. To manage modules, the number is limited to 50.
+     * MariaDB can only use 61 tables in a join but Omeka adds a join for each
+     * property. So, to manage modules, the number is limited to 50 here.
      */
     const REQUEST_MAX_ARGS = 50;
 

@@ -68,6 +68,7 @@ class SearchResourcesListener
         }
 
         // Process advanced search plus keys.
+        $this->searchSites($qb, $query);
         $this->searchResourceClassTerm($qb, $query);
         $this->searchDateTime($qb, $query);
         $this->buildPropertyQuery($qb, $query);
@@ -162,6 +163,88 @@ class SearchResourcesListener
         }
 
         return $query;
+    }
+
+    /**
+     * Allow to search a resource in multiple sites (with "or").
+     */
+    protected function searchSites(QueryBuilder $qb, array $query): void
+    {
+        if (empty($query['site_id']) || !is_array($query['site_id'])) {
+            return;
+        }
+
+        // The site "0" is kept: no site, as in core adapter.
+        $sites = array_unique(array_map('intval', array_filter($query['site_id'], 'is_numeric')));
+        if (!$sites) {
+            return;
+        }
+
+        $expr = $qb->expr();
+
+        // Adapted from \Omeka\Api\Adapter\ItemAdapter::buildQuery().
+        if ($this->adapter instanceof ItemAdapter) {
+            $siteAlias = $this->adapter->createAlias();
+            $qb->innerJoin(
+                'omeka_root.sites', $siteAlias, 'WITH', $expr->in(
+                    "$siteAlias.id",
+                    $this->adapter->createNamedParameter($qb, $sites)
+                )
+            );
+
+            if (!empty($query['site_attachments_only'])) {
+                $siteBlockAttachmentsAlias = $this->adapter->createAlias();
+                $qb->innerJoin(
+                    'omeka_root.siteBlockAttachments',
+                    $siteBlockAttachmentsAlias
+                );
+                $sitePageBlockAlias = $this->adapter->createAlias();
+                $qb->innerJoin(
+                    "$siteBlockAttachmentsAlias.block",
+                    $sitePageBlockAlias
+                );
+                $sitePageAlias = $this->adapter->createAlias();
+                $qb->innerJoin(
+                    "$sitePageBlockAlias.page",
+                    $sitePageAlias
+                );
+                $siteAlias = $this->adapter->createAlias();
+                $qb->innerJoin(
+                    "$sitePageAlias.site",
+                    $siteAlias
+                );
+                $qb->andWhere($expr->in(
+                    "$siteAlias.id",
+                    $this->adapter->createNamedParameter($qb, $sites))
+                );
+            }
+        }
+
+        // Adapted from \Omeka\Api\Adapter\ItemSetAdapter::buildQuery().
+        elseif ($this->adapter instanceof ItemSetAdapter) {
+            $siteAdapter = $this->adapter->getAdapter('sites');
+            // Though $site isn't used here, this is intended to ensure that the
+            // user cannot perform a query against a private site he doesn't
+            // have access to.
+            // TODO To be optimized.
+            foreach ($sites as &$site) {
+                try {
+                    $siteAdapter->findEntity($site);
+                } catch (Exception\NotFoundException $e) {
+                    $site = 0;
+                }
+            }
+            unset($site);
+            $this->siteItemSetsAlias = $this->adapter->createAlias();
+            $qb->innerJoin(
+                'omeka_root.siteItemSets',
+                $this->siteItemSetsAlias
+            );
+            $qb->andWhere($expr->in(
+                "$this->siteItemSetsAlias.site",
+                $this->adapter->createNamedParameter($qb, $sites))
+            );
+        }
     }
 
     /**

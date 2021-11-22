@@ -44,10 +44,10 @@ $defaultThumbnail = '<img src="' . $assetUrl('thumbnails/default.png', 'Omeka', 
         $resourceType = $resource->resourceName();
         $media = $resource->primaryMedia();
         $thumbnail = $media ? $thumbnailHelper($media, 'medium') : $defaultThumbnail;
-        if ($headingTerm) $heading = $resource->value($headingTerm, ['lang' => $langValue]);
-        if (empty($heading)) $heading = $resource->displayTitle($translate('[Untitled]'), $lang);
-        if ($bodyTerm) $body = $resource->value($bodyTerm, ['lang' => $langValue]);
-        if (empty($body)) $body = $resource->displayDescription(null, $lang);
+        $heading = $headingTerm ? $resource->value($headingTerm, ['lang' => $langValue]) : null;
+        $heading = $heading ? $heading->asHtml() : $escape($resource->displayTitle($translate('[Untitled]'), $lang));
+        $body = $bodyTerm ? $resource->value($bodyTerm, ['lang' => $langValue]) : null;
+        $body = $body ? $body->asHtml() : $escape($resource->displayDescription(null, $lang));
     ?>
 
     <li class="resource <?= $resourceType ?>">
@@ -55,9 +55,9 @@ $defaultThumbnail = '<img src="' . $assetUrl('thumbnails/default.png', 'Omeka', 
             <?= $hyperlink->raw($thumbnail, $resource->url(), ['class' => 'resource-link']) ?>
         </div>
         <div class="resource-metadata">
-            <h4><?= $resource->link($heading) ?></h4>
+            <h4><?= $resource->linkRaw($heading) ?></h4>
             <div class="description">
-                <?= $escape($body) ?>
+                <?= $body ?>
             </div>
         </div>
     </li>

@@ -79,6 +79,12 @@ class SearchingForm extends AbstractBlockLayout
                 $view->logger()->err($message);
                 return '';
             }
+        } else {
+            $message = new \Omeka\Stdlib\Message(
+                'No search page specified for this block.' // @translate
+            );
+            $view->logger()->err($message);
+            return '';
         }
 
         /** @var \Laminas\Form\Form $form */
@@ -93,6 +99,7 @@ class SearchingForm extends AbstractBlockLayout
         $vars = [
             'heading' => $block->dataValue('heading', ''),
             'displayResults' => $displayResults,
+            'searchConfig' => $searchConfig,
             // Name "searchPage" is kept to simplify migration.
             'searchPage' => $searchConfig,
             'site' => $site,

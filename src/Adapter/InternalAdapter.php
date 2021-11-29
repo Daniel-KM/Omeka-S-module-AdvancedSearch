@@ -50,7 +50,7 @@ class InternalAdapter extends AbstractAdapter
         $qb = $connection->createQueryBuilder();
         $qb
             ->select(
-                'DISTINCT CONCAT(vocabulary.prefix, ":", property.local_name) AS "name"',
+                'CONCAT(vocabulary.prefix, ":", property.local_name) AS "name"',
                 'property.label AS "label"'
             )
             ->from('property', 'property')
@@ -58,11 +58,11 @@ class InternalAdapter extends AbstractAdapter
             ->addOrderBy('vocabulary.id', 'ASC')
             ->addOrderBy('property.local_name', 'ASC');
 
-        $result = $connection->executeQuery($qb)->fetchAllAssociative();
-
-        foreach ($result as $field) {
-            $fields[$field['name']] = $field;
+        $result = $connection->executeQuery($qb)->fetchAllKeyValue();
+        foreach ($result as $name => &$field) {
+            $field = ['name' => $name, 'label' => $field];
         }
+        unset($field);
 
         return $availableFields = $fields;
     }
@@ -148,7 +148,11 @@ class InternalAdapter extends AbstractAdapter
                 'DISTINCT CONCAT(vocabulary.prefix, ":", property.local_name) AS "name"',
                 'property.label AS "label"',
                 'vocabulary.prefix AS "prefix"',
-                'vocabulary.label AS "vocabulary"'
+                'vocabulary.label AS "vocabulary"',
+                // Only the previous selects are needed, but some databases
+                // require "order by" or "group by" value to be in the select,
+                // in particular to fix the "only_full_group_by" issue.
+                'property.local_name'
             )
             ->from('property', 'property')
             ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')

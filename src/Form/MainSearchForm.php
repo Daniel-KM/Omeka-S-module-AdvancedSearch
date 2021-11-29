@@ -938,7 +938,7 @@ class MainSearchForm extends Form
             $qb = $connection->createQueryBuilder();
             $qb
                 ->select(
-                    'DISTINCT CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
+                    'CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
                     'property.id AS id'
                 )
                 ->from('property', 'property')

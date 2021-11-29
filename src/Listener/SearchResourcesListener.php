@@ -1264,7 +1264,7 @@ class SearchResourcesListener
             $qb = $connection->createQueryBuilder();
             $qb
                 ->select(
-                    'DISTINCT CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
+                    'CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
                     'property.id AS id'
                 )
                 ->from('property', 'property')
@@ -1315,7 +1315,7 @@ class SearchResourcesListener
             $qb = $connection->createQueryBuilder();
             $qb
                 ->select(
-                    'DISTINCT CONCAT(vocabulary.prefix, ":", resource_class.local_name) AS term',
+                    'CONCAT(vocabulary.prefix, ":", resource_class.local_name) AS term',
                     'resource_class.id AS id'
                 )
                 ->from('resource_class', 'resource_class')

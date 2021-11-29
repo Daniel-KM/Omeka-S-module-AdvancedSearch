@@ -1005,7 +1005,7 @@ SQL;
             $qb = $connection->createQueryBuilder();
             $qb
                 ->select(
-                    'DISTINCT property.id AS id',
+                    'property.id AS id',
                     'CONCAT(vocabulary.prefix, ":", property.local_name) AS term'
                     // 'COUNT(value.id) AS total'
                 )
@@ -1039,7 +1039,7 @@ SQL;
             $qb = $connection->createQueryBuilder();
             $qb
                 ->select(
-                    'DISTINCT CONCAT(vocabulary.prefix, "_", property.local_name) AS "key"',
+                    'CONCAT(vocabulary.prefix, "_", property.local_name) AS "key"',
                     'CONCAT(vocabulary.prefix, ":", property.local_name) AS "term"'
                 )
                 ->from('property', 'property')
@@ -1069,7 +1069,7 @@ SQL;
             $qb = $connection->createQueryBuilder();
             $qb
                 ->select(
-                    'DISTINCT CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
+                    'CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
                     'property.id AS id'
                 )
                 ->from('property', 'property')
@@ -1114,7 +1114,7 @@ SQL;
             $qb = $connection->createQueryBuilder();
             $qb
                 ->select(
-                    'DISTINCT CONCAT(vocabulary.prefix, ":", resource_class.local_name) AS term',
+                    'CONCAT(vocabulary.prefix, ":", resource_class.local_name) AS term',
                     'resource_class.id AS id'
                 )
                 ->from('resource_class', 'resource_class')

@@ -80,7 +80,7 @@ class SearchRequestToResponse extends AbstractPlugin
         $searchAdapter = $searchEngine ? $searchEngine->adapter() : null;
         if ($searchAdapter) {
             $availableFields = $searchAdapter->setSearchEngine($searchEngine)->getAvailableFields();
-            // Include the specific fields to simplify querying with the form.
+            // Include the specific fields to simplify querying with main form.
             $searchFormSettings['available_fields'] = $availableFields;
             $specialFieldsToInputFields = [
                 'resource_type' => 'resource_type',
@@ -105,6 +105,10 @@ class SearchRequestToResponse extends AbstractPlugin
         } else {
             $searchFormSettings['available_fields'] = [];
         }
+
+        // Solr doesn't allow unavailable args anymore (invalid or unknown).
+        $searchFormSettings['only_available_fields'] = $searchAdapter
+            && $searchAdapter instanceof \SearchSolr\Adapter\SolariumAdapter;
 
         // TODO Copy the option for per page in the search config form (keeping the default).
         // TODO Add a max per_page.

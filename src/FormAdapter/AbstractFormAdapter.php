@@ -67,6 +67,25 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
     {
         $query = new Query;
 
+        // Solr doesn't allow unavailable args anymore (invalid or unknown).
+        $onlyAvailableFields = !empty($formSettings['only_available_fields']);
+        if ($onlyAvailableFields) {
+            $availableFields = $formSettings['available_fields'] ?? [];
+            if ($availableFields) {
+                $checkAvailableField = function ($field) use ($availableFields) {
+                    return isset($availableFields[$field]);
+                };
+            } else {
+                $checkAvailableField = function ($field) {
+                    return false;
+                };
+            }
+        } else {
+            $checkAvailableField = function ($field) {
+                return true;
+            };
+        }
+
         // TODO Manage the "browse_attached_items" / "site_attachments_only".
 
         // This function fixes some forms that add an array level.
@@ -167,13 +186,13 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                     if (empty($joiner)) {
                         if (empty($operator)) {
                             foreach ($value as $filter) {
-                                if (isset($filter['field']) && isset($filter['value']) && trim($filter['value']) !== '') {
+                                if (isset($filter['field']) && isset($filter['value']) && trim($filter['value']) !== '' && $checkAvailableField($filter['field'])) {
                                     $query->addFilter($filter['field'], $filter['value']);
                                 }
                             }
                         } else {
                             foreach ($value as $filter) {
-                                if (isset($filter['field'])) {
+                                if (isset($filter['field']) && $checkAvailableField($filter['field'])) {
                                     $type = empty($filter['type']) ? 'in' : $filter['type'];
                                     if ($type === 'ex' || $type === 'nex') {
                                         $query->addFilterQuery($filter['field'], null, $type);
@@ -186,14 +205,14 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                     } else {
                         if (empty($operator)) {
                             foreach ($value as $filter) {
-                                if (isset($filter['field']) && isset($filter['value']) && trim($filter['value']) !== '') {
+                                if (isset($filter['field']) && isset($filter['value']) && trim($filter['value']) !== '' && $checkAvailableField($filter['field'])) {
                                     $join = isset($filter['join']) && in_array($filter['join'], ['or', 'not']) ? $filter['join'] : 'and';
                                     $query->addFilterQuery($filter['field'], $filter['value'], $type, $join);
                                 }
                             }
                         } else {
                             foreach ($value as $filter) {
-                                if (isset($filter['field'])) {
+                                if (isset($filter['field']) && $checkAvailableField($filter['field'])) {
                                     $type = empty($filter['type']) ? 'in' : $filter['type'];
                                     if ($type === 'ex' || $type === 'nex') {
                                         $join = isset($filter['join']) && in_array($filter['join'], ['or', 'not']) ? $filter['join'] : 'and';
@@ -253,6 +272,10 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                     break;
 
                 default:
+                    if (!$checkAvailableField($name)) {
+                        continue 2;
+                    }
+
                     if (is_string($value)
                         || $isSimpleList($value)
                     ) {

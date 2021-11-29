@@ -291,6 +291,11 @@ class ApiSearch extends AbstractPlugin
         } else {
             $searchFormSettings['available_fields'] = [];
         }
+
+        // Solr doesn't allow unavailable args anymore (invalid or unknown).
+        $searchFormSettings['only_available_fields'] = $searchAdapter
+            && $searchAdapter instanceof \SearchSolr\Adapter\SolariumAdapter;
+
         $searchQuery = $this->apiFormAdapter->toQuery($query, $searchFormSettings);
         $searchQuery->setResources([$resource]);
 

@@ -76,11 +76,12 @@ class SearchResourcesListener
             $this->searchHasMedia($qb, $query);
             $this->searchHasMediaOriginal($qb, $query);
             $this->searchHasMediaThumbnails($qb, $query);
-            $this->searchItemByMediaType($qb, $query);
+            $this->searchByMediaType($qb, $query);
         } elseif ($this->adapter instanceof MediaAdapter) {
             $this->searchMediaByItemSet($qb, $query);
             $this->searchHasOriginal($qb, $query);
             $this->searchHasThumbnails($qb, $query);
+            $this->searchByMediaType($qb, $query);
         }
     }
 
@@ -924,12 +925,12 @@ class SearchResourcesListener
     }
 
     /**
-     * Build query to check if media types.
+     * Build query to check by media types.
      *
      * @param QueryBuilder $qb
      * @param array $query
      */
-    protected function searchItemByMediaType(
+    protected function searchByMediaType(
         QueryBuilder $qb,
         array $query
     ): void {
@@ -945,8 +946,18 @@ class SearchResourcesListener
             return;
         }
 
-        $mediaAlias = $this->adapter->createAlias();
         $expr = $qb->expr();
+
+        if ($this->adapter instanceof MediaAdapter) {
+            $qb
+                ->andWhere($expr->in(
+                    'omeka_root.mediaType',
+                    $this->adapter->createNamedParameter($qb, $values)
+                ));
+            return;
+        }
+
+        $mediaAlias = $this->adapter->createAlias();
 
         $qb->innerJoin(
             \Omeka\Entity\Media::class,

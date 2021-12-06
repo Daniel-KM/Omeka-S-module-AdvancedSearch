@@ -64,7 +64,7 @@ class InternalAdapter extends AbstractAdapter
         }
         unset($field);
 
-        return $availableFields = $fields;
+        return $availableFields = array_merge($fields, $result);
     }
 
     public function getAvailableSortFields(): array

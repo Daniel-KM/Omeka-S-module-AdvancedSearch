@@ -81,7 +81,40 @@ class MvcListeners extends AbstractListenerAggregate
         $event->setRouteMatch($routeMatch);
 
         /** @see \Laminas\Stdlib\Parameters */
-        $event->getRequest()->getQuery()
+        $query = $event->getRequest()->getQuery();
+        $query
             ->set('item_set', ['id' => [$itemSetId]]);
+
+        // Manage order of items in item set for module Next.
+        // TODO Move the feature from module Next to here.
+        if (!empty($query['sort'])) {
+            return;
+        }
+
+        $orders = $siteSettings->get('next_items_order_for_itemsets');
+        if (!$orders) {
+            return;
+        }
+
+        // For performance, the check uses a single strpos.
+        $specificOrder = null;
+        $idString = ',' . $itemSetId . ',';
+        foreach ($orders as $ids => $order) {
+            if (strpos(',' . $ids . ',', $idString) !== false) {
+                $specificOrder = $order;
+                break;
+            }
+        }
+
+        // Check the default order, if any.
+        if (is_null($specificOrder)) {
+            if (!isset($orders[0])) {
+                return;
+            }
+            $specificOrder = $orders[0];
+        }
+
+        $query
+            ->set('sort', trim($specificOrder['sort_by'] . ' ' . $specificOrder['sort_order']));
     }
 }

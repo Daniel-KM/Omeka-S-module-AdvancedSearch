@@ -596,6 +596,8 @@ class SearchResourcesListener
                     // The aim is to search anywhere except ocr content.
                     // Use not positive + in() or notIn()? A full list is simpler.
                     $otherIds = array_diff($this->usedPropertiesByTerm, $excludePropertyIds);
+                    // Avoid issue when everything is excluded.
+                    $otherIds[] = 0;
                     $joinConditions[] = $expr->in("$valuesAlias.property", $otherIds);
                 }
             }

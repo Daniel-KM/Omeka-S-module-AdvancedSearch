@@ -784,8 +784,8 @@ class Module extends AbstractModule
 
                 case 'is_public':
                     $filters[$translate('Visibility')][$this->urlQuery($key)] = $value
-                        ? $translate('Private')
-                        : $translate('Public');
+                        ? $translate('Public')
+                        : $translate('Private');
                     break;
 
                 case 'resource_class_term':

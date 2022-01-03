@@ -353,6 +353,16 @@ class SearchResourcesListener
             'lt' => 'gte',
         ];
 
+        $withoutValueQueryTypes = [
+            'ex',
+            'nex',
+        ];
+
+        $arrayValueQueryTypes = [
+            'list',
+            'nlist',
+        ];
+
         foreach ($query['property'] as $queryRow) {
             if (!(
                 is_array($queryRow)
@@ -371,13 +381,21 @@ class SearchResourcesListener
                 continue;
             }
 
-            // A value can be an array with types "list" and "nlist".
-            if (!is_array($value)
-                && !strlen((string) $value)
-                && $queryType !== 'nex'
-                && $queryType !== 'ex'
-            ) {
-                continue;
+            // Quick check of value.
+            // A empty string "" is not a value, but "0" is a value.
+            if (!in_array($queryType, $withoutValueQueryTypes, true)) {
+                // A value may be an array with some types.
+                if (in_array($queryType, $arrayValueQueryTypes, true)) {
+                    $value = is_array($value) ? $value : [$value];
+                    $value = array_unique(array_filter(array_map('trim', array_map('strval', $value)), 'strlen'));
+                    if (empty($value)) {
+                        continue;
+                    }
+                }
+                // The value should be a scalar in all other cases.
+                elseif (is_array($value) || !strlen((string) $value)) {
+                    continue;
+                }
             }
 
             // Invert the query type for joiner "not".
@@ -437,11 +455,8 @@ class SearchResourcesListener
                     $positive = false;
                     // no break.
                 case 'list':
-                    $list = is_array($value) ? $value : explode("\n", $value);
-                    $list = array_unique(array_filter(array_map('trim', array_map('strval', $list)), 'strlen'));
-                    if (empty($list)) {
-                        continue 2;
-                    }
+                    $param = $this->adapter->createNamedParameter($qb, $value);
+                    $qb->setParameter(substr($param, 1), $value, Connection::PARAM_STR_ARRAY);
                     $param = $this->adapter->createNamedParameter($qb, $list);
                     $subqueryAlias = $this->adapter->createAlias();
                     $subquery = $entityManager

@@ -702,6 +702,7 @@ class Module extends AbstractModule
     /**
      * Filter search filters.
      *
+     * @see \Omeka\View\Helper\SearchFilters
      * @param Event $event
      */
     public function filterSearchFilters(Event $event): void
@@ -712,7 +713,29 @@ class Module extends AbstractModule
         }
 
         $view = $event->getTarget();
+        $api = $view->plugin('api');
         $translate = $view->plugin('translate');
+
+        // Only non-core querying.
+        $queryTypes = [
+            'list' => $translate('is in list'), // @translate
+            'nlist' => $translate('is not in list'), // @translate
+            'sw' => $translate('starts with'), // @translate
+            'nsw' => $translate('does not start with'), // @translate
+            'ew' => $translate('ends with'), // @translate
+            'new' => $translate('does not end with'), // @translate
+            'res' => $translate('is resource with ID'), // @translate
+            'nres' => $translate('is not resource with ID'), // @translate
+        ];
+
+        $reciprocalQueryTypes = [
+            'list' => 'nlist',
+            'nlist' => 'list',
+            'sw' => 'nsw',
+            'nsw' => 'sw',
+            'ew' => 'new',
+            'new' => 'ew',
+        ];
 
         $filters = $event->getParam('filters');
 
@@ -746,6 +769,63 @@ class Module extends AbstractModule
             }
 
             switch ($key) {
+                case 'property':
+                    // TODO The array may be more than zero when firsts are standard (see core too for inverse).
+                    $index = 0;
+                    foreach (array_filter($value, 'is_array') as $subKey => $queryRow) {
+                        $queryType = $queryRow['type'] ?? 'eq';
+                        if (!isset($reciprocalQueryTypes[$queryType])) {
+                            continue;
+                        }
+
+                        $propertyId = $queryRow['property'] ?? null;
+                        $joiner = $queryRow['joiner'] ?? 'and';
+                        $value = $queryRow['value'] ?? '';
+
+                        // A value can be an array with types "list" and "nlist".
+                        if (!is_array($value)
+                            && !strlen((string) $value)
+                        ) {
+                            continue;
+                        }
+
+                        if ($propertyId) {
+                            if (is_numeric($propertyId)) {
+                                try {
+                                    $property = $api->read('properties', $propertyId)->getContent();
+                                } catch (NotFoundException $e) {
+                                    $property = null;
+                                }
+                            } else {
+                                $property = $api->searchOne('properties', ['term' => $propertyId])->getContent();
+                            }
+
+                            if ($property) {
+                                $propertyLabel = $translate($property->label());
+                            } else {
+                                $propertyLabel = $translate('Unknown property');
+                            }
+                        } else {
+                            $propertyLabel = $translate('[Any property]');
+                        }
+
+                        $filterLabel = $propertyLabel . ' ' . $queryTypes[$queryType];
+                        if ($index > 0) {
+                            if ($joiner === 'or') {
+                                $filterLabel = $translate('OR') . ' ' . $filterLabel;
+                            } elseif ($joiner === 'not') {
+                                $filterLabel = $translate('EXCEPT') . ' ' . $filterLabel; // @translate
+                            } else {
+                                $filterLabel = $translate('AND') . ' ' . $filterLabel;
+                            }
+                        }
+
+                        $filters[$filterLabel][] = implode(', ', $flatArray($value));
+
+                        ++$index;
+                    }
+                    break;
+
                 case 'datetime':
                     $queryTypes = [
                         'gt' => $translate('after'),

@@ -2,8 +2,8 @@
 
 namespace AdvancedSearch;
 
-use Omeka\Stdlib\Message;
 use Omeka\Mvc\Controller\Plugin\Messenger;
+use Omeka\Stdlib\Message;
 
 /**
  * @var Module $this

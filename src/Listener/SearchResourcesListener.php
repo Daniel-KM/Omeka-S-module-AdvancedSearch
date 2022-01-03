@@ -2,8 +2,8 @@
 
 namespace AdvancedSearch\Listener;
 
-use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Query\Expr\Join;
 use Laminas\EventManager\Event;
 use Omeka\Api\Adapter\ItemAdapter;
 use Omeka\Api\Adapter\MediaAdapter;
@@ -187,7 +187,7 @@ class SearchResourcesListener
         if ($this->adapter instanceof ItemAdapter) {
             $siteAlias = $this->adapter->createAlias();
             $qb->innerJoin(
-                'omeka_root.sites', $siteAlias, 'WITH', $expr->in(
+                'omeka_root.sites', $siteAlias, Join::WITH, $expr->in(
                     "$siteAlias.id",
                     $this->adapter->createNamedParameter($qb, $sites)
                 )
@@ -573,6 +573,13 @@ class SearchResourcesListener
                     continue 2;
             }
 
+            // Avoid to get results when the query is incorrect.
+            // In that case, no param should be set in the current loop.
+            if ($incorrectValue) {
+                $where = $expr->eq('omeka_root.id', 0);
+                break;
+            }
+
             $joinConditions = [];
             // Narrow to specific property, if one is selected.
             // The check is done against the requested property, like in core:
@@ -591,12 +598,6 @@ class SearchResourcesListener
                     $otherIds = array_diff($this->usedPropertiesByTerm, $excludePropertyIds);
                     $joinConditions[] = $expr->in("$valuesAlias.property", $otherIds);
                 }
-            }
-
-            // Avoid to get results when the query is incorrect.
-            if ($incorrectValue) {
-                $where = $expr->eq('omeka_root.id', 0);
-                break;
             }
 
             if ($dataType) {
@@ -624,7 +625,7 @@ class SearchResourcesListener
             }
 
             if ($joinConditions) {
-                $qb->leftJoin($valuesJoin, $valuesAlias, 'WITH', $expr->andX(...$joinConditions));
+                $qb->leftJoin($valuesJoin, $valuesAlias, Join::WITH, $expr->andX(...$joinConditions));
             } else {
                 $qb->leftJoin($valuesJoin, $valuesAlias);
             }
@@ -1059,12 +1060,12 @@ class SearchResourcesListener
             $qb
                 ->leftJoin(
                     'omeka_root.item',
-                    $itemAlias, 'WITH',
+                    $itemAlias, Join::WITH,
                     $expr->eq("$itemAlias.id", 'omeka_root.item')
                 )
                 ->innerJoin(
                     $itemAlias . '.itemSets',
-                    $itemSetAlias, 'WITH',
+                    $itemSetAlias, Join::WITH,
                     $expr->in("$itemSetAlias.id", $this->adapter->createNamedParameter($qb, $itemSets))
                 );
         }

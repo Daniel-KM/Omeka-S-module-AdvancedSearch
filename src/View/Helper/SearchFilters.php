@@ -49,18 +49,18 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
         );
 
         $queryTypes = [
-            'eq' => $translate('is exactly'),
-            'neq' => $translate('is not exactly'),
-            'in' => $translate('contains'),
-            'nin' => $translate('does not contain'),
-            'sw' => $translate('starts with'),
-            'nsw' => $translate('does not start with'),
-            'ew' => $translate('ends with'),
-            'new' => $translate('does not end with'),
-            'res' => $translate('is resource with ID'),
-            'nres' => $translate('is not resource with ID'),
-            'ex' => $translate('has any value'),
-            'nex' => $translate('has no values'),
+            'eq' => $translate('is exactly'), // @translate
+            'neq' => $translate('is not exactly'), // @translate
+            'in' => $translate('contains'), // @translate
+            'nin' => $translate('does not contain'), // @translate
+            'sw' => $translate('starts with'), // @translate
+            'nsw' => $translate('does not start with'), // @translate
+            'ew' => $translate('ends with'), // @translate
+            'new' => $translate('does not end with'), // @translate
+            'res' => $translate('is resource with ID'), // @translate
+            'nres' => $translate('is not resource with ID'), // @translate
+            'ex' => $translate('has any value'), // @translate
+            'nex' => $translate('has no values'), // @translate
         ];
 
         foreach ($this->query as $key => $value) {

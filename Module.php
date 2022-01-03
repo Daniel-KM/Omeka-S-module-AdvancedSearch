@@ -772,7 +772,7 @@ class Module extends AbstractModule
                             if ($joiner === 'or') {
                                 $filterLabel = $translate('OR') . ' ' . $filterLabel;
                             } elseif ($joiner === 'not') {
-                                $filterLabel = $translate('NOT') . ' ' . $filterLabel;
+                                $filterLabel = $translate('EXCEPT') . ' ' . $filterLabel; // @translate
                             } else {
                                 $filterLabel = $translate('AND') . ' ' . $filterLabel;
                             }
@@ -1075,7 +1075,7 @@ class Module extends AbstractModule
                             if ($joiner === 'or') {
                                 $filterLabel = $translate('OR') . ' ' . $filterLabel;
                             } elseif ($joiner === 'not') {
-                                $filterLabel = $translate('NOT') . ' ' . $filterLabel;
+                                $filterLabel = $translate('EXCEPT') . ' ' . $filterLabel; // @translate
                             } else {
                                 $filterLabel = $translate('AND') . ' ' . $filterLabel;
                             }

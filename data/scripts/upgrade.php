@@ -229,3 +229,11 @@ SQL;
     );
     $messenger->addWarning($message);
 }
+
+if (version_compare($oldVersion, '3.3.6.9', '<')) {
+    $messenger = new Messenger();
+    $message = new Message(
+        'It is now possible to query ressources with linked ressources in the standard advanced form.' // @translate
+    );
+    $messenger->addWarning($message);
+}

@@ -626,24 +626,21 @@ class Module extends AbstractModule
     {
         // Adapted from the advanced-search/properties.phtml template.
 
+        // The advanced search form can be used anywhere, so load it in all cases.
+        $view = $event->getTarget();
+        $assetUrl = $view->plugin('assetUrl');
+        $view->headLink()
+            ->appendStylesheet($assetUrl('vendor/chosen-js/chosen.css', 'Omeka'));
+        $view->headScript()
+            ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.js', 'Omeka'), 'text/javascript', ['defer' => 'defer'])
+            ->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
+
+        // For the main search field in the left sidebar in admin.
         if ($this->getServiceLocator()->get('Omeka\Status')->isAdminRequest()) {
-            $view = $event->getTarget();
-            $assetUrl = $view->plugin('assetUrl');
             $view->headLink()
-                ->appendStylesheet($assetUrl('vendor/chosen-js/chosen.css', 'Omeka'))
                 ->appendStylesheet($assetUrl('css/advanced-search-admin.css', 'AdvancedSearch'));
             $view->headScript()
-                ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.js', 'Omeka'), 'text/javascript', ['defer' => 'defer'])
-                ->appendFile($assetUrl('js/advanced-search.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer'])
                 ->appendFile($assetUrl('js/advanced-search-admin.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
-        } else {
-            $view = $event->getTarget();
-            $assetUrl = $view->plugin('assetUrl');
-            $view->headLink()
-                ->appendStylesheet($assetUrl('vendor/chosen-js/chosen.css', 'Omeka'));
-            $view->headScript()
-                ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.js', 'Omeka'), 'text/javascript', ['defer' => 'defer'])
-                ->appendFile($assetUrl('js/advanced-search.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
         }
 
         $query = $event->getParam('query', []);

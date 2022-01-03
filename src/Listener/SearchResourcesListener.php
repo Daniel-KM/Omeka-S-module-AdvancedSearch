@@ -303,6 +303,8 @@ class SearchResourcesListener
      *   - nres: has no resource (core)
      *   - dtp: has data type
      *   - ndtp: does not have data type
+     *   - lex: is a linked resource
+     *   - nlex: is not a linked resource
      *   For date time only for now (a check is done to have a meaningful answer):
      *   TODO Remove the check for valid date time? Add another key (before/after)?
      *   Of course, it's better to use Numeric Data Types.
@@ -347,6 +349,8 @@ class SearchResourcesListener
             'nres' => 'res',
             'dtp' => 'ndtp',
             'ndtp' => 'dtp',
+            'lex' => 'nlex',
+            'nlex' => 'lex',
             'gt' => 'lte',
             'gte' => 'lt',
             'lte' => 'gt',
@@ -356,11 +360,18 @@ class SearchResourcesListener
         $withoutValueQueryTypes = [
             'ex',
             'nex',
+            'lex',
+            'nlex',
         ];
 
         $arrayValueQueryTypes = [
             'list',
             'nlist',
+        ];
+
+        $subjectQueryTypes = [
+            'lex',
+            'nlex',
         ];
 
         foreach ($query['property'] as $queryRow) {
@@ -457,7 +468,6 @@ class SearchResourcesListener
                 case 'list':
                     $param = $this->adapter->createNamedParameter($qb, $value);
                     $qb->setParameter(substr($param, 1), $value, Connection::PARAM_STR_ARRAY);
-                    $param = $this->adapter->createNamedParameter($qb, $list);
                     $subqueryAlias = $this->adapter->createAlias();
                     $subquery = $entityManager
                         ->createQueryBuilder()
@@ -538,6 +548,26 @@ class SearchResourcesListener
                     }
                     break;
 
+                // Linked resources (subject values).
+
+                case 'nlex':
+                    // For consistency, "nlex" is the reverse of "exl" even when
+                    // a resource is linked with a public and a private resource.
+                    // A private linked resource is not linked for an anonymous.
+                    $positive = false;
+                case 'lex':
+                    $subValuesAlias = $this->adapter->createAlias();
+                    $subResourceAlias = $this->adapter->createAlias();
+                    // Use a subquery so rights are automatically managed.
+                    $subQb = $entityManager
+                        ->createQueryBuilder()
+                        ->select("IDENTITY($subValuesAlias.valueResource)")
+                        ->from(\Omeka\Entity\Value::class, $subValuesAlias)
+                        ->innerJoin("$subValuesAlias.resource", $subResourceAlias)
+                        ->where($expr->isNotNull("$subValuesAlias.valueResource"));
+                    $predicateExpr = $expr->in("$valuesAlias.resource", $subQb->getDQL());
+                    break;
+
                 // TODO Manage uri and resources with gt, gte, lte, lt (it has a meaning at least for resource ids, but separate).
                 case 'gt':
                     $valueNorm = $this->getDateTimeFromValue($value, false);
@@ -596,6 +626,7 @@ class SearchResourcesListener
             }
 
             $joinConditions = [];
+
             // Narrow to specific property, if one is selected.
             // The check is done against the requested property, like in core:
             // when user request is invalid, return an empty result.

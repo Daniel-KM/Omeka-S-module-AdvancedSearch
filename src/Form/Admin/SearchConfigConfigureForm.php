@@ -303,6 +303,8 @@ ex = has any value
 nex = has no values
 res = is resource with ID
 nres = is not resource with ID
+lex = is a linked resource
+nlex = is not a linked resource
 ',
                     'rows' => 12,
                 ],

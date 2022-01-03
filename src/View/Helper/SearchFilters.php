@@ -61,6 +61,15 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
             'nres' => $translate('is not resource with ID'), // @translate
             'ex' => $translate('has any value'), // @translate
             'nex' => $translate('has no values'), // @translate
+            'lex' => $translate('is a linked resource'), // @translate
+            'nlex' => $translate('is not a linked resource'), // @translate
+        ];
+
+        $withoutValueQueryTypes = [
+            'ex',
+            'nex',
+            'lex',
+            'nlex',
         ];
 
         foreach ($this->query as $key => $value) {
@@ -112,7 +121,7 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
                         if (!isset($queryTypes[$queryType])) {
                             continue;
                         }
-                        if (!$value && $queryType !== 'nex' && $queryType !== 'ex') {
+                        if (!$value && !in_array($queryType, $withoutValueQueryTypes, true)) {
                             continue;
                         }
                         if ($propertyId) {

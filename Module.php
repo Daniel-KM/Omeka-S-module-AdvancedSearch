@@ -634,7 +634,16 @@ class Module extends AbstractModule
                 ->appendStylesheet($assetUrl('css/advanced-search-admin.css', 'AdvancedSearch'));
             $view->headScript()
                 ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.js', 'Omeka'), 'text/javascript', ['defer' => 'defer'])
+                ->appendFile($assetUrl('js/advanced-search.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer'])
                 ->appendFile($assetUrl('js/advanced-search-admin.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
+        } else {
+            $view = $event->getTarget();
+            $assetUrl = $view->plugin('assetUrl');
+            $view->headLink()
+                ->appendStylesheet($assetUrl('vendor/chosen-js/chosen.css', 'Omeka'));
+            $view->headScript()
+                ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.js', 'Omeka'), 'text/javascript', ['defer' => 'defer'])
+                ->appendFile($assetUrl('js/advanced-search.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
         }
 
         $query = $event->getParam('query', []);
@@ -726,6 +735,8 @@ class Module extends AbstractModule
             'new' => $translate('does not end with'), // @translate
             'res' => $translate('is resource with ID'), // @translate
             'nres' => $translate('is not resource with ID'), // @translate
+            'lex' => $translate('is a linked resource'), // @translate
+            'nlex' => $translate('is not a linked resource'), // @translate
         ];
 
         $reciprocalQueryTypes = [
@@ -735,6 +746,13 @@ class Module extends AbstractModule
             'nsw' => 'sw',
             'ew' => 'new',
             'new' => 'ew',
+            'lex' => 'nlex',
+            'nlex' => 'lex',
+        ];
+
+        $withoutValue = [
+            'lex',
+            'nlex',
         ];
 
         $filters = $event->getParam('filters');
@@ -782,11 +800,18 @@ class Module extends AbstractModule
                         $joiner = $queryRow['joiner'] ?? 'and';
                         $value = $queryRow['value'] ?? '';
 
+                        $isWithoutValue = in_array($queryType, $withoutValue, true);
+
                         // A value can be an array with types "list" and "nlist".
                         if (!is_array($value)
                             && !strlen((string) $value)
+                            && !$isWithoutValue
                         ) {
                             continue;
+                        }
+
+                        if ($isWithoutValue) {
+                            $value = '';
                         }
 
                         if ($propertyId) {
@@ -918,7 +943,7 @@ class Module extends AbstractModule
     }
 
     /**
-     * Manage specific arguments of the searching form.
+     * Manage specific arguments of the module searching form.
      *
      * @todo Should use the form adapter (but only main form is really used).
      * @see \AdvancedSearch\FormAdapter\AbstractFormAdapter
@@ -1084,6 +1109,8 @@ class Module extends AbstractModule
                         'new' => $translate('does not end with'), // @translate
                         'res' => $translate('is resource with ID'), // @translate
                         'nres' => $translate('is not resource with ID'), // @translate
+                        'lex' => $translate('is a linked resource'), // @translate
+                        'nlex' => $translate('is not a linked resource'), // @translate
                         'gt' => $translate('greater than'), // @translate
                         'gte' => $translate('greater than or equal'), // @translate
                         'lte' => $translate('lower than or equal'), // @translate
@@ -1105,10 +1132,24 @@ class Module extends AbstractModule
                         'new' => 'ew',
                         'res' => 'nres',
                         'nres' => 'res',
+                        'lex' => 'nlex',
+                        'nlex' => 'lex',
                         'gt' => 'lte',
                         'gte' => 'lt',
                         'lte' => 'gt',
                         'lt' => 'gte',
+                    ];
+
+                    $subjectQueryTypes = [
+                        'lex',
+                        'nlex',
+                    ];
+
+                    $withoutValue = [
+                        'ex',
+                        'nex',
+                        'lex',
+                        'nlex',
                     ];
 
                     // To get the name of the advanced fields, a loop should be done for now.
@@ -1131,16 +1172,17 @@ class Module extends AbstractModule
                         $joiner = $queryRow['join'] ?? 'and';
                         $value = $queryRow['value'] ?? '';
 
+                        $isWithoutValue = in_array($queryType, $withoutValue, true);
+
                         // A value can be an array with types "list" and "nlist".
                         if (!is_array($value)
                             && !strlen((string) $value)
-                            && $queryType !== 'nex'
-                            && $queryType !== 'ex'
+                            && !$isWithoutValue
                         ) {
                             continue;
                         }
 
-                        if ($queryType === 'ex' || $queryType === 'nex') {
+                        if ($isWithoutValue) {
                             $value = '';
                         }
 

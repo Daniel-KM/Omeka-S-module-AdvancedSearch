@@ -565,7 +565,9 @@ class SearchResourcesListener
                         ->from(\Omeka\Entity\Value::class, $subValuesAlias)
                         ->innerJoin("$subValuesAlias.resource", $subResourceAlias)
                         ->where($expr->isNotNull("$subValuesAlias.valueResource"));
-                    $predicateExpr = $expr->in("$valuesAlias.resource", $subQb->getDQL());
+                    // Warning: the property check should be done on subjects,
+                    // so the predicate expression is finalized below.
+                    // $predicateExpr = $expr->in("$valuesAlias.resource", $subQb->getDQL());
                     break;
 
                 // TODO Manage uri and resources with gt, gte, lte, lt (it has a meaning at least for resource ids, but separate).
@@ -630,7 +632,28 @@ class SearchResourcesListener
             // Narrow to specific property, if one is selected.
             // The check is done against the requested property, like in core:
             // when user request is invalid, return an empty result.
-            if ($queryRow['property']) {
+            // But first, manage the exception for queries on subject values,
+            // where the properties should be checked against the sub-query.
+            if (in_array($queryType, $subjectQueryTypes)) {
+                // Same process as below.
+                if ($queryRow['property']) {
+                    $subQb
+                        ->andWhere(count($propertyIds) < 2
+                            ? $expr->eq("$subValuesAlias.property", (int) reset($propertyIds))
+                            : $expr->in("$subValuesAlias.property", $propertyIds)
+                        );
+                } elseif ($excludePropertyIds) {
+                    $excludePropertyIds = $this->getPropertyIds(is_array($excludePropertyIds) ? $excludePropertyIds : [$excludePropertyIds]);
+                    if (count($excludePropertyIds)) {
+                        $otherIds = array_diff($this->usedPropertiesByTerm, $excludePropertyIds);
+                        $otherIds[] = 0;
+                        $subQb
+                            ->andWhere($expr->in("$subValuesAlias.property", $otherIds));
+                    }
+                }
+                // Finalize the predicate expression on the subjects.
+                $predicateExpr = $expr->in("$valuesAlias.resource", $subQb->getDQL());
+            } elseif ($queryRow['property']) {
                 $joinConditions[] = count($propertyIds) < 2
                     // There may be 0 or 1 property id.
                     ? $expr->eq("$valuesAlias.property", (int) reset($propertyIds))

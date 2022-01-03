@@ -296,7 +296,7 @@ DROP TABLE IF EXISTS `_suggestions_temporary`;
 
 SQL;
 
-        $this->connection->executeQuery($sql, $bind, $types);
+        $this->connection->executeStatement($sql, $bind, $types);
 
         return $this;
     }
@@ -471,7 +471,7 @@ DROP TABLE IF EXISTS `_suggestions_temporary`;
 
 SQL;
 
-        $this->connection->executeQuery($sql, $bind, $types);
+        $this->connection->executeStatement($sql, $bind, $types);
 
         return $this;
     }
@@ -756,7 +756,9 @@ SQL;
             $qb
                 ->select(
                     'CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
-                    'property.id AS id'
+                    'property.id AS id',
+                    // Required with only_full_group_by.
+                    'vocabulary.id'
                 )
                 ->from('property', 'property')
                 ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')

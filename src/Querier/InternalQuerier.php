@@ -164,10 +164,8 @@ LIMIT :limit
 SQL;
 
         try {
-            $results = $connection
-                ->executeQuery($sql, $bind, $types)
-                ->fetchAll();
-        } catch (\Doctrine\DBAL\DBALException $e) {
+            $results = $connection->executeQuery($sql, $bind, $types)->fetchAllAssociative();
+        } catch (\Exception $e) {
             $this->logger->err($e->getMessage());
             return $this->response
                 ->setMessage('An internal issue in database occurred.'); // @translate
@@ -350,9 +348,7 @@ SQL;
         }
 
         try {
-            $results = $connection
-                ->executeQuery($sql, $bind, $types)
-                ->fetchAll();
+            $results = $connection->executeQuery($sql, $bind, $types)->fetchAllAssociative();
         } catch (\Doctrine\DBAL\Exception $e) {
             $this->logger->err($e->getMessage());
             return $this->response

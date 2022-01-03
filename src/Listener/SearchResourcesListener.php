@@ -1268,7 +1268,9 @@ class SearchResourcesListener
             $qb
                 ->select(
                     'CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
-                    'property.id AS id'
+                    'property.id AS id',
+                    // Required with only_full_group_by.
+                    'vocabulary.id'
                 )
                 ->from('property', 'property')
                 ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
@@ -1319,7 +1321,9 @@ class SearchResourcesListener
             $qb
                 ->select(
                     'CONCAT(vocabulary.prefix, ":", resource_class.local_name) AS term',
-                    'resource_class.id AS id'
+                    'resource_class.id AS id',
+                    // Required with only_full_group_by.
+                    'vocabulary.id'
                 )
                 ->from('resource_class', 'resource_class')
                 ->innerJoin('resource_class', 'vocabulary', 'vocabulary', 'resource_class.vocabulary_id = vocabulary.id')

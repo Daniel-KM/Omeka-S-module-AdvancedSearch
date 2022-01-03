@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-22 00:00+0000\n"
+"POT-Creation-Date: 2022-01-03 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,113 +17,134 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: Module.php:751 view/common/advanced-search/date-time.phtml:74
-msgid "after"
-msgstr ""
-
-#: Module.php:752 view/common/advanced-search/date-time.phtml:73
-msgid "after or on"
-msgstr ""
-
-#: Module.php:753 view/common/advanced-search/date-time.phtml:75
-msgid "on"
-msgstr ""
-
-#: Module.php:754 view/common/advanced-search/date-time.phtml:76
-msgid "not on"
-msgstr ""
-
-#: Module.php:755 view/common/advanced-search/date-time.phtml:77
-msgid "before or on"
-msgstr ""
-
-#: Module.php:756 view/common/advanced-search/date-time.phtml:78
-msgid "before"
-msgstr ""
-
-#: Module.php:757 view/common/advanced-search/date-time.phtml:79
-msgid "has any date / time"
-msgstr ""
-
-#: Module.php:758 view/common/advanced-search/date-time.phtml:80
-msgid "has no date / time"
-msgstr ""
-
-#: Module.php:775 Module.php:1078
-msgid "NOT"
-msgstr ""
-
-#: Module.php:799 view/common/advanced-search/has-media.phtml:12
-#: view/common/advanced-search/has-media.phtml:27
-msgid "Has media"
-msgstr ""
-
-#: Module.php:806
-msgid "Has original"
-msgstr ""
-
-#: Module.php:813 view/common/advanced-search/has-thumbnails.phtml:12
-#: view/common/advanced-search/has-thumbnails.phtml:27
-msgid "Has thumbnails"
-msgstr ""
-
-#: Module.php:820
-msgid "Media types"
-msgstr ""
-
-#: Module.php:905
-msgid "Resource id"
-msgstr ""
-
-#: Module.php:999
+#: Module.php:727 Module.php:1105
 msgid "is in list"
 msgstr ""
 
-#: Module.php:1000
+#: Module.php:728 Module.php:1106
 msgid "is not in list"
 msgstr ""
 
-#: Module.php:1001 src/View/Helper/SearchFilters.php:56
+#: Module.php:729 Module.php:1107 src/View/Helper/SearchFilters.php:56
 #: view/common/advanced-search/properties.phtml:86
 msgid "starts with"
 msgstr ""
 
-#: Module.php:1002 src/View/Helper/SearchFilters.php:57
+#: Module.php:730 Module.php:1108 src/View/Helper/SearchFilters.php:57
 #: view/common/advanced-search/properties.phtml:87
 msgid "does not start with"
 msgstr ""
 
-#: Module.php:1003 src/View/Helper/SearchFilters.php:58
+#: Module.php:731 Module.php:1109 src/View/Helper/SearchFilters.php:58
 #: view/common/advanced-search/properties.phtml:88
 msgid "ends with"
 msgstr ""
 
-#: Module.php:1004 src/View/Helper/SearchFilters.php:59
+#: Module.php:732 Module.php:1110 src/View/Helper/SearchFilters.php:59
 #: view/common/advanced-search/properties.phtml:89
 msgid "does not end with"
 msgstr ""
 
-#: Module.php:1007
+#: Module.php:735 Module.php:1113 src/View/Helper/SearchFilters.php:64
+#: view/common/advanced-search/properties.phtml:94
+msgid "is a linked resource"
+msgstr ""
+
+#: Module.php:736 Module.php:1114 src/View/Helper/SearchFilters.php:65
+#: view/common/advanced-search/properties.phtml:95
+msgid "is not a linked resource"
+msgstr ""
+
+#: Module.php:737 Module.php:1115 src/View/Helper/SearchFilters.php:66
+#: view/common/advanced-search/properties.phtml:96
+msgid "is linked with resource with ID"
+msgstr ""
+
+#: Module.php:738 Module.php:1116 src/View/Helper/SearchFilters.php:67
+#: view/common/advanced-search/properties.phtml:97
+msgid "is not linked with resource with ID"
+msgstr ""
+
+#: Module.php:843 Module.php:881 Module.php:1207
+#: src/View/Helper/SearchFilters.php:153
+msgid "EXCEPT"
+msgstr ""
+
+#: Module.php:857 view/common/advanced-search/date-time.phtml:74
+msgid "after"
+msgstr ""
+
+#: Module.php:858 view/common/advanced-search/date-time.phtml:73
+msgid "after or on"
+msgstr ""
+
+#: Module.php:859 view/common/advanced-search/date-time.phtml:75
+msgid "on"
+msgstr ""
+
+#: Module.php:860 view/common/advanced-search/date-time.phtml:76
+msgid "not on"
+msgstr ""
+
+#: Module.php:861 view/common/advanced-search/date-time.phtml:77
+msgid "before or on"
+msgstr ""
+
+#: Module.php:862 view/common/advanced-search/date-time.phtml:78
+msgid "before"
+msgstr ""
+
+#: Module.php:863 view/common/advanced-search/date-time.phtml:79
+msgid "has any date / time"
+msgstr ""
+
+#: Module.php:864 view/common/advanced-search/date-time.phtml:80
+msgid "has no date / time"
+msgstr ""
+
+#: Module.php:905 view/common/advanced-search/has-media.phtml:12
+#: view/common/advanced-search/has-media.phtml:27
+msgid "Has media"
+msgstr ""
+
+#: Module.php:912
+msgid "Has original"
+msgstr ""
+
+#: Module.php:919 view/common/advanced-search/has-thumbnails.phtml:12
+#: view/common/advanced-search/has-thumbnails.phtml:27
+msgid "Has thumbnails"
+msgstr ""
+
+#: Module.php:926
+msgid "Media types"
+msgstr ""
+
+#: Module.php:1011
+msgid "Resource id"
+msgstr ""
+
+#: Module.php:1117
 msgid "greater than"
 msgstr ""
 
-#: Module.php:1008
+#: Module.php:1118
 msgid "greater than or equal"
 msgstr ""
 
-#: Module.php:1009
+#: Module.php:1119
 msgid "lower than or equal"
 msgstr ""
 
-#: Module.php:1010
+#: Module.php:1120
 msgid "lower than"
 msgstr ""
 
-#: Module.php:1071
+#: Module.php:1200
 msgid "Unknown field"
 msgstr ""
 
-#: Module.php:1072
+#: Module.php:1201
 msgid "[Any field]"
 msgstr ""
 
@@ -168,10 +189,6 @@ msgstr ""
 #: src/Mvc/Controller/Plugin/ApiSearch.php:189
 #, php-format
 msgid "Permission denied for the current user to %s the %s resource."
-msgstr ""
-
-#: src/View/Helper/SearchFilters.php:142
-msgid "EXCEPT"
 msgstr ""
 
 #: view/advanced-search/admin/index/browse.phtml:52
@@ -539,6 +556,12 @@ msgid ""
 "needed). See the default config page."
 msgstr ""
 
+#: data/scripts/upgrade.php:236
+msgid ""
+"It is now possible to query ressources with linked ressources in the "
+"standard advanced form."
+msgstr ""
+
 #: data/search_configs/default.php:186
 msgid "Results by 10"
 msgstr ""
@@ -596,52 +619,56 @@ msgstr ""
 msgid "The module %s can be reenabled."
 msgstr ""
 
-#: Module.php:1204
+#: Module.php:843 Module.php:881 Module.php:1207
+msgid " "
+msgstr ""
+
+#: Module.php:1333
 #, php-format
 msgid "Unable to batch index metadata for search engine \"%s\": %s"
 msgstr ""
 
-#: Module.php:1209
+#: Module.php:1338
 #, php-format
 msgid "Unable to batch update the search engine \"%s\": see log."
 msgstr ""
 
-#: Module.php:1294
+#: Module.php:1423
 #, php-format
 msgid "Unable to delete the search index for resource #%d: %s"
 msgstr ""
 
-#: Module.php:1299
+#: Module.php:1428
 #, php-format
 msgid ""
 "Unable to delete the search index for the deleted resource #%d: see log."
 msgstr ""
 
-#: Module.php:1319
+#: Module.php:1448
 #, php-format
 msgid "Unable to index metadata of resource #%d for search: %s"
 msgstr ""
 
-#: Module.php:1324
+#: Module.php:1453
 #, php-format
 msgid "Unable to update the search index for resource #%d: see log."
 msgstr ""
 
-#: Module.php:1501
+#: Module.php:1630
 #, php-format
 msgid ""
 "The internal search engine (sql) is available. Configure it in the %ssearch "
 "manager%s."
 msgstr ""
 
-#: Module.php:1542
+#: Module.php:1671
 #, php-format
 msgid ""
 "The internal suggester (sql) will be available after indexation. Configure "
 "it in the %ssearch manager%s."
 msgstr ""
 
-#: Module.php:1576
+#: Module.php:1705
 #, php-format
 msgid ""
 "The default search page is available. Configure it in the %ssearch manager"
@@ -996,149 +1023,149 @@ msgid ""
 "operators are used when empty."
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:317
+#: src/Form/Admin/SearchConfigConfigureForm.php:321
 msgid "Results display (when supported by theme)"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:325
+#: src/Form/Admin/SearchConfigConfigureForm.php:329
 msgid "List of query filters"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:328
-#: src/Form/Admin/SearchConfigConfigureForm.php:345
-#: src/Form/Admin/SearchConfigConfigureForm.php:362
-#: src/Form/Admin/SearchConfigConfigureForm.php:379
-#: src/Form/Admin/SearchConfigConfigureForm.php:396
+#: src/Form/Admin/SearchConfigConfigureForm.php:332
+#: src/Form/Admin/SearchConfigConfigureForm.php:349
+#: src/Form/Admin/SearchConfigConfigureForm.php:366
+#: src/Form/Admin/SearchConfigConfigureForm.php:383
+#: src/Form/Admin/SearchConfigConfigureForm.php:400
 msgid "Results header"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:329
-#: src/Form/Admin/SearchConfigConfigureForm.php:346
-#: src/Form/Admin/SearchConfigConfigureForm.php:363
-#: src/Form/Admin/SearchConfigConfigureForm.php:380
-#: src/Form/Admin/SearchConfigConfigureForm.php:397
+#: src/Form/Admin/SearchConfigConfigureForm.php:333
+#: src/Form/Admin/SearchConfigConfigureForm.php:350
+#: src/Form/Admin/SearchConfigConfigureForm.php:367
+#: src/Form/Admin/SearchConfigConfigureForm.php:384
+#: src/Form/Admin/SearchConfigConfigureForm.php:401
 msgid "Results footer"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:330
-#: src/Form/Admin/SearchConfigConfigureForm.php:347
-#: src/Form/Admin/SearchConfigConfigureForm.php:364
-#: src/Form/Admin/SearchConfigConfigureForm.php:381
-#: src/Form/Admin/SearchConfigConfigureForm.php:398
-#: src/Form/Admin/SearchConfigConfigureForm.php:627
+#: src/Form/Admin/SearchConfigConfigureForm.php:334
+#: src/Form/Admin/SearchConfigConfigureForm.php:351
+#: src/Form/Admin/SearchConfigConfigureForm.php:368
+#: src/Form/Admin/SearchConfigConfigureForm.php:385
+#: src/Form/Admin/SearchConfigConfigureForm.php:402
+#: src/Form/Admin/SearchConfigConfigureForm.php:631
 msgid "Both"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:342
+#: src/Form/Admin/SearchConfigConfigureForm.php:346
 msgid "Paginator"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:359
+#: src/Form/Admin/SearchConfigConfigureForm.php:363
 msgid "Pagination per page"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:393
+#: src/Form/Admin/SearchConfigConfigureForm.php:397
 msgid "Grid / list"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:410
+#: src/Form/Admin/SearchConfigConfigureForm.php:414
 msgid "Grid / list default mode"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:412
+#: src/Form/Admin/SearchConfigConfigureForm.php:416
 msgid "Auto (previous user choice)"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:413
+#: src/Form/Admin/SearchConfigConfigureForm.php:417
 msgid "Grid"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:414
+#: src/Form/Admin/SearchConfigConfigureForm.php:418
 msgid "List"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:415
+#: src/Form/Admin/SearchConfigConfigureForm.php:419
 msgid "Only grid"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:416
+#: src/Form/Admin/SearchConfigConfigureForm.php:420
 msgid "Only list"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:444
+#: src/Form/Admin/SearchConfigConfigureForm.php:448
 msgid "If any, the search page will display a select to paginate results."
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:467
+#: src/Form/Admin/SearchConfigConfigureForm.php:471
 msgid "Sorting"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:476
+#: src/Form/Admin/SearchConfigConfigureForm.php:480
 msgid "Sort fields"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:477
+#: src/Form/Admin/SearchConfigConfigureForm.php:481
 msgid ""
 "List of sort fields that will be displayed in the search page. Format is "
 "\"term dir = Label\"."
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:495
+#: src/Form/Admin/SearchConfigConfigureForm.php:499
 msgid "Available sort fields"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:496
+#: src/Form/Admin/SearchConfigConfigureForm.php:500
 msgid ""
 "List of all available sort fields, among which some can be copied above."
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:526
+#: src/Form/Admin/SearchConfigConfigureForm.php:530
 msgid "List of facets"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:527
+#: src/Form/Admin/SearchConfigConfigureForm.php:531
 msgid ""
 "List of facets that will be displayed in the search page. Format is \"field "
 "= Label\" and optionnally \" = Select\"."
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:546
+#: src/Form/Admin/SearchConfigConfigureForm.php:550
 msgid "Available facets"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:547
+#: src/Form/Admin/SearchConfigConfigureForm.php:551
 msgid "List of all available facets, among which some can be copied above."
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:562
+#: src/Form/Admin/SearchConfigConfigureForm.php:566
 msgid "Maximum number of facet by field"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:563
+#: src/Form/Admin/SearchConfigConfigureForm.php:567
 msgid "The maximum number of values fetched for each facet"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:576
+#: src/Form/Admin/SearchConfigConfigureForm.php:580
 msgid "Order of facet items"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:578
+#: src/Form/Admin/SearchConfigConfigureForm.php:582
 msgid "Native"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:580
+#: src/Form/Admin/SearchConfigConfigureForm.php:584
 msgid "Count (biggest first)"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:581
+#: src/Form/Admin/SearchConfigConfigureForm.php:585
 msgid "Count (smallest first)"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:594
+#: src/Form/Admin/SearchConfigConfigureForm.php:598
 msgid "Get facets from specific languages"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:595
+#: src/Form/Admin/SearchConfigConfigureForm.php:599
 msgid ""
 "Generally, facets are translated in the view, but in some cases, facet "
 "values may be translated directly in a multivalued property. Use \"|\" to "
@@ -1148,35 +1175,35 @@ msgid ""
 "results."
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:607
+#: src/Form/Admin/SearchConfigConfigureForm.php:611
 msgid "Facet mode"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:609
+#: src/Form/Admin/SearchConfigConfigureForm.php:613
 msgid "Send request with a button"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:610
+#: src/Form/Admin/SearchConfigConfigureForm.php:614
 msgid "Send request directly"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:623
+#: src/Form/Admin/SearchConfigConfigureForm.php:627
 msgid "Position of the button \"Apply filters\""
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:625
+#: src/Form/Admin/SearchConfigConfigureForm.php:629
 msgid "Above facets"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:626
+#: src/Form/Admin/SearchConfigConfigureForm.php:630
 msgid "Below facets"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:641
+#: src/Form/Admin/SearchConfigConfigureForm.php:645
 msgid "Display the list of active facets"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:653
+#: src/Form/Admin/SearchConfigConfigureForm.php:657
 msgid "Display the count of each facet item"
 msgstr ""
 
@@ -1378,22 +1405,22 @@ msgstr ""
 msgid "An issue occurred for the suggester."
 msgstr ""
 
-#: src/Querier/InternalQuerier.php:173 src/Querier/InternalQuerier.php:359
+#: src/Querier/InternalQuerier.php:171 src/Querier/InternalQuerier.php:355
 msgid "An internal issue in database occurred."
 msgstr ""
 
-#: src/Querier/InternalQuerier.php:349
+#: src/Querier/InternalQuerier.php:347
 msgid "This mode is currently not supported with the internal search engine."
 msgstr ""
 
-#: src/Querier/InternalQuerier.php:426
+#: src/Querier/InternalQuerier.php:422
 #, php-format
 msgid ""
 "The query \"%1$s\" uses %2$d properties, that is more than the %3$d "
 "supported currently. Excluded fields are removed."
 msgstr ""
 
-#: src/Querier/InternalQuerier.php:434
+#: src/Querier/InternalQuerier.php:430
 #, php-format
 msgid ""
 "The query \"%1$s\" uses %2$d properties, that is more than the %3$d "
@@ -1780,7 +1807,7 @@ msgstr ""
 msgid "Form adapter \"%s\" not found."
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/SearchRequestToResponse.php:208
+#: src/Mvc/Controller/Plugin/SearchRequestToResponse.php:212
 #, php-format
 msgid ""
 "Query error: %s\n"

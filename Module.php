@@ -737,6 +737,8 @@ class Module extends AbstractModule
             'nres' => $translate('is not resource with ID'), // @translate
             'lex' => $translate('is a linked resource'), // @translate
             'nlex' => $translate('is not a linked resource'), // @translate
+            'lres' => $translate('is linked with resource with ID'), // @translate
+            'nlres' => $translate('is not linked with resource with ID'), // @translate
         ];
 
         $reciprocalQueryTypes = [
@@ -748,6 +750,8 @@ class Module extends AbstractModule
             'new' => 'ew',
             'lex' => 'nlex',
             'nlex' => 'lex',
+            'lres' => 'nlres',
+            'nlres' => 'lres',
         ];
 
         $withoutValue = [
@@ -1111,6 +1115,8 @@ class Module extends AbstractModule
                         'nres' => $translate('is not resource with ID'), // @translate
                         'lex' => $translate('is a linked resource'), // @translate
                         'nlex' => $translate('is not a linked resource'), // @translate
+                        'lres' => $translate('is linked with resource with ID'), // @translate
+                        'nlres' => $translate('is not linked with resource with ID'), // @translate
                         'gt' => $translate('greater than'), // @translate
                         'gte' => $translate('greater than or equal'), // @translate
                         'lte' => $translate('lower than or equal'), // @translate
@@ -1134,16 +1140,20 @@ class Module extends AbstractModule
                         'nres' => 'res',
                         'lex' => 'nlex',
                         'nlex' => 'lex',
+                        'lres' => 'nlres',
+                        'nlres' => 'lres',
                         'gt' => 'lte',
                         'gte' => 'lt',
                         'lte' => 'gt',
                         'lt' => 'gte',
                     ];
 
-                    $subjectQueryTypes = [
-                        'lex',
-                        'nlex',
-                    ];
+                    // $subjectQueryTypes = [
+                    //     'lex',
+                    //     'nlex',
+                    //     'lres',
+                    //     'nlres',
+                    // ];
 
                     $withoutValue = [
                         'ex',

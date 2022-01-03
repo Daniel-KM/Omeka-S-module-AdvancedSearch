@@ -226,6 +226,8 @@ class ApiFormAdapter implements FormAdapterInterface
                 case 'ex':
                 case 'nlex':
                 case 'lex':
+                case 'nlres':
+                case 'lres':
                     $query->addFilterQuery($propertyField, $value, $queryType);
                     break;
                 default:

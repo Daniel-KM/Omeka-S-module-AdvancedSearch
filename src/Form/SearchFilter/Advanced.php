@@ -107,6 +107,8 @@ class Advanced extends Fieldset
                 'nres' => 'is not resource with ID', // @translate
                 'lex' => 'is a linked resource', // @translate
                 'nlex' => 'is not a linked resource', // @translate
+                'lres' => 'is linked with resource with ID', // @translate
+                'nlres' => 'is not linked with resource with ID', // @translate
             ];
             if ($joiner && $joinerNot) {
                 unset(
@@ -116,7 +118,8 @@ class Advanced extends Fieldset
                     $operators['new'],
                     $operators['nex'],
                     $operators['nres'],
-                    $operators['nlex']
+                    $operators['nlex'],
+                    $operators['nlres']
                 );
             }
             $this

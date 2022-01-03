@@ -305,6 +305,8 @@ res = is resource with ID
 nres = is not resource with ID
 lex = is a linked resource
 nlex = is not a linked resource
+lres = is linked with resource with ID
+nlres = is not linked with resource with ID
 ',
                     'rows' => 12,
                 ],

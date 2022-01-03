@@ -63,6 +63,8 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
             'nex' => $translate('has no values'), // @translate
             'lex' => $translate('is a linked resource'), // @translate
             'nlex' => $translate('is not a linked resource'), // @translate
+            'lres' => $translate('is linked with resource with ID'), // @translate
+            'nlres' => $translate('is not linked with resource with ID'), // @translate
         ];
 
         $withoutValueQueryTypes = [

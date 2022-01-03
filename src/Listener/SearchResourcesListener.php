@@ -2,6 +2,7 @@
 
 namespace AdvancedSearch\Listener;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Expr\Join;
 use Laminas\EventManager\Event;
@@ -305,6 +306,8 @@ class SearchResourcesListener
      *   - ndtp: does not have data type
      *   - lex: is a linked resource
      *   - nlex: is not a linked resource
+     *   - lres: is linked with resource #id
+     *   - nlres: is not linked with resource #id
      *   For date time only for now (a check is done to have a meaningful answer):
      *   TODO Remove the check for valid date time? Add another key (before/after)?
      *   Of course, it's better to use Numeric Data Types.
@@ -351,6 +354,8 @@ class SearchResourcesListener
             'ndtp' => 'dtp',
             'lex' => 'nlex',
             'nlex' => 'lex',
+            'lres' => 'nlres',
+            'nlres' => 'lres',
             'gt' => 'lte',
             'gte' => 'lt',
             'lte' => 'gt',
@@ -367,11 +372,22 @@ class SearchResourcesListener
         $arrayValueQueryTypes = [
             'list',
             'nlist',
+            'lres',
+            'nlres',
+        ];
+
+        $intValueQueryTypes = [
+            'res',
+            'nres',
+            'lres',
+            'nlres',
         ];
 
         $subjectQueryTypes = [
             'lex',
             'nlex',
+            'lres',
+            'nlres',
         ];
 
         foreach ($query['property'] as $queryRow) {
@@ -394,11 +410,15 @@ class SearchResourcesListener
 
             // Quick check of value.
             // A empty string "" is not a value, but "0" is a value.
-            if (!in_array($queryType, $withoutValueQueryTypes, true)) {
+            if (in_array($queryType, $withoutValueQueryTypes, true)) {
+                $value = null;
+            } else {
                 // A value may be an array with some types.
                 if (in_array($queryType, $arrayValueQueryTypes, true)) {
                     $value = is_array($value) ? $value : [$value];
-                    $value = array_unique(array_filter(array_map('trim', array_map('strval', $value)), 'strlen'));
+                    $value = in_array($queryType, $intValueQueryTypes)
+                        ? array_unique(array_map('intval', $value))
+                        : array_unique(array_filter(array_map('trim', array_map('strval', $value)), 'strlen'));
                     if (empty($value)) {
                         continue;
                     }
@@ -548,14 +568,15 @@ class SearchResourcesListener
                     }
                     break;
 
-                // Linked resources (subject values).
-
+                // The linked resources (subject values) use the same sub-query.
                 case 'nlex':
                     // For consistency, "nlex" is the reverse of "exl" even when
                     // a resource is linked with a public and a private resource.
                     // A private linked resource is not linked for an anonymous.
+                case 'nlres':
                     $positive = false;
                 case 'lex':
+                case 'lres':
                     $subValuesAlias = $this->adapter->createAlias();
                     $subResourceAlias = $this->adapter->createAlias();
                     // Use a subquery so rights are automatically managed.
@@ -565,6 +586,18 @@ class SearchResourcesListener
                         ->from(\Omeka\Entity\Value::class, $subValuesAlias)
                         ->innerJoin("$subValuesAlias.resource", $subResourceAlias)
                         ->where($expr->isNotNull("$subValuesAlias.valueResource"));
+                    // For "nlres" and "lres".
+                    if ($value) {
+                        // In fact, "lres" is the list of linked resources. May be simplified?
+                        if (count($value) === 1) {
+                            $param = $this->adapter->createNamedParameter($qb, reset($value));
+                            $subQb->andWhere($expr->eq("$subValuesAlias.resource", $param));
+                        } else {
+                            $param = $this->adapter->createNamedParameter($qb, $value);
+                            $qb->setParameter(substr($param, 1), $value, Connection::PARAM_INT_ARRAY);
+                            $subQb->andWhere($expr->in("$subValuesAlias.resource", $param));
+                        }
+                    }
                     // Warning: the property check should be done on subjects,
                     // so the predicate expression is finalized below.
                     // $predicateExpr = $expr->in("$valuesAlias.resource", $subQb->getDQL());

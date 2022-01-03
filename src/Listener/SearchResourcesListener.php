@@ -509,10 +509,10 @@ class SearchResourcesListener
                     $predicateExpr = $expr->isNotNull("$valuesAlias.id");
                     break;
 
-                case 'dtp':
+                case 'ndtp':
                     $positive = false;
                     // no break.
-                case 'ndtp':
+                case 'dtp':
                     if (is_array($value)) {
                         $dataTypeAlias = $this->adapter->createAlias();
                         $qb->setParameter($dataTypeAlias, $value, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);

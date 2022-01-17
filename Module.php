@@ -109,7 +109,7 @@ class Module extends AbstractModule
             return;
         }
 
-        $version = $module->getIni('version');
+        $version = (string) $module->getIni('version');
         if (version_compare($version, '3.5.7', '<')) {
             // Check the module Search of BibLibre.
             throw new \Omeka\Module\Exception\ModuleCannotInstallException(
@@ -123,7 +123,7 @@ class Module extends AbstractModule
         }
 
         $module = $moduleManager->getModule('AdvancedSearch');
-        $version = $module ? $module->getIni('version') : null;
+        $version = $module ? (string) $module->getIni('version') : null;
         if (version_compare($version, '3.3.6.6', '>')) {
             throw new \Omeka\Module\Exception\ModuleCannotInstallException(
                 'To be automatically upgraded and replaced by this module, use version 3.3.6.6 or below.' // @translate

@@ -284,7 +284,7 @@ class SearchResourcesListener
      * Query format:
      *
      * - property[{index}][joiner]: "and" OR "or" OR "not" joiner with previous query
-     * - property[{index}][property]: property ID
+     * - property[{index}][property]: property ID or array of property IDs
      * - property[{index}][text]: search text
      * - property[{index}][type]: search type
      * - property[{index}][datatype]: filter on data type(s)
@@ -393,20 +393,19 @@ class SearchResourcesListener
         foreach ($query['property'] as $queryRow) {
             if (!(
                 is_array($queryRow)
-                && array_key_exists('property', $queryRow)
                 && array_key_exists('type', $queryRow)
             )) {
                 continue;
             }
 
             $queryType = $queryRow['type'];
-            $joiner = $queryRow['joiner'] ?? '';
-            $value = $queryRow['text'] ?? '';
-            $dataType = $queryRow['datatype'] ?? '';
-
             if (!isset($reciprocalQueryTypes[$queryType])) {
                 continue;
             }
+
+            $joiner = $queryRow['joiner'] ?? '';
+            $value = $queryRow['text'] ?? '';
+            $dataType = $queryRow['datatype'] ?? '';
 
             // Quick check of value.
             // A empty string "" is not a value, but "0" is a value.
@@ -435,11 +434,11 @@ class SearchResourcesListener
                 $queryType = $reciprocalQueryTypes[$queryType];
             }
 
-            $propertyIds = $queryRow['property'];
+            $propertyIds = $queryRow['property'] ?? null;
             if ($propertyIds) {
                 $propertyIds = $this->getPropertyIds(is_array($propertyIds) ? $propertyIds : [$propertyIds]);
             }
-            $excludePropertyIds = $queryRow['property'] || empty($queryRow['except']) ? false : $queryRow['except'];
+            $excludePropertyIds = !empty($queryRow['property']) || empty($queryRow['except']) ? false : $queryRow['except'];
 
             $valuesAlias = $this->adapter->createAlias();
             $positive = true;
@@ -688,8 +687,8 @@ class SearchResourcesListener
                 $predicateExpr = $expr->in("$valuesAlias.resource", $subQb->getDQL());
             } elseif ($queryRow['property']) {
                 $joinConditions[] = count($propertyIds) < 2
-                    // There may be 0 or 1 property id.
-                    ? $expr->eq("$valuesAlias.property", (int) reset($propertyIds))
+                    // There may be 1 or more property id.
+                    ? $expr->eq("$valuesAlias.property", reset($propertyIds))
                     : $expr->in("$valuesAlias.property", $propertyIds);
             } elseif ($excludePropertyIds) {
                 $excludePropertyIds = $this->getPropertyIds(is_array($excludePropertyIds) ? $excludePropertyIds : [$excludePropertyIds]);

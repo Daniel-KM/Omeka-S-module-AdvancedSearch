@@ -42,6 +42,11 @@ class AbstractFacetElement extends AbstractFacet
             $params = $view->params()->fromRoute();
             $queryBase = $view->params()->fromQuery();
 
+            // Keep browsing inside an item set.
+            if (!empty($params['item-set-id'])) {
+                $route = 'site/item-set';
+            }
+
             $isSiteRequest = $plugins->get('status')->isSiteRequest();
             if ($isSiteRequest) {
                 $this->siteId = $plugins

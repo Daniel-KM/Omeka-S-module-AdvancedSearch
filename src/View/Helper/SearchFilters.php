@@ -2,7 +2,7 @@
 
 namespace AdvancedSearch\View\Helper;
 
-use Laminas\View\Helper\AbstractHelper;
+use Omeka\Api\Adapter\ResourceAdapter;
 use Omeka\Api\Exception\NotFoundException;
 
 /**
@@ -23,6 +23,16 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
      * @var array
      */
     protected $query;
+
+    /**
+     * @var ResourceAdapter
+     */
+    protected $resourceAdapter;
+
+    public function __construct(ResourceAdapter $resourceAdapter)
+    {
+        $this->resourceAdapter = $resourceAdapter;
+    }
 
     /**
      * Render filters from search query, with urls if needed (if set in theme).
@@ -110,35 +120,38 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
                     $index = 0;
                     foreach ($value as $subKey => $queryRow) {
                         if (!(is_array($queryRow)
-                            && array_key_exists('property', $queryRow)
                             && array_key_exists('type', $queryRow)
                         )) {
                             continue;
                         }
-                        $propertyId = $queryRow['property'];
                         $queryType = $queryRow['type'];
-                        $joiner = $queryRow['joiner'] ?? null;
-                        $value = $queryRow['text'] ?? null;
-
                         if (!isset($queryTypes[$queryType])) {
                             continue;
                         }
-                        if (!$value && !in_array($queryType, $withoutValueQueryTypes, true)) {
+                        $value = $queryRow['text'] ?? null;
+                        if (in_array($queryType, $withoutValueQueryTypes, true)) {
+                            $value = null;
+                        } elseif ((is_array($value) && !count($value)) || !strlen((string) $value)) {
                             continue;
                         }
-                        if ($propertyId) {
-                            if (is_numeric($propertyId)) {
-                                try {
-                                    $property = $api->read('properties', $propertyId)->getContent();
-                                } catch (NotFoundException $e) {
-                                    $property = null;
+                        $joiner = $queryRow['joiner'] ?? null;
+                        $queriedProperties = $queryRow['property'] ?? null;
+                        // Properties may be an array with an empty value
+                        // (any property) in advanced form, so remove empty
+                        // strings from it, in which case the check should
+                        // be skipped.
+                        if (is_array($queriedProperties) && in_array('', $queriedProperties, true)) {
+                            $queriedProperties = [];
+                        }
+                        if ($queriedProperties) {
+                            $propertyIds = $this->getPropertyIds($queriedProperties);
+                            $properties = $propertyIds ? $api->search('properties', ['id' => $propertyIds])->getContent() : [];
+                            if ($properties) {
+                                $propertyLabel = [];
+                                foreach ($properties as $property) {
+                                    $propertyLabel[] = $translate($property->label());
                                 }
-                            } else {
-                                $property = $api->searchOne('properties', ['term' => $propertyId])->getContent();
-                            }
-
-                            if ($property) {
-                                $propertyLabel = $translate($property->label());
+                                $propertyLabel = implode(' ' . $translate('OR') . ' ', $propertyLabel);
                             } else {
                                 $propertyLabel = $translate('Unknown property');
                             }
@@ -269,5 +282,46 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
         return $newQuery
             ? $this->baseUrl . '?' . http_build_query($newQuery, '', '&', PHP_QUERY_RFC3986)
             : $this->baseUrl;
+    }
+
+    /**
+     * Get one or more property ids by JSON-LD terms or by numeric ids.
+     *
+     * @param array|int|string|null $termsOrIds One or multiple ids or terms.
+     * @return int[] The property ids matching terms or ids, or all properties
+     * by terms.
+     */
+    protected function getPropertyIds($termsOrIds = null): array
+    {
+        static $propertiesByTerms;
+        static $propertiesByTermsAndIds;
+
+        if (is_null($propertiesByTermsAndIds)) {
+            $connection = $this->resourceAdapter->getServiceLocator()->get('Omeka\Connection');
+            $qb = $connection->createQueryBuilder();
+            $qb
+                ->select(
+                    'DISTINCT CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
+                    'property.id AS id',
+                    // Required with only_full_group_by.
+                    'vocabulary.id'
+                )
+                ->from('property', 'property')
+                ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
+                ->orderBy('vocabulary.id', 'asc')
+                ->addOrderBy('property.id', 'asc')
+            ;
+            $propertiesByTerms = array_map('intval', $connection->executeQuery($qb)->fetchAllKeyValue());
+            $propertiesByTermsAndIds = array_replace($propertiesByTerms, array_combine($propertiesByTerms, $propertiesByTerms));
+        }
+
+        if (is_null($termsOrIds)) {
+            return $propertiesByTerms;
+        }
+
+        if (is_scalar($termsOrIds)) {
+            $termsOrIds = [$termsOrIds];
+        }
+        return array_intersect_key($propertiesByTermsAndIds, array_flip($termsOrIds));
     }
 }

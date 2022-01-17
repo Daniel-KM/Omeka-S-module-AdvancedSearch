@@ -758,7 +758,7 @@ class Module extends AbstractModule
 
         $filters = $event->getParam('filters');
 
-        $this->baseUrl = $event->getParam('baseUrl');
+        $this->baseUrl = (string) $event->getParam('baseUrl');
 
         $this->query = $this->searchResourcesListener->normalizeQueryDateTime($query);
         unset(

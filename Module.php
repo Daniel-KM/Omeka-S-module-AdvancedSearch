@@ -46,6 +46,7 @@ use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
 use Laminas\ModuleManager\ModuleManager;
 use Laminas\Mvc\MvcEvent;
+use Omeka\Api\Exception\NotFoundException;
 use Omeka\Entity\Resource;
 use Omeka\Mvc\Controller\Plugin\Messenger;
 use Omeka\Stdlib\Message;
@@ -997,8 +998,8 @@ class Module extends AbstractModule
                 // Resource type is "items", "item_sets", etc.
                 case 'resource_type':
                     $resourceTypes = [
-                        'items' => $transalte('Items'),
-                        'item_sets' => $transalte('Item sets'),
+                        'items' => $translate('Items'),
+                        'item_sets' => $translate('Item sets'),
                     ];
                     $filterLabel = $translate('Resource type'); // @translate
                     foreach ($flatArray($value) as $subKey => $subValue) {

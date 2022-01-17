@@ -7,7 +7,9 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Expr\Join;
 use Laminas\EventManager\Event;
 use Omeka\Api\Adapter\ItemAdapter;
+use Omeka\Api\Adapter\ItemSetAdapter;
 use Omeka\Api\Adapter\MediaAdapter;
+use Omeka\Api\Exception\NotFoundException;
 
 class SearchResourcesListener
 {
@@ -225,7 +227,7 @@ class SearchResourcesListener
             foreach ($sites as &$site) {
                 try {
                     $siteAdapter->findEntity($site);
-                } catch (Exception\NotFoundException $e) {
+                } catch (NotFoundException $e) {
                     $site = 0;
                 }
             }

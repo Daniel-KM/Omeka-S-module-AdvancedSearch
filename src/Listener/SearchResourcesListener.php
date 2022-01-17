@@ -277,8 +277,8 @@ class SearchResourcesListener
      * Query format:
      *
      * - property[{index}][joiner]: "and" OR "or" OR "not" joiner with previous query
-     * - property[{index}][property]: property ID or array of property IDs
-     * - property[{index}][text]: search text
+     * - property[{index}][property]: property ID or term or array of property IDs or terms
+     * - property[{index}][text]: search text or array of texts or values
      * - property[{index}][type]: search type
      * - property[{index}][datatype]: filter on data type(s)
      *   - eq: is exactly (core)
@@ -320,13 +320,14 @@ class SearchResourcesListener
 
         $valuesJoin = 'omeka_root.values';
         $where = '';
-        $expr = $qb->expr();
 
-        $escape = function ($string) {
+        // @see \Doctrine\ORM\QueryBuilder::expr().
+        $expr = $qb->expr();
+        $entityManager = $this->adapter->getEntityManager();
+
+        $escapeSql = function ($string) {
             return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], (string) $string);
         };
-
-        $entityManager = $this->adapter->getEntityManager();
 
         // Initialize properties and used properties one time.
         $this->getPropertyIds();
@@ -358,13 +359,6 @@ class SearchResourcesListener
             'lt' => 'gte',
         ];
 
-        $withoutValueQueryTypes = [
-            'ex',
-            'nex',
-            'lex',
-            'nlex',
-        ];
-
         $arrayValueQueryTypes = [
             'list',
             'nlist',
@@ -377,6 +371,13 @@ class SearchResourcesListener
             'nres',
             'lres',
             'nlres',
+        ];
+
+        $withoutValueQueryTypes = [
+            'ex',
+            'nex',
+            'lex',
+            'nlex',
         ];
 
         $subjectQueryTypes = [
@@ -399,42 +400,41 @@ class SearchResourcesListener
                 continue;
             }
 
-            $joiner = $queryRow['joiner'] ?? '';
             $value = $queryRow['text'] ?? '';
-            $dataType = $queryRow['datatype'] ?? '';
 
             // Quick check of value.
             // A empty string "" is not a value, but "0" is a value.
             if (in_array($queryType, $withoutValueQueryTypes, true)) {
                 $value = null;
-            } else {
-                // A value may be an array with some types.
-                if (in_array($queryType, $arrayValueQueryTypes, true)) {
-                    $value = is_array($value) ? $value : [$value];
-                    $value = in_array($queryType, $intValueQueryTypes)
-                        ? array_unique(array_map('intval', $value))
-                        : array_unique(array_filter(array_map('trim', array_map('strval', $value)), 'strlen'));
-                    if (empty($value)) {
-                        continue;
-                    }
+            }
+            // Check array of values.
+            elseif (in_array($queryType, $arrayValueQueryTypes, true)) {
+                if ((is_array($value) && !count($value)) || !strlen((string) $value)) {
+                    continue;
                 }
-                // The value should be a scalar in all other cases.
-                elseif (is_array($value) || !strlen((string) $value)) {
+                if (!is_array($value)) {
+                    $value = [$value];
+                }
+                $value = in_array($queryType, $intValueQueryTypes)
+                    ? array_unique(array_map('intval', $value))
+                    : array_unique(array_filter(array_map('trim', array_map('strval', $value)), 'strlen'));
+                if (empty($value)) {
                     continue;
                 }
             }
+            // The value should be a scalar in all other cases.
+            elseif (is_array($value) || !strlen((string) $value)) {
+                continue;
+            }
+
+            $joiner = $queryRow['joiner'] ?? '';
+            $dataType = $queryRow['datatype'] ?? '';
 
             // Invert the query type for joiner "not".
             if ($joiner === 'not') {
                 $joiner = 'and';
                 $queryType = $reciprocalQueryTypes[$queryType];
             }
-
-            $propertyIds = $queryRow['property'] ?? null;
-            if ($propertyIds) {
-                $propertyIds = array_values(array_unique($this->getPropertyIds($propertyIds)));
-            }
-            $excludePropertyIds = !empty($queryRow['property']) || empty($queryRow['except']) ? false : $queryRow['except'];
 
             $valuesAlias = $this->adapter->createAlias();
             $positive = true;
@@ -463,7 +463,7 @@ class SearchResourcesListener
                     $positive = false;
                     // no break.
                 case 'in':
-                    $param = $this->adapter->createNamedParameter($qb, '%' . $escape($value) . '%');
+                    $param = $this->adapter->createNamedParameter($qb, '%' . $escapeSql($value) . '%');
                     $subqueryAlias = $this->adapter->createAlias();
                     $subquery = $entityManager
                         ->createQueryBuilder()
@@ -500,7 +500,7 @@ class SearchResourcesListener
                     $positive = false;
                     // no break.
                 case 'sw':
-                    $param = $this->adapter->createNamedParameter($qb, $escape($value) . '%');
+                    $param = $this->adapter->createNamedParameter($qb, $escapeSql($value) . '%');
                     $subqueryAlias = $this->adapter->createAlias();
                     $subquery = $entityManager
                         ->createQueryBuilder()
@@ -518,7 +518,7 @@ class SearchResourcesListener
                     $positive = false;
                     // no break.
                 case 'ew':
-                    $param = $this->adapter->createNamedParameter($qb, '%' . $escape($value));
+                    $param = $this->adapter->createNamedParameter($qb, '%' . $escapeSql($value));
                     $subqueryAlias = $this->adapter->createAlias();
                     $subquery = $entityManager
                         ->createQueryBuilder()
@@ -536,10 +536,14 @@ class SearchResourcesListener
                     $positive = false;
                     // no break.
                 case 'res':
-                    $predicateExpr = $expr->eq(
-                        "$valuesAlias.valueResource",
-                        $this->adapter->createNamedParameter($qb, $value)
-                    );
+                    if (count($value) <= 1) {
+                        $param = $this->adapter->createNamedParameter($qb, (int) reset($value));
+                        $predicateExpr = $expr->eq("$valuesAlias.valueResource", $param);
+                    } else {
+                        $param = $this->adapter->createNamedParameter($qb, $value);
+                        $qb->setParameter(substr($param, 1), $value, Connection::PARAM_INT_ARRAY);
+                        $predicateExpr = $expr->in("$valuesAlias.valueResource", $param);
+                    }
                     break;
 
                 case 'nex':
@@ -565,11 +569,12 @@ class SearchResourcesListener
 
                 // The linked resources (subject values) use the same sub-query.
                 case 'nlex':
-                    // For consistency, "nlex" is the reverse of "exl" even when
+                    // For consistency, "nlex" is the reverse of "lex" even when
                     // a resource is linked with a public and a private resource.
                     // A private linked resource is not linked for an anonymous.
                 case 'nlres':
                     $positive = false;
+                    // no break.
                 case 'lex':
                 case 'lres':
                     $subValuesAlias = $this->adapter->createAlias();
@@ -581,11 +586,12 @@ class SearchResourcesListener
                         ->from(\Omeka\Entity\Value::class, $subValuesAlias)
                         ->innerJoin("$subValuesAlias.resource", $subResourceAlias)
                         ->where($expr->isNotNull("$subValuesAlias.valueResource"));
-                    // For "nlres" and "lres".
-                    if ($value) {
-                        // In fact, "lres" is the list of linked resources. May be simplified?
-                        if (count($value) === 1) {
-                            $param = $this->adapter->createNamedParameter($qb, reset($value));
+                    // Warning: the property check should be done on subjects,
+                    // so the predicate expression is finalized below.
+                    if (is_array($value)) {
+                        // In fact, "lres" is the list of linked resources.
+                        if (count($value) <= 1) {
+                            $param = $this->adapter->createNamedParameter($qb, (int) reset($value));
                             $subQb->andWhere($expr->eq("$subValuesAlias.resource", $param));
                         } else {
                             $param = $this->adapter->createNamedParameter($qb, $value);
@@ -593,9 +599,6 @@ class SearchResourcesListener
                             $subQb->andWhere($expr->in("$subValuesAlias.resource", $param));
                         }
                     }
-                    // Warning: the property check should be done on subjects,
-                    // so the predicate expression is finalized below.
-                    // $predicateExpr = $expr->in("$valuesAlias.resource", $subQb->getDQL());
                     break;
 
                 // TODO Manage uri and resources with gt, gte, lte, lt (it has a meaning at least for resource ids, but separate).
@@ -657,46 +660,57 @@ class SearchResourcesListener
 
             $joinConditions = [];
 
-            // Narrow to specific property, if one is selected.
-            // The check is done against the requested property, like in core:
-            // when user request is invalid, return an empty result.
-            // But first, manage the exception for queries on subject values,
-            // where the properties should be checked against the sub-query.
-            if (in_array($queryType, $subjectQueryTypes)) {
-                // Same process as below.
-                if ($queryRow['property']) {
-                    $subQb
-                        ->andWhere(count($propertyIds) < 2
-                            ? $expr->eq("$subValuesAlias.property", (int) reset($propertyIds))
-                            : $expr->in("$subValuesAlias.property", $propertyIds)
-                        );
-                } elseif ($excludePropertyIds) {
-                    $excludePropertyIds = array_values(array_unique($this->getPropertyIds($excludePropertyIds)));
-                    if (count($excludePropertyIds)) {
-                        $otherIds = array_diff($this->usedPropertiesByTerm, $excludePropertyIds);
-                        $otherIds[] = 0;
+            // Narrow to specific properties, if one or more are selected.
+            $propertyIds = $queryRow['property'] ?? null;
+            // Properties may be an array with an empty value (any property) in
+            // advanced form, so remove empty strings from it, in which case the
+            // check should be skipped.
+            if (is_array($propertyIds) && in_array('', $propertyIds, true)) {
+                $propertyIds = [];
+            }
+            // TODO What if a property is ""?
+            $excludePropertyIds = $propertyIds || empty($queryRow['except'])
+                ? false
+                :  array_values(array_unique($this->getPropertyIds($queryRow['except'])));
+            if ($propertyIds) {
+                $propertyIds = array_values(array_unique($this->getPropertyIds($propertyIds)));
+                if ($propertyIds) {
+                    // For queries on subject values, the properties should be
+                    // checked against the sub-query.
+                    if (in_array($queryType, $subjectQueryTypes)) {
                         $subQb
-                            ->andWhere($expr->in("$subValuesAlias.property", $otherIds));
+                            ->andWhere(count($propertyIds) < 2
+                                ? $expr->eq("$subValuesAlias.property", reset($propertyIds))
+                                : $expr->in("$subValuesAlias.property", $propertyIds)
+                            );
+                    } else {
+                        $joinConditions[] = count($propertyIds) < 2
+                            ? $expr->eq("$valuesAlias.property", reset($propertyIds))
+                            : $expr->in("$valuesAlias.property", $propertyIds);
                     }
+                } else {
+                    // Don't return results for this part for fake properties.
+                    $joinConditions[] = $expr->eq("$valuesAlias.property", 0);
                 }
-                // Finalize the predicate expression on the subjects.
-                $predicateExpr = $expr->in("$valuesAlias.resource", $subQb->getDQL());
-            } elseif ($queryRow['property']) {
-                $joinConditions[] = count($propertyIds) < 2
-                    // There may be 1 or more property id.
-                    ? $expr->eq("$valuesAlias.property", reset($propertyIds))
-                    : $expr->in("$valuesAlias.property", $propertyIds);
-            } elseif ($excludePropertyIds) {
-                $excludePropertyIds = array_values(array_unique($this->getPropertyIds($excludePropertyIds)));
-                // Use standard query if nothing to exclude, else limit search.
-                if (count($excludePropertyIds)) {
-                    // The aim is to search anywhere except ocr content.
-                    // Use not positive + in() or notIn()? A full list is simpler.
-                    $otherIds = array_diff($this->usedPropertiesByTerm, $excludePropertyIds);
-                    // Avoid issue when everything is excluded.
-                    $otherIds[] = 0;
+            }
+            // Use standard query if nothing to exclude, else limit search.
+            elseif ($excludePropertyIds) {
+                // The aim is to search anywhere except ocr content.
+                // Use not positive + in() or notIn()? A full list is simpler.
+                $otherIds = array_diff($this->usedPropertiesByTerm, $excludePropertyIds);
+                // Avoid issue when everything is excluded.
+                $otherIds[] = 0;
+                if (in_array($queryType, $subjectQueryTypes)) {
+                    $subQb
+                        ->andWhere($expr->in("$subValuesAlias.property", $otherIds));
+                } else {
                     $joinConditions[] = $expr->in("$valuesAlias.property", $otherIds);
                 }
+            }
+
+            // Finalize predicate expression on subject values.
+            if (in_array($queryType, $subjectQueryTypes)) {
+                $predicateExpr = $expr->in("$valuesAlias.resource", $subQb->getDQL());
             }
 
             if ($dataType) {

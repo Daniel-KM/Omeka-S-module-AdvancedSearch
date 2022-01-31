@@ -364,6 +364,8 @@ class SearchResourcesListener
         $arrayValueQueryTypes = [
             'list',
             'nlist',
+            'res',
+            'nres',
             'lres',
             'nlres',
         ];

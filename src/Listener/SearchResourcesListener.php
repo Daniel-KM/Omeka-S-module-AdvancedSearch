@@ -411,7 +411,9 @@ class SearchResourcesListener
             }
             // Check array of values.
             elseif (in_array($queryType, $arrayValueQueryTypes, true)) {
-                if ((is_array($value) && !count($value)) || !strlen((string) $value)) {
+                if ((is_array($value) && !count($value))
+                    || (!is_array($value) && !strlen((string) $value))
+                ) {
                     continue;
                 }
                 if (!is_array($value)) {

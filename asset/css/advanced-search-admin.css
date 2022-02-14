@@ -100,4 +100,7 @@
     #search-filters .filter input {
         margin-right: 6px;
     }
+    input[type=submit][disabled] {
+        cursor: unset;
+    }
 }

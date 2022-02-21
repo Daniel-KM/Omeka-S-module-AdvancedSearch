@@ -32,9 +32,9 @@ $this->form->setButtonLabel($translate('Confirm reindex'));
             <?= $translate('Process of indexation') ?>
             <br/>
             <br/>
-            <input form="<?= $form->getName() ?>" type="radio" name="process_mode" id="process_mode" value="sql"><?= $translate('Direct sql (in particular mode "full")') ?>
+            <input form="<?= $form->getName() ?>" type="radio" name="process_mode" id="process_mode" value="sql"/><?= $translate('Direct sql (in particular mode "full")') ?>
             </br/>
-            <input form="<?= $form->getName() ?>" type="radio" name="process_mode" id="process_mode" value="orm"><?= $translate('Orm (slower but more precise index, required for old database, or small memory)') ?>
+            <input form="<?= $form->getName() ?>" type="radio" name="process_mode" id="process_mode" value="orm" checked="checked"/><?= $translate('Orm (slower but more precise index, required for old database, or small memory)') ?>
         </p>
         <p>
         <?php if ($totalJobs): ?>

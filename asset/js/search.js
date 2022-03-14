@@ -1,6 +1,6 @@
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2017-2021
+ * Copyright Daniel Berthereau, 2017-2022
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -30,7 +30,8 @@ var Search = (function() {
     var self = {};
 
     self.setViewType = function(viewType) {
-        var resourceLists = document.querySelectorAll('.search-results .resource-list');
+        // In some themes, the mode for resource list is set with a different class.
+        var resourceLists = document.querySelectorAll('.search-results .resource-list, .search-results .resources-list-content');
         for (var i = 0; i < resourceLists.length; i++) {
             var resourceItem = resourceLists[i];
             resourceItem.className = resourceItem.className.replace(' grid', '').replace(' list', '')

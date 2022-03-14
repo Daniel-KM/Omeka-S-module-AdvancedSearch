@@ -906,7 +906,7 @@ class MainSearchForm extends Form
     /**
      * Check a property term or id.
      *
-     * @see \Bulk\Mvc\Controller\Plugin\Bulk::getPropertyTerm()
+     * @see \BulkImport\Mvc\Controller\Plugin\Bulk::getPropertyTerm()
      * @todo Factorize with \AdvancedSearch\Querier\InternalQuerier::getPropertyTerm()
      * @see \AdvancedSearch\Querier\InternalQuerier::getPropertyTerm()
      */

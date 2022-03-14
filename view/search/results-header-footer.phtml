@@ -12,7 +12,7 @@
 $plugins = $this->getHelperPluginManager();
 $escape = $plugins->get('escapeHtml');
 $translate = $plugins->get('translate');
-$translatePlural = $plugins->get('translatePlural');
+// $translatePlural = $plugins->get('translatePlural');
 
 // Default values of the module.
 $displayParts = [
@@ -30,11 +30,15 @@ if (isset($displayParts['per_pages']) && $perPages = $searchPage->subSetting('pa
     // Don't display unmanaged per page from the query, but set the default Omeka per page.
     // Can be simplified in a theme.
     $setting = $plugins->get('setting');
-    $defaultPerPage = $this->status()->isSiteRequest() ? ($plugins->get('siteSetting')('pagination_per_page') ?: $setting('pagination_per_page', 25)) : $setting('pagination_per_page', 25);
-    $perPages = array_replace([(int) $defaultPerPage => sprintf($translate('Results by %d'), $defaultPerPage)], $perPages);
+    $defaultPerPage = (int) ($this->status()->isSiteRequest() ? ($plugins->get('siteSetting')('pagination_per_page') ?: $setting('pagination_per_page', 25)) : $setting('pagination_per_page', 25));
+    $perPages = array_replace([$defaultPerPage => sprintf($translate('Results by %d'), $defaultPerPage)], $perPages);
     ksort($perPages);
-    $perPage = $query->getPerPage() ?: null;
+    $perPage = (int) $query->getPerPage() ?: $defaultPerPage;
 }
+
+$sortFields = isset($displayParts['sort']) ? $searchPage->subSetting('sort', 'fields') : [];
+$gridListMode = $searchPage->subSetting('display', 'grid_list_mode', 'auto');
+$multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['list_only', 'grid_only']);
 ?>
 
 <?php if (isset($displayParts['search_filters'])): ?>
@@ -51,17 +55,17 @@ if (isset($displayParts['per_pages']) && $perPages = $searchPage->subSetting('pa
 <div class="search-results-per-page">
     <select name="per_page">
         <?php foreach ($perPages as $per => $label): ?>
-        <?= sprintf('<option value="%d"%s>%s</option>', (int) $per, $per === $perPage ? ' selected="selected"' : '', $escape($label)) ?>
+        <?= sprintf('<option value="%d"%s>%s</option>', $per, $per === $perPage ? ' selected="selected"' : '', $escape($label)) ?>
         <?php endforeach; ?>
     </select>
 </div>
 <?php endif; ?>
 
-<?php if (isset($displayParts['sort']) && $sortFields = $searchPage->subSetting('sort', 'fields')): ?>
+<?php if ($sortFields): ?>
 <?= $this->searchSortSelector($query, $sortFields) ?>
 <?php endif; ?>
 
-<?php if (isset($displayParts['grid_list']) && ($gridListMode = $searchPage->subSetting('display', 'grid_list_mode', 'auto')) && !in_array($gridListMode, ['list_only', 'grid_only'])): ?>
+<?php if ($multiMode): ?>
 <div class="search-results-display">
     <a class="search-view-type search-view-type-list<?= $gridListMode === 'list' ? ' active' : '' ?>" href="#"><?= $translate('list') ?></a>
     |

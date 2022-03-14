@@ -50,10 +50,20 @@ $vars = $this->vars();
 // Used in case of a redirect of item-set/show to search, when used like item/browse.
 $itemSetId = $this->params()->fromRoute('item-set-id');
 // TODO Use site item set ?
+/** @var \Omeka\Api\Representation\ItemSetRepresentation $itemSet */
 $itemSet = $itemSetId ? $api->searchOne('item_sets', ['id' => $itemSetId])->getContent() : null;
 
 $isPartial = !$site;
 $skipFormAction = !empty($skipFormAction);
+
+$documentCount = isset($response) ? $response->getTotalResults() : 0;
+if ($documentCount):
+    $itemSetsCount = $response->getResourceTotalResults('item_sets');
+    $itemsCount = $response->getResourceTotalResults('items');
+    $displayParts = $searchPage->setting('display', []);
+    $displayPartsHeader = array_filter($displayParts, function ($v) { return in_array($v, ['header', 'both']); });
+    $displayPartsFooter = array_filter($displayParts, function ($v) { return in_array($v, ['footer', 'both']); });
+endif;
 
 $this->headLink()->appendStylesheet($assetUrl('css/search.css', 'AdvancedSearch'));
 $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
@@ -89,18 +99,11 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'te
 <?= $this->searchForm($searchPage, null, $skipFormAction) ?>
 
 <?php if (isset($response)):
-$documentCount = $response->getTotalResults();
 ?>
 <div class="search-results-wrapper">
     <div class="search-results">
 
-        <?php if ($documentCount):
-            $itemSetsCount = $response->getResourceTotalResults('item_sets');
-            $itemsCount = $response->getResourceTotalResults('items');
-            $displayParts = $searchPage->setting('display', []);
-            $displayPartsHeader = array_filter($displayParts, function ($v) { return in_array($v, ['header', 'both']); });
-            $displayPartsFooter = array_filter($displayParts, function ($v) { return in_array($v, ['footer', 'both']); });
-            ?>
+        <?php if ($documentCount): ?>
 
         <?php if ($displayPartsHeader): ?>
         <div class="search-results-part search-results-header">

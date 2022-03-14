@@ -962,7 +962,7 @@ SQL;
     /**
      * Check a property term or id.
      *
-     * @see \Bulk\Mvc\Controller\Plugin\Bulk::getPropertyTerm()
+     * @see \BulkImport\Mvc\Controller\Plugin\Bulk::getPropertyTerm()
      */
     protected function getPropertyTerm($termOrId): ?string
     {

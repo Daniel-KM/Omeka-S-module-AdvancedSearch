@@ -108,6 +108,7 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'te
         <?php if ($displayPartsHeader): ?>
         <div class="search-results-part search-results-header">
             <?= $partial('search/results-header-footer', [
+                'site' => $site,
                 'searchPage' => $searchPage,
                 'query' => $query,
                 'response' => $response,
@@ -145,6 +146,7 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'te
         <?php if ($displayPartsFooter): ?>
         <div class="search-results-part search-results-footer">
             <?= $partial('search/results-header-footer', [
+                'site' => $site,
                 'searchPage' => $searchPage,
                 'query' => $query,
                 'response' => $response,
@@ -177,6 +179,7 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'te
     </div>
 
     <?= $partial('search/facets', [
+        'site' => $site,
         'searchPage' => $searchPage,
         'query' => $query,
         'response' => $response,

@@ -61,7 +61,7 @@ $options = $searchPage->setting('facet', []);
 
         <?php if ($displayFacetButton && ($displayButton === 'above' || $displayButton === 'both')): ?>
         <div class="apply-facets apply-facets-top">
-            <input type="submit" value="<?= $translate('Apply facets') ?>"/>
+            <button type="submit"><?= $translate('Apply facets') ?></button>
         </div>
         <?php endif; ?>
 
@@ -84,7 +84,7 @@ $options = $searchPage->setting('facet', []);
 
         <?php if ($displayFacetButton && ($displayButton === 'below' || $displayButton === 'both')): ?>
         <div class="apply-facets apply-facets-bottom">
-            <input type="submit" value="<?= $translate('Apply facets') ?>"/>
+            <button type="submit"><?= $translate('Apply facets') ?></button>
         </div>
         <?php endif; ?>
 

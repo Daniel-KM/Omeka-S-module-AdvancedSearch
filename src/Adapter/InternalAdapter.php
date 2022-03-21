@@ -2,8 +2,6 @@
 
 namespace AdvancedSearch\Adapter;
 
-use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
-
 class InternalAdapter extends AbstractAdapter
 {
     public function getLabel(): string

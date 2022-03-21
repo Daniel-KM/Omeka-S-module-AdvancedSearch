@@ -5,11 +5,9 @@ namespace AdvancedSearch\View\Helper;
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use AdvancedSearch\Query;
 use Laminas\View\Helper\AbstractHelper;
-use Omeka\Api\Exception\NotFoundException;
 
 /**
  * View helper for rendering search filters for the advanced search response.
- *
  */
 class SearchingFilters extends AbstractHelper
 {

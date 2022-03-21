@@ -764,7 +764,7 @@ SQL;
                 ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
                 ->orderBy('vocabulary.id', 'asc')
                 ->addOrderBy('property.id', 'asc');
-            ;
+
             $properties = array_map('intval', $this->connection->executeQuery($qb)->fetchAllKeyValue());
             $this->propertiesByTermsAndIds = array_replace($properties, array_combine($properties, $properties));
         }

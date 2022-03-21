@@ -29,6 +29,7 @@ $filterLocale = (bool) $setting('filter_locale_values');
 $siteLang = $plugins->get('lang')();
 $lang = $filterLocale ? $siteLang : null;
 $langValue = $filterLocale ? [$siteLang, ''] : null;
+$untitled = $translate('[Untitled]');
 
 $headingTerm = $setting('browse_heading_property_term');
 $bodyTerm = $setting('browse_body_property_term');
@@ -44,11 +45,12 @@ $defaultThumbnail = '<img src="' . $assetUrl('thumbnails/default.png', 'Omeka', 
 <ul class="resource-list search-results-list<?= $gridListMode === 'list_only' ? ' list' : ($gridListMode === 'grid_only' ? ' grid' : '') ?>">
     <?php /** @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource */
     foreach ($resources as $resource):
+        // Can be simplified in the public theme.
         $resourceUrl = $site ? $resource->siteUrl($siteSlug) : $resource->adminUrl($siteSlug);
         $resourceType = $resource->resourceName();
         $resourceThumbnail = $thumbnail($resource, 'medium') ?: $defaultThumbnail;
         $heading = $headingTerm ? $resource->value($headingTerm, ['lang' => $langValue]) : null;
-        $heading = $heading ? $heading->asHtml() : $escape($resource->displayTitle($translate('[Untitled]'), $lang));
+        $heading = $heading ? $heading->asHtml() : $escape($resource->displayTitle($untitled, $lang));
         $body = $bodyTerm ? $resource->value($bodyTerm, ['lang' => $langValue]) : null;
         $body = $body ? $body->asHtml() : $escape($resource->displayDescription(null, $lang));
     ?>

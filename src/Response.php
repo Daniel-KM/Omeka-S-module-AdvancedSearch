@@ -30,7 +30,7 @@
 
 namespace AdvancedSearch;
 
-use \Omeka\Api\Manager as ApiManager;
+use Omeka\Api\Manager as ApiManager;
 
 /**
  * @todo Manage resources as a whole with a global order.

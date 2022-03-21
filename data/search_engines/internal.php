@@ -291,7 +291,7 @@ return [
                     ],
                 ],
             ],
-        ]
+        ],
     ],
     'o:created' => null,
     'o:modified' => null,

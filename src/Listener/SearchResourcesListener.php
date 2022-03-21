@@ -3,8 +3,8 @@
 namespace AdvancedSearch\Listener;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\QueryBuilder;
 use Laminas\EventManager\Event;
 use Omeka\Api\Adapter\ItemAdapter;
 use Omeka\Api\Adapter\ItemSetAdapter;

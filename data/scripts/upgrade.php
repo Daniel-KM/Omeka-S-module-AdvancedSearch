@@ -131,7 +131,7 @@ SQL;
         ->orderBy('search_config.id', 'asc');
     $searchConfigsSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
     foreach ($searchConfigsSettings as $id => $searchConfigSettings) {
-        $searchConfigSettings = json_decode($searchConfigSettings,  true) ?: [];
+        $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
         foreach ($searchConfigSettings['form']['filters'] ?? [] as $key => $filter) {
             if (in_array($filter['field'], [
                 'site_id',
@@ -170,7 +170,7 @@ SQL;
         ->orderBy('id', 'asc');
     $searchEnginesSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
     foreach ($searchEnginesSettings as $id => $searchEngineSettings) {
-        $searchEngineSettings = json_decode($searchEngineSettings,  true) ?: [];
+        $searchEngineSettings = json_decode($searchEngineSettings, true) ?: [];
         $searchEngineSettings['adapter'] = array_replace(
             $defaultAdapterSettings,
             $searchEngineSettings['adapter'] ?? []

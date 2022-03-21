@@ -46,6 +46,7 @@ return [
             'searchingForm' => View\Helper\SearchingForm::class,
             'searchingFilters' => View\Helper\SearchingFilters::class,
             'searchingUrl' => View\Helper\SearchingUrl::class,
+            'searchPaginationPerPageSelector' => View\Helper\SearchPaginationPerPageSelector::class,
             'searchSortSelector' => View\Helper\SearchSortSelector::class,
         ],
         'factories' => [

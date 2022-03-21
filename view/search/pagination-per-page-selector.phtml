@@ -1,0 +1,16 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \AdvancedSearch\Query $query
+ * @var \Laminas\Form\Element\Select $select
+ * @var array $options
+ * @var bool $asUrl
+ */
+
+if (count($options) <= 1) return;
+?>
+
+<div class="search-pagination-per-page<?= $asUrl ? ' as-url' : '' ?>">
+    <?= $this->formLabel($select) ?>
+    <?= $this->formSelect($select) ?>
+</div>

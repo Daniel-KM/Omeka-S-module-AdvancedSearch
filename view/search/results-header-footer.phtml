@@ -10,9 +10,7 @@
  */
 
 $plugins = $this->getHelperPluginManager();
-$escape = $plugins->get('escapeHtml');
 $translate = $plugins->get('translate');
-// $translatePlural = $plugins->get('translatePlural');
 
 // Default values of the module.
 $displayParts = [
@@ -26,16 +24,7 @@ $displayParts = [
 $displayParts = $searchPage ? $searchPage->setting('display', $displayParts) : $displayParts;
 $displayParts = array_filter($displayParts, function ($v) use ($resultPart) { return in_array($v, [$resultPart, 'both']); });
 
-if (isset($displayParts['per_pages']) && $perPages = $searchPage->subSetting('pagination', 'per_pages')) {
-    // Don't display unmanaged per page from the query, but set the default Omeka per page.
-    // Can be simplified in a theme.
-    $setting = $plugins->get('setting');
-    $defaultPerPage = (int) ($this->status()->isSiteRequest() ? ($plugins->get('siteSetting')('pagination_per_page') ?: $setting('pagination_per_page', 25)) : $setting('pagination_per_page', 25));
-    $perPages = array_replace([$defaultPerPage => sprintf($translate('Results by %d'), $defaultPerPage)], $perPages);
-    ksort($perPages);
-    $perPage = (int) $query->getPerPage() ?: $defaultPerPage;
-}
-
+$paginationPerPages = isset($displayParts['per_pages']) ? $searchPage->subSetting('pagination', 'per_pages') : [];
 $sortFields = isset($displayParts['sort']) ? $searchPage->subSetting('sort', 'fields') : [];
 $gridListMode = $searchPage->subSetting('display', 'grid_list_mode', 'auto');
 $multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['list_only', 'grid_only']);
@@ -51,14 +40,8 @@ $multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['lis
 </div>
 <?php endif; ?>
 
-<?php if (!empty($perPages)): ?>
-<div class="search-results-per-page">
-    <select name="per_page">
-        <?php foreach ($perPages as $per => $label): ?>
-        <?= sprintf('<option value="%d"%s>%s</option>', $per, $per === $perPage ? ' selected="selected"' : '', $escape($label)) ?>
-        <?php endforeach; ?>
-    </select>
-</div>
+<?php if (count($paginationPerPages)): ?>
+<?= $this->searchPaginationPerPageSelector($query, $paginationPerPages) ?>
 <?php endif; ?>
 
 <?php if (count($sortFields)): ?>

@@ -77,20 +77,22 @@ class SearchSortSelector extends AbstractHelper
         $currentUrl = strtok($serverUrl(true), '?');
         $currentQuery = $params->fromQuery();
         $currentSort = $query->getSort();
-        $sorts = $options;
-        $options = [];
-        $currentSortUrl = null;
-        foreach ($sorts as $name => $sortOption) {
-            $sortName = $currentUrl . '?' . http_build_query(['sort' => $name] + $currentQuery, '', '&', PHP_QUERY_RFC3986);
-            if ($name === $currentSort) {
-                $currentSortUrl = $sortName;
-            }
-            $options[$sortName] = $sortOption['label'] ? $translate($sortOption['label']) : $sortName;
+        $optionsWithUrl = [];
+        foreach ($options as $name => $sortOption) {
+            $url = $currentUrl . '?' . http_build_query(['page' => 1, 'sort' => $name] + $currentQuery, '', '&', PHP_QUERY_RFC3986);
+            $optionsWithUrl[$name] = [
+                'value' => $name,
+                // The label is automatically translated by Laminas.
+                'label' => $sortOption['label'] ?: $name,
+                'attributes' => [
+                    'data-url' => $url,
+                ],
+            ];
         }
 
         return (new Select('sort'))
-            ->setValueOptions($options)
-            ->setValue($currentSortUrl)
+            ->setValueOptions($optionsWithUrl)
+            ->setValue($currentSort)
             ->setLabel($translate('Sort by')); // @translate
     }
 }

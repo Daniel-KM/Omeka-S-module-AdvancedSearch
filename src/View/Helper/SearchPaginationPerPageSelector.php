@@ -76,21 +76,23 @@ class SearchPaginationPerPageSelector extends AbstractHelper
         $currentUrl = strtok($serverUrl(true), '?');
         $currentQuery = $params->fromQuery();
         $currentPerPage = (int) $query->getPerPage() ?: $defaultPerPage;
-        $perPages = $options;
-        $options = [];
-        $currentPerPageUrl = null;
-        foreach ($perPages as $perPage => $label) {
+        $optionsWithUrl = [];
+        foreach ($options as $perPage => $label) {
             $perPage = (int) $perPage;
-            $key = $currentUrl . '?' . http_build_query(['page' => 1, 'per_page' => $perPage] + $currentQuery, '', '&', PHP_QUERY_RFC3986);
-            if ($perPage === $currentPerPage) {
-                $currentPerPageUrl = $key;
-            }
-            $options[$key] = $translate($label);
+            $url = $currentUrl . '?' . http_build_query(['page' => 1, 'per_page' => $perPage] + $currentQuery, '', '&', PHP_QUERY_RFC3986);
+            $optionsWithUrl[$perPage] = [
+                'value' => $perPage,
+                // The label is automatically translated by Laminas.
+                'label' => $label,
+                'attributes' => [
+                    'data-url' => $url,
+                ],
+            ];
         }
 
         return (new Select('per_page'))
-            ->setValueOptions($options)
-            ->setValue($currentPerPageUrl)
+            ->setValueOptions($optionsWithUrl)
+            ->setValue($currentPerPage)
             ->setLabel($translate('Per page')); // @translate
     }
 }

@@ -41,11 +41,11 @@ $multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['lis
 <?php endif; ?>
 
 <?php if (count($paginationPerPages)): ?>
-<?= $this->searchPaginationPerPageSelector($query, $paginationPerPages) ?>
+<?= $this->searchPaginationPerPageSelector($query, $paginationPerPages, true) ?>
 <?php endif; ?>
 
 <?php if (count($sortFields)): ?>
-<?= $this->searchSortSelector($query, $sortFields) ?>
+<?= $this->searchSortSelector($query, $sortFields, true) ?>
 <?php endif; ?>
 
 <?php if ($multiMode): ?>

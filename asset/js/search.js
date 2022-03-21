@@ -133,8 +133,18 @@ $(document).ready(function() {
         // $('#search-form [name=q]').focus();
     });
 
+    /* Results tools (sort, pagination, per-page) */
+
+    $('.as-url select, select.as-url').on('change', function(e) {
+        const url = $(this).find('option:selected').data('url');
+        if (url && url.length && window.location !== url) {
+            window.location = url;
+        };
+    });
+
     /* Per-page selector links (depending if server or client build) */
-    $('.search-results-per-page select').on('change', function(e) {
+    /* @deprecated Kept for old themes: use ".as-url" instead */
+    $('.search-results-per-page:not(.as-url) select').on('change', function(e) {
         // Per-page fields don't look like a url.
         e.preventDefault();
         var perPage = $(this).val();
@@ -151,7 +161,8 @@ $(document).ready(function() {
     });
 
     /* Sort selector links (depending if server or client build) */
-    $('.search-sort select').on('change', function(e) {
+    /* @deprecated Kept for old themes: use ".as-url" instead. */
+    $('.search-sort:not(.as-url) select').on('change', function(e) {
         // Sort fields don't look like a url.
         e.preventDefault();
         var sort = $(this).val();
@@ -165,6 +176,8 @@ $(document).ready(function() {
             window.location.search = searchParams.toString();
         }
     });
+
+    /* Facets. */
 
     $('.search-facets-active a').on('click', function(e) {
         // Reload with the link when there is no button to apply facets.

@@ -2,15 +2,15 @@
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var \AdvancedSearch\Query $query
- * @var array $sortOptions
- * @var ?\Laminas\Form\Element\Select $sortSelect
- * @var bool $asSortUrls
+ * @var \Laminas\Form\Element\Select $select
+ * @var array $options
+ * @var bool $asUrl
  */
 
-if (empty($sortSelect)) return;
+if (count($options) <= 1) return;
 ?>
 
-<div class="search-sort<?= $asSortUrls ? ' search-sort-urls' : '' ?>">
-    <?= $this->formLabel($sortSelect) ?>
-    <?= $this->formSelect($sortSelect) ?>
+<div class="search-sort<?= $asUrl ? ' as-url' : '' ?>">
+    <?= $this->formLabel($select) ?>
+    <?= $this->formSelect($select) ?>
 </div>

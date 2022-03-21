@@ -421,7 +421,26 @@ class Query implements \JsonSerializable
     }
 
     /**
-     * Check if the query is filled, except public, pagination, sort and facets.
+     * Check for a simple browse: no query, no filters and no facets.
+     *
+     * This is not the inverse of isSearchQuery(): unlike isSearchQuery(),
+     * facets are taken into a account.
+     */
+    public function isBrowse(): bool
+    {
+        return $this->getQuery() === ''
+            && $this->getFilters() === []
+            && $this->getDateRangeFilters() === []
+            && $this->getFilterQueries() === []
+            && $this->getActiveFacets() === []
+        ;
+    }
+
+    /**
+     * Check if the query is filled, except public, pagination, sort and filters.
+     *
+     * This is not the inverse of isBrowse(): unlike isBrowse(), facets are not
+     * taken into a account.
      */
     public function isSearchQuery(): bool
     {

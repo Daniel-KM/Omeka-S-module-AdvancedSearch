@@ -72,7 +72,7 @@ class InternalQuerier extends AbstractQuerier
                 $totalResults = $apiResponse->getTotalResults();
                 $result = $apiResponse->getContent();
                 // TODO Currently experimental. To replace by a query + arg "querier=internal".
-                $this->response->setAllResourceIdsForResourceType($resourceType, $result ?: []);
+                $this->response->setAllResourceIdsForResourceType($resourceType, array_map('intval', $result) ?: []);
                 if ($result && ($offset || $limit)) {
                     $result = array_slice($result, $offset, $limit ?: null);
                     // $apiResponse->setContent($result);

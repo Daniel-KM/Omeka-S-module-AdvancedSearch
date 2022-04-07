@@ -237,3 +237,19 @@ if (version_compare($oldVersion, '3.3.6.9', '<')) {
     );
     $messenger->addWarning($message);
 }
+
+if (version_compare($oldVersion, '3.3.6.12', '<')) {
+    $messenger = new Messenger();
+    $message = new Message(
+        'A new option was added to display the resources mixed (by default) or item sets and items separately (old behavior).' // @translate
+    );
+    $messenger->addWarning($message);
+    $message = new Message(
+        'The template for the sort selector has been updated.' // @translate
+    );
+    $messenger->addWarning($message);
+    $message = new Message(
+        'A helper for the pagination per page has been added.' // @translate
+    );
+    $messenger->addSuccess($message);
+}

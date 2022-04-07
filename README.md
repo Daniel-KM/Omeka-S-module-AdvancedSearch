@@ -23,8 +23,8 @@ It can be extended in two ways:
 - Adapters that will do the real work (indexing and querying).
 
 The default form answers to most of the common needs. It can be configured in
-the admin interface to make it a basic form _à la_ Google, or to build a
-complex form with or without auto-suggestion, advanced filters, sort fields,
+the admin interface to make it a basic form _à la_ Google, or to build a complex
+form with or without auto-suggestion, advanced filters, sort fields,
 facets, collection selector, resource class selector, resource template
 selector, properties filters with various input elements, like numbers or date
 ranges.
@@ -52,14 +52,29 @@ Added fields are:
 - visibility public/private
 - media by item set
 
-Moreover, it adds new search query operator for properties:
+Moreover, it adds new search query operator for properties (some are available
+only via api: no fields in the advanced search form for now):
 
-- start with
-- end with
-- in list (via api only).
+- `list`: is in list
+- `nlist`: is not in list
+- `sw`: starts with
+- `nsw`: does not start with
+- `ew`: ends with
+- `new`: does not end with
+- `dtp`: has data type
+- `ndtp`: does not have data type
+- `lex`: is a linked resource
+- `nlex`: is not a linked resource
+- `lres`: is linked with resource #id
+- `nlres`: is not linked with resource #id
 - exclude one or multiple properties (except title)
 
-Furthermore, it adds the joiner type "not".
+Furthermore:
+- adds the joiner type `not` that can be use to invert the query. For example,
+  "and property dcterms:title not equals 'search text'" is the same than "not property dcterms:title equals 'search text'".
+  It avoids to display half of the complex query types to the user.
+- adds the key `datatype` to filter a property query by datatype. For example,
+  "and property dcterms:subject equals 'subject' with datatype 'customvocab:1'".
 
 Finally, an option allows to display only the used properties and classes in the
 advanced search form, with chosen-select.
@@ -366,6 +381,7 @@ TODO
 - [ ] Improve the internal autosuggester to return the list of next words when space.
 - [x] Use a "or" for facets of each group.
 - [ ] Manage pagination when item set is redirected to search.
+- [ ] Reorder items in items set (from module Next, see MvcListeners).
 
 
 Warning

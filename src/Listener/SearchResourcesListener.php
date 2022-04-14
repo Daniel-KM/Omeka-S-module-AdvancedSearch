@@ -43,6 +43,8 @@ class SearchResourcesListener
 
     /**
      * Helper to filter search queries.
+     *
+     * @todo Integrate the override in a way a direct call to adapter->buildQuery() can work with advanced property search (see Reference and some other modules).
      */
     public function onDispatch(Event $event): void
     {

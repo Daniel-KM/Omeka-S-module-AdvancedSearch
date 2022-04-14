@@ -987,37 +987,6 @@ SQL;
     }
 
     /**
-     * Get all property terms by id, ordered by descendant total values.
-     *
-     * @return array Associative array of terms by ids.
-     */
-    protected function getUsedPropertyByIds(): array
-    {
-        static $properties;
-
-        if (is_null($properties)) {
-            /** @var \Doctrine\DBAL\Connection $connection */
-            $connection = $this->services->get('Omeka\Connection');
-            $qb = $connection->createQueryBuilder();
-            $qb
-                ->select(
-                    'property.id AS id',
-                    'CONCAT(vocabulary.prefix, ":", property.local_name) AS term'
-                    // 'COUNT(value.id) AS total'
-                )
-                ->from('property', 'property')
-                ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
-                ->innerJoin('property', 'value', 'value', 'property.id = value.property_id')
-                ->groupBy('id')
-                ->orderBy('COUNT(value.id)', 'DESC')
-            ;
-            $properties = $connection->executeQuery($qb)->fetchAllKeyValue();
-        }
-
-        return $properties;
-    }
-
-    /**
      * Get all property terms as terms with "_".
      *
      * This allows to convert some Solr keys like "dcterms_subject_ss" into a
@@ -1032,6 +1001,12 @@ SQL;
         if (is_null($properties)) {
             /** @var \Doctrine\DBAL\Connection $connection */
             $connection = $this->services->get('Omeka\Connection');
+            // For big databases, manage used properties separately.
+            $subQb = $connection->createQueryBuilder();
+            $subQb
+                ->select('DISTINCT property_id')
+                ->from('value', 'value')
+            ;
             $qb = $connection->createQueryBuilder();
             $qb
                 ->select(
@@ -1040,7 +1015,9 @@ SQL;
                 )
                 ->from('property', 'property')
                 ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
-                ->innerJoin('property', 'value', 'value', 'property.id = value.property_id')
+                // Overflow on big databases, so use subquery.
+                // ->innerJoin('property', 'value', 'value', 'property.id = value.property_id')
+                ->where('property.id IN (' . $subQb . ')')
             ;
             $properties = $connection->executeQuery($qb)->fetchAllKeyValue();
         }

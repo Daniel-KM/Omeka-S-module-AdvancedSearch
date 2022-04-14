@@ -973,6 +973,7 @@ class Module extends AbstractModule
 
         // @see \AdvancedSearch\FormAdapter\AbstractFormAdapter::toQuery()
         // This function manages only one level, so check value when needed.
+        // TODO Simplify queries (or make clear distinction between standard and old way).
         $flatArray = function ($value): array {
             if (!is_array($value)) {
                 return [$value];
@@ -982,6 +983,22 @@ class Module extends AbstractModule
                 return $value;
             }
             return is_array(reset($value)) ? $value[$firstKey] : [$value[$firstKey]];
+        };
+
+        $flatArrayValueResourceIds = function ($value, array $titles): array {
+            if (is_array($value)) {
+                $firstKey = key($value);
+                if (is_numeric($firstKey)) {
+                    $values = $value;
+                } else {
+                    $values = is_array(reset($value)) ? $value[$firstKey] : [$value[$firstKey]];
+                }
+            } else {
+                $values = [$value] ;
+            }
+            $values = array_unique($values);
+            $values = array_combine($values, $values);
+            return array_replace($values, $titles);
         };
 
         foreach ($this->query as $key => $value) {
@@ -1114,12 +1131,16 @@ class Module extends AbstractModule
                         'nsw' => $translate('does not start with'), // @translate
                         'ew' => $translate('ends with'), // @translate
                         'new' => $translate('does not end with'), // @translate
-                        'res' => $translate('is resource with ID'), // @translate
-                        'nres' => $translate('is not resource with ID'), // @translate
+                        // 'res' => $translate('is resource with ID'), // @translate
+                        // 'nres' => $translate('is not resource with ID'), // @translate
+                        'res' => $translate('is'), // @translate
+                        'nres' => $translate('is not'), // @translate
                         'lex' => $translate('is a linked resource'), // @translate
                         'nlex' => $translate('is not a linked resource'), // @translate
-                        'lres' => $translate('is linked with resource with ID'), // @translate
-                        'nlres' => $translate('is not linked with resource with ID'), // @translate
+                        // 'lres' => $translate('is linked with resource with ID'), // @translate
+                        // 'nlres' => $translate('is not linked with resource with ID'), // @translate
+                        'lres' => $translate('is linked with'), // @translate
+                        'nlres' => $translate('is not linked with'), // @translate
                         'gt' => $translate('greater than'), // @translate
                         'gte' => $translate('greater than or equal'), // @translate
                         'lte' => $translate('lower than or equal'), // @translate
@@ -1164,6 +1185,39 @@ class Module extends AbstractModule
                         'lex',
                         'nlex',
                     ];
+
+                    $withResourceIds = [
+                        'res',
+                        'nres',
+                        'lres',
+                        'nlres',
+                    ];
+
+                    // Get all resources titles with one query.
+                    $vrTitles = [];
+                    $vrIds = [];
+                    foreach ($value as $queryRow) {
+                        if (is_array($queryRow) && isset($queryRow['type']) && !empty($queryRow['value']) && in_array($queryRow['type'], $withResourceIds)) {
+                            is_array($queryRow['value'])
+                                ? $vrIds = array_merge($vrIds, array_values($queryRow['value']))
+                                : $vrIds[] = $queryRow['value'];
+                        }
+                    }
+                    $vrIds = array_unique(array_filter(array_map('intval', $vrIds)));
+                    if ($vrIds) {
+                        // Currently, "resources" cannot be searched, so use adapter
+                        // directly. Rights are managed.
+                        /** @var \Doctrine\ORM\EntityManager $entityManager */
+                        $services = $this->getServiceLocator();
+                        $entityManager = $services->get('Omeka\EntityManager');
+                        $qb = $entityManager->createQueryBuilder();
+                        $qb
+                            ->select('omeka_root.id', 'omeka_root.title')
+                            ->from(\Omeka\Entity\Resource::class, 'omeka_root')
+                            ->where($qb->expr()->in('omeka_root.id', ':ids'))
+                            ->setParameter('ids', $vrIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
+                        $vrTitles = array_column($qb->getQuery()->getScalarResult(), 'title', 'id');
+                    }
 
                     // To get the name of the advanced fields, a loop should be done for now.
                     $searchFormAdvancedLabels = [];
@@ -1232,7 +1286,10 @@ class Module extends AbstractModule
                             }
                         }
 
-                        $filters[$filterLabel][$this->urlQuery($key, $subKey)] = implode(', ', $flatArray($value));
+                        $vals = in_array($queryRow['type'], $withResourceIds)
+                            ? $flatArrayValueResourceIds($value, $vrTitles)
+                            : $flatArray($value);
+                        $filters[$filterLabel][$this->urlQuery($key, $subKey)] = implode(', ', $vals);
 
                         ++$index;
                     }

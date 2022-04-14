@@ -1546,7 +1546,7 @@ class Module extends AbstractModule
         $services = $this->getServiceLocator();
         $settings = $services->get('Omeka\Settings');
         $siteSettings = $services->get('Omeka\Settings\Site');
-        $api = $services->get('ControllerPluginManager')->get('api');
+        $api = $services->get('Omeka\ApiManager');
         $site = null;
         $searchConfig = null;
 
@@ -1554,7 +1554,10 @@ class Module extends AbstractModule
         // default search config.
         $defaultSite = (int) $settings->get('default_site');
         if ($defaultSite) {
-            $site = $api->searchOne('sites', ['id' => $defaultSite])->getContent();
+            try {
+                $site = $api->read('sites', ['id' => $defaultSite])->getContent();
+            } catch (\Exception $e) {
+            }
         }
         if ($site) {
             $siteSettings->setTargetId($site->id());
@@ -1562,15 +1565,23 @@ class Module extends AbstractModule
         } else {
             $searchConfigId = (int) $settings->get('advancedsearch_main_config');
         }
+        $searchConfig = null;
         if ($searchConfigId) {
-            $searchConfig = $api->searchOne('search_configs', ['id' => $searchConfigId])->getContent();
+            try {
+                $searchConfig = $api->read('search_configs', ['id' => $searchConfigId])->getContent();
+            } catch (\Exception $e) {
+            }
         }
         if (!$searchConfig) {
-            $searchConfig = $api->searchOne('search_configs')->getContent();
+            try {
+                $searchConfig = $api->search('search_configs', ['limit' => 1])->getContent();
+                $searchConfig = reset($searchConfig);
+            } catch (\Exception $e) {
+            }
         }
         if (!$searchConfig) {
             $searchConfigId = $this->createDefaultSearchConfig();
-            $searchConfig = $api->searchOne('search_configs', ['id' => $searchConfigId])->getContent();
+            $searchConfig = $api->read('search_configs', ['id' => $searchConfigId])->getContent();
         }
 
         /** @var \Omeka\Entity\Site $site */

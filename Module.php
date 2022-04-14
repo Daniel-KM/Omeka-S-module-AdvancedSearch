@@ -1096,6 +1096,11 @@ class Module extends AbstractModule
                     break;
 
                 case 'filter':
+                    $value = array_filter($value, 'is_array');
+                    if (!count($value)) {
+                        break;
+                    }
+
                     $queryTypes = [
                         'eq' => $translate('is exactly'), // @translate
                         'neq' => $translate('is not exactly'), // @translate
@@ -1171,7 +1176,7 @@ class Module extends AbstractModule
                     $fieldFiltersLabels = array_replace($fieldLabels, array_filter($searchFormAdvancedLabels));
 
                     $index = 0;
-                    foreach (array_filter($value, 'is_array') as $subKey => $queryRow) {
+                    foreach ($value as $subKey => $queryRow) {
                         $queryType = $queryRow['type'] ?? 'eq';
                         if (!isset($reciprocalQueryTypes[$queryType])) {
                             continue;
@@ -1197,9 +1202,25 @@ class Module extends AbstractModule
                         // The field is currently always single: use multi-fields else.
                         // TODO Support multi-fields.
                         $queryField = $queryRow['field'] ?? '';
+                        /*
                         $fieldLabel = $queryField
                             ? $fieldFiltersLabels[$queryField] ?? $translate('Unknown field') // @translate
                             : $translate('[Any field]'); // @translate
+                        */
+                        // Support default solr index names for compatibility
+                        // of custom themes.
+                        if ($queryField) {
+                            if (isset($fieldFiltersLabels[$queryField])) {
+                                $fieldLabel = $fieldFiltersLabels[$queryField];
+                            } elseif (strpos($queryField, '_')) {
+                                $fieldLabel = $fieldFiltersLabels[strtok($queryField, '_') . ':' . strtok('_')] ?? $translate('Unknown field'); // @translate
+                            } else {
+                                $fieldLabel = $translate('Unknown field'); // @translate
+                            }
+                        } else {
+                            $fieldLabel = $translate('[Any field]'); // @translate
+                        }
+
                         $filterLabel = $fieldLabel . ' ' . $queryTypes[$queryType];
                         if ($index > 0) {
                             if ($joiner === 'or') {

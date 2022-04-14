@@ -181,12 +181,17 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                         }
                     }
 
-                    // TODO The filter field can be multiple.
+                    // TODO The filter field can be multiple (as array).
 
                     if (empty($joiner)) {
                         if (empty($operator)) {
                             foreach ($value as $filter) {
-                                if (isset($filter['field']) && isset($filter['value']) && trim($filter['value']) !== '' && $checkAvailableField($filter['field'])) {
+                                if (isset($filter['field'])
+                                    && isset($filter['value'])
+                                    && !is_array($filter['value'])
+                                    && trim($filter['value']) !== ''
+                                    && $checkAvailableField($filter['field'])
+                                ) {
                                     $query->addFilter($filter['field'], $filter['value']);
                                 }
                             }

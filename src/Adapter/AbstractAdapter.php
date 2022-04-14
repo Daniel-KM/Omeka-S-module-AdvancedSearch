@@ -38,7 +38,7 @@ abstract class AbstractAdapter implements AdapterInterface
     /**
      * @var \Laminas\ServiceManager\ServiceLocatorInterface
      */
-    protected $serviceLocator;
+    protected $services;
 
     /**
      * @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation
@@ -47,7 +47,7 @@ abstract class AbstractAdapter implements AdapterInterface
 
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator): AdapterInterface
     {
-        $this->serviceLocator = $serviceLocator;
+        $this->services = $serviceLocator;
         return $this;
     }
 
@@ -89,6 +89,6 @@ abstract class AbstractAdapter implements AdapterInterface
 
     protected function getServiceLocator(): ServiceLocatorInterface
     {
-        return $this->serviceLocator;
+        return $this->services;
     }
 }

@@ -1258,8 +1258,8 @@ class Module extends AbstractModule
                         $queryField = $queryRow['field'] ?? '';
                         /*
                         $fieldLabel = $queryField
-                            ? $fieldFiltersLabels[$queryField] ?? $translate('Unknown field') // @translate
-                            : $translate('[Any field]'); // @translate
+                            ? $fieldFiltersLabels[$queryField] ?? $translate('Unknown field') // @ translate
+                            : $translate('[Any field]'); // @ translate
                         */
                         // Support default solr index names for compatibility
                         // of custom themes.

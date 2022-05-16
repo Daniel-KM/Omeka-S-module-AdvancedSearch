@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-01-03 00:00+0000\n"
+"POT-Creation-Date: 2022-05-16 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,142 +17,118 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: Module.php:727 Module.php:1105
+#: Module.php:728 Module.php:1128
 msgid "is in list"
 msgstr ""
 
-#: Module.php:728 Module.php:1106
+#: Module.php:729 Module.php:1129
 msgid "is not in list"
 msgstr ""
 
-#: Module.php:729 Module.php:1107 src/View/Helper/SearchFilters.php:56
-#: view/common/advanced-search/properties.phtml:86
-msgid "starts with"
-msgstr ""
-
-#: Module.php:730 Module.php:1108 src/View/Helper/SearchFilters.php:57
-#: view/common/advanced-search/properties.phtml:87
-msgid "does not start with"
-msgstr ""
-
-#: Module.php:731 Module.php:1109 src/View/Helper/SearchFilters.php:58
-#: view/common/advanced-search/properties.phtml:88
-msgid "ends with"
-msgstr ""
-
-#: Module.php:732 Module.php:1110 src/View/Helper/SearchFilters.php:59
-#: view/common/advanced-search/properties.phtml:89
-msgid "does not end with"
-msgstr ""
-
-#: Module.php:735 Module.php:1113 src/View/Helper/SearchFilters.php:64
-#: view/common/advanced-search/properties.phtml:94
-msgid "is a linked resource"
-msgstr ""
-
-#: Module.php:736 Module.php:1114 src/View/Helper/SearchFilters.php:65
-#: view/common/advanced-search/properties.phtml:95
-msgid "is not a linked resource"
-msgstr ""
-
-#: Module.php:737 Module.php:1115 src/View/Helper/SearchFilters.php:66
-#: view/common/advanced-search/properties.phtml:96
-msgid "is linked with resource with ID"
-msgstr ""
-
-#: Module.php:738 Module.php:1116 src/View/Helper/SearchFilters.php:67
-#: view/common/advanced-search/properties.phtml:97
-msgid "is not linked with resource with ID"
-msgstr ""
-
-#: Module.php:843 Module.php:881 Module.php:1207
-#: src/View/Helper/SearchFilters.php:153
+#: Module.php:844 Module.php:882 Module.php:1283
+#: src/View/Helper/SearchFilters.php:166
 msgid "EXCEPT"
 msgstr ""
 
-#: Module.php:857 view/common/advanced-search/date-time.phtml:74
+#: Module.php:858 view/common/advanced-search/date-time.phtml:74
 msgid "after"
 msgstr ""
 
-#: Module.php:858 view/common/advanced-search/date-time.phtml:73
+#: Module.php:859 view/common/advanced-search/date-time.phtml:73
 msgid "after or on"
 msgstr ""
 
-#: Module.php:859 view/common/advanced-search/date-time.phtml:75
+#: Module.php:860 view/common/advanced-search/date-time.phtml:75
 msgid "on"
 msgstr ""
 
-#: Module.php:860 view/common/advanced-search/date-time.phtml:76
+#: Module.php:861 view/common/advanced-search/date-time.phtml:76
 msgid "not on"
 msgstr ""
 
-#: Module.php:861 view/common/advanced-search/date-time.phtml:77
+#: Module.php:862 view/common/advanced-search/date-time.phtml:77
 msgid "before or on"
 msgstr ""
 
-#: Module.php:862 view/common/advanced-search/date-time.phtml:78
+#: Module.php:863 view/common/advanced-search/date-time.phtml:78
 msgid "before"
 msgstr ""
 
-#: Module.php:863 view/common/advanced-search/date-time.phtml:79
+#: Module.php:864 view/common/advanced-search/date-time.phtml:79
 msgid "has any date / time"
 msgstr ""
 
-#: Module.php:864 view/common/advanced-search/date-time.phtml:80
+#: Module.php:865 view/common/advanced-search/date-time.phtml:80
 msgid "has no date / time"
 msgstr ""
 
-#: Module.php:905 view/common/advanced-search/has-media.phtml:12
+#: Module.php:906 view/common/advanced-search/has-media.phtml:12
 #: view/common/advanced-search/has-media.phtml:27
 msgid "Has media"
 msgstr ""
 
-#: Module.php:912
+#: Module.php:913
 msgid "Has original"
 msgstr ""
 
-#: Module.php:919 view/common/advanced-search/has-thumbnails.phtml:12
+#: Module.php:920 view/common/advanced-search/has-thumbnails.phtml:12
 #: view/common/advanced-search/has-thumbnails.phtml:27
 msgid "Has thumbnails"
 msgstr ""
 
-#: Module.php:926
+#: Module.php:927
 msgid "Media types"
 msgstr ""
 
-#: Module.php:1011
+#: Module.php:1029
 msgid "Resource id"
 msgstr ""
 
-#: Module.php:1117
+#: Module.php:1136
+msgid "is"
+msgstr ""
+
+#: Module.php:1137
+msgid "is not"
+msgstr ""
+
+#: Module.php:1142
+msgid "is linked with"
+msgstr ""
+
+#: Module.php:1143
+msgid "is not linked with"
+msgstr ""
+
+#: Module.php:1144
 msgid "greater than"
 msgstr ""
 
-#: Module.php:1118
+#: Module.php:1145
 msgid "greater than or equal"
 msgstr ""
 
-#: Module.php:1119
+#: Module.php:1146
 msgid "lower than or equal"
 msgstr ""
 
-#: Module.php:1120
+#: Module.php:1147
 msgid "lower than"
 msgstr ""
 
-#: Module.php:1200
+#: Module.php:1270 Module.php:1272
 msgid "Unknown field"
 msgstr ""
 
-#: Module.php:1201
+#: Module.php:1275
 msgid "[Any field]"
 msgstr ""
 
-#: src/Adapter/InternalAdapter.php:86
+#: src/Adapter/InternalAdapter.php:84
 msgid "Asc"
 msgstr ""
 
-#: src/Adapter/InternalAdapter.php:87
+#: src/Adapter/InternalAdapter.php:85
 msgid "Desc"
 msgstr ""
 
@@ -165,7 +141,7 @@ msgstr ""
 msgid "Filters"
 msgstr ""
 
-#: src/Generic/AbstractModule.php:66
+#: src/Generic/AbstractModule.php:66 src/Generic/AbstractModule.php:740
 #, php-format
 msgid "This module requires the module \"%s\"."
 msgstr ""
@@ -179,7 +155,23 @@ msgstr ""
 msgid "This module has resources that cannot be installed."
 msgstr ""
 
-#: src/Generic/AbstractModule.php:725
+#: src/Generic/AbstractModule.php:87
+msgid ""
+"This module cannot install its tables, because they exist already. Try to "
+"remove them first."
+msgstr ""
+
+#: src/Generic/AbstractModule.php:328
+#, php-format
+msgid "The module removed tables \"%s\" from a previous broken install."
+msgstr ""
+
+#: src/Generic/AbstractModule.php:735
+#, php-format
+msgid "This module requires the module \"%s\", version %s or above."
+msgstr ""
+
+#: src/Generic/AbstractModule.php:832
 #, php-format
 msgid ""
 "The module \"%s\" was automatically deactivated because the dependencies are "
@@ -189,6 +181,11 @@ msgstr ""
 #: src/Mvc/Controller/Plugin/ApiSearch.php:189
 #, php-format
 msgid "Permission denied for the current user to %s the %s resource."
+msgstr ""
+
+#: src/View/Helper/SearchPaginationPerPageSelector.php:65
+#: src/View/Helper/SearchPaginationPerPageSelector.php:96
+msgid "Per page"
 msgstr ""
 
 #: view/advanced-search/admin/index/browse.phtml:52
@@ -439,52 +436,47 @@ msgstr ""
 msgid "Select below…"
 msgstr ""
 
-#: view/search/facets.phtml:45
+#: view/search/facets.phtml:46
 msgid "Facets"
 msgstr ""
 
-#: view/search/facets.phtml:48
+#: view/search/facets.phtml:49
 msgid "Active facets"
 msgstr ""
 
-#: view/search/facets.phtml:64 view/search/facets.phtml:87
+#: view/search/facets.phtml:65 view/search/facets.phtml:88
 msgid "Apply facets"
 msgstr ""
 
-#: view/search/facets.phtml:69
+#: view/search/facets.phtml:70
 msgid "No facets."
 msgstr ""
 
-#: view/search/resource-list.phtml:35
+#: view/search/resource-list.phtml:39
 msgid "No media"
 msgstr ""
 
-#: view/search/results-header-footer.phtml:34
-#, php-format
-msgid "Results by %d"
-msgstr ""
-
-#: view/search/results-header-footer.phtml:66
+#: view/search/results-header-footer.phtml:54
 msgid "list"
 msgstr ""
 
-#: view/search/results-header-footer.phtml:68
+#: view/search/results-header-footer.phtml:56
 msgid "grid"
 msgstr ""
 
-#: view/search/search.phtml:167
+#: view/search/search.phtml:164
 msgid "Fill a query and get results."
 msgstr ""
 
-#: view/search/search.phtml:169
+#: view/search/search.phtml:166
 msgid "This item set has no items."
 msgstr ""
 
-#: view/search/search.phtml:176
+#: view/search/search.phtml:173
 msgid "Your query returned no results"
 msgstr ""
 
-#: view/search/search.phtml:196
+#: view/search/search.phtml:194
 msgid "An error occured and your query returned no results."
 msgstr ""
 
@@ -508,12 +500,12 @@ msgid "Select item sets…"
 msgstr ""
 
 #: data/scripts/upgrade_from_advancedsearchplus.php:79
-#: data/scripts/upgrade_from_search.php:355 Module.php:221
+#: data/scripts/upgrade_from_search.php:355 Module.php:222
 #, php-format
 msgid "The module \"%s\" was upgraded by module \"%s\" and uninstalled."
 msgstr ""
 
-#: data/scripts/upgrade_from_search.php:29 Module.php:116
+#: data/scripts/upgrade_from_search.php:29 Module.php:117
 msgid ""
 "Compatibility of this module with module \"Search\" of BibLibre has not been "
 "checked. Uninstall it first, or upgrade it with its fork at https://gitlab."
@@ -562,6 +554,26 @@ msgid ""
 "standard advanced form."
 msgstr ""
 
+#: data/scripts/upgrade.php:244
+msgid ""
+"A new option was added to display the resources mixed (by default) or item "
+"sets and items separately (old behavior)."
+msgstr ""
+
+#: data/scripts/upgrade.php:248
+msgid "The template for the sort selector has been updated."
+msgstr ""
+
+#: data/scripts/upgrade.php:252
+msgid "A helper for the pagination per page has been added."
+msgstr ""
+
+#: data/search_configs/default.php:185
+#: src/View/Helper/SearchPaginationPerPageSelector.php:42
+#, php-format
+msgid "Results by %d"
+msgstr ""
+
 #: data/search_configs/default.php:186
 msgid "Results by 10"
 msgstr ""
@@ -578,101 +590,102 @@ msgstr ""
 msgid "Results by 100"
 msgstr ""
 
-#: Module.php:121
+#: Module.php:122
 msgid ""
-"To be automatically upgraded and replaced by this module, the module \"Search"
-"\" should be updated first to version 3.5.23.3 or greater."
+"To be automatically upgraded and replaced by this module, the module "
+"\"Search\" should be updated first to version 3.5.23.3 or greater."
 msgstr ""
 
-#: Module.php:129
+#: Module.php:130
 msgid ""
 "To be automatically upgraded and replaced by this module, use version "
 "3.3.6.6 or below."
 msgstr ""
 
-#: Module.php:139
+#: Module.php:140
 msgid ""
 "The module Reference is required to use the facets with the default internal "
 "adapter, but not for the Solr adapter."
 msgstr ""
 
-#: Module.php:162 Module.php:180
+#: Module.php:163 Module.php:181
 #, php-format
 msgid ""
 "An error occurred during migration of module \"%s\". Check the config and "
 "uninstall it manually."
 msgstr ""
 
-#: Module.php:187
+#: Module.php:188
 msgid ""
 "The modules Search, Advanced Search Plus, PSL Search Form, Search Solr "
 "cannot be upgraded with a version of Advanced Search greater than 3.3.6.6."
 msgstr ""
 
-#: Module.php:201
+#: Module.php:202
 #, php-format
 msgid "The module %s should be upgraded to version %s or later."
 msgstr ""
 
-#: Module.php:207
+#: Module.php:208
 #, php-format
 msgid "The module %s can be reenabled."
 msgstr ""
 
-#: Module.php:843 Module.php:881 Module.php:1207
+#: Module.php:844 Module.php:882 Module.php:1283
 msgid " "
 msgstr ""
 
-#: Module.php:1333
+#: Module.php:1412
 #, php-format
 msgid "Unable to batch index metadata for search engine \"%s\": %s"
 msgstr ""
 
-#: Module.php:1338
+#: Module.php:1417
 #, php-format
 msgid "Unable to batch update the search engine \"%s\": see log."
 msgstr ""
 
-#: Module.php:1423
+#: Module.php:1502
 #, php-format
 msgid "Unable to delete the search index for resource #%d: %s"
 msgstr ""
 
-#: Module.php:1428
+#: Module.php:1507
 #, php-format
 msgid ""
 "Unable to delete the search index for the deleted resource #%d: see log."
 msgstr ""
 
-#: Module.php:1448
+#: Module.php:1527
 #, php-format
 msgid "Unable to index metadata of resource #%d for search: %s"
 msgstr ""
 
-#: Module.php:1453
+#: Module.php:1532
 #, php-format
 msgid "Unable to update the search index for resource #%d: see log."
 msgstr ""
 
-#: Module.php:1630
+#: Module.php:1720
 #, php-format
 msgid ""
 "The internal search engine (sql) is available. Configure it in the %ssearch "
 "manager%s."
 msgstr ""
 
-#: Module.php:1671
+#: Module.php:1761
 #, php-format
 msgid ""
 "The internal suggester (sql) will be available after indexation. Configure "
 "it in the %ssearch manager%s."
 msgstr ""
 
-#: Module.php:1705
+#: Module.php:1795
 #, php-format
 msgid ""
-"The default search page is available. Configure it in the %ssearch manager"
-"%s, in the main settings (for admin) and in site settings (for public)."
+"The default search page is available. Configure it in the %ssearch "
+"manager%s, in the main settings (for admin) and in site settings (for "
+"public)."
 msgstr ""
 
 #: src/Form/MainSearchForm.php:320
@@ -1228,9 +1241,9 @@ msgstr ""
 
 #: src/Form/Admin/InternalConfigFieldset.php:30
 msgid ""
-"List of fields that refers to multiple properties, formatted \"name = label"
-"\", then the list of properties and an empty line. The name must not be a "
-"property term or a reserved keyword."
+"List of fields that refers to multiple properties, formatted \"name = "
+"label\", then the list of properties and an empty line. The name must not be "
+"a property term or a reserved keyword."
 msgstr ""
 
 #: src/Form/Admin/SearchSuggesterForm.php:75
@@ -1660,8 +1673,8 @@ msgstr ""
 #: src/Job/IndexSuggestions.php:106
 #, php-format
 msgid ""
-"Suggester #%d (\"%s\"): There are already %d other jobs \"Index Suggestions"
-"\" and the current one is not forced."
+"Suggester #%d (\"%s\"): There are already %d other jobs \"Index "
+"Suggestions\" and the current one is not forced."
 msgstr ""
 
 #: src/Job/IndexSuggestions.php:112
@@ -1765,15 +1778,15 @@ msgid ""
 "Failed indexed resources should be checked manually."
 msgstr ""
 
-#: src/Adapter/InternalAdapter.php:11
+#: src/Adapter/InternalAdapter.php:9
 msgid "Internal [sql]"
 msgstr ""
 
-#: src/Adapter/InternalAdapter.php:126
+#: src/Adapter/InternalAdapter.php:124
 msgid "Multi-fields"
 msgstr ""
 
-#: src/Adapter/InternalAdapter.php:137
+#: src/Adapter/InternalAdapter.php:135
 msgid "Generic"
 msgstr ""
 
@@ -1814,40 +1827,40 @@ msgid ""
 "Query: %s"
 msgstr ""
 
-#: config/module.config.php:272
+#: config/module.config.php:273
 msgid "Automatic mapping of empty values"
 msgstr ""
 
-#: config/module.config.php:273
+#: config/module.config.php:274
 msgid "Available"
 msgstr ""
 
-#: config/module.config.php:274
+#: config/module.config.php:275
 msgid "Enabled"
 msgstr ""
 
-#: config/module.config.php:275
+#: config/module.config.php:276
 msgid "Find"
 msgstr ""
 
-#: config/module.config.php:276
+#: config/module.config.php:277
 msgid "Find resources…"
 msgstr ""
 
-#: config/module.config.php:277
+#: config/module.config.php:278
 msgid "Processing…"
 msgstr ""
 
-#: config/module.config.php:278
+#: config/module.config.php:279
 msgid ""
 "Try to map automatically the metadata and the properties that are not mapped "
 "yet with the fields of the index"
 msgstr ""
 
-#: config/module.config.php:336
+#: config/module.config.php:337
 msgid "Full text"
 msgstr ""
 
-#: config/module.config.php:348
+#: config/module.config.php:349
 msgid "Date time"
 msgstr ""

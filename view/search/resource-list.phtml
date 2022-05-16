@@ -23,7 +23,7 @@ $thumbnail = $plugins->get('thumbnail');
 // Can be simplified in a public theme.
 $setting = $plugins->get($site ? 'siteSetting' : 'setting');
 
-$siteSlug = $site->slug();
+$siteSlug = $site ? $site->slug() : null;
 
 $filterLocale = (bool) $setting('filter_locale_values');
 $siteLang = $plugins->get('lang')();

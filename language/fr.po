@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-16 00:00+0000\n"
-"PO-Revision-Date: 2022-05-16 00:00+0000\n"
+"POT-Creation-Date: 2022-05-23 00:00+0000\n"
+"PO-Revision-Date: 2022-05-23 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -144,7 +144,7 @@ msgstr "Filtres"
 #: src/Generic/AbstractModule.php:66 src/Generic/AbstractModule.php:740
 #, php-format
 msgid "This module requires the module \"%s\"."
-msgstr "Ce module requiert le module \"%s\"."
+msgstr "Ce module requiert le module « %s »."
 
 #: src/Generic/AbstractModule.php:73
 #, php-format
@@ -171,8 +171,8 @@ msgstr ""
 
 #: src/Generic/AbstractModule.php:735
 #, php-format
-msgid "This module requires the module \"%s\", version %s or above."
-msgstr "Ce module requiert le module « %s », version %s ou supérieure."
+msgid "This module requires the module \"%1$s\", version %2$s or above."
+msgstr "Ce module requiert le module « %1$s », version %2$s ou supérieure."
 
 #: src/Generic/AbstractModule.php:832
 #, php-format
@@ -487,19 +487,19 @@ msgstr "liste"
 msgid "grid"
 msgstr "grille"
 
-#: view/search/search.phtml:164
+#: view/search/search.phtml:165
 msgid "Fill a query and get results."
 msgstr "Faîtes une requête pour obtenir des résultats."
 
-#: view/search/search.phtml:166
+#: view/search/search.phtml:167
 msgid "This item set has no items."
 msgstr "Cette collection n’a pas de contenus."
 
-#: view/search/search.phtml:173
+#: view/search/search.phtml:174
 msgid "Your query returned no results"
 msgstr "Votre recherche n'a retourné aucun résultat"
 
-#: view/search/search.phtml:194
+#: view/search/search.phtml:195
 msgid "An error occured and your query returned no results."
 msgstr ""
 "Une erreur est survenue et votre recherche n'a retourné aucun résultat."
@@ -846,7 +846,7 @@ msgstr ""
 
 #: src/Form/SearchingFormFieldset.php:72
 msgid "Hidden filter query"
-msgstr "Requête pour le filtre caché"
+msgstr "Requête cachée pour filtrer"
 
 #: src/Form/SearchingFormFieldset.php:73
 msgid ""

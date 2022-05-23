@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-16 00:00+0000\n"
+"POT-Creation-Date: 2022-05-23 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -168,7 +168,7 @@ msgstr ""
 
 #: src/Generic/AbstractModule.php:735
 #, php-format
-msgid "This module requires the module \"%s\", version %s or above."
+msgid "This module requires the module \"%1$s\", version %2$s or above."
 msgstr ""
 
 #: src/Generic/AbstractModule.php:832
@@ -464,19 +464,19 @@ msgstr ""
 msgid "grid"
 msgstr ""
 
-#: view/search/search.phtml:164
+#: view/search/search.phtml:165
 msgid "Fill a query and get results."
 msgstr ""
 
-#: view/search/search.phtml:166
+#: view/search/search.phtml:167
 msgid "This item set has no items."
 msgstr ""
 
-#: view/search/search.phtml:173
+#: view/search/search.phtml:174
 msgid "Your query returned no results"
 msgstr ""
 
-#: view/search/search.phtml:194
+#: view/search/search.phtml:195
 msgid "An error occured and your query returned no results."
 msgstr ""
 

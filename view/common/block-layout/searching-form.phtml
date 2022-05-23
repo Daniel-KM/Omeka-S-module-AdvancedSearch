@@ -1,17 +1,19 @@
 <?php
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\SitePageBlockRepresentation $block
  * @var \Omeka\Api\Representation\SiteRepresentation $site
+ * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
  * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchPage
- * @var bool $displayResults Skip form action?
  * @var \AdvancedSearch\Query $query
- * @var \AdvancedSearch\Response $response
  * @var string $heading
+ * @var bool $displayResults Skip form action?
+ * @var \AdvancedSearch\Response $response
+ * @var bool $skipFormAction Returns results on the same page. Always true, passed to partial.
  */
 
 $plugins = $this->getHelperPluginManager();
-$escape = $this->plugin('escapeHtml');
-$vars = $this->vars();
+$escape = $plugins->get('escapeHtml');
 ?>
 
 <?php if (empty($displayResults) || empty($searchPage)): ?>
@@ -33,8 +35,7 @@ $vars = $this->vars();
 </div>
 <?php endif; ?>
 
-<?php $vars->offsetUnset('displayResults') ?>
-<?php $vars->offsetSet('skipFormAction', true) ?>
+<?php $this->vars()->offsetUnset('displayResults'); ?>
 <?= $this->partial('search/search') ?>
 
 <?php endif; ?>

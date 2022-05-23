@@ -97,14 +97,17 @@ class SearchingForm extends AbstractBlockLayout
         $displayResults = $block->dataValue('display_results', false);
 
         $vars = [
+            'block' => $block,
+            'site' => $site,
             'heading' => $block->dataValue('heading', ''),
-            'displayResults' => $displayResults,
             'searchConfig' => $searchConfig,
             // Name "searchPage" is kept to simplify migration.
             'searchPage' => $searchConfig,
-            'site' => $site,
             'query' => null,
+            'displayResults' => $displayResults,
             'response' => new Response,
+            // Returns results on the same page.
+            'skipFormAction' => true,
         ];
 
         if ($displayResults) {

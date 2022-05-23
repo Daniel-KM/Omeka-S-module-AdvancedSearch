@@ -1,7 +1,7 @@
 <?php
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2017-2021
+ * Copyright Daniel Berthereau, 2017-2022
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -30,11 +30,13 @@
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var \Omeka\Api\Representation\SiteRepresentation $site
+ * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
  * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchPage
  * @var \AdvancedSearch\Query $query
  * @var \AdvancedSearch\Response $response
+ *
  * For block layout:
- * @var string $heading Unused in current template.
+ * @var string $heading Used in the block layout template.
  * @var bool $skipFormAction Remove action of the form, so it uses current page.
  */
 
@@ -53,8 +55,7 @@ $itemSetId = $this->params()->fromRoute('item-set-id');
 /** @var \Omeka\Api\Representation\ItemSetRepresentation $itemSet */
 $itemSet = $itemSetId ? $api->searchOne('item_sets', ['id' => $itemSetId])->getContent() : null;
 
-$isPartial = !$site;
-$skipFormAction = !empty($skipFormAction);
+$isPartial = $skipFormAction = !empty($skipFormAction);
 
 $documentCount = isset($response) ? $response->getTotalResults() : 0;
 if ($documentCount):

@@ -211,6 +211,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                         if (empty($operator)) {
                             foreach ($value as $filter) {
                                 if (isset($filter['field']) && isset($filter['value']) && trim($filter['value']) !== '' && $checkAvailableField($filter['field'])) {
+                                    $type = empty($filter['type']) ? 'in' : $filter['type'];
                                     $join = isset($filter['join']) && in_array($filter['join'], ['or', 'not']) ? $filter['join'] : 'and';
                                     $query->addFilterQuery($filter['field'], $filter['value'], $type, $join);
                                 }

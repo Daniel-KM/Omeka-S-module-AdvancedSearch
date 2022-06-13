@@ -103,6 +103,7 @@ class Advanced extends Fieldset
                 'new' => 'does not end with', // @translate
                 'ex' => 'has any value', // @translate
                 'nex' => 'has no values', // @translate
+                'exs' => 'has a single value', // @translate
                 'exm' => 'has multiple values', // @translate
                 'nexm' => 'has not multiple values', // @translate
                 'res' => 'is resource with ID', // @translate

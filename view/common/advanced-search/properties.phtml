@@ -91,6 +91,7 @@ $queryText = function (array $search, $engine) use ($escape, $translate) {
                 <?php echo $queryOption('nres', $property, 'type', $translate('is not resource with ID')); ?>
                 <?php echo $queryOption('ex', $property, 'type', $translate('has any value')); ?>
                 <?php echo $queryOption('nex', $property, 'type', $translate('has no values')); ?>
+                <?php echo $queryOption('exs', $property, 'type', $translate('has a single value')); ?>
                 <?php echo $queryOption('exm', $property, 'type', $translate('has multiple values')); ?>
                 <?php echo $queryOption('nexm', $property, 'type', $translate('has not multiple values')); ?>
                 <?php echo $queryOption('lex', $property, 'type', $translate('is a linked resource')); ?>

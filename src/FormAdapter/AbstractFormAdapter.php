@@ -199,7 +199,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                             foreach ($value as $filter) {
                                 if (isset($filter['field']) && $checkAvailableField($filter['field'])) {
                                     $type = empty($filter['type']) ? 'in' : $filter['type'];
-                                    if (in_array($type, ['ex', 'nex', 'exm', 'nexm'])) {
+                                    if (in_array($type, ['ex', 'nex', 'exs', 'exm', 'nexm'])) {
                                         $query->addFilterQuery($filter['field'], null, $type);
                                     } elseif (isset($filter['value']) && trim($filter['value']) !== '') {
                                         $query->addFilterQuery($filter['field'], $filter['value'], $type);
@@ -219,7 +219,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                             foreach ($value as $filter) {
                                 if (isset($filter['field']) && $checkAvailableField($filter['field'])) {
                                     $type = empty($filter['type']) ? 'in' : $filter['type'];
-                                    if (in_array($type, ['ex', 'nex', 'exm', 'nexm'])) {
+                                    if (in_array($type, ['ex', 'nex', 'exs', 'exm', 'nexm'])) {
                                         $join = isset($filter['join']) && in_array($filter['join'], ['or', 'not']) ? $filter['join'] : 'and';
                                         $query->addFilterQuery($filter['field'], null, $type, $join);
                                     } elseif (isset($filter['value']) && trim($filter['value']) !== '') {

@@ -733,6 +733,7 @@ class Module extends AbstractModule
             'new' => $translate('does not end with'), // @translate
             'res' => $translate('is resource with ID'), // @translate
             'nres' => $translate('is not resource with ID'), // @translate
+            'exs' => $translate('has a single value'), // @translate
             'exm' => $translate('has multiple values'), // @translate
             'nexm' => $translate('has not multiple values'), // @translate
             'lex' => $translate('is a linked resource'), // @translate
@@ -748,6 +749,8 @@ class Module extends AbstractModule
             'nsw' => 'sw',
             'ew' => 'new',
             'new' => 'ew',
+            // TODO Clarify. Don't use null for next check of query types.
+            'exs' => '',
             'exm' => 'nexm',
             'nexm' => 'exm',
             'lex' => 'nlex',
@@ -759,6 +762,7 @@ class Module extends AbstractModule
         $withoutValue = [
             'lex',
             'nlex',
+            'exs',
             'exm',
             'nexm',
         ];
@@ -1131,6 +1135,7 @@ class Module extends AbstractModule
                         'nin' => $translate('does not contain'), // @translate
                         'ex' => $translate('has any value'), // @translate
                         'nex' => $translate('has no values'), // @translate
+                        'exs' => $translate('has a single value'), // @translate
                         'exm' => $translate('has multiple values'), // @translate
                         'nexm' => $translate('has not multiple values'), // @translate
                         'list' => $translate('is in list'), // @translate
@@ -1162,6 +1167,7 @@ class Module extends AbstractModule
                         'nin' => 'in',
                         'ex' => 'nex',
                         'nex' => 'ex',
+                        'exs' => '',
                         'exm' => 'nexm',
                         'nexm' => 'exm',
                         'list' => 'nlist',
@@ -1192,6 +1198,7 @@ class Module extends AbstractModule
                     $withoutValue = [
                         'ex',
                         'nex',
+                        'exs',
                         'exm',
                         'nexm',
                         'lex',

@@ -180,7 +180,7 @@ class ApiFormAdapter implements FormAdapterInterface
             // $joiner = $queryRow['joiner']) ?? null;
             $value = $queryRow['text'] ?? null;
 
-            if (!$value && !in_array($queryType, ['ex', 'nex', 'exm', 'nexm'])) {
+            if (!$value && !in_array($queryType, ['ex', 'nex', 'exs', 'exm', 'nexm'])) {
                 continue;
             }
 
@@ -224,6 +224,7 @@ class ApiFormAdapter implements FormAdapterInterface
                 case 'res':
                 case 'nex':
                 case 'ex':
+                case 'exs':
                 case 'nexm':
                 case 'exm':
                 case 'nlex':

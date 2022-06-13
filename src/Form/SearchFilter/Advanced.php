@@ -103,6 +103,8 @@ class Advanced extends Fieldset
                 'new' => 'does not end with', // @translate
                 'ex' => 'has any value', // @translate
                 'nex' => 'has no values', // @translate
+                'exm' => 'has multiple values', // @translate
+                'nexm' => 'has not multiple values', // @translate
                 'res' => 'is resource with ID', // @translate
                 'nres' => 'is not resource with ID', // @translate
                 'lex' => 'is a linked resource', // @translate
@@ -117,6 +119,7 @@ class Advanced extends Fieldset
                     $operators['nsw'],
                     $operators['new'],
                     $operators['nex'],
+                    $operators['nexm'],
                     $operators['nres'],
                     $operators['nlex'],
                     $operators['nlres']

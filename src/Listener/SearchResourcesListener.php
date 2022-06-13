@@ -291,6 +291,8 @@ class SearchResourcesListener
      *   - nin: does not contain (core)
      *   - ex: has any value (core)
      *   - nex: has no value (core)
+     *   - exm: has multiple values
+     *   - nexm: has not multiple values
      *   - list: is in list
      *   - nlist: is not in list
      *   - sw: starts with
@@ -343,6 +345,8 @@ class SearchResourcesListener
             'nin' => 'in',
             'ex' => 'nex',
             'nex' => 'ex',
+            'exm' => 'nexm',
+            'nexm' => 'exm',
             'list' => 'nlist',
             'nlist' => 'list',
             'sw' => 'nsw',
@@ -382,6 +386,8 @@ class SearchResourcesListener
         $withoutValueQueryTypes = [
             'ex',
             'nex',
+            'exm',
+            'nexm',
             'lex',
             'nlex',
         ];
@@ -559,6 +565,16 @@ class SearchResourcesListener
                     // no break.
                 case 'ex':
                     $predicateExpr = $expr->isNotNull("$valuesAlias.id");
+                    break;
+
+                case 'exm':
+                    $predicateExpr = $expr->isNotNull("$valuesAlias.id");
+                    $qb->having($expr->gt("COUNT($valuesAlias.id)", 1));
+                    break;
+                case 'nexm':
+                    // No predicate expression, but simplify process.
+                    $predicateExpr = $expr->eq(1, 1);
+                    $qb->having($expr->lt("COUNT($valuesAlias.id)", 2));
                     break;
 
                 case 'ndtp':

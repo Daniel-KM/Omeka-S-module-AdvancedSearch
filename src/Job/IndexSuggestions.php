@@ -637,7 +637,7 @@ SQL;
             }
 
             // Get it each loop because of the entity manager clearing clearing.
-            $suggester = $this->entityManager->getRepository(\AdvancedSearch\Entity\SearchSuggester::class)->find($suggesterId);
+            $suggester = $this->entityManager->find(\AdvancedSearch\Entity\SearchSuggester::class, $suggesterId);
 
             $suggestionCriteria = new Criteria($expr->eq('suggester', $suggester));
             $suggestions = $suggestionRepository->matching($suggestionCriteria);

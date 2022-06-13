@@ -6,7 +6,7 @@
  * Improve search with new fields, auto-suggest, filters, facets, specific pages, etc.
  *
  * @copyright BibLibre, 2016-2017
- * @copyright Daniel Berthereau, 2017-2021
+ * @copyright Daniel Berthereau, 2017-2022
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
  *
  * This software is governed by the CeCILL license under French law and abiding
@@ -1125,6 +1125,8 @@ class Module extends AbstractModule
                         'nin' => $translate('does not contain'), // @translate
                         'ex' => $translate('has any value'), // @translate
                         'nex' => $translate('has no values'), // @translate
+                        'exm' => $translate('has multiple values'), // @translate
+                        'nexm' => $translate('has not multiple values'), // @translate
                         'list' => $translate('is in list'), // @translate
                         'nlist' => $translate('is not in list'), // @translate
                         'sw' => $translate('starts with'), // @translate
@@ -1154,6 +1156,8 @@ class Module extends AbstractModule
                         'nin' => 'in',
                         'ex' => 'nex',
                         'nex' => 'ex',
+                        'exm' => 'nexm',
+                        'nexm' => 'exm',
                         'list' => 'nlist',
                         'nlist' => 'list',
                         'sw' => 'nsw',
@@ -1182,6 +1186,8 @@ class Module extends AbstractModule
                     $withoutValue = [
                         'ex',
                         'nex',
+                        'exm',
+                        'nexm',
                         'lex',
                         'nlex',
                     ];

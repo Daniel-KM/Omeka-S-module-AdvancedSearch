@@ -977,8 +977,8 @@ class Module extends AbstractModule
 
         // Manage all fields, included those not in the form in order to support
         // queries for long term. But use labels set in the form if any.
-        $formFieldLabels = array_column($searchFormSettings['filters'], 'label', 'field');
-        $availableFieldLabels = array_combine(array_keys($availableFields), array_column($availableFields, 'label'));
+        $formFieldLabels = array_column($searchFormSettings['filters'] ?? [], 'label', 'field');
+        $availableFieldLabels = array_combine(array_keys($availableFields), array_column($availableFields ?? [], 'label'));
         $fieldLabels = array_replace($availableFieldLabels, array_filter($formFieldLabels));
 
         // @see \AdvancedSearch\FormAdapter\AbstractFormAdapter::toQuery()
@@ -1305,7 +1305,7 @@ class Module extends AbstractModule
                             }
                         }
 
-                        $vals = in_array($queryRow['type'], $withResourceIds)
+                        $vals = in_array($queryType, $withResourceIds)
                             ? $flatArrayValueResourceIds($value, $vrTitles)
                             : $flatArray($value);
                         $filters[$filterLabel][$this->urlQuery($key, $subKey)] = implode(', ', $vals);

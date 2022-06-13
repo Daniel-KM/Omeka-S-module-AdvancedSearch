@@ -733,6 +733,8 @@ class Module extends AbstractModule
             'new' => $translate('does not end with'), // @translate
             'res' => $translate('is resource with ID'), // @translate
             'nres' => $translate('is not resource with ID'), // @translate
+            'exm' => $translate('has multiple values'), // @translate
+            'nexm' => $translate('has not multiple values'), // @translate
             'lex' => $translate('is a linked resource'), // @translate
             'nlex' => $translate('is not a linked resource'), // @translate
             'lres' => $translate('is linked with resource with ID'), // @translate
@@ -746,6 +748,8 @@ class Module extends AbstractModule
             'nsw' => 'sw',
             'ew' => 'new',
             'new' => 'ew',
+            'exm' => 'nexm',
+            'nexm' => 'exm',
             'lex' => 'nlex',
             'nlex' => 'lex',
             'lres' => 'nlres',
@@ -755,6 +759,8 @@ class Module extends AbstractModule
         $withoutValue = [
             'lex',
             'nlex',
+            'exm',
+            'nexm',
         ];
 
         $filters = $event->getParam('filters');

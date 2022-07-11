@@ -82,6 +82,7 @@ return [
             Form\Element\OptionalSelect::class => Form\Element\OptionalSelect::class,
             Form\Element\OptionalUrl::class => Form\Element\OptionalUrl::class,
             Form\Element\TextExact::class => Form\Element\TextExact::class,
+            Form\Element\UrlQuery::class => Form\Element\UrlQuery::class,
         ],
         'factories' => [
             Form\Admin\ApiFormConfigFieldset::class => Service\Form\ApiFormConfigFieldsetFactory::class,

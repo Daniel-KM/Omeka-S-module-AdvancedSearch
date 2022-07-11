@@ -541,64 +541,9 @@ SQL;
     {
         // Don't use excluded fields for filters.
         $this->filterQueryValues($this->query->getFilters());
-
-        $multifields = $this->engine->settingAdapter('multifields', []);
-
-        $dateRangeFilters = $this->query->getDateRangeFilters();
-        foreach ($dateRangeFilters as $field => $filterValues) {
-            if ($field === 'created' || $field === 'modified') {
-                $argName = 'datetime';
-            } else {
-                $field = $this->getPropertyTerm($field)
-                    ?? $multifields[$field]['fields']
-                    ?? $this->underscoredNameToTerm($field)
-                    ?? null;
-                if (!$field) {
-                    continue;
-                }
-                $argName = 'property';
-            }
-            foreach ($filterValues as $filterValue) {
-                if (strlen($filterValue['from'])) {
-                    $this->args[$argName][] = [
-                        'joiner' => 'and',
-                        'property' => $field,
-                        'type' => 'gte',
-                        'text' => $filterValue['from'],
-                    ];
-                }
-                if (strlen($filterValue['to'])) {
-                    $this->args[$argName][] = [
-                        'joiner' => 'and',
-                        'property' => $field,
-                        'type' => 'lte',
-                        'text' => $filterValue['to'],
-                    ];
-                }
-            }
-        }
-
-        $filters = $this->query->getFilterQueries();
-        foreach ($filters as $field => $values) {
-            $field = $this->getPropertyTerm($field)
-                ?? $multifields[$field]['fields']
-                ?? $this->underscoredNameToTerm($field)
-                ?? null;
-            if (!$field) {
-                continue;
-            }
-            foreach ($values as $value) {
-                $this->args['property'][] = [
-                    'joiner' => $value['join'],
-                    'property' => $field,
-                    'type' => $value['type'],
-                    'text' => $value['value'],
-                ];
-            }
-        }
-
+        $this->filterQueryDateRange($this->query->getDateRangeFilters());
+        $this->filterQueryFilters($this->query->getFilterQueries());
         $this->argsWithoutActiveFacets = $this->args;
-
         $this->filterQueryValues($this->query->getActiveFacets(), true);
     }
 
@@ -701,6 +646,65 @@ SQL;
                         }
                     }
                     break;
+            }
+        }
+    }
+
+    protected function filterQueryDateRange(array $dateRangeFilters): void
+    {
+        $multifields = $this->engine->settingAdapter('multifields', []);
+        foreach ($dateRangeFilters as $field => $filterValues) {
+            if ($field === 'created' || $field === 'modified') {
+                $argName = 'datetime';
+            } else {
+                $field = $this->getPropertyTerm($field)
+                    ?? $multifields[$field]['fields']
+                    ?? $this->underscoredNameToTerm($field)
+                    ?? null;
+                if (!$field) {
+                    continue;
+                }
+                $argName = 'property';
+            }
+            foreach ($filterValues as $filterValue) {
+                if (strlen($filterValue['from'])) {
+                    $this->args[$argName][] = [
+                        'joiner' => 'and',
+                        'property' => $field,
+                        'type' => 'gte',
+                        'text' => $filterValue['from'],
+                    ];
+                }
+                if (strlen($filterValue['to'])) {
+                    $this->args[$argName][] = [
+                        'joiner' => 'and',
+                        'property' => $field,
+                        'type' => 'lte',
+                        'text' => $filterValue['to'],
+                    ];
+                }
+            }
+        }
+    }
+
+    protected function filterQueryFilters(array $filters): void
+    {
+        $multifields = $this->engine->settingAdapter('multifields', []);
+        foreach ($filters as $field => $values) {
+            $field = $this->getPropertyTerm($field)
+                ?? $multifields[$field]['fields']
+                ?? $this->underscoredNameToTerm($field)
+                ?? null;
+            if (!$field) {
+                continue;
+            }
+            foreach ($values as $value) {
+                $this->args['property'][] = [
+                    'joiner' => $value['join'],
+                    'property' => $field,
+                    'type' => $value['type'],
+                    'text' => $value['value'],
+                ];
             }
         }
     }
@@ -916,7 +920,7 @@ SQL;
     {
         static $users;
 
-        if (is_null($resourceTemplates)) {
+        if (is_null($users)) {
             /** @var \Doctrine\DBAL\Connection $connection */
             $connection = $this->services->get('Omeka\Connection');
             $qb = $connection->createQueryBuilder();

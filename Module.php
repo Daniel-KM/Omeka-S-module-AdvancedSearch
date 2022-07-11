@@ -327,84 +327,100 @@ class Module extends AbstractModule
             [$this, 'filterSearchFilters']
         );
 
-        // Listeners for the indexing for items, item sets and media.
+        // Listeners for the indexing of items, item sets and media.
+        // Let other modules to update data before indexing.
 
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemAdapter::class,
             'api.create.post',
-            [$this, 'updateSearchEngine']
+            [$this, 'updateSearchEngine'],
+            -100
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemAdapter::class,
             'api.batch_update.pre',
-            [$this, 'preBatchUpdateSearchEngine']
+            [$this, 'preBatchUpdateSearchEngine'],
+            -100
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemAdapter::class,
             'api.batch_update.post',
-            [$this, 'postBatchUpdateSearchEngine']
+            [$this, 'postBatchUpdateSearchEngine'],
+            -100
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemAdapter::class,
             'api.update.post',
-            [$this, 'updateSearchEngine']
+            [$this, 'updateSearchEngine'],
+            -100
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemAdapter::class,
             'api.delete.post',
-            [$this, 'updateSearchEngine']
+            [$this, 'updateSearchEngine'],
+            -100
         );
 
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemSetAdapter::class,
             'api.create.post',
-            [$this, 'updateSearchEngine']
+            [$this, 'updateSearchEngine'],
+            -100
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemSetAdapter::class,
             'api.batch_update.pre',
-            [$this, 'preBatchUpdateSearchEngine']
+            [$this, 'preBatchUpdateSearchEngine'],
+            -100
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemSetAdapter::class,
             'api.batch_update.post',
-            [$this, 'postBatchUpdateSearchEngine']
+            [$this, 'postBatchUpdateSearchEngine'],
+            -100
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemSetAdapter::class,
             'api.update.post',
-            [$this, 'updateSearchEngine']
+            [$this, 'updateSearchEngine'],
+            -100
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemSetAdapter::class,
             'api.delete.post',
-            [$this, 'updateSearchEngine']
+            [$this, 'updateSearchEngine'],
+            -100
         );
 
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\MediaAdapter::class,
             'api.update.post',
-            [$this, 'updateSearchEngineMedia']
+            [$this, 'updateSearchEngineMedia'],
+            -100
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\MediaAdapter::class,
             'api.batch_update.pre',
-            [$this, 'preBatchUpdateSearchEngine']
+            [$this, 'preBatchUpdateSearchEngine'],
+            -100
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\MediaAdapter::class,
             'api.batch_update.post',
-            [$this, 'postBatchUpdateSearchEngine']
+            [$this, 'postBatchUpdateSearchEngine'],
+            -100
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\MediaAdapter::class,
             'api.delete.pre',
-            [$this, 'preUpdateSearchEngineMedia']
+            [$this, 'preUpdateSearchEngineMedia'],
+            -100
         );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\MediaAdapter::class,
             'api.delete.post',
-            [$this, 'updateSearchEngineMedia']
+            [$this, 'updateSearchEngineMedia'],
+            -100
         );
 
         // Listeners for sites.

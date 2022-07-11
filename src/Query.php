@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2018-2021
+ * Copyright Daniel Berthereau, 2018-2022
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software. You can use, modify and/ or
@@ -63,6 +63,11 @@ class Query implements \JsonSerializable
      * @var array
      */
     protected $filterQueries = [];
+
+    /**
+     * @var array
+     */
+    protected $hiddenQueryFilters = [];
 
     /**
      * @var string|null
@@ -136,7 +141,7 @@ class Query implements \JsonSerializable
     protected $siteId;
 
     /**
-     * The key is always trimmed and it is always a stringed.
+     * The query should be stringable and is always trimmed.
      */
     public function setQuery($query): self
     {
@@ -237,6 +242,17 @@ class Query implements \JsonSerializable
     public function getFilterQueries(): array
     {
         return $this->filterQueries;
+    }
+
+    public function setHiddenQueryFilters(array $hiddenQueryFilters): self
+    {
+        $this->hiddenQueryFilters = $hiddenQueryFilters;
+        return $this;
+    }
+
+    public function getHiddenQueryFilters(): array
+    {
+        return $this->hiddenQueryFilters;
     }
 
     /**
@@ -460,6 +476,7 @@ class Query implements \JsonSerializable
             'filters' => $this->getFilters(),
             'date_range_filters' => $this->getDateRangeFilters(),
             'filter_queries' => $this->getFilterQueries(),
+            'hidden_query_filters' => $this->getHiddenQueryFilters(),
             'sort' => $this->getSort(),
             'page' => $this->getPage(),
             'offset' => $this->getOffset(),

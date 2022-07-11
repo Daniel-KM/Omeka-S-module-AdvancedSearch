@@ -20,6 +20,7 @@ return [
         'search' => [
             'default_results' => 'default',
             'default_query' => '',
+            'hidden_query_filters' => '',
         ],
 
         'autosuggest' => [

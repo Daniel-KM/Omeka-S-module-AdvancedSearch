@@ -93,6 +93,7 @@ class SearchConfigConfigureForm extends Form
                     'value' => 'default',
                 ],
             ])
+            // TODO Use UrlQuery instead of Text for the default query to avoid conversion each time.
             ->add([
                 'name' => 'default_query',
                 'type' => Element\Text::class,
@@ -102,6 +103,17 @@ class SearchConfigConfigureForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'default_query',
+                ],
+            ])
+            ->add([
+                'name' => 'hidden_query_filters',
+                'type' => AdvancedSearchElement\UrlQuery::class,
+                'options' => [
+                    'label' => 'Hidden query filter to limit results', // @translate
+                    'default' => 'These args are appended to all queries. The format of the query depends on the search form and the search engine.', // @translated
+                ],
+                'attributes' => [
+                    'id' => 'hidden_query_filters',
                 ],
             ])
         ;

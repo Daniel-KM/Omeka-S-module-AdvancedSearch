@@ -408,6 +408,7 @@ SQL;
             $this->args['site_id'] = $siteId;
         }
 
+        $this->appendHiddenFilters();
         $this->filterQuery();
 
         if (!empty($this->args['property'])
@@ -529,6 +530,17 @@ SQL;
         $this->args['fulltext_search'] = $q;
     }
 
+    protected function appendHiddenFilters(): void
+    {
+        $hiddenFilters = $this->query->getHiddenQueryFilters();
+        if (!$hiddenFilters) {
+            return;
+        }
+        $this->filterQueryValues($hiddenFilters);
+        $this->filterQueryDateRange($hiddenFilters);
+        $this->filterQueryFilters($hiddenFilters);
+    }
+
     /**
      * Filter the query.
      *
@@ -566,7 +578,8 @@ SQL;
                 // "resource_type" is used externally and "resource_name" internally.
                 case 'resource_name':
                 case 'resource_type':
-                    $this->args['resource_name'] = $flatArray($values);
+                    $values = $flatArray($values);
+                    $this->args['resource_name'] = empty($this->args['resource_name']) ? $values : array_merge($this->args['resource_name'], $values);
                     continue 2;
 
                 // "is_public" is automatically managed by this internal adapter
@@ -575,39 +588,45 @@ SQL;
                     continue 2;
 
                 case 'id':
-                    $this->args['id'] = array_filter(array_map('intval', $flatArray($values)));
+                    $values = array_filter(array_map('intval', $flatArray($values)));;
+                    $this->args['id'] = empty($this->args['id']) ? $values : array_merge($this->args['id'], $values);
                     continue 2;
 
                 case 'owner_id':
                     $values = $flatArray($values);
-                    $this->args['owner_id'] = is_numeric(reset($values))
+                    $values = is_numeric(reset($values))
                         ? array_filter(array_map('intval', $values))
                         : $this->listUserIds($values);
+                    $this->args['owner_id'] = empty($this->args['owner_id']) ? $values : array_merge($this->args['owner_id'], $values);
                     continue 2;
 
                 case 'site_id':
                     $values = $flatArray($values);
-                    $this->args['site_id'] = is_numeric(reset($values))
+                    $values = is_numeric(reset($values))
                         ? array_filter(array_map('intval', $values))
                         : $this->listSiteIds($values);
+                    $this->args['site_id'] = empty($this->args['site_id']) ? $values : array_merge($this->args['site_id'], $values);
                     continue 2;
 
                 case 'resource_class_id':
                     $values = $flatArray($values);
-                    $this->args['resource_class_id'] = is_numeric(reset($values))
+                    $values = is_numeric(reset($values))
                         ? array_filter(array_map('intval', $values))
                         : $this->listResourceClassIds($values);
+                    $this->args['resource_class_id'] = empty($this->args['resource_class_id']) ? $values : array_merge($this->args['resource_class_id'], $values);
                     continue 2;
 
                 case 'resource_template_id':
                     $values = $flatArray($values);
-                    $this->args['resource_template_id'] = is_numeric(reset($values))
+                    $values = is_numeric(reset($values))
                         ? array_filter(array_map('intval', $values))
                         : $this->listResourceTemplateIds($values);
+                    $this->args['resource_template_id'] = empty($this->args['resource_template_id']) ? $values : array_merge($this->args['resource_template_id'], $values);
                     continue 2;
 
                 case 'item_set_id':
-                    $this->args['item_set_id'] = array_filter(array_map('intval', $flatArray($values)));
+                    $values = array_filter(array_map('intval', $flatArray($values)));
+                    $this->args['item_set_id'] = empty($this->args['item_set_id']) ? $values : array_merge($this->args['item_set_id'], $values);
                     continue 2;
 
                 default:
@@ -630,6 +649,14 @@ SQL;
                     }
                     foreach ($values as $value) {
                         if (is_array($value)) {
+                            // Skip date range queries (for hidden queries).
+                            if (isset($value['from']) || isset($value['to'])) {
+                                continue;
+                            }
+                            // Skip queries filters (for hidden queries).
+                            if (isset($value['joiner']) || isset($value['type']) || isset($value['text']) || isset($value['join']) || isset($value['value'])) {
+                                continue;
+                            }
                             $this->args['property'][] = [
                                 'joiner' => 'and',
                                 'property' => $field,
@@ -667,7 +694,11 @@ SQL;
                 $argName = 'property';
             }
             foreach ($filterValues as $filterValue) {
-                if (strlen($filterValue['from'])) {
+                // Skip simple and query filters (for hidden queries).
+                if (!is_array($filterValue)) {
+                    continue;
+                }
+                if (isset($filterValue['from']) && strlen($filterValue['from'])) {
                     $this->args[$argName][] = [
                         'joiner' => 'and',
                         'property' => $field,
@@ -675,7 +706,7 @@ SQL;
                         'text' => $filterValue['from'],
                     ];
                 }
-                if (strlen($filterValue['to'])) {
+                if (isset($filterValue['to']) && strlen($filterValue['to'])) {
                     $this->args[$argName][] = [
                         'joiner' => 'and',
                         'property' => $field,
@@ -699,6 +730,11 @@ SQL;
                 continue;
             }
             foreach ($values as $value) {
+                // Skip simple filters (for hidden queries).
+                if (!$value || !is_array($value)) {
+                    continue;
+                }
+                $value += ['join' => null, 'type' => null, 'value' => null];
                 $this->args['property'][] = [
                     'joiner' => $value['join'],
                     'property' => $field,

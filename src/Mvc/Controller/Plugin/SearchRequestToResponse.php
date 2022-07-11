@@ -126,6 +126,14 @@ class SearchRequestToResponse extends AbstractPlugin
         /** @var \AdvancedSearch\Query $query */
         $query = $formAdapter->toQuery($request, $searchFormSettings);
 
+        // Append hidden query if any (filter, date range filter, filter query).
+        $hiddenFilters = $searchConfigSettings['search']['hidden_query_filters'] ?? [];
+        if ($hiddenFilters) {
+            // TODO Convert a generic hidden query filters into a specific one?
+            // $hiddenFilters = $formAdapter->toQuery($hiddenFilters, $searchFormSettings);
+            $query->setHiddenQueryFilters($hiddenFilters);
+        }
+
         // Add global parameters.
 
         $this->searchEngine = $searchConfig->engine();

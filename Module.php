@@ -1334,6 +1334,18 @@ class Module extends AbstractModule
                     // Append only fields that are not yet processed somewhere
                     // else, included searchFilters helper.
                     if (isset($fieldLabels[$key]) && !isset($filters[$fieldLabels[$key]])) {
+                        if (is_array($value) && (array_key_exists('from', $value) || array_key_exists('to', $value))) {
+                            $filterLabel = $fieldLabels[$key];
+                            if (array_key_exists('from', $value) && array_key_exists('to', $value)) {
+                                $filters[$filterLabel][$this->urlQuery($key)] = sprintf($translate('from %s to %s'), $value['from'], $value['to']); // @translate
+                            } elseif (array_key_exists('from', $value)) {
+                                $filters[$filterLabel][$this->urlQuery($key)] = sprintf($translate('since %s'), $value['from']); // @translate
+                            } elseif (array_key_exists('to', $value)) {
+                                $filters[$filterLabel][$this->urlQuery($key)] = sprintf($translate('until %s'), $value['to']); // @translate
+                            }
+                            break;
+                        }
+
                         $filterLabel = $fieldLabels[$key];
                         foreach (array_filter(array_map('trim', array_map('strval', $flatArray($value))), 'strlen') as $subKey => $subValue) {
                             $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $subValue;

@@ -166,7 +166,9 @@ class SearchFilters extends AbstractHelper
                         $value = $queryRow['text'] ?? null;
                         if (in_array($queryType, self::PROPERTY_QUERY['value_none'], true)) {
                             $value = null;
-                        } elseif ((is_array($value) && !count($value)) || !strlen((string) $value)) {
+                        } elseif ((is_array($value) && !count($value))
+                            || (!is_array($value) && !strlen((string) $value))
+                        ) {
                             continue;
                         }
                         $joiner = $queryRow['joiner'] ?? null;

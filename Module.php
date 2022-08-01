@@ -646,18 +646,19 @@ class Module extends AbstractModule
         // The advanced search form can be used anywhere, so load it in all cases.
         $view = $event->getTarget();
         $assetUrl = $view->plugin('assetUrl');
-        $view->headLink()
-            ->appendStylesheet($assetUrl('vendor/chosen-js/chosen.css', 'Omeka'));
         $view->headScript()
-            ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.js', 'Omeka'), 'text/javascript', ['defer' => 'defer'])
             ->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
-
-        // For the main search field in the left sidebar in admin.
-        if ($this->getServiceLocator()->get('Omeka\Status')->isAdminRequest()) {
+        if ($view->status()->isAdminRequest()) {
+            // For the main search field in the left sidebar in admin.
             $view->headLink()
                 ->appendStylesheet($assetUrl('css/advanced-search-admin.css', 'AdvancedSearch'));
             $view->headScript()
                 ->appendFile($assetUrl('js/advanced-search-admin.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
+        } else {
+            $view->headLink()
+                ->prependStylesheet($assetUrl('vendor/chosen-js/chosen.min.css', 'Omeka'));
+            $view->headScript()
+                ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.js', 'Omeka'), 'text/javascript', ['defer' => 'defer']);
         }
 
         $query = $event->getParam('query', []);

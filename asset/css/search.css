@@ -24,9 +24,12 @@
     #search-filters .filter {
         display: flex;
         margin-bottom: 0;
+        /*
         margin-left: 30%;
         padding-bottom: 6px;
         padding-left: 1.69492%;
+        */
+        padding: 6px;
     }
     #search-filters .filter:first-of-type {
         padding-top: 6px;

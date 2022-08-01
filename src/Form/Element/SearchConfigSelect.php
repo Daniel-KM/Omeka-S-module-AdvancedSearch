@@ -6,6 +6,8 @@ use Laminas\Form\Element\Select;
 
 class SearchConfigSelect extends Select
 {
+    use TraitOptionalElement;
+
     /**
      * @var \Omeka\Api\Manager
      */

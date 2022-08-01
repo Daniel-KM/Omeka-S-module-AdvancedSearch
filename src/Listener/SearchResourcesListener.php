@@ -403,10 +403,7 @@ class SearchResourcesListener
         ];
 
         foreach ($query['property'] as $queryRow) {
-            if (!(
-                is_array($queryRow)
-                && array_key_exists('type', $queryRow)
-            )) {
+            if (!is_array($queryRow) || !array_key_exists('type', $queryRow)) {
                 continue;
             }
 

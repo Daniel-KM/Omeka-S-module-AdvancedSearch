@@ -11,18 +11,27 @@
 
 // Remove code to avoid to load the same files multiple times in your theme.
 
-$assetUrl = $this->plugin('assetUrl');
+$plugins = $this->getHelperPluginManager();
+$status = $plugins->get('status');
+$assetUrl = $plugins->get('assetUrl');
+$headLink = $plugins->get('headLink');
+$headScript = $plugins->get('headScript');
 
 if ($searchPage->subSetting('autosuggest', 'suggester')
     || $searchPage->subSetting('autosuggest', 'url')
 ) {
-    $this->headScript()
+    $headScript
         ->appendFile($assetUrl('vendor/jquery-autocomplete/jquery.autocomplete.min.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
 }
 
-$this->headLink()
-    ->appendStylesheet($assetUrl('vendor/chosen-js/chosen.min.css', 'Omeka'))
+if (!$status->isAdminRequest()) {
+    $headLink
+        ->prependStylesheet($assetUrl('vendor/chosen-js/chosen.css', 'Omeka'));
+    $headScript
+        ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.min.js', 'Omeka'), 'text/javascript', ['defer' => 'defer']);
+}
+
+$headLink
     ->appendStylesheet($assetUrl('css/search.css', 'AdvancedSearch'));
-$this->headScript()
-    ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.min.js', 'Omeka'), 'text/javascript', ['defer' => 'defer'])
+$headScript
     ->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);

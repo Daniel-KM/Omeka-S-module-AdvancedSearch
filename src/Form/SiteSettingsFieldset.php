@@ -56,6 +56,7 @@ class SiteSettingsFieldset extends Fieldset
         }
 
         $this
+            ->setAttribute('id', 'advanced-search')
             ->add([
                 'name' => 'advancedsearch_note_core',
                 'type' => Note::class,

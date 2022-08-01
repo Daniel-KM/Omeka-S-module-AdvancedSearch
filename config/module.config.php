@@ -54,6 +54,7 @@ return [
             'apiSearchOne' => Service\ViewHelper\ApiSearchOneFactory::class,
             // Used in AdvancedResourceTemplate, AdvancedSearch and BlockPlus.
             'assetUrl' => Service\ViewHelper\AssetUrlFactory::class,
+            'easyMeta' => Service\ViewHelper\EasyMetaFactory::class,
             'matchedRouteName' => Service\ViewHelper\MatchedRouteNameFactory::class,
             'mediaTypeSelect' => Service\ViewHelper\MediaTypeSelectFactory::class,
             'searchEngineConfirm' => Service\ViewHelper\SearchEngineConfirmFactory::class,

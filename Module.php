@@ -300,12 +300,6 @@ class Module extends AbstractModule
                 'view.advanced_search',
                 [$this, 'displayAdvancedSearch']
             );
-            // Filter the search filters for the advanced search pages.
-            $sharedEventManager->attach(
-                $controller,
-                'view.search.filters',
-                [$this, 'filterSearchFilters']
-            );
         }
         $controllers = [
             'Omeka\Controller\Site\Item',
@@ -797,6 +791,7 @@ class Module extends AbstractModule
      * Filter search filters.
      *
      * @see \Omeka\View\Helper\SearchFilters
+     * @see \AdvancedSearch\View\Helper\SearchFilters
      * @param Event $event
      */
     public function filterSearchFilters(Event $event): void
@@ -805,53 +800,6 @@ class Module extends AbstractModule
         if (empty($query)) {
             return;
         }
-
-        $view = $event->getTarget();
-        $translate = $view->plugin('translate');
-
-        // Only non-core querying.
-        $queryTypes = [
-            'list' => $translate('is in list'), // @translate
-            'nlist' => $translate('is not in list'), // @translate
-            'sw' => $translate('starts with'), // @translate
-            'nsw' => $translate('does not start with'), // @translate
-            'ew' => $translate('ends with'), // @translate
-            'new' => $translate('does not end with'), // @translate
-            'res' => $translate('is resource with ID'), // @translate
-            'nres' => $translate('is not resource with ID'), // @translate
-            'exs' => $translate('has a single value'), // @translate
-            'exm' => $translate('has multiple values'), // @translate
-            'nexm' => $translate('has not multiple values'), // @translate
-            'lex' => $translate('is a linked resource'), // @translate
-            'nlex' => $translate('is not a linked resource'), // @translate
-            'lres' => $translate('is linked with resource with ID'), // @translate
-            'nlres' => $translate('is not linked with resource with ID'), // @translate
-        ];
-
-        $reciprocalQueryTypes = [
-            'list' => 'nlist',
-            'nlist' => 'list',
-            'sw' => 'nsw',
-            'nsw' => 'sw',
-            'ew' => 'new',
-            'new' => 'ew',
-            // TODO Clarify. Don't use null for next check of query types.
-            'exs' => '',
-            'exm' => 'nexm',
-            'nexm' => 'exm',
-            'lex' => 'nlex',
-            'nlex' => 'lex',
-            'lres' => 'nlres',
-            'nlres' => 'lres',
-        ];
-
-        $withoutValue = [
-            'lex',
-            'nlex',
-            'exs',
-            'exm',
-            'nexm',
-        ];
 
         $filters = $event->getParam('filters');
 
@@ -865,167 +813,6 @@ class Module extends AbstractModule
             $this->query['__searchConfig'],
             $this->query['__searchQuery']
         );
-
-        // This function fixes some forms that add an array level.
-        // This function manages only one level, so check value when needed.
-        $flatArray = function ($value): array {
-            if (!is_array($value)) {
-                return [$value];
-            }
-            $firstKey = key($value);
-            if (is_numeric($firstKey)) {
-                return $value;
-            }
-            return is_array(reset($value)) ? $value[$firstKey] : [$value[$firstKey]];
-        };
-
-        foreach ($this->query as $key => $value) {
-            if ($value === null || $value === '' || $value === []) {
-                continue;
-            }
-
-            switch ($key) {
-                case 'property':
-                    $easyMeta = $this->getServiceLocator()->get('ViewHelperManager')->get('easyMeta');
-                    // TODO The array may be more than zero when firsts are standard (see core too for inverse).
-                    $index = 0;
-                    foreach (array_filter($value, 'is_array') as $subKey => $queryRow) {
-                        $queryType = $queryRow['type'] ?? 'eq';
-                        if (!isset($reciprocalQueryTypes[$queryType])) {
-                            continue;
-                        }
-
-                        $propertyId = $queryRow['property'] ?? null;
-                        $joiner = $queryRow['joiner'] ?? 'and';
-                        $value = $queryRow['value'] ?? '';
-
-                        $isWithoutValue = in_array($queryType, $withoutValue, true);
-
-                        // A value can be an array with types "list" and "nlist".
-                        if (!is_array($value)
-                            && !strlen((string) $value)
-                            && !$isWithoutValue
-                        ) {
-                            continue;
-                        }
-
-                        if ($isWithoutValue) {
-                            $value = '';
-                        }
-
-                        if ($propertyId) {
-                            // A property can be a list of properties.
-                            $propertyLabels = [];
-                            $properties = is_array($propertyId) ? $propertyId : [$propertyId];
-                            foreach ($properties as $property) {
-                                $label = $easyMeta->propertyLabels($property);
-                                $propertyLabels[] = $label ? $translate($label) : $translate('Unknown property');
-                            }
-                            $propertyLabel = implode(' ' . $translate('OR') . ' ', $propertyLabels);
-                        } else {
-                            $propertyLabel = $translate('[Any property]');
-                        }
-
-                        $filterLabel = $propertyLabel . ' ' . $queryTypes[$queryType];
-                        if ($index > 0) {
-                            if ($joiner === 'or') {
-                                $filterLabel = $translate('OR') . ' ' . $filterLabel;
-                            } elseif ($joiner === 'not') {
-                                $filterLabel = $translate('EXCEPT') . ' ' . $filterLabel; // @translate
-                            } else {
-                                $filterLabel = $translate('AND') . ' ' . $filterLabel;
-                            }
-                        }
-
-                        $filters[$filterLabel][] = implode(', ', $flatArray($value));
-
-                        ++$index;
-                    }
-                    break;
-
-                case 'datetime':
-                    $queryTypes = [
-                        'gt' => $translate('after'),
-                        'gte' => $translate('after or on'),
-                        'eq' => $translate('on'),
-                        'neq' => $translate('not on'),
-                        'lte' => $translate('before or on'),
-                        'lt' => $translate('before'),
-                        'ex' => $translate('has any date / time'),
-                        'nex' => $translate('has no date / time'),
-                    ];
-
-                    $value = $this->query['datetime'];
-                    $engine = 0;
-                    foreach ($value as $subKey => $queryRow) {
-                        $joiner = $queryRow['joiner'];
-                        $field = $queryRow['field'];
-                        $type = $queryRow['type'];
-                        $datetimeValue = $queryRow['value'];
-
-                        $fieldLabel = $field === 'modified' ? $translate('Modified') : $translate('Created');
-                        $filterLabel = $fieldLabel . ' ' . $queryTypes[$type];
-                        if ($engine > 0) {
-                            if ($joiner === 'or') {
-                                $filterLabel = $translate('OR') . ' ' . $filterLabel;
-                            } elseif ($joiner === 'not') {
-                                $filterLabel = $translate('EXCEPT') . ' ' . $filterLabel; // @translate
-                            } else {
-                                $filterLabel = $translate('AND') . ' ' . $filterLabel;
-                            }
-                        }
-                        $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $datetimeValue;
-                        ++$engine;
-                    }
-                    break;
-
-                case 'is_public':
-                    $filters[$translate('Visibility')][$this->urlQuery($key)] = $value
-                        ? $translate('Private')
-                        : $translate('Public');
-                    break;
-
-                case 'resource_class_term':
-                    $filterLabel = $translate('Class'); // @translate
-                    foreach ($flatArray($value) as $subKey => $subValue) {
-                        $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $subValue;
-                    }
-                    break;
-
-                case 'has_media':
-                    $filterLabel = $translate('Has media'); // @translate
-                    $filters[$filterLabel][$this->urlQuery($key)] = $value
-                        ? $translate('yes') // @translate
-                        : $translate('no'); // @translate
-                    break;
-
-                case 'has_original':
-                    $filterLabel = $translate('Has original'); // @translate
-                    $filters[$filterLabel][$this->urlQuery($key)] = $value
-                        ? $translate('yes') // @translate
-                        : $translate('no'); // @translate
-                    break;
-
-                case 'has_thumbnails':
-                    $filterLabel = $translate('Has thumbnails'); // @translate
-                    $filters[$filterLabel][$this->urlQuery($key)] = $value
-                        ? $translate('yes') // @translate
-                        : $translate('no'); // @translate
-                    break;
-
-                case 'media_types':
-                    $filterLabel = $translate('Media types'); // @translate
-                    foreach ($flatArray($value) as $subKey => $subValue) {
-                        $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $subValue;
-                    }
-                    break;
-
-                // The query "item_set_id" is already managed by the main search filter.
-
-                default:
-                    break;
-            }
-        }
 
         if (isset($query['__searchConfig'])) {
             $filters = $this->filterSearchingFilters($query, $filters);

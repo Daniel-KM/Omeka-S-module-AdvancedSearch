@@ -43,14 +43,16 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
         $partialName = $partialName ?: self::PARTIAL_NAME;
 
         $view = $this->getView();
-        $translate = $view->plugin('translate');
+        $plugins = $view->getHelperPluginManager();
+        $api = $plugins->get('api');
+        $translate = $plugins->get('translate');
 
         $filters = [];
-        $api = $view->api();
         $query = $query ?? $view->params()->fromQuery();
 
         $this->baseUrl = $this->view->url(null, [], true);
-        $this->query = $query;
+        $searchResourcesListener = new \AdvancedSearch\Listener\SearchResourcesListener();
+        $this->query = $searchResourcesListener->normalizeQueryDateTime($query);
         unset(
             $this->query['page'],
             $this->query['offset'],
@@ -91,6 +93,19 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
             'nlex',
         ];
 
+        // This function fixes some forms that add an array level.
+        // This function manages only one level, so check value when needed.
+        $flatArray = function ($value): array {
+            if (!is_array($value)) {
+                return [$value];
+            }
+            $firstKey = key($value);
+            if (is_numeric($firstKey)) {
+                return $value;
+            }
+            return is_array(reset($value)) ? $value[$firstKey] : [$value[$firstKey]];
+        };
+
         // Normally, query is already cleaned.
         // TODO Remove checks of search keys, already done during event api.search.pre.
         foreach ($this->query as $key => $value) {
@@ -130,6 +145,8 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
 
                 // Search values (by property or all)
                 case 'property':
+                    $easyMeta = $plugins->get('easyMeta');
+                    // TODO The array may be more than zero when firsts are standard (see core too for inverse).
                     $index = 0;
                     foreach ($value as $subKey => $queryRow) {
                         if (!(is_array($queryRow)
@@ -157,19 +174,15 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
                             $queriedProperties = [];
                         }
                         if ($queriedProperties) {
-                            $propertyIds = $this->getPropertyIds($queriedProperties);
-                            $properties = $propertyIds ? $api->search('properties', ['id' => $propertyIds])->getContent() : [];
-                            if ($properties) {
-                                $propertyLabel = [];
-                                foreach ($properties as $property) {
-                                    $propertyLabel[] = $translate($property->label());
-                                }
-                                $propertyLabel = implode(' ' . $translate('OR') . ' ', $propertyLabel);
-                            } else {
-                                $propertyLabel = $translate('Unknown property');
+                            $propertyLabel = [];
+                            $properties = is_array($queriedProperties) ? $queriedProperties : [$queriedProperties];
+                            foreach ($properties as $property) {
+                                $label = $easyMeta->propertyLabels($property);
+                                $propertyLabel[] = $label ? $translate($label) : $translate('Unknown property'); // @translate
                             }
+                            $propertyLabel = implode(' ' . $translate('OR') . ' ', $propertyLabel);
                         } else {
-                            $propertyLabel = $translate('[Any property]');
+                            $propertyLabel = $translate('[Any property]'); // @translate
                         }
                         $filterLabel = $propertyLabel . ' ' . $queryTypes[$queryType];
                         if ($index > 0) {
@@ -182,7 +195,7 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
                             }
                         }
 
-                        $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $value;
+                        $filters[$filterLabel][$this->urlQuery($key, $subKey)] = implode(', ', $flatArray($value));
                         ++$index;
                     }
                     break;
@@ -229,7 +242,7 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
                             try {
                                 $filterValue = $api->read('item_sets', $subValue)->getContent()->displayTitle();
                             } catch (NotFoundException $e) {
-                                $filterValue = $translate('Unknown item set');
+                                $filterValue = $translate('Unknown item set'); // @translate
                             }
                         } else {
                             $filterValue = $translate('[none]'); // @translate
@@ -282,6 +295,83 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
                     $filters[$filterLabel][$this->urlQuery($key)] = $value
                         ? $translate('yes') // @translate
                         : $translate('no'); // @translate
+                    break;
+
+                case 'datetime':
+                    $queryTypesDatetime = [
+                        'gt' => $translate('after'),
+                        'gte' => $translate('after or on'),
+                        'eq' => $translate('on'),
+                        'neq' => $translate('not on'),
+                        'lte' => $translate('before or on'),
+                        'lt' => $translate('before'),
+                        'ex' => $translate('has any date / time'),
+                        'nex' => $translate('has no date / time'),
+                    ];
+
+                    $value = $this->query['datetime'];
+                    $engine = 0;
+                    foreach ($value as $subKey => $queryRow) {
+                        $joiner = $queryRow['joiner'];
+                        $field = $queryRow['field'];
+                        $type = $queryRow['type'];
+                        $datetimeValue = $queryRow['value'];
+
+                        $fieldLabel = $field === 'modified' ? $translate('Modified') : $translate('Created');
+                        $filterLabel = $fieldLabel . ' ' . $queryTypesDatetime[$type];
+                        if ($engine > 0) {
+                            if ($joiner === 'or') {
+                                $filterLabel = $translate('OR') . ' ' . $filterLabel;
+                            } elseif ($joiner === 'not') {
+                                $filterLabel = $translate('EXCEPT') . ' ' . $filterLabel; // @translate
+                            } else {
+                                $filterLabel = $translate('AND') . ' ' . $filterLabel;
+                            }
+                        }
+                        $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $datetimeValue;
+                        ++$engine;
+                    }
+                    break;
+
+                case 'is_public':
+                    $filters[$translate('Visibility')][$this->urlQuery($key)] = $value
+                        ? $translate('Private')
+                        : $translate('Public');
+                    break;
+
+                case 'resource_class_term':
+                    $filterLabel = $translate('Class'); // @translate
+                    foreach ($flatArray($value) as $subKey => $subValue) {
+                        $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $subValue;
+                    }
+                    break;
+
+                case 'has_media':
+                    $filterLabel = $translate('Has media'); // @translate
+                    $filters[$filterLabel][$this->urlQuery($key)] = $value
+                        ? $translate('yes') // @translate
+                        : $translate('no'); // @translate
+                    break;
+
+                case 'has_original':
+                    $filterLabel = $translate('Has original'); // @translate
+                    $filters[$filterLabel][$this->urlQuery($key)] = $value
+                        ? $translate('yes') // @translate
+                        : $translate('no'); // @translate
+                    break;
+
+                case 'has_thumbnails':
+                    $filterLabel = $translate('Has thumbnails'); // @translate
+                    $filters[$filterLabel][$this->urlQuery($key)] = $value
+                        ? $translate('yes') // @translate
+                        : $translate('no'); // @translate
+                    break;
+
+                case 'media_types':
+                    $filterLabel = $translate('Media types'); // @translate
+                    foreach ($flatArray($value) as $subKey => $subValue) {
+                        $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $subValue;
+                    }
                     break;
 
                 default:

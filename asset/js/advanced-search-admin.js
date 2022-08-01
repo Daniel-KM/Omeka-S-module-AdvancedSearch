@@ -27,7 +27,7 @@ $(document).ready(function() {
 
     $('.chosen-select').chosen(chosenOptions);
 
-    $('#resource-templates .value select, #item-sets .value select, #site_id, #owner_id, #datetime-queries .value select')
+    $('body.search').find('#resource-templates .value select, #item-sets .value select, #site_id, #owner_id, #datetime-queries .value select')
         .addClass('chosen-select').chosen(chosenOptions);
     $('#property-queries, #resource-class').on('o:value-created', '.value', function(e) {
         $('.chosen-select').chosen(chosenOptions);

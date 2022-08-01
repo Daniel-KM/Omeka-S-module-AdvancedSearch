@@ -5,13 +5,13 @@ namespace AdvancedSearch\Mvc\Controller\Plugin;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
-use Laminas\EventManager\Event;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use Omeka\Api\Adapter\ItemAdapter;
 use Omeka\Api\Adapter\ItemSetAdapter;
 use Omeka\Api\Adapter\MediaAdapter;
 use Omeka\Api\Exception\NotFoundException;
 use Omeka\Api\Adapter\AbstractResourceEntityAdapter;
+use Omeka\Api\Request;
 
 class SearchResourcesQueryBuilder extends AbstractPlugin
 {
@@ -59,52 +59,132 @@ class SearchResourcesQueryBuilder extends AbstractPlugin
     }
 
     /**
-     * Helper to filter search queries.
+     * Helper to manage search queries before core.
+     *
+     * The process removes keys before core processing and re-add them after to
+     * avoid a double process for core adapter keys.
      *
      * @todo Integrate the override in a way a direct call to adapter->buildQuery() can work with advanced property search (see Reference and some other modules). For now, use buildInitialQuery().
      *
-     * @see \AdvancedSearch\Module::onApiSearchPre()
      * @see \AdvancedSearch\Api\ManagerDelegator::search()
      */
-    public function onDispatch(Event $event): void
+    public function startOverrideRequest(Request $request): self
     {
-        /**
-         * @var \Doctrine\ORM\QueryBuilder $qb
-         * @var \Omeka\Api\Request $request
-         */
-        $qb = $event->getParam('queryBuilder');
-        $request = $event->getParam('request');
         $query = $request->getContent();
 
-        // Reset the query for properties.
-        $override = $request->getOption('override', []);
-        if ($override) {
-            if (isset($override['owner_id'])) {
-                $query['owner_id'] = $override['owner_id'];
-            }
-            if (isset($override['resource_class_id'])) {
-                $query['resource_class_id'] = $override['resource_class_id'];
-            }
-            if (isset($override['resource_template_id'])) {
-                $query['resource_template_id'] = $override['resource_template_id'];
-            }
-            if (isset($override['item_set_id'])) {
-                $query['item_set_id'] = $override['item_set_id'];
-            }
-            if (isset($override['property'])) {
-                $query['property'] = $override['property'];
-            }
-            $request->setContent($query);
-            $request->setOption('override', null);
+        $override = [];
+        $query = $this->startOverrideQuery($query, $override);
+        if (!empty($override)) {
+            $request->setOption('override', $override);
         }
 
-        $this->buildInitialQuery($qb, $query, $event->getTarget());
+        $request->setContent($query);
+
+        return $this;
     }
 
-    public function buildInitialQuery(QueryBuilder $qb, array $query, AbstractResourceEntityAdapter $adapter): void
+    /**
+     * Helper to manage search queries after core.
+     */
+    public function endOverrideRequest(Request $request): self
+    {
+        $query = $request->getContent();
+        $override = $request->getOption('override', []);
+
+        $query = $this->endOverrideQuery($query, $override);
+        $request->setContent($query);
+        $request->setOption('override', null);
+
+        return $this;
+    }
+
+    /**
+     * Override query keys that have improved features before process in core.
+     *
+     * Overridden keys are passed via referenced variable.
+     *
+     * @see \AdvancedSearch\Api\ManagerDelegator::search()
+     */
+    public function startOverrideQuery(array $query, array &$override): array
+    {
+        $override = [];
+
+        // The query is cleaned first to simplify checks.
+        $query = $this->cleanQuery($query);
+
+        if (isset($query['owner_id'])) {
+            $override['owner_id'] = $query['owner_id'];
+            unset($query['owner_id']);
+        }
+        if (isset($query['resource_class_id'])) {
+            $override['resource_class_id'] = $query['resource_class_id'];
+            unset($query['resource_class_id']);
+        }
+        if (isset($query['resource_template_id'])) {
+            $override['resource_template_id'] = $query['resource_template_id'];
+            unset($query['resource_template_id']);
+        }
+        if (isset($query['item_set_id'])) {
+            $override['item_set_id'] = $query['item_set_id'];
+            unset($query['item_set_id']);
+        }
+        if (!empty($query['property'])) {
+            $override['property'] = $query['property'];
+            unset($query['property']);
+        }
+        // "site" is more complex and has already a special key "in_sites", that
+        // can be true or false. This key is not overridden.
+        // When the key "site_id" is set, the key "in_sites" is skipped in core.
+        if (isset($query['site_id']) && (int) $query['site_id'] === 0) {
+            $query['in_sites'] = false;
+            unset($query['site_id']);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Reinclude overridden keys in the search queries after core process.
+     *
+     * The modules, included this one, can process them after end of overriding.
+     */
+    public function endOverrideQuery(array $query, ?array $override = null): array
+    {
+        // Reset the query for properties.
+        if (!$override) {
+            return $query;
+        }
+
+        if (isset($override['owner_id'])) {
+            $query['owner_id'] = $override['owner_id'];
+        }
+        if (isset($override['resource_class_id'])) {
+            $query['resource_class_id'] = $override['resource_class_id'];
+        }
+        if (isset($override['resource_template_id'])) {
+            $query['resource_template_id'] = $override['resource_template_id'];
+        }
+        if (isset($override['item_set_id'])) {
+            $query['item_set_id'] = $override['item_set_id'];
+        }
+        if (isset($override['property'])) {
+            $query['property'] = $override['property'];
+        }
+
+        return $query;
+    }
+
+    public function setAdapter(AbstractResourceEntityAdapter $adapter): self
     {
         $this->adapter = $adapter;
+        return $this;
+    }
 
+    /**
+     * Process this module search features. The adapter must be set first.
+     */
+    public function buildInitialQuery(QueryBuilder $qb, array $query): void
+    {
         // Process advanced search plus keys.
         $this->searchSites($qb, $query);
         $this->searchResources($qb, $query);
@@ -122,6 +202,55 @@ class SearchResourcesQueryBuilder extends AbstractPlugin
             $this->searchHasThumbnails($qb, $query);
             $this->searchByMediaType($qb, $query);
         }
+    }
+
+    /**
+     * The advanced search form returns all keys, so remove useless ones.
+     *
+     * @param array $query
+     * @return array
+     */
+    public function cleanQuery(array $query): array
+    {
+        // Clean simple useless fields to avoid useless checks in many places.
+        // TODO Clean property, numeric, dates, etc.
+        foreach ($query as $key => $value) {
+            if ($value === '' || $value === null || $value === []) {
+                unset($query[$key]);
+            } elseif ($key === 'id') {
+                $values = is_array($value) ? $value : [$value];
+                $values = array_filter($values, function ($id) {
+                    return $id !== '' && $id !== null;
+                });
+                    if (count($values)) {
+                        $query[$key] = $values;
+                    } else {
+                        unset($query[$key]);
+                    }
+            } elseif (in_array($key, [
+                'owner_id',
+                'site_id',
+            ])) {
+                if (is_numeric($value)) {
+                    $query[$key] = (int) $value;
+                } else {
+                    unset($query[$key]);
+                }
+            } elseif (in_array($key, [
+                'resource_class_id',
+                'resource_template_id',
+                'item_set_id',
+            ])) {
+                $values = is_array($value) ? $value : [$value];
+                $values = array_map('intval', array_filter($values, 'is_numeric'));
+                if (count($values)) {
+                    $query[$key] = $values;
+                } else {
+                    unset($query[$key]);
+                }
+            }
+        }
+        return $query;
     }
 
     /**

@@ -248,7 +248,7 @@ class Module extends AbstractModule
             $sharedEventManager->attach(
                 $adapter,
                 'api.search.pre',
-                [$this, 'onApiSearchPre'],
+                [$this, 'startOverrideQuery'],
                 // Let any other module, except core, to search properties.
                 -100
             );
@@ -256,7 +256,7 @@ class Module extends AbstractModule
             $sharedEventManager->attach(
                 $adapter,
                 'api.search.query',
-                [$this, 'onApiSearchQuery'],
+                [$this, 'endOverrideQuery'],
                 // Process before any other module in order to reset query.
                 +100
             );
@@ -595,95 +595,41 @@ class Module extends AbstractModule
      * Clean useless fields and store some keys to process them one time only.
      *
      * @see \AdvancedSearch\Api\ManagerDelegator::search()
-     * @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResourcesQueryBuilder::onDispatch()
+     * @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResourcesQueryBuilder::startOverrideQuery()
      */
-    public function onApiSearchPre(Event $event): void
+    public function startOverrideQuery(Event $event): void
     {
         /** @var \Omeka\Api\Request $request */
         $request = $event->getParam('request');
-        $query = $request->getContent();
 
-        // Clean simple useless fields to avoid useless checks in many places.
-        // TODO Clean property, numeric, dates, etc.
-        foreach ($query as $key => $value) {
-            if ($value === '' || $value === null || $value === []) {
-                unset($query[$key]);
-            } elseif ($key === 'id') {
-                $values = is_array($value) ? $value : [$value];
-                $values = array_filter($values, function ($id) {
-                    return $id !== '' && $id !== null;
-                });
-                if (count($values)) {
-                    $query[$key] = $values;
-                } else {
-                    unset($query[$key]);
-                }
-            } elseif (in_array($key, [
-                'owner_id',
-                'site_id',
-            ])) {
-                if (is_numeric($value)) {
-                    $query[$key] = (int) $value;
-                } else {
-                    unset($query[$key]);
-                }
-            } elseif (in_array($key, [
-                'resource_class_id',
-                'resource_template_id',
-                'item_set_id',
-            ])) {
-                $values = is_array($value) ? $value : [$value];
-                $values = array_map('intval', array_filter($values, 'is_numeric'));
-                if (count($values)) {
-                    $query[$key] = $values;
-                } else {
-                    unset($query[$key]);
-                }
-            }
-        }
-
-        // Override some keys (separated from loop for clean process).
-        $override = [];
-        if (isset($query['owner_id'])) {
-            $override['owner_id'] = $query['owner_id'];
-            unset($query['owner_id']);
-        }
-        if (isset($query['resource_class_id'])) {
-            $override['resource_class_id'] = $query['resource_class_id'];
-            unset($query['resource_class_id']);
-        }
-        if (isset($query['resource_template_id'])) {
-            $override['resource_template_id'] = $query['resource_template_id'];
-            unset($query['resource_template_id']);
-        }
-        if (isset($query['item_set_id'])) {
-            $override['item_set_id'] = $query['item_set_id'];
-            unset($query['item_set_id']);
-        }
-        if (!empty($query['property'])) {
-            $override['property'] = $query['property'];
-            unset($query['property']);
-        }
-        // "site" is more complex and has already a special key "in_sites", that
-        // can be true or false. This key is not overridden.
-        // When the key "site_id" is set, the key "in_sites" is skipped in core.
-        if (isset($query['site_id']) && (int) $query['site_id'] === 0) {
-            $query['in_sites'] = false;
-            unset($query['site_id']);
-        }
-        if ($override) {
-            $request->setOption('override', $override);
-        }
-
-        $request->setContent($query);
-    }
-
-    public function onApiSearchQuery(Event $event): void
-    {
-        /** @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResourcesQueryBuilder::onDispatch() */
+        /** @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResourcesQueryBuilder::startOverrideQuery() */
         $this->getServiceLocator()->get('ControllerPluginManager')
             ->get('searchResourcesQueryBuilder')
-            ->onDispatch($event);
+            ->startOverrideRequest($request);
+    }
+
+    /**
+     * Reset original fields and process search after core.
+     *
+     * @see \AdvancedSearch\Api\ManagerDelegator::search()
+     * @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResourcesQueryBuilder::endOverrideQuery()
+     */
+    public function endOverrideQuery(Event $event): void
+    {
+        /** @var \Omeka\Api\Request $request */
+        $request = $event->getParam('request');
+        $qb = $event->getParam('queryBuilder');
+        $adapter = $event->getTarget();
+
+        /** @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResourcesQueryBuilder::endOverrideQuery() */
+        $searchResourcesQueryBuilder = $this->getServiceLocator()->get('ControllerPluginManager')
+            ->get('searchResourcesQueryBuilder');
+
+        $searchResourcesQueryBuilder
+            ->endOverrideRequest($request)
+            ->setAdapter($adapter)
+            // Process the query for overridden keys.
+            ->buildInitialQuery($qb, $request->getContent());
     }
 
     public function onFormVocabMemberSelectQuery(Event $event): void
@@ -827,6 +773,7 @@ class Module extends AbstractModule
      *
      * @todo Should use the form adapter (but only main form is really used).
      * @see \AdvancedSearch\FormAdapter\AbstractFormAdapter
+     * @todo Move filterSearchingFilters() to a view helper.
      */
     protected function filterSearchingFilters(array $query, array $filters): array
     {

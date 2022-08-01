@@ -90,6 +90,12 @@ class SearchFilters extends AbstractHelper
             'nlres' => $translate('is not linked with'), // @translate
             'tp' => $translate('has main type'), // @translate
             'ntp' => $translate('has not main type'), // @translate
+            'tpl' => $translate('has type literal-like'), // @translate
+            'ntpl' => $translate('has not type literal-like'), // @translate
+            'tpr' => $translate('has type resource-like'), // @translate
+            'ntpr' => $translate('has not type resource-like'), // @translate
+            'tpu' => $translate('has type uri-like'), // @translate
+            'ntpu' => $translate('has not type uri-like'), // @translate
             'dtp' => $translate('has data type'), // @translate
             'ndtp' => $translate('has not data type'), // @translate
             // 'gt' => $translate('greater than'), // @translate

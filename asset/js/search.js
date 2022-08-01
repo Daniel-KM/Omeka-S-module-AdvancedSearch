@@ -279,7 +279,7 @@ $(document).ready(function() {
     function disableQueryTextInput(queryType) {
         var queryText = queryType.siblings('.query-text');
         queryText.prop('disabled',
-            ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'lex', 'nlex'].includes(queryType.val()));
+            ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'lex', 'nlex', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu'].includes(queryType.val()));
     };
     $(document).on('change', '.query-type', function () {
          disableQueryTextInput($(this));

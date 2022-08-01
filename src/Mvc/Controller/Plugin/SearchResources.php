@@ -70,6 +70,12 @@ class SearchResources extends AbstractPlugin
             'nres' => 'res',
             'tp' => 'ntp',
             'ntp' => 'tp',
+            'tpl' => 'ntpl',
+            'ntpl' => 'tpl',
+            'tpr' => 'ntpr',
+            'ntpr' => 'tpr',
+            'tpu' => 'ntpu',
+            'ntpu' => 'tpu',
             'dtp' => 'ndtp',
             'ndtp' => 'dtp',
             'lex' => 'nlex',
@@ -106,6 +112,12 @@ class SearchResources extends AbstractPlugin
             'nexm',
             'lex',
             'nlex',
+            'tpl',
+            'ntpl',
+            'tpr',
+            'ntpr',
+            'tpu',
+            'ntpu',
         ],
         'value_subject' => [
             'lex',
@@ -708,6 +720,12 @@ class SearchResources extends AbstractPlugin
      *   - nres: has no resource (core)
      *   - tp: has main type (literal-like, resource-like, uri-like)
      *   - ntp: has not main type (literal-like, resource-like, uri-like)
+     *   - tpl: has type literal-like
+     *   - ntpl: has not type literal-like
+     *   - tpr: has type resource-like
+     *   - ntpr: has not type resource-like
+     *   - tpu: has type uri-like
+     *   - ntpu: has not type uri-like
      *   - dtp: has data type
      *   - ndtp: has not data type
      *   - lex: is a linked resource
@@ -948,6 +966,33 @@ class SearchResources extends AbstractPlugin
                     } else {
                         $predicateExpr = $expr->eq(1, 0);
                     }
+                    break;
+
+                case 'ntpl':
+                    $positive = false;
+                    // no break.
+                case 'tpl':
+                    // Because a resource or a uri can have a label stored
+                    // in "value", a literal-like value is a value without
+                    // resource and without uri.
+                    $predicateExpr = $expr->andX(
+                        $expr->isNull("$valuesAlias.valueResource"),
+                        $expr->isNull("$valuesAlias.uri")
+                    );
+                    break;
+
+                case 'ntpr':
+                    $positive = false;
+                    // no break.
+                case 'tpr':
+                    $predicateExpr = $expr->isNotNull("$valuesAlias.valueResource");
+                    break;
+
+                case 'ntpu':
+                    $positive = false;
+                    // no break.
+                case 'tpu':
+                    $predicateExpr = $expr->isNotNull("$valuesAlias.uri");
                     break;
 
                 case 'ndtp':

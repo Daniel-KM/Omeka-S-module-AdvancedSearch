@@ -112,8 +112,16 @@ $queryText = function (array $search, $index) use ($escape, $translate) {
                 <?= $queryOption('nlex', $property, 'type', $translate('is not a linked resource')) ?>
                 <?= $queryOption('lres', $property, 'type', $translate('is linked with resource with ID')) ?>
                 <?= $queryOption('nlres', $property, 'type', $translate('is not linked with resource with ID')) ?>
+                <?php /* // TODO Require a js to force value to be "literal", "resource" or "uri". ?>
                 <?= $queryOption('tp', $property, 'type', $translate('has main type')) ?>
                 <?= $queryOption('ntp', $property, 'type', $translate('has not main type')) ?>
+                <?php */ ?>
+                <?= $queryOption('tpl', $property, 'type', $translate('has type literal-like')) ?>
+                <?= $queryOption('ntpl', $property, 'type', $translate('has not type literal-like')) ?>
+                <?= $queryOption('tpr', $property, 'type', $translate('has type resource-like')) ?>
+                <?= $queryOption('ntpr', $property, 'type', $translate('has not type resource-like')) ?>
+                <?= $queryOption('tplu', $property, 'type', $translate('has type uri-like')) ?>
+                <?= $queryOption('ntpu', $property, 'type', $translate('has not type uri-like')) ?>
                 <?= $queryOption('dtp', $property, 'type', $translate('has data type')) ?>
                 <?= $queryOption('ndtp', $property, 'type', $translate('has not data type')) ?>
             </select>

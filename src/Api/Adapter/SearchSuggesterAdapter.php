@@ -14,6 +14,16 @@ class SearchSuggesterAdapter extends AbstractEntityAdapter
     protected $sortFields = [
         'id' => 'id',
         'name' => 'name',
+        'engine' => 'engine',
+        'created' => 'created',
+        'modified' => 'modified',
+    ];
+
+    protected $scalarFields = [
+        'id' => 'id',
+        'name' => 'name',
+        'engine' => 'engine',
+        'settings' => 'settings',
         'created' => 'created',
         'modified' => 'modified',
     ];

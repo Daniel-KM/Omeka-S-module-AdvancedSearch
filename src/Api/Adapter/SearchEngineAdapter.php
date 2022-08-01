@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2017-2021
+ * Copyright Daniel Berthereau, 2017-2022
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -41,6 +41,16 @@ class SearchEngineAdapter extends AbstractEntityAdapter
     protected $sortFields = [
         'id' => 'id',
         'name' => 'name',
+        'adapter' => 'adapter',
+        'created' => 'created',
+        'modified' => 'modified',
+    ];
+
+    protected $scalarFields = [
+        'id' => 'id',
+        'name' => 'name',
+        'adapter' => 'adapter',
+        'settings' => 'settings',
         'created' => 'created',
         'modified' => 'modified',
     ];

@@ -67,6 +67,9 @@ $queryText = function (array $search, $index) use ($escape, $translate) {
         $index = 0;
         foreach ($properties as $property):
             $stem = "property[$index]";
+            $propertyList = isset($property['property'])
+                ? (is_array($property['property']) ? $property['property'] : [$property['property']])
+                : [null];
         ?>
         <div class="value">
             <select class="joiner chosen-select" name="<?= $escape($stem . '[joiner]') ?>">
@@ -82,8 +85,10 @@ $queryText = function (array $search, $index) use ($escape, $translate) {
                 ],
                 'attributes' => [
                     'class' => 'query-property chosen-select',
-                    'value' => $property['property'] ?? null,
+                    'value' => $propertyList,
                     'aria-label' => $translate('Property'),
+                    'multiple' => true,
+                    'data-placeholder' => $translate('Select properties…'),
                 ],
             ]) ?>
             <select class="query-type chosen-select" name="<?= $escape($stem . '[type]') ?>" aria-label="<?= $translate('Query type') ?>">

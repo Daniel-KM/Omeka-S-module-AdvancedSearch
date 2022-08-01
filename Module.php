@@ -973,6 +973,10 @@ class Module extends AbstractModule
                         // 'nlres' => $translate('is not linked with resource with ID'), // @translate
                         'lres' => $translate('is linked with'), // @translate
                         'nlres' => $translate('is not linked with'), // @translate
+                        'tp' => $translate('has main type'), // @translate
+                        'ntp' => $translate('has not main type'), // @translate
+                        'dtp' => $translate('has data type'), // @translate
+                        'ndtp' => $translate('has not data type'), // @translate
                         'gt' => $translate('greater than'), // @translate
                         'gte' => $translate('greater than or equal'), // @translate
                         'lte' => $translate('lower than or equal'), // @translate

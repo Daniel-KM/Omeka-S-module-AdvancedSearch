@@ -68,6 +68,8 @@ class SearchResources extends AbstractPlugin
             'new' => 'ew',
             'res' => 'nres',
             'nres' => 'res',
+            'tp' => 'ntp',
+            'ntp' => 'tp',
             'dtp' => 'ndtp',
             'ndtp' => 'dtp',
             'lex' => 'nlex',
@@ -86,6 +88,8 @@ class SearchResources extends AbstractPlugin
             'nres',
             'lres',
             'nlres',
+            'dtp',
+            'ndtp',
         ],
         'value_integer' => [
             'res',
@@ -702,8 +706,10 @@ class SearchResources extends AbstractPlugin
      *   - new: does not end with
      *   - res: has resource (core)
      *   - nres: has no resource (core)
+     *   - tp: has main type (literal-like, resource-like, uri-like)
+     *   - ntp: has not main type (literal-like, resource-like, uri-like)
      *   - dtp: has data type
-     *   - ndtp: does not have data type
+     *   - ndtp: has not data type
      *   - lex: is a linked resource
      *   - nlex: is not a linked resource
      *   - lres: is linked with resource #id
@@ -921,6 +927,27 @@ class SearchResources extends AbstractPlugin
                 case 'exm':
                     $predicateExpr = $expr->isNotNull("$valuesAlias.id");
                     $qb->having($expr->gt("COUNT($valuesAlias.id)", 1));
+                    break;
+
+                case 'ntp':
+                    $positive = false;
+                    // no break.
+                case 'tp':
+                    if ($value === 'literal') {
+                        // Because a resource or a uri can have a label stored
+                        // in "value", a literal-like value is a value without
+                        // resource and without uri.
+                        $predicateExpr = $expr->andX(
+                            $expr->isNull("$valuesAlias.valueResource"),
+                            $expr->isNull("$valuesAlias.uri")
+                        );
+                    } elseif ($value === 'resource') {
+                        $predicateExpr = $expr->isNotNull("$valuesAlias.valueResource");
+                    } elseif ($value === 'uri') {
+                        $predicateExpr = $expr->isNotNull("$valuesAlias.uri");
+                    } else {
+                        $predicateExpr = $expr->eq(1, 0);
+                    }
                     break;
 
                 case 'ndtp':

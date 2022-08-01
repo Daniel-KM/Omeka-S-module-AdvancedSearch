@@ -112,6 +112,10 @@ $queryText = function (array $search, $index) use ($escape, $translate) {
                 <?= $queryOption('nlex', $property, 'type', $translate('is not a linked resource')) ?>
                 <?= $queryOption('lres', $property, 'type', $translate('is linked with resource with ID')) ?>
                 <?= $queryOption('nlres', $property, 'type', $translate('is not linked with resource with ID')) ?>
+                <?= $queryOption('tp', $property, 'type', $translate('has main type')) ?>
+                <?= $queryOption('ntp', $property, 'type', $translate('has not main type')) ?>
+                <?= $queryOption('dtp', $property, 'type', $translate('has data type')) ?>
+                <?= $queryOption('ndtp', $property, 'type', $translate('has not data type')) ?>
             </select>
             <?= $queryText($property, $index) ?>
             <button type="button" class="o-icon-delete remove-value button" aria-label="<?= $translate('Remove value') ?>" title="<?= $translate('Remove value') ?>"></button>

@@ -63,6 +63,9 @@ class SearchResourcesListener
         // Reset the query for properties.
         $override = $request->getOption('override', []);
         if ($override) {
+            if (isset($override['owner_id'])) {
+                $query['owner_id'] = $override['owner_id'];
+            }
             if (isset($override['resource_class_id'])) {
                 $query['resource_class_id'] = $override['resource_class_id'];
             }
@@ -276,6 +279,27 @@ class SearchResourcesListener
          */
 
         $expr = $qb->expr();
+
+        if (isset($query['owner_id'])) {
+            if (empty($query['owner_id'])) {
+                $qb
+                    ->andWhere(
+                        $expr->isNull('omeka_root.owner')
+                    );
+            } else {
+                $userAlias = $this->adapter->createAlias();
+                $qb
+                    ->innerJoin(
+                        'omeka_root.owner',
+                        $userAlias
+                    );
+                    $qb
+                    ->andWhere($expr->eq(
+                        "$userAlias.id",
+                        $this->adapter->createNamedParameter($qb, $query['owner_id']))
+                    );
+            }
+        }
 
         if (isset($query['resource_class_id'])
             && $query['resource_class_id'] !== ''

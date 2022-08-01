@@ -97,6 +97,10 @@ class ManagerDelegator extends \Omeka\Api\Manager
 
                 // Override some keys (separated from loop for clean process).
                 $override = [];
+                if (isset($query['owner_id'])) {
+                    $override['owner_id'] = $query['owner_id'];
+                    unset($query['owner_id']);
+                }
                 if (isset($query['resource_class_id'])) {
                     $override['resource_class_id'] = $query['resource_class_id'];
                     unset($query['resource_class_id']);

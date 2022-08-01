@@ -241,10 +241,14 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
                 // Search user
                 case 'owner_id':
                     $filterLabel = $translate('User');
-                    try {
-                        $filterValue = $api->read('users', $value)->getContent()->name();
-                    } catch (NotFoundException $e) {
-                        $filterValue = $translate('Unknown user');
+                    if ($value) {
+                        try {
+                            $filterValue = $api->read('users', $value)->getContent()->name();
+                        } catch (NotFoundException $e) {
+                            $filterValue = $translate('Unknown user'); // @translate
+                        }
+                    } else {
+                        $filterValue = $translate('[none]'); // @translate
                     }
                     $filters[$filterLabel][$this->urlQuery($key)] = $filterValue;
                     break;

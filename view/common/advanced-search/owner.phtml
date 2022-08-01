@@ -1,0 +1,41 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var array $query
+ *
+ * Same as core template, with:
+ * - include resource "without owner" (id = 0);
+ * - use chosen-select;
+ * - short echo.
+ */
+
+$plugins = $this->getHelperPluginManager();
+$translate = $plugins->get('translate');
+$hyperlink = $plugins->get('hyperlink');
+$userSelect = $plugins->get('userSelect');
+?>
+
+<div class="field">
+    <div class="field-meta">
+        <label for="owner_id"><?= $translate('Search by owner') ?></label>
+        <?= $hyperlink('', '#', ['class' => 'expand', 'title' => $translate('Expand')]) ?>
+        <div class="collapsible">
+            <div class="field-description"><?= $translate('Searches for resources that are owned by this user.') ?></div>
+        </div>
+    </div>
+    <div class="inputs">
+        <?= $userSelect([
+            'name' => 'owner_id',
+            'options' => [
+                'prepend_value_options' => [
+                    '0' => '[none]',
+                ],
+            ],
+            'attributes' => [
+                'id' => 'owner_id',
+                'value' => $query['owner_id'] ?? null,
+            ],
+        ]) ?>
+    </div>
+</div>
+

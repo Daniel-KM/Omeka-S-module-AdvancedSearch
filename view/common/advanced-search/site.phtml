@@ -1,0 +1,44 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var array $query
+ *
+ * Same as core template, with:
+ * - include resource "without site" (id = 0 or in_sites = false);
+ * - use chosen-select;
+ * - short echo.
+ */
+
+$plugins = $this->getHelperPluginManager();
+$translate = $plugins->get('translate');
+$hyperlink = $plugins->get('hyperlink');
+$siteSelect = $plugins->get('siteSelect');
+
+if (empty($query['site_id']) && isset($query['in_sites']) && ($query['in_sites'] === 0 || $query['in_sites'] === '0' || $query['in_sites'] === false)) {
+    $query['site_id'] = 0;
+}
+?>
+
+<div class="field">
+    <div class="field-meta">
+        <label for="site_id"><?= $translate('Search by site') ?></label>
+        <?= $hyperlink('', '#', ['class' => 'expand', 'title' => $this->translate('Expand')]) ?>
+        <div class="collapsible">
+            <div class="field-description"><?= $translate('Searches for items that are assigned to this site.') ?></div>
+        </div>
+    </div>
+    <div class="inputs">
+        <?= $siteSelect([
+            'name' => 'site_id',
+            'options' => [
+                'prepend_value_options' => [
+                    '0' => '[none]',
+                ],
+            ],
+            'attributes' => [
+                'id' => 'site_id',
+                'value' => $query['site_id'] ?? null,
+            ]
+        ]) ?>
+    </div>
+</div>

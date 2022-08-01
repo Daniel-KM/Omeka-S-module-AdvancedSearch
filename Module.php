@@ -680,6 +680,13 @@ class Module extends AbstractModule
             $override['property'] = $query['property'];
             unset($query['property']);
         }
+        // "site" is more complex and has already a special key "in_sites", that
+        // can be true or false. This key is not overridden.
+        // When the key "site_id" is set, the key "in_sites" is skipped in core.
+        if (isset($query['site_id']) && (int) $query['site_id'] === 0) {
+            $query['in_sites'] = false;
+            unset($query['site_id']);
+        }
         if ($override) {
             $request->setOption('override', $override);
         }

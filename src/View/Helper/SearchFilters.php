@@ -263,13 +263,25 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
                         if (!is_numeric($subValue)) {
                             continue;
                         }
-                        try {
-                            $filterValue = $api->read('sites', ['id' => $subValue])->getContent()->title();
-                        } catch (NotFoundException $e) {
-                            $filterValue = $translate('Unknown site');
+                        // Normally, "0" is moved to "in_sites".
+                        if ($subValue) {
+                            try {
+                                $filterValue = $api->read('sites', ['id' => $subValue])->getContent()->title();
+                            } catch (NotFoundException $e) {
+                                $filterValue = $translate('Unknown site'); // @translate
+                            }
+                        } else {
+                            $filterValue = $translate('[none]'); // @translate
                         }
                         $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $filterValue;
                     }
+                    break;
+
+                case 'in_sites':
+                    $filterLabel = $translate('In a site'); // @translate
+                    $filters[$filterLabel][$this->urlQuery($key)] = $value
+                        ? $translate('yes') // @translate
+                        : $translate('no'); // @translate
                     break;
 
                 default:

@@ -1,6 +1,6 @@
 {
     "name": "daniel-km/omeka-s-module-search",
-    "description": "Add improved search capabilities to Omeka S: auto-suggest, filters, facets, etc.",
+    "description": "Module for Omeka S to add improved search capabilities: auto-suggest, filters, facets, etc.",
     "type": "library",
     "license": "CECILL-2.1",
     "authors": [
@@ -67,5 +67,11 @@
             "# Fix https://github.com/devbridge/jQuery-Autocomplete/pull/811",
             "@php -r '$f = __DIR__ . \"/asset/vendor/jquery-autocomplete/jquery.autocomplete.min.js\"; file_put_contents($f, str_replace(\",200)\", \",350)\", file_get_contents($f)));'"
         ]
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true,
+            "oomphinc/composer-installers-extender": true
+        }
     }
 }

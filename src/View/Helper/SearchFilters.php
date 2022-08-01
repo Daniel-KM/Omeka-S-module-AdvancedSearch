@@ -2,8 +2,7 @@
 
 namespace AdvancedSearch\View\Helper;
 
-use AdvancedSearch\Mvc\Controller\Plugin\SearchResourcesQueryBuilder;
-use Omeka\Api\Adapter\ResourceAdapter;
+use Laminas\View\Helper\AbstractHelper;
 use Omeka\Api\Exception\NotFoundException;
 
 /**
@@ -14,17 +13,12 @@ use Omeka\Api\Exception\NotFoundException;
  *
  * @see \Omeka\View\Helper\SearchFilters
  */
-class SearchFilters extends \Omeka\View\Helper\SearchFilters
+class SearchFilters extends AbstractHelper
 {
     /**
-     * @var ResourceAdapter
+     * The default partial view script.
      */
-    protected $resourceAdapter;
-
-    /**
-     * @var SearchResourcesQueryBuilder
-     */
-    protected $searchResourcesQueryBuilder;
+    const PARTIAL_NAME = 'common/search-filters';
 
     /**
      * @var string
@@ -36,13 +30,6 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
      */
     protected $query;
 
-    public function __construct(ResourceAdapter $resourceAdapter, SearchResourcesQueryBuilder $searchResourcesQueryBuilder)
-    {
-        $this->resourceAdapter = $resourceAdapter;
-        // TODO Remove the construct for SearchResourcesQueryBuilder
-        $this->searchResourcesQueryBuilder = $searchResourcesQueryBuilder;
-    }
-
     /**
      * Render filters from search query, with urls if needed (if set in theme).
      */
@@ -52,14 +39,17 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
 
         $view = $this->getView();
         $plugins = $view->getHelperPluginManager();
+        $url = $plugins->get('url');
         $api = $plugins->get('api');
+        $params = $plugins->get('params');
         $translate = $plugins->get('translate');
+        $searchResources = $plugins->get('searchResources');
 
         $filters = [];
-        $query = $query ?? $view->params()->fromQuery();
+        $query = $query ?? $params->fromQuery();
 
-        $this->baseUrl = $this->view->url(null, [], true);
-        $this->query = $this->searchResourcesQueryBuilder->normalizeQueryDateTime($query);
+        $this->baseUrl = $url(null, [], true);
+        $this->query = $searchResources->normalizeQueryDateTime($query);
         unset(
             $this->query['page'],
             $this->query['offset'],

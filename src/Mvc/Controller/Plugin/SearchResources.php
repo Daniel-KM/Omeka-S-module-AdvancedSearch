@@ -13,7 +13,7 @@ use Omeka\Api\Exception\NotFoundException;
 use Omeka\Api\Adapter\AbstractResourceEntityAdapter;
 use Omeka\Api\Request;
 
-class SearchResourcesQueryBuilder extends AbstractPlugin
+class SearchResources extends AbstractPlugin
 {
     /**
      * @var \Doctrine\DBAL\Connection

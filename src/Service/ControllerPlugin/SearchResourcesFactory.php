@@ -2,15 +2,15 @@
 
 namespace AdvancedSearch\Service\ControllerPlugin;
 
-use AdvancedSearch\Mvc\Controller\Plugin\SearchResourcesQueryBuilder;
+use AdvancedSearch\Mvc\Controller\Plugin\SearchResources;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
-class SearchResourcesQueryBuilderFactory implements FactoryInterface
+class SearchResourcesFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        return new SearchResourcesQueryBuilder(
+        return new SearchResources(
             $services->get('Omeka\Connection')
         );
     }

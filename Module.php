@@ -595,16 +595,16 @@ class Module extends AbstractModule
      * Clean useless fields and store some keys to process them one time only.
      *
      * @see \AdvancedSearch\Api\ManagerDelegator::search()
-     * @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResourcesQueryBuilder::startOverrideQuery()
+     * @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResources::startOverrideQuery()
      */
     public function startOverrideQuery(Event $event): void
     {
         /** @var \Omeka\Api\Request $request */
         $request = $event->getParam('request');
 
-        /** @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResourcesQueryBuilder::startOverrideQuery() */
+        /** @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResources::startOverrideQuery() */
         $this->getServiceLocator()->get('ControllerPluginManager')
-            ->get('searchResourcesQueryBuilder')
+            ->get('searchResources')
             ->startOverrideRequest($request);
     }
 
@@ -612,7 +612,7 @@ class Module extends AbstractModule
      * Reset original fields and process search after core.
      *
      * @see \AdvancedSearch\Api\ManagerDelegator::search()
-     * @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResourcesQueryBuilder::endOverrideQuery()
+     * @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResources::endOverrideQuery()
      */
     public function endOverrideQuery(Event $event): void
     {
@@ -621,11 +621,11 @@ class Module extends AbstractModule
         $qb = $event->getParam('queryBuilder');
         $adapter = $event->getTarget();
 
-        /** @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResourcesQueryBuilder::endOverrideQuery() */
-        $searchResourcesQueryBuilder = $this->getServiceLocator()->get('ControllerPluginManager')
-            ->get('searchResourcesQueryBuilder');
+        /** @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResources::endOverrideQuery() */
+        $searchResources = $this->getServiceLocator()->get('ControllerPluginManager')
+            ->get('searchResources');
 
-        $searchResourcesQueryBuilder
+        $searchResources
             ->endOverrideRequest($request)
             ->setAdapter($adapter)
             // Process the query for overridden keys.
@@ -749,10 +749,10 @@ class Module extends AbstractModule
 
         $this->baseUrl = (string) $event->getParam('baseUrl');
 
-        $searchResourcesQueryBuilder = $this->getServiceLocator()->get('ControllerPluginManager')
-            ->get('searchResourcesQueryBuilder');
+        $searchResources = $this->getServiceLocator()->get('ControllerPluginManager')
+            ->get('searchResources');
 
-        $this->query = $searchResourcesQueryBuilder->normalizeQueryDateTime($query);
+        $this->query = $searchResources->normalizeQueryDateTime($query);
         unset(
             $this->query['page'],
             $this->query['offset'],

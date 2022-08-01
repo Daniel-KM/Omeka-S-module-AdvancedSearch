@@ -253,3 +253,11 @@ if (version_compare($oldVersion, '3.3.6.12', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.3.6.15', '<')) {
+    $messenger = new Messenger();
+    $message = new Message(
+        'It’s now possible to search resources by multiples properties, and resources without class, template, item set, site or owner.' // @translate
+    );
+    $messenger->addSuccess($message);
+}

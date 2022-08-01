@@ -291,7 +291,9 @@ class SearchResources extends AbstractPlugin
         // Clean simple useless fields to avoid useless checks in many places.
         // TODO Clean property, numeric, dates, etc.
         foreach ($query as $key => $value) {
-            if ($value === '' || $value === null || $value === [] || !$key || $key === 'submit') {
+            if ($value === '' || $value === null || $value === []
+                || !$key || $key === 'submit' || $key === 'numeric-toggle-time-checkbox'
+            ) {
                 unset($query[$key]);
             } elseif ($key === 'id') {
                 $values = is_array($value) ? $value : [$value];
@@ -439,6 +441,45 @@ class SearchResources extends AbstractPlugin
                             ];
                         }
                     }
+                    unset($queryRow);
+                }
+            } elseif ($key === 'numeric') {
+                if (is_array($value)) {
+                    if (empty($query['numeric']['ts']['gte']['pid']) && empty($query['numeric']['ts']['gte']['val'])) {
+                        unset($query['numeric']['ts']['gte']);
+                    }
+                    if (empty($query['numeric']['ts']['lte']['pid']) && empty($query['numeric']['ts']['lte']['val'])) {
+                        unset($query['numeric']['ts']['lte']);
+                    }
+                    if (empty($query['numeric']['ts']['gte']) && empty($query['numeric']['ts']['lte'])) {
+                        unset($query['numeric']['ts']);
+                    }
+                    if (empty($query['numeric']['dur']['gt']['pid']) && empty($query['numeric']['dur']['gt']['val'])) {
+                        unset($query['numeric']['dur']['gt']);
+                    }
+                    if (empty($query['numeric']['dur']['lt']['pid']) && empty($query['numeric']['dur']['lt']['val'])) {
+                        unset($query['numeric']['dur']['lt']);
+                    }
+                    if (empty($query['numeric']['dur']['gt']) && empty($query['numeric']['dur']['lt'])) {
+                        unset($query['numeric']['dur']);
+                    }
+                    if (empty($query['numeric']['ivl']['pid']) && empty($query['numeric']['ivl']['val'])) {
+                        unset($query['numeric']['ivl']);
+                    }
+                    if (empty($query['numeric']['int']['gt']['pid']) && empty($query['numeric']['int']['gt']['val'])) {
+                        unset($query['numeric']['int']['gt']);
+                    }
+                    if (empty($query['numeric']['int']['lt']['pid']) && empty($query['numeric']['int']['lt']['val'])) {
+                        unset($query['numeric']['int']['lt']);
+                    }
+                    if (empty($query['numeric']['int']['gt']) && empty($query['numeric']['int']['lt'])) {
+                        unset($query['numeric']['int']);
+                    }
+                    if (empty($query['numeric'])) {
+                        unset($query['numeric']);
+                    }
+                } else {
+                    unset($query['numeric']);
                 }
             }
         }

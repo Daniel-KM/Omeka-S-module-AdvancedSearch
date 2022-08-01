@@ -21,8 +21,6 @@ class SearchFilters extends AbstractHelper
      */
     const PARTIAL_NAME = 'common/search-filters';
 
-    const PROPERTY_QUERY = SearchResources::PROPERTY_QUERY;
-
     /**
      * @var string
      */
@@ -160,17 +158,16 @@ class SearchFilters extends AbstractHelper
                     // TODO The array may be more than zero when firsts are standard (see core too for inverse).
                     $index = 0;
                     foreach ($value as $subKey => $queryRow) {
-                        if (!(is_array($queryRow)
-                            && array_key_exists('type', $queryRow)
-                        )) {
+                        if (!is_array($queryRow)
+                            || empty($queryRow['type'])
+                            || !isset(SearchResources::PROPERTY_QUERY['reciprocal'][$queryRow['type']])
+                        ) {
                             continue;
                         }
                         $queryType = $queryRow['type'];
-                        if (!isset($queryTypes[$queryType])) {
-                            continue;
-                        }
                         $value = $queryRow['text'] ?? null;
-                        if (in_array($queryType, self::PROPERTY_QUERY['value_none'], true)) {
+                        $noValue = in_array($queryType, SearchResources::PROPERTY_QUERY['value_none'], true);
+                        if ($noValue) {
                             $value = null;
                         } elseif ((is_array($value) && !count($value))
                             || (!is_array($value) && !strlen((string) $value))
@@ -197,7 +194,9 @@ class SearchFilters extends AbstractHelper
                         } else {
                             $propertyLabel = $translate('[Any property]'); // @translate
                         }
-                        $filterLabel = $propertyLabel . ' ' . $queryTypes[$queryType];
+                        $filterLabel = $noValue
+                            ? $propertyLabel
+                            : ($propertyLabel . ' ' . $queryTypes[$queryType]);
                         if ($index > 0) {
                             if ($joiner === 'or') {
                                 $filterLabel = $translate('OR') . ' ' . $filterLabel;
@@ -207,8 +206,9 @@ class SearchFilters extends AbstractHelper
                                 $filterLabel = $translate('AND') . ' ' . $filterLabel;
                             }
                         }
-
-                        $filters[$filterLabel][$this->urlQuery($key, $subKey)] = implode(', ', $flatArray($value));
+                        $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $noValue
+                            ? $queryTypes[$queryType]
+                            : implode(', ', $flatArray($value));
                         ++$index;
                     }
                     break;

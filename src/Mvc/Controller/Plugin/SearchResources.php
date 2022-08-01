@@ -328,7 +328,7 @@ class SearchResources extends AbstractPlugin
                 if (is_array($value)) {
                     foreach ($query['property'] as $k => $queryRow) {
                         if (!is_array($queryRow)
-                            || !isset($queryRow['type'])
+                            || empty($queryRow['type'])
                             || !isset(self::PROPERTY_QUERY['reciprocal'][$queryRow['type']])
                         ) {
                             unset($query['property'][$k]);
@@ -765,7 +765,7 @@ class SearchResources extends AbstractPlugin
 
         foreach ($query['property'] as $queryRow) {
             if (!is_array($queryRow)
-                || !isset($queryRow['type'])
+                || empty($queryRow['type'])
                 || !isset(self::PROPERTY_QUERY['reciprocal'][$queryRow['type']])
             ) {
                 continue;

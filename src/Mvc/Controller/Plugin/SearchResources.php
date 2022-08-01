@@ -48,6 +48,69 @@ class SearchResources extends AbstractPlugin
      */
     protected $usedResourceClassesByTerm;
 
+    const PROPERTY_QUERY = [
+        'reciprocal' => [
+            'eq' => 'neq',
+            'neq' => 'eq',
+            'in' => 'nin',
+            'nin' => 'in',
+            'ex' => 'nex',
+            'nex' => 'ex',
+            'exs' => 'nexs',
+            'nexs' => 'exs',
+            'exm' => 'nexm',
+            'nexm' => 'exm',
+            'list' => 'nlist',
+            'nlist' => 'list',
+            'sw' => 'nsw',
+            'nsw' => 'sw',
+            'ew' => 'new',
+            'new' => 'ew',
+            'res' => 'nres',
+            'nres' => 'res',
+            'dtp' => 'ndtp',
+            'ndtp' => 'dtp',
+            'lex' => 'nlex',
+            'nlex' => 'lex',
+            'lres' => 'nlres',
+            'nlres' => 'lres',
+            'gt' => 'lte',
+            'gte' => 'lt',
+            'lte' => 'gt',
+            'lt' => 'gte',
+        ],
+        'value_array' => [
+            'list',
+            'nlist',
+            'res',
+            'nres',
+            'lres',
+            'nlres',
+        ],
+        'value_integer' => [
+            'res',
+            'nres',
+            'lres',
+            'nlres',
+        ],
+        'value_none' => [
+            'ex',
+            'nex',
+            'exs',
+            'nexs',
+            'exm',
+            'nexm',
+            'lex',
+            'nlex',
+        ],
+        'value_subject' => [
+            'lex',
+            'nlex',
+            'lres',
+            'nlres',
+        ],
+    ];
+
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
@@ -206,27 +269,24 @@ class SearchResources extends AbstractPlugin
 
     /**
      * The advanced search form returns all keys, so remove useless ones.
-     *
-     * @param array $query
-     * @return array
      */
     public function cleanQuery(array $query): array
     {
         // Clean simple useless fields to avoid useless checks in many places.
         // TODO Clean property, numeric, dates, etc.
         foreach ($query as $key => $value) {
-            if ($value === '' || $value === null || $value === []) {
+            if ($value === '' || $value === null || $value === [] || !$key || $key === 'submit') {
                 unset($query[$key]);
             } elseif ($key === 'id') {
                 $values = is_array($value) ? $value : [$value];
                 $values = array_filter($values, function ($id) {
                     return $id !== '' && $id !== null;
                 });
-                    if (count($values)) {
-                        $query[$key] = $values;
-                    } else {
-                        unset($query[$key]);
-                    }
+                if (count($values)) {
+                    $query['id'] = $values;
+                } else {
+                    unset($query['id']);
+                }
             } elseif (in_array($key, [
                 'owner_id',
                 'site_id',
@@ -248,86 +308,122 @@ class SearchResources extends AbstractPlugin
                 } else {
                     unset($query[$key]);
                 }
-            }
-        }
-        return $query;
-    }
-
-    /**
-     * Normalize the query for the date time argument.
-     *
-     * This method is used during the event "view.search.filters" via filterSearchFilters().
-     */
-    public function normalizeQueryDateTime(array $query): array
-    {
-        if (empty($query['datetime'])) {
-            return $query;
-        }
-
-        // Manage a single date time.
-        if (!is_array($query['datetime'])) {
-            $query['datetime'] = [[
-                'joiner' => 'and',
-                'field' => 'created',
-                'type' => 'eq',
-                'value' => $query['datetime'],
-            ]];
-            return $query;
-        }
-
-        foreach ($query['datetime'] as $key => &$queryRow) {
-            if (empty($queryRow)) {
-                unset($query['datetime'][$key]);
-                continue;
-            }
-
-            // Clean query and manage default values.
-            if (is_array($queryRow)) {
-                $queryRow = array_map('mb_strtolower', array_map('trim', $queryRow));
-                if (empty($queryRow['joiner'])) {
-                    $queryRow['joiner'] = 'and';
+            } elseif ($key === 'property') {
+                if (is_array($value)) {
+                    foreach ($query['property'] as $k => $queryRow) {
+                        if (!is_array($queryRow)
+                            || !isset($queryRow['type'])
+                            || !isset(self::PROPERTY_QUERY['reciprocal'][$queryRow['type']])
+                        ) {
+                            unset($query['property'][$k]);
+                            continue;
+                        }
+                        $queryType = $queryRow['type'];
+                        $queryValue = $queryRow['text'] ?? '';
+                        // Quick check of value.
+                        // A empty string "" is not a value, but "0" is a value.
+                        if (in_array($queryType, self::PROPERTY_QUERY['value_none'], true)) {
+                            $queryValue = null;
+                        }
+                        // Check array of values.
+                        elseif (in_array($queryType, self::PROPERTY_QUERY['value_array'], true)) {
+                            if ((is_array($queryValue) && !count($queryValue))
+                                || (!is_array($queryValue) && !strlen((string) $queryValue))
+                            ) {
+                                unset($query['property'][$k]);
+                                continue;
+                            }
+                            if (!is_array($queryValue)) {
+                                $queryValue = [$queryValue];
+                            }
+                            $queryValue = in_array($queryType, self::PROPERTY_QUERY['value_integer'])
+                                ? array_unique(array_map('intval', $queryValue))
+                                : array_unique(array_filter(array_map('trim', array_map('strval', $queryValue)), 'strlen'));
+                            if (empty($queryValue)) {
+                                unset($query['property'][$k]);
+                                continue;
+                            } else {
+                                $query['property'][$k]['text'] = $queryValue;
+                            }
+                        }
+                        // The value should be a scalar in all other cases.
+                        elseif (is_array($queryValue) || !strlen((string) $queryValue)) {
+                            unset($query['property'][$k]);
+                            continue;
+                        }
+                        if (is_array($queryRow['property'])) {
+                            $query['property'][$k]['property'] = array_unique($query['property'][$k]['property']);
+                        }
+                    }
                 } else {
-                    if (!in_array($queryRow['joiner'], ['and', 'or', 'not'])) {
-                        unset($query['datetime'][$key]);
-                        continue;
+                    unset($query['property']);
+                }
+            } elseif ($key === 'datetime') {
+                // Manage a single date time.
+                if (!is_array($query['datetime'])) {
+                    $query['datetime'] = [[
+                        'joiner' => 'and',
+                        'field' => 'created',
+                        'type' => 'eq',
+                        'value' => $query['datetime'],
+                    ]];
+                } else {
+                    foreach ($query['datetime'] as $key => &$queryRow) {
+                        if (empty($queryRow)) {
+                            unset($query['datetime'][$key]);
+                            continue;
+                        }
+
+                        // Clean query and manage default values.
+                        if (is_array($queryRow)) {
+                            $queryRow = array_map('mb_strtolower', array_map('trim', $queryRow));
+                            if (empty($queryRow['joiner'])) {
+                                $queryRow['joiner'] = 'and';
+                            } else {
+                                if (!in_array($queryRow['joiner'], ['and', 'or', 'not'])) {
+                                    unset($query['datetime'][$key]);
+                                    continue;
+                                }
+                            }
+
+                            if (empty($queryRow['field'])) {
+                                $queryRow['field'] = 'created';
+                            } else {
+                                if (!in_array($queryRow['field'], ['created', 'modified'])) {
+                                    unset($query['datetime'][$key]);
+                                    continue;
+                                }
+                            }
+
+                            if (empty($queryRow['type'])) {
+                                $queryRow['type'] = 'eq';
+                            } else {
+                                // "ex" and "nex" are useful only for the modified time.
+                                if (!in_array($queryRow['type'], ['lt', 'lte', 'eq', 'gte', 'gt', 'neq', 'ex', 'nex'])) {
+                                    unset($query['datetime'][$key]);
+                                    continue;
+                                }
+                            }
+
+                            if (in_array($queryRow['type'], ['ex', 'nex'])) {
+                                $query['datetime'][$key]['value'] = '';
+                            } elseif (empty($queryRow['value'])) {
+                                unset($query['datetime'][$key]);
+                                continue;
+                            } else {
+                                // Date time cannot be longer than 19 numbers.
+                                // But user can choose a year only, etc.
+                            }
+                        } else {
+                            $queryRow = [
+                                'joiner' => 'and',
+                                'field' => 'created',
+                                'type' => 'eq',
+                                'value' => $queryRow,
+                            ];
+                        }
                     }
                 }
-
-                if (empty($queryRow['field'])) {
-                    $queryRow['field'] = 'created';
-                } else {
-                    if (!in_array($queryRow['field'], ['created', 'modified'])) {
-                        unset($query['datetime'][$key]);
-                        continue;
-                    }
-                }
-
-                if (empty($queryRow['type'])) {
-                    $queryRow['type'] = 'eq';
-                } else {
-                    // "ex" and "nex" are useful only for the modified time.
-                    if (!in_array($queryRow['type'], ['lt', 'lte', 'eq', 'gte', 'gt', 'neq', 'ex', 'nex'])) {
-                        unset($query['datetime'][$key]);
-                        continue;
-                    }
-                }
-
-                if (in_array($queryRow['type'], ['ex', 'nex'])) {
-                    $query['datetime'][$key]['value'] = '';
-                } elseif (empty($queryRow['value'])) {
-                    unset($query['datetime'][$key]);
-                    continue;
-                } else {
-                    // Date time cannot be longer than 19 numbers.
-                    // But user can choose a year only, etc.
-                }
-            } else {
-                $queryRow = [
-                    'joiner' => 'and',
-                    'field' => 'created',
-                    'type' => 'eq',
-                    'value' => $queryRow,
-                ];
             }
         }
 
@@ -643,90 +739,24 @@ class SearchResources extends AbstractPlugin
         // Initialize properties and used properties one time.
         $this->getPropertyIds();
 
-        $reciprocalQueryTypes = [
-            'eq' => 'neq',
-            'neq' => 'eq',
-            'in' => 'nin',
-            'nin' => 'in',
-            'ex' => 'nex',
-            'nex' => 'ex',
-            'exs' => 'nexs',
-            'nexs' => 'exs',
-            'exm' => 'nexm',
-            'nexm' => 'exm',
-            'list' => 'nlist',
-            'nlist' => 'list',
-            'sw' => 'nsw',
-            'nsw' => 'sw',
-            'ew' => 'new',
-            'new' => 'ew',
-            'res' => 'nres',
-            'nres' => 'res',
-            'dtp' => 'ndtp',
-            'ndtp' => 'dtp',
-            'lex' => 'nlex',
-            'nlex' => 'lex',
-            'lres' => 'nlres',
-            'nlres' => 'lres',
-            'gt' => 'lte',
-            'gte' => 'lt',
-            'lte' => 'gt',
-            'lt' => 'gte',
-        ];
-
-        $arrayValueQueryTypes = [
-            'list',
-            'nlist',
-            'res',
-            'nres',
-            'lres',
-            'nlres',
-        ];
-
-        $intValueQueryTypes = [
-            'res',
-            'nres',
-            'lres',
-            'nlres',
-        ];
-
-        $withoutValueQueryTypes = [
-            'ex',
-            'nex',
-            'exs',
-            'nexs',
-            'exm',
-            'nexm',
-            'lex',
-            'nlex',
-        ];
-
-        $subjectQueryTypes = [
-            'lex',
-            'nlex',
-            'lres',
-            'nlres',
-        ];
-
         foreach ($query['property'] as $queryRow) {
-            if (!is_array($queryRow) || !array_key_exists('type', $queryRow)) {
+            if (!is_array($queryRow)
+                || !isset($queryRow['type'])
+                || !isset(self::PROPERTY_QUERY['reciprocal'][$queryRow['type']])
+            ) {
                 continue;
             }
 
             $queryType = $queryRow['type'];
-            if (!isset($reciprocalQueryTypes[$queryType])) {
-                continue;
-            }
-
             $value = $queryRow['text'] ?? '';
 
             // Quick check of value.
             // A empty string "" is not a value, but "0" is a value.
-            if (in_array($queryType, $withoutValueQueryTypes, true)) {
+            if (in_array($queryType, self::PROPERTY_QUERY['value_none'], true)) {
                 $value = null;
             }
             // Check array of values.
-            elseif (in_array($queryType, $arrayValueQueryTypes, true)) {
+            elseif (in_array($queryType, self::PROPERTY_QUERY['value_array'], true)) {
                 if ((is_array($value) && !count($value))
                     || (!is_array($value) && !strlen((string) $value))
                 ) {
@@ -735,7 +765,7 @@ class SearchResources extends AbstractPlugin
                 if (!is_array($value)) {
                     $value = [$value];
                 }
-                $value = in_array($queryType, $intValueQueryTypes)
+                $value = in_array($queryType, self::PROPERTY_QUERY['value_integer'])
                     ? array_unique(array_map('intval', $value))
                     : array_unique(array_filter(array_map('trim', array_map('strval', $value)), 'strlen'));
                 if (empty($value)) {
@@ -753,7 +783,7 @@ class SearchResources extends AbstractPlugin
             // Invert the query type for joiner "not".
             if ($joiner === 'not') {
                 $joiner = 'and';
-                $queryType = $reciprocalQueryTypes[$queryType];
+                $queryType = self::PROPERTY_QUERY['reciprocal'][$queryType];
             }
 
             $valuesAlias = $this->adapter->createAlias();
@@ -1017,7 +1047,7 @@ class SearchResources extends AbstractPlugin
                 if ($propertyIds) {
                     // For queries on subject values, the properties should be
                     // checked against the sub-query.
-                    if (in_array($queryType, $subjectQueryTypes)) {
+                    if (in_array($queryType, self::PROPERTY_QUERY['value_subject'])) {
                         $subQb
                             ->andWhere(count($propertyIds) < 2
                                 ? $expr->eq("$subValuesAlias.property", reset($propertyIds))
@@ -1040,7 +1070,7 @@ class SearchResources extends AbstractPlugin
                 $otherIds = array_diff($this->usedPropertiesByTerm, $excludePropertyIds);
                 // Avoid issue when everything is excluded.
                 $otherIds[] = 0;
-                if (in_array($queryType, $subjectQueryTypes)) {
+                if (in_array($queryType, self::PROPERTY_QUERY['value_subject'])) {
                     $subQb
                         ->andWhere($expr->in("$subValuesAlias.property", $otherIds));
                 } else {
@@ -1049,7 +1079,7 @@ class SearchResources extends AbstractPlugin
             }
 
             // Finalize predicate expression on subject values.
-            if (in_array($queryType, $subjectQueryTypes)) {
+            if (in_array($queryType, self::PROPERTY_QUERY['value_subject'])) {
                 $predicateExpr = $expr->in("$valuesAlias.resource", $subQb->getDQL());
             }
 
@@ -1119,13 +1149,12 @@ class SearchResources extends AbstractPlugin
      *   partial date/time allowed ("2018-05", etc.).
      *
      * @param QueryBuilder $qb
-     * @param array $query
+     * @param array $query The query should be cleaned first.
      */
     protected function searchDateTime(
         QueryBuilder $qb,
         array $query
     ): void {
-        $query = $this->normalizeQueryDateTime($query);
         if (empty($query['datetime'])) {
             return;
         }

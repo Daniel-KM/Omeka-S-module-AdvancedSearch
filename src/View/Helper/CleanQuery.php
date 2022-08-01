@@ -5,7 +5,7 @@ namespace AdvancedSearch\View\Helper;
 use AdvancedSearch\Mvc\Controller\Plugin\SearchResources as PluginSearchResources;
 use Laminas\View\Helper\AbstractHelper;
 
-class SearchResources extends AbstractHelper
+class CleanQuery extends AbstractHelper
 {
     /**
      * @var \AdvancedSearch\Mvc\Controller\Plugin\SearchResources
@@ -17,24 +17,11 @@ class SearchResources extends AbstractHelper
         $this->searchResources = $searchResources;
     }
 
-    public function __invoke(): self
-    {
-        return $this;
-    }
-
     /**
      * The advanced search form returns all keys, so remove useless ones.
      */
-    public function cleanQuery(array $query): array
+    public function __invoke(array $query): array
     {
         return $this->searchResources->cleanQuery($query);
-    }
-
-    /**
-     * Normalize the query for the date time argument.
-     */
-    public function normalizeQueryDateTime(array $query): array
-    {
-        return $this->searchResources->normalizeQueryDateTime($query);
     }
 }

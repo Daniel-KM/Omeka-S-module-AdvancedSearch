@@ -2,6 +2,7 @@
 
 namespace AdvancedSearch\View\Helper;
 
+use AdvancedSearch\Mvc\Controller\Plugin\SearchResources;
 use Laminas\View\Helper\AbstractHelper;
 use Omeka\Api\Exception\NotFoundException;
 
@@ -20,6 +21,8 @@ class SearchFilters extends AbstractHelper
      */
     const PARTIAL_NAME = 'common/search-filters';
 
+    const PROPERTY_QUERY = SearchResources::PROPERTY_QUERY;
+
     /**
      * @var string
      */
@@ -33,7 +36,7 @@ class SearchFilters extends AbstractHelper
     /**
      * Render filters from search query, with urls if needed (if set in theme).
      */
-    public function __invoke($partialName = null, array $query = null): string
+    public function __invoke($partialName = null, ?array $query = null): string
     {
         $partialName = $partialName ?: self::PARTIAL_NAME;
 
@@ -43,13 +46,13 @@ class SearchFilters extends AbstractHelper
         $api = $plugins->get('api');
         $params = $plugins->get('params');
         $translate = $plugins->get('translate');
-        $searchResources = $plugins->get('searchResources');
+        $cleanQuery = $plugins->get('cleanQuery');
 
         $filters = [];
         $query = $query ?? $params->fromQuery();
 
         $this->baseUrl = $url(null, [], true);
-        $this->query = $searchResources->normalizeQueryDateTime($query);
+        $this->query = $cleanQuery($query);
         unset(
             $this->query['page'],
             $this->query['offset'],
@@ -63,33 +66,32 @@ class SearchFilters extends AbstractHelper
             'neq' => $translate('is not exactly'), // @translate
             'in' => $translate('contains'), // @translate
             'nin' => $translate('does not contain'), // @translate
-            'sw' => $translate('starts with'), // @translate
-            'nsw' => $translate('does not start with'), // @translate
-            'ew' => $translate('ends with'), // @translate
-            'new' => $translate('does not end with'), // @translate
-            'res' => $translate('is resource with ID'), // @translate
-            'nres' => $translate('is not resource with ID'), // @translate
             'ex' => $translate('has any value'), // @translate
             'nex' => $translate('has no values'), // @translate
             'exs' => $translate('has a single value'), // @translate
             'nexs' => $translate('has not a single value'), // @translate
             'exm' => $translate('has multiple values'), // @translate
             'nexm' => $translate('has not multiple values'), // @translate
+            'list' => $translate('is in list'), // @translate
+            'nlist' => $translate('is not in list'), // @translate
+            'sw' => $translate('starts with'), // @translate
+            'nsw' => $translate('does not start with'), // @translate
+            'ew' => $translate('ends with'), // @translate
+            'new' => $translate('does not end with'), // @translate
+            // 'res' => $translate('is resource with ID'), // @translate
+            // 'nres' => $translate('is not resource with ID'), // @translate
+            'res' => $translate('is'), // @translate
+            'nres' => $translate('is not'), // @translate
             'lex' => $translate('is a linked resource'), // @translate
             'nlex' => $translate('is not a linked resource'), // @translate
-            'lres' => $translate('is linked with resource with ID'), // @translate
-            'nlres' => $translate('is not linked with resource with ID'), // @translate
-        ];
-
-        $withoutValueQueryTypes = [
-            'ex',
-            'nex',
-            'exs',
-            'nexs',
-            'exm',
-            'nexm',
-            'lex',
-            'nlex',
+            // 'lres' => $translate('is linked with resource with ID'), // @translate
+            // 'nlres' => $translate('is not linked with resource with ID'), // @translate
+            'lres' => $translate('is linked with'), // @translate
+            'nlres' => $translate('is not linked with'), // @translate
+            // 'gt' => $translate('greater than'), // @translate
+            // 'gte' => $translate('greater than or equal'), // @translate
+            // 'lte' => $translate('lower than or equal'), // @translate
+            // 'lt' => $translate('lower than'), // @translate
         ];
 
         // This function fixes some forms that add an array level.
@@ -158,7 +160,7 @@ class SearchFilters extends AbstractHelper
                             continue;
                         }
                         $value = $queryRow['text'] ?? null;
-                        if (in_array($queryType, $withoutValueQueryTypes, true)) {
+                        if (in_array($queryType, self::PROPERTY_QUERY['value_none'], true)) {
                             $value = null;
                         } elseif ((is_array($value) && !count($value)) || !strlen((string) $value)) {
                             continue;

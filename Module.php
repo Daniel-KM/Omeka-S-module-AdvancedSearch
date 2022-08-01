@@ -41,6 +41,7 @@ if (!class_exists(\Generic\AbstractModule::class)) {
 }
 
 use AdvancedSearch\Indexer\IndexerInterface;
+use AdvancedSearch\Mvc\Controller\Plugin\SearchResources;
 use Generic\AbstractModule;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
@@ -749,10 +750,11 @@ class Module extends AbstractModule
 
         $this->baseUrl = (string) $event->getParam('baseUrl');
 
+        /** @var \AdvancedSearch\Mvc\Controller\Plugin\SearchResources $searchResources */
         $searchResources = $this->getServiceLocator()->get('ControllerPluginManager')
             ->get('searchResources');
 
-        $this->query = $searchResources->normalizeQueryDateTime($query);
+        $this->query = $searchResources->cleanQuery($query);
         unset(
             $this->query['page'],
             $this->query['offset'],
@@ -761,6 +763,7 @@ class Module extends AbstractModule
             $this->query['__searchQuery']
         );
 
+        // TODO Clarify main search filters and searching filters.
         if (isset($query['__searchConfig'])) {
             $filters = $this->filterSearchingFilters($query, $filters);
         }
@@ -976,65 +979,15 @@ class Module extends AbstractModule
                         'lt' => $translate('lower than'), // @translate
                     ];
 
-                    $reciprocalQueryTypes = [
-                        'eq' => 'neq',
-                        'neq' => 'eq',
-                        'in' => 'nin',
-                        'nin' => 'in',
-                        'ex' => 'nex',
-                        'nex' => 'ex',
-                        'exs' => 'nexs',
-                        'nexs' => 'exs',
-                        'exm' => 'nexm',
-                        'nexm' => 'exm',
-                        'list' => 'nlist',
-                        'nlist' => 'list',
-                        'sw' => 'nsw',
-                        'nsw' => 'sw',
-                        'ew' => 'new',
-                        'new' => 'ew',
-                        'res' => 'nres',
-                        'nres' => 'res',
-                        'lex' => 'nlex',
-                        'nlex' => 'lex',
-                        'lres' => 'nlres',
-                        'nlres' => 'lres',
-                        'gt' => 'lte',
-                        'gte' => 'lt',
-                        'lte' => 'gt',
-                        'lt' => 'gte',
-                    ];
-
-                    // $subjectQueryTypes = [
-                    //     'lex',
-                    //     'nlex',
-                    //     'lres',
-                    //     'nlres',
-                    // ];
-
-                    $withoutValue = [
-                        'ex',
-                        'nex',
-                        'exs',
-                        'nexs',
-                        'exm',
-                        'nexm',
-                        'lex',
-                        'nlex',
-                    ];
-
-                    $withResourceIds = [
-                        'res',
-                        'nres',
-                        'lres',
-                        'nlres',
-                    ];
-
                     // Get all resources titles with one query.
                     $vrTitles = [];
                     $vrIds = [];
                     foreach ($value as $queryRow) {
-                        if (is_array($queryRow) && isset($queryRow['type']) && !empty($queryRow['value']) && in_array($queryRow['type'], $withResourceIds)) {
+                        if (is_array($queryRow)
+                            && isset($queryRow['type'])
+                            && !empty($queryRow['value'])
+                            && in_array($queryRow['type'], SearchResources::PROPERTY_QUERY['value_subject'])
+                        ) {
                             is_array($queryRow['value'])
                                 ? $vrIds = array_merge($vrIds, array_values($queryRow['value']))
                                 : $vrIds[] = $queryRow['value'];
@@ -1069,14 +1022,14 @@ class Module extends AbstractModule
                     $index = 0;
                     foreach ($value as $subKey => $queryRow) {
                         $queryType = $queryRow['type'] ?? 'eq';
-                        if (!isset($reciprocalQueryTypes[$queryType])) {
+                        if (!isset(SearchResources::PROPERTY_QUERY['reciprocal'][$queryType])) {
                             continue;
                         }
 
                         $joiner = $queryRow['join'] ?? 'and';
                         $value = $queryRow['value'] ?? '';
 
-                        $isWithoutValue = in_array($queryType, $withoutValue, true);
+                        $isWithoutValue = in_array($queryType, SearchResources::PROPERTY_QUERY['value_none'], true);
 
                         // A value can be an array with types "list" and "nlist".
                         if (!is_array($value)
@@ -1123,7 +1076,7 @@ class Module extends AbstractModule
                             }
                         }
 
-                        $vals = in_array($queryType, $withResourceIds)
+                        $vals = in_array($queryType, SearchResources::PROPERTY_QUERY['value_subject'])
                             ? $flatArrayValueResourceIds($value, $vrTitles)
                             : $flatArray($value);
                         $filters[$filterLabel][$this->urlQuery($key, $subKey)] = implode(', ', $vals);

@@ -55,12 +55,12 @@ return [
             'apiSearchOne' => Service\ViewHelper\ApiSearchOneFactory::class,
             // Used in AdvancedResourceTemplate, AdvancedSearch and BlockPlus.
             'assetUrl' => Service\ViewHelper\AssetUrlFactory::class,
+            'cleanQuery' => Service\ViewHelper\CleanQueryFactory::class,
             'easyMeta' => Service\ViewHelper\EasyMetaFactory::class,
             'matchedRouteName' => Service\ViewHelper\MatchedRouteNameFactory::class,
             'mediaTypeSelect' => Service\ViewHelper\MediaTypeSelectFactory::class,
             'searchEngineConfirm' => Service\ViewHelper\SearchEngineConfirmFactory::class,
             'searchRequestToResponse' => Service\ViewHelper\SearchRequestToResponseFactory::class,
-            'searchResources' => Service\ViewHelper\SearchResourcesFactory::class,
             'searchSuggesterConfirm' => Service\ViewHelper\SearchSuggesterConfirmFactory::class,
         ],
         'delegators' => [

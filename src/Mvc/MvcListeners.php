@@ -14,30 +14,9 @@ class MvcListeners extends AbstractListenerAggregate
     {
         $this->listeners[] = $events->attach(
             MvcEvent::EVENT_ROUTE,
-            [$this, 'fixIsPublic'],
-            500
-        );
-
-        $this->listeners[] = $events->attach(
-            MvcEvent::EVENT_ROUTE,
             [$this, 'redirectItemSetToSearch'],
             -10
         );
-    }
-
-    /**
-     * Replace "&is_public=&" by "is_public = null".
-     *
-     * @link https://github.com/omeka/omeka-s/pull/1671
-     * @deprecated Waiting for fix https://github.com/omeka/omeka-s/pull/1671 (included in Omeka v3.1).
-     */
-    public function fixIsPublic(MvcEvent $event): void
-    {
-        /** @var \Laminas\Stdlib\Parameters $query */
-        $query = $event->getRequest()->getQuery();
-        if ($query->get('is_public') === '') {
-            $query->set('is_public', null);
-        }
     }
 
     /**

@@ -24,8 +24,6 @@ class ManagerDelegator extends \Omeka\Api\Manager
      * Override core api search:
      * - Allows to override a search by property when initialize is false.
      * - Execute a search API request with an option to do a quick search.
-     * - Fix "is_public" (Omeka < 3.1).
-     * @link https://github.com/omeka/omeka-s/pull/1671 Included in Omeka 3.1.
      *
      * The quick search is enabled when the argument "index" is true in the
      * options or in the data. It would be better to use the argument "options",
@@ -42,14 +40,6 @@ class ManagerDelegator extends \Omeka\Api\Manager
         // ApiSearch is set static to avoid a loop during init of Api Manager.
         /** @var \AdvancedSearch\Mvc\Controller\Plugin\ApiSearch $apiSearch */
         static $apiSearch;
-
-        // Fix https://github.com/omeka/omeka-s/pull/1671 (Omeka < 3.1).
-        if (isset($data['is_public'])
-            && $data['is_public'] === ''
-            && version_compare(\Omeka\Module::VERSION, '3.1', '<')
-        ) {
-            $data['is_public'] = null;
-        }
 
         if (empty($options['index']) && empty($data['index'])) {
             // Use the standard process when possible.

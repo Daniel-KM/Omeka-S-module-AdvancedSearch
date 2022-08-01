@@ -45,6 +45,9 @@ class SearchResourcesListener
      * Helper to filter search queries.
      *
      * @todo Integrate the override in a way a direct call to adapter->buildQuery() can work with advanced property search (see Reference and some other modules).
+     *
+     * @see \AdvancedSearch\Module::onApiSearchPre()
+     * @see \AdvancedSearch\Api\ManagerDelegator::search()
      */
     public function onDispatch(Event $event): void
     {
@@ -59,14 +62,26 @@ class SearchResourcesListener
 
         // Reset the query for properties.
         $override = $request->getOption('override', []);
-        if (!empty($override['property'])) {
-            $query['property'] = $override['property'];
+        if ($override) {
+            if (isset($override['resource_class_id'])) {
+                $query['resource_class_id'] = $override['resource_class_id'];
+            }
+            if (isset($override['resource_template_id'])) {
+                $query['resource_template_id'] = $override['resource_template_id'];
+            }
+            if (isset($override['item_set_id'])) {
+                $query['item_set_id'] = $override['item_set_id'];
+            }
+            if (isset($override['property'])) {
+                $query['property'] = $override['property'];
+            }
             $request->setContent($query);
             $request->setOption('override', null);
         }
 
         // Process advanced search plus keys.
         $this->searchSites($qb, $query);
+        $this->searchResources($qb, $query);
         $this->searchResourceClassTerm($qb, $query);
         $this->searchDateTime($qb, $query);
         $this->buildPropertyQuery($qb, $query);
@@ -243,6 +258,118 @@ class SearchResourcesListener
                 "$this->siteItemSetsAlias.site",
                 $this->adapter->createNamedParameter($qb, $sites))
             );
+        }
+    }
+
+    /**
+     * Override the core adapter to search resource without template, etc.
+     *
+     * @see \Omeka\Api\Adapter\AbstractResourceEntityAdapter::buildQuery()
+     */
+    protected function searchResources(QueryBuilder $qb, array $query): void
+    {
+        /**
+         * Overridden keys of the query are already cleaned.
+         *
+         * @see \AdvancedSearch\Module::onApiSearchPre()
+         * @see \AdvancedSearch\Api\ManagerDelegator::search()
+         */
+
+        $expr = $qb->expr();
+
+        if (isset($query['resource_class_id'])
+            && $query['resource_class_id'] !== ''
+            && $query['resource_class_id'] !== []
+            && $query['resource_class_id'] !== null
+        ) {
+            $resourceClassIds = is_array($query['resource_class_id']) ? $query['resource_class_id'] : [$query['resource_class_id']];
+            if (array_values($resourceClassIds) === [0]) {
+                $qb
+                    ->andWhere(
+                        $expr->isNull('omeka_root.resourceClass')
+                    );
+            } elseif (in_array(0, $resourceClassIds, true)) {
+                $qb
+                    ->andWhere($expr->orX(
+                        $expr->isNull('omeka_root.resourceClass'),
+                        $expr->in(
+                            'omeka_root.resourceClass',
+                            $this->adapter->createNamedParameter($qb, $resourceClassIds)
+                        )
+                    ));
+            } else {
+                $qb
+                    ->andWhere($expr->in(
+                        'omeka_root.resourceClass',
+                        $this->adapter->createNamedParameter($qb, $resourceClassIds)
+                    ));
+            }
+        }
+
+        if (isset($query['resource_template_id'])
+            && $query['resource_template_id'] !== ''
+            && $query['resource_template_id'] !== []
+            && $query['resource_template_id'] !== null
+        ) {
+            $resourceTemplateIds = is_array($query['resource_template_id']) ? $query['resource_template_id'] : [$query['resource_template_id']];
+            if (array_values($resourceTemplateIds) === [0]) {
+                $qb
+                    ->andWhere(
+                        $expr->isNull('omeka_root.resourceTemplate')
+                    );
+            } elseif (in_array(0, $resourceTemplateIds, true)) {
+                $qb
+                    ->andWhere($expr->orX(
+                        $expr->isNull('omeka_root.resourceTemplate'),
+                        $expr->in(
+                            'omeka_root.resourceTemplate',
+                            $this->adapter->createNamedParameter($qb, $resourceTemplateIds)
+                        )
+                    ));
+            } else {
+                $qb
+                    ->andWhere($expr->in(
+                        'omeka_root.resourceTemplate',
+                        $this->adapter->createNamedParameter($qb, $resourceTemplateIds)
+                    ));
+            }
+        }
+
+        if ($this->adapter instanceof ItemAdapter && isset($query['item_set_id'])
+            && $query['item_set_id'] !== ''
+            && $query['item_set_id'] !== []
+            && $query['item_set_id'] !== null
+        ) {
+            $itemSetIds = is_array($query['item_set_id']) ? $query['item_set_id'] : [$query['item_set_id']];
+            $itemSetAlias = $this->adapter->createAlias();
+            if (array_values($itemSetIds) === [0]) {
+                $qb
+                    ->leftJoin(
+                        'omeka_root.itemSets',
+                        $itemSetAlias
+                    )
+                    ->andWhere($expr->isNull("$itemSetAlias.id"));
+            } elseif (in_array(0, $itemSetIds, true)) {
+                $qb
+                    ->leftJoin(
+                        'omeka_root.itemSets',
+                        $itemSetAlias
+                    )
+                    ->andWhere($expr->orX(
+                        $expr->isNull("$itemSetAlias.id"),
+                        $expr->in(
+                            "$itemSetAlias.id",
+                            $this->adapter->createNamedParameter($qb, $itemSetIds)
+                        )
+                    ));
+            } else {
+                $qb
+                    ->innerJoin(
+                        'omeka_root.itemSets',
+                        $itemSetAlias, Join::WITH,
+                        $expr->in("$itemSetAlias.id", $this->adapter->createNamedParameter($qb, $itemSetIds))
+                    );
+            }
         }
     }
 
@@ -1189,26 +1316,45 @@ class SearchResourcesListener
             return;
         }
 
-        $itemSets = $query['item_set_id'];
-        if (!is_array($itemSets)) {
-            $itemSets = [$itemSets];
-        }
-        $itemSets = array_filter($itemSets, 'is_numeric');
+        // Overridden keys of the query are already cleaned.
 
-        if ($itemSets) {
-            $expr = $qb->expr();
-            $itemAlias = $this->adapter->createAlias();
-            $itemSetAlias = $this->adapter->createAlias();
+        $expr = $qb->expr();
+        $itemAlias = $this->adapter->createAlias();
+        $itemSetAlias = $this->adapter->createAlias();
+
+        $qb
+            ->innerJoin(
+                'omeka_root.item',
+                $itemAlias, Join::WITH,
+                $expr->eq("$itemAlias.id", 'omeka_root.item')
+            );
+
+        if (array_values($query['item_set_id']) === [0]) {
             $qb
                 ->leftJoin(
-                    'omeka_root.item',
-                    $itemAlias, Join::WITH,
-                    $expr->eq("$itemAlias.id", 'omeka_root.item')
+                    "$itemAlias.itemSets",
+                    $itemSetAlias
                 )
+                ->andWhere($expr->isNull("$itemSetAlias.id"));
+        } elseif (in_array(0, $query['item_set_id'], true)) {
+            $qb
+                ->leftJoin(
+                    "$itemAlias.itemSets",
+                    $itemSetAlias
+                )
+                ->andWhere($expr->orX(
+                    $expr->isNull("$itemSetAlias.id"),
+                    $expr->in(
+                        "$itemSetAlias.id",
+                        $this->adapter->createNamedParameter($qb, $query['item_set_id'])
+                    )
+                ));
+        } else {
+            $qb
                 ->innerJoin(
-                    $itemAlias . '.itemSets',
+                    "$itemAlias.itemSets",
                     $itemSetAlias, Join::WITH,
-                    $expr->in("$itemSetAlias.id", $this->adapter->createNamedParameter($qb, $itemSets))
+                    $expr->in("$itemSetAlias.id", $this->adapter->createNamedParameter($qb, $query['item_set_id']))
                 );
         }
     }

@@ -252,6 +252,8 @@ class Module extends AbstractModule
             // normally, then process properties normally in api.search.query.
             // This process is required because it is not possible to override
             // the method buildPropertyQuery() in AbstractResourceEntityAdapter.
+            // The point is the same to search resource without template, class,
+            // item set, site and owner.
             // Because this event does not apply when initialize = false, the
             // api manager has a delegator that does the same.
             $sharedEventManager->attach(
@@ -607,20 +609,77 @@ class Module extends AbstractModule
     }
 
     /**
-     * Save key "property" of the original query to process it one time only.
+     * Clean useless fields and store some keys to process them one time only.
      *
-     * @param Event $event
+     * @see \AdvancedSearch\Api\ManagerDelegator::search()
      */
     public function onApiSearchPre(Event $event): void
     {
         /** @var \Omeka\Api\Request $request */
         $request = $event->getParam('request');
         $query = $request->getContent();
-        if (empty($query['property'])) {
-            return;
+
+        // Clean simple useless fields to avoid useless checks in many places.
+        // TODO Clean property, numeric, dates, etc.
+        foreach ($query as $key => $value) {
+            if ($value === '' || $value === null || $value === []) {
+                unset($query[$key]);
+            } elseif ($key === 'id') {
+                $values = is_array($value) ? $value : [$value];
+                $values = array_filter($values, function ($id) {
+                    return $id !== '' && $id !== null;
+                });
+                if (count($values)) {
+                    $query[$key] = $values;
+                } else {
+                    unset($query[$key]);
+                }
+            } elseif (in_array($key, [
+                'owner_id',
+                'site_id',
+            ])) {
+                if (is_numeric($value)) {
+                    $query[$key] = (int) $value;
+                } else {
+                    unset($query[$key]);
+                }
+            } elseif (in_array($key, [
+                'resource_class_id',
+                'resource_template_id',
+                'item_set_id',
+            ])) {
+                $values = is_array($value) ? $value : [$value];
+                $values = array_map('intval', array_filter($values, 'is_numeric'));
+                if (count($values)) {
+                    $query[$key] = $values;
+                } else {
+                    unset($query[$key]);
+                }
+            }
         }
-        $request->setOption('override', ['property' => $query['property']]);
-        unset($query['property']);
+
+        // Override some keys (separated from loop for clean process).
+        $override = [];
+        if (isset($query['resource_class_id'])) {
+            $override['resource_class_id'] = $query['resource_class_id'];
+            unset($query['resource_class_id']);
+        }
+        if (isset($query['resource_template_id'])) {
+            $override['resource_template_id'] = $query['resource_template_id'];
+            unset($query['resource_template_id']);
+        }
+        if (isset($query['item_set_id'])) {
+            $override['item_set_id'] = $query['item_set_id'];
+            unset($query['item_set_id']);
+        }
+        if (!empty($query['property'])) {
+            $override['property'] = $query['property'];
+            unset($query['property']);
+        }
+        if ($override) {
+            $request->setOption('override', $override);
+        }
+
         $request->setContent($query);
     }
 

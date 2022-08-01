@@ -8,7 +8,8 @@ use Omeka\Api\Exception\NotFoundException;
 /**
  * View helper for rendering search filters.
  *
- * Override core helper in order to add the urls without the filters.
+ * Override core helper in order to add the urls without the filters and
+ * resources without template, class, etc.
  *
  * @see \Omeka\View\Helper\SearchFilters
  */
@@ -90,6 +91,8 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
             'nlex',
         ];
 
+        // Normally, query is already cleaned.
+        // TODO Remove checks of search keys, already done during event api.search.pre.
         foreach ($this->query as $key => $value) {
             if ($value === null || $value === '' || $value === []) {
                 continue;
@@ -98,7 +101,7 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
             switch ($key) {
                 // Fulltext
                 case 'fulltext_search':
-                    $filterLabel = $translate('Search full-text');
+                    $filterLabel = $translate('Search full-text'); // @translate
                     $filters[$filterLabel][$this->urlQuery($key)] = $value;
                     break;
 
@@ -112,10 +115,14 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
                         if (!is_numeric($subValue)) {
                             continue;
                         }
-                        try {
-                            $filterValue = $translate($api->read('resource_classes', $subValue)->getContent()->label());
-                        } catch (NotFoundException $e) {
-                            $filterValue = $translate('Unknown class');
+                        if ($subValue) {
+                            try {
+                                $filterValue = $translate($api->read('resource_classes', $subValue)->getContent()->label());
+                            } catch (NotFoundException $e) {
+                                $filterValue = $translate('Unknown class'); // @translate
+                            }
+                        } else {
+                            $filterValue = $translate('[none]'); // @translate
                         }
                         $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $filterValue;
                     }
@@ -195,10 +202,14 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
                         if (!is_numeric($subValue)) {
                             continue;
                         }
-                        try {
-                            $filterValue = $api->read('resource_templates', $subValue)->getContent()->label();
-                        } catch (NotFoundException $e) {
-                            $filterValue = $translate('Unknown template');
+                        if ($subValue) {
+                            try {
+                                $filterValue = $api->read('resource_templates', $subValue)->getContent()->label();
+                            } catch (NotFoundException $e) {
+                                $filterValue = $translate('Unknown template'); // @translate
+                            }
+                        } else {
+                            $filterValue = $translate('[none]'); // @translate
                         }
                         $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $filterValue;
                     }
@@ -214,10 +225,14 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
                         if (!is_numeric($subValue)) {
                             continue;
                         }
-                        try {
-                            $filterValue = $api->read('item_sets', $subValue)->getContent()->displayTitle();
-                        } catch (NotFoundException $e) {
-                            $filterValue = $translate('Unknown item set');
+                        if ($subValue) {
+                            try {
+                                $filterValue = $api->read('item_sets', $subValue)->getContent()->displayTitle();
+                            } catch (NotFoundException $e) {
+                                $filterValue = $translate('Unknown item set');
+                            }
+                        } else {
+                            $filterValue = $translate('[none]'); // @translate
                         }
                         $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $filterValue;
                     }

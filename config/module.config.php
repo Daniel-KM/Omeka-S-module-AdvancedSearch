@@ -131,6 +131,7 @@ return [
             'apiSearch' => Service\ControllerPlugin\ApiSearchFactory::class,
             'apiSearchOne' => Service\ControllerPlugin\ApiSearchOneFactory::class,
             'searchForm' => Service\ControllerPlugin\SearchFormFactory::class,
+            'searchResourcesQueryBuilder' => Service\ControllerPlugin\SearchResourcesQueryBuilderFactory::class,
             'totalJobs' => Service\ControllerPlugin\TotalJobsFactory::class,
         ],
     ],

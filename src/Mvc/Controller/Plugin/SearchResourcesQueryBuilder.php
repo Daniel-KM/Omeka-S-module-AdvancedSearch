@@ -1,18 +1,32 @@
 <?php declare(strict_types=1);
 
-namespace AdvancedSearch\Listener;
+namespace AdvancedSearch\Mvc\Controller\Plugin;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Laminas\EventManager\Event;
+use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use Omeka\Api\Adapter\ItemAdapter;
 use Omeka\Api\Adapter\ItemSetAdapter;
 use Omeka\Api\Adapter\MediaAdapter;
 use Omeka\Api\Exception\NotFoundException;
+use Omeka\Api\Adapter\AbstractResourceEntityAdapter;
 
-class SearchResourcesListener
+class SearchResourcesQueryBuilder extends AbstractPlugin
 {
+    /**
+     * @var \Doctrine\DBAL\Connection
+     */
+    protected $connection;
+
+    /**
+     * The adapter used to build the query.
+     *
+     * @var \Omeka\Api\Adapter\AbstractResourceEntityAdapter
+     */
+    protected $adapter;
+
     /**
      * List of used property ids by term.
      *
@@ -34,17 +48,20 @@ class SearchResourcesListener
      */
     protected $usedResourceClassesByTerm;
 
-    /**
-     * The adapter that is requesting.
-     *
-     * @var \Omeka\Api\Adapter\AbstractResourceEntityAdapter
-     */
-    protected $adapter;
+    public function __construct(Connection $connection)
+    {
+        $this->connection = $connection;
+    }
+
+    public function __invoke(): self
+    {
+        return $this;
+    }
 
     /**
      * Helper to filter search queries.
      *
-     * @todo Integrate the override in a way a direct call to adapter->buildQuery() can work with advanced property search (see Reference and some other modules).
+     * @todo Integrate the override in a way a direct call to adapter->buildQuery() can work with advanced property search (see Reference and some other modules). For now, use buildInitialQuery().
      *
      * @see \AdvancedSearch\Module::onApiSearchPre()
      * @see \AdvancedSearch\Api\ManagerDelegator::search()
@@ -56,7 +73,6 @@ class SearchResourcesListener
          * @var \Omeka\Api\Request $request
          */
         $qb = $event->getParam('queryBuilder');
-        $this->adapter = $event->getTarget();
         $request = $event->getParam('request');
         $query = $request->getContent();
 
@@ -81,6 +97,13 @@ class SearchResourcesListener
             $request->setContent($query);
             $request->setOption('override', null);
         }
+
+        $this->buildInitialQuery($qb, $query, $event->getTarget());
+    }
+
+    public function buildInitialQuery(QueryBuilder $qb, array $query, AbstractResourceEntityAdapter $adapter): void
+    {
+        $this->adapter = $adapter;
 
         // Process advanced search plus keys.
         $this->searchSites($qb, $query);
@@ -739,7 +762,7 @@ class SearchResourcesListener
                 case 'dtp':
                     if (is_array($value)) {
                         $dataTypeAlias = $this->adapter->createAlias();
-                        $qb->setParameter($dataTypeAlias, $value, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
+                        $qb->setParameter($dataTypeAlias, $value, Connection::PARAM_STR_ARRAY);
                         $predicateExpr = $expr->in("$valuesAlias.type", $dataTypeAlias);
                     } else {
                         $dataTypeAlias = $this->adapter->createNamedParameter($qb, $value);
@@ -896,7 +919,7 @@ class SearchResourcesListener
             if ($dataType) {
                 if (is_array($dataType)) {
                     $dataTypeAlias = $this->adapter->createAlias();
-                    $qb->setParameter($dataTypeAlias, $dataType, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
+                    $qb->setParameter($dataTypeAlias, $dataType, Connection::PARAM_STR_ARRAY);
                     $predicateExpr = $expr->andX(
                         $predicateExpr,
                         $expr->in("$valuesAlias.type", ':' . $dataTypeAlias)
@@ -1558,8 +1581,7 @@ class SearchResourcesListener
         static $propertiesByTermsAndIds;
 
         if (is_null($propertiesByTermsAndIds)) {
-            $connection = $this->adapter->getServiceLocator()->get('Omeka\Connection');
-            $qb = $connection->createQueryBuilder();
+            $qb = $this->connection->createQueryBuilder();
             $qb
                 ->select(
                     'DISTINCT CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
@@ -1572,11 +1594,11 @@ class SearchResourcesListener
                 ->orderBy('vocabulary.id', 'asc')
                 ->addOrderBy('property.id', 'asc')
             ;
-            $propertiesByTerms = array_map('intval', $connection->executeQuery($qb)->fetchAllKeyValue());
+            $propertiesByTerms = array_map('intval', $this->connection->executeQuery($qb)->fetchAllKeyValue());
             $propertiesByTermsAndIds = array_replace($propertiesByTerms, array_combine($propertiesByTerms, $propertiesByTerms));
 
             $qb->innerJoin('property', 'value', 'value', 'property.id = value.property_id');
-            $this->usedPropertiesByTerm = array_map('intval', $connection->executeQuery($qb)->fetchAllKeyValue());
+            $this->usedPropertiesByTerm = array_map('intval', $this->connection->executeQuery($qb)->fetchAllKeyValue());
         }
 
         if (is_null($termsOrIds)) {
@@ -1623,8 +1645,7 @@ class SearchResourcesListener
     protected function prepareResourceClasses(): self
     {
         if (is_null($this->resourceClassesByTermsAndIds)) {
-            $connection = $this->adapter->getServiceLocator()->get('Omeka\Connection');
-            $qb = $connection->createQueryBuilder();
+            $qb = $this->connection->createQueryBuilder();
             $qb
                 ->select(
                     'CONCAT(vocabulary.prefix, ":", resource_class.local_name) AS term',
@@ -1637,11 +1658,11 @@ class SearchResourcesListener
                 ->orderBy('vocabulary.id', 'asc')
                 ->addOrderBy('resource_class.id', 'asc')
             ;
-            $resourceClasses = array_map('intval', $connection->executeQuery($qb)->fetchAllKeyValue());
+            $resourceClasses = array_map('intval', $this->connection->executeQuery($qb)->fetchAllKeyValue());
             $this->resourceClassesByTermsAndIds = array_replace($resourceClasses, array_combine($resourceClasses, $resourceClasses));
 
             $qb->innerJoin('resource_class', 'resource', 'resource', 'resource_class.id = resource.resource_class_id');
-            $this->usedResourceClassesByTerm = array_map('intval', $connection->executeQuery($qb)->fetchAllKeyValue());
+            $this->usedResourceClassesByTerm = array_map('intval', $this->connection->executeQuery($qb)->fetchAllKeyValue());
             return $this;
         }
     }

@@ -2,6 +2,7 @@
 
 namespace AdvancedSearch\View\Helper;
 
+use AdvancedSearch\Mvc\Controller\Plugin\SearchResourcesQueryBuilder;
 use Omeka\Api\Adapter\ResourceAdapter;
 use Omeka\Api\Exception\NotFoundException;
 
@@ -16,6 +17,16 @@ use Omeka\Api\Exception\NotFoundException;
 class SearchFilters extends \Omeka\View\Helper\SearchFilters
 {
     /**
+     * @var ResourceAdapter
+     */
+    protected $resourceAdapter;
+
+    /**
+     * @var SearchResourcesQueryBuilder
+     */
+    protected $searchResourcesQueryBuilder;
+
+    /**
      * @var string
      */
     protected $baseUrl;
@@ -25,14 +36,11 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
      */
     protected $query;
 
-    /**
-     * @var ResourceAdapter
-     */
-    protected $resourceAdapter;
-
-    public function __construct(ResourceAdapter $resourceAdapter)
+    public function __construct(ResourceAdapter $resourceAdapter, SearchResourcesQueryBuilder $searchResourcesQueryBuilder)
     {
         $this->resourceAdapter = $resourceAdapter;
+        // TODO Remove the construct for SearchResourcesQueryBuilder
+        $this->searchResourcesQueryBuilder = $searchResourcesQueryBuilder;
     }
 
     /**
@@ -51,8 +59,7 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
         $query = $query ?? $view->params()->fromQuery();
 
         $this->baseUrl = $this->view->url(null, [], true);
-        $searchResourcesListener = new \AdvancedSearch\Listener\SearchResourcesListener();
-        $this->query = $searchResourcesListener->normalizeQueryDateTime($query);
+        $this->query = $this->searchResourcesQueryBuilder->normalizeQueryDateTime($query);
         unset(
             $this->query['page'],
             $this->query['offset'],

@@ -19,7 +19,8 @@ class SearchFiltersFactory implements FactoryInterface
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
         return new SearchFilters(
-            $services->get('Omeka\ApiAdapterManager')->get('resources')
+            $services->get('Omeka\ApiAdapterManager')->get('resources'),
+            $services->get('ControllerPluginManager')->get('searchResourcesQueryBuilder')
         );
     }
 }

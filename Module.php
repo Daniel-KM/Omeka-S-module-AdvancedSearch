@@ -60,11 +60,6 @@ class Module extends AbstractModule
      */
     protected $isBatchUpdate;
 
-    /**
-     * @var Listener\SearchResourcesListener
-     */
-    protected $searchResourcesListener;
-
     public function init(ModuleManager $moduleManager): void
     {
         /** @var \Laminas\ModuleManager\Listener\ServiceListenerInterface $serviceListerner */
@@ -234,12 +229,6 @@ class Module extends AbstractModule
             [$this, 'addHeaders']
         );
 
-        /*
-         * The listener is stored because it is used for each adapter and in the
-         * method "filterSearchFilters()".
-         */
-        $this->searchResourcesListener = new Listener\SearchResourcesListener();
-
         $adapters = [
             \Omeka\Api\Adapter\ItemAdapter::class,
             \Omeka\Api\Adapter\ItemSetAdapter::class,
@@ -267,7 +256,7 @@ class Module extends AbstractModule
             $sharedEventManager->attach(
                 $adapter,
                 'api.search.query',
-                [$this->searchResourcesListener, 'onDispatch'],
+                [$this, 'onApiSearchQuery'],
                 // Process before any other module in order to reset query.
                 +100
             );
@@ -606,6 +595,7 @@ class Module extends AbstractModule
      * Clean useless fields and store some keys to process them one time only.
      *
      * @see \AdvancedSearch\Api\ManagerDelegator::search()
+     * @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResourcesQueryBuilder::onDispatch()
      */
     public function onApiSearchPre(Event $event): void
     {
@@ -686,6 +676,14 @@ class Module extends AbstractModule
         }
 
         $request->setContent($query);
+    }
+
+    public function onApiSearchQuery(Event $event): void
+    {
+        /** @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResourcesQueryBuilder::onDispatch() */
+        $this->getServiceLocator()->get('ControllerPluginManager')
+            ->get('searchResourcesQueryBuilder')
+            ->onDispatch($event);
     }
 
     public function onFormVocabMemberSelectQuery(Event $event): void
@@ -805,7 +803,10 @@ class Module extends AbstractModule
 
         $this->baseUrl = (string) $event->getParam('baseUrl');
 
-        $this->query = $this->searchResourcesListener->normalizeQueryDateTime($query);
+        $searchResourcesQueryBuilder = $this->getServiceLocator()->get('ControllerPluginManager')
+            ->get('searchResourcesQueryBuilder');
+
+        $this->query = $searchResourcesQueryBuilder->normalizeQueryDateTime($query);
         unset(
             $this->query['page'],
             $this->query['offset'],

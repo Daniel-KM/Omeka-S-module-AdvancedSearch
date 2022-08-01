@@ -72,6 +72,7 @@ class SearchFilters extends AbstractHelper
             'ex' => $translate('has any value'), // @translate
             'nex' => $translate('has no values'), // @translate
             'exs' => $translate('has a single value'), // @translate
+            'nexs' => $translate('has not a single value'), // @translate
             'exm' => $translate('has multiple values'), // @translate
             'nexm' => $translate('has not multiple values'), // @translate
             'lex' => $translate('is a linked resource'), // @translate
@@ -84,6 +85,7 @@ class SearchFilters extends AbstractHelper
             'ex',
             'nex',
             'exs',
+            'nexs',
             'exm',
             'nexm',
             'lex',

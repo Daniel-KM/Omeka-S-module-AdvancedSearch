@@ -951,6 +951,7 @@ class Module extends AbstractModule
                         'ex' => $translate('has any value'), // @translate
                         'nex' => $translate('has no values'), // @translate
                         'exs' => $translate('has a single value'), // @translate
+                        'nexs' => $translate('has not a single value'), // @translate
                         'exm' => $translate('has multiple values'), // @translate
                         'nexm' => $translate('has not multiple values'), // @translate
                         'list' => $translate('is in list'), // @translate
@@ -982,7 +983,8 @@ class Module extends AbstractModule
                         'nin' => 'in',
                         'ex' => 'nex',
                         'nex' => 'ex',
-                        'exs' => '',
+                        'exs' => 'nexs',
+                        'nexs' => 'exs',
                         'exm' => 'nexm',
                         'nexm' => 'exm',
                         'list' => 'nlist',
@@ -1014,6 +1016,7 @@ class Module extends AbstractModule
                         'ex',
                         'nex',
                         'exs',
+                        'nexs',
                         'exm',
                         'nexm',
                         'lex',

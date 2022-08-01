@@ -105,6 +105,7 @@ $queryText = function (array $search, $index) use ($escape, $translate) {
                 <?= $queryOption('ex', $property, 'type', $translate('has any value')) ?>
                 <?= $queryOption('nex', $property, 'type', $translate('has no values')) ?>
                 <?= $queryOption('exs', $property, 'type', $translate('has a single value')) ?>
+                <?= $queryOption('nexs', $property, 'type', $translate('has not a single value')) ?>
                 <?= $queryOption('exm', $property, 'type', $translate('has multiple values')) ?>
                 <?= $queryOption('nexm', $property, 'type', $translate('has not multiple values')) ?>
                 <?= $queryOption('lex', $property, 'type', $translate('is a linked resource')) ?>

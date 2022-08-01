@@ -595,6 +595,7 @@ class SearchResources extends AbstractPlugin
      *   - ex: has any value (core)
      *   - nex: has no value (core)
      *   - exs: has a single value
+     *   - nexs: has not a single value
      *   - exm: has multiple values
      *   - nexm: has not multiple values
      *   - list: is in list
@@ -649,7 +650,8 @@ class SearchResources extends AbstractPlugin
             'nin' => 'in',
             'ex' => 'nex',
             'nex' => 'ex',
-            'exs' => '',
+            'exs' => 'nexs',
+            'nexs' => 'exs',
             'exm' => 'nexm',
             'nexm' => 'exm',
             'list' => 'nlist',
@@ -692,6 +694,7 @@ class SearchResources extends AbstractPlugin
             'ex',
             'nex',
             'exs',
+            'nexs',
             'exm',
             'nexm',
             'lex',
@@ -870,19 +873,24 @@ class SearchResources extends AbstractPlugin
                     $predicateExpr = $expr->isNotNull("$valuesAlias.id");
                     break;
 
+                case 'nexs':
+                    // No predicate expression, but simplify process.
+                    $predicateExpr = $expr->eq(1, 1);
+                    $qb->having($expr->neq("COUNT($valuesAlias.id)", 1));
+                    break;
                 case 'exs':
                     $predicateExpr = $expr->isNotNull("$valuesAlias.id");
                     $qb->having($expr->eq("COUNT($valuesAlias.id)", 1));
                     break;
 
-                case 'exm':
-                    $predicateExpr = $expr->isNotNull("$valuesAlias.id");
-                    $qb->having($expr->gt("COUNT($valuesAlias.id)", 1));
-                    break;
                 case 'nexm':
                     // No predicate expression, but simplify process.
                     $predicateExpr = $expr->eq(1, 1);
                     $qb->having($expr->lt("COUNT($valuesAlias.id)", 2));
+                    break;
+                case 'exm':
+                    $predicateExpr = $expr->isNotNull("$valuesAlias.id");
+                    $qb->having($expr->gt("COUNT($valuesAlias.id)", 1));
                     break;
 
                 case 'ndtp':

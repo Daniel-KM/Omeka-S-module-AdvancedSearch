@@ -68,6 +68,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
         $query = new Query;
 
         // Solr doesn't allow unavailable args anymore (invalid or unknown).
+        // Furthermore, fields are case sensitive.
         $onlyAvailableFields = !empty($formSettings['only_available_fields']);
         if ($onlyAvailableFields) {
             $availableFields = $formSettings['available_fields'] ?? [];

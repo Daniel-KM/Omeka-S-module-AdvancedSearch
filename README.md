@@ -5,9 +5,13 @@ Advanced Search (module for Omeka S)
 > are available on [GitLab], which seems to respect users and privacy better
 > than the previous repository.__
 
-[Advanced Search] is a module for [Omeka S] that adds search capabilities to the
-public interface of Omeka S, in particular auto-completion, filters, facets, and
-aggregated fields querying.
+[Advanced Search] is a module for [Omeka S] that improves the standard search
+(visibility, thumbnails, starts with, resources without templates, search in
+multiple properties at a time, etc.) and that adds search capabilities to the
+public interface of Omeka S, in particular auto-completion, filters, facets,
+and aggregated fields querying.
+
+These features are progressively integrated in the Omeka core.
 
 Furthermore, it provides a common interface for other modules to extend it
 (forms, indexers, queriers). It can be displayed as a block on any page too.
@@ -53,7 +57,7 @@ Added fields are:
 - media by item set
 
 Moreover, it adds new search query operator for properties (some are available
-only via api: no fields in the advanced search form for now):
+only via api, not in the advanced search form for now):
 
 - `list`: is in list
 - `nlist`: is not in list
@@ -70,6 +74,9 @@ only via api: no fields in the advanced search form for now):
 - exclude one or multiple properties (except title)
 
 Furthermore:
+- search in multiple properties at a time, for example `dcterms:creator and dcterms:contributor have a value`.
+- search resources without without template, class, item set, site and owner.
+  This feature is included directly in the advanced search form in each select.
 - adds the joiner type `not` that can be use to invert the query. For example,
   "and property dcterms:title not equals 'search text'" is the same than "not property dcterms:title equals 'search text'".
   It avoids to display half of the complex query types to the user.
@@ -262,6 +269,8 @@ and some other ones are available too.
 - `has_thumbnails` for items and medias.
 - `item_set_id` for medias.
 - `media_types` for items.
+- to search resource without template, class, item set, site and owner, search
+  for the id `0`, for example, in a url, `resource_template_id=0`.
 
 ### Exclude properties
 
@@ -344,29 +353,29 @@ TODO
 ----
 
 - [ ] Inverse logic in response: fill all results as flat and group them by
-  resource type only if needed.
+      resource type only if needed.
 - [ ] Update to remove features integrated in Omeka S v 3.1 and remove dead fixes
-  for Omeka S beta.
+      for Omeka S beta.
 - [x] The override of a search query with "property" should be called even with
-  "initialize = false" in the api.
+      "initialize = false" in the api.
 - [x] Remove distinction between advanced and basic form: they are just a list
-  of elements.
+      of elements.
 - [ ] Create advanced search form (in particular prepared select) only not used (add an option or argument?).
 - [ ] Simplify the form with https://docs.laminas.dev/laminas-form/v3/form-creation/creation-via-factory/
-  and js, storing the whole form one time. See UserProfile too.
+      and js, storing the whole form one time. See UserProfile too.
 - [ ] Normalize the url query with a true standard: Solr? Omeka S?, at the
-  choice of the admin or the developer of the forms and queriers? Avoid to
-  multiply query formats. Probably replace the custom one by the Solr/Lucene one.
+      choice of the admin or the developer of the forms and queriers? Avoid to
+      multiply query formats. Probably replace the custom one by the Solr/Lucene one.
 - [x] Genericize the name of the fields of be able for internal querier to use
-  or convert the fields names.
+      or convert the fields names.
 - [ ] Make the search arguments groupable to allow smart facets: always display all
-  facets from the original queries, with "or" between facets of the same group,
-  and "and" between groups. Require that the core api allows groups.
+      facets from the original queries, with "or" between facets of the same group,
+      and "and" between groups. Require that the core api allows groups.
 - [ ] Integrate auto-suggestion (or short list) to any field.
 - [ ] Use the Laminas config (ini/json/xml) to allow complex form (see User Profile)
 - [ ] Use the standard view with tabs and property selector for the page creation,
-  in order not to limit it to Dublin Core terms. The tabs may be "Filters",
-  "Facets", and "Sort".
+      in order not to limit it to Dublin Core terms. The tabs may be "Filters",
+      "Facets", and "Sort".
 - [x] Create an internal index (see Omeka Classic) or use the fulltext feature
 - [ ] Move all code related to Internal (sql) into another module? No.
 - [ ] Allow to remove an index without removing pages.
@@ -382,6 +391,11 @@ TODO
 - [x] Use a "or" for facets of each group.
 - [ ] Manage pagination when item set is redirected to search.
 - [ ] Reorder items in items set (from module Next, see MvcListeners).
+- [ ] Integrate the override in a way a direct call to adapter->buildQuery() can
+      work with advanced property search (see Reference and some other modules).
+- [ ] Rename search config "name" by "title" or "label".
+- [ ] Add hidden query to site settings.
+- [ ] DateRange field (_dr) may not appear in the type of index in mapping.
 
 
 Warning

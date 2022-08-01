@@ -123,7 +123,7 @@ class Module extends AbstractModule
         $version = $module ? (string) $module->getIni('version') : null;
         if (version_compare($version, '3.3.6.6', '>')) {
             throw new \Omeka\Module\Exception\ModuleCannotInstallException(
-                'To be automatically upgraded and replaced by this module, use version 3.3.6.6 or below.' // @translate
+                'To upgrade and replace module "Search" by this module, use module AdvancedSearch version 3.3.6.6 or below.' // @translate
             );
         }
     }

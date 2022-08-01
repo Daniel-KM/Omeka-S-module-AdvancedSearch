@@ -737,7 +737,6 @@ class Module extends AbstractModule
         }
 
         $view = $event->getTarget();
-        $api = $view->plugin('api');
         $translate = $view->plugin('translate');
 
         // Only non-core querying.
@@ -817,6 +816,7 @@ class Module extends AbstractModule
 
             switch ($key) {
                 case 'property':
+                    $easyMeta = $this->getServiceLocator()->get('ViewHelperManager')->get('easyMeta');
                     // TODO The array may be more than zero when firsts are standard (see core too for inverse).
                     $index = 0;
                     foreach (array_filter($value, 'is_array') as $subKey => $queryRow) {
@@ -844,21 +844,14 @@ class Module extends AbstractModule
                         }
 
                         if ($propertyId) {
-                            if (is_numeric($propertyId)) {
-                                try {
-                                    $property = $api->read('properties', $propertyId)->getContent();
-                                } catch (NotFoundException $e) {
-                                    $property = null;
-                                }
-                            } else {
-                                $property = $api->searchOne('properties', ['term' => $propertyId])->getContent();
+                            // A property can be a list of properties.
+                            $propertyLabels = [];
+                            $properties = is_array($propertyId) ? $propertyId : [$propertyId];
+                            foreach ($properties as $property) {
+                                $label = $easyMeta->propertyLabels($property);
+                                $propertyLabels[] = $label ? $translate($label) : $translate('Unknown property');
                             }
-
-                            if ($property) {
-                                $propertyLabel = $translate($property->label());
-                            } else {
-                                $propertyLabel = $translate('Unknown property');
-                            }
+                            $propertyLabel = implode(' ' . $translate('OR') . ' ', $propertyLabels);
                         } else {
                             $propertyLabel = $translate('[Any property]');
                         }

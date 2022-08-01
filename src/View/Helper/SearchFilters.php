@@ -299,35 +299,9 @@ class SearchFilters extends \Omeka\View\Helper\SearchFilters
      */
     protected function getPropertyIds($termsOrIds = null): array
     {
-        static $propertiesByTerms;
-        static $propertiesByTermsAndIds;
-
-        if (is_null($propertiesByTermsAndIds)) {
-            $connection = $this->resourceAdapter->getServiceLocator()->get('Omeka\Connection');
-            $qb = $connection->createQueryBuilder();
-            $qb
-                ->select(
-                    'DISTINCT CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
-                    'property.id AS id',
-                    // Required with only_full_group_by.
-                    'vocabulary.id'
-                )
-                ->from('property', 'property')
-                ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
-                ->orderBy('vocabulary.id', 'asc')
-                ->addOrderBy('property.id', 'asc')
-            ;
-            $propertiesByTerms = array_map('intval', $connection->executeQuery($qb)->fetchAllKeyValue());
-            $propertiesByTermsAndIds = array_replace($propertiesByTerms, array_combine($propertiesByTerms, $propertiesByTerms));
-        }
-
-        if (is_null($termsOrIds)) {
-            return $propertiesByTerms;
-        }
-
         if (is_scalar($termsOrIds)) {
             $termsOrIds = [$termsOrIds];
         }
-        return array_intersect_key($propertiesByTermsAndIds, array_flip($termsOrIds));
+        return $this->view->easyMeta()->propertyIds($termsOrIds);
     }
 }

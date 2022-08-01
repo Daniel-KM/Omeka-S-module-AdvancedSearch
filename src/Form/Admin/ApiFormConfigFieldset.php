@@ -3,7 +3,7 @@
 namespace AdvancedSearch\Form\Admin;
 
 use AdvancedSearch\Form\Element as AdvancedSearchElement;
-use Doctrine\DBAL\Connection;
+use AdvancedSearch\View\Helper\EasyMeta;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Omeka\Form\Element as OmekaElement;
@@ -11,9 +11,9 @@ use Omeka\Form\Element as OmekaElement;
 class ApiFormConfigFieldset extends Fieldset
 {
     /**
-     * @var Connection
+     * @var EasyMeta
      */
-    protected $connection;
+    protected $easyMeta;
 
     public function init(): void
     {
@@ -221,7 +221,7 @@ class ApiFormConfigFieldset extends Fieldset
         ;
 
         // Prefill the mapping (the specific metadata are mapped above).
-        $sourceFields = $this->getPropertyIds();
+        $sourceFields = $this->easyMeta->propertyIds();
         $prefill = [];
         foreach (array_keys($sourceFields) as $sourceField) {
             if (isset($availableFields[$sourceField])) {
@@ -278,7 +278,7 @@ class ApiFormConfigFieldset extends Fieldset
                 ],
                 'attributes' => [
                     'id' => 'form_available_properies',
-                    'value' => array_keys($this->getPropertyIds()),
+                    'value' => $this->easyMeta->propertyTerms(),
                     'placeholder' => 'dcterms_subjects_ss',
                     'rows' => 12,
                 ],
@@ -368,38 +368,9 @@ class ApiFormConfigFieldset extends Fieldset
         return $options;
     }
 
-    /**
-     * Get all property ids by term.
-     *
-     * @see \BulkImport\Mvc\Controller\Plugin\Bulk::getPropertyIds()
-     *
-     * @return array Associative array of ids by term.
-     */
-    public function getPropertyIds(): array
+    public function setEasyMeta(EasyMeta $easyMeta): self
     {
-        static $properties;
-
-        if (is_null($properties)) {
-            $qb = $this->connection->createQueryBuilder();
-            $qb
-                ->select(
-                    'CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
-                    'property.id AS id'
-                )
-                ->from('property', 'property')
-                ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
-                ->orderBy('vocabulary.id', 'asc')
-                ->addOrderBy('property.id', 'asc')
-            ;
-            $properties = array_map('intval', $this->connection->executeQuery($qb)->fetchAllKeyValue());
-        }
-
-        return $properties;
-    }
-
-    public function setConnection(Connection $connection): self
-    {
-        $this->connection = $connection;
+        $this->easyMeta = $easyMeta;
         return $this;
     }
 }

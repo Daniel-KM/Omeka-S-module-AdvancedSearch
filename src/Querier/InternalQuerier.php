@@ -213,7 +213,7 @@ SQL;
 
         $fields = $this->query->getSuggestFields();
         if ($fields) {
-            $ids = $this->listPropertyIds($fields);
+            $ids = $this->getPropertyIds($fields);
             if (!$ids) {
                 // Searching inside non-existing properties outputs no result.
                 return $this->response
@@ -228,7 +228,7 @@ SQL;
 
         $excludedFields = $this->query->getExcludedFields();
         if ($excludedFields) {
-            $ids = $this->listPropertyIds($excludedFields);
+            $ids = $this->getPropertyIds($excludedFields);
             if ($ids) {
                 $sqlFields .= ' AND `value`.`property_id` NOT IN (:excluded_property_ids)';
                 $bind['excluded_property_ids'] = $ids;
@@ -630,7 +630,7 @@ SQL;
                     continue 2;
 
                 default:
-                    $field = $this->getPropertyTerm($field)
+                    $field = $this->getPropertyTerms($field)
                         ?? $multifields[$field]['fields']
                         ?? $this->underscoredNameToTerm($field)
                         ?? null;
@@ -684,7 +684,7 @@ SQL;
             if ($field === 'created' || $field === 'modified') {
                 $argName = 'datetime';
             } else {
-                $field = $this->getPropertyTerm($field)
+                $field = $this->getPropertyTerms($field)
                     ?? $multifields[$field]['fields']
                     ?? $this->underscoredNameToTerm($field)
                     ?? null;
@@ -722,7 +722,7 @@ SQL;
     {
         $multifields = $this->engine->settingAdapter('multifields', []);
         foreach ($filters as $field => $values) {
-            $field = $this->getPropertyTerm($field)
+            $field = $this->getPropertyTerms($field)
                 ?? $multifields[$field]['fields']
                 ?? $this->underscoredNameToTerm($field)
                 ?? null;
@@ -813,7 +813,7 @@ SQL;
         $fields = [];
         foreach ($facetFields as $facetField) {
             $fields[$facetField] = $metadataFieldsToNames[$facetField]
-                ?? $this->getPropertyTerm($facetField)
+                ?? $this->getPropertyTerms($facetField)
                 ?? $multifields[$facetField]['fields']
                 ?? $facetField;
         }
@@ -1000,33 +1000,6 @@ SQL;
     }
 
     /**
-     * Check a property term or id.
-     *
-     * @see \BulkImport\Mvc\Controller\Plugin\Bulk::getPropertyTerm()
-     */
-    protected function getPropertyTerm($termOrId): ?string
-    {
-        $ids = $this->getPropertyIds();
-        return is_numeric($termOrId)
-            ? (array_search($termOrId, $ids) ?: null)
-            : (array_key_exists($termOrId, $ids) ? $termOrId : null);
-    }
-
-    /**
-     * Convert a list of terms into a list of property ids.
-     *
-     * @see \Reference\Mvc\Controller\Plugin\References::listPropertyIds()
-     *
-     * @param array $values
-     * @return array Only values that are terms are converted into ids, the
-     * other ones are removed.
-     */
-    protected function listPropertyIds(array $values): array
-    {
-        return array_intersect_key($this->getPropertyIds(), array_fill_keys($values, null));
-    }
-
-    /**
      * Get all property terms as terms with "_".
      *
      * This allows to convert some Solr keys like "dcterms_subject_ss" into a
@@ -1066,34 +1039,21 @@ SQL;
     }
 
     /**
-     * Get all property ids by term.
-     *
-     * @see \BulkImport\Mvc\Controller\Plugin\Bulk::getPropertyIds()
+     * Get one or more property ids by JSON-LD terms or by numeric ids.
      *
      * @return array Associative array of ids by term.
      */
-    protected function getPropertyIds(): array
+    protected function getPropertyIds($termsOrIds = null)
     {
-        static $properties;
+        return $this->services->get('ViewHelperManager')->get('easyMeta')->propertyIds($termsOrIds);
+    }
 
-        if (is_null($properties)) {
-            /** @var \Doctrine\DBAL\Connection $connection */
-            $connection = $this->services->get('Omeka\Connection');
-            $qb = $connection->createQueryBuilder();
-            $qb
-                ->select(
-                    'CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
-                    'property.id AS id'
-                )
-                ->from('property', 'property')
-                ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
-                ->orderBy('vocabulary.id', 'asc')
-                ->addOrderBy('property.id', 'asc')
-            ;
-            $properties = array_map('intval', $connection->executeQuery($qb)->fetchAllKeyValue());
-        }
-
-        return $properties;
+    /**
+     * Get one or more property terms by JSON-LD terms or by numeric ids.
+     */
+    protected function getPropertyTerms($termsOrIds = null)
+    {
+        return $this->services->get('ViewHelperManager')->get('easyMeta')->propertyTerms($termsOrIds);
     }
 
     /**

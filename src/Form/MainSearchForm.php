@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * Copyright Daniel Berthereau 2018-2021
+ * Copyright Daniel Berthereau 2018-2022
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -904,52 +904,23 @@ class MainSearchForm extends Form
     }
 
     /**
-     * Check a property term or id.
-     *
-     * @see \BulkImport\Mvc\Controller\Plugin\Bulk::getPropertyTerm()
-     * @todo Factorize with \AdvancedSearch\Querier\InternalQuerier::getPropertyTerm()
-     * @see \AdvancedSearch\Querier\InternalQuerier::getPropertyTerm()
+     * Get a property term or id.
      */
     protected function getPropertyTerm($termOrId): ?string
     {
-        $ids = $this->getPropertyIds();
-        return is_numeric($termOrId)
-            ? (array_search($termOrId, $ids) ?: null)
-            : (array_key_exists($termOrId, $ids) ? $termOrId : null);
+        return $this->getOption('search_config')->getServiceLocator()->get('ViewHelperManager')
+            ->get('easyMeta')->propertyTerms($termOrId);
     }
 
     /**
      * Get all property ids by term.
      *
-     * @see \BulkImport\Mvc\Controller\Plugin\Bulk::getPropertyIds()
-     * @todo Factorize with \AdvancedSearch\Querier\InternalQuerier::getPropertyIds()
-     * @see \AdvancedSearch\Querier\InternalQuerier::getPropertyIds()
-     *
      * @return array Associative array of ids by term.
      */
     protected function getPropertyIds(): array
     {
-        static $properties;
-
-        if (is_null($properties)) {
-            /** @var \Doctrine\DBAL\Connection $connection */
-            $services = $this->getOption('search_config')->getServiceLocator();
-            $connection = $services->get('Omeka\Connection');
-            $qb = $connection->createQueryBuilder();
-            $qb
-                ->select(
-                    'CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
-                    'property.id AS id'
-                )
-                ->from('property', 'property')
-                ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
-                ->orderBy('vocabulary.id', 'asc')
-                ->addOrderBy('property.id', 'asc')
-            ;
-            $properties = array_map('intval', $connection->executeQuery($qb)->fetchAllKeyValue());
-        }
-
-        return $properties;
+        return $this->getOption('search_config')->getServiceLocator()->get('ViewHelperManager')
+            ->get('easyMeta')->propertyIds();
     }
 
     public function setBasePath(string $basePath): Form

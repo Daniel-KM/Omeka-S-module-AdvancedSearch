@@ -1376,6 +1376,8 @@ class SearchResourcesListener
     /**
      * Get one or more property ids by JSON-LD terms or by numeric ids.
      *
+     * @todo Factorize with \AdvancedSearch\View\Helper\EasyMeta::propertyIds() (differences: return array and used properties).
+     *
      * @param array|int|string|null $termsOrIds One or multiple ids or terms.
      * @return int[] The property ids matching terms or ids, or all properties
      * by terms.
@@ -1417,7 +1419,8 @@ class SearchResourcesListener
                 : [];
         }
 
-        return array_intersect_key($propertiesByTermsAndIds, array_flip($termsOrIds));
+        // TODO Keep original order.
+        return array_intersect_key($propertiesByTermsAndIds, array_fill_keys($termsOrIds, null));
     }
 
     /**

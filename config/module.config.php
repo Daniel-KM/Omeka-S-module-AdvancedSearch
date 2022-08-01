@@ -52,6 +52,8 @@ return [
         'factories' => [
             'apiSearch' => Service\ViewHelper\ApiSearchFactory::class,
             'apiSearchOne' => Service\ViewHelper\ApiSearchOneFactory::class,
+            // Used in AdvancedResourceTemplate, AdvancedSearch and BlockPlus.
+            'assetUrl' => Service\ViewHelper\AssetUrlFactory::class,
             'matchedRouteName' => Service\ViewHelper\MatchedRouteNameFactory::class,
             'mediaTypeSelect' => Service\ViewHelper\MediaTypeSelectFactory::class,
             'searchEngineConfirm' => Service\ViewHelper\SearchEngineConfirmFactory::class,
@@ -268,6 +270,12 @@ return [
                 'pattern' => '%s.mo',
                 'text_domain' => null,
             ],
+        ],
+    ],
+    'assets' => [
+        // Override internals assets. Only for Omeka assets: modules can use another filename.
+        'internals' => [
+            'js/global.js' => 'AdvancedSearch',
         ],
     ],
     'js_translate_strings' => [

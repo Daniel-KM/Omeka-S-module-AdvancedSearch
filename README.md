@@ -161,8 +161,10 @@ To create a new config for a page with a search engine, follow these steps.
        engile. The order of the fields will be the one that will be used for
        display. All field will be displayed, even if they are not managed by the
        search engine.
-       With the internal adapter, the fields `item_set_id_field`, `resource_class_id_field`,
-       and `resource_template_id_field` display a select by default.
+       With the internal adapter, the fields `item_set_id`, `resource_class_id`,
+       and `resource_template_id` display a select by default. You may have to
+       use `Omeka/Select`, `Omeka/MultiCheckbox`, or variants to get option
+       values automatically.
        Note that some indexers may have fields that seem duplicated, but they
        aren’t: some of them allow to prepare search engines and some other
        facets or sort indexes. Some of them may be used for all uses. This is
@@ -396,6 +398,7 @@ TODO
 - [ ] Rename search config "name" by "title" or "label".
 - [ ] Add hidden query to site settings.
 - [ ] DateRange field (_dr) may not appear in the type of index in mapping.
+- [ ] Use omeka selects option values by default for classes, templates, item sets, sites.
 
 
 Warning

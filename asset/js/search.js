@@ -208,7 +208,7 @@ $(document).ready(function() {
     });
 
     $('.search-facets').on('change', 'input[type=checkbox]', function() {
-        if (!$('.apply-facets').length) {
+        if (!$('.apply-facets').length && $(this).data('url')) {
             window.location = $(this).data('url');
         }
     });

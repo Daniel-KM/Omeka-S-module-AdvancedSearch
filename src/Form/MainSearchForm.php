@@ -266,6 +266,8 @@ class MainSearchForm extends Form
         }
 
         $filter['search_config'] = $this->getOption('search_config');
+
+        /** @var \AdvancedSearch\Form\SearchFilter\Advanced $advanced */
         $advanced = $this->formElementManager->get(SearchFilter\Advanced::class, $filter);
         if (!$advanced->count()) {
             return null;
@@ -860,6 +862,7 @@ class MainSearchForm extends Form
 
     protected function getItemSetsOptions($byOwner = false): array
     {
+        /** @var \Omeka\Form\Element\ItemSetSelect $select */
         $select = $this->formElementManager->get(\Omeka\Form\Element\ItemSetSelect::class, []);
         if ($this->site) {
             $select->setOptions([
@@ -881,12 +884,14 @@ class MainSearchForm extends Form
 
     protected function getOwnerOptions(): array
     {
+        /** @var \Omeka\Form\Element\UserSelect $select */
         $select = $this->formElementManager->get(\Omeka\Form\Element\UserSelect::class, []);
         return $select->getValueOptions();
     }
 
     protected function getSiteOptions(): array
     {
+        /** @var \Omeka\Form\Element\SiteSelect $select */
         $select = $this->formElementManager->get(\Omeka\Form\Element\SiteSelect::class, []);
         return $select->setOption('disable_group_by_owner', true)->getValueOptions();
     }

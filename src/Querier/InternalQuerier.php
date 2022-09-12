@@ -589,7 +589,7 @@ SQL;
                     continue 2;
 
                 case 'id':
-                    $values = array_filter(array_map('intval', $flatArray($values)));;
+                    $values = array_filter(array_map('intval', $flatArray($values)));
                     $this->args['id'] = empty($this->args['id']) ? $values : array_merge($this->args['id'], $values);
                     continue 2;
 

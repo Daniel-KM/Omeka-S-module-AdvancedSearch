@@ -6,11 +6,11 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
+use Omeka\Api\Adapter\AbstractResourceEntityAdapter;
 use Omeka\Api\Adapter\ItemAdapter;
 use Omeka\Api\Adapter\ItemSetAdapter;
 use Omeka\Api\Adapter\MediaAdapter;
 use Omeka\Api\Exception\NotFoundException;
-use Omeka\Api\Adapter\AbstractResourceEntityAdapter;
 use Omeka\Api\Request;
 
 class SearchResources extends AbstractPlugin
@@ -664,7 +664,7 @@ class SearchResources extends AbstractPlugin
                         'omeka_root.owner',
                         $userAlias
                     );
-                    $qb
+                $qb
                     ->andWhere($expr->eq(
                         "$userAlias.id",
                         $this->adapter->createNamedParameter($qb, $query['owner_id']))

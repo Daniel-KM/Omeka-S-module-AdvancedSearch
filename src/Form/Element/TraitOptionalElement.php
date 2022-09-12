@@ -2,8 +2,6 @@
 
 namespace AdvancedSearch\Form\Element;
 
-use Laminas\Form\Element\Select;
-
 trait TraitOptionalElement
 {
     /**

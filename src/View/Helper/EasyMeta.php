@@ -19,17 +19,17 @@ class EasyMeta extends AbstractHelper
     /**
      * @var array
      */
-    static protected $propertiesByTerms;
+    protected static $propertiesByTerms;
 
     /**
      * @var array
      */
-    static protected $propertiesByTermsAndIds;
+    protected static $propertiesByTermsAndIds;
 
     /**
      * @var array
      */
-    static protected $propertiesLabels;
+    protected static $propertiesLabels;
 
     public function __construct(Connection $connection)
     {

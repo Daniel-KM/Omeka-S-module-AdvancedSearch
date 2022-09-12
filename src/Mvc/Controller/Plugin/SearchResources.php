@@ -497,7 +497,7 @@ class SearchResources extends AbstractPlugin
         }
 
         // The site "0" is kept: no site, as in core adapter.
-        $sites = array_unique(array_map('intval', array_filter($query['site_id'], 'is_numeric')));
+        $sites = array_values(array_unique(array_map('intval', array_filter($query['site_id'], 'is_numeric'))));
         if (!$sites) {
             return;
         }
@@ -611,7 +611,9 @@ class SearchResources extends AbstractPlugin
             && $query['resource_class_id'] !== []
             && $query['resource_class_id'] !== null
         ) {
-            $resourceClassIds = is_array($query['resource_class_id']) ? $query['resource_class_id'] : [$query['resource_class_id']];
+            $resourceClassIds = is_array($query['resource_class_id'])
+                ? array_values($query['resource_class_id'])
+                : [$query['resource_class_id']];
             if (array_values($resourceClassIds) === [0]) {
                 $qb
                     ->andWhere(
@@ -640,7 +642,9 @@ class SearchResources extends AbstractPlugin
             && $query['resource_template_id'] !== []
             && $query['resource_template_id'] !== null
         ) {
-            $resourceTemplateIds = is_array($query['resource_template_id']) ? $query['resource_template_id'] : [$query['resource_template_id']];
+            $resourceTemplateIds = is_array($query['resource_template_id'])
+                ? array_values($query['resource_template_id'])
+                : [$query['resource_template_id']];
             if (array_values($resourceTemplateIds) === [0]) {
                 $qb
                     ->andWhere(
@@ -669,7 +673,9 @@ class SearchResources extends AbstractPlugin
             && $query['item_set_id'] !== []
             && $query['item_set_id'] !== null
         ) {
-            $itemSetIds = is_array($query['item_set_id']) ? $query['item_set_id'] : [$query['item_set_id']];
+            $itemSetIds = is_array($query['item_set_id'])
+                ? array_values($query['item_set_id'])
+                : [$query['item_set_id']];
             $itemSetAlias = $this->adapter->createAlias();
             if (array_values($itemSetIds) === [0]) {
                 $qb
@@ -830,9 +836,10 @@ class SearchResources extends AbstractPlugin
                 if (!is_array($value)) {
                     $value = [$value];
                 }
+                // To use array_values() avoids doctrine issue with string keys.
                 $value = in_array($queryType, self::PROPERTY_QUERY['value_integer'])
-                    ? array_unique(array_map('intval', $value))
-                    : array_unique(array_filter(array_map('trim', array_map('strval', $value)), 'strlen'));
+                    ? array_values(array_unique(array_map('intval', $value)))
+                    : array_values(array_unique(array_filter(array_map('trim', array_map('strval', $value)), 'strlen')));
                 if (empty($value)) {
                     continue;
                 }
@@ -1040,13 +1047,13 @@ class SearchResources extends AbstractPlugin
                     $positive = false;
                     // no break.
                 case 'dtp':
-                    if (is_array($value)) {
+                    if (count($value) <= 1) {
+                        $dataTypeAlias = $this->adapter->createNamedParameter($qb, reset($value));
+                        $predicateExpr = $expr->eq("$valuesAlias.type", $dataTypeAlias);
+                    } else {
                         $dataTypeAlias = $this->adapter->createAlias();
                         $qb->setParameter($dataTypeAlias, $value, Connection::PARAM_STR_ARRAY);
                         $predicateExpr = $expr->in("$valuesAlias.type", $dataTypeAlias);
-                    } else {
-                        $dataTypeAlias = $this->adapter->createNamedParameter($qb, $value);
-                        $predicateExpr = $expr->eq("$valuesAlias.type", $dataTypeAlias);
                     }
                     break;
 
@@ -1197,18 +1204,18 @@ class SearchResources extends AbstractPlugin
             }
 
             if ($dataType) {
-                if (is_array($dataType)) {
-                    $dataTypeAlias = $this->adapter->createAlias();
-                    $qb->setParameter($dataTypeAlias, $dataType, Connection::PARAM_STR_ARRAY);
-                    $predicateExpr = $expr->andX(
-                        $predicateExpr,
-                        $expr->in("$valuesAlias.type", ':' . $dataTypeAlias)
-                    );
-                } else {
-                    $dataTypeAlias = $this->adapter->createNamedParameter($qb, $dataType);
+                if (!is_array($dataType) || count($dataType) <= 1) {
+                    $dataTypeAlias = $this->adapter->createNamedParameter($qb, is_array($dataType) ? reset($dataType) : $dataType);
                     $predicateExpr = $expr->andX(
                         $predicateExpr,
                         $expr->eq("$valuesAlias.type", $dataTypeAlias)
+                    );
+                } else {
+                    $dataTypeAlias = $this->adapter->createAlias();
+                    $qb->setParameter($dataTypeAlias, array_values($dataType), Connection::PARAM_STR_ARRAY);
+                    $predicateExpr = $expr->andX(
+                        $predicateExpr,
+                        $expr->in("$valuesAlias.type", ':' . $dataTypeAlias)
                     );
                 }
             }
@@ -1541,6 +1548,7 @@ class SearchResources extends AbstractPlugin
         if (empty($values)) {
             return;
         }
+        $values = array_values($values);
 
         $expr = $qb->expr();
 
@@ -1648,6 +1656,9 @@ class SearchResources extends AbstractPlugin
         $itemAlias = $this->adapter->createAlias();
         $itemSetAlias = $this->adapter->createAlias();
 
+        // To use array_values() avoids doctrine issue with string keys.
+        $itemSetIds = array_values($query['item_set_id']);
+
         $qb
             ->innerJoin(
                 'omeka_root.item',
@@ -1655,14 +1666,14 @@ class SearchResources extends AbstractPlugin
                 $expr->eq("$itemAlias.id", 'omeka_root.item')
             );
 
-        if (array_values($query['item_set_id']) === [0]) {
+        if ($itemSetIds === [0]) {
             $qb
                 ->leftJoin(
                     "$itemAlias.itemSets",
                     $itemSetAlias
                 )
                 ->andWhere($expr->isNull("$itemSetAlias.id"));
-        } elseif (in_array(0, $query['item_set_id'], true)) {
+        } elseif (in_array(0, $itemSetIds, true)) {
             $qb
                 ->leftJoin(
                     "$itemAlias.itemSets",
@@ -1672,7 +1683,7 @@ class SearchResources extends AbstractPlugin
                     $expr->isNull("$itemSetAlias.id"),
                     $expr->in(
                         "$itemSetAlias.id",
-                        $this->adapter->createNamedParameter($qb, $query['item_set_id'])
+                        $this->adapter->createNamedParameter($qb, $itemSetIds)
                     )
                 ));
         } else {
@@ -1680,7 +1691,7 @@ class SearchResources extends AbstractPlugin
                 ->innerJoin(
                     "$itemAlias.itemSets",
                     $itemSetAlias, Join::WITH,
-                    $expr->in("$itemSetAlias.id", $this->adapter->createNamedParameter($qb, $query['item_set_id']))
+                    $expr->in("$itemSetAlias.id", $this->adapter->createNamedParameter($qb, $itemSetIds))
                 );
         }
     }

@@ -125,6 +125,10 @@ class SearchResources extends AbstractPlugin
             'lres',
             'nlres',
         ],
+        'optimize' => [
+            'eq' => 'list',
+            'neq' => 'nlist',
+        ],
     ];
 
     public function __construct(Connection $connection)
@@ -374,7 +378,7 @@ class SearchResources extends AbstractPlugin
                         if (is_array($queryRow['property'])) {
                             $query['property'][$k]['property'] = array_unique($query['property'][$k]['property']);
                         }
-                        if (in_array($query['property'][$k]['type'], ['eq', 'list'])) {
+                        if (in_array($query['property'][$k]['type'], ['eq', 'list', 'neq', 'nlist'])) {
                             // TODO Manage the case where the property is numeric or term (simplify above instead of in the process below).
                             $queryRowProperty = is_array($queryRow['property']) ? implode(',', $queryRow['property']) : $queryRow['property'];
                             $short = $queryRowProperty . '/' . $queryRow['type'] . '/' . ($queryRow['joiner'] ?? 'and');
@@ -515,15 +519,16 @@ class SearchResources extends AbstractPlugin
             return $query;
         }
 
-        // Replace multiple "subject = x OR subject = y" by "subject in list [x, y]".
+        // Replace multiple "subject = x OR subject = y" by "subject in list [x, y]"
+        // and variants: not equal to not in list, and types "and" and "except".
         // On a base > 10000 items and more than three or four subjects with OR,
-        // mysql never ends request. The point is managed for AND too, even if
-        // it less slow.
+        // mysql never ends request.
         foreach ($shortProperties as $shortProperty) {
-            if ($shortProperty['total'] < 2 || $shortProperty['type'] !== 'eq') {
+            if ($shortProperty['total'] < 2 || !isset(self::PROPERTY_QUERY['optimize'][$shortProperty['type']])) {
                 continue;
             }
-            $shortList = $shortProperty['property_string'] . '/list/' . $shortProperty['joiner'];
+            $optimizedType = self::PROPERTY_QUERY['optimize'][$shortProperty['type']];
+            $shortList = $shortProperty['property_string'] . '/' . $optimizedType . '/' . $shortProperty['joiner'];
             if (isset($shortProperties[$shortList])) {
                 // TODO Replace multiple "subject in list [x] OR subject in list [y]" by "subject in list [x, y]" first (but rare).
                 // if (count($shortProperties[$shortList]['keys']) > 1) {}
@@ -532,7 +537,7 @@ class SearchResources extends AbstractPlugin
             } else {
                 $query['property'][] = [
                     'property' => $shortProperty['property'],
-                    'type' => 'list',
+                    'type' => $optimizedType,
                     'joiner' => $shortProperty['joiner'],
                     'text' => [],
                 ];

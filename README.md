@@ -59,22 +59,42 @@ Added fields are:
 Moreover, it adds new search query operator for properties (some are available
 only via api, not in the advanced search form for now):
 
+- `exs`: has a single value
+- `nexs`: has not a single value
+- `exm`: has multiple values
+- `nexm`: has not multiple values
 - `list`: is in list
 - `nlist`: is not in list
 - `sw`: starts with
 - `nsw`: does not start with
 - `ew`: ends with
 - `new`: does not end with
+- `tp`: has main type (literal-like, resource-like, uri-like)
+- `ntp`: has not main type (literal-like, resource-like, uri-like)
+- `tpl`: has type literal-like
+- `ntpl`: has not type literal-like
+- `tpr`: has type resource-like
+- `ntpr`: has not type resource-like
+- `tpu`: has type uri-like
+- `ntpu`: has not type uri-like
 - `dtp`: has data type
-- `ndtp`: does not have data type
+- `ndtp`: has not data type
 - `lex`: is a linked resource
 - `nlex`: is not a linked resource
 - `lres`: is linked with resource #id
 - `nlres`: is not linked with resource #id
+- `gt`: greater than
+- `gte`: greater than or equal
+- `lte`: lower than or equal
+- `lt`: lower than
 - exclude one or multiple properties (except title)
 
+__Warning__: With the internal sql engine, comparisons are mysql comparisons, so
+alphabetic ones. They works for string and four digit years and standard dates,
+not for numbers nor variable dates.
+
 Furthermore:
-- search in multiple properties at a time, for example `dcterms:creator and dcterms:contributor have a value`.
+- search in multiple properties at a time, for example `dcterms:creator or dcterms:contributor are equal to value "Anonymous"`.
 - search resources without without template, class, item set, site and owner.
   This feature is included directly in the advanced search form in each select.
 - adds the joiner type `not` that can be use to invert the query. For example,
@@ -82,6 +102,8 @@ Furthermore:
   It avoids to display half of the complex query types to the user.
 - adds the key `datatype` to filter a property query by datatype. For example,
   "and property dcterms:subject equals 'subject' with datatype 'customvocab:1'".
+- search no item set, no class, no template, no owner or no site. To search
+  missing value, use `0`, for example `item_set_id=0`.
 
 Finally, an option allows to display only the used properties and classes in the
 advanced search form, with chosen-select.
@@ -212,6 +234,7 @@ A search form may have many parameters. They don't need to be all filled.
 - Before the query
   - main querier
   - autosuggestion
+  - filters
   - advanced search form
 - After the query
   - results display
@@ -237,7 +260,7 @@ the module [Search Solr].
 Example of a direct url for Solr (should be configured first): `http://example.com:8983/solr/omeka/suggest?suggest=true&suggest.build=true&suggest.dictionary=mainSuggester&suggest.count=100`.
 The query param should be `suggest.q`.
 
-### Filters
+#### Filters
 
 Filters are used before the querying. Any field can be added.
 In the text area, each line is a filter, with a name, a label, a type and
@@ -245,6 +268,21 @@ options, separated with a `=`.
 
 For advanced filters, similar to the Omeka ones, use "advanced" as field name
 and type.
+
+### After the query
+
+#### Facets
+
+See options in the config form.
+The format to fill each facet is "field = Label" and optionnally the type after
+another "=", "Checkbox", "Select" or "SelectRange".
+
+The list of facets can be displayed as checkboxes (default: `Checkbox`), a select
+with multiple values `Select` or a double select for ranges `SelectRange`.
+
+Warning: With internal sql engine, `SelectRange` orders values alphabetically,
+so it is used for string, years or standard dates, but not for number or
+variable dates. With Solr, `SelectRange` works only with date and numbers.
 
 
 Internal engine (mysql)
@@ -277,7 +315,7 @@ and some other ones are available too.
 ### Exclude properties
 
 To exclude properties to search in, use key `except`. For example, to search
-anywhere except in "bibo:content", that may contains ocr or full text, use this
+anywhere except in "bibo:content", that may contain ocr or full text, use this
 api query `https://example.org/api/items?property[0][except]=bibo:content&property[0][type]=in&property[0][text]=text to search`, or in internal api:
 
 ```php
@@ -379,7 +417,7 @@ TODO
       in order not to limit it to Dublin Core terms. The tabs may be "Filters",
       "Facets", and "Sort".
 - [x] Create an internal index (see Omeka Classic) or use the fulltext feature
-- [ ] Move all code related to Internal (sql) into another module? No.
+- [-] Move all code related to Internal (sql) into another module? No.
 - [ ] Allow to remove an index without removing pages.
 - [ ] Allow to import/export a mapping via json, for example the default one.
 - [ ] Add an option to use the search api by default (and an option `'index' => false`).

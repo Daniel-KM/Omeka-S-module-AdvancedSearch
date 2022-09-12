@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016-2017
- * Copyright Daniel Berthereau, 2018-2021
+ * Copyright Daniel Berthereau, 2018-2022
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -540,7 +540,7 @@ nlres = is not linked with resource with ID
                 'type' => AdvancedSearchElement\DataTextarea::class,
                 'options' => [
                     'label' => 'List of facets', // @translate
-                    'info' => 'List of facets that will be displayed in the search page. Format is "field = Label" and optionnally " = Select".', // @translate
+                    'info' => 'List of facets that will be displayed in the search page. Format is "field = Label" and optionnally " = Select" or " = SelectRange". With internal sql engine, "SelectRange" orders values alphabetically. With Solr, "SelectRange" works only with date and numbers.', // @translate
                     'as_key_value' => true,
                     'key_value_separator' => '=',
                     'data_keys' => [

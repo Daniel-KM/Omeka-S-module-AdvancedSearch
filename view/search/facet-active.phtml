@@ -7,6 +7,7 @@
  * @var int $count
  * @var bool $active
  * @var string $url
+ * @var string|int|null $key
  * @var array $options
  * @var \Laminas\View\Helper\EscapeHtml $escapeHtml
  * @var \Laminas\View\Helper\EscapeHtmlAttr $escapeHtmlAttr
@@ -18,6 +19,20 @@
 // else it should be managed in facets.phtml.
 
 if (!$active) return;
+
+$texts = [
+    'from' => '%s : from %s', // @translate
+    'to' => '%s : to %s', // @translate
+];
+$text = $texts[$key] ?? '%s : %s'; // @translate
+
+$replace = [
+    '{url}' => $escapeHtmlAttr($url),
+    '{facet_field}' => $escapeHtmlAttr($name),
+    '{facet_value}' => $escapeHtmlAttr($value),
+    '{facet_label}' => $escapeHtml(sprintf($text, $translate($facetLabel($name)), $label)),
+];
 ?>
 
-<a class="facet-active" href="<?= $escapeHtmlAttr($url) ?>" data-facet-name="facet[<?= $escapeHtmlAttr($name) ?>][]" data-facet-value="<?= $escapeHtmlAttr($value) ?>"><?= $escapeHtml(sprintf('%s : %s', $translate($facetLabel($name)), $label)) ?></a>
+<?= str_replace(array_keys($replace), array_values($replace),
+    '<a class="facet-active" href="{url}" data-facet-name="facet[{facet_field}][]" data-facet-value="{facet_value}">{facet_label}</a>') ?>

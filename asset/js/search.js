@@ -216,11 +216,29 @@ $(document).ready(function() {
     $('.search-facets').on('change', 'select', function() {
         if (!$('#apply-facets').length) {
             // Replace the current select args by new ones.
-            // Names in facets have no index in array ("[]").
-            let url = new URL(window.location.href);
+            // Names in facets may have no index in array ("[]") when it is a multiple one.
+            // But the select may be a single select too, in which case the url is already in data.
+            let url;
+            let selectValues = $(this).val();
+            if (typeof selectValues !== 'object') {
+                let option =  $(this).find('option:selected');
+                if (option.length && option[0].value !== '') {
+                    url = option.data('url');
+                    if (url && url.length) {
+                        window.location = url;
+                    }
+                } else {
+                    url = new URL(window.location.href);
+                    url.searchParams.delete($(this).prop('name'));
+                    window.location = url.toString();
+                }
+                return;
+            }
+            // Prepare the url with the selected values.
+            url = new URL(window.location.href);
             let selectName = $(this).prop('name');
             url.searchParams.delete(selectName);
-            $(this).val().forEach((element, index) => {
+            selectValues.forEach((element, index) => {
                 url.searchParams.set(selectName.substring(0, selectName.length - 2) + '[' + index + ']', element);
             });
             window.location = url.toString();

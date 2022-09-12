@@ -39,6 +39,7 @@ return [
             'facetLink' => View\Helper\FacetLink::class,
             'facetLinks' => View\Helper\FacetLinks::class,
             'facetSelect' => View\Helper\FacetSelect::class,
+            'facetSelectRange' => View\Helper\FacetSelectRange::class,
             'formMultiText' => Form\View\Helper\FormMultiText::class,
             'formNote' => Form\View\Helper\FormNote::class,
             'hiddenInputsFromFilteredQuery' => View\Helper\HiddenInputsFromFilteredQuery::class,

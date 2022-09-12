@@ -32,7 +32,7 @@ class AbstractFacet extends AbstractHelper
      * @param array $facetValues Each facet value has two keys: value and count.
      * @return string|array
      */
-    public function __invoke(string $name, array $facetValues, array $options = [], bool $asData = false)
+    public function __invoke(string $facetField, array $facetValues, array $options = [], bool $asData = false)
     {
         static $facetsData = [];
 
@@ -64,24 +64,24 @@ class AbstractFacet extends AbstractHelper
 
         unset($queryBase['page']);
         // Add url when display is direct, active and label.
-        if (!isset($facetsData[$name])) {
+        if (!isset($facetsData[$facetField])) {
             $isFacetModeDirect = ($options['mode'] ?? '') === 'link';
             foreach ($facetValues as /* $facetIndex => */ &$facetValue) {
                 $facetValueValue = (string) $facetValue['value'];
                 $query = $queryBase;
 
                 // The facet value is compared against a string (the query args).
-                $facetValueLabel = (string) $this->facetValueLabel($name, $facetValueValue);
+                $facetValueLabel = (string) $this->facetValueLabel($facetField, $facetValueValue);
                 if (strlen($facetValueLabel)) {
-                    if (isset($query['facet'][$name]) && array_search($facetValueValue, $query['facet'][$name]) !== false) {
-                        $values = $query['facet'][$name];
+                    if (isset($query['facet'][$facetField]) && array_search($facetValueValue, $query['facet'][$facetField]) !== false) {
+                        $values = $query['facet'][$facetField];
                         $values = array_filter($values, function ($v) use ($facetValueValue) {
                             return $v !== $facetValueValue;
                         });
-                        $query['facet'][$name] = $values;
+                        $query['facet'][$facetField] = $values;
                         $active = true;
                     } else {
-                        $query['facet'][$name][] = $facetValueValue;
+                        $query['facet'][$facetField][] = $facetValueValue;
                         $active = false;
                     }
                     $url = $isFacetModeDirect ? $urlHelper($route, $params, ['query' => $query]) : '';
@@ -96,18 +96,18 @@ class AbstractFacet extends AbstractHelper
                 $facetValue['url'] = $url;
             }
             unset($facetValue);
-            $facetsData[$name] = [
-                'name' => $name,
+            $facetsData[$facetField] = [
+                'name' => $facetField,
                 'facetValues' => $facetValues,
                 'options' => $options,
             ];
         }
 
         if ($asData) {
-            return $facetsData[$name];
+            return $facetsData[$facetField];
         }
 
-        return $partialHelper($this->partial, $facetsData[$name]);
+        return $partialHelper($this->partial, $facetsData[$facetField]);
     }
 
     /**
@@ -115,13 +115,13 @@ class AbstractFacet extends AbstractHelper
      *
      * @todo Remove search of facet labels: use values from the response.
      */
-    protected function facetValueLabel(string $name, string $value): ?string
+    protected function facetValueLabel(string $facetField, string $value): ?string
     {
         if (!strlen($value)) {
             return null;
         }
 
-        switch ($name) {
+        switch ($facetField) {
             case 'resource_name':
             case 'resource_type':
                 return $value;

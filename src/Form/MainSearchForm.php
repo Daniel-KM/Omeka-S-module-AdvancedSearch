@@ -530,7 +530,6 @@ class MainSearchForm extends Form
                     'id' => 'search-owner-id',
                     'multiple' => true,
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
-                    // End users understand "collections" more than "item sets".
                     'data-placeholder' => 'Select owners…', // @translate
                 ],
             ])
@@ -561,7 +560,6 @@ class MainSearchForm extends Form
                     'id' => 'search-site-id',
                     'multiple' => true,
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
-                    // End users understand "collections" more than "item sets".
                     'data-placeholder' => 'Select sites…', // @translate
                 ],
             ])

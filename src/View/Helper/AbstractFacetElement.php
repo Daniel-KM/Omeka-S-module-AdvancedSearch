@@ -10,7 +10,7 @@ class AbstractFacetElement extends AbstractFacet
      * @param array $facet A facet has two keys: value and count.
      * @return string|array
      */
-    public function __invoke(string $name, array $facet, array $options = [], bool $asData = false)
+    public function __invoke(string $facetField, array $facet, array $options = [], bool $asData = false)
     {
         // Variables are static to speed up process for all facets.
         // TODO Share the list between active and facet helpers.
@@ -60,21 +60,21 @@ class AbstractFacetElement extends AbstractFacet
         }
 
         $facetValue = (string) $facet['value'];
-        if (!isset($facetsData[$name][$facetValue])) {
+        if (!isset($facetsData[$facetField][$facetValue])) {
             $query = $queryBase;
 
             // The facet value is compared against a string (the query args).
-            $facetValueLabel = (string) $this->facetValueLabel($name, $facetValue);
+            $facetValueLabel = (string) $this->facetValueLabel($facetField, $facetValue);
             if (strlen($facetValueLabel)) {
-                if (isset($query['facet'][$name]) && array_search($facetValue, $query['facet'][$name]) !== false) {
-                    $values = $query['facet'][$name];
+                if (isset($query['facet'][$facetField]) && array_search($facetValue, $query['facet'][$facetField]) !== false) {
+                    $values = $query['facet'][$facetField];
                     $values = array_filter($values, function ($v) use ($facetValue) {
                         return $v !== $facetValue;
                     });
-                    $query['facet'][$name] = $values;
+                    $query['facet'][$facetField] = $values;
                     $active = true;
                 } else {
-                    $query['facet'][$name][] = $facetValue;
+                    $query['facet'][$facetField][] = $facetValue;
                     $active = false;
                 }
                 $url = $urlHelper($route, $params, ['query' => $query]);
@@ -83,8 +83,8 @@ class AbstractFacetElement extends AbstractFacet
                 $url = '';
             }
 
-            $facetsData[$name][$facetValue] = [
-                'name' => $name,
+            $facetsData[$facetField][$facetValue] = [
+                'name' => $facetField,
                 'value' => $facetValue,
                 'label' => $facetValueLabel,
                 'count' => $facet['count'],
@@ -100,15 +100,15 @@ class AbstractFacetElement extends AbstractFacet
         } elseif (isset($facet['count'])) {
             // When facet selected is used, the count is null, so it should be
             // updated when possible.
-            $facetsData[$name][$facetValue]['count'] = $facet['count'];
+            $facetsData[$facetField][$facetValue]['count'] = $facet['count'];
         }
 
         if ($asData) {
-            return $facetsData[$name][$facetValue];
+            return $facetsData[$facetField][$facetValue];
         }
 
-        return strlen($facetsData[$name][$facetValue]['label'])
-            ? $partialHelper($this->partial, $facetsData[$name][$facetValue])
+        return strlen($facetsData[$facetField][$facetValue]['label'])
+            ? $partialHelper($this->partial, $facetsData[$facetField][$facetValue])
             : '';
     }
 }

@@ -25,7 +25,7 @@ $ids = array_filter($ids, 'is_numeric') ?: [null];
 if ($status->isSiteRequest()) {
     $layout = $plugins->get('layout');
     $site = $layout->site;
-    if (!$site->siteItemSets()) {
+    if (!$site || !$site->siteItemSets()) {
         return;
     }
     $filterLocale = (bool) $this->siteSetting('filter_locale_values');

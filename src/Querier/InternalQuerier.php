@@ -909,7 +909,7 @@ SQL;
             $optionsFacetRange['sort_by'] = 'alphabetic';
             $optionsFacetRange['sort_order'] = 'asc';
 
-            // TODO Manage range facets.
+            // TODO Make InternalQuerier and References manage facet ranges (for now via a manual process here and above and in FacetSelectRange).
             foreach (array_keys($fields) as $facetField) {
                 $isFacetRange = $facets[$facetField]['type'] === 'SelectRange';
                 // Like Solr, get all facet values, so all existing values.
@@ -933,25 +933,6 @@ SQL;
                             'value' => $value,
                             'count' => $count + $facetCountsByField[$facetField][$value]['count'],
                         ];
-                    }
-                }
-                // TODO Make InternalQuerier and References manage facet ranges (for now via a manual process here and above).
-                // TODO Optimize the process to get from/to of a facet range.
-                // TODO Move to FacetSelectRange?
-                if ($isFacetRange) {
-                    $activeFacets = $this->query->getActiveFacet($facetField);
-                    $facetRangeFrom = $activeFacets['from'] ?? null;
-                    $facetRangeTo = $activeFacets['to'] ?? null;
-                    if (!is_null($facetRangeFrom) || !is_null($facetRangeTo)) {
-                        foreach ($facetCountsByField[$facetField] as $facetValue => &$facetValueData) {
-                            if ($facetValue === $facetRangeFrom) {
-                                $facetValueData['from'] = true;
-                            }
-                            if ($facetValue === $facetRangeTo) {
-                                $facetValueData['to'] = true;
-                            }
-                        }
-                        unset($facetValueData);
                     }
                 }
             }

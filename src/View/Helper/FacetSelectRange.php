@@ -10,14 +10,14 @@ class FacetSelectRange extends AbstractFacet
     {
         $isFacetModeDirect = ($options['mode'] ?? '') === 'link';
 
-        // TODO Useless: already available via the query. And better from the query, because it can manage discrete range.
-        // Get values "from" and "to", if any.
-        $rangeFroms = array_column($facetValues, 'from', 'value');
-        $rangeFrom = reset($rangeFroms);
-        $rangeFrom = $rangeFrom === false || $rangeFrom === '' ? null : key($rangeFroms);
-        $rangeTos = array_column($facetValues, 'to', 'value');
-        $rangeTo = reset($rangeTos);
-        $rangeTo = $rangeTo === false || $rangeTo === '' ? null : key($rangeTos);
+        // It is simpler and better to get from/to from the query, because it
+        // can manage discrete range.
+        $rangeFrom = isset($this->queryBase['facet'][$facetField]['from']) && $this->queryBase['facet'][$facetField]['from'] !== ''
+            ? $this->queryBase['facet'][$facetField]['from']
+            : null;
+        $rangeTo = isset($this->queryBase['facet'][$facetField]['to']) && $this->queryBase['facet'][$facetField]['to'] !== ''
+            ? $this->queryBase['facet'][$facetField]['to']
+            : null;
 
         $hasRangeFromOnly = !is_null($rangeFrom) && is_null($rangeTo);
         $hasRangeToOnly = is_null($rangeFrom) && !is_null($rangeTo);

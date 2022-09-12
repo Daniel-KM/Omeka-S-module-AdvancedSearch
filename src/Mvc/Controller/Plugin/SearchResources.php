@@ -328,6 +328,8 @@ class SearchResources extends AbstractPlugin
                 }
             } elseif ($key === 'property') {
                 if (is_array($value)) {
+                    // Short properties allows to prepare optimization.
+                    $shortProperties = [];
                     foreach ($query['property'] as $k => $queryRow) {
                         if (!is_array($queryRow)
                             || empty($queryRow['type'])
@@ -372,7 +374,24 @@ class SearchResources extends AbstractPlugin
                         if (is_array($queryRow['property'])) {
                             $query['property'][$k]['property'] = array_unique($query['property'][$k]['property']);
                         }
+                        if (in_array($query['property'][$k]['type'], ['eq', 'list'])) {
+                            // TODO Manage the case where the property is numeric or term (simplify above instead of in the process below).
+                            $queryRowProperty = is_array($queryRow['property']) ? implode(',', $queryRow['property']) : $queryRow['property'];
+                            $short = $queryRowProperty . '/' . $queryRow['type'] . '/' . ($queryRow['joiner'] ?? 'and');
+                            if (isset($shortProperties[$short])) {
+                                ++$shortProperties[$short]['total'];
+                            } else {
+                                $shortProperties[$short]['property_string'] = $queryRowProperty;
+                                $shortProperties[$short]['property'] = $queryRow['property'];
+                                $shortProperties[$short]['type'] = $queryRow['type'];
+                                $shortProperties[$short]['joiner'] = $queryRow['joiner'];
+                                $shortProperties[$short]['total'] = 1;
+                            }
+                            $shortProperties[$short]['keys'][] = $k;
+                            $shortProperties[$short]['texts'][] = $queryRow['text'];
+                        }
                     }
+                    $query = $this->optimizeQueryProperty($query, $shortProperties);
                 } else {
                     unset($query['property']);
                 }
@@ -481,6 +500,48 @@ class SearchResources extends AbstractPlugin
                 } else {
                     unset($query['numeric']);
                 }
+            }
+        }
+
+        return $query;
+    }
+
+    /**
+     * Helper to optimize query for properties.
+     */
+    protected function optimizeQueryProperty(array $query, array $shortProperties): array
+    {
+        if (!count($shortProperties) || count($query['property']) <= 1) {
+            return $query;
+        }
+
+        // Replace multiple "subject = x OR subject = y" by "subject in list [x, y]".
+        // On a base > 10000 items and more than three or four subjects with OR,
+        // mysql never ends request. The point is managed for AND too, even if
+        // it less slow.
+        foreach ($shortProperties as $shortProperty) {
+            if ($shortProperty['total'] < 2 || $shortProperty['type'] !== 'eq') {
+                continue;
+            }
+            $shortList = $shortProperty['property_string'] . '/list/' . $shortProperty['joiner'];
+            if (isset($shortProperties[$shortList])) {
+                // TODO Replace multiple "subject in list [x] OR subject in list [y]" by "subject in list [x, y]" first (but rare).
+                // if (count($shortProperties[$shortList]['keys']) > 1) {}
+                reset($shortProperties[$shortList]['keys']);
+                $kShortList = key($shortProperties[$shortList]['keys']);
+            } else {
+                $query['property'][] = [
+                    'property' => $shortProperty['property'],
+                    'type' => 'list',
+                    'joiner' => $shortProperty['joiner'],
+                    'text' => [],
+                ];
+                end($query['property']);
+                $kShortList = key($query['property']);
+            }
+            $query['property'][$kShortList]['text'] = $shortProperty['texts'];
+            foreach ($shortProperty['keys'] as $shortPropertyKey) {
+                unset($query['property'][$shortPropertyKey]);
             }
         }
 

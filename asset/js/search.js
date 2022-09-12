@@ -214,7 +214,7 @@ $(document).ready(function() {
     });
 
     $('.search-facets').on('change', 'select', function() {
-        if (!$('.apply-facets').length) {
+        if (!$('#apply-facets').length) {
             // Replace the current select args by new ones.
             // Names in facets have no index in array ("[]").
             let url = new URL(window.location.href);

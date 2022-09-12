@@ -779,13 +779,13 @@ class SearchResources extends AbstractPlugin
      *   - nlex: is not a linked resource
      *   - lres: is linked with resource #id
      *   - nlres: is not linked with resource #id
-     *   For date time only for now (a check is done to have a meaningful answer):
-     *   TODO Remove the check for valid date time? Add another key (before/after)?
-     *   Of course, it's better to use Numeric Data Types.
-     *   - gt: greater than (after)
+     *   Comparisons
+     *   Warning: Comparisons are mysql comparisons, so alphabetic ones.
+     *   TODO Add specific types to compare date and time (probably useless: use module NumericDataTypes).
+     *   - gt: greater than
      *   - gte: greater than or equal
      *   - lte: lower than or equal
-     *   - lt: lower than (before)
+     *   - lt: lower than
      *
      * @param QueryBuilder $qb
      * @param array $query
@@ -1093,48 +1093,28 @@ class SearchResources extends AbstractPlugin
 
                 // TODO Manage uri and resources with gt, gte, lte, lt (it has a meaning at least for resource ids, but separate).
                 case 'gt':
-                    $valueNorm = $this->getDateTimeFromValue($value, false);
-                    if (is_null($valueNorm)) {
-                        $incorrectValue = true;
-                    } else {
-                        $predicateExpr = $expr->gt(
-                            "$valuesAlias.value",
-                            $this->adapter->createNamedParameter($qb, $valueNorm)
-                        );
-                    }
+                    $predicateExpr = $expr->gt(
+                        "$valuesAlias.value",
+                        $this->adapter->createNamedParameter($qb, $value)
+                    );
                     break;
                 case 'gte':
-                    $valueNorm = $this->getDateTimeFromValue($value, true);
-                    if (is_null($valueNorm)) {
-                        $incorrectValue = true;
-                    } else {
-                        $predicateExpr = $expr->gte(
-                            "$valuesAlias.value",
-                            $this->adapter->createNamedParameter($qb, $valueNorm)
-                        );
-                    }
+                    $predicateExpr = $expr->gte(
+                        "$valuesAlias.value",
+                        $this->adapter->createNamedParameter($qb, $value)
+                    );
                     break;
                 case 'lte':
-                    $valueNorm = $this->getDateTimeFromValue($value, false);
-                    if (is_null($valueNorm)) {
-                        $incorrectValue = true;
-                    } else {
-                        $predicateExpr = $expr->lte(
-                            "$valuesAlias.value",
-                            $this->adapter->createNamedParameter($qb, $valueNorm)
-                        );
-                    }
+                    $predicateExpr = $expr->lte(
+                        "$valuesAlias.value",
+                        $this->adapter->createNamedParameter($qb, $value)
+                    );
                     break;
                 case 'lt':
-                    $valueNorm = $this->getDateTimeFromValue($value, true);
-                    if (is_null($valueNorm)) {
-                        $incorrectValue = true;
-                    } else {
-                        $predicateExpr = $expr->lt(
-                            "$valuesAlias.value",
-                            $this->adapter->createNamedParameter($qb, $valueNorm)
-                        );
-                    }
+                    $predicateExpr = $expr->lt(
+                        "$valuesAlias.value",
+                        $this->adapter->createNamedParameter($qb, $value)
+                    );
                     break;
 
                 default:

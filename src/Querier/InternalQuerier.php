@@ -548,6 +548,7 @@ SQL;
      * @todo Make core search properties groupable ("or" inside a group, "and" between group).
      *
      * Note: when a facet is selected, it is managed like a filter.
+     * For facet ranges, filters are managed as lower than / greater than.
      */
     protected function filterQuery(): void
     {
@@ -559,7 +560,7 @@ SQL;
         $this->filterQueryValues($this->query->getActiveFacets(), true);
     }
 
-    protected function filterQueryValues(array $filters, bool $inList = false): void
+    protected function filterQueryValues(array $filters, bool $inListForFacets = false): void
     {
         $multifields = $this->engine->settingAdapter('multifields', []);
 
@@ -638,13 +639,34 @@ SQL;
                         break;
                     }
                     // "In list" is used for facets.
-                    if ($inList) {
-                        $this->args['property'][] = [
-                            'joiner' => 'and',
-                            'property' => $field,
-                            'type' => 'list',
-                            'text' => $flatArray($values),
-                        ];
+                    if ($inListForFacets) {
+                        $firstKey = key($values);
+                        // Check for a facet range.
+                        if (count($values) <= 2 && ($firstKey === 'from' || $firstKey === 'to')) {
+                            if (isset($values['from']) && $values['from'] !== '') {
+                                $this->args['property'][] = [
+                                    'joiner' => 'and',
+                                    'property' => $field,
+                                    'type' => 'gte',
+                                    'text' => $values['from'],
+                                ];
+                            }
+                            if (isset($values['to']) && $values['to'] !== '') {
+                                $this->args['property'][] = [
+                                    'joiner' => 'and',
+                                    'property' => $field,
+                                    'type' => 'lte',
+                                    'text' => $values['to'],
+                                ];
+                            }
+                        } else {
+                            $this->args['property'][] = [
+                                'joiner' => 'and',
+                                'property' => $field,
+                                'type' => 'list',
+                                'text' => $flatArray($values),
+                            ];
+                        }
                         break;
                     }
                     foreach ($values as $value) {
@@ -791,10 +813,12 @@ SQL;
         /** @var \Reference\Mvc\Controller\Plugin\References $references */
         $references = $this->services->get('ControllerPluginManager')->get('references');
 
-        $facetFields = $this->query->getFacetFields();
+        // @deprecated Will be removed in a future version.
         $facetLimit = $this->query->getFacetLimit();
         $facetOrder = $this->query->getFacetOrder();
         $facetLanguages = $this->query->getFacetLanguages();
+        // $facetFields = $this->query->getFacetFields();
+        $facets = $this->query->getFacets();
 
         $metadataFieldsToNames = [
             'resource_name' => 'resource_type',
@@ -811,7 +835,7 @@ SQL;
         // Normalize search query keys as omeka keys for items and item sets.
         $multifields = $this->engine->settingAdapter('multifields', []);
         $fields = [];
-        foreach ($facetFields as $facetField) {
+        foreach ($facets as $facetField => $facetData) {
             $fields[$facetField] = $metadataFieldsToNames[$facetField]
                 ?? $this->getPropertyTerms($facetField)
                 ?? $multifields[$facetField]['fields']
@@ -821,7 +845,7 @@ SQL;
         // Facet counts don't make a distinction by resource type, so they
         // should be merged here. This is needed as long as there is no single
         // query for resource (items and item sets together).
-        $facetCountsByField = array_fill_keys($facetFields, []);
+        $facetCountsByField = array_fill_keys(array_keys($facets), []);
 
         $facetData = $this->argsWithoutActiveFacets;
 
@@ -848,6 +872,7 @@ SQL;
         }
 
         foreach ($this->resourceTypes as $resourceType) {
+            // Default options.
             $options = [
                 'resource_name' => $resourceType,
                 // Options sql.
@@ -870,13 +895,33 @@ SQL;
                 'output' => 'associative',
             ];
 
+            // TODO Make References manages individual options for each field (limit, order, languages, range).
             $values = $references
                 ->setMetadata($fields)
                 ->setQuery($facetData)
                 ->setOptions($options)
                 ->list();
 
+            // For facet ranges, the limit and order should be removed.
+            // TODO Add an individual sort_by for numeric facet ranges (currently "alphabetic", that works fine only for years).
+            $optionsFacetRange = $options;
+            $optionsFacetRange['per_page'] = 0;
+            $optionsFacetRange['sort_by'] = 'alphabetic';
+            $optionsFacetRange['sort_order'] = 'asc';
+
+            // TODO Manage range facets.
             foreach (array_keys($fields) as $facetField) {
+                $isFacetRange = $facets[$facetField]['type'] === 'SelectRange';
+                // Like Solr, get all facet values, so all existing values.
+                /** @see https://solr.apache.org/guide/solr/latest/query-guide/faceting.html */
+                if ($isFacetRange) {
+                    // TODO Remove this double query for facet range when individual options will be managed.
+                    $values = $references
+                        ->setMetadata([$fields[$facetField]])
+                        ->setQuery($facetData)
+                        ->setOptions($optionsFacetRange)
+                        ->list();
+                }
                 foreach ($values[$facetField]['o:references'] ?? [] as $value => $count) {
                     if (empty($facetCountsByField[$facetField][$value])) {
                         $facetCountsByField[$facetField][$value] = [
@@ -888,6 +933,25 @@ SQL;
                             'value' => $value,
                             'count' => $count + $facetCountsByField[$facetField][$value]['count'],
                         ];
+                    }
+                }
+                // TODO Make InternalQuerier and References manage facet ranges (for now via a manual process here and above).
+                // TODO Optimize the process to get from/to of a facet range.
+                // TODO Move to FacetSelectRange?
+                if ($isFacetRange) {
+                    $activeFacets = $this->query->getActiveFacet($facetField);
+                    $facetRangeFrom = $activeFacets['from'] ?? null;
+                    $facetRangeTo = $activeFacets['to'] ?? null;
+                    if (!is_null($facetRangeFrom) || !is_null($facetRangeTo)) {
+                        foreach ($facetCountsByField[$facetField] as $facetValue => &$facetValueData) {
+                            if ($facetValue === $facetRangeFrom) {
+                                $facetValueData['from'] = true;
+                            }
+                            if ($facetValue === $facetRangeTo) {
+                                $facetValueData['to'] = true;
+                            }
+                        }
+                        unset($facetValueData);
                     }
                 }
             }

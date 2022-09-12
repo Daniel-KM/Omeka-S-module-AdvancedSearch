@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 
 /*
- * Copyright Daniel Berthereau, 2019-2021
+ * Copyright Daniel Berthereau, 2019-2022
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -272,8 +272,26 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                         continue 2;
                     }
                     foreach ($value as $facetName => $facetValues) {
-                        foreach ($facetValues as $facetValue) {
-                            $query->addActiveFacet($facetName, $facetValue);
+                        $firstFacetKey = key($facetValues);
+                        if ($firstFacetKey === 'from' || $firstFacetKey === 'to') {
+                            // Reorder early when needed.
+                            // TODO Move to Query?
+                            $facetRangeFrom = isset($facetValues['from']) && $facetValues['from'] !== ''
+                                ? $facetValues['from']
+                                : null;
+                            $facetRangeTo = isset($facetValues['to']) && $facetValues['to'] !== ''
+                                ? $facetValues['to']
+                                : null;
+                            if (!is_null($facetRangeFrom) && !is_null($facetRangeTo) && ($facetRangeFrom <=> $facetRangeTo) > 0) {
+                                $facetRangeFromFrom = $facetRangeFrom;
+                                $facetRangeFrom = $facetRangeTo;
+                                $facetRangeTo = $facetRangeFromFrom;
+                            }
+                            $query->addActiveFacetRange($facetName, $facetRangeFrom, $facetRangeTo);
+                        } else {
+                            foreach ($facetValues as $facetValue) {
+                                $query->addActiveFacet($facetName, $facetValue);
+                            }
                         }
                     }
                     break;

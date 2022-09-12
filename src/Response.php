@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2018-2021
+ * Copyright Daniel Berthereau, 2018-2022
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -76,6 +76,9 @@ class Response implements \JsonSerializable
     protected $allResouceIdsByResourceType = [];
 
     /**
+     * Active facets are a list of selected facet values by facet.
+     * For range facets, the list is a two keys array with "from" and "to".
+     *
      * @var array
      */
     protected $activeFacets = [];
@@ -306,7 +309,14 @@ class Response implements \JsonSerializable
      */
     public function setActiveFacets(array $activeFacetsByName): self
     {
+        // Clean keys to simplify merge and other methods.
         $this->activeFacets = array_map(function ($v) {
+            if (array_key_exists('from', $v) || array_key_exists('to', $v)) {
+                return [
+                    'from' => $v['from'] ?? null,
+                    'to' => $v['to'] ?? null,
+                ];
+            }
             return array_values(array_unique($v));
         }, $activeFacetsByName);
         return $this;
@@ -317,10 +327,17 @@ class Response implements \JsonSerializable
      */
     public function addActiveFacets(string $name, array $activeFacets): self
     {
-        $this->activeFacets[$name] = isset($this->activeFacets[$name])
-            ? array_merge($this->activeFacets[$name], array_values($activeFacets))
-            : array_values($activeFacets);
-        $this->activeFacets[$name] = array_values(array_unique($this->activeFacets[$name]));
+        if (array_key_exists('from', $activeFacets) || array_key_exists('to', $activeFacets)) {
+            $this->activeFacets[$name] = [
+                'from' => $activeFacets['from'] ?? null,
+                'to' => $activeFacets['to'] ?? null,
+            ];
+        } else {
+            $this->activeFacets[$name] = isset($this->activeFacets[$name])
+                ? array_merge($this->activeFacets[$name], array_values($activeFacets))
+                : array_values($activeFacets);
+            $this->activeFacets[$name] = array_values(array_unique($this->activeFacets[$name]));
+        }
         return $this;
     }
 
@@ -331,6 +348,20 @@ class Response implements \JsonSerializable
     {
         $this->activeFacets[$name][] = $activeFacet;
         $this->activeFacets[$name] = array_values(array_unique($this->activeFacets[$name]));
+        return $this;
+    }
+
+    /**
+     * Add an active facet for a name.
+     */
+    public function addActiveFacetRange(string $name, ?string $from, ?string $to): self
+    {
+        if (!is_null($from) && !is_null($to)) {
+            $this->activeFacets[$name] = [
+                'from' => $from,
+                'to' => $to,
+            ];
+        }
         return $this;
     }
 
@@ -348,6 +379,7 @@ class Response implements \JsonSerializable
      * Store a list of counts for all facets of all resources.
      *
      * @param array $facetCountsByField Counts by facet, with keys "value" and "count".
+     * May contain "from" and "to" for facet range.
      */
     public function setFacetCounts(array $facetCountsByField): self
     {

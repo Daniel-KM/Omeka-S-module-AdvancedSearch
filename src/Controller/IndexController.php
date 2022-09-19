@@ -101,17 +101,20 @@ class IndexController extends AbstractActionController
             switch ($defaultResults) {
                 case 'none':
                     $defaultQuery = '';
+                    $defaultQueryPost = '';
                     break;
                 case 'query':
                     $defaultQuery = $searchConfig->subSetting('search', 'default_query') ?: '';
+                    $defaultQueryPost = $searchConfig->subSetting('search', 'default_query_post') ?: '';
                     break;
                 case 'default':
                 default:
                     // "*" means the default query managed by the search engine.
                     $defaultQuery = '*';
+                    $defaultQueryPost = $searchConfig->subSetting('search', 'default_query_post') ?: '';
                     break;
             }
-            if ($defaultQuery === '') {
+            if ($defaultQuery === '' && $defaultQueryPost === '') {
                 if ($isJsonQuery) {
                     return new JsonModel([
                         'status' => 'error',
@@ -121,10 +124,17 @@ class IndexController extends AbstractActionController
                 return $view;
             }
             $parsedQuery = [];
-            parse_str($defaultQuery, $parsedQuery);
+            if ($defaultQuery) {
+                parse_str($defaultQuery, $parsedQuery);
+            }
+            $parsedQueryPost = [];
+            if ($defaultQueryPost) {
+                parse_str($defaultQueryPost, $parsedQueryPost);
+            }
             // Keep the other arguments of the request (mainly pagination, sort,
-            // and facets).
-            $request = $parsedQuery + $request;
+            // and facets), but append default args if not set in request.
+            // It allows user to sort the default query.
+            $request = $parsedQuery + $request + $parsedQueryPost;
         }
 
         $result = $this->searchRequestToResponse($request, $searchConfig, $site);

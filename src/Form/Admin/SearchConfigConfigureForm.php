@@ -106,11 +106,22 @@ class SearchConfigConfigureForm extends Form
                 ],
             ])
             ->add([
+                'name' => 'default_query_post',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Complementary default query', // @translate
+                    'info' => 'Mainly used to specify a default sort when request is empty, but other args are possible (default pagination, selected facets…).', // @translated
+                ],
+                'attributes' => [
+                    'id' => 'default_query_post',
+                ],
+            ])
+            ->add([
                 'name' => 'hidden_query_filters',
                 'type' => AdvancedSearchElement\UrlQuery::class,
                 'options' => [
                     'label' => 'Hidden query filter to limit results', // @translate
-                    info => 'These args are appended to all queries. The format of the query depends on the search form and the search engine.', // @translated
+                    'info' => 'These args are appended to all queries. The format of the query depends on the search form and the search engine.', // @translated
                 ],
                 'attributes' => [
                     'id' => 'hidden_query_filters',

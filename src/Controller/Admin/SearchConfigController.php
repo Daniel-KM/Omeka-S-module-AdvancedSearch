@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016-2017
- * Copyright Daniel Berthereau, 2018-2021
+ * Copyright Daniel Berthereau, 2018-2022
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -490,6 +490,10 @@ class SearchConfigController extends AbstractActionController
 
         if (isset($params['search']['default_query'])) {
             $params['search']['default_query'] = trim($params['search']['default_query'] ?? '', "? \t\n\r\0\x0B");
+        }
+
+        if (isset($params['search']['default_query_post'])) {
+            $params['search']['default_query_post'] = trim($params['search']['default_query_post'] ?? '', "? \t\n\r\0\x0B");
         }
 
         // Add a warning because it may be a hard to understand issue.

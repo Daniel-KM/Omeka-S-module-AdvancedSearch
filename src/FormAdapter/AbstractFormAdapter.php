@@ -29,6 +29,7 @@
 
 namespace AdvancedSearch\FormAdapter;
 
+use AdvancedSearch\Mvc\Controller\Plugin\SearchResources;
 use AdvancedSearch\Query;
 
 abstract class AbstractFormAdapter implements FormAdapterInterface
@@ -172,6 +173,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
 
                 case 'filter':
                     // The request filters are the advanced ones in the form settings.
+                    // The default query type is "in" (contains).
                     $joiner = null;
                     $operator = null;
                     foreach ($formSettings['filters'] as $filter) {
@@ -200,7 +202,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                             foreach ($value as $filter) {
                                 if (isset($filter['field']) && $checkAvailableField($filter['field'])) {
                                     $type = empty($filter['type']) ? 'in' : $filter['type'];
-                                    if (in_array($type, ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'lex', 'nlex'])) {
+                                    if (in_array($type, SearchResources::PROPERTY_QUERY['value_none'])) {
                                         $query->addFilterQuery($filter['field'], null, $type);
                                     } elseif (isset($filter['value']) && trim($filter['value']) !== '') {
                                         $query->addFilterQuery($filter['field'], $filter['value'], $type);
@@ -221,7 +223,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                             foreach ($value as $filter) {
                                 if (isset($filter['field']) && $checkAvailableField($filter['field'])) {
                                     $type = empty($filter['type']) ? 'in' : $filter['type'];
-                                    if (in_array($type, ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'lex', 'nlex'])) {
+                                    if (in_array($type, SearchResources::PROPERTY_QUERY['value_none'])) {
                                         $join = isset($filter['join']) && in_array($filter['join'], ['or', 'not']) ? $filter['join'] : 'and';
                                         $query->addFilterQuery($filter['field'], null, $type, $join);
                                     } elseif (isset($filter['value']) && trim($filter['value']) !== '') {

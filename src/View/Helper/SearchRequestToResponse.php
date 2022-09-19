@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace AdvancedSearch\View\Helper;
 
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
@@ -35,8 +36,7 @@ class SearchRequestToResponse extends AbstractHelper
         array $request,
         SearchConfigRepresentation $searchConfig,
         SiteRepresentation $site = null
-    ) {
-        $searchPlugin = $this->searchRequestToResponse;
-        return $searchPlugin($request, $searchConfig, $site);
+    ): array {
+        return $this->searchRequestToResponse->__invoke($request, $searchConfig, $site);
     }
 }

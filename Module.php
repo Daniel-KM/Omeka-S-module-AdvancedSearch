@@ -735,8 +735,12 @@ class Module extends AbstractModule
     /**
      * Filter search filters.
      *
+     * The search filter helper is overridden, so manage only the searching
+     * filters here.
+     *
      * @see \Omeka\View\Helper\SearchFilters
      * @see \AdvancedSearch\View\Helper\SearchFilters
+     *
      * @param Event $event
      */
     public function filterSearchFilters(Event $event): void

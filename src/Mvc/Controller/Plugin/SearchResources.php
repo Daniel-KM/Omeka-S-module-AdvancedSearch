@@ -48,6 +48,13 @@ class SearchResources extends AbstractPlugin
      */
     protected $usedResourceClassesByTerm;
 
+    /**
+     * Tables of all query types and their behaviors.
+     *
+     * May be used by other modules.
+     *
+     * @var array
+     */
     const PROPERTY_QUERY = [
         'reciprocal' => [
             'eq' => 'neq',
@@ -910,18 +917,31 @@ class SearchResources extends AbstractPlugin
                     continue;
                 }
             }
-            // The value should be a scalar in all other cases.
-            elseif (is_array($value) || !strlen((string) $value)) {
+            // The value should be scalar in all other cases (int or string).
+            elseif (is_array($value)) {
                 continue;
+            } else {
+                $value = trim((string) $value);
+                if (!strlen($value)) {
+                    continue;
+                }
+                if (in_array($queryType, self::PROPERTY_QUERY['value_integer'])) {
+                    if (!is_numeric($value)) {
+                        continue;
+                    }
+                    $value = (int) $value;
+                }
             }
 
             $joiner = $queryRow['joiner'] ?? '';
             $dataType = $queryRow['datatype'] ?? '';
 
-            // Invert the query type for joiner "not".
+            // Check joiner and invert the query type for joiner "not".
             if ($joiner === 'not') {
                 $joiner = 'and';
                 $queryType = self::PROPERTY_QUERY['reciprocal'][$queryType];
+            } elseif ($joiner && $joiner !== 'or') {
+                $joiner = 'and';
             }
 
             $valuesAlias = $this->adapter->createAlias();

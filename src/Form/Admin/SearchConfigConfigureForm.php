@@ -99,7 +99,7 @@ class SearchConfigConfigureForm extends Form
                 'type' => Element\Text::class,
                 'options' => [
                     'label' => 'Default query', // @translate
-                    'default' => 'The format of the query depends on the search form and the search engine.', // @translated
+                    'info' => 'The format of the query depends on the search form and the search engine.', // @translated
                 ],
                 'attributes' => [
                     'id' => 'default_query',
@@ -110,7 +110,7 @@ class SearchConfigConfigureForm extends Form
                 'type' => AdvancedSearchElement\UrlQuery::class,
                 'options' => [
                     'label' => 'Hidden query filter to limit results', // @translate
-                    'default' => 'These args are appended to all queries. The format of the query depends on the search form and the search engine.', // @translated
+                    info => 'These args are appended to all queries. The format of the query depends on the search form and the search engine.', // @translated
                 ],
                 'attributes' => [
                     'id' => 'hidden_query_filters',

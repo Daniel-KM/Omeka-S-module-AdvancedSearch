@@ -76,10 +76,10 @@ class SearchRequestToResponse extends AbstractPlugin
 
         $searchFormSettings = $searchConfigSettings['form'] ?? [];
 
-        $searchEngine = $searchConfig->engine();
-        $searchAdapter = $searchEngine ? $searchEngine->adapter() : null;
+        $this->searchEngine = $searchConfig->engine();
+        $searchAdapter = $this->searchEngine ? $this->searchEngine->adapter() : null;
         if ($searchAdapter) {
-            $availableFields = $searchAdapter->setSearchEngine($searchEngine)->getAvailableFields();
+            $availableFields = $searchAdapter->setSearchEngine($this->searchEngine)->getAvailableFields();
             // Include the specific fields to simplify querying with main form.
             $searchFormSettings['available_fields'] = $availableFields;
             $specialFieldsToInputFields = [
@@ -136,7 +136,6 @@ class SearchRequestToResponse extends AbstractPlugin
 
         // Add global parameters.
 
-        $this->searchEngine = $searchConfig->engine();
         $engineSettings = $this->searchEngine->settings();
 
         $user = $plugins->get('identity')();

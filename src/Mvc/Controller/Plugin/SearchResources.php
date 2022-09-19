@@ -413,7 +413,7 @@ class SearchResources extends AbstractPlugin
                                 $shortProperties[$short]['property_string'] = $queryRowProperty;
                                 $shortProperties[$short]['property'] = $queryRow['property'];
                                 $shortProperties[$short]['type'] = $queryRow['type'];
-                                $shortProperties[$short]['joiner'] = $queryRow['joiner'];
+                                $shortProperties[$short]['joiner'] = $queryRow['joiner'] ?? 'and';
                                 $shortProperties[$short]['total'] = 1;
                             }
                             $shortProperties[$short]['keys'][] = $k;

@@ -25,13 +25,14 @@ $this->form->setButtonLabel($translate('Confirm reindex'));
         <h3><?= sprintf($translate('Reindex "%s"'), $resource->name()) ?></h3>
         <p><?= $translate('Are you sure you would like to reindex this index?') ?></p>
         <p>
-        <?= $translate('All the indexes will be cleared first, so the search will be unavailable for a while.') ?>
-        <?= $translate('You may redirect the users to a clone of the current index temporary.') ?>
+        <?= $translate('Set "1" to reindex all resources without clearing the current index.') ?>
+        <?= $translate('It avoids interruption in the search page, but in rare cases, it may keep indexes of deleted resources that were not removed.') ?>
+        <?= $translate('Set a greater resource id to reindex resources starting this resource id.') ?>
         </p>
         <p>
-        <?= $translate('You may prefer to keep existing indexes and to start the indexing at the following resource id.') ?>
-        <?= $translate('Set "1" to reindex all resources without clearing the current index.') ?>
-        <input name="start_resource_id" placeholder="0" value="" min="0" type="number" form="confirmform" />
+        <?= $translate('With "0", the full index will be cleared first, so the search will be unavailable for a while.') ?>
+        <?= $translate('You may redirect the users to a clone of the current index temporary.') ?>
+        <input name="start_resource_id" placeholder="0" value="1" min="0" type="number" form="confirmform" />
         </p>
         <p>
         <?= $translate('You may want to limit the reindexing to a resource type.') ?>

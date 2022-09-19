@@ -31,7 +31,7 @@ $this->form->setButtonLabel($translate('Confirm reindex'));
         <p>
         <?= $translate('You may prefer to keep existing indexes and to start the indexing at the following resource id.') ?>
         <?= $translate('Set "1" to reindex all resources without clearing the current index.') ?>
-        <input name="start_resource_id" placeholder="0" value="" type="number" form="confirmform" />
+        <input name="start_resource_id" placeholder="0" value="" min="0" type="number" form="confirmform" />
         </p>
         <p>
         <?= $translate('You may want to limit the reindexing to a resource type.') ?>

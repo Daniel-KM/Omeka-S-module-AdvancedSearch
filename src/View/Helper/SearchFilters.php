@@ -16,6 +16,8 @@ use Omeka\Api\Exception\NotFoundException;
  */
 class SearchFilters extends AbstractHelper
 {
+    use SearchFiltersTrait;
+
     /**
      * The default partial view script.
      */
@@ -60,49 +62,6 @@ class SearchFilters extends AbstractHelper
             $this->query['__searchConfig'],
             $this->query['__searchQuery']
         );
-
-        $queryTypes = [
-            'eq' => $translate('is exactly'), // @translate
-            'neq' => $translate('is not exactly'), // @translate
-            'in' => $translate('contains'), // @translate
-            'nin' => $translate('does not contain'), // @translate
-            'ex' => $translate('has any value'), // @translate
-            'nex' => $translate('has no values'), // @translate
-            'exs' => $translate('has a single value'), // @translate
-            'nexs' => $translate('has not a single value'), // @translate
-            'exm' => $translate('has multiple values'), // @translate
-            'nexm' => $translate('has not multiple values'), // @translate
-            'list' => $translate('is in list'), // @translate
-            'nlist' => $translate('is not in list'), // @translate
-            'sw' => $translate('starts with'), // @translate
-            'nsw' => $translate('does not start with'), // @translate
-            'ew' => $translate('ends with'), // @translate
-            'new' => $translate('does not end with'), // @translate
-            // 'res' => $translate('is resource with ID'), // @translate
-            // 'nres' => $translate('is not resource with ID'), // @translate
-            'res' => $translate('is'), // @translate
-            'nres' => $translate('is not'), // @translate
-            'lex' => $translate('is a linked resource'), // @translate
-            'nlex' => $translate('is not a linked resource'), // @translate
-            // 'lres' => $translate('is linked with resource with ID'), // @translate
-            // 'nlres' => $translate('is not linked with resource with ID'), // @translate
-            'lres' => $translate('is linked with'), // @translate
-            'nlres' => $translate('is not linked with'), // @translate
-            'tp' => $translate('has main type'), // @translate
-            'ntp' => $translate('has not main type'), // @translate
-            'tpl' => $translate('has type literal-like'), // @translate
-            'ntpl' => $translate('has not type literal-like'), // @translate
-            'tpr' => $translate('has type resource-like'), // @translate
-            'ntpr' => $translate('has not type resource-like'), // @translate
-            'tpu' => $translate('has type uri-like'), // @translate
-            'ntpu' => $translate('has not type uri-like'), // @translate
-            'dtp' => $translate('has data type'), // @translate
-            'ndtp' => $translate('has not data type'), // @translate
-            'gt' => $translate('greater than'), // @translate
-            'gte' => $translate('greater than or equal'), // @translate
-            'lte' => $translate('lower than or equal'), // @translate
-            'lt' => $translate('lower than'), // @translate
-        ];
 
         // This function fixes some forms that add an array level.
         // This function manages only one level, so check value when needed.
@@ -156,6 +115,7 @@ class SearchFilters extends AbstractHelper
 
                 // Search values (by property or all)
                 case 'property':
+                    $queryTypesLabels = $this->getQueryTypesLabels();
                     $easyMeta = $plugins->get('easyMeta');
                     // TODO The array may be more than zero when firsts are standard (see core too for inverse).
                     $index = 0;
@@ -198,7 +158,7 @@ class SearchFilters extends AbstractHelper
                         }
                         $filterLabel = $noValue
                             ? $propertyLabel
-                            : ($propertyLabel . ' ' . $queryTypes[$queryType]);
+                            : ($propertyLabel . ' ' . $queryTypesLabels[$queryType]);
                         if ($index > 0) {
                             if ($joiner === 'or') {
                                 $filterLabel = $translate('OR') . ' ' . $filterLabel;
@@ -209,7 +169,7 @@ class SearchFilters extends AbstractHelper
                             }
                         }
                         $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $noValue
-                            ? $queryTypes[$queryType]
+                            ? $queryTypesLabels[$queryType]
                             : implode(', ', $flatArray($value));
                         ++$index;
                     }

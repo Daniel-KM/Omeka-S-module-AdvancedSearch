@@ -94,6 +94,7 @@ alphabetic ones. They works for string and four digit years and standard dates,
 not for numbers nor variable dates.
 
 Furthermore:
+
 - search in multiple properties at a time, for example `dcterms:creator or dcterms:contributor are equal to value "Anonymous"`.
 - search resources without without template, class, item set, site and owner.
   This feature is included directly in the advanced search form in each select.
@@ -228,19 +229,19 @@ your data.
 A search form may have many parameters. They don't need to be all filled.
 
 - Configuration of the search engine
-  - main params
-  - indexer
-  - querier
+    - main params
+    - indexer
+    - querier
 - Before the query
-  - main querier
-  - autosuggestion
-  - filters
-  - advanced search form
+    - main querier
+    - autosuggestion
+    - filters
+    - advanced search form
 - After the query
-  - results display
-  - pagination
-  - sort
-  - facets
+    - results display
+    - pagination
+    - sort
+    - facets
 
 Some features are complex, so they have their own config form (autosuggestion
 for now, and, in a future version, advanced form and facets).

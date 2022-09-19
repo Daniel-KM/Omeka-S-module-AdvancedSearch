@@ -387,13 +387,15 @@ class SearchingFilters extends AbstractHelper
                     // else, included searchFilters helper.
                     if (isset($fieldLabels[$key]) && !isset($filters[$fieldLabels[$key]])) {
                         if (is_array($value) && (array_key_exists('from', $value) || array_key_exists('to', $value))) {
+                            $valueFrom = $value['from'] ?? '';
+                            $valueTo = $value['to'] ?? '';
                             $filterLabel = $fieldLabels[$key];
-                            if (array_key_exists('from', $value) && array_key_exists('to', $value)) {
-                                $filters[$filterLabel][$this->urlQuery($key)] = sprintf($translate('from %s to %s'), $value['from'], $value['to']); // @translate
-                            } elseif (array_key_exists('from', $value)) {
-                                $filters[$filterLabel][$this->urlQuery($key)] = sprintf($translate('since %s'), $value['from']); // @translate
-                            } elseif (array_key_exists('to', $value)) {
-                                $filters[$filterLabel][$this->urlQuery($key)] = sprintf($translate('until %s'), $value['to']); // @translate
+                            if ($valueFrom !== '' && $valueTo !== '') {
+                                $filters[$filterLabel][$this->urlQuery($key)] = sprintf($translate('from %s to %s'), $valueFrom, $valueTo);// @translate
+                            } elseif ($valueFrom !== '') {
+                                $filters[$filterLabel][$this->urlQuery($key)] = sprintf($translate('since %s'), $valueFrom); // @translate
+                            } elseif ($valueTo !== '') {
+                                $filters[$filterLabel][$this->urlQuery($key)] = sprintf($translate('until %s'), $valueTo); // @translate
                             }
                             break;
                         }

@@ -94,6 +94,24 @@ class SearchResources extends AbstractPlugin
             'lte' => 'gt',
             'lt' => 'gte',
         ],
+        'negative' => [
+            'neq',
+            'nin',
+            'nex',
+            'nexs',
+            'nexm',
+            'nlist',
+            'nsw',
+            'new',
+            'nres',
+            'ntp',
+            'ntpl',
+            'ntpr',
+            'ntpu',
+            'ndtp',
+            'nlex',
+            'nlres',
+        ],
         'value_array' => [
             'list',
             'nlist',
@@ -859,6 +877,10 @@ class SearchResources extends AbstractPlugin
      *   - gte: greater than or equal
      *   - lte: lower than or equal
      *   - lt: lower than
+     *
+     * Reserved for future implementation (already in Solr):
+     *   - ma: matches a simple regex
+     *   - nma: does not match a simple regex
      *
      * @param QueryBuilder $qb
      * @param array $query

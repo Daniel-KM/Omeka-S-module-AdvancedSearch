@@ -27,6 +27,8 @@ class SearchFilters extends AbstractHelper
     protected $baseUrl;
 
     /**
+     * The cleaned query.
+     *
      * @var array
      */
     protected $query;
@@ -96,10 +98,10 @@ class SearchFilters extends AbstractHelper
             'ntpu' => $translate('has not type uri-like'), // @translate
             'dtp' => $translate('has data type'), // @translate
             'ndtp' => $translate('has not data type'), // @translate
-            // 'gt' => $translate('greater than'), // @translate
-            // 'gte' => $translate('greater than or equal'), // @translate
-            // 'lte' => $translate('lower than or equal'), // @translate
-            // 'lt' => $translate('lower than'), // @translate
+            'gt' => $translate('greater than'), // @translate
+            'gte' => $translate('greater than or equal'), // @translate
+            'lte' => $translate('lower than or equal'), // @translate
+            'lt' => $translate('lower than'), // @translate
         ];
 
         // This function fixes some forms that add an array level.

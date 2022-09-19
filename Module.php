@@ -1035,7 +1035,8 @@ class Module extends AbstractModule
 
                     $index = 0;
                     foreach ($value as $subKey => $queryRow) {
-                        $queryType = $queryRow['type'] ?? 'eq';
+                        // Default query type is "in", unlike standard search.
+                        $queryType = $queryRow['type'] ?? 'in';
                         if (!isset(SearchResources::PROPERTY_QUERY['reciprocal'][$queryType])) {
                             continue;
                         }

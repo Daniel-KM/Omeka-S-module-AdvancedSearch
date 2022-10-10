@@ -400,18 +400,19 @@ class SearchResources extends AbstractPlugin
                             unset($query['property'][$k]);
                             continue;
                         }
-                        if (is_array($queryRow['property'])) {
+                        $queryRowProp = isset($queryRow['property']) ? $queryRow['property'] : null;
+                        if (is_array($queryRowProp)) {
                             $query['property'][$k]['property'] = array_unique($query['property'][$k]['property']);
                         }
                         if (in_array($query['property'][$k]['type'], ['eq', 'list', 'neq', 'nlist'])) {
                             // TODO Manage the case where the property is numeric or term (simplify above instead of in the process below).
-                            $queryRowProperty = is_array($queryRow['property']) ? implode(',', $queryRow['property']) : $queryRow['property'];
+                            $queryRowProperty = is_array($queryRowProp) ? implode(',', $queryRowProp) : $queryRowProp;
                             $short = $queryRowProperty . '/' . $queryRow['type'] . '/' . ($queryRow['joiner'] ?? 'and');
                             if (isset($shortProperties[$short])) {
                                 ++$shortProperties[$short]['total'];
                             } else {
                                 $shortProperties[$short]['property_string'] = $queryRowProperty;
-                                $shortProperties[$short]['property'] = $queryRow['property'];
+                                $shortProperties[$short]['property'] = $queryRowProp;
                                 $shortProperties[$short]['type'] = $queryRow['type'];
                                 $shortProperties[$short]['joiner'] = $queryRow['joiner'] ?? 'and';
                                 $shortProperties[$short]['total'] = 1;

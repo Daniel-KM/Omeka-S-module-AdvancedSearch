@@ -313,12 +313,15 @@ class SearchResources extends AbstractPlugin
     }
 
     /**
-     * The advanced search form returns all keys, so remove useless ones.
+     * Clear useless keys of a query.
+     *
+     * The advanced search form returns all keys, so clear useless ones and
+     * avoid to check them in many places.
+     *
+     * @todo Improve cleaning query.
      */
     public function cleanQuery(array $query): array
     {
-        // Clean simple useless fields to avoid useless checks in many places.
-        // TODO Clean property, numeric, dates, etc.
         foreach ($query as $key => $value) {
             if ($value === '' || $value === null || $value === []
                 || !$key || $key === 'submit' || $key === 'numeric-toggle-time-checkbox'
@@ -494,15 +497,23 @@ class SearchResources extends AbstractPlugin
                 }
             } elseif ($key === 'numeric') {
                 if (is_array($value)) {
+                    // Timestamp.
+                    if (empty($query['numeric']['ts']['gt']['pid']) && empty($query['numeric']['ts']['gt']['val'])) {
+                        unset($query['numeric']['ts']['gt']);
+                    }
+                    if (empty($query['numeric']['ts']['lt']['pid']) && empty($query['numeric']['ts']['lt']['val'])) {
+                        unset($query['numeric']['ts']['lt']);
+                    }
                     if (empty($query['numeric']['ts']['gte']['pid']) && empty($query['numeric']['ts']['gte']['val'])) {
                         unset($query['numeric']['ts']['gte']);
                     }
                     if (empty($query['numeric']['ts']['lte']['pid']) && empty($query['numeric']['ts']['lte']['val'])) {
                         unset($query['numeric']['ts']['lte']);
                     }
-                    if (empty($query['numeric']['ts']['gte']) && empty($query['numeric']['ts']['lte'])) {
+                    if (empty($query['numeric']['ts']['gt']) && empty($query['numeric']['ts']['lt']) && empty($query['numeric']['ts']['gte']) && empty($query['numeric']['ts']['lte'])) {
                         unset($query['numeric']['ts']);
                     }
+                    // Duration.
                     if (empty($query['numeric']['dur']['gt']['pid']) && empty($query['numeric']['dur']['gt']['val'])) {
                         unset($query['numeric']['dur']['gt']);
                     }
@@ -512,9 +523,11 @@ class SearchResources extends AbstractPlugin
                     if (empty($query['numeric']['dur']['gt']) && empty($query['numeric']['dur']['lt'])) {
                         unset($query['numeric']['dur']);
                     }
+                    // Interval.
                     if (empty($query['numeric']['ivl']['pid']) && empty($query['numeric']['ivl']['val'])) {
                         unset($query['numeric']['ivl']);
                     }
+                    // Integer.
                     if (empty($query['numeric']['int']['gt']['pid']) && empty($query['numeric']['int']['gt']['val'])) {
                         unset($query['numeric']['int']['gt']);
                     }
@@ -524,6 +537,7 @@ class SearchResources extends AbstractPlugin
                     if (empty($query['numeric']['int']['gt']) && empty($query['numeric']['int']['lt'])) {
                         unset($query['numeric']['int']);
                     }
+                    // Global.
                     if (empty($query['numeric'])) {
                         unset($query['numeric']);
                     }

@@ -34,9 +34,11 @@ class FormNote extends AbstractHelper
         }
 
         // It may use attributes, even if the text is empty.
-        $view = $this->getView();
+        $plugins = $this->getView()->getHelperPluginManager();
+        $translate = $plugins->get('translate');
+        $escape = $this->escapeHtmlHelper = $plugins->get('escapeHtml');
         return $this->openTag($element)
-            . $view->escapeHtml($view->translate($element->getOption('text')))
+            . $escape($translate($element->getOption('text')))
             . $this->closeTag();
     }
 

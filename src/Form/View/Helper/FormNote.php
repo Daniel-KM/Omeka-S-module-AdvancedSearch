@@ -8,6 +8,11 @@ use Laminas\Form\View\Helper\AbstractHelper;
 class FormNote extends AbstractHelper
 {
     /**
+     * @var string|null
+     */
+    protected $wrap = 'div';
+
+    /**
      * Generate a static text for a form.
      *
      * @see \Laminas\Form\View\Helper\FormLabel
@@ -28,18 +33,39 @@ class FormNote extends AbstractHelper
 
     public function render(ElementInterface $element)
     {
+        // For compatibility with other modules, options "html" and "text" are
+        // checked. Will be removed in Omeka S v4.
         $content = $element->getOption('html');
         if ($content) {
             return $content;
         }
+        $content = $element->getOption('text');
+        if (strlen((string) $content)) {
+            $isEscaped = false;
+            $this->wrap = 'p';
+        } else {
+            $content = $element->getContent();
+            $isEscaped = $element->getIsEscaped();
+            $this->wrap = $element->getWrap();
+            if (!$this->wrap && !strlen((string) $content)) {
+                return '';
+            }
+        }
 
-        // It may use attributes, even if the text is empty.
-        $plugins = $this->getView()->getHelperPluginManager();
-        $translate = $plugins->get('translate');
-        $escape = $this->escapeHtmlHelper = $plugins->get('escapeHtml');
-        return $this->openTag($element)
-            . $escape($translate($element->getOption('text')))
-            . $this->closeTag();
+        if (!$isEscaped) {
+            $plugins = $this->getView()->getHelperPluginManager();
+            $escape = $this->escapeHtmlHelper = $plugins->get('escapeHtml');
+            $translate = $plugins->get('translate');
+            $content = $escape($translate($content));
+        }
+
+        if ($this->wrap) {
+            return $this->openTag($element)
+                . $content
+                . $this->closeTag();
+        }
+
+        return $content;
     }
 
     /**
@@ -51,7 +77,7 @@ class FormNote extends AbstractHelper
     public function openTag($attributesOrElement = null)
     {
         if (empty($attributesOrElement)) {
-            return '<p>';
+            return '<' . $this->wrap . '>';
         }
 
         if (is_array($attributesOrElement)) {
@@ -60,7 +86,7 @@ class FormNote extends AbstractHelper
             if (!is_object($attributesOrElement)
                 || !($attributesOrElement instanceof ElementInterface)
             ) {
-                return '<p>';
+                return '<' . $this->wrap . '>';
             }
             $attributes = $attributesOrElement->getAttributes();
             if (is_object($attributes)) {
@@ -69,7 +95,7 @@ class FormNote extends AbstractHelper
         }
 
         $attributes = $this->createAttributesString($attributes);
-        return sprintf('<p %s>', $attributes);
+        return sprintf('<%s %s>', $this->wrap, $attributes);
     }
 
     /**
@@ -79,7 +105,7 @@ class FormNote extends AbstractHelper
      */
     public function closeTag()
     {
-        return '</p>';
+        return '</' . $this->wrap . '>';
     }
 
     /**

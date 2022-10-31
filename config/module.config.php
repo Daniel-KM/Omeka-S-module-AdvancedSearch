@@ -152,17 +152,6 @@ return [
             'Search\FormAdapterManager' => Service\FormAdapterManagerFactory::class,
         ],
     ],
-    'navigation' => [
-        'AdminModule' => [
-            'search' => [
-                'label' => 'Search manager', // @translate
-                'route' => 'admin/search',
-                'resource' => Controller\Admin\IndexController::class,
-                'privilege' => 'browse',
-                'class' => 'o-icon-search',
-            ],
-        ],
-    ],
     'navigation_links' => [
         'invokables' => [
             'search-page' => Site\Navigation\Link\SearchPage::class,
@@ -170,6 +159,7 @@ return [
     ],
     'router' => [
         'routes' => [
+            // TODO Include site routes here, not during bootstrap.
             'admin' => [
                 'child_routes' => [
                     // To simplify migration, the route is "search".
@@ -282,6 +272,17 @@ return [
                 'base_dir' => dirname(__DIR__) . '/language',
                 'pattern' => '%s.mo',
                 'text_domain' => null,
+            ],
+        ],
+    ],
+    'navigation' => [
+        'AdminModule' => [
+            'search' => [
+                'label' => 'Search manager', // @translate
+                'route' => 'admin/search',
+                'resource' => Controller\Admin\IndexController::class,
+                'privilege' => 'browse',
+                'class' => 'o-icon-search',
             ],
         ],
     ],

@@ -584,6 +584,38 @@ class Module extends AbstractModule
                                 ],
                             ],
                         ],
+                        'atom' => [
+                            'type' => \Laminas\Router\Http\Literal::class,
+                            'options' => [
+                                'route' => '/atom',
+                                'defaults' => [
+                                    '__NAMESPACE__' => 'AdvancedSearch\Controller',
+                                    '__SITE__' => true,
+                                    'controller' => \AdvancedSearch\Controller\IndexController::class,
+                                    'action' => 'rss',
+                                    'feed' => 'atom',
+                                    'id' => $searchConfigId,
+                                    // Store the page slug to simplify checks.
+                                    'page-slug' => $searchConfigSlug,
+                                ],
+                            ],
+                        ],
+                        'rss' => [
+                            'type' => \Laminas\Router\Http\Literal::class,
+                            'options' => [
+                                'route' => '/rss',
+                                'defaults' => [
+                                    '__NAMESPACE__' => 'AdvancedSearch\Controller',
+                                    '__SITE__' => true,
+                                    'controller' => \AdvancedSearch\Controller\IndexController::class,
+                                    'action' => 'rss',
+                                    'feed' => 'rss',
+                                    'id' => $searchConfigId,
+                                    // Store the page slug to simplify checks.
+                                    'page-slug' => $searchConfigSlug,
+                                ],
+                            ],
+                        ],
                     ],
                 ]
             );

@@ -125,6 +125,7 @@ class MainSearchForm extends Form
                 'attributes' => [
                     'id' => 'q',
                     'data-type-field' => 'q',
+                    'placeholder' => 'Search', // @translate,
                 ],
             ])
         ;

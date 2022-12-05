@@ -86,4 +86,8 @@
     input[type=submit][disabled] {
         cursor: unset;
     }
+
+    #advanced-search #property-queries .chosen-container-multi .chosen-choices .search-choice {
+        max-width: 24em;
+    }
 }

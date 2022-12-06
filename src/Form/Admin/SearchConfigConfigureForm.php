@@ -91,6 +91,20 @@ class SearchConfigConfigureForm extends Form
             ])
             
             ->add([
+                'name' => 'autocomplete',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Disable auto-complete', // @translate
+                    'info' => 'Disable native browser auto-complete in main search box.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'autocomplete',
+                    'required' => false,
+                    'value' => false,
+                ],
+            ])
+            
+            ->add([
                 'name' => 'default_results',
                 'type' => Element\Radio::class,
                 'options' => [

@@ -115,6 +115,8 @@ class MainSearchForm extends Form
         // The main query is always the first element and submit the last one.
         // TODO Allow to order and to skip "q" (include it as a standard filter).
 
+        $disableAutocomplete = $this->formSettings['search']['autocomplete'] ?? null;
+        
         $this
             ->add([
                 'name' => 'q',
@@ -125,6 +127,7 @@ class MainSearchForm extends Form
                 'attributes' => [
                     'id' => 'q',
                     'placeholder' => $this->formSettings['search']['placeholder'] ?? '',                 
+                    'autocomplete' => $disableAutocomplete ? 'off' : 'on',
                     'data-type-field' => 'q',
                 ],
             ])

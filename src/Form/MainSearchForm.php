@@ -124,6 +124,7 @@ class MainSearchForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'q',
+                    'placeholder' => $this->formSettings['search']['placeholder'] ?? '',                 
                     'data-type-field' => 'q',
                 ],
             ])

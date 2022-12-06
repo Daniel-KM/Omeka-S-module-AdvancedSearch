@@ -76,6 +76,20 @@ class SearchConfigConfigureForm extends Form
                 ],
             ])
             ->get('search')
+            
+            ->add([
+                'name' => 'placeholder',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Placeholder text', // @translate
+                    'info' => 'Placeholder text to display in main search box before input.', // @translate  
+                ],
+                'attributes' => [
+                    'id' => 'placeholder',
+                    'required' => false,
+                ],
+            ])
+            
             ->add([
                 'name' => 'default_results',
                 'type' => Element\Radio::class,

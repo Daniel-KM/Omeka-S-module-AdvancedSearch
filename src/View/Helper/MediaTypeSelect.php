@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace AdvancedSearch\View\Helper;
 
 use AdvancedSearch\Form\Element\MediaTypeSelect as Select;

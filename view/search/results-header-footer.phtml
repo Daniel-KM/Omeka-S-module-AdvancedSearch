@@ -2,7 +2,8 @@
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var \Omeka\Api\Representation\SiteRepresentation $site
- * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchPage
+ * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
+ * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchPage Alias of $searchConfig
  * @var \AdvancedSearch\Query $query
  * @var \AdvancedSearch\Response $response
  * @var \Omeka\Api\Representation\ItemSetRepresentation $itemSet
@@ -22,17 +23,17 @@ $displayParts = [
     'grid_list' => 'header',
     'grid_list_mode' => 'auto',
 ];
-$displayParts = $searchPage ? $searchPage->setting('display', $displayParts) : $displayParts;
+$displayParts = $searchConfig ? $searchConfig->setting('display', $displayParts) : $displayParts;
 $displayParts = array_filter($displayParts, function ($v) use ($resultPart) { return in_array($v, [$resultPart, 'both']); });
 
-$paginationPerPages = isset($displayParts['per_pages']) ? $searchPage->subSetting('pagination', 'per_pages') : [];
-$sortFields = isset($displayParts['sort']) ? $searchPage->subSetting('sort', 'fields') : [];
-$gridListMode = $searchPage->subSetting('display', 'grid_list_mode', 'auto');
+$paginationPerPages = isset($displayParts['per_pages']) ? $searchConfig->subSetting('pagination', 'per_pages') : [];
+$sortFields = isset($displayParts['sort']) ? $searchConfig->subSetting('sort', 'fields') : [];
+$gridListMode = $searchConfig->subSetting('display', 'grid_list_mode', 'auto');
 $multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['list_only', 'grid_only']);
 ?>
 
 <?php if (isset($displayParts['search_filters'])): ?>
-<?= $this->searchingFilters($searchPage, $query, ['template' => 'common/search-filters-links']) ?>
+<?= $this->searchingFilters($searchConfig, $query, ['template' => 'common/search-filters-links']) ?>
 <?php endif; ?>
 
 <?php if (isset($displayParts['paginator'])): ?>

@@ -29,17 +29,16 @@ class SearchingFormFieldset extends Fieldset
                     'id' => 'searching-form-heading',
                 ],
             ])
-            // Name "search_page" is kept to simplify migration.
             ->add([
-                'name' => 'o:block[__blockIndex__][o:data][search_page]',
+                'name' => 'o:block[__blockIndex__][o:data][search_config]',
                 'type' => Element\Select::class,
                 'options' => [
-                    'label' => 'Search page', // @translate
+                    'label' => 'Search config page', // @translate
                     'info' => 'The request below will be checked against the matching form below. Keys unknown by the form will be removed.', // @translate
                     'value_options' => $searchConfigs,
                 ],
                 'attributes' => [
-                    'id' => 'searching-form-search-page',
+                    'id' => 'searching-form-search-config',
                     'required' => true,
                 ],
             ])
@@ -119,19 +118,13 @@ class SearchingFormFieldset extends Fieldset
         return $configs;
     }
 
-    /**
-     * @param Api $api
-     */
-    public function setApi(Api $api)
+    public function setApi(Api $api): self
     {
         $this->api = $api;
         return $this;
     }
 
-    /**
-     * @param SiteSetting $siteSetting
-     */
-    public function setSiteSetting(SiteSetting $siteSetting)
+    public function setSiteSetting(SiteSetting $siteSetting): self
     {
         $this->siteSetting = $siteSetting;
         return $this;

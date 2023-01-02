@@ -1120,6 +1120,7 @@ class Module extends AbstractModule
 
         // No echo: it should just be a preload.
         // "searchPage" is kept to simplify migration.
+        $view->vars()->offsetSet('searchConfig', $searchConfig);
         $view->vars()->offsetSet('searchPage', $searchConfig);
         $view->partial($partialHeaders);
     }

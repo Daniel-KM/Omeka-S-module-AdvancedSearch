@@ -31,7 +31,7 @@
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var \Omeka\Api\Representation\SiteRepresentation $site
  * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
- * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchPage
+ * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchPage Alias of $searchConfig
  * @var \AdvancedSearch\Query $query
  * @var \AdvancedSearch\Response $response
  *
@@ -61,7 +61,7 @@ $documentCount = isset($response) ? $response->getTotalResults() : 0;
 if ($documentCount):
     $itemSetsCount = $response->getResourceTotalResults('item_sets');
     $itemsCount = $response->getResourceTotalResults('items');
-    $displayParts = $searchPage->setting('display', []);
+    $displayParts = $searchConfig->setting('display', []);
     $displayPartsHeader = array_filter($displayParts, function ($v) { return in_array($v, ['header', 'both']); });
     $displayPartsFooter = array_filter($displayParts, function ($v) { return in_array($v, ['footer', 'both']); });
 endif;
@@ -97,7 +97,7 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'te
 
 <?php endif; ?>
 
-<?= $this->searchForm($searchPage, null, $skipFormAction) ?>
+<?= $this->searchForm($searchConfig, null, $skipFormAction) ?>
 
 <?php if (isset($response)): ?>
 
@@ -110,7 +110,9 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'te
         <div class="search-results-part search-results-header">
             <?= $partial('search/results-header-footer', [
                 'site' => $site,
-                'searchPage' => $searchPage,
+                'searchConfig' => $searchConfig,
+                // Kept for compatibility with old themes.
+                'searchPage' => $searchConfig,
                 'query' => $query,
                 'response' => $response,
                 'itemSet' => $itemSet,
@@ -124,7 +126,8 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'te
             <?php if ($itemSetsCount): ?>
             <?= $partial('search/resource-list', [
                 'site' => $site,
-                'searchPage' => $searchPage,
+                'searchConfig' => $searchConfig,
+                'searchPage' => $searchConfig,
                 'query' => $query,
                 'response' => $response,
                 'title' => sprintf($translatePlural('%s item set', '%s item sets', $itemSetsCount), $itemSetsCount),
@@ -135,7 +138,8 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'te
             <?php if ($itemsCount): ?>
             <?= $partial('search/resource-list', [
                 'site' => $site,
-                'searchPage' => $searchPage,
+                'searchConfig' => $searchConfig,
+                'searchPage' => $searchConfig,
                 'query' => $query,
                 'response' => $response,
                 'title' => sprintf($translatePlural('%s item', '%s items', $itemsCount), $itemsCount),
@@ -148,7 +152,8 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'te
         <div class="search-results-part search-results-footer">
             <?= $partial('search/results-header-footer', [
                 'site' => $site,
-                'searchPage' => $searchPage,
+                'searchConfig' => $searchConfig,
+                'searchPage' => $searchConfig,
                 'query' => $query,
                 'response' => $response,
                 'itemSet' => $itemSet,
@@ -166,9 +171,9 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'te
                 <?php elseif (empty($query) && $itemSet): ?>
                 <?= $translate('This item set has no items.') ?>
                 <?php else: ?>
-                <?php if (in_array($searchPage->subSetting('display', 'search_filters', 'header'), ['header', 'both'])): ?>
+                <?php if (in_array($searchConfig->subSetting('display', 'search_filters', 'header'), ['header', 'both'])): ?>
                 <div class="search-results-part search-results-header">
-                    <?= $this->searchingFilters($searchPage, $query, ['template' => 'common/search-filters-links']) ?>
+                    <?= $this->searchingFilters($searchConfig, $query, ['template' => 'common/search-filters-links']) ?>
                 </div>
                 <?php endif; ?>
                 <?= $translate('Your query returned no results') ?>
@@ -181,7 +186,8 @@ $this->headScript()->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'te
 
     <?= $partial('search/facets', [
         'site' => $site,
-        'searchPage' => $searchPage,
+        'searchConfig' => $searchConfig,
+        'searchPage' => $searchConfig,
         'query' => $query,
         'response' => $response,
         'itemSet' => $itemSet,

@@ -115,7 +115,9 @@ class SearchForm extends AbstractHelper
      */
     public function getSearchEngine(): ?SearchEngineRepresentation
     {
-        return $this->searchConfig ? $this->searchConfig->engine() : null;
+        return $this->searchConfig
+            ? $this->searchConfig->engine()
+            : null;
     }
 
     /**
@@ -150,7 +152,11 @@ class SearchForm extends AbstractHelper
     public function __toString(): string
     {
         return $this->partial
-            ? $this->getView()->partial($this->partial, ['form' => $this->form])
+            ? $this->getView()->partial($this->partial, [
+                'form' => $this->form,
+                'searchConfig' => $this->searchConfig,
+                'searchPage' => $this->searchConfig,
+            ])
             : '';
     }
 }

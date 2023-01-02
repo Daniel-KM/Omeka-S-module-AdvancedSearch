@@ -314,9 +314,30 @@ class Module extends AbstractModule
         // Listeners for the indexing of items, item sets and media.
         // Let other modules to update data before indexing.
 
+        // The use of the form avoids to run the indexing three times.
+        // See below preBatchUpdateSearchEngine().
+        $sharedEventManager->attach(
+            \Omeka\Form\ResourceBatchUpdateForm::class,
+            'form.add_elements',
+            [$this, 'formAddElementsResourceBatchUpdateForm']
+        );
+
+        // Items.
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemAdapter::class,
             'api.create.post',
+            [$this, 'updateSearchEngine'],
+            -100
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\ItemAdapter::class,
+            'api.update.post',
+            [$this, 'updateSearchEngine'],
+            -100
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\ItemAdapter::class,
+            'api.delete.post',
             [$this, 'updateSearchEngine'],
             -100
         );
@@ -332,22 +353,23 @@ class Module extends AbstractModule
             [$this, 'postBatchUpdateSearchEngine'],
             -100
         );
+
+        // Item sets.
         $sharedEventManager->attach(
-            \Omeka\Api\Adapter\ItemAdapter::class,
+            \Omeka\Api\Adapter\ItemSetAdapter::class,
+            'api.create.post',
+            [$this, 'updateSearchEngine'],
+            -100
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\ItemSetAdapter::class,
             'api.update.post',
             [$this, 'updateSearchEngine'],
             -100
         );
         $sharedEventManager->attach(
-            \Omeka\Api\Adapter\ItemAdapter::class,
-            'api.delete.post',
-            [$this, 'updateSearchEngine'],
-            -100
-        );
-
-        $sharedEventManager->attach(
             \Omeka\Api\Adapter\ItemSetAdapter::class,
-            'api.create.post',
+            'api.delete.post',
             [$this, 'updateSearchEngine'],
             -100
         );
@@ -363,35 +385,13 @@ class Module extends AbstractModule
             [$this, 'postBatchUpdateSearchEngine'],
             -100
         );
-        $sharedEventManager->attach(
-            \Omeka\Api\Adapter\ItemSetAdapter::class,
-            'api.update.post',
-            [$this, 'updateSearchEngine'],
-            -100
-        );
-        $sharedEventManager->attach(
-            \Omeka\Api\Adapter\ItemSetAdapter::class,
-            'api.delete.post',
-            [$this, 'updateSearchEngine'],
-            -100
-        );
 
+        // Medias.
+        // There is no api.create.post for medias.
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\MediaAdapter::class,
             'api.update.post',
             [$this, 'updateSearchEngineMedia'],
-            -100
-        );
-        $sharedEventManager->attach(
-            \Omeka\Api\Adapter\MediaAdapter::class,
-            'api.batch_update.pre',
-            [$this, 'preBatchUpdateSearchEngine'],
-            -100
-        );
-        $sharedEventManager->attach(
-            \Omeka\Api\Adapter\MediaAdapter::class,
-            'api.batch_update.post',
-            [$this, 'postBatchUpdateSearchEngine'],
             -100
         );
         $sharedEventManager->attach(
@@ -404,6 +404,18 @@ class Module extends AbstractModule
             \Omeka\Api\Adapter\MediaAdapter::class,
             'api.delete.post',
             [$this, 'updateSearchEngineMedia'],
+            -100
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\MediaAdapter::class,
+            'api.batch_update.pre',
+            [$this, 'preBatchUpdateSearchEngine'],
+            -100
+        );
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\MediaAdapter::class,
+            'api.batch_update.post',
+            [$this, 'postBatchUpdateSearchEngine'],
             -100
         );
 
@@ -810,9 +822,32 @@ class Module extends AbstractModule
     }
 
     /**
-     * Prepare a batch update to process it one time only for performance.
+     * Flag a front or back batch update to process in bulk one time only.
      *
-     * This process avoids a bug too.
+     * The batch create/update processes is mainly a loop of create/update
+     * processes, so it may not be efficient for bulk indexing. Furthermore, a
+     * batch update is divided in three batches: one to replace data, the second
+     * to remove data and the third to append data.
+     * @see \Omeka\Form\ResourceBatchUpdateForm::preprocessData()
+     * @see \Omeka\Job\BatchUpdate
+     * The process should be done only one time, so at the end of the last
+     * sub-batch (append). Because The only way to do it is to append it to the
+     * form. But the index should not be run when there is no action, and it is
+     * not possible to determine if there were other actions before, because the
+     * data are not passed as a whole, but by part.
+     * A better solution requires changes in core: to pass all data, or to use a
+     * whole event pre and/or post batch updat, or to use only one batch update
+     * with three steps.
+     *
+     * So this method set a flag to skip individual update of resources and to
+     * allow to run the update in bulk during post. Finally, it avoids too to
+     * index resources when the process is terminated with error.
+     *
+     * The previous version was a way too to fix issue #omeka/omeka-s/1690.
+     * The fix was not enough for foreground batch edit (see new fix).
+     * @see https://github.com/omeka/omeka-s/issues/1690
+     *
+     * Explanation of the bug < v3.1.
      * When there is a batch update, with modules SearchSolr and NumericDataTypes,
      * a bug occurs on the second call to update when the process is done in
      * admin ui via batch edit selected resources and when one of the selected
@@ -827,17 +862,29 @@ class Module extends AbstractModule
      * and \Omeka\Job\BatchUpdate::perform()). But, conversely, when this option
      * is set, it doesn't work any more for a background process, so a check is
      * done to check if this is a background event.
-     * @todo Find where the resource template property is created. This issue may disappear de facto in a future version.
      *
-     * @todo Clean the process with the fix in Omeka 3.1.
-     *
-     * @param Event $event
+     * For >= v3.1, no difference is done between front/back process.
      */
+    public function formAddElementsResourceBatchUpdateForm(Event $event): void
+    {
+        /** @var \Omeka\Form\ResourceBatchUpdateForm $form */
+        $form = $event->getTarget();
+        $form
+            ->add([
+                'name' => 'advancedsearch',
+                'type' => \Laminas\Form\Element\Hidden::class,
+                'attributes' => [
+                    'id' => 'advancedsearch',
+                    'value' => '1',
+                    // This attribute is required to make "batch edit all" working.
+                    'data-collection-action' => 'append',
+                ],
+            ]);
+    }
+
     public function preBatchUpdateSearchEngine(Event $event): void
     {
-        // This is a background job if there is no route match.
-        $routeMatch = $this->getServiceLocator()->get('application')->getMvcEvent()->getRouteMatch();
-        $this->isBatchUpdate = !empty($routeMatch);
+        $this->isBatchUpdate = true;
     }
 
     public function postBatchUpdateSearchEngine(Event $event): void
@@ -846,13 +893,19 @@ class Module extends AbstractModule
             return;
         }
 
-        $serviceLocator = $this->getServiceLocator();
-        $api = $serviceLocator->get('Omeka\ApiManager');
-
+        /** @var \Omeka\Api\Request $request */
         $request = $event->getParam('request');
+        $collectionAction = $request->getOption('collectionAction');
+        if ($collectionAction !== 'append') {
+            return;
+        }
+
         $requestResource = $request->getResource();
         $response = $event->getParam('response');
         $resources = $response->getContent();
+
+        $serviceLocator = $this->getServiceLocator();
+        $api = $serviceLocator->get('Omeka\ApiManager');
 
         /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
         $searchEngines = $api->search('search_engines')->getContent();
@@ -895,6 +948,7 @@ class Module extends AbstractModule
         if ($this->isBatchUpdate) {
             return;
         }
+
         $serviceLocator = $this->getServiceLocator();
         $api = $serviceLocator->get('Omeka\ApiManager');
 
@@ -920,6 +974,10 @@ class Module extends AbstractModule
 
     public function updateSearchEngineMedia(Event $event): void
     {
+        if ($this->isBatchUpdate) {
+            return;
+        }
+
         $serviceLocator = $this->getServiceLocator();
         $api = $serviceLocator->get('Omeka\ApiManager');
 

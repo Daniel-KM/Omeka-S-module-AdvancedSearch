@@ -519,7 +519,7 @@ for the future digital library [Corpus du Louvre].
 [Search Solr]: https://gitlab.com/Daniel-KM/Omeka-S-module-SearchSolr
 [SearchSolr]: https://gitlab.com/Daniel-KM/Omeka-S-module-SearchSolr
 [Soundex]: https://en.wikipedia.org/wiki/Soundex
-[Installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
+[Installing a module]: https://omeka.org/s/docs/user-manual/modules/#installing-modules
 [this patch]: https://github.com/omeka/omeka-s/pull/1519/files
 [jQuery-Autocomplete]: https://github.com/devbridge/jQuery-Autocomplete
 [Reference]: https://gitlab.com/Daniel-KM/Omeka-S-module-Reference

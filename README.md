@@ -441,6 +441,7 @@ TODO
 - [ ] DateRange field (_dr) may not appear in the type of index in mapping.
 - [ ] Use omeka selects option values by default for classes, templates, item sets, sites.
 - [ ] Create index for Soundex and non-English algorithms.
+- [ ] Remove SearchingForm?
 
 
 Warning

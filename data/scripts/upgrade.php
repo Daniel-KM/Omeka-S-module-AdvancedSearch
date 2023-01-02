@@ -24,7 +24,7 @@ $messenger = $plugins->get('messenger');
 $entityManager = $services->get('Omeka\EntityManager');
 
 if (version_compare($oldVersion, '3.3.6.2', '<')) {
-    $this->checkDependency();
+    $this->checkDependencies();
 
     $sqls = <<<'SQL'
 CREATE TABLE `search_suggester` (
@@ -272,4 +272,23 @@ if (version_compare($oldVersion, '3.3.6.16', '<')) {
         'Update your theme to support new features for facets (active facets, button apply facets with id="apply-facets", list of facet values).' // @translate
     );
     $messenger->addWarning($message);
+}
+
+if (version_compare($oldVersion, '3.3.6.19', '<')) {
+    $sql = <<<'SQL'
+UPDATE `site_page_block`
+SET
+    `data` = REPLACE(data, '"search_page":', '"search_config":')
+WHERE
+    `data` LIKE '%"search_page":%'
+;
+SQL;
+    $connection->executeStatement($sql);
+
+    $message = new Message(
+        'It’s now possible to search values similar other ones (via %1$sSoundex%2$s, designed for British English phonetic).', // @translate
+        '<a href="https://en.wikipedia.org/wiki/Soundex">', '</a>'
+    );
+    $message->setEscapeHtml(false);
+    $messenger->addSuccess($message);
 }

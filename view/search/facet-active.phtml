@@ -21,10 +21,10 @@
 if (!$active) return;
 
 $texts = [
-    'from' => '%s : from %s', // @translate
-    'to' => '%s : to %s', // @translate
+    'from' => '%1$s: from %2$s', // @translate
+    'to' => '%1$s: to %2$s', // @translate
 ];
-$text = $texts[$key] ?? '%s : %s'; // @translate
+$text = $texts[$key] ?? '%1$s: %2$s'; // @translate
 
 $replace = [
     '{url}' => $escapeHtmlAttr($url),

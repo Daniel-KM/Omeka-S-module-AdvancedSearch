@@ -269,7 +269,7 @@ if (version_compare($oldVersion, '3.3.6.16', '<')) {
     );
     $messenger->addWarning($message);
     $message = new Message(
-        'Updade your theme to support new features for facets (active facets, button apply facets with id="apply-facets", list of facet values).' // @translate
+        'Update your theme to support new features for facets (active facets, button apply facets with id="apply-facets", list of facet values).' // @translate
     );
     $messenger->addWarning($message);
 }

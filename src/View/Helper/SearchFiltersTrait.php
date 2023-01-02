@@ -27,10 +27,12 @@ trait SearchFiltersTrait
                 'nsw' => $translate('does not start with'), // @translate
                 'ew' => $translate('ends with'), // @translate
                 'new' => $translate('does not end with'), // @translate
+                'near' => $translate('is similar to'), // @translate
+                'nnear' => $translate('is not similar to'), // @translate
                 'res' => $translate('is resource with ID'), // @translate
                 'nres' => $translate('is not resource with ID'), // @translate
-                'res' => $translate('is'), // @translate
-                'nres' => $translate('is not'), // @translate
+                // 'res' => $translate('is'), // @translate
+                // 'nres' => $translate('is not'), // @translate
                 'lex' => $translate('is a linked resource'), // @translate
                 'nlex' => $translate('is not a linked resource'), // @translate
                 'lres' => $translate('is linked with resource with ID'), // @translate

@@ -73,6 +73,8 @@ class SearchResources extends AbstractPlugin
             'nsw' => 'sw',
             'ew' => 'new',
             'new' => 'ew',
+            'near' => 'nnear',
+            'nnear' => 'near',
             'res' => 'nres',
             'nres' => 'res',
             'tp' => 'ntp',
@@ -103,6 +105,7 @@ class SearchResources extends AbstractPlugin
             'nlist',
             'nsw',
             'new',
+            'nnear',
             'nres',
             'ntp',
             'ntpl',
@@ -869,6 +872,8 @@ class SearchResources extends AbstractPlugin
      *   - nsw: does not start with
      *   - ew: ends with
      *   - new: does not end with
+     *   - near: is similar to
+     *   - nnear: is not similar to
      *   - res: has resource (core)
      *   - nres: has no resource (core)
      *   - tp: has main type (literal-like, resource-like, uri-like)
@@ -1074,6 +1079,29 @@ class SearchResources extends AbstractPlugin
                         $expr->in("$valuesAlias.valueResource", $subquery->getDQL()),
                         $expr->like("$valuesAlias.value", $param),
                         $expr->like("$valuesAlias.uri", $param)
+                    );
+                    break;
+
+                case 'nnear':
+                    $positive = false;
+                    // no break.
+                case 'near':
+                    // The mysql soundex() is not standard, because it returns
+                    // more than four characters, so the comparaison cannot be
+                    // done with a static value from the php soundex() function.
+                    $param = $this->adapter->createNamedParameter($qb, $value);
+                    $subqueryAlias = $this->adapter->createAlias();
+                    $subquery = $entityManager
+                        ->createQueryBuilder()
+                        ->select("$subqueryAlias.id")
+                        ->from('Omeka\Entity\Resource', $subqueryAlias)
+                        ->where($expr->eq("SOUNDEX($subqueryAlias.title)", "SOUNDEX($param)"));
+                    $predicateExpr = $expr->orX(
+                        $expr->in("$valuesAlias.valueResource", $subquery->getDQL()),
+                        $expr->eq("SOUNDEX($valuesAlias.value)", "SOUNDEX($param)")/*,
+                        // A soundex on a uri has no meaning.
+                        $expr->eq("SOUNDEX($valuesAlias.uri)", "SOUNDEX($param)")
+                        */
                     );
                     break;
 

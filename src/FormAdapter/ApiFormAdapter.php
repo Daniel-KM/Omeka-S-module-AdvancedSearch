@@ -231,6 +231,8 @@ class ApiFormAdapter implements FormAdapterInterface
                 case 'ew':
                 case 'nma':
                 case 'ma':
+                case 'nnear':
+                case 'near':
                 case 'nres':
                 case 'res':
                 case 'nex':

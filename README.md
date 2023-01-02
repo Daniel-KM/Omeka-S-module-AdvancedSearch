@@ -69,6 +69,8 @@ only via api, not in the advanced search form for now):
 - `nsw`: does not start with
 - `ew`: ends with
 - `new`: does not end with
+- `near`: is similar to (algorithm [Soundex], based on British English phonetic)
+- `nnear`: is not similar to
 - `tp`: has main type (literal-like, resource-like, uri-like)
 - `ntp`: has not main type (literal-like, resource-like, uri-like)
 - `tpl`: has type literal-like
@@ -438,6 +440,7 @@ TODO
 - [ ] Add hidden query to site settings.
 - [ ] DateRange field (_dr) may not appear in the type of index in mapping.
 - [ ] Use omeka selects option values by default for classes, templates, item sets, sites.
+- [ ] Create index for Soundex and non-English algorithms.
 
 
 Warning
@@ -515,6 +518,7 @@ for the future digital library [Corpus du Louvre].
 [Solr]: https://solr.apache.org/
 [Search Solr]: https://gitlab.com/Daniel-KM/Omeka-S-module-SearchSolr
 [SearchSolr]: https://gitlab.com/Daniel-KM/Omeka-S-module-SearchSolr
+[Soundex]: https://en.wikipedia.org/wiki/Soundex
 [Installing a module]: http://dev.omeka.org/docs/s/user-manual/modules/#installing-modules
 [this patch]: https://github.com/omeka/omeka-s/pull/1519/files
 [jQuery-Autocomplete]: https://github.com/devbridge/jQuery-Autocomplete

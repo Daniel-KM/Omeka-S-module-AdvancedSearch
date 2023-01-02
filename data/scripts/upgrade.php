@@ -2,26 +2,26 @@
 
 namespace AdvancedSearch;
 
-use Omeka\Mvc\Controller\Plugin\Messenger;
 use Omeka\Stdlib\Message;
 
 /**
  * @var Module $this
  * @var \Laminas\ServiceManager\ServiceLocatorInterface $services
- * @var string $oldVersion
  * @var string $newVersion
+ * @var string $oldVersion
  *
- * @var \Doctrine\ORM\EntityManager $entityManager
- * @var \Doctrine\DBAL\Connection $connection
  * @var \Omeka\Api\Manager $api
- * @var array $config
  * @var \Omeka\Settings\Settings $settings
+ * @var \Doctrine\DBAL\Connection $connection
+ * @var \Doctrine\ORM\EntityManager $entityManager
+ * @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger
  */
-// $entityManager = $services->get('Omeka\EntityManager');
-$connection = $services->get('Omeka\Connection');
-// $api = $services->get('Omeka\ApiManager');
-// $config = require dirname(__DIR__, 2) . '/config/module.config.php';
+$plugins = $services->get('ControllerPluginManager');
+$api = $plugins->get('api');
 $settings = $services->get('Omeka\Settings');
+$connection = $services->get('Omeka\Connection');
+$messenger = $plugins->get('messenger');
+$entityManager = $services->get('Omeka\EntityManager');
 
 if (version_compare($oldVersion, '3.3.6.2', '<')) {
     $this->checkDependency();
@@ -55,7 +55,7 @@ ALTER TABLE `search_suggester` ADD CONSTRAINT FK_F64D915AE78C9C0A FOREIGN KEY (`
 ALTER TABLE `search_suggestion` ADD CONSTRAINT FK_536C3D170913F08 FOREIGN KEY (`suggester_id`) REFERENCES `search_suggester` (`id`) ON DELETE CASCADE;
 SQL;
     foreach (array_filter(explode(";\n", $sqls)) as $sql) {
-        $connection->exec($sql);
+        $connection->executeStatement($sql);
     }
 }
 
@@ -66,10 +66,12 @@ if (version_compare($oldVersion, '3.3.6.3', '<')) {
     $sql = <<<'SQL'
 SELECT `id`, `path` FROM `search_config` ORDER BY `id`;
 SQL;
-    $searchConfigPaths = $connection->fetchAll($sql);
+    $searchConfigPaths = $connection->fetchAllAssociative($sql);
     $searchConfigPaths = array_column($searchConfigPaths, 'path', 'id');
     $settings->set('advancedsearch_all_configs', $searchConfigPaths);
 }
+
+// End of support of direct upgrade of modules Search and derivative modules.
 
 if (version_compare($oldVersion, '3.3.6.7', '<')) {
     $sql = <<<SQL
@@ -190,8 +192,6 @@ SQL;
         ]);
     }
 
-    $messenger = new Messenger();
-
     /** @var \Omeka\Module\Manager $moduleManager */
     $moduleManager = $services->get('Omeka\ModuleManager');
     $module = $moduleManager->getModule('Reference');
@@ -231,7 +231,6 @@ SQL;
 }
 
 if (version_compare($oldVersion, '3.3.6.9', '<')) {
-    $messenger = new Messenger();
     $message = new Message(
         'It is now possible to query ressources with linked ressources in the standard advanced form.' // @translate
     );
@@ -239,7 +238,6 @@ if (version_compare($oldVersion, '3.3.6.9', '<')) {
 }
 
 if (version_compare($oldVersion, '3.3.6.12', '<')) {
-    $messenger = new Messenger();
     $message = new Message(
         'A new option was added to display the resources mixed (by default) or item sets and items separately (old behavior).' // @translate
     );
@@ -255,7 +253,6 @@ if (version_compare($oldVersion, '3.3.6.12', '<')) {
 }
 
 if (version_compare($oldVersion, '3.3.6.15', '<')) {
-    $messenger = new Messenger();
     $message = new Message(
         'It’s now possible to search resources by multiples properties, and resources without class, template, item set, site or owner.' // @translate
     );
@@ -263,7 +260,6 @@ if (version_compare($oldVersion, '3.3.6.15', '<')) {
 }
 
 if (version_compare($oldVersion, '3.3.6.16', '<')) {
-    $messenger = new Messenger();
     $message = new Message(
         'It’s now possible to use facet range with a double select (from/to). With internal sql engine, order is alphabetic only for now: it works for strings and simple four digits years or standard dates, not integer or variable dates. With Solr, only numbers and dates are supported. The theme may need to be updated.' // @translate
     );

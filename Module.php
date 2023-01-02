@@ -47,7 +47,6 @@ use Laminas\EventManager\SharedEventManagerInterface;
 use Laminas\ModuleManager\ModuleManager;
 use Laminas\Mvc\MvcEvent;
 use Omeka\Entity\Resource;
-use Omeka\Mvc\Controller\Plugin\Messenger;
 use Omeka\Stdlib\Message;
 
 class Module extends AbstractModule
@@ -121,22 +120,22 @@ class Module extends AbstractModule
         $version = $module ? (string) $module->getIni('version') : null;
         if (version_compare($version, '3.3.6.6', '>')) {
             throw new \Omeka\Module\Exception\ModuleCannotInstallException(
-                'To be automatically upgraded and replaced by this module, use version 3.3.6.6 or below.' // @translate
+                'To be automatically upgraded and replaced by this module, use version 3.3.6.6 or below, then upgrade it.' // @translate
             );
         }
     }
 
     protected function postInstall(): void
     {
-        $messenger = new Messenger;
+        $services = $this->getServiceLocator();
+        /** @var \Omeka\Module\Manager $moduleManager */
+        $moduleManager = $services->get('Omeka\ModuleManager');
+        $messenger = $services->get('ControllerPluginManager')->get('messenger');
+
         $optionalModule = 'Reference';
         if (!$this->isModuleActive($optionalModule)) {
             $messenger->addWarning('The module Reference is required to use the facets with the default internal adapter, but not for the Solr adapter.'); // @translate
         }
-
-        $services = $this->getServiceLocator();
-        /** @var \Omeka\Module\Manager $moduleManager */
-        $moduleManager = $services->get('Omeka\ModuleManager');
 
         // Upgrade from old modules AdvancedSearchPlus and Search.
 
@@ -1201,7 +1200,7 @@ class Module extends AbstractModule
         $services = $this->getServiceLocator();
 
         $urlHelper = $services->get('ViewHelperManager')->get('url');
-        $messenger = new Messenger;
+        $messenger = $services->get('ControllerPluginManager')->get('messenger');
 
         /** @var \Doctrine\DBAL\Connection $connection */
         $connection = $services->get('Omeka\Connection');
@@ -1213,7 +1212,7 @@ FROM `search_engine`
 WHERE `adapter` = "internal"
 ORDER BY `id`;
 SQL;
-        $searchEngineId = (int) $connection->fetchColumn($sqlSearchEngineId);
+        $searchEngineId = (int) $connection->fetchOne($sqlSearchEngineId);
 
         if (!$searchEngineId) {
             // Create the internal adapter.
@@ -1229,7 +1228,7 @@ SQL;
                 $searchEngineConfig['o:adapter'],
                 json_encode($searchEngineConfig['o:settings'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
             ]);
-            $searchEngineId = $connection->fetchColumn($sqlSearchEngineId);
+            $searchEngineId = $connection->fetchOne($sqlSearchEngineId);
             $message = new Message(
                 'The internal search engine (sql) is available. Configure it in the %ssearch manager%s.', // @translate
                 // Don't use the url helper, the route is not available during install.
@@ -1248,7 +1247,7 @@ WHERE `engine_id` = $searchEngineId
 ORDER BY `id`
 LIMIT 1;
 SQL;
-        $suggesterId = (int) $connection->fetchColumn($sqlSuggesterId);
+        $suggesterId = (int) $connection->fetchOne($sqlSuggesterId);
 
         if (!$suggesterId) {
             // Create the internal suggester.
@@ -1288,7 +1287,7 @@ FROM `search_config`
 WHERE `engine_id` = $searchEngineId
 ORDER BY `id`;
 SQL;
-        $searchConfigId = (int) $connection->fetchColumn($sqlSearchConfigId);
+        $searchConfigId = (int) $connection->fetchOne($sqlSearchConfigId);
 
         if (!$searchConfigId) {
             $sql = <<<SQL

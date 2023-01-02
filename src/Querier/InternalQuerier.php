@@ -4,7 +4,6 @@ namespace AdvancedSearch\Querier;
 
 use AdvancedSearch\Querier\Exception\QuerierException;
 use AdvancedSearch\Response;
-use Omeka\Mvc\Controller\Plugin\Messenger;
 use Omeka\Stdlib\Message;
 
 class InternalQuerier extends AbstractQuerier
@@ -414,11 +413,12 @@ SQL;
         if (!empty($this->args['property'])
             && count($this->args['property']) > self::REQUEST_MAX_ARGS
         ) {
-            $params = $this->services->get('ControllerPluginManager')->get('params');
+            $plugins = $this->services->get('ControllerPluginManager');
+            $params = $plugins->get('params');
             $req = $params->fromQuery();
             unset($req['csrf']);
             $req = urldecode(http_build_query(array_filter($req), '', '&', PHP_QUERY_RFC3986));
-            $messenger = new Messenger;
+            $messenger = $plugins->get('messenger');
             if ($this->query->getExcludedFields()) {
                 $message = new Message('The query "%1$s" uses %2$d properties, that is more than the %3$d supported currently. Excluded fields are removed.', // @translate
                     $req, count($this->args['property']), self::REQUEST_MAX_ARGS);

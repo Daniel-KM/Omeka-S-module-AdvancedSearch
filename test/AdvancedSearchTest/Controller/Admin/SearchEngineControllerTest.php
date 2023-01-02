@@ -65,7 +65,7 @@ class SearchEngineControllerTest extends \AdvancedSearchTest\Controller\SearchCo
 
         $this->assertRedirectTo('/admin/search-manager');
 
-        $messenger = new Messenger;
+        $messenger = $this->getServiceLocator()->get('ControllerPluginManager')->get('messenger');
         $messages = $messenger->get();
         $message = $messages[Messenger::SUCCESS][0];
         $this->assertInstanceOf(Message::class, $message);

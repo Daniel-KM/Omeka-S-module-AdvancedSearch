@@ -2,7 +2,6 @@
 
 namespace AdvancedSearch;
 
-use Omeka\Mvc\Controller\Plugin\Messenger;
 use Omeka\Stdlib\Message;
 
 /**
@@ -11,6 +10,7 @@ use Omeka\Stdlib\Message;
  * @var \Doctrine\DBAL\Connection $connection
  * @var \Omeka\Module\Manager $moduleManager
  * @var \Omeka\Settings\Settings $settings
+ * @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger
  */
 $connection = $services->get('Omeka\Connection');
 $settings = $services->get('Omeka\Settings');
@@ -21,7 +21,7 @@ if (!$aspModule) {
     return;
 }
 
-$messenger = new Messenger();
+$messenger = $services->get('ControllerPluginManager')->get('messenger');
 
 // Convert the settings.
 

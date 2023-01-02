@@ -2,7 +2,6 @@
 
 namespace AdvancedSearch;
 
-use Omeka\Mvc\Controller\Plugin\Messenger;
 use Omeka\Stdlib\Message;
 
 /**
@@ -21,7 +20,7 @@ if (!$searchModule) {
     return;
 }
 
-$messenger = new Messenger();
+$messenger = $services->get('ControllerPluginManager')->get('messenger');
 
 $oldVersion = $searchModule->getIni('version');
 if (version_compare($oldVersion, '3.5.7', '<')) {

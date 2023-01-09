@@ -482,7 +482,7 @@ class MainSearchForm extends Form
         $element
             ->setAttributes([
                 'id' => 'search-id',
-                'data-field-type', $filter['type'] === 'MultiText' ? 'multitext' : 'text',
+                'data-field-type' => $filter['type'] === 'MultiText' ? 'multitext' : 'text',
             ])
             ->setOptions([
                 'label' => $filter['label'], // @translate
@@ -498,7 +498,7 @@ class MainSearchForm extends Form
         $element
             ->setAttributes([
                 'id' => 'search-is-public',
-                'data-field-type', 'checkbox',
+                'data-field-type' => 'checkbox',
             ])
             ->setOptions([
                 'label' => $filter['label'], // @translate
@@ -514,7 +514,7 @@ class MainSearchForm extends Form
         $fieldset
             ->setAttributes([
                 'id' => 'search-owners',
-                'data-field-type', 'owner',
+                'data-field-type' => 'owner',
             ])
             ->add([
                 'name' => 'id',
@@ -544,7 +544,7 @@ class MainSearchForm extends Form
         $fieldset
             ->setAttributes([
                 'id' => 'search-sites',
-                'data-field-type', 'site',
+                'data-field-type' => 'site',
             ])
             ->add([
                 'name' => 'id',
@@ -576,7 +576,7 @@ class MainSearchForm extends Form
         $fieldset = new Fieldset('class');
         $fieldset->setAttributes([
             'id' => 'search-classes',
-            'data-field-type', 'class',
+            'data-field-type' => 'class',
         ]);
 
         /** @var \Omeka\Form\Element\ResourceClassSelect $element */
@@ -646,7 +646,7 @@ class MainSearchForm extends Form
         $fieldset = new Fieldset('template');
         $fieldset->setAttributes([
             'id' => 'search-templates',
-            'data-field-type', 'template',
+            'data-field-type' => 'template',
         ]);
 
         /** @var \Omeka\Form\Element\ResourceTemplateSelect $element */
@@ -711,7 +711,7 @@ class MainSearchForm extends Form
         $fieldset
             ->setAttributes([
                 'id' => 'search-item-sets',
-                'data-field-type', 'itemset',
+                'data-field-type' => 'itemset',
             ])
             ->add([
                 'name' => 'id',

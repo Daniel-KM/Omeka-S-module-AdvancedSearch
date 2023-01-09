@@ -7,7 +7,7 @@ class ResourceTemplateSelect extends \Omeka\Form\Element\ResourceTemplateSelect
     use TraitGroupByOwner;
     use TraitOptionalElement;
 
-    public function getValueOptions()
+    public function getValueOptions(): array
     {
         return $this->getValueOptionsFix();
     }

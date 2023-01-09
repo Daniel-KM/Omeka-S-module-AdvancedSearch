@@ -7,7 +7,7 @@ class ItemSetSelect extends \Omeka\Form\Element\ItemSetSelect
     use TraitGroupByOwner;
     use TraitOptionalElement;
 
-    public function getValueOptions()
+    public function getValueOptions(): array
     {
         return $this->getValueOptionsFix();
     }

@@ -7,7 +7,7 @@ class SiteSelect extends \Omeka\Form\Element\SiteSelect
     use TraitGroupByOwner;
     use TraitOptionalElement;
 
-    public function getValueOptions()
+    public function getValueOptions(): array
     {
         return $this->getValueOptionsFix();
     }

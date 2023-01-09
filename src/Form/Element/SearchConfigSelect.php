@@ -13,7 +13,7 @@ class SearchConfigSelect extends Select
      */
     protected $apiManager;
 
-    public function getValueOptions()
+    public function getValueOptions(): array
     {
         $response = $this->apiManager->search('search_configs');
         $searchConfigs = $response->getContent();

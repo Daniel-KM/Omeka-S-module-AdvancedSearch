@@ -81,7 +81,7 @@ class SearchEngineForm extends Form
         return $options;
     }
 
-    public function setSearchAdapterManager($searchAdapterManager)
+    public function setSearchAdapterManager($searchAdapterManager): self
     {
         $this->searchAdapterManager = $searchAdapterManager;
         return $this;

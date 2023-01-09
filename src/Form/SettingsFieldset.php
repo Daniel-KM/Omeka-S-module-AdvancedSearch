@@ -25,15 +25,22 @@ class SettingsFieldset extends Fieldset
 
     protected $label = 'Advanced Search (admin board)'; // @translate
 
+    protected $elementGroups = [
+        'search' => 'Search', // @translate
+        'advanced_search' => 'Advanced Search (module)', // @translate
+    ];
+
     public function init(): void
     {
         $this
             ->setAttribute('id', 'advanced-search')
+            ->setOption('element_groups', $this->elementGroups)
             /** @deprecated Since Omeka v3.1 */
             ->add([
                 'name' => 'advancedsearch_restrict_used_terms',
                 'type' => Element\Checkbox::class,
                 'options' => [
+                    'element_group' => 'search',
                     'label' => 'Restrict to used properties and resources classes', // @translate
                     'info' => 'If checked, restrict the list of properties and resources classes to the used ones in advanced search form.', // @translate
                 ],
@@ -46,6 +53,7 @@ class SettingsFieldset extends Fieldset
                 'name' => 'advancedsearch_main_config',
                 'type' => AdvancedSearchElement\OptionalSelect::class,
                 'options' => [
+                    'element_group' => 'advanced_search',
                     'label' => 'Default search page (admin)', // @translate
                     'info' => 'This search engine is used in the admin bar.', // @translate
                     'value_options' => $this->searchConfigs,
@@ -59,6 +67,7 @@ class SettingsFieldset extends Fieldset
                 'name' => 'advancedsearch_configs',
                 'type' => AdvancedSearchElement\OptionalMultiCheckbox::class,
                 'options' => [
+                    'element_group' => 'advanced_search',
                     'label' => 'Available search pages', // @translate
                     'value_options' => $this->searchConfigs,
                 ],
@@ -70,6 +79,7 @@ class SettingsFieldset extends Fieldset
                 'name' => 'advancedsearch_api_config',
                 'type' => AdvancedSearchElement\OptionalSelect::class,
                 'options' => [
+                    'element_group' => 'advanced_search',
                     'label' => 'Quick api search via external search engine', // @translate
                     'info' => 'The method apiSearch() allows to do a quick search in some cases. It requires a mapping done with the Omeka api and the selected index.', // @translate
                     'value_options' => $this->searchConfigsApi,
@@ -79,10 +89,12 @@ class SettingsFieldset extends Fieldset
                     'id' => 'advancedsearch_api_config',
                 ],
             ])
+            // TODO Remove this useless option.
             ->add([
                 'name' => 'advancedsearch_batch_size',
                 'type' => Element\Number::class,
                 'options' => [
+                    'element_group' => 'advanced_search',
                     'label' => 'Search batch size for reindexation', // @translate
                     'info' => 'Default is 100, but it can be adapted according to your resource average size, your mapping and your architecture.', // @translate
                 ],

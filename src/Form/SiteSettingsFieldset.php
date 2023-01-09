@@ -25,11 +25,16 @@ class SiteSettingsFieldset extends Fieldset
     protected $defaultSearchFields = [];
 
     /**
-     * Warning: there is a core fieldset "Search".
+     * Warning: there is a core fieldset "Search" (before Omeka v4).
      *
      * @var string
      */
     protected $label = 'Advanced Search (module)'; // @translate
+
+    protected $elementGroups = [
+        'search' => 'Search', // @translate
+        'advanced_search' => 'Advanced Search (module)', // @translate
+    ];
 
     public function init(): void
     {
@@ -46,10 +51,12 @@ class SiteSettingsFieldset extends Fieldset
 
         $this
             ->setAttribute('id', 'advanced-search')
+            ->setOption('element_groups', $this->elementGroups)
             ->add([
                 'name' => 'advancedsearch_note_core',
                 'type' => AdvancedSearchElement\Note::class,
                 'options' => [
+                    'element_group' => 'search',
                     'text' => 'Core advanced search page', // @translate
                 ],
                 'attributes' => [
@@ -61,6 +68,7 @@ class SiteSettingsFieldset extends Fieldset
                 'name' => 'advancedsearch_restrict_used_terms',
                 'type' => Element\Checkbox::class,
                 'options' => [
+                    'element_group' => 'search',
                     'label' => 'Restrict to used properties and resources classes', // @translate
                     'info' => 'If checked, restrict the list of properties and resources classes to the used ones in advanced search form.', // @translate
                 ],
@@ -73,6 +81,7 @@ class SiteSettingsFieldset extends Fieldset
                 'name' => 'advancedsearch_search_fields',
                 'type' => AdvancedSearchElement\OptionalMultiCheckbox::class,
                 'options' => [
+                    'element_group' => 'search',
                     'label' => 'Display only following fields', // @translate
                     'value_options' => $this->defaultSearchFields,
                     'use_hidden_element' => true,
@@ -87,6 +96,7 @@ class SiteSettingsFieldset extends Fieldset
                 'name' => 'advancedsearch_note_page',
                 'type' => AdvancedSearchElement\Note::class,
                 'options' => [
+                    'element_group' => 'advanced_search',
                     'text' => 'Module search pages', // @translate
                 ],
                 'attributes' => [
@@ -97,6 +107,7 @@ class SiteSettingsFieldset extends Fieldset
                 'name' => 'advancedsearch_main_config',
                 'type' => AdvancedSearchElement\OptionalSelect::class,
                 'options' => [
+                    'element_group' => 'advanced_search',
                     'label' => 'Default search page', // @translate
                     'value_options' => $this->searchConfigs,
                     'empty_option' => 'Select the default search engine for the site…', // @translate
@@ -109,6 +120,7 @@ class SiteSettingsFieldset extends Fieldset
                 'name' => 'advancedsearch_configs',
                 'type' => AdvancedSearchElement\OptionalMultiCheckbox::class,
                 'options' => [
+                    'element_group' => 'advanced_search',
                     'label' => 'Available search pages', // @translate
                     'value_options' => $this->searchConfigs,
                 ],
@@ -121,6 +133,7 @@ class SiteSettingsFieldset extends Fieldset
                 'name' => 'advancedsearch_redirect_itemset',
                 'type' => Element\Checkbox::class,
                 'options' => [
+                    'element_group' => 'advanced_search',
                     'label' => 'Redirect item set page to search', // @translate
                     'info' => 'By default, item-set/show is redirected to item/browse. This option redirects it to the search page.', // @translate
                 ],

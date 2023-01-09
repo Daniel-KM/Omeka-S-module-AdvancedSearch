@@ -1,5 +1,5 @@
 {
-    "name": "daniel-km/omeka-s-module-search",
+    "name": "daniel-km/omeka-s-module-advanced-search",
     "description": "Module for Omeka S to add improved search capabilities: auto-suggest, filters, facets, etc.",
     "type": "library",
     "license": "CECILL-2.1",
@@ -40,7 +40,13 @@
     ],
     "require": {
         "oomphinc/composer-installers-extender": "^2.0",
-        "devbridge/jquery-autocomplete": "1.4.11"
+        "devbridge/jquery-autocomplete": "1.4.11",
+        "laminas/laminas-feed": "^2.18"
+    },
+    "replace": {
+        "laminas/laminas-escaper": "*",
+        "laminas/laminas-servicemanager": "*",
+        "laminas/laminas-stdlib": "*"
     },
     "require-dev": {
         "biblibre/omeka-s-test-helper": "dev-master"

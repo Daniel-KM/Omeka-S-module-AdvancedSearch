@@ -59,7 +59,7 @@ class MainSearchForm extends Form
     protected $siteSetting;
 
     /**
-     * @var \Laminas\Form\FormElementManager\FormElementManagerV3Polyfill
+     * @var \Laminas\Form\FormElementManager;
      */
     protected $formElementManager;
 
@@ -279,7 +279,7 @@ class MainSearchForm extends Form
             ->setAttribute('data-field-type', 'filter')
             ->setOptions([
                 'label' => $filter['label'],
-                'count' => $filter['max_number'],
+                'count' => (int) $filter['max_number'],
                 'should_create_template' => true,
                 'allow_add' => true,
                 'target_element' => $advanced,

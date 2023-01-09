@@ -82,9 +82,10 @@
         flex: 0 0 100%;
     }
     .search-results .search-filters .filter a::after {
-        content: "x";
+        content: "×";
         float: right;
-        margin-right: 9px;
+        color: initial;
+        margin: -3px 6px auto;
     }
 
     .search-view-type.active {

@@ -570,6 +570,11 @@ class SearchResources extends AbstractPlugin
             if ($shortProperty['total'] < 2 || !isset(self::PROPERTY_QUERY['optimize'][$shortProperty['type']])) {
                 continue;
             }
+            // Joiner should be "OR", because "AND" cannot be used with sql "IN()".
+            // @see https://github.com/Daniel-KM/Omeka-S-module-AdvancedSearch/issues/4
+            if ($shortProperty['joiner'] !== 'or') {
+                continue;
+            }
             $optimizedType = self::PROPERTY_QUERY['optimize'][$shortProperty['type']];
             $shortList = $shortProperty['property_string'] . '/' . $optimizedType . '/' . $shortProperty['joiner'];
             if (isset($shortProperties[$shortList])) {

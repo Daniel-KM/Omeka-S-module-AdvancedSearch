@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace AdvancedSearch\Service\Form;
 
 use AdvancedSearch\Form\Admin\SearchEngineConfigureForm;
@@ -12,10 +13,9 @@ class SearchEngineConfigureFormFactory implements FactoryInterface
         $api = $services->get('Omeka\ApiManager');
         $translator = $services->get('MvcTranslator');
 
-        $form = new SearchEngineConfigureForm(null, $options);
-        $form->setTranslator($translator);
-        $form->setApiManager($api);
-
-        return $form;
+        $form = new SearchEngineConfigureForm(null, $options ?? []);
+        return $form
+            ->setApiManager($api)
+            ->setTranslator($translator);
     }
 }

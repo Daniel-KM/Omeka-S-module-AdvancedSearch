@@ -10,12 +10,19 @@ class SiteSettingsFieldsetFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        $fieldset = new SiteSettingsFieldset(null, $options);
-        $viewHelpers = $services->get('ViewHelperManager');
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation[] $searchConfigs */
+        $searchConfigs = $services->get('Omeka\ApiManager')->search('search_configs')->getContent();
+        $valueOptions = [];
+        foreach ($searchConfigs as $searchConfig) {
+            $labelSearchConfig = sprintf('%s (/%s)', $searchConfig->name(), $searchConfig->path());
+            $valueOptions[$searchConfig->id()] = $labelSearchConfig;
+        }
+        $siteSettings = $services->get('Omeka\Settings\Site');
+        $fieldset = new SiteSettingsFieldset(null, $options ?? []);
         $config = $services->get('Config');
         return $fieldset
-            ->setApi($viewHelpers->get('api'))
-            ->setSetting($viewHelpers->get('setting'))
+            ->setSettings($siteSettings)
+            ->setSearchConfigs($valueOptions)
             ->setDefaultSearchFields($config['advancedsearch']['search_fields'] ?: []);
     }
 }

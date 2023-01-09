@@ -10,7 +10,7 @@ class SearchConfigFormFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        return (new SearchConfigForm(null, $options))
+        return (new SearchConfigForm(null, $options ?? []))
             ->setApiManager($services->get('Omeka\ApiManager'))
             ->setFormAdapterManager($services->get('Search\FormAdapterManager'));
     }

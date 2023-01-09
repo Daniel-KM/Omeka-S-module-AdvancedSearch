@@ -11,7 +11,7 @@ class SearchEngineFormFactory implements FactoryInterface
     {
         $searchAdapterManager = $services->get('Search\AdapterManager');
 
-        $form = new SearchEngineForm(null, $options);
+        $form = new SearchEngineForm(null, $options ?? []);
         $form->setSearchAdapterManager($searchAdapterManager);
         return $form;
     }

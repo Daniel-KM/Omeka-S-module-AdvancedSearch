@@ -2,25 +2,22 @@
 
 namespace AdvancedSearch\Form;
 
-use AdvancedSearch\Form\Element\Note;
-use AdvancedSearch\Form\Element\OptionalMultiCheckbox;
-use AdvancedSearch\Form\Element\OptionalSelect;
+use AdvancedSearch\Form\Element as AdvancedSearchElement;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
-use Omeka\View\Helper\Api;
-use Omeka\View\Helper\Setting;
+use Omeka\Settings\AbstractSettings;
 
 class SiteSettingsFieldset extends Fieldset
 {
     /**
-     * @var Api
+     * @var AbstractSettings
      */
-    protected $api;
+    protected $settings = null;
 
     /**
-     * @var Setting
+     * @var array
      */
-    protected $setting;
+    protected $searchConfigs = [];
 
     /**
      * @var array
@@ -44,22 +41,14 @@ class SiteSettingsFieldset extends Fieldset
             $this->defaultSearchFields[$key] = $defaultSearchField['label'] ?? $key;
         }
 
-        $selectAllTerms = $this->setting->__invoke('advancedsearch_restrict_used_terms', false);
-        $searchFields = $this->setting->__invoke('advancedsearch_search_fields', $defaultSelectedFields) ?: [];
-
-        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation[] $searchConfigs */
-        $searchConfigs = $this->api->search('search_configs')->getContent();
-
-        $valueOptions = [];
-        foreach ($searchConfigs as $searchConfig) {
-            $valueOptions[$searchConfig->id()] = sprintf('%s (/%s)', $searchConfig->name(), $searchConfig->path());
-        }
+        $selectAllTerms = $this->settings->get('advancedsearch_restrict_used_terms', false);
+        $searchFields = $this->settings->get('advancedsearch_search_fields') ?: $defaultSelectedFields;
 
         $this
             ->setAttribute('id', 'advanced-search')
             ->add([
                 'name' => 'advancedsearch_note_core',
-                'type' => Note::class,
+                'type' => AdvancedSearchElement\Note::class,
                 'options' => [
                     'text' => 'Core advanced search page', // @translate
                 ],
@@ -82,7 +71,7 @@ class SiteSettingsFieldset extends Fieldset
             ])
             ->add([
                 'name' => 'advancedsearch_search_fields',
-                'type' => OptionalMultiCheckbox::class,
+                'type' => AdvancedSearchElement\OptionalMultiCheckbox::class,
                 'options' => [
                     'label' => 'Display only following fields', // @translate
                     'value_options' => $this->defaultSearchFields,
@@ -96,7 +85,7 @@ class SiteSettingsFieldset extends Fieldset
 
             ->add([
                 'name' => 'advancedsearch_note_page',
-                'type' => Note::class,
+                'type' => AdvancedSearchElement\Note::class,
                 'options' => [
                     'text' => 'Module search pages', // @translate
                 ],
@@ -106,10 +95,10 @@ class SiteSettingsFieldset extends Fieldset
             ])
             ->add([
                 'name' => 'advancedsearch_main_config',
-                'type' => OptionalSelect::class,
+                'type' => AdvancedSearchElement\OptionalSelect::class,
                 'options' => [
                     'label' => 'Default search page', // @translate
-                    'value_options' => $valueOptions,
+                    'value_options' => $this->searchConfigs,
                     'empty_option' => 'Select the default search engine for the site…', // @translate
                 ],
                 'attributes' => [
@@ -118,10 +107,10 @@ class SiteSettingsFieldset extends Fieldset
             ])
             ->add([
                 'name' => 'advancedsearch_configs',
-                'type' => OptionalMultiCheckbox::class,
+                'type' => AdvancedSearchElement\OptionalMultiCheckbox::class,
                 'options' => [
                     'label' => 'Available search pages', // @translate
-                    'value_options' => $valueOptions,
+                    'value_options' => $this->searchConfigs,
                 ],
                 'attributes' => [
                     'id' => 'advancedsearch_configs',
@@ -143,15 +132,15 @@ class SiteSettingsFieldset extends Fieldset
         ;
     }
 
-    public function setApi(Api $api): Fieldset
+    public function setSettings(AbstractSettings $settings): Fieldset
     {
-        $this->api = $api;
+        $this->settings = $settings;
         return $this;
     }
 
-    public function setSetting(Setting $setting): Fieldset
+    public function setSearchConfigs(array $searchConfigs): Fieldset
     {
-        $this->setting = $setting;
+        $this->searchConfigs = $searchConfigs;
         return $this;
     }
 

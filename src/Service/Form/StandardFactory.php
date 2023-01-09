@@ -9,6 +9,6 @@ class StandardFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        return new $requestedName(null, $options);
+        return new $requestedName(null, $options ?? []);
     }
 }

@@ -73,7 +73,7 @@ class Response implements \JsonSerializable
      *
      * @var array
      */
-    protected $allResouceIdsByResourceType = [];
+    protected $allResourceIdsByResourceType = [];
 
     /**
      * Active facets are a list of selected facet values by facet.
@@ -214,7 +214,7 @@ class Response implements \JsonSerializable
         foreach ($idsByResourceType as &$values) {
             $values = array_values($values);
         }
-        $this->allResouceIdsByResourceType = $idsByResourceType;
+        $this->allResourceIdsByResourceType = $idsByResourceType;
         return $this;
     }
 
@@ -227,7 +227,7 @@ class Response implements \JsonSerializable
      */
     public function setAllResourceIdsForResourceType(string $resourceType, array $ids): self
     {
-        $this->allResouceIdsByResourceType[$resourceType] = array_values($ids);
+        $this->allResourceIdsByResourceType[$resourceType] = array_values($ids);
         return $this;
     }
 
@@ -242,19 +242,19 @@ class Response implements \JsonSerializable
      */
     public function getResourceIds(string $resourceType = null, bool $byResourceType = false): array
     {
-        if (!count($this->allResouceIdsByResourceType)) {
+        if (!count($this->allResourceIdsByResourceType)) {
             foreach (array_keys($this->results) as $resourceType) {
-                $this->allResouceIdsByResourceType[$resourceType] = array_column($this->getResults($resourceType), 'id');
+                $this->allResourceIdsByResourceType[$resourceType] = array_column($this->getResults($resourceType), 'id');
             }
         }
 
         if ($byResourceType && !$resourceType) {
-            return $this->allResouceIdsByResourceType;
+            return $this->allResourceIdsByResourceType;
         }
 
         return $resourceType
-            ? $this->allResouceIdsByResourceType[$resourceType] ?? []
-            : array_merge(...array_values($this->allResouceIdsByResourceType));
+            ? $this->allResourceIdsByResourceType[$resourceType] ?? []
+            : array_merge(...array_values($this->allResourceIdsByResourceType));
     }
 
     /**

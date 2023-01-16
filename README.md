@@ -501,7 +501,7 @@ Copyright
 See commits for full list of contributors.
 
 * Copyright BibLibre, 2016-2017 (see [BibLibre])
-* Copyright Daniel Berthereau, 2017-2022 (see [Daniel-KM])
+* Copyright Daniel Berthereau, 2017-2023 (see [Daniel-KM])
 * Copyright Tomas Kirda 2017 (library jQuery-Autocomplete)
 
 This module is a merge of features from the deprecated modules [Advanced Search Plus],

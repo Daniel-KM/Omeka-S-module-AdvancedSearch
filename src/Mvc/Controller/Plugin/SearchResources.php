@@ -907,6 +907,8 @@ class SearchResources extends AbstractPlugin
      *   - ma: matches a simple regex
      *   - nma: does not match a simple regex
      *
+     * @see \Annotate\Api\Adapter\QueryPropertiesTrait::buildPropertyQuery()
+     *
      * @param QueryBuilder $qb
      * @param array $query
      */

@@ -923,7 +923,7 @@ class SearchResources extends AbstractPlugin
         $expr = $qb->expr();
         $entityManager = $this->adapter->getEntityManager();
 
-        $escapeSql = function ($string) {
+        $escapeSqlLike = function ($string) {
             return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], (string) $string);
         };
 
@@ -1018,7 +1018,7 @@ class SearchResources extends AbstractPlugin
                     $positive = false;
                     // no break.
                 case 'in':
-                    $param = $this->adapter->createNamedParameter($qb, '%' . $escapeSql($value) . '%');
+                    $param = $this->adapter->createNamedParameter($qb, '%' . $escapeSqlLike($value) . '%');
                     $subqueryAlias = $this->adapter->createAlias();
                     $subquery = $entityManager
                         ->createQueryBuilder()
@@ -1055,7 +1055,7 @@ class SearchResources extends AbstractPlugin
                     $positive = false;
                     // no break.
                 case 'sw':
-                    $param = $this->adapter->createNamedParameter($qb, $escapeSql($value) . '%');
+                    $param = $this->adapter->createNamedParameter($qb, $escapeSqlLike($value) . '%');
                     $subqueryAlias = $this->adapter->createAlias();
                     $subquery = $entityManager
                         ->createQueryBuilder()
@@ -1073,7 +1073,7 @@ class SearchResources extends AbstractPlugin
                     $positive = false;
                     // no break.
                 case 'ew':
-                    $param = $this->adapter->createNamedParameter($qb, '%' . $escapeSql($value));
+                    $param = $this->adapter->createNamedParameter($qb, '%' . $escapeSqlLike($value));
                     $subqueryAlias = $this->adapter->createAlias();
                     $subquery = $entityManager
                         ->createQueryBuilder()

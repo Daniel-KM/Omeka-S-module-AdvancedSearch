@@ -363,6 +363,23 @@ nlres = is not linked with resource with ID
                 ],
             ])
             ->add([
+                'name' => 'active_facets',
+                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'List of active facets', // @translate
+                    'value_options' => [
+                        'none' => 'No', // @translate
+                        'header' => 'Results header', // @translate
+                        'footer' => 'Results footer', // @translate
+                        'both' => 'Both', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'active_facets',
+                    'value' => 'none',
+                ],
+            ])
+            ->add([
                 'name' => 'paginator',
                 'type' => AdvancedSearchElement\OptionalRadio::class,
                 'options' => [
@@ -660,10 +677,10 @@ nlres = is not linked with resource with ID
                 'options' => [
                     'label' => 'Position of the button "Apply filters"', // @translate
                     'value_options' => [
+                        'none' => 'None', // @translate
                         'above' => 'Above facets', // @translate
                         'below' => 'Below facets', // @translate
                         'both' => 'Both', // @translate
-                        'none' => 'None', // @translate
                     ],
                 ],
                 'attributes' => [

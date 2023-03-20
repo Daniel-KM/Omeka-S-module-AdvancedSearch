@@ -18,7 +18,7 @@ $displayCount = !empty($options['display_count']);
 <select name="facet[<?= $name ?>][]" multiple="multiple" class="search-facet-items chosen-select" data-placeholder="<?= $translate('Select below…') ?>">
     <?php foreach ($facetValues as $facetValue): ?>
     <option value="<?= $escapeAttr($facetValue['value']) ?>"<?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($facetValue['url']) . '"' : '' ?><?= $facetValue['active'] ? ' selected="selected"' : '' ?>>
-        <?= $escape($facetValue['value']) ?><?php if ($displayCount): ?> (<span class="count"><?= $facetValue['count'] ?>)<?php endif; ?>
+        <?= $escape($facetValue['value']) ?><?php if ($displayCount): ?> (<span class="count"><?= $facetValue['count'] ?></span>)<?php endif; ?>
     </option>
     <?php endforeach; ?>
 </select>

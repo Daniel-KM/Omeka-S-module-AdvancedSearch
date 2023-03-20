@@ -24,7 +24,7 @@ $displayCount = !empty($options['display_count']);
         <option value=""></option>
         <?php foreach ($facetValues as $facetValue): ?>
         <option value="<?= $escapeAttr($facetValue['value']) ?>"<?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($facetValue['url_from']) . '"' : '' ?><?= $facetValue['is_from'] ? ' selected="selected"' : '' ?>>
-            <?= $escape($facetValue['value']) ?><?php if ($displayCount): ?> (<span class="count"><?= $facetValue['count'] ?>)<?php endif; ?>
+            <?= $escape($facetValue['value']) ?><?php if ($displayCount): ?> (<span class="count"><?= $facetValue['count'] ?></span>)<?php endif; ?>
         </option>
         <?php endforeach; ?>
     </select>
@@ -33,7 +33,7 @@ $displayCount = !empty($options['display_count']);
         <option value=""></option>
         <?php foreach ($facetValues as $facetValue): ?>
         <option value="<?= $escapeAttr($facetValue['value']) ?>"<?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($facetValue['url_to']) . '"' : '' ?><?= $facetValue['is_to'] ? ' selected="selected"' : '' ?>>
-            <?= $escape($facetValue['value']) ?><?php if ($displayCount): ?> (<span class="count"><?= $facetValue['count'] ?>)<?php endif; ?>
+            <?= $escape($facetValue['value']) ?><?php if ($displayCount): ?> (<span class="count"><?= $facetValue['count'] ?></span>)<?php endif; ?>
         </option>
         <?php endforeach; ?>
     </select>

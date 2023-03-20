@@ -11,7 +11,7 @@
  * @var ?\Omeka\Api\Representation\ItemSetRepresentation $itemSet
  */
 
-if (!isset($response) || empty($searchPage->subSetting('facet', 'facets'))) return;
+if (!isset($response) || empty($searchConfig->subSetting('facet', 'facets'))) return;
 
 $plugins = $this->getHelperPluginManager();
 $translate = $plugins->get('translate');
@@ -22,11 +22,11 @@ $activeFacets = $response->getActiveFacets();
 // Don't display facet groups without facet elements.
 $facets = array_filter($facets);
 
-$displayActive = (bool) $searchPage->subSetting('facet', 'display_active', true);
+$displayActive = (bool) $searchConfig->subSetting('facet', 'display_active', true);
 
-$isFacetModeButton = $searchPage->subSetting('facet', 'mode') !== 'link';
+$isFacetModeButton = $searchConfig->subSetting('facet', 'mode') !== 'link';
 $displayFacetButton = $isFacetModeButton && !empty($facets);
-$displayButton = $displayFacetButton ? $searchPage->subSetting('facet', 'display_button', 'above') : 'none';
+$displayButton = $displayFacetButton ? $searchConfig->subSetting('facet', 'display_button', 'above') : 'none';
 
 $facetActive = $plugins->get('facetActive');
 $facetLabel = $plugins->get('facetLabel');
@@ -41,7 +41,7 @@ if (!empty($itemSet)) {
     unset($activeFacets['item_set_id']);
 }
 
-$options = $searchPage->setting('facet', []);
+$options = $searchConfig->setting('facet', []);
 ?>
 
 <aside class="search-facets">

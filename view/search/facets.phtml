@@ -14,6 +14,7 @@
 if (!isset($response) || empty($searchConfig->subSetting('facet', 'facets'))) return;
 
 $plugins = $this->getHelperPluginManager();
+$escape = $plugins->get('escapeHtml');
 $translate = $plugins->get('translate');
 
 $facets = $response->getFacetCounts();
@@ -46,7 +47,9 @@ $options = $searchConfig->setting('facet', []);
 
 <aside class="search-facets">
 
-    <h3><?= $translate('Facets') ?></h3>
+    <?php if ($facetsLabel = $searchConfig->subSetting('facet', 'label', $translate('Facets'))): ?>
+    <h3><?= $escape($facetsLabel) ?></h3>
+    <?php endif; ?>
 
     <?php if ($displayActive && count($activeFacets)): ?>
     <h4><?= $translate('Active facets') ?></h4>

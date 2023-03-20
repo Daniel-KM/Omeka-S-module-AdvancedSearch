@@ -547,6 +547,17 @@ nlres = is not linked with resource with ID
             ->get('facet')
             // field (term) = label (order means weight).
             ->add([
+                'name' => 'label',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Label above the list of facets', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'label',
+                    'value' => 'Facets',
+                ],
+            ])
+            ->add([
                 'name' => 'facets',
                 'type' => AdvancedSearchElement\DataTextarea::class,
                 'options' => [

@@ -216,6 +216,7 @@ return [
         ],
 
         'facet' => [
+            'label' => 'Facets', // @translate
             'facets' => [
                 'item_set_id' => [
                     'name' => 'item_set_id',

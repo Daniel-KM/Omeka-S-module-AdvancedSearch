@@ -30,6 +30,29 @@ class SearchingFormFieldset extends Fieldset
                 ],
             ])
             ->add([
+                'name' => 'o:block[__blockIndex__][o:data][html]',
+                'type' => Element\Textarea::class,
+                'options' => [
+                    'label' => 'Html to display', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'search-form-html',
+                    'class' => 'block-html full wysiwyg',
+                    'rows' => '5',
+                ],
+            ])
+            ->add([
+                'name' => 'o:block[__blockIndex__][o:data][link]',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Link to display', // @translate
+                    'info' => 'Formatted as "/url/full/path Label of the link".', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'search-form-link',
+                ],
+            ])
+            ->add([
                 'name' => 'o:block[__blockIndex__][o:data][search_config]',
                 'type' => Element\Select::class,
                 'options' => [

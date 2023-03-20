@@ -7,6 +7,8 @@
  * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchPage Alias of $searchConfig
  * @var \AdvancedSearch\Query $query
  * @var string $heading
+ * @var string $html
+ * @var array $link
  * @var bool $displayResults Skip form action?
  * @var \AdvancedSearch\Response $response
  * @var bool $skipFormAction Returns results on the same page. Always true, passed to partial.
@@ -14,28 +16,47 @@
 
 $plugins = $this->getHelperPluginManager();
 $escape = $plugins->get('escapeHtml');
+$hyperlink = $plugins->get('hyperlink');
 ?>
 
 <?php if (empty($displayResults) || empty($searchConfig)): ?>
 
-<div class="block-search">
+<div class="block block-search">
     <?php if (!empty($heading)): ?>
     <h2><?= $escape($heading) ?></h2>
     <?php endif; ?>
+
+    <?= $html ?>
+
     <?= $searchConfig
         ? $this->searchForm($searchConfig, null, $displayResults)
         : $this->searchingForm(null, $displayResults) ?>
+
+    <?php if ($link): ?>
+    <div class="block-search-link">
+    <?= $hyperlink($link['label'], $link['url']) ?>
+    </div>
+    <?php endif; ?>
+
 </div>
 
 <?php else: ?>
 
 <?php if (!empty($heading)): ?>
-<div class="block-search">
+<div class="block block-search">
     <h2><?= $escape($heading) ?></h2>
 </div>
 <?php endif; ?>
 
+<?= $html ?>
+
 <?php $this->vars()->offsetUnset('displayResults'); ?>
 <?= $this->partial('search/search') ?>
+
+<?php if ($link): ?>
+<div class="block-search-link">
+    <?= $hyperlink($link['label'], $link['url']) ?>
+</div>
+<?php endif; ?>
 
 <?php endif; ?>

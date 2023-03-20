@@ -97,10 +97,19 @@ class SearchingForm extends AbstractBlockLayout
         $site = $block->page()->site();
         $displayResults = !empty($data['display_results']);
 
+        if (empty($data['link'])) {
+            $link = [];
+        } else {
+            $link = explode(' ', $data['link'], 2);
+            $link = ['url' => trim($link[0]), 'label' => trim($link[1] ?? '')];
+        }
+
         $vars = [
             'block' => $block,
             'site' => $site,
             'heading' => $data['heading'] ?? '',
+            'html' => $data['html'] ?? '',
+            'link' => $link,
             'searchConfig' => $searchConfig,
             // Name "searchPage" is kept to simplify migration.
             'searchPage' => $searchConfig,

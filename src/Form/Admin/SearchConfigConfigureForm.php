@@ -380,6 +380,23 @@ nlres = is not linked with resource with ID
                 ],
             ])
             ->add([
+                'name' => 'total_results',
+                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Total results', // @translate
+                    'value_options' => [
+                        'none' => 'No', // @translate
+                        'header' => 'Results header', // @translate
+                        'footer' => 'Results footer', // @translate
+                        'both' => 'Both', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'total_results',
+                    'value' => 'header',
+                ],
+            ])
+            ->add([
                 'name' => 'paginator',
                 'type' => AdvancedSearchElement\OptionalRadio::class,
                 'options' => [

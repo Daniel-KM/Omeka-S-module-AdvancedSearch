@@ -13,11 +13,13 @@
 
 $plugins = $this->getHelperPluginManager();
 $translate = $plugins->get('translate');
+$translatePlural = $plugins->get('translatePlural');
 
 // Default values of the module.
 $displayParts = [
     'search_filters' => 'header',
     'active_facets' => 'none',
+    'total_results' => 'header',
     'paginator' => 'header',
     'per_pages' => 'header',
     'sort' => 'header',
@@ -50,8 +52,15 @@ $multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['lis
 <?= $this->searchingFilters($searchConfig, $query, ['template' => 'common/search-filters-links']) ?>
 <?php endif; ?>
 
+<?php if (isset($displayParts['total_results'])): ?>
+<div class="search-results-count-total">
+    <?php $totalResults = $response->getTotalResults(); ?>
+    <?=  sprintf($translatePlural('%s item', '%s items', $totalResults), $totalResults) ?>
+</div>
+<?php endif; ?>
+
 <?php if (isset($displayParts['paginator'])): ?>
-<div class="search-results-count">
+<div class="search-results-count <?= isset($displayParts['total_results']) ? 'no-total-results' : '' ?>">
     <?= $this->pagination('common/pagination') ?>
 </div>
 <?php endif; ?>

@@ -176,6 +176,7 @@ return [
         'display' => [
             'search_filters' => 'header',
             'active_facets' => 'none',
+            'total_results' => 'header',
             'paginator' => 'header',
             'per_pages' => 'header',
             'sort' => 'header',

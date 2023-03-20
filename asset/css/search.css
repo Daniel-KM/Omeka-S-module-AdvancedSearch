@@ -20,7 +20,7 @@
 
     #search-filters {
         margin: 36px 0;
-}
+    }
     #search-filters .filter {
         display: flex;
         margin-bottom: 0;
@@ -154,6 +154,9 @@
 
     .search-results .resource-list {
         display: flex;
+    }
+    .search-results-count.no-total-results .row-count {
+        display: none;
     }
     .search-results .resource-list.list {
         flex-direction: column;

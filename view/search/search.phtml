@@ -43,9 +43,13 @@
 $plugins = $this->getHelperPluginManager();
 $api = $plugins->get('api');
 $partial = $plugins->get('partial');
+$escape = $plugins->get('escapeHtml');
 $assetUrl = $plugins->get('assetUrl');
 $translate = $plugins->get('translate');
+$hyperlink = $plugins->get('hyperlink');
 $translatePlural = $plugins->get('translatePlural');
+
+$breadcrumbs = $plugins->has('breadcrumbs') ? $plugins->get('breadcrumbs') : null;
 
 $vars = $this->vars();
 
@@ -83,6 +87,21 @@ $this->headScript()
 ?>
 
 <?php if (empty($isPartial)): ?>
+<?php if ($breadcrumbs): ?>
+    <?= $breadcrumbs() ?>
+<?php else: ?>
+<nav id="breadcrumb" class="breadcrumbs">
+    <ul>
+        <li><?= $hyperlink($translate('Home'), $site->siteUrl()) ?></li>
+        <?php if ($itemSet): ?>
+        <li><?= $translate('Collections') ?></li>
+        <li><span><?= $itemSet->siteUrl($site->slug()) ?></span></li>
+        <?php endif; ?>
+        <li><span><?= $escape($translate('Search')) ?></span></li>
+    </ul>
+</nav>
+<?php endif; ?>
+
 <div id="search-page">
 <?php endif; ?>
 

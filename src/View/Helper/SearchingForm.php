@@ -8,6 +8,8 @@ class SearchingForm extends AbstractHelper
 {
     /**
      * Display the search form if any, else display the standard form.
+     *
+     * @uses \AdvancedSearch\View\Helper\SearchForm
      */
     public function __invoke(?string $searchFormPartial = null, bool $skipFormAction = false): string
     {

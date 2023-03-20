@@ -38,7 +38,7 @@ class HiddenInputsFromFilteredQuery extends AbstractHtmlElement
             if (!$nameValue) {
                 continue;
             }
-            [$name, $value] = explode('=', $nameValue, 2);
+            [$name, $value] = mb_strpos($nameValue, '=') === false ? [$nameValue, ''] : explode('=', $nameValue, 2);
             $name = urldecode($name);
             if (is_null($value) || in_array($name, $skipNames)) {
                 continue;

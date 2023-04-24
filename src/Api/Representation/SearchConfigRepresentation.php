@@ -82,6 +82,9 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         return $url('admin/search/config-id', $params, $options);
     }
 
+    /**
+     * Url of the real search page.
+     */
     public function adminSearchUrl($canonical = false): string
     {
         $url = $this->getViewHelper('Url');

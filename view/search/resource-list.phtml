@@ -22,9 +22,9 @@ $hyperlink = $plugins->get('hyperlink');
 $thumbnail = $plugins->get('thumbnail');
 
 // Can be simplified in a public theme.
-$setting = $plugins->get($site ? 'siteSetting' : 'setting');
+$setting = $plugins->get(isset($site) ? 'siteSetting' : 'setting');
 
-$siteSlug = $site ? $site->slug() : null;
+$siteSlug = isset($site) ? $site->slug() : null;
 
 $filterLocale = (bool) $setting('filter_locale_values');
 $siteLang = $plugins->get('lang')();

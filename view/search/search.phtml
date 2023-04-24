@@ -53,7 +53,9 @@ $breadcrumbs = $plugins->has('breadcrumbs') ? $plugins->get('breadcrumbs') : nul
 
 $vars = $this->vars();
 
-$filterLocale = (bool) $this->siteSetting('filter_locale_values');
+$setting = $plugins->get(isset($site) ? 'siteSetting' : 'setting');
+
+$filterLocale = (bool) $setting('filter_locale_values');
 $lang = $this->lang();
 $langTitle = $filterLocale ? $lang : null;
 $langValue = $filterLocale ? [$lang, ''] : null;
@@ -92,10 +94,12 @@ $this->headScript()
 <?php else: ?>
 <nav id="breadcrumb" class="breadcrumbs">
     <ul>
+        <?php if (isset($site)): ?>
         <li><?= $hyperlink($translate('Home'), $site->siteUrl()) ?></li>
+        <?php endif; ?>
         <?php if ($itemSet): ?>
         <li><?= $translate('Collections') ?></li>
-        <li><span><?= $itemSet->siteUrl($site->slug()) ?></span></li>
+        <li><span><?= isset($site) ? $itemSet->siteUrl($site->slug()) : $itemSet->adminUrl() ?></span></li>
         <?php endif; ?>
         <li><span><?= $escape($translate('Search')) ?></span></li>
     </ul>

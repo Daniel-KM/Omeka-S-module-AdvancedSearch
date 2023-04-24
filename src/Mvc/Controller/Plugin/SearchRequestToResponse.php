@@ -246,7 +246,7 @@ class SearchRequestToResponse extends AbstractPlugin
         $totalResults = array_map(function ($resource) use ($response) {
             return $response->getResourceTotalResults($resource);
         }, $engineSettings['resources']);
-        $plugins->get('paginator')(max($totalResults), $query->getPage() ?: 1);
+        $plugins->get('paginator')(max($totalResults), $query->getPage() ?: 1, $query->getPerPage());
 
         return [
             'status' => 'success',

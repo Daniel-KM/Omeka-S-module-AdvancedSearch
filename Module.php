@@ -178,8 +178,19 @@ class Module extends AbstractModule
                 }
             }
         } else {
-            $messenger->addWarning('The modules Search, Advanced Search Plus, PSL Search Form, Search Solr cannot be upgraded with a version of Advanced Search greater than 3.3.6.6.'); // @translate
-            $this->installResources();
+            $has = false;
+            foreach (['Search', 'AdvancedSearchPlus', 'PslSearchForm', 'Solr'] as $module) {
+                $module = $moduleManager->getModule($module);
+                $has = $has || ($module && in_array($module->getState(), [
+                    \Omeka\Module\Manager::STATE_ACTIVE,
+                    \Omeka\Module\Manager::STATE_NOT_ACTIVE,
+                    \Omeka\Module\Manager::STATE_NEEDS_UPGRADE,
+                ]));
+            }
+            if ($has) {
+                $messenger->addWarning('The modules Search, Advanced Search Plus, PSL Search Form, and Search Solr cannot be upgraded with a version of Advanced Search greater than 3.3.6.6.'); // @translate
+                $this->installResources();
+            }
         }
 
         // The module is automatically disabled when Search is uninstalled.

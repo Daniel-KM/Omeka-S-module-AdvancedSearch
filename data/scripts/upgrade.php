@@ -292,3 +292,10 @@ SQL;
     $message->setEscapeHtml(false);
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.7', '<')) {
+    $message = new Message(
+        'Some new options were added to manage facets.' // @translate
+    );
+    $messenger->addSuccess($message);
+}

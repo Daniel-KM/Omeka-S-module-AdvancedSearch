@@ -36,6 +36,7 @@ use Laminas\Form\Element;
 use Laminas\Form\ElementInterface;
 use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
+use Laminas\Form\FormElementManager;
 use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Form\Element as OmekaElement;
 use Omeka\View\Helper\Setting;
@@ -59,7 +60,7 @@ class MainSearchForm extends Form
     protected $siteSetting;
 
     /**
-     * @var \Laminas\Form\FormElementManager;
+     * @var \Laminas\Form\FormElementManager
      */
     protected $formElementManager;
 
@@ -944,7 +945,7 @@ class MainSearchForm extends Form
         return $this;
     }
 
-    public function setFormElementManager($formElementManager): Form
+    public function setFormElementManager(FormElementManager $formElementManager): Form
     {
         $this->formElementManager = $formElementManager;
         return $this;

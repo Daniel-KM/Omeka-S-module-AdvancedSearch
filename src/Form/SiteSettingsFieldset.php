@@ -145,19 +145,19 @@ class SiteSettingsFieldset extends Fieldset
         ;
     }
 
-    public function setSettings(AbstractSettings $settings): Fieldset
+    public function setSettings(AbstractSettings $settings): self
     {
         $this->settings = $settings;
         return $this;
     }
 
-    public function setSearchConfigs(array $searchConfigs): Fieldset
+    public function setSearchConfigs(array $searchConfigs): self
     {
         $this->searchConfigs = $searchConfigs;
         return $this;
     }
 
-    public function setDefaultSearchFields(array $defaultSearchFields): Fieldset
+    public function setDefaultSearchFields(array $defaultSearchFields): self
     {
         $this->defaultSearchFields = $defaultSearchFields;
         return $this;

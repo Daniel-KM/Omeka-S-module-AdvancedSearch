@@ -105,19 +105,19 @@ class SettingsFieldset extends Fieldset
             ]);
     }
 
-    public function setSearchConfigs(array $searchConfigs): Fieldset
+    public function setSearchConfigs(array $searchConfigs): self
     {
         $this->searchConfigs = $searchConfigs;
         return $this;
     }
 
-    public function setSearchConfigsApi(array $searchConfigsApi): Fieldset
+    public function setSearchConfigsApi(array $searchConfigsApi): self
     {
         $this->searchConfigsApi = $searchConfigsApi;
         return $this;
     }
 
-    public function setRestrictUsedTerms(bool $restrictUsedTerms): Fieldset
+    public function setRestrictUsedTerms(bool $restrictUsedTerms): self
     {
         $this->restrictUsedTerms = $restrictUsedTerms;
         return $this;

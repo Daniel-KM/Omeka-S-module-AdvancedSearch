@@ -210,6 +210,8 @@ class SearchRequestToResponse extends AbstractPlugin
             $query->setFacets($facets);
         }
 
+        $query->setOption('facet_display_list', $searchConfigSettings['facet']['display_list'] ?? 'all');
+
         $eventManager = $services->get('Application')->getEventManager();
         $eventArgs = $eventManager->prepareArgs([
             'request' => $request,

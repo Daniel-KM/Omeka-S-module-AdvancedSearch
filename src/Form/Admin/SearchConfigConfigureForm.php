@@ -673,6 +673,22 @@ nlres = is not linked with resource with ID
                 ],
             ])
             ->add([
+                'name' => 'display_list',
+                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Display list of facets', // @translate
+                    'value_options' => [
+                        'all' => 'All facets, even with 0 results', // @translate
+                        'available' => 'Available facets only', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'display_list',
+                    'required' => false,
+                    'value' => 'available',
+                ],
+            ])
+            ->add([
                 'name' => 'mode',
                 'type' => AdvancedSearchElement\OptionalRadio::class,
                 'options' => [

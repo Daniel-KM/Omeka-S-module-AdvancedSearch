@@ -144,6 +144,11 @@ class Query implements \JsonSerializable
     protected $siteId;
 
     /**
+     * @var array
+     */
+    protected $options = [];
+
+    /**
      * The query should be stringable and is always trimmed.
      */
     public function setQuery($query): self
@@ -540,6 +545,21 @@ class Query implements \JsonSerializable
     public function getSiteId(): ?int
     {
         return $this->siteId;
+    }
+
+    /**
+     * @experimental Only used to pass the display list mode for facets for now.
+     * May be removed in a future version.
+     */
+    public function setOption(string $key, $value): self
+    {
+        $this->options[$key] = $value;
+        return $this;
+    }
+
+    public function getOption(string $key, $default = null)
+    {
+        return $this->options[$key] ?? $default;
     }
 
     /**

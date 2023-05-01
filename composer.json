@@ -45,7 +45,6 @@
     },
     "replace": {
         "laminas/laminas-escaper": "*",
-        "laminas/laminas-servicemanager": "*",
         "laminas/laminas-stdlib": "*"
     },
     "require-dev": {

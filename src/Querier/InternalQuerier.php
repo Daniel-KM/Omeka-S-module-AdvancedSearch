@@ -847,8 +847,6 @@ SQL;
         // query for resource (items and item sets together).
         $facetCountsByField = array_fill_keys(array_keys($facets), []);
 
-        $facetData = $this->argsWithoutActiveFacets;
-
         $facetOrders = [
             'alphabetic asc' => [
                 'sort_by' => 'alphabetic',
@@ -898,7 +896,7 @@ SQL;
             // TODO Make References manages individual options for each field (limit, order, languages, range).
             $values = $references
                 ->setMetadata($fields)
-                ->setQuery($facetData)
+                ->setQuery($this->args)
                 ->setOptions($options)
                 ->list();
 
@@ -918,7 +916,7 @@ SQL;
                     // TODO Remove this double query for facet range when individual options will be managed.
                     $values = $references
                         ->setMetadata([$fields[$facetField]])
-                        ->setQuery($facetData)
+                        ->setQuery($this->args)
                         ->setOptions($optionsFacetRange)
                         ->list();
                 }

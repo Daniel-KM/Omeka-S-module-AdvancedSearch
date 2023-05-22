@@ -206,6 +206,9 @@ class MainSearchForm extends Form
                     case 'item_set/o:id':
                         $element = $this->searchItemSet($filter);
                         break;
+                    case 'item_sets_tree':
+                        $element = $this->searchItemSetsTree($filter);
+                        break;
                     default:
                         $method = 'search' . $type;
                         $element = method_exists($this, $method)
@@ -737,6 +740,37 @@ class MainSearchForm extends Form
         return $fieldset;
     }
 
+    protected function searchItemSetsTree(array $filter): ?ElementInterface
+    {
+        $fieldset = new Fieldset('item_sets_tree');
+        $fieldset
+            ->setAttributes([
+                'id' => 'search-item-sets-tree',
+                'data-field-type' => 'itemset',
+            ])
+            ->add([
+                'name' => 'id',
+                'type' => $filter['type'] === 'MultiCheckbox'
+                    ? AdvancedSearchElement\OptionalMultiCheckbox::class
+                    : AdvancedSearchElement\OptionalSelect::class,
+                'options' => [
+                    'label' => $filter['label'], // @translate
+                    'value_options' => $this->getItemSetsTreeOptions($filter['type'] !== 'MultiCheckbox'),
+                    'empty_option' => '',
+                ],
+                'attributes' => [
+                    'id' => 'search-item-sets-tree',
+                    'multiple' => true,
+                    'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
+                    // End users understand "collections" more than "item sets".
+                    'data-placeholder' => 'Select collections…', // @translate
+                ],
+            ])
+        ;
+
+        return $fieldset;
+    }
+
     /**
      * Add input filters.
      *
@@ -861,6 +895,32 @@ class MainSearchForm extends Form
 
     protected function getItemSetsOptions($byOwner = false): array
     {
+        /** @var \Omeka\Form\Element\ItemSetSelect $select */
+        $select = $this->formElementManager->get(\Omeka\Form\Element\ItemSetSelect::class, []);
+        if ($this->site) {
+            $select->setOptions([
+                'query' => ['site_id' => $this->site->id(), 'sort_by' => 'dcterms:title', 'sort_order' => 'asc'],
+                'disable_group_by_owner' => true,
+            ]);
+            // By default, sort is case sensitive. So use a case insensitive sort.
+            $valueOptions = $select->getValueOptions();
+            natcasesort($valueOptions);
+        } else {
+            $select->setOptions([
+                'query' => ['sort_by' => 'dcterms:title', 'sort_order' => 'asc'],
+                'disable_group_by_owner' => !$byOwner,
+            ]);
+            $valueOptions = $select->getValueOptions();
+        }
+        return $valueOptions;
+    }
+
+    protected function getItemSetsTreeOptions($byOwner = false): array
+    {
+        if (!$this->formElementManager->has('itemSetsTreeSelect')) {
+            return [];
+        }
+
         /** @var \Omeka\Form\Element\ItemSetSelect $select */
         $select = $this->formElementManager->get(\Omeka\Form\Element\ItemSetSelect::class, []);
         if ($this->site) {

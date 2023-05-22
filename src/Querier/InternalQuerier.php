@@ -630,6 +630,11 @@ SQL;
                     $this->args['item_set_id'] = empty($this->args['item_set_id']) ? $values : array_merge($this->args['item_set_id'], $values);
                     continue 2;
 
+                case 'item_sets_tree':
+                    $values = array_filter(array_map('intval', $flatArray($values)));
+                    $this->args['item_sets_tree'] = empty($this->args['item_sets_tree']) ? $values : array_merge($this->args['item_sets_tree'], $values);
+                    continue 2;
+
                 default:
                     $field = $this->getPropertyTerms($field)
                         ?? $multifields[$field]['fields']
@@ -829,6 +834,7 @@ SQL;
             'resource_class_id' => 'o:resource_class',
             'resource_template_id' => 'o:resource_template',
             'item_set_id' => 'o:item_set',
+            'item_sets_tree' => 'item_sets_tree',
         ];
 
         // Convert multi-fields into a list of property terms.

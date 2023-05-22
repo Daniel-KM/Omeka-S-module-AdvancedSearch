@@ -35,6 +35,7 @@ $facetLabel = $plugins->get('facetLabel');
 $facetElements = $isFacetModeButton ? $plugins->get('facetCheckboxes') : $plugins->get('facetLinks');
 $facetSelect = $plugins->get('facetSelect');
 $facetSelectRange = $plugins->get('facetSelectRange');
+$facetElementsTree = $isFacetModeButton ? $plugins->get('facetCheckboxesTree') : $plugins->get('facetLinksTree');
 
 // Don't display facets for item sets when browsing an item set.
 if (!empty($itemSet)) {
@@ -84,6 +85,8 @@ $options = $searchConfig->setting('facet', []);
                 <?= $facetSelect($name, $facetValues, $options) ?>
                 <?php elseif ($facetType === 'SelectRange'): ?>
                 <?= $facetSelectRange($name, $facetValues, $options) ?>
+                <?php elseif ($facetType === 'Tree'): ?>
+                <?= $facetElementsTree($name, $facetValues, $options) ?>
                 <?php else: ?>
                 <?= $facetElements($name, $facetValues, $options) ?>
                 <?php endif; ?>

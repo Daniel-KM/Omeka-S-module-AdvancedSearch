@@ -69,11 +69,13 @@ class AbstractFacet extends AbstractHelper
     /**
      * Create one facet as link, checkbox, select or button.
      *
+     * @param string|array $facetField Field name or null for active facets.
      * @param array $facetValues Each facet value has two keys: value and count.
      * May have more for specific facets, like facet range.
+     * For active facets, keys are names and values are list of values.
      * @return string|array
      */
-    public function __invoke(string $facetField, array $facetValues, array $options = [], bool $asData = false)
+    public function __invoke(?string $facetField, array $facetValues, array $options = [], bool $asData = false)
     {
         static $facetsData = [];
 
@@ -111,7 +113,11 @@ class AbstractFacet extends AbstractHelper
         }
 
         unset($this->queryBase['page']);
-        if (!isset($facetsData[$facetField])) {
+
+        // For active facets, there is no facet field.
+        if ($facetField === null) {
+            $facetsData[$facetField] = $this->prepareActiveFacetData($facetValues, $options);
+        } elseif (!isset($facetsData[$facetField])) {
             $facetsData[$facetField] = $this->prepareFacetData($facetField, $facetValues, $options);
         }
 
@@ -119,7 +125,9 @@ class AbstractFacet extends AbstractHelper
             return $facetsData[$facetField];
         }
 
-        return $this->partialHelper->__invoke($this->partial, $facetsData[$facetField]);
+        return $this->partialHelper->__invoke($this->partial, $facetField === null
+            ? ['activeFacets' => $facetsData[$facetField], 'options' => $options]
+            :  $facetsData[$facetField]);
     }
 
     /**
@@ -311,6 +319,26 @@ class AbstractFacet extends AbstractHelper
                     // Manage the case where a resource was indexed but removed.
                     : null;
 
+            case 'item_sets_tree':
+            case 'item_sets_tree_is':
+                if (!is_numeric($value)) {
+                    return $value;
+                }
+                if ($this->tree) {
+                    if (is_numeric($value)) {
+                        return $this->tree[$value]['title'] ?? $value;
+                    }
+                    // Confirm that the title exists.
+                    // This is useless for now, since item sets tree are indexed by id.
+                    $labels = array_column($this->tree ?? [], 'title', 'id');
+                    $key = array_search($value, $labels);
+                    if ($key !== false) {
+                        return $value;
+                    }
+                }
+                // The tree may not be available, so get title via api.
+                // no break.
+
             case 'item_set':
             case 'item_set_id':
                 $data = ['id' => $value];
@@ -325,17 +353,6 @@ class AbstractFacet extends AbstractHelper
                     // Manage the case where a resource was indexed but removed.
                     // In public side, the item set should belong to a site too.
                     : null;
-
-            case 'item_sets_tree':
-            case 'item_sets_tree_is':
-                if (is_numeric($value)) {
-                    return $this->tree[$value]['title'] ?? $value;
-                }
-                // Confirm that the title exists.
-                // This is useless for now, since item sets tree are indexed by id.
-                $labels = array_column($this->tree, 'title', 'id');
-                $key = array_search($value, $labels);
-                return $key ? $value : $value;
 
             case 'property':
             default:

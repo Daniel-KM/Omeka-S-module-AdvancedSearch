@@ -33,6 +33,7 @@ return [
     'view_helpers' => [
         'invokables' => [
             'facetActive' => View\Helper\FacetActive::class,
+            'facetActives' => View\Helper\FacetActives::class,
             'facetCheckbox' => View\Helper\FacetCheckbox::class,
             'facetCheckboxes' => View\Helper\FacetCheckboxes::class,
             'facetCheckboxesTree' => View\Helper\FacetCheckboxesTree::class,

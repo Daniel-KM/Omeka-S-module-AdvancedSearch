@@ -29,7 +29,7 @@ $isFacetModeButton = $searchConfig->subSetting('facet', 'mode') !== 'link';
 $displayFacetButton = $isFacetModeButton && !empty($facets);
 $displayButton = $displayFacetButton ? $searchConfig->subSetting('facet', 'display_button', 'above') : 'none';
 
-$facetActive = $plugins->get('facetActive');
+$facetActives = $plugins->get('facetActives');
 $facetLabel = $plugins->get('facetLabel');
 // Facet checkbox can be used in any case anyway, the js checks it.
 $facetElements = $isFacetModeButton ? $plugins->get('facetCheckboxes') : $plugins->get('facetLinks');
@@ -54,11 +54,7 @@ $options = $searchConfig->setting('facet', []);
 
     <?php if ($displayActive && count($activeFacets)): ?>
     <h4><?= $translate('Active facets') ?></h4>
-    <ul class="search-facets-active">
-        <?php foreach ($activeFacets as $name => $facetValues) foreach ($facetValues as $facetKey => $facetValue): ?>
-        <li><?= $facetActive($name, ['value' => $facetValue, 'count' => null, 'key' => $facetKey], $options) ?></li>
-        <?php endforeach; ?>
-    </ul>
+    <?= $facetActives(null, $activeFacets, $options) ?>
     <?php endif; ?>
 
     <form id="form-facets">

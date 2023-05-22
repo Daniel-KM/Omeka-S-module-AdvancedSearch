@@ -2,6 +2,9 @@
 
 namespace AdvancedSearch\View\Helper;
 
+/**
+ * @deprecated Since 3.4.8. Use AbstractFacet only.
+ */
 class AbstractFacetElement extends AbstractFacet
 {
     /**

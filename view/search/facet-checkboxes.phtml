@@ -4,7 +4,7 @@
  * @var string $name
  * @var array $facetValues With value, count, active, label and url when needed.
  * @var array $options
- * @var array $tree For item sets tree.
+ * @var array|null $tree For item sets tree. Don't contain data from item sets not in the site.
  */
 
 $plugins = $this->getHelperPluginManager();
@@ -24,8 +24,9 @@ $isTree = is_array($tree);
         $label = $displayCount
             ? sprintf('%s (<span class="count">%d</span>)', $escape($facetValue['label']),  $facetValue['count'])
             : $escape($facetValue['label']);
+        $treeVal = $isTree ? $tree[$facetValue['value']] ?? null : null;
     ?>
-    <li class="search-facet-item"<?=  $isTree ? sprintf(' data-value="%s" data-parent="%s" data-level="%s"', $tree[$facetValue['value']]['id'], $tree[$facetValue['value']]['parent'], $tree[$facetValue['value']]['level']) : '' ?>>
+    <li class="search-facet-item"<?= $treeVal ? sprintf(' data-value="%s" data-parent="%s" data-level="%s"', $treeVal['id'], $treeVal['parent'], $treeVal['level']) : '' ?>>
         <input type="checkbox" name="facet[<?= $name ?>][]" id="<?= $escapedId ?>" value="<?= $escapedValue ?>"<?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($facetValue['url']) . '"' : '' ?><?= $facetValue['active'] ? ' checked="checked"' : '' ?>/>
         <label for="<?= $escapedId ?>"><?= $label ?></label>
     </li>

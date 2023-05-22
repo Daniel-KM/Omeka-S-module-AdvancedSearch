@@ -4,7 +4,7 @@
  * @var string $name
  * @var array $facetValues With value, count, active, label and url when needed.
  * @var array $options
- * @var array|null $tree For item sets tree.
+ * @var array|null $tree For item sets tree. Don't contain data from item sets not in the site.
  */
 
 $plugins = $this->getHelperPluginManager();
@@ -18,7 +18,8 @@ $isTree = is_array($tree);
 
 <ul class="search-facet-items">
     <?php foreach ($facetValues as $facetValue): ?>
-    <li class="<?= $facetValue['active'] ? 'active' : 'inactive' ?>"<?=  $isTree ? sprintf(' data-value="%s" data-parent="%s" data-level="%s"', $tree[$facetValue['value']]['id'], $tree[$facetValue['value']]['parent'], $tree[$facetValue['value']]['level']) : '' ?>>
+        <?php $treeVal = $isTree ? $tree[$facetValue['value']] ?? null : null; ?>
+    <li class="<?= $facetValue['active'] ? 'active' : 'inactive' ?>"<?= $treeVal ? sprintf(' data-value="%s" data-parent="%s" data-level="%s"', $treeVal['id'], $treeVal['parent'], $treeVal['level']) : '' ?>>
         <a href="<?= $escapeAttr($facetValue['url']) ?>"><?= $escape($facetValue['label']) ?></a>
         <?php if ($displayCount): ?>
         (<span class="count"><?= $facetValue['count'] ?></span>)

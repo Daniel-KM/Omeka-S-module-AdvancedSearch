@@ -18,12 +18,16 @@ $isTree = is_array($tree);
 
 <ul class="search-facet-items">
     <?php foreach ($facetValues as $facetValue): ?>
-        <?php $treeVal = $isTree ? $tree[$facetValue['value']] ?? null : null; ?>
+    <?php $treeVal = $isTree ? $tree[$facetValue['value']] ?? null : null; ?>
     <li class="<?= $facetValue['active'] ? 'active' : 'inactive' ?>"<?= $treeVal ? sprintf(' data-value="%s" data-parent="%s" data-level="%s"', $treeVal['id'], $treeVal['parent'], $treeVal['level']) : '' ?>>
-        <a href="<?= $escapeAttr($facetValue['url']) ?>"><?= $escape($facetValue['label']) ?></a>
-        <?php if ($displayCount): ?>
-        (<span class="count"><?= $facetValue['count'] ?></span>)
-        <?php endif; ?>
+        <a href="<?= $escapeAttr($facetValue['url']) ?>">
+            <span>
+                <?= $escape($facetValue['label']) ?>
+                <?php if ($displayCount): ?>
+                <span class="count">(<?= $facetValue['count'] ?>)</span>)
+                <?php endif; ?>
+            </span>
+        </a>
     </li>
     <?php endforeach; ?>
 </ul>

@@ -20,8 +20,12 @@ $displayCount = !empty($options['display_count']);
 ?>
 
 <span class="<?= $active ? 'active' : 'inactive' ?>">
-    <a href="<?= $escapeHtmlAttr($url) ?>"><?= $escapeHtml($label) ?></a>
-    <?php if ($displayCount): ?>
-    (<span class="count"><?= $count ?></span>)
-    <?php endif; ?>
+    <a href="<?= $escapeHtmlAttr($url) ?>">
+        <span>
+            <?= $escapeHtml($label) ?>
+            <?php if ($displayCount): ?>
+            <span class="count">(<?= $count ?>)</span>
+            <?php endif; ?>
+        </span>
+    </a>
 </span>

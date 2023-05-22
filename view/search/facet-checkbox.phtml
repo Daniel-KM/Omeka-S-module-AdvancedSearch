@@ -22,4 +22,4 @@ $displayCount = !empty($options['display_count']);
 ?>
 
 <input type="checkbox" name="facet[<?= $name ?>][]" id="<?= $escapedId ?>" value="<?= $escapedValue ?>" data-url="<?= $escapeHtmlAttr($url) ?>" <?php if ($active) echo ' checked="checked"'; ?>/>
-<label for="<?= $escapedId ?>"><?= $escapeHtml($label) ?><?php if ($displayCount): ?> (<span class="count"><?= $count ?></span>)<?php endif; ?></label>
+<label for="<?= $escapedId ?>"><span><?= $escapeHtml($label) ?><?php if ($displayCount): ?> <span class="count">(<?= $count ?>)</span><?php endif; ?></span></span></label>

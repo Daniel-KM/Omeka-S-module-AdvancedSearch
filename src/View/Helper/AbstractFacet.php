@@ -366,6 +366,7 @@ class AbstractFacet extends AbstractHelper
      * Use a quick connection request instead of a long procedure.
      *
      * @see \AdvancedSearch\View\Helper\AbstractFacet::itemsSetsTreeQuick()
+     * @see \BlockPlus\View\Helper\Breadcrumbs::itemsSetsTreeQuick()
      * @see \SearchSolr\ValueExtractor\AbstractResourceEntityValueExtractor::itemSetsTreeQuick()
      *
      * @todo Simplify ordering: by sql (for children too) or store.
@@ -461,6 +462,8 @@ SQL;
         }
 
         // Root is already ordered via sql.
+
+        // TODO The children are useless here.
 
         // Reorder whole structure.
         // TODO Use a while loop.

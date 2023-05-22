@@ -136,6 +136,42 @@
         padding-left: 0;
         list-style: none;
     }
+    .search-facet-items li[data-level="1"] a {
+        margin-left: 12px;
+    }
+    .search-facet-items li[data-level="2"] a {
+        margin-left: 24px;
+    }
+    .search-facet-items li[data-level="3"] a {
+        margin-left: 36px;
+    }
+    .search-facet-items li[data-level="4"] a {
+        margin-left: 48px;
+    }
+    .search-facet-items li[data-level="5"] a {
+        margin-left: 60px;
+    }
+    .search-facet-items li[data-level="6"] a {
+        margin-left: 72px;
+    }
+    .search-facet-items li[data-level="7"] a {
+        margin-left: 84px;
+    }
+    .search-facet-items li[data-level="8"] a {
+        margin-left: 96px;
+    }
+    .search-facet-items li[data-level="9"] a {
+        margin-left: 108px;
+    }
+    .search-facet-items li[data-level="10"] a {
+        margin-left: 120px;
+    }
+    .search-facet-items li[data-level="11"] a {
+        margin-left: 132px;
+    }
+    .search-facet-items li[data-level="12"] a {
+        margin-left: 144px;
+    }
     .search-facet-item {
         display: block;
     }

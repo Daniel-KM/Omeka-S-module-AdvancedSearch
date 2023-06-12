@@ -295,13 +295,12 @@ class SearchFilters extends AbstractHelper
                         $fieldLabel = $field === 'modified' ? $translate('Modified') : $translate('Created');
                         $filterLabel = $fieldLabel . ' ' . $queryTypesDatetime[$type];
                         if ($engine > 0) {
-                            if ($joiner === 'or') {
-                                $filterLabel = $translate('OR') . ' ' . $filterLabel;
-                            } elseif ($joiner === 'not') {
-                                $filterLabel = $translate('EXCEPT') . ' ' . $filterLabel; // @translate
-                            } else {
-                                $filterLabel = $translate('AND') . ' ' . $filterLabel;
-                            }
+                            $joiners = [
+                                'or' => $translate('OR'), // @translate
+                                'not' => $translate('EXCEPT'), // @translate
+                                'and' => $translate('AND'), // @translate
+                            ];
+                            $filterLabel = ($joiners[$joiner] ?? $joiners['and']) . ' ' . $filterLabel;
                         }
                         $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $datetimeValue;
                         ++$engine;

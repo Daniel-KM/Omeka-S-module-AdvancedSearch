@@ -364,13 +364,12 @@ class SearchingFilters extends AbstractHelper
 
                         $filterLabel = $fieldLabel . ' ' . $queryTypesLabels[$queryType];
                         if ($index > 0) {
-                            if ($joiner === 'or') {
-                                $filterLabel = $translate('OR') . ' ' . $filterLabel;
-                            } elseif ($joiner === 'not') {
-                                $filterLabel = $translate('EXCEPT') . ' ' . $filterLabel; // @translate
-                            } else {
-                                $filterLabel = $translate('AND') . ' ' . $filterLabel;
-                            }
+                            $joiners = [
+                                'or' => $translate('OR'), // @translate
+                                'not' => $translate('EXCEPT'), // @translate
+                                'and' => $translate('AND'), // @translate
+                            ];
+                            $filterLabel = ($joiners[$joiner] ?? $joiners['and']) . ' ' . $filterLabel;
                         }
 
                         $vals = in_array($queryType, SearchResources::PROPERTY_QUERY['value_subject'])

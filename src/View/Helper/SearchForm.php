@@ -58,21 +58,16 @@ class SearchForm extends AbstractHelper
     {
         $plugins = $this->getView()->getHelperPluginManager();
         $isAdmin = $plugins->get('status')->isAdminRequest();
+
         if (empty($searchConfig)) {
-            // If it is on a search page route, use the id, else use the setting.
+            $getSearchConfig = $plugins->get('getSearchConfig');
+            // If it is on a search page route, use the id.
+            // TODO It may be possible to use the search config path.
             $params = $plugins->get('params')->fromRoute();
-            $setting = $plugins->get($isAdmin ? 'setting' : 'siteSetting');
-            if ($params['controller'] === 'AdvancedSearch\Controller\IndexController') {
-                $searchConfigId = $params['id'];
-                // Check if this search config is allowed.
-                if (!in_array($searchConfigId, $setting('advancedsearch_configs'))) {
-                    $searchConfigId = 0;
-                }
-            }
-            if (empty($searchConfigId)) {
-                $searchConfigId = $setting('advancedsearch_main_config');
-            }
-            $this->searchConfig = $plugins->get('api')->searchOne('search_configs', ['id' => (int) $searchConfigId])->getContent();
+            $searchConfigId = $params['controller'] === 'AdvancedSearch\Controller\IndexController'
+                    ? (int) $params['id']
+                    : null;
+            $this->searchConfig = $getSearchConfig($searchConfigId);
         } else {
             $this->searchConfig = $searchConfig;
         }

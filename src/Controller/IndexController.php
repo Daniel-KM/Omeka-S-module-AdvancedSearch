@@ -71,7 +71,7 @@ class IndexController extends AbstractActionController
 
         // TODO Factorize with rss output below.
         $view = new ViewModel([
-            // The form is not set in the view, but via helper searchingForm()
+            // The form is not set in the view, but via helper getSearchForm()
             // or via searchConfig.
             'searchConfig' => $searchConfig,
             // "searchPage" is kept to simplify migration.

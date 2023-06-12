@@ -65,24 +65,11 @@ class SearchingForm extends AbstractBlockLayout
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $data['search_config'] ?? null;
         if ($searchConfig) {
-            try {
-                $searchConfig = $view->api()->read('search_configs', ['id' => $searchConfig])->getContent();
-            } catch (\Omeka\Api\Exception\NotFoundException $e) {
-                $view->logger()->err($e->getMessage());
-                return '';
-            }
-            $available = $view->siteSetting('advancedsearch_configs');
-            if (!in_array($searchConfig->id(), $available)) {
-                $message = new \Omeka\Stdlib\Message(
-                    'The search page #%d is not available for the site %s.', // @translate
-                    $searchConfig->id(), $block->page()->site()->slug()
-                );
-                $view->logger()->err($message);
-                return '';
-            }
-        } else {
+            $searchConfig = $this->getSearchConfig($searchConfig);
+        }
+        if (!$searchConfig) {
             $message = new \Omeka\Stdlib\Message(
-                'No search page specified for this block.' // @translate
+                'No search config specified for this block or not available for this site.' // @translate
             );
             $view->logger()->err($message);
             return '';

@@ -150,6 +150,72 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         return $this->form;
     }
 
+    /**
+     * Render the form.
+     *
+     * @param array $options
+     * - template (string): Use a specific template instead of the default one.
+     * This is the template of the form, not the main template of the search page.
+     * - skip_form_action (bool): Don't set form action, so use the current page.
+     * - skip_partial_headers (bool): Skip partial headers.
+     * Other options are passed to the partial.
+     */
+    public function renderForm(array $options = []): string
+    {
+        if (!$this->isFormInit) {
+            $this->formInit();
+        }
+
+        if (!$this->form) {
+            return '';
+        }
+
+        $options += [
+            'template' => null,
+            'skip_form_action' => false,
+            'skip_partial_headers' => false,
+        ];
+
+        /** @var \Laminas\View\HelperPluginManager $plugins  */
+        $plugins = $this->getServiceLocator()->get('ViewHelperManager');
+        /** @var \Laminas\View\Helper\Partial $partial */
+        $partial = $plugins->get('partial');
+        // In rare cases, view may be missing.
+        $view = $partial->getView();
+
+        if (!$options['template']) {
+            $options['template'] = $this->formAdapter->getFormPartial();
+            if (!$options['template']) {
+                return '';
+            }
+        }
+
+        if ($view && !$view->resolver($options['template'])) {
+            return '';
+        }
+
+        if (!$options['skip_partial_headers']) {
+            $partialHeaders = $this->formAdapter->getFormPartialHeaders();
+            if ($partialHeaders) {
+                // No output.
+                $partial($partialHeaders, [
+                    'searchConfig' => $this,
+                ] + $options);
+            }
+        }
+
+        if (!empty($options['skip_form_action'])) {
+            $isAdmin = $plugins->get('status')->isAdminRequest();
+            $url = $isAdmin ? $this->adminSearchUrl() : $this->siteUrl();
+            $this->form->setAttribute('action', $url);
+        }
+
+        return $partial($options['template'], [
+            'searchConfig' => $this,
+            'form' => $this->form
+        ] + $options);
+    }
+
     public function settings(): array
     {
         return $this->resource->getSettings();

@@ -99,6 +99,8 @@ class SearchingForm extends AbstractBlockLayout
             $link = ['url' => trim($link[0]), 'label' => trim($link[1] ?? '')];
         }
 
+        $cssClass = str_replace('searching-form', 'block-template', basename((string) $block->dataValue('template', ''))) ?: 'block-template';
+
         $vars = [
             'block' => $block,
             'site' => $site,
@@ -110,6 +112,7 @@ class SearchingForm extends AbstractBlockLayout
             // Returns results on the same page.
             'skipFormAction' => $displayResults,
             'displayResults' => $displayResults,
+            'cssClass' => $cssClass,
             'response' => new Response,
         ];
 

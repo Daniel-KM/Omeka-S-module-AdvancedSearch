@@ -64,9 +64,8 @@ class SearchingForm extends AbstractBlockLayout
 
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $data['search_config'] ?? null;
-        if ($searchConfig) {
-            $searchConfig = $this->getSearchConfig($searchConfig);
-        }
+        $searchConfigId = empty($searchConfig) || $searchConfig === 'default' ? null : (int) $searchConfig;
+        $searchConfig = $view->getSearchConfig($searchConfigId);
         if (!$searchConfig) {
             $message = new \Omeka\Stdlib\Message(
                 'No search config specified for this block or not available for this site.' // @translate
@@ -75,9 +74,13 @@ class SearchingForm extends AbstractBlockLayout
             return '';
         }
 
-        /** @var \Laminas\Form\Form $form */
-        $form = $view->searchForm($searchConfig)->getForm();
+        $form = $searchConfig->form();
         if (!$form) {
+            $message = new \Omeka\Stdlib\Message(
+                'The search config "%s" has no form associated.', // @translate
+                $searchConfig->path()
+            );
+            $view->logger()->warn($message);
             return '';
         }
 
@@ -98,13 +101,11 @@ class SearchingForm extends AbstractBlockLayout
             'html' => $data['html'] ?? '',
             'link' => $link,
             'searchConfig' => $searchConfig,
-            // Name "searchPage" is kept to simplify migration.
-            'searchPage' => $searchConfig,
             'query' => null,
+            // Returns results on the same page.
+            'skipFormAction' => $displayResults,
             'displayResults' => $displayResults,
             'response' => new Response,
-            // Returns results on the same page.
-            'skipFormAction' => true,
         ];
 
         if ($displayResults) {

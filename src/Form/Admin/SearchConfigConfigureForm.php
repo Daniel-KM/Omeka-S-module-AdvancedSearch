@@ -221,6 +221,16 @@ advanced = Filters = Advanced',
                 ],
             ])
             ->add([
+                'name' => 'button_reset',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Add a button "reset"', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'button_reset',
+                ],
+            ])
+            ->add([
                 'name' => 'available_filters',
                 'type' => OmekaElement\ArrayTextarea::class,
                 'options' => [

@@ -229,6 +229,25 @@ class MainSearchForm extends Form
             }
         }
 
+        if (!empty($this->formSettings['form']['button_reset'])) {
+            $this
+                ->add([
+                    'name' => 'reset',
+                    'type' => Element\Button::class,
+                    'options' => [
+                        'label' => 'Reset fields', // @translate
+                        'label_attributes' => [
+                            'class' => 'search-reset',
+                        ],
+                    ],
+                    'attributes' => [
+                        'id' => 'reset',
+                        'type' => 'reset',
+                        'class' => 'search-reset',
+                    ],
+                ]);
+        }
+
         $this
             ->add([
                 'name' => 'submit',

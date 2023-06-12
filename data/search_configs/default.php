@@ -171,6 +171,7 @@ return [
                 ],
                 */
             ],
+            'button_reset' => true,
         ],
 
         'display' => [

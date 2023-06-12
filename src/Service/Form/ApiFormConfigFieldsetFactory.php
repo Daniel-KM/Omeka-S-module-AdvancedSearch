@@ -11,6 +11,6 @@ class ApiFormConfigFieldsetFactory implements FactoryInterface
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
         return (new ApiFormConfigFieldset(null, $options ?? []))
-            ->setEasyMeta($services->get('ViewHelperManager')->get('easyMeta'));
+            ->setEasyMeta($services->get('ViewHelperManager')->get(\AdvancedSearch\View\Helper\EasyMeta::class));
     }
 }

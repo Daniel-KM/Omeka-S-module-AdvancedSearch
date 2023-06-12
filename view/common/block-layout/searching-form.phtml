@@ -21,18 +21,14 @@ $hyperlink = $plugins->get('hyperlink');
     <?php if (!empty($heading)): ?>
     <h2><?= $escape($heading) ?></h2>
     <?php endif; ?>
-
     <?= $html ?>
-
-    <?= $this->searchForm($searchConfig, [
+    <?= $searchConfig->renderForm([
         'template' => null,
         'skip_form_action' => $skipFormAction,
     ]) ?>
-
     <?php if ($link): ?>
     <div class="block-search-link">
-    <?= $hyperlink($link['label'], $link['url']) ?>
+        <?= $hyperlink($link['label'], $link['url']) ?>
     </div>
     <?php endif; ?>
-
 </div>

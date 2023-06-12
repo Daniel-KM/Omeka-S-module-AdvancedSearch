@@ -71,8 +71,7 @@ class IndexController extends AbstractActionController
 
         // TODO Factorize with rss output below.
         $view = new ViewModel([
-            // The form is not set in the view, but via helper getSearchForm()
-            // or via searchConfig.
+            // The form is set via searchConfig.
             'searchConfig' => $searchConfig,
             // "searchPage" is kept to simplify migration.
             'searchPage' => $searchConfig,
@@ -83,17 +82,18 @@ class IndexController extends AbstractActionController
         ]);
 
         $request = $this->params()->fromQuery();
-        $form = $this->searchForm($searchConfig);
-        // The form may be empty for a direct query.
-        $isJsonQuery = !$form;
 
+        $form = $searchConfig->form();
         if ($form) {
             // Check csrf issue.
-            $request = $this->validateSearchRequest($searchConfig, $form, $request);
+            $request = $this->validateSearchRequest($searchConfig, $request);
             if ($request === false) {
                 return $view;
             }
         }
+
+        // The form may be empty for a direct query.
+        $isJsonQuery = !$form;
 
         // Check if the query is empty and use the default query in that case.
         // So the default query is used only on the search config.
@@ -428,7 +428,6 @@ class IndexController extends AbstractActionController
      */
     protected function validateSearchRequest(
         SearchConfigRepresentation $searchConfig,
-        \Laminas\Form\Form $form,
         array $request
     ) {
         // Only validate the csrf.
@@ -436,6 +435,7 @@ class IndexController extends AbstractActionController
         // redirection. In that case, there is no csrf element, so no check to
         // do.
         if (array_key_exists('csrf', $request)) {
+            $form = $searchConfig->form();
             $form->setData($request);
             if (!$form->isValid()) {
                 $messages = $form->getMessages();

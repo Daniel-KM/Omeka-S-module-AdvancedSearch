@@ -9,7 +9,7 @@ use Laminas\Form\Form;
 use Laminas\View\Helper\AbstractHelper;
 
 /**
- * @todo Remove this view helper and use SearchConfigRepresentation::form() only.
+ * @deprecated Since 3.4.9. Use $searchConfig->renderForm().
  */
 class SearchForm extends AbstractHelper
 {

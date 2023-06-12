@@ -31,7 +31,6 @@
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var \Omeka\Api\Representation\SiteRepresentation $site
  * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
- * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchPage Alias of $searchConfig
  * @var \AdvancedSearch\Query $query
  * @var \AdvancedSearch\Response $response
  *
@@ -132,7 +131,7 @@ $this->headScript()
 
 <?php endif; ?>
 
-<?= $this->searchForm($searchConfig, null, $skipFormAction) ?>
+<?= $searchConfig->renderForm(['template' => null, 'skip_form_action' => $skipFormAction]) ?>
 
 <?php if (isset($response)): ?>
 

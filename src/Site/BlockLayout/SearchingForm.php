@@ -133,11 +133,12 @@ class SearchingForm extends AbstractBlockLayout
                 $request = $query;
             }
 
-            $result = $view->searchRequestToResponse($request, $searchConfig, $site);
+            $plugins = $block->getServiceLocator()->get('ControllerPluginManager');
+            $result = $plugins->get('searchRequestToResponse')($request, $searchConfig, $site);
             if ($result['status'] === 'success') {
                 $vars = array_replace($vars, $result['data']);
             } elseif ($result['status'] === 'error') {
-                $messenger = $block->getServiceLocator()->get('ControllerPluginManager')->get('messenger');
+                $messenger = $plugins->get('messenger');
                 $messenger->addError($result['message']);
             }
         }

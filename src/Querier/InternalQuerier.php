@@ -580,7 +580,9 @@ SQL;
                 case 'resource_name':
                 case 'resource_type':
                     $values = $flatArray($values);
-                    $this->args['resource_name'] = empty($this->args['resource_name']) ? $values : array_merge($this->args['resource_name'], $values);
+                    $this->args['resource_name'] = empty($this->args['resource_name'])
+                        ? $values
+                        : array_merge(is_array($this->args['resource_name']) ? $this->args['resource_name'] : [$this->args['resource_name']], $values);
                     continue 2;
 
                 // "is_public" is automatically managed by this internal adapter
@@ -590,7 +592,9 @@ SQL;
 
                 case 'id':
                     $values = array_filter(array_map('intval', $flatArray($values)));
-                    $this->args['id'] = empty($this->args['id']) ? $values : array_merge($this->args['id'], $values);
+                    $this->args['id'] = empty($this->args['id'])
+                        ? $values
+                        : array_merge(is_array($this->args['id']) ? $this->args['id'] : [$this->args['id']], $values);
                     continue 2;
 
                 case 'owner_id':
@@ -598,7 +602,9 @@ SQL;
                     $values = is_numeric(reset($values))
                         ? array_filter(array_map('intval', $values))
                         : $this->listUserIds($values);
-                    $this->args['owner_id'] = empty($this->args['owner_id']) ? $values : array_merge($this->args['owner_id'], $values);
+                    $this->args['owner_id'] = empty($this->args['owner_id'])
+                        ? $values
+                        : array_merge(is_array($this->args['owner_id']) ? $this->args['owner_id'] : [$this->args['owner_id']], $values);
                     continue 2;
 
                 case 'site_id':
@@ -606,7 +612,9 @@ SQL;
                     $values = is_numeric(reset($values))
                         ? array_filter(array_map('intval', $values))
                         : $this->listSiteIds($values);
-                    $this->args['site_id'] = empty($this->args['site_id']) ? $values : array_merge($this->args['site_id'], $values);
+                    $this->args['site_id'] = empty($this->args['site_id'])
+                        ? $values
+                        : array_merge(is_array($this->args['site_id']) ? $this->args['site_id'] : [$this->args['site_id']], $values);
                     continue 2;
 
                 case 'resource_class_id':
@@ -614,7 +622,9 @@ SQL;
                     $values = is_numeric(reset($values))
                         ? array_filter(array_map('intval', $values))
                         : $this->listResourceClassIds($values);
-                    $this->args['resource_class_id'] = empty($this->args['resource_class_id']) ? $values : array_merge($this->args['resource_class_id'], $values);
+                    $this->args['resource_class_id'] = empty($this->args['resource_class_id'])
+                        ? $values
+                        : array_merge(is_array($this->args['resource_class_id']) ? $this->args['resource_class_id'] : [$this->args['resource_class_id']], $values);
                     continue 2;
 
                 case 'resource_template_id':
@@ -622,17 +632,23 @@ SQL;
                     $values = is_numeric(reset($values))
                         ? array_filter(array_map('intval', $values))
                         : $this->listResourceTemplateIds($values);
-                    $this->args['resource_template_id'] = empty($this->args['resource_template_id']) ? $values : array_merge($this->args['resource_template_id'], $values);
+                    $this->args['resource_template_id'] = empty($this->args['resource_template_id'])
+                        ? $values
+                        : array_merge(is_array($this->args['resource_template_id']) ? $this->args['resource_template_id'] : [$this->args['resource_template_id']], $values);
                     continue 2;
 
                 case 'item_set_id':
                     $values = array_filter(array_map('intval', $flatArray($values)));
-                    $this->args['item_set_id'] = empty($this->args['item_set_id']) ? $values : array_merge($this->args['item_set_id'], $values);
+                    $this->args['item_set_id'] = empty($this->args['item_set_id'])
+                        ? $values
+                        : array_merge(is_array($this->args['item_set_id']) ? $this->args['item_set_id'] : [$this->args['item_set_id']], $values);
                     continue 2;
 
                 case 'item_sets_tree':
                     $values = array_filter(array_map('intval', $flatArray($values)));
-                    $this->args['item_sets_tree'] = empty($this->args['item_sets_tree']) ? $values : array_merge($this->args['item_sets_tree'], $values);
+                    $this->args['item_sets_tree'] = empty($this->args['item_sets_tree'])
+                        ? $values
+                        : array_merge(is_array($this->args['item_sets_tree']) ? $this->args['item_sets_tree'] : [$this->args['item_sets_tree']], $values);
                     continue 2;
 
                 default:

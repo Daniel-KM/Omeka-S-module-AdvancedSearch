@@ -802,7 +802,7 @@ class Module extends AbstractModule
 
         $filters = $event->getParam('filters');
 
-        $this->baseUrl = (string) $event->getParam('baseUrl');
+        // $this->baseUrl = (string) $event->getParam('baseUrl');
 
         /** @var \AdvancedSearch\Mvc\Controller\Plugin\SearchResources $searchResources */
         $searchResources = $this->getServiceLocator()->get('ControllerPluginManager')

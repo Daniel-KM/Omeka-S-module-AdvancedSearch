@@ -921,7 +921,10 @@ class SearchResources extends AbstractPlugin
         $valuesJoin = 'omeka_root.values';
         $where = '';
 
-        // @see \Doctrine\ORM\QueryBuilder::expr().
+        /**
+         * @see \Doctrine\ORM\QueryBuilder::expr().
+         * @var \Doctrine\ORM\EntityManager $entityManager
+         */
         $expr = $qb->expr();
         $entityManager = $this->adapter->getEntityManager();
 

@@ -44,8 +44,8 @@ class IndexController extends AbstractActionController
     {
         $searchConfigId = (int) $this->params('id');
 
-        $isPublic = $this->status()->isSiteRequest();
-        if ($isPublic) {
+        $isSiteRequest = $this->status()->isSiteRequest();
+        if ($isSiteRequest) {
             $site = $this->currentSite();
             $siteSettings = $this->siteSettings();
             $siteSearchConfigs = $siteSettings->get('advancedsearch_configs', []);
@@ -215,8 +215,8 @@ class IndexController extends AbstractActionController
 
         $searchConfigId = (int) $this->params('id');
 
-        $isPublic = $this->status()->isSiteRequest();
-        if ($isPublic) {
+        $isSiteRequest = $this->status()->isSiteRequest();
+        if ($isSiteRequest) {
             $site = $this->currentSite();
             $siteSettings = $this->siteSettings();
             $siteSearchConfigs = $siteSettings->get('advancedsearch_configs', []);
@@ -293,8 +293,8 @@ class IndexController extends AbstractActionController
 
         $searchConfigId = (int) $this->params('id');
 
-        $isPublic = $this->status()->isSiteRequest();
-        if ($isPublic) {
+        $isSiteRequest = $this->status()->isSiteRequest();
+        if ($isSiteRequest) {
             $site = $this->currentSite();
             $siteSettings = $this->siteSettings();
             $siteSearchConfigs = $siteSettings->get('advancedsearch_configs', []);

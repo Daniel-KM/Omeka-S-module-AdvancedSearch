@@ -138,8 +138,15 @@ class SearchRequestToResponse extends AbstractPlugin
 
         $engineSettings = $this->searchEngine->settings();
 
-        $user = $plugins->get('identity')();
+        // Manage rights of resources to search: visibility public/private and
+        // access (free/reserved/forbidden).
+        // The ser status can be stored even without the module AccessResource.
+
         // TODO Manage roles from modules and visibility from modules (access resources).
+        // TODO Researcher and author may not access all private resources.
+        // TODO Manage other modes of access than global (by ip or individual).
+
+        $user = $plugins->get('identity')();
         $omekaRoles = [
             \Omeka\Permissions\Acl::ROLE_GLOBAL_ADMIN,
             \Omeka\Permissions\Acl::ROLE_SITE_ADMIN,
@@ -148,8 +155,16 @@ class SearchRequestToResponse extends AbstractPlugin
             \Omeka\Permissions\Acl::ROLE_AUTHOR,
             \Omeka\Permissions\Acl::ROLE_RESEARCHER,
         ];
-        if ($user && in_array($user->getRole(), $omekaRoles)) {
+        $userRole = $user ? $user->getRole() : null;
+
+        $accessToAdmin = $user && in_array($userRole, $omekaRoles);
+        if ($accessToAdmin) {
             $query->setIsPublic(false);
+            $query->setAccessStatus('forbidden');
+        }
+
+        if ($user && !in_array($userRole, $omekaRoles)) {
+            $query->setAccessStatus('reserved');
         }
 
         if ($site) {

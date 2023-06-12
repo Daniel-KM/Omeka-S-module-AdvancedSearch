@@ -50,6 +50,13 @@ class Query implements \JsonSerializable
     protected $isPublic = true;
 
     /**
+     * @var string "free", "reserved" or "forbidden".
+     *
+     * @see \AccessResource\Module
+     */
+    protected $accessStatus = 'free';
+
+    /**
      * @var array
      */
     protected $filters = [];
@@ -197,6 +204,17 @@ class Query implements \JsonSerializable
     public function getIsPublic(): bool
     {
         return $this->isPublic;
+    }
+
+    public function setAccessStatus($accessStatus): self
+    {
+        $this->accessStatus = (string) $accessStatus;
+        return $this;
+    }
+
+    public function getAccessStatus(): string
+    {
+        return $this->accessStatus;
     }
 
     /**

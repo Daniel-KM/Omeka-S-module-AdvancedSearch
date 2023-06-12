@@ -238,6 +238,7 @@ class Module extends AbstractModule
             [$this, 'addHeaders']
         );
 
+        /** @see \AdvancedSearch\Api\ManagerDelegator::search() */
         $adapters = [
             \Omeka\Api\Adapter\ItemAdapter::class,
             \Omeka\Api\Adapter\ItemSetAdapter::class,

@@ -47,11 +47,14 @@ class ManagerDelegator extends \Omeka\Api\Manager
             if (array_key_exists('initialize', $options)
                 && !$options['initialize']
                 && in_array($resource, [
+                    /** @see \AdvancedSearch\Module::attachListeners() */
                     'items',
                     'media',
                     'item_sets',
-                    'annotations',
-                    'generations',
+                    // Annotations are managed directly in Omeka, so no need to override.
+                    // 'annotations',
+                    // Generation does not use complex search for now.
+                    // 'generations',
                 ])
             ) {
                 $query = &$data;

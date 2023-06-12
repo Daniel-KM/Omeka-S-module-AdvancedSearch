@@ -10,6 +10,28 @@ $params = $this->params()->fromQuery() ?: [];
 $form
     ->setData($params)
     ->prepare();
+
+$formId = $form->getAttribute('id');
+if (!$formId) {
+    $formId = 'form-search';
+    $form->setAttribute('id', $formId);
+}
+
+// Move buttons reset and submit outside of the form.
+$reset = null;
+$submit = null;
+if ($form->has('reset')) {
+    $reset = $form->get('reset')->setAttribute('form', $formId);
+    $form->remove('reset');
+}
+if ($form->has('submit')) {
+    $submit = $form->get('submit')->setAttribute('form', $formId);
+    $form->remove('submit');
+}
 ?>
 
 <?= $this->form($form) ?>
+<div class="search-form-buttons">
+    <?= $reset ? $this->formButton($reset) : null ?>
+    <?= $submit ? $this->formButton($submit) : null ?>
+</div>

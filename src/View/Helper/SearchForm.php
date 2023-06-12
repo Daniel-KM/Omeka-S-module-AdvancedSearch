@@ -33,6 +33,11 @@ class SearchForm extends AbstractHelper
     /**
      * @var string
      */
+    protected $partialHeaders;
+
+    /**
+     * @var string
+     */
     protected $template;
 
     /**
@@ -79,6 +84,9 @@ class SearchForm extends AbstractHelper
      */
     protected function initSearchForm(?SearchConfigRepresentation $searchConfig = null, array $options): void
     {
+        $this->form = null;
+        $this->partialHeaders = null;
+        $this->template = null;
         $this->options = $options;
 
         $plugins = $this->getView()->getHelperPluginManager();
@@ -97,33 +105,34 @@ class SearchForm extends AbstractHelper
             $this->searchConfig = $searchConfig;
         }
 
-        $this->form = null;
-        $this->template = null;
-
         if (!$searchConfig) {
             return;
         }
 
         $formAdapter = $this->searchConfig->formAdapter();
-        if ($formAdapter) {
-            $this->form = $formAdapter->form();
-            if ($this->form) {
-                if (empty($options['skip_form_action'])) {
-                    $url = $isAdmin
-                        ? $this->searchConfig->adminSearchUrl()
-                        : $this->searchConfig->siteUrl();
-                    $this->form->setAttribute('action', $url);
-                }
-            }
+        if (!$formAdapter) {
+            return;
         }
 
-        if ($this->form) {
-            $this->template = $options['template'];
-            if (empty($this->template) && $this->searchConfig) {
-                $formAdapter = $this->searchConfig->formAdapter();
-                $this->template = $formAdapter
-                    ? ($formAdapter->getFormPartial() ?: self::PARTIAL_NAME)
-                    : self::PARTIAL_NAME;
+        $this->form = $formAdapter->getForm();
+        if (!$this->form) {
+            return;
+        }
+
+        if (empty($options['skip_form_action'])) {
+            $url = $isAdmin
+                ? $this->searchConfig->adminSearchUrl()
+                : $this->searchConfig->siteUrl();
+            $this->form->setAttribute('action', $url);
+        }
+
+        $this->template = $options['template'];
+        if (empty($this->template)) {
+            $this->template = $formAdapter->getFormPartial();
+            if ($this->template) {
+                $this->partialHeaders = $formAdapter->getFormPartialHeaders();
+            } else {
+                $this->template = self::PARTIAL_NAME;
             }
         }
     }
@@ -177,6 +186,13 @@ class SearchForm extends AbstractHelper
     {
         if (!$this->template) {
             return '';
+        }
+
+        if ($this->partialHeaders) {
+            $this->getView()->partial($this->partialHeaders, [
+                'searchConfig' => $this->searchConfig,
+                'form' => $this->form,
+            ] + $this->options);
         }
 
         return $this->getView()->partial($this->template, [

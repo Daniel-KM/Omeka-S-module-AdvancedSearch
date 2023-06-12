@@ -85,7 +85,12 @@ class SearchingForm extends AbstractBlockLayout
         }
 
         $site = $block->page()->site();
+
         $displayResults = !empty($data['display_results']);
+
+        if (!$displayResults) {
+            $form->setAttribute('action', $searchConfig->siteUrl($site->slug()));
+        }
 
         if (empty($data['link'])) {
             $link = [];

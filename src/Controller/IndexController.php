@@ -289,6 +289,8 @@ class IndexController extends AbstractActionController
      */
     public function rssAction()
     {
+        require_once dirname(__DIR__, 2) . '/vendor/autoload.php';
+
         $searchConfigId = (int) $this->params('id');
 
         $isPublic = $this->status()->isSiteRequest();

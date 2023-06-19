@@ -63,7 +63,7 @@ class SearchConfigConfigureForm extends Form
         $availableFields = $this->getAvailableFields();
 
         $this
-            ->setAttribute('id', 'search-form-configure');
+            ->setAttribute('id', 'form-search-config-configure');
 
         // Settings for the search engine. Can be overwritten by a specific form.
 

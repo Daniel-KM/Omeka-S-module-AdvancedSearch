@@ -287,6 +287,24 @@ return [
                 'class' => 'o-icon-search',
             ],
         ],
+        'AdvancedSearch\Config' => [
+            [
+                'label' => 'Manage', // @translate
+                'route' => 'admin/search/config-id',
+                'resource' => Controller\Admin\SearchConfigController::class,
+                'action' => 'edit',
+                'privilege' => 'edit',
+                'useRouteMatch' => true,
+            ],
+            [
+                'label' => 'Configure', // @translate
+                'route' => 'admin/search/config-id',
+                'resource' => Controller\Admin\SearchConfigController::class,
+                'action' => 'configure',
+                'privilege' => 'edit',
+                'useRouteMatch' => true,
+            ],
+        ],
     ],
     'assets' => [
         // Override internals assets. Only for Omeka assets: modules can use another filename.

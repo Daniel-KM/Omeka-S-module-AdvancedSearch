@@ -39,9 +39,11 @@ $form->prepare();
 <?= $this->pageTitle($translate('Add search page')) ?>
 
 <?= $this->form()->openTag($form) ?>
+
 <div id="page-actions">
     <button type="submit"><?= $translate('Add and configure') ?></button>
 </div>
+
 <?= $this->formCollection($form, false) ?>
 <?php $this->trigger('view.add.form.after'); ?>
 <?= $this->form()->closeTag() ?>

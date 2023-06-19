@@ -299,3 +299,13 @@ if (version_compare($oldVersion, '3.4.7', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.10', '<')) {
+    $sql = <<<'SQL'
+UPDATE `search_config`
+SET
+    `settings` = REPLACE(`settings`, '"display_button"', '"display_submit"')
+;
+SQL;
+    $connection->executeStatement($sql);
+}

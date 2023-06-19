@@ -366,18 +366,18 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
         // $page, $perPage, $offset, $limit are null or int, but not settings.
         $formSettings['search']['per_page'] = empty($formSettings['search']['per_page']) ? null : (int) $formSettings['search']['per_page'];
         if ($page || empty($offset)) {
-            $page = $page ?? 1;
-            $perPage = $perPage ?? $limit ?? $formSettings['search']['per_page'] ?? \Omeka\Stdlib\Paginator::PER_PAGE;
+            $page ??= 1;
+            $perPage ??= $limit ?? $formSettings['search']['per_page'] ?? \Omeka\Stdlib\Paginator::PER_PAGE;
             $query->setLimitPage($page, $perPage);
         } else {
-            $limit = $limit ?? $perPage ?? $formSettings['search']['per_page'] ?? \Omeka\Stdlib\Paginator::PER_PAGE;
+            $limit ??= $perPage ?? $formSettings['search']['per_page'] ?? \Omeka\Stdlib\Paginator::PER_PAGE;
             $query->setLimitOffset($offset, $perPage);
         }
 
         if ($sort) {
             $query->setSort($sort);
         } elseif ($sortBy) {
-            $query->setSort($sortBy . ($sortOrder ? ' ' . $sortOrder: ''));
+            $query->setSort($sortBy . ($sortOrder ? ' ' . $sortOrder : ''));
         }
 
         return $query;

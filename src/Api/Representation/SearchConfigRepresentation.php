@@ -212,7 +212,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
 
         return $partial($options['template'], [
             'searchConfig' => $this,
-            'form' => $this->form
+            'form' => $this->form,
         ] + $options);
     }
 

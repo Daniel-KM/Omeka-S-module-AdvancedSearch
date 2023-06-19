@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+
 namespace AdvancedSearch\Service\ControllerPlugin;
 
 use AdvancedSearch\Mvc\Controller\Plugin\ApiSearch;

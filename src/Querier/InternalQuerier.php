@@ -437,7 +437,7 @@ SQL;
 
         $sort = $this->query->getSort();
         if ($sort) {
-            list($sortField, $sortOrder) = explode(' ', $sort);
+            [$sortField, $sortOrder] = explode(' ', $sort);
             $this->args['sort_by'] = $sortField;
             $this->args['sort_order'] = $sortOrder === 'desc' ? 'desc' : 'asc';
         }

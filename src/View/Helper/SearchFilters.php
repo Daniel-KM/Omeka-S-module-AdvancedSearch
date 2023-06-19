@@ -51,7 +51,7 @@ class SearchFilters extends AbstractHelper
         $cleanQuery = $plugins->get('cleanQuery');
 
         $filters = [];
-        $query = $query ?? $params->fromQuery();
+        $query ??= $params->fromQuery();
 
         $this->baseUrl = $url(null, [], true);
         $this->query = $cleanQuery($query);

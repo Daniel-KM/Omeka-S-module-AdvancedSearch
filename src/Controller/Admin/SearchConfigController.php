@@ -442,7 +442,7 @@ class SearchConfigController extends AbstractActionController
         // Ok facet.
 
         // Fix form.
-        $settings['form']['filters'] = $settings['form']['filters'] ?? [];
+        $settings['form']['filters'] ??= [];
         if (empty($settings['form']['filters'])) {
             return $settings;
         }
@@ -531,7 +531,7 @@ class SearchConfigController extends AbstractActionController
 
         // The field "advanced" is only for display, so save it with filters.
         // TODO No more include advanced fields in filters, but still cleaning.
-        $params['form']['filters'] = $params['form']['filters'] ?? [];
+        $params['form']['filters'] ??= [];
         $advanced = $params['form']['advanced'] ?? [];
         $keyAdvanced = false;
         foreach ($params['form']['filters'] as $keyFilter => $filter) {

@@ -97,7 +97,7 @@ class IndexController extends AbstractActionController
 
         // Check if the query is empty and use the default query in that case.
         // So the default query is used only on the search config.
-        list($request, $isEmptyRequest) = $this->cleanRequest($request);
+        [$request, $isEmptyRequest] = $this->cleanRequest($request);
         if ($isEmptyRequest) {
             $defaultResults = $searchConfig->subSetting('search', 'default_results') ?: 'default';
             switch ($defaultResults) {
@@ -551,7 +551,7 @@ class IndexController extends AbstractActionController
 
         // Check if the query is empty and use the default query in that case.
         // So the default query is used only on the search config.
-        list($request, $isEmptyRequest) = $this->cleanRequest($request);
+        [$request, $isEmptyRequest] = $this->cleanRequest($request);
         if ($isEmptyRequest) {
             $defaultResults = $searchConfig->subSetting('search', 'default_results') ?: 'default';
             switch ($defaultResults) {

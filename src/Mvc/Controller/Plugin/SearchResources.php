@@ -406,7 +406,7 @@ class SearchResources extends AbstractPlugin
                             unset($query['property'][$k]);
                             continue;
                         }
-                        $queryRowProp = isset($queryRow['property']) ? $queryRow['property'] : null;
+                        $queryRowProp = $queryRow['property'] ?? null;
                         if (is_array($queryRowProp)) {
                             $query['property'][$k]['property'] = array_unique($query['property'][$k]['property']);
                         }
@@ -1302,7 +1302,7 @@ class SearchResources extends AbstractPlugin
             // TODO What if a property is ""?
             $excludePropertyIds = $propertyIds || empty($queryRow['except'])
                 ? false
-                :  array_values(array_unique($this->getPropertyIds($queryRow['except'])));
+                : array_values(array_unique($this->getPropertyIds($queryRow['except'])));
             if ($propertyIds) {
                 $propertyIds = array_values(array_unique($this->getPropertyIds($propertyIds)));
                 if ($propertyIds) {
@@ -1664,7 +1664,7 @@ class SearchResources extends AbstractPlugin
                 ->andWhere($expr->orX(
                     $expr->isNull($mediaAlias . '.id'),
                     $expr->eq($mediaAlias . '.' . $fields[$field], 0)
-            ));
+                ));
         }
     }
 

@@ -67,7 +67,7 @@ class SearchRequestToResponse extends AbstractPlugin
 
         $searchConfigSettings = $searchConfig->settings();
 
-        list($request, $isEmptyRequest) = $this->cleanRequest($request);
+        [$request, $isEmptyRequest] = $this->cleanRequest($request);
         if ($isEmptyRequest) {
             // Keep the other arguments of the request (mainly pagination, sort,
             // and facets).
@@ -174,7 +174,7 @@ class SearchRequestToResponse extends AbstractPlugin
         // Check resources.
         $resourceTypes = $query->getResources();
         // TODO Check why resources may not be filled.
-        $engineSettings['resources'] = $engineSettings['resources'] ?? ['items'];
+        $engineSettings['resources'] ??= ['items'];
         if ($resourceTypes) {
             $resourceTypes = array_intersect($resourceTypes, $engineSettings['resources']) ?: $engineSettings['resources'];
             $query->setResources($resourceTypes);

@@ -730,20 +730,20 @@ class Module extends AbstractModule
             $partials[] = 'common/advanced-search/media-item-sets';
         }
 
-        $query['datetime'] = $query['datetime'] ?? '';
+        $query['datetime'] ??= '';
         $partials[] = 'common/advanced-search/date-time';
 
         $partials[] = 'common/advanced-search/visibility';
 
         if ($resourceType === 'item') {
-            $query['has_media'] = $query['has_media'] ?? '';
+            $query['has_media'] ??= '';
             $partials[] = 'common/advanced-search/has-media';
         }
 
         if ($resourceType === 'item' || $resourceType === 'media') {
-            $query['has_original'] = $query['has_original'] ?? '';
+            $query['has_original'] ??= '';
             $partials[] = 'common/advanced-search/has-original';
-            $query['has_thumbnails'] = $query['has_thumbnails'] ?? '';
+            $query['has_thumbnails'] ??= '';
             $partials[] = 'common/advanced-search/has-thumbnails';
         }
 

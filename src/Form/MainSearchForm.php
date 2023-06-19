@@ -437,9 +437,9 @@ class MainSearchForm extends Form
         $valueOptions = ['' => ''] + $valueOptions;
 
         $attributes = $filter['attributes'] ?? [];
-        $attributes['class'] = $attributes['class'] ?? 'chosen-select';
-        $attributes['placeholder'] = $attributes['placeholder'] ?? '';
-        $attributes['data-placeholder'] = $attributes['data-placeholder'] ?? ' ';
+        $attributes['class'] ??= 'chosen-select';
+        $attributes['placeholder'] ??= '';
+        $attributes['data-placeholder'] ??= ' ';
 
         $element = new AdvancedSearchElement\OptionalSelect($filter['field']);
         $element

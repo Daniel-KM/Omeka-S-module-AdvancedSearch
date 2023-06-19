@@ -127,7 +127,7 @@ class AbstractFacet extends AbstractHelper
 
         return $this->partialHelper->__invoke($this->partial, $facetField === null
             ? ['activeFacets' => $facetsData[$facetField], 'options' => $options]
-            :  $facetsData[$facetField]);
+            : $facetsData[$facetField]);
     }
 
     /**

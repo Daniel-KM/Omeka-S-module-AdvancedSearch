@@ -240,6 +240,8 @@ $this->headScript()
     <p><?= $translate('No search suggesters created yet.') ?></p>
 <?php endif; ?>
 
+<?php $this->trigger('view.browse.after'); ?>
+
 <div class="sidebar">
     <a href="#"
         class="sidebar-close o-icon-close"

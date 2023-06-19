@@ -178,7 +178,7 @@ class AbstractFacet extends AbstractHelper
 
         // For item set tree, the values should be reordered according to the
         // tree, else indentation will be incorrect.
-        if ($this->isTree && count($this->tree) > 1) {
+        if ($this->isTree && $this->tree && count($this->tree) > 1) {
             $facetValuesByIds = [];
             foreach ($facetValues as $data) {
                 $facetValuesByIds[$data['value']] = $data;

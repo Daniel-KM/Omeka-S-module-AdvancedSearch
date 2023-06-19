@@ -282,12 +282,44 @@ return [
     ],
     'navigation' => [
         'AdminModule' => [
-            'search' => [
+            'advanced-search' => [
                 'label' => 'Search manager', // @translate
                 'route' => 'admin/search',
                 'resource' => Controller\Admin\IndexController::class,
                 'privilege' => 'browse',
                 'class' => 'o-icon-search',
+                'pages' => [
+                    [
+                        'route' => 'admin/search/engine',
+                        'visible' => false,
+                        'pages' => [
+                            [
+                                'route' => 'admin/search/engine-id',
+                                'visible' => false,
+                            ],
+                        ],
+                    ],
+                    [
+                        'route' => 'admin/search/config',
+                        'visible' => false,
+                        'pages' => [
+                            [
+                                'route' => 'admin/search/config-id',
+                                'visible' => false,
+                            ],
+                        ],
+                    ],
+                    [
+                        'route' => 'admin/search/suggester',
+                        'visible' => false,
+                        'pages' => [
+                            [
+                                'route' => 'admin/search/suggester-id',
+                                'visible' => false,
+                            ],
+                        ],
+                    ],
+                ],
             ],
         ],
         'AdvancedSearch\Config' => [

@@ -91,8 +91,10 @@ class MainSearchForm extends Form
         $this
             ->setAttributes([
                 'id' => 'form-search',
-                'class' => 'form-search',
+                'class' => 'search-form form-search',
             ]);
+
+        // The attribute "form" is appended to all fields to simplify themes.
 
         // Omeka adds a csrf automatically in \Omeka\Form\Initializer\Csrf.
         // Remove the csrf, because it is useless for a search form and the url
@@ -125,6 +127,7 @@ class MainSearchForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'q',
+                    'form' => 'form-search',
                     'data-type-field' => 'q',
                 ],
             ])
@@ -242,6 +245,7 @@ class MainSearchForm extends Form
                     ],
                     'attributes' => [
                         'id' => 'reset',
+                        'form' => 'form-search',
                         'type' => 'reset',
                         'class' => 'search-reset',
                     ],
@@ -260,6 +264,7 @@ class MainSearchForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'submit',
+                    'form' => 'form-search',
                     'type' => 'submit',
                     'class' => 'search-submit',
                 ],
@@ -277,6 +282,7 @@ class MainSearchForm extends Form
         $element = new Element($filter['field']);
         $element
             ->setLabel($filter['label'])
+            ->setAttribute('form', 'form-search')
             ->setAttribute('data-field-type', $filter['type'])
         ;
         return $element;
@@ -299,6 +305,7 @@ class MainSearchForm extends Form
         $element = new Element\Collection('filter');
         $element
             ->setLabel((string) $filter['label'])
+            ->setAttribute('form', 'form-search')
             ->setAttribute('data-field-type', 'filter')
             ->setOptions([
                 'label' => $filter['label'],
@@ -310,6 +317,7 @@ class MainSearchForm extends Form
             ])
             ->setAttributes([
                 'id' => 'search-filters',
+                'form' => 'form-search',
             ])
         ;
 
@@ -321,6 +329,7 @@ class MainSearchForm extends Form
         $element = new Element\Checkbox($filter['field']);
         $element
             ->setLabel($filter['label'])
+            ->setAttribute('form', 'form-search')
             ->setAttribute('data-field-type', 'checkbox')
         ;
         if (!empty($filter['options']) && count($filter['options']) === 2) {
@@ -337,6 +346,7 @@ class MainSearchForm extends Form
         $fieldset = new Fieldset($filter['field']);
         $fieldset
             ->setLabel($filter['label'])
+            ->setAttribute('form', 'form-search')
             ->setAttribute('data-field-type', 'daterange')
             ->add([
                 'name' => 'from',
@@ -345,6 +355,7 @@ class MainSearchForm extends Form
                     'label' => 'From', // @translate
                 ],
                 'attributes' => [
+                    'form' => 'form-search',
                     'placeholder' => 'YYYY', // @translate
                 ],
             ])
@@ -355,6 +366,7 @@ class MainSearchForm extends Form
                     'label' => 'To', // @translate
                 ],
                 'attributes' => [
+                    'form' => 'form-search',
                     'placeholder' => 'YYYY', // @translate
                 ],
             ])
@@ -368,7 +380,9 @@ class MainSearchForm extends Form
         $value = $filter['options'] === [] ? '' : reset($filter['options']);
         $element = new Element\Hidden($filter['field']);
         $element
-            ->setValue($value);
+            ->setValue($value)
+            ->setAttribute('form', 'form-search')
+        ;
         return $element;
     }
 
@@ -378,8 +392,9 @@ class MainSearchForm extends Form
         $element = new AdvancedSearchElement\OptionalMultiCheckbox($filter['field']);
         $element
             ->setLabel($filter['label'])
-            ->setAttribute('data-field-type', 'multicheckbox')
             ->setValueOptions($valueOptions)
+            ->setAttribute('form', 'form-search')
+            ->setAttribute('data-field-type', 'multicheckbox')
         ;
         return $element;
     }
@@ -404,6 +419,7 @@ class MainSearchForm extends Form
         $element = new AdvancedSearchElement\MultiText($filter['field']);
         $element
             ->setLabel($filter['label'])
+            ->setAttribute('form', 'form-search')
             ->setAttribute('data-field-type', 'multitext')
         ;
         return $element;
@@ -414,6 +430,7 @@ class MainSearchForm extends Form
         $element = new Element\Number($filter['field']);
         $element
             ->setLabel($filter['label'])
+            ->setAttribute('form', 'form-search')
             ->setAttribute('data-field-type', 'number')
         ;
         return $element;
@@ -425,8 +442,9 @@ class MainSearchForm extends Form
         $element = new AdvancedSearchElement\OptionalRadio($filter['field']);
         $element
             ->setLabel($filter['label'])
-            ->setAttribute('data-field-type', 'radio')
             ->setValueOptions($valueOptions)
+            ->setAttribute('form', 'form-search')
+            ->setAttribute('data-field-type', 'radio')
         ;
         return $element;
     }
@@ -437,14 +455,15 @@ class MainSearchForm extends Form
         $valueOptions = ['' => ''] + $valueOptions;
 
         $attributes = $filter['attributes'] ?? [];
+        $attributes['form'] = 'form-search';
         $attributes['class'] ??= 'chosen-select';
         $attributes['placeholder'] ??= '';
         $attributes['data-placeholder'] ??= ' ';
+        $attributes['data-field-type'] = $fieldType;
 
         $element = new AdvancedSearchElement\OptionalSelect($filter['field']);
         $element
             ->setLabel($filter['label'])
-            ->setAttribute('data-field-type', $fieldType)
             ->setOptions([
                 'value_options' => $valueOptions,
                 'empty_option' => '',
@@ -464,6 +483,7 @@ class MainSearchForm extends Form
         $element = new Element\Text($filter['field']);
         $element
             ->setLabel($filter['label'])
+            ->setAttribute('form', 'form-search')
             ->setAttribute('data-field-type', 'text')
         ;
         return $element;
@@ -478,12 +498,6 @@ class MainSearchForm extends Form
             ? AdvancedSearchElement\OptionalMultiCheckbox('resource_type')
             : AdvancedSearchElement\OptionalSelect('resource_type');
         $element
-            ->setAttributes([
-                'id' => 'search-resource-type',
-                'multiple' => true,
-                'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
-                'data-placeholder' => 'Select resource type…', // @translate
-            ])
             ->setOptions([
                 'label' => $filter['label'], // @translate
                 'value_options' => [
@@ -491,6 +505,13 @@ class MainSearchForm extends Form
                     'item_sets' => 'Item sets',
                 ],
                 'empty_option' => '',
+            ])
+            ->setAttributes([
+                'id' => 'search-resource-type',
+                'form' => 'form-search',
+                'multiple' => true,
+                'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
+                'data-placeholder' => 'Select resource type…', // @translate
             ])
         ;
 
@@ -503,12 +524,13 @@ class MainSearchForm extends Form
             ? new AdvancedSearchElement\MultiText('id')
             : new Element\Text('id');
         $element
-            ->setAttributes([
-                'id' => 'search-id',
-                'data-field-type' => $filter['type'] === 'MultiText' ? 'multitext' : 'text',
-            ])
             ->setOptions([
                 'label' => $filter['label'], // @translate
+            ])
+            ->setAttributes([
+                'id' => 'search-id',
+                'form' => 'form-search',
+                'data-field-type' => $filter['type'] === 'MultiText' ? 'multitext' : 'text',
             ])
         ;
 
@@ -519,12 +541,13 @@ class MainSearchForm extends Form
     {
         $element = new Element\Checkbox('is_public');
         $element
-            ->setAttributes([
-                'id' => 'search-is-public',
-                'data-field-type' => 'checkbox',
-            ])
             ->setOptions([
                 'label' => $filter['label'], // @translate
+            ])
+            ->setAttributes([
+                'id' => 'search-is-public',
+                'form' => 'form-search',
+                'data-field-type' => 'checkbox',
             ])
         ;
 
@@ -537,6 +560,7 @@ class MainSearchForm extends Form
         $fieldset
             ->setAttributes([
                 'id' => 'search-owners',
+                'form' => 'form-search',
                 'data-field-type' => 'owner',
             ])
             ->add([
@@ -551,6 +575,7 @@ class MainSearchForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'search-owner-id',
+                    'form' => 'form-search',
                     'multiple' => true,
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
                     'data-placeholder' => 'Select owners…', // @translate
@@ -567,6 +592,7 @@ class MainSearchForm extends Form
         $fieldset
             ->setAttributes([
                 'id' => 'search-sites',
+                'form' => 'form-search',
                 'data-field-type' => 'site',
             ])
             ->add([
@@ -581,6 +607,7 @@ class MainSearchForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'search-site-id',
+                    'form' => 'form-search',
                     'multiple' => true,
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
                     'data-placeholder' => 'Select sites…', // @translate
@@ -599,6 +626,7 @@ class MainSearchForm extends Form
         $fieldset = new Fieldset('class');
         $fieldset->setAttributes([
             'id' => 'search-classes',
+            'form' => 'form-search',
             'data-field-type' => 'class',
         ]);
 
@@ -648,6 +676,7 @@ class MainSearchForm extends Form
             ->setName('id')
             ->setAttributes([
                 'id' => 'search-class-id',
+                'form' => 'form-search',
                 'multiple' => true,
                 'class' => 'chosen-select',
                 'data-placeholder' => 'Select classes…', // @translate
@@ -669,6 +698,7 @@ class MainSearchForm extends Form
         $fieldset = new Fieldset('template');
         $fieldset->setAttributes([
             'id' => 'search-templates',
+            'form' => 'form-search',
             'data-field-type' => 'template',
         ]);
 
@@ -685,6 +715,7 @@ class MainSearchForm extends Form
             ])
             ->setAttributes([
                 'id' => 'search-template-id',
+                'form' => 'form-search',
                 'multiple' => true,
                 'class' => 'chosen-select',
                 'data-placeholder' => 'Select templates…', // @translate
@@ -708,6 +739,7 @@ class MainSearchForm extends Form
                             ],
                             'attributes' => [
                                 'id' => 'search-template-id',
+                                'form' => 'form-search',
                                 'multiple' => true,
                                 'class' => 'chosen-select',
                                 'data-placeholder' => 'Select templates…', // @translate
@@ -734,6 +766,7 @@ class MainSearchForm extends Form
         $fieldset
             ->setAttributes([
                 'id' => 'search-item-sets',
+                'form' => 'form-search',
                 'data-field-type' => 'itemset',
             ])
             ->add([
@@ -748,6 +781,7 @@ class MainSearchForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'search-item-set-id',
+                    'form' => 'form-search',
                     'multiple' => true,
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
                     // End users understand "collections" more than "item sets".
@@ -765,6 +799,7 @@ class MainSearchForm extends Form
         $fieldset
             ->setAttributes([
                 'id' => 'search-item-sets-tree',
+                'form' => 'form-search',
                 'data-field-type' => 'itemset',
             ])
             ->add([
@@ -779,6 +814,7 @@ class MainSearchForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'search-item-sets-tree',
+                    'form' => 'form-search',
                     'multiple' => true,
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
                     // End users understand "collections" more than "item sets".

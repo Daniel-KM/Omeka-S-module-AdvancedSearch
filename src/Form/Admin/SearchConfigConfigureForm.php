@@ -185,7 +185,7 @@ class SearchConfigConfigureForm extends Form
                 'name' => 'form',
                 'type' => Fieldset::class,
                 'options' => [
-                    'label' => 'Advanced form', // @translate
+                    'label' => 'Form', // @translate
                 ],
             ])
             ->get('form')

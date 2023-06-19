@@ -30,8 +30,12 @@ if ($form->has('submit')) {
 }
 ?>
 
-<?= $this->form($form) ?>
-<div class="search-form-buttons">
-    <?= $reset ? $this->formButton($reset) : null ?>
-    <?= $submit ? $this->formButton($submit) : null ?>
+<div id="advanced-search-form-wrapper">
+    <div id="advanced-search-form">
+        <?= $this->form($form) ?>
+        <div class="search-form-buttons">
+            <?= $reset ? $this->formButton($reset) : null ?>
+            <?= $submit ? $this->formButton($submit) : null ?>
+        </div>
+    </div>
 </div>

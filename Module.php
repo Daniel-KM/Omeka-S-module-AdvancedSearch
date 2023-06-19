@@ -319,7 +319,7 @@ class Module extends AbstractModule
 
         // The search pages use the core process to display used filters.
         $sharedEventManager->attach(
-            \AdvancedSearch\Controller\IndexController::class,
+            \AdvancedSearch\Controller\SearchController::class,
             'view.search.filters',
             [$this, 'filterSearchFilters']
         );
@@ -452,11 +452,11 @@ class Module extends AbstractModule
         /** @var \Omeka\Permissions\Acl $acl */
         $acl = $this->getServiceLocator()->get('Omeka\Acl');
         $acl
-            // All can search and suggest, only admins can admin (by default).
+            // All can search and suggest, only admins can admin.
             ->allow(
                 null,
                 [
-                    \AdvancedSearch\Controller\IndexController::class,
+                    \AdvancedSearch\Controller\SearchController::class,
                 ]
             )
             // To search require read/search access to adapter.
@@ -522,9 +522,11 @@ class Module extends AbstractModule
                             'defaults' => [
                                 '__NAMESPACE__' => 'AdvancedSearch\Controller',
                                 '__ADMIN__' => true,
-                                'controller' => \AdvancedSearch\Controller\IndexController::class,
+                                'controller' => \AdvancedSearch\Controller\SearchController::class,
                                 'action' => 'search',
                                 'id' => $searchConfigId,
+                                // Store the page slug to simplify checks.
+                                'page-slug' => $searchConfigSlug,
                             ],
                         ],
                         'may_terminate' => true,
@@ -536,9 +538,11 @@ class Module extends AbstractModule
                                     'defaults' => [
                                         '__NAMESPACE__' => 'AdvancedSearch\Controller',
                                         '__ADMIN__' => true,
-                                        'controller' => \AdvancedSearch\Controller\IndexController::class,
+                                        'controller' => \AdvancedSearch\Controller\SearchController::class,
                                         'action' => 'suggest',
                                         'id' => $searchConfigId,
+                                        // Store the page slug to simplify checks.
+                                        'page-slug' => $searchConfigSlug,
                                     ],
                                 ],
                             ],
@@ -580,7 +584,7 @@ class Module extends AbstractModule
                         'defaults' => [
                             '__NAMESPACE__' => 'AdvancedSearch\Controller',
                             '__SITE__' => true,
-                            'controller' => \AdvancedSearch\Controller\IndexController::class,
+                            'controller' => \AdvancedSearch\Controller\SearchController::class,
                             'action' => 'search',
                             'id' => $searchConfigId,
                             // Store the page slug to simplify checks.
@@ -596,7 +600,7 @@ class Module extends AbstractModule
                                 'defaults' => [
                                     '__NAMESPACE__' => 'AdvancedSearch\Controller',
                                     '__SITE__' => true,
-                                    'controller' => \AdvancedSearch\Controller\IndexController::class,
+                                    'controller' => \AdvancedSearch\Controller\SearchController::class,
                                     'action' => 'suggest',
                                     'id' => $searchConfigId,
                                     // Store the page slug to simplify checks.
@@ -611,7 +615,7 @@ class Module extends AbstractModule
                                 'defaults' => [
                                     '__NAMESPACE__' => 'AdvancedSearch\Controller',
                                     '__SITE__' => true,
-                                    'controller' => \AdvancedSearch\Controller\IndexController::class,
+                                    'controller' => \AdvancedSearch\Controller\SearchController::class,
                                     'action' => 'rss',
                                     'feed' => 'atom',
                                     'id' => $searchConfigId,
@@ -627,7 +631,7 @@ class Module extends AbstractModule
                                 'defaults' => [
                                     '__NAMESPACE__' => 'AdvancedSearch\Controller',
                                     '__SITE__' => true,
-                                    'controller' => \AdvancedSearch\Controller\IndexController::class,
+                                    'controller' => \AdvancedSearch\Controller\SearchController::class,
                                     'action' => 'rss',
                                     'feed' => 'rss',
                                     'id' => $searchConfigId,
@@ -1021,7 +1025,7 @@ class Module extends AbstractModule
         $status = $plugins->get('status');
         if ($status->isSiteRequest()) {
             $params = $view->params()->fromRoute();
-            if ($params['controller'] === \AdvancedSearch\Controller\IndexController::class) {
+            if ($params['controller'] === \AdvancedSearch\Controller\SearchController::class) {
                 $searchConfig = @$params['id'];
             } else {
                 $searchConfig = $view->siteSetting('advancedsearch_main_config');

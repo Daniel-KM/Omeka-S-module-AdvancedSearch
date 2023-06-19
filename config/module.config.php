@@ -24,7 +24,7 @@ return [
         ],
         // View "search" is kept to simplify migration.
         'controller_map' => [
-            Controller\IndexController::class => 'search',
+            Controller\SearchController::class => 'search',
         ],
         'strategies' => [
             'ViewJsonStrategy',
@@ -120,7 +120,7 @@ return [
     'controllers' => [
         'invokables' => [
             Controller\Admin\IndexController::class => Controller\Admin\IndexController::class,
-            Controller\IndexController::class => Controller\IndexController::class,
+            Controller\SearchController::class => Controller\SearchController::class,
         ],
         'factories' => [
             Controller\Admin\SearchConfigController::class => Service\Controller\Admin\SearchConfigControllerFactory::class,

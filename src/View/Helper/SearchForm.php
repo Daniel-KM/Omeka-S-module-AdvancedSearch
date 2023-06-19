@@ -97,7 +97,7 @@ class SearchForm extends AbstractHelper
             // If it is on a search page route, use the id.
             // TODO It may be possible to use the search config path.
             $params = $plugins->get('params')->fromRoute();
-            $searchConfigId = $params['controller'] === 'AdvancedSearch\Controller\IndexController'
+            $searchConfigId = $params['controller'] === \AdvancedSearch\Controller\SearchController::class
                 ? (int) $params['id']
                 : null;
             $this->searchConfig = $getSearchConfig($searchConfigId);

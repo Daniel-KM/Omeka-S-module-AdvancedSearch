@@ -155,7 +155,7 @@ class SearchingForm extends AbstractBlockLayout
     /**
      * Get the request from the query and check it according to the search config.
      *
-     * @todo Factorize with \AdvancedSearch\Controller\IndexController::getSearchRequest()
+     * @todo Factorize with \AdvancedSearch\Controller\SearchController::getSearchRequest()
      *
      * @param SearchConfigRepresentation $searchConfig
      * @param \Laminas\Form\Form $searchForm

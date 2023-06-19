@@ -49,11 +49,13 @@ class MvcListeners extends AbstractListenerAggregate
         $params = [
             '__NAMESPACE__' => 'AdvancedSearch\Controller',
             '__SITE__' => true,
-            'controller' => \AdvancedSearch\Controller\IndexController::class,
+            'controller' => \AdvancedSearch\Controller\SearchController::class,
             'action' => 'search',
             'site-slug' => $siteSlug,
             'id' => $searchMainPage,
             'item-set-id' => $itemSetId,
+            // TODO Store the page slug to simplify checks.
+            // 'page-slug' => $searchConfigSlug,
         ];
         $routeMatch = new RouteMatch($params);
         $routeMatch->setMatchedRouteName('search-page-' . $searchMainPage);

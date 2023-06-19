@@ -231,7 +231,7 @@ class ApiSearch extends AbstractPlugin
      *
      * @see \Omeka\Api\Adapter\AbstractResourceEntityAdapter
      * @see \Omeka\Api\Adapter\AbstractEntityAdapter
-     * @see \AdvancedSearch\Controller\IndexController::searchAction()
+     * @see \AdvancedSearch\Controller\SearchController::searchAction()
      *
      * @param Request $request
      * @return Response
@@ -240,7 +240,7 @@ class ApiSearch extends AbstractPlugin
     {
         // TODO Manage all standard params.
         // See \Omeka\Api\Adapter\AbstractEntityAdapter::search() to normalize params.
-        // See \AdvancedSearch\Controller\IndexController::searchAction() for process.
+        // See \AdvancedSearch\Controller\SearchController::searchAction() for process.
         // Currently, only manage simple search and common params.
         // This corresponds to the search page form, but for the api.
         $query = $request->getContent();

@@ -245,6 +245,8 @@ $(document).ready(function() {
         }
     });
 
+    /* Results */
+
     $('.search-view-type-list').on('click', function(e) {
         e.preventDefault();
         Search.setViewType('list');

@@ -715,7 +715,7 @@ nlres = is not linked with resource with ID
                 ],
             ])
             ->add([
-                'name' => 'display_button',
+                'name' => 'display_submit',
                 'type' => AdvancedSearchElement\OptionalRadio::class,
                 'options' => [
                     'label' => 'Position of the button "Apply filters"', // @translate
@@ -727,7 +727,25 @@ nlres = is not linked with resource with ID
                     ],
                 ],
                 'attributes' => [
-                    'id' => 'facet_display_button',
+                    'id' => 'facet_display_submit',
+                    'required' => false,
+                    'value' => 'above',
+                ],
+            ])
+            ->add([
+                'name' => 'display_reset',
+                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Position of the button "Reset facets"', // @translate
+                    'value_options' => [
+                        'none' => 'None', // @translate
+                        'above' => 'Above facets', // @translate
+                        'below' => 'Below facets', // @translate
+                        'both' => 'Both', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'facet_display_reset',
                     'required' => false,
                     'value' => 'above',
                 ],

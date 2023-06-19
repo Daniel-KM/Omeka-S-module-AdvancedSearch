@@ -256,6 +256,7 @@ return [
             'order' => '',
             'display_list' => 'available',
             'display_button' => 'above',
+            'display_reset' => 'above',
             'display_active' => true,
             'display_count' => true,
         ],

@@ -157,13 +157,18 @@ class SearchRequestToResponse extends AbstractPlugin
         ];
         $userRole = $user ? $user->getRole() : null;
 
+        // Default access status is "free".
         $accessToAdmin = $user && in_array($userRole, $omekaRoles);
         if ($accessToAdmin) {
             $query->setIsPublic(false);
             $query->setAccessStatus('forbidden');
         }
 
-        if ($user && !in_array($userRole, $omekaRoles)) {
+        // Warning for module AccessResource: don't force isPublic here, because
+        // reserved resources are private.
+        elseif ($user && !in_array($userRole, $omekaRoles)) {
+            // This is the default.
+            // $query->setIsPublic(true);
             $query->setAccessStatus('reserved');
         }
 

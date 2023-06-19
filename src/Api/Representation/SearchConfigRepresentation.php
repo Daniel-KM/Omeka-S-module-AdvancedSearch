@@ -204,7 +204,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
             }
         }
 
-        if (!empty($options['skip_form_action'])) {
+        if (empty($options['skip_form_action'])) {
             $isAdmin = $plugins->get('status')->isAdminRequest();
             $url = $isAdmin ? $this->adminSearchUrl() : $this->siteUrl();
             $this->form->setAttribute('action', $url);

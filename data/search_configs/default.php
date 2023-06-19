@@ -172,6 +172,7 @@ return [
                 */
             ],
             'button_reset' => true,
+            'button_submit' => true,
         ],
 
         'display' => [
@@ -255,7 +256,7 @@ return [
             'limit' => 10,
             'order' => '',
             'display_list' => 'available',
-            'display_button' => 'above',
+            'display_submit' => 'above',
             'display_reset' => 'above',
             'display_active' => true,
             'display_count' => true,

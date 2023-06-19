@@ -231,6 +231,16 @@ advanced = Filters = Advanced',
                 ],
             ])
             ->add([
+                'name' => 'button_submit',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Add a button "submit"', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'button_submit',
+                ],
+            ])
+            ->add([
                 'name' => 'available_filters',
                 'type' => OmekaElement\ArrayTextarea::class,
                 'options' => [

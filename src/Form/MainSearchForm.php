@@ -252,24 +252,25 @@ class MainSearchForm extends Form
                 ]);
         }
 
-        $this
-            ->add([
-                'name' => 'submit',
-                'type' => Element\Button::class,
-                'options' => [
-                    'label' => 'Search', // @translate
-                    'label_attributes' => [
+        if (!empty($this->formSettings['form']['button_submit'])) {
+            $this
+                ->add([
+                    'name' => 'submit',
+                    'type' => Element\Button::class,
+                    'options' => [
+                        'label' => 'Search', // @translate
+                        'label_attributes' => [
+                            'class' => 'search-submit',
+                        ],
+                    ],
+                    'attributes' => [
+                        'id' => 'submit',
+                        'form' => 'form-search',
+                        'type' => 'submit',
                         'class' => 'search-submit',
                     ],
-                ],
-                'attributes' => [
-                    'id' => 'submit',
-                    'form' => 'form-search',
-                    'type' => 'submit',
-                    'class' => 'search-submit',
-                ],
-            ])
-        ;
+                ]);
+        }
 
         $this->appendInputFilters();
     }

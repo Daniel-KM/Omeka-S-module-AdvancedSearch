@@ -568,7 +568,7 @@ SQL;
             if (!is_array($values)) {
                 return [$values];
             } elseif (is_array(reset($values))) {
-                return array_merge(...$values);
+                return array_merge(...array_values($values));
             }
             return $values;
         };

@@ -61,11 +61,14 @@ return [
             // Used in AdvancedResourceTemplate, AdvancedSearch and BlockPlus.
             'assetUrl' => Service\ViewHelper\AssetUrlFactory::class,
             'cleanQuery' => Service\ViewHelper\CleanQueryFactory::class,
+            // Used in AdvancedSearch and Annotate.
             'easyMeta' => Service\ViewHelper\EasyMetaFactory::class,
             'matchedRouteName' => Service\ViewHelper\MatchedRouteNameFactory::class,
             'mediaTypeSelect' => Service\ViewHelper\MediaTypeSelectFactory::class,
             'searchEngineConfirm' => Service\ViewHelper\SearchEngineConfirmFactory::class,
             'searchSuggesterConfirm' => Service\ViewHelper\SearchSuggesterConfirmFactory::class,
+            // Allow to call EasyMeta, used in AdvancedSearch and Annotate.
+            View\Helper\EasyMeta::class => Service\ViewHelper\EasyMetaFactory::class,
         ],
         'delegators' => [
             'Laminas\Form\View\Helper\FormElement' => [

@@ -11,7 +11,7 @@ use Omeka\Form\Element as OmekaElement;
 class ApiFormConfigFieldset extends Fieldset
 {
     /**
-     * @var EasyMeta
+     * @var \AdvancedSearch\View\Helper\EasyMeta
      */
     protected $easyMeta;
 
@@ -368,7 +368,7 @@ class ApiFormConfigFieldset extends Fieldset
         return $options;
     }
 
-    public function setEasyMeta(EasyMeta $easyMeta): self
+    public function setEasyMeta($easyMeta): self
     {
         $this->easyMeta = $easyMeta;
         return $this;

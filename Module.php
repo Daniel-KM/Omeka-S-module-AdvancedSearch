@@ -40,7 +40,7 @@ if (!class_exists(\Generic\AbstractModule::class)) {
         : __DIR__ . '/src/Generic/AbstractModule.php';
 }
 
-use AdvancedSearch\Indexer\IndexerInterface;
+use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
 use Generic\AbstractModule;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
@@ -919,13 +919,12 @@ class Module extends AbstractModule
         $searchEngines = $api->search('search_engines')->getContent();
         foreach ($searchEngines as $searchEngine) {
             if (in_array($requestResource, $searchEngine->setting('resources', []))) {
-                $indexer = $searchEngine->indexer();
                 if ($request->getOperation() == 'delete') {
                     $id = $request->getId();
-                    $this->deleteIndexResource($indexer, $requestResource, $id);
+                    $this->deleteIndexResource($searchEngine, $requestResource, $id);
                 } else {
                     $resource = $response->getContent();
-                    $this->updateIndexResource($indexer, $resource);
+                    $this->updateIndexResource($searchEngine, $resource);
                 }
             }
         }
@@ -951,8 +950,7 @@ class Module extends AbstractModule
         $searchEngines = $api->search('search_engines')->getContent();
         foreach ($searchEngines as $searchEngine) {
             if (in_array('items', $searchEngine->setting('resources', []))) {
-                $indexer = $searchEngine->indexer();
-                $this->updateIndexResource($indexer, $item);
+                $this->updateIndexResource($searchEngine, $item);
             }
         }
     }
@@ -960,25 +958,26 @@ class Module extends AbstractModule
     /**
      * Delete the index for the resource in search engine.
      *
-     * @param IndexerInterface $indexer
+     * @param SearchEngineRepresentation $searchEngine
      * @param string $resourceName
      * @param int $id
      */
-    protected function deleteIndexResource(IndexerInterface $indexer, $resourceName, $id): void
+    protected function deleteIndexResource(SearchEngineRepresentation $searchEngine, $resourceName, $id): void
     {
+        $indexer = $searchEngine->indexer();
         try {
             $indexer->deleteResource($resourceName, $id);
         } catch (\Exception $e) {
             $services = $this->getServiceLocator();
             $logger = $services->get('Omeka\Logger');
             $logger->err(new Message(
-                'Unable to delete the search index for resource #%1$d: %2$s', // @translate
-                $id, $e->getMessage()
+                'Unable to delete the search index for resource #%1$d in search engine "%2$s": %3$s', // @translate
+                $id, $searchEngine->name(), $e->getMessage()
             ));
             $messenger = $services->get('ControllerPluginManager')->get('messenger');
             $messenger->addWarning(new Message(
-                'Unable to delete the search index for the deleted resource #%d: see log.', // @translate
-                $id
+                'Unable to delete the search index for the deleted resource #%1$d in search engine "%2$s": see log.', // @translate
+                $id, $searchEngine->name()
             ));
         }
     }
@@ -986,24 +985,25 @@ class Module extends AbstractModule
     /**
      * Update the index in search engine for a resource.
      *
-     * @param IndexerInterface $indexer
+     * @param SearchEngineRepresentation $searchEngine
      * @param Resource $resource
      */
-    protected function updateIndexResource(IndexerInterface $indexer, Resource $resource): void
+    protected function updateIndexResource(SearchEngineRepresentation $searchEngine, Resource $resource): void
     {
+        $indexer = $searchEngine->indexer();
         try {
             $indexer->indexResource($resource);
         } catch (\Exception $e) {
             $services = $this->getServiceLocator();
             $logger = $services->get('Omeka\Logger');
             $logger->err(new Message(
-                'Unable to index metadata of resource #%1$d for search: %2$s', // @translate
-                $resource->getId(), $e->getMessage()
+                'Unable to index metadata of resource #%1$d for search in search engine "%2$s": %3$s', // @translate
+                $resource->getId(), $searchEngine->name(), $e->getMessage()
             ));
             $messenger = $services->get('ControllerPluginManager')->get('messenger');
             $messenger->addWarning(new Message(
-                'Unable to update the search index for resource #%d: see log.', // @translate
-                $resource->getId()
+                'Unable to update the search index for resource #%1$d in search engine "%2$s": see log.', // @translate
+                $resource->getId(), $searchEngine->name()
             ));
         }
     }

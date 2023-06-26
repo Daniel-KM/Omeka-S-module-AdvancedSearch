@@ -46,6 +46,9 @@ class DataTextarea extends ArrayTextarea
         if (is_string($array)) {
             return $array;
         }
+        if (is_null($array)) {
+            return '';
+        }
         $textMode = $this->getDataTextMode();
         if ($textMode === 'last_is_list') {
             return $this->arrayToStringLastIsList($array);
@@ -57,6 +60,9 @@ class DataTextarea extends ArrayTextarea
     {
         if (is_array($string)) {
             return $string;
+        }
+        if (is_null($string)) {
+            return [];
         }
         $textMode = $this->getDataTextMode();
         if ($textMode === 'last_is_list') {

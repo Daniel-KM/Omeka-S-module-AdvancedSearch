@@ -262,7 +262,7 @@ class Module extends AbstractModule
                 'api.search.pre',
                 [$this, 'startOverrideQuery'],
                 // Let any other module, except core, to search properties.
-                -100
+                -200
             );
             // Add the search query filters for resources.
             $sharedEventManager->attach(
@@ -270,7 +270,7 @@ class Module extends AbstractModule
                 'api.search.query',
                 [$this, 'endOverrideQuery'],
                 // Process before any other module in order to reset query.
-                +100
+                +200
             );
         }
 
@@ -657,7 +657,12 @@ class Module extends AbstractModule
         /** @var \Omeka\Api\Request $request */
         $request = $event->getParam('request');
 
-        /** @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResources::startOverrideQuery() */
+        // Don't override for api index search.
+        if ($request->getOption('is_index_search')) {
+            return;
+        }
+
+        /** @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResources::startOverrideRequest() */
         $this->getServiceLocator()->get('ControllerPluginManager')
             ->get('searchResources')
             ->startOverrideRequest($request);
@@ -673,10 +678,16 @@ class Module extends AbstractModule
     {
         /** @var \Omeka\Api\Request $request */
         $request = $event->getParam('request');
+
+        // Don't override for api index search.
+        if ($request->getOption('is_index_search')) {
+            return;
+        }
+
         $qb = $event->getParam('queryBuilder');
         $adapter = $event->getTarget();
 
-        /** @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResources::endOverrideQuery() */
+        /** @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResources::endOverrideRequest() */
         $searchResources = $this->getServiceLocator()->get('ControllerPluginManager')
             ->get('searchResources');
 

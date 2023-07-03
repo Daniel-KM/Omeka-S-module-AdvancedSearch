@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS `search_engine` (
     `name` VARCHAR(190) NOT NULL,
     `adapter` VARCHAR(190) NOT NULL,
     `settings` LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json)',
-    `created` DATETIME NOT NULL,
+    `created` DATETIME DEFAULT NOW() NOT NULL,
     `modified` DATETIME DEFAULT NULL,
     PRIMARY KEY(`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS `search_config` (
     `path` VARCHAR(190) NOT NULL,
     `form_adapter` VARCHAR(190) NOT NULL,
     `settings` LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json)',
-    `created` DATETIME NOT NULL,
+    `created` DATETIME DEFAULT NOW() NOT NULL,
     `modified` DATETIME DEFAULT NULL,
     INDEX IDX_D684063E78C9C0A (`engine_id`),
     PRIMARY KEY(`id`)
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `search_suggester` (
     `engine_id` INT NOT NULL,
     `name` VARCHAR(190) NOT NULL,
     `settings` LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json)',
-    `created` DATETIME NOT NULL,
+    `created` DATETIME DEFAULT NOW() NOT NULL,
     `modified` DATETIME DEFAULT NULL,
     INDEX IDX_F64D915AE78C9C0A (`engine_id`),
     PRIMARY KEY(`id`)

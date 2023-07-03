@@ -4,13 +4,10 @@ namespace AdvancedSearch\Entity;
 
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Event\LifecycleEventArgs;
-use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Omeka\Entity\AbstractEntity;
 
 /**
  * @Entity
- * @HasLifecycleCallbacks
  */
 class SearchSuggester extends AbstractEntity
 {
@@ -63,7 +60,11 @@ class SearchSuggester extends AbstractEntity
      * @var DateTime
      *
      * @Column(
-     *     type="datetime"
+     *     type="datetime",
+     *     nullable=false,
+     *     options={
+     *         "default": "NOW()"
+     *     }
      * )
      */
     protected $created;
@@ -156,23 +157,5 @@ class SearchSuggester extends AbstractEntity
     public function getSuggestions(): ArrayCollection
     {
         return $this->suggestions;
-    }
-
-    /**
-     * @PrePersist
-     */
-    public function prePersist(LifecycleEventArgs $eventArgs): self
-    {
-        $this->created = new DateTime('now');
-        return $this;
-    }
-
-    /**
-     * @PreUpdate
-     */
-    public function preUpdate(PreUpdateEventArgs $eventArgs): self
-    {
-        $this->modified = new DateTime('now');
-        return $this;
     }
 }

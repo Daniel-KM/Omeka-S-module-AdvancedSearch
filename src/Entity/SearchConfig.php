@@ -31,13 +31,10 @@
 namespace AdvancedSearch\Entity;
 
 use DateTime;
-use Doctrine\ORM\Event\LifecycleEventArgs;
-use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Omeka\Entity\AbstractEntity;
 
 /**
  * @Entity
- * @HasLifecycleCallbacks
  */
 class SearchConfig extends AbstractEntity
 {
@@ -110,7 +107,11 @@ class SearchConfig extends AbstractEntity
      * @var DateTime
      *
      * @Column(
-     *     type="datetime"
+     *     type="datetime",
+     *     nullable=false,
+     *     options={
+     *         "default": "NOW()"
+     *     }
      * )
      */
     protected $created;
@@ -205,23 +206,5 @@ class SearchConfig extends AbstractEntity
     public function getModified(): ?DateTime
     {
         return $this->modified;
-    }
-
-    /**
-     * @PrePersist
-     */
-    public function prePersist(LifecycleEventArgs $eventArgs): self
-    {
-        $this->created = new DateTime('now');
-        return $this;
-    }
-
-    /**
-     * @PreUpdate
-     */
-    public function preUpdate(PreUpdateEventArgs $eventArgs): self
-    {
-        $this->modified = new DateTime('now');
-        return $this;
     }
 }

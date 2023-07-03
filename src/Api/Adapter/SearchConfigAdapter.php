@@ -138,6 +138,7 @@ class SearchConfigAdapter extends AbstractEntityAdapter
         if ($this->shouldHydrate($request, 'o:settings')) {
             $entity->setSettings($request->getValue('o:settings') ?? []);
         }
+        $this->updateTimestamps($request, $entity);
     }
 
     public function validateEntity(EntityInterface $entity, ErrorStore $errorStore): void

@@ -309,3 +309,24 @@ SET
 SQL;
     $connection->executeStatement($sql);
 }
+
+if (version_compare($oldVersion, '3.4.11', '<')) {
+    $sql = <<<'SQL'
+ALTER TABLE `search_config` CHANGE `created` `created` datetime NOT NULL DEFAULT NOW() AFTER `settings`;
+ALTER TABLE `search_engine` CHANGE `created` `created` datetime NOT NULL DEFAULT NOW() AFTER `settings`;
+ALTER TABLE `search_suggester` CHANGE `created` `created` datetime NOT NULL DEFAULT NOW() AFTER `settings`;
+SQL;
+    $connection->executeStatement($sql);
+
+    /** @var \Omeka\Module\Manager $moduleManager */
+    $moduleManager = $services->get('Omeka\ModuleManager');
+    $module = $moduleManager->getModule('Reference');
+    $hasReference = $module
+        && version_compare($module->getIni('version'), '3.4.43', '<');
+    if ($hasReference) {
+        $message = new Message(
+            'It is recommended to upgrade the module "Reference" to improve performance.' // @translate
+        );
+        $messenger->addWarning($message);
+    }
+}

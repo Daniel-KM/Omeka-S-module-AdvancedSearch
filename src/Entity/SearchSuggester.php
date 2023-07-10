@@ -63,7 +63,7 @@ class SearchSuggester extends AbstractEntity
      *     type="datetime",
      *     nullable=false,
      *     options={
-     *         "default": "NOW()"
+     *         "default": "CURRENT_TIMESTAMP"
      *     }
      * )
      */

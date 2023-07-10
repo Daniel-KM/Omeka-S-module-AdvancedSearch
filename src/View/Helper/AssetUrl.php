@@ -7,9 +7,8 @@ namespace AdvancedSearch\View\Helper;
  *
  * Override core helper to allow to override internal assets in a generic way.
  *
- * @see \AdvancedResourceTemplate\Service\ViewHelper\AssetUrlFactory
- * @see \AdvancedSearch\Service\ViewHelper\AssetUrlFactory
- * @see \BlockPlus\Service\ViewHelper\AssetUrlFactory
+ * @see \AdvancedResourceTemplate\View\Helper\AssetUrl
+ * @see \AdvancedSearch\View\Helper\AssetUrl
  */
 class AssetUrl extends \Omeka\View\Helper\AssetUrl
 {
@@ -42,6 +41,6 @@ class AssetUrl extends \Omeka\View\Helper\AssetUrl
             );
         }
 
-        return parent::__invoke($file, $module, $override, $versioned);
+        return parent::__invoke($file, $module, $override, $versioned, $absolute);
     }
 }

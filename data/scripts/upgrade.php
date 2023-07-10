@@ -330,3 +330,12 @@ SQL;
         $messenger->addWarning($message);
     }
 }
+
+if (version_compare($oldVersion, '3.4.12', '<')) {
+    $sql = <<<'SQL'
+ALTER TABLE `search_config` CHANGE `created` `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `settings`;
+ALTER TABLE `search_engine` CHANGE `created` `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `settings`;
+ALTER TABLE `search_suggester` CHANGE `created` `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `settings`;
+SQL;
+    $connection->executeStatement($sql);
+}

@@ -76,7 +76,7 @@ foreach ($sqls as $sql) {
 }
 
 $message = new Message(
-    'The module "%s" was upgraded by module "%s" and uninstalled.', // @translate
+    'The module "%1$s" was upgraded by module "%2$s" and uninstalled.', // @translate
     'Advanced Search Plus', 'Advanced Search'
 );
 $messenger->addWarning($message);

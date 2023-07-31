@@ -232,32 +232,32 @@ msgstr "n’a pas le grand type"
 #: src/View/Helper/SearchFiltersTrait.php:44
 #: view/common/advanced-search/properties.phtml:121
 msgid "has type literal-like"
-msgstr "a un type littéral"
+msgstr "a un type principal littéral"
 
 #: src/View/Helper/SearchFiltersTrait.php:45
 #: view/common/advanced-search/properties.phtml:122
 msgid "has not type literal-like"
-msgstr "n’a pas un type littéral"
+msgstr "n’a pas un type principal littéral"
 
 #: src/View/Helper/SearchFiltersTrait.php:46
 #: view/common/advanced-search/properties.phtml:123
 msgid "has type resource-like"
-msgstr "a un type ressource liée"
+msgstr "a un type principal ressource liée"
 
 #: src/View/Helper/SearchFiltersTrait.php:47
 #: view/common/advanced-search/properties.phtml:124
 msgid "has not type resource-like"
-msgstr "n’a pas un type ressource liée"
+msgstr "n’a pas un type principal ressource liée"
 
 #: src/View/Helper/SearchFiltersTrait.php:48
 #: view/common/advanced-search/properties.phtml:125
 msgid "has type uri-like"
-msgstr "a un type uri"
+msgstr "a un type principal uri"
 
 #: src/View/Helper/SearchFiltersTrait.php:49
 #: view/common/advanced-search/properties.phtml:126
 msgid "has not type uri-like"
-msgstr "n’a pas un type uri"
+msgstr "n’a pas un type principal uri"
 
 #: src/View/Helper/SearchFiltersTrait.php:50
 #: view/common/advanced-search/properties.phtml:127

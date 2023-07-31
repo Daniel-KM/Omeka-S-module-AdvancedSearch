@@ -257,6 +257,7 @@ class Module extends AbstractModule
             // item set, site and owner.
             // Because this event does not apply when initialize = false, the
             // api manager has a delegator that does the same.
+            // TODO Use a single event but with another priority?
             $sharedEventManager->attach(
                 $adapter,
                 'api.search.pre',

@@ -138,13 +138,12 @@ class SearchRequestToResponse extends AbstractPlugin
 
         $engineSettings = $this->searchEngine->settings();
 
-        // Manage rights of resources to search: visibility public/private and
-        // access (free/reserved/protected/forbidden).
-        // The access status can be stored even without module Access.
+        // Manage rights of resources to search: visibility public/private.
 
-        // TODO Manage roles from modules and visibility from modules (access resources).
         // TODO Researcher and author may not access all private resources.
-        // TODO Manage other modes of access than global (by ip or individual).
+        // TODO Manage roles from modules and access level from module Access.
+
+        // For module Access, this is a standard filter.
 
         $user = $plugins->get('identity')();
         $omekaRoles = [
@@ -157,20 +156,12 @@ class SearchRequestToResponse extends AbstractPlugin
         ];
         $userRole = $user ? $user->getRole() : null;
 
-        // TODO Rewrite according to version 3.4.17 of module Access.
-        // Default access status is "free".
         $accessToAdmin = $user && in_array($userRole, $omekaRoles);
         if ($accessToAdmin) {
             $query->setIsPublic(false);
-            $query->setAccessStatus('forbidden');
-        }
-
-        // Warning for module AccessResource: don't force isPublic here, because
-        // reserved resources are private.
-        elseif ($user && !in_array($userRole, $omekaRoles)) {
+        // } elseif ($user && !in_array($userRole, $omekaRoles)) {
             // This is the default.
             // $query->setIsPublic(true);
-            $query->setAccessStatus('reserved');
         }
 
         if ($site) {

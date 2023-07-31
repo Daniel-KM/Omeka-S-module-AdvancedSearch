@@ -644,6 +644,15 @@ SQL;
                         : array_merge(is_array($this->args['item_set_id']) ? $this->args['item_set_id'] : [$this->args['item_set_id']], $values);
                     continue 2;
 
+                // Module Access: access level (free, reserved, protected, forbidden).
+                case 'access':
+                    $values = array_filter($flatArray($values));
+                    $this->args['access'] = empty($this->args['access'])
+                        ? $values
+                        : array_merge(is_array($this->args['access']) ? $this->args['access'] : [$this->args['access']], $values);
+                    continue 2;
+
+                // Module Item Sets Tree.
                 case 'item_sets_tree':
                     $values = array_filter(array_map('intval', $flatArray($values)));
                     $this->args['item_sets_tree'] = empty($this->args['item_sets_tree'])

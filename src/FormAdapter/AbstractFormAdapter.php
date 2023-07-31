@@ -152,6 +152,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                 // Specific fields.
 
                 case 'is_public':
+                case 'is_open':
                     if (is_string($value)
                         && strlen($value)
                         && isset($formSettings['available_fields'][$name]['to'])

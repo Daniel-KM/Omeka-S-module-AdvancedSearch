@@ -218,6 +218,20 @@ class ApiFormConfigFieldset extends Fieldset
                     'class' => 'chosen-select',
                 ],
             ])
+            ->add([
+                'name' => 'is_open',
+                'type' => AdvancedSearchElement\OptionalSelect::class,
+                'options' => [
+                    'label' => 'Is open', // @translate
+                    'value_options' => $availableFields,
+                    'empty_option' => 'None', // @translate
+                    'use_hidden_element' => true,
+                ],
+                'attributes' => [
+                    'required' => false,
+                    'class' => 'chosen-select',
+                ],
+            ])
         ;
 
         // Prefill the mapping (the specific metadata are mapped above).

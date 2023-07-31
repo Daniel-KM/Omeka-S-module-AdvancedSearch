@@ -761,6 +761,9 @@ SQL;
         }
     }
 
+    /**
+     * @todo In internal querier, advanced filters manage only properties for now.
+     */
     protected function filterQueryFilters(array $filters): void
     {
         $multifields = $this->engine->settingAdapter('multifields', []);
@@ -850,6 +853,7 @@ SQL;
             'resource_class_id' => 'o:resource_class',
             'resource_template_id' => 'o:resource_template',
             'item_set_id' => 'o:item_set',
+            'access' => 'access',
             'item_sets_tree' => 'item_sets_tree',
         ];
 

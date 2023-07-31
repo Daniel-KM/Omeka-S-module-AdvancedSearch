@@ -233,6 +233,13 @@ class InternalAdapter extends AbstractAdapter
                 'from' => 'item_set/o:id',
                 'to' => 'item_set_id',
             ],
+            // Module Access.
+            'access' => [
+                'name' => 'access',
+                'label' => 'Access',
+                'from' => 'access',
+                'to' => 'access',
+            ],
             // Module Item Sets Tree.
             'item_sets_tree' => [
                 'name' => 'item_sets_tree',

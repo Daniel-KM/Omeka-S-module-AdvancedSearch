@@ -46,6 +46,7 @@ class MainSearchFormFactory implements FactoryInterface
         return (new MainSearchForm(null, $options))
             ->setBasePath($helpers->get('basePath')())
             ->setSite($currentSite)
+            ->setSettings($services->get('Omeka\Settings'))
             ->setSiteSetting($siteSetting)
             ->setFormElementManager($services->get('FormElementManager'))
             ->setEntityManager($services->get('Omeka\EntityManager'))

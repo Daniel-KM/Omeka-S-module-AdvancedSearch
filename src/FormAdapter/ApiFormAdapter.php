@@ -144,6 +144,11 @@ class ApiFormAdapter implements FormAdapterInterface
         if (isset($metadata['is_open']) && isset($request['is_open'])) {
             $query->addFilter($metadata['is_open'], (bool) $request['is_open']);
         }
+
+        // Module Access.
+        if (isset($metadata['access']) && isset($request['access'])) {
+            $query->addFilter($metadata['access'], (string) $request['access']);
+        }
     }
 
     /**

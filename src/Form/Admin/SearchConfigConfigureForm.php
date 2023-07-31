@@ -261,7 +261,7 @@ advanced = Filters = Advanced',
                 'type' => AdvancedSearchElement\DataTextarea::class,
                 'options' => [
                     'label' => 'Advanced filters', // @translate
-                    'info' => 'List of filters that will be displayed in the search form. Format is "term = Label". The field should exist in all resources fields.', // @translate
+                    'info' => 'List of filters that will be displayed in the search form. Format is "term = Label". The field should exist in all resources fields. Only properties are managed for internal search engine.', // @translate
                     'as_key_value' => true,
                     'key_value_separator' => '=',
                     'data_keys' => [

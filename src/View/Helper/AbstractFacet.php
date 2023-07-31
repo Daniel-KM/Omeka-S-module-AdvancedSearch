@@ -224,6 +224,7 @@ class AbstractFacet extends AbstractHelper
         }
 
         switch ($facetField) {
+            case 'access':
             case 'resource_name':
             case 'resource_type':
                 return $value;

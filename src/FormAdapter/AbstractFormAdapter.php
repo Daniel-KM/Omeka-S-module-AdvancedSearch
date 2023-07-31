@@ -172,6 +172,15 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                     }
                     continue 2;
 
+                case 'access':
+                    if (is_string($value)
+                        && strlen($value)
+                        && isset($formSettings['available_fields'][$name]['to'])
+                    ) {
+                        $query->addFilter($formSettings['available_fields'][$name]['to'], $value);
+                    }
+                    continue 2;
+
                 case 'filter':
                     // The request filters are the advanced ones in the form settings.
                     // The default query type is "in" (contains).

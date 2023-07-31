@@ -39,6 +39,7 @@ use Laminas\Form\Form;
 use Laminas\Form\FormElementManager;
 use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Form\Element as OmekaElement;
+use Omeka\Settings\Settings;
 use Omeka\View\Helper\Setting;
 use Reference\Mvc\Controller\Plugin\References;
 
@@ -53,6 +54,11 @@ class MainSearchForm extends Form
      * @var SiteRepresentation
      */
     protected $site;
+
+    /**
+     * @var Settings
+     */
+    protected $settings;
 
     /**
      * @var Setting
@@ -208,6 +214,9 @@ class MainSearchForm extends Form
                         break;
                     case 'item_set/o:id':
                         $element = $this->searchItemSet($filter);
+                        break;
+                    case 'access':
+                        $element = $this->searchAccess($filter);
                         break;
                     case 'item_sets_tree':
                         $element = $this->searchItemSetsTree($filter);
@@ -794,6 +803,9 @@ class MainSearchForm extends Form
         return $fieldset;
     }
 
+    /**
+     * Manage hierachical item sets for module Item Sets Tree.
+     */
     protected function searchItemSetsTree(array $filter): ?ElementInterface
     {
         $fieldset = new Fieldset('item_sets_tree');
@@ -820,6 +832,49 @@ class MainSearchForm extends Form
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
                     // End users understand "collections" more than "item sets".
                     'data-placeholder' => 'Select collections…', // @translate
+                ],
+            ])
+        ;
+
+        return $fieldset;
+    }
+
+    /**
+     * Manage access levels for module Access.
+     */
+    protected function searchAccess(array $filter): ?ElementInterface
+    {
+        $valueOptions = $this->settings->get('access_property_levels', [
+            'free' => 'free',
+            'reserved' => 'reserved',
+            // 'protected' => 'protected',
+            'forbidden' => 'forbidden',
+        ]);
+        unset($valueOptions['protected']);
+
+        $fieldset = new Fieldset('access');
+        $fieldset
+            ->setAttributes([
+                'id' => 'search-access',
+                'form' => 'form-search',
+                'data-field-type' => 'access',
+            ])
+            ->add([
+                'name' => 'id',
+                'type' => $filter['type'] === 'Radio'
+                    ? AdvancedSearchElement\OptionalRadio::class
+                    : AdvancedSearchElement\OptionalSelect::class,
+                'options' => [
+                    'label' => $filter['label'], // @translate
+                    'value_options' => $valueOptions,
+                    'empty_option' => '',
+                ],
+                'attributes' => [
+                    'id' => 'search-access',
+                    'form' => 'form-search',
+                    // 'multiple' => false,
+                    'class' => $filter['type'] === 'Radio' ? '' : 'chosen-select',
+                    'data-placeholder' => 'Select access…', // @translate
                 ],
             ])
         ;
@@ -1052,6 +1107,12 @@ class MainSearchForm extends Form
     public function setSite(?SiteRepresentation $site): Form
     {
         $this->site = $site;
+        return $this;
+    }
+
+    public function setSettings(?Settings $settings = null): Form
+    {
+        $this->settings = $settings;
         return $this;
     }
 

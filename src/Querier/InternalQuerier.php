@@ -919,6 +919,7 @@ SQL;
                 'sort_order' => $facetOrders[$facetOrder]['sort_order'],
                 'filters' => [
                     'languages' => $facetLanguages,
+                    // 'main_types' => [],
                     'datatypes' => [],
                 ],
                 'values' => [],
@@ -932,7 +933,7 @@ SQL;
                 'output' => 'associative',
             ];
 
-            // TODO Make References manages individual options for each field (limit, order, languages, range).
+            // TODO Make References manages individual options for each field (limit, order, languages, range, main data types, data types).
             $values = $references
                 ->setMetadata($fields)
                 ->setQuery($facetData)
@@ -951,15 +952,25 @@ SQL;
                 $isFacetRange = $facets[$facetField]['type'] === 'SelectRange';
                 // Like Solr, get all facet values, so all existing values.
                 /** @see https://solr.apache.org/guide/solr/latest/query-guide/faceting.html */
+                // TODO Remove these double queries for facet range when individual options will be managed.
                 if ($isFacetRange) {
-                    // TODO Remove this double query for facet range when individual options will be managed.
-                    $values = $references
-                        ->setMetadata([$fields[$facetField]])
+                    $localValues = $references
+                        ->setMetadata([$facetField => $fields[$facetField]])
                         ->setQuery($facetData)
                         ->setOptions($optionsFacetRange)
                         ->list();
+                } elseif (!empty($facets[$facetField]['options']) && $facets[$facetField]['options'] !== ['value', 'uri', 'resource']) {
+                    $localOptions = $options;
+                    $localOptions['filters']['main_types'] = $facets[$facetField]['options'];
+                    $localValues = $references
+                        ->setMetadata([$facetField => $fields[$facetField]])
+                        ->setQuery($facetData)
+                        ->setOptions($localOptions)
+                        ->list();
+                } else {
+                    $localValues = $values;
                 }
-                foreach ($values[$facetField]['o:references'] ?? [] as $value => $count) {
+                foreach ($localValues[$facetField]['o:references'] ?? [] as $value => $count) {
                     if (empty($facetCountsByField[$facetField][$value])) {
                         $facetCountsByField[$facetField][$value] = [
                             'value' => $value,

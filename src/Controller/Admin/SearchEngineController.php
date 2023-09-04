@@ -175,7 +175,7 @@ class SearchEngineController extends AbstractActionController
         $jobArgs['start_resource_id'] = $startResourceId;
         $jobArgs['resource_names'] = $resourceNames;
         $jobArgs['force'] = $force;
-        // Synchronous dispatcher for testing purpose.
+        // Synchronous dispatcher for quick testing purpose.
         // $job = $this->jobDispatcher()->dispatch(\AdvancedSearch\Job\IndexSearch::class, $jobArgs, $searchEngine->getServiceLocator()->get('Omeka\Job\DispatchStrategy\Synchronous'));
         $job = $this->jobDispatcher()->dispatch(\AdvancedSearch\Job\IndexSearch::class, $jobArgs);
 

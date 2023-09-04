@@ -2,6 +2,8 @@
 
 namespace AdvancedSearch\Mvc\Controller\Plugin;
 
+use DateTime;
+use DateTimeZone;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
@@ -1436,7 +1438,7 @@ class SearchResources extends AbstractPlugin
             switch ($type) {
                 case 'gt':
                     $valueNorm = $this->getDateTimeFromValue($value, false);
-                    if (is_null($valueNorm)) {
+                    if ($valueNorm === null) {
                         $incorrectValue = true;
                     } else {
                         $param = $this->adapter->createNamedParameter($qb, $valueNorm);
@@ -1445,7 +1447,7 @@ class SearchResources extends AbstractPlugin
                     break;
                 case 'gte':
                     $valueNorm = $this->getDateTimeFromValue($value, true);
-                    if (is_null($valueNorm)) {
+                    if ($valueNorm === null) {
                         $incorrectValue = true;
                     } else {
                         $param = $this->adapter->createNamedParameter($qb, $valueNorm);
@@ -1455,7 +1457,7 @@ class SearchResources extends AbstractPlugin
                 case 'eq':
                     $valueFromNorm = $this->getDateTimeFromValue($value, true);
                     $valueToNorm = $this->getDateTimeFromValue($value, false);
-                    if (is_null($valueFromNorm) || is_null($valueToNorm)) {
+                    if ($valueFromNorm === null || $valueToNorm === null) {
                         $incorrectValue = true;
                     } else {
                         if ($valueFromNorm === $valueToNorm) {
@@ -1471,7 +1473,7 @@ class SearchResources extends AbstractPlugin
                 case 'neq':
                     $valueFromNorm = $this->getDateTimeFromValue($value, true);
                     $valueToNorm = $this->getDateTimeFromValue($value, false);
-                    if (is_null($valueFromNorm) || is_null($valueToNorm)) {
+                    if ($valueFromNorm === null || $valueToNorm === null) {
                         $incorrectValue = true;
                     } else {
                         if ($valueFromNorm === $valueToNorm) {
@@ -1488,7 +1490,7 @@ class SearchResources extends AbstractPlugin
                     break;
                 case 'lte':
                     $valueNorm = $this->getDateTimeFromValue($value, false);
-                    if (is_null($valueNorm)) {
+                    if ($valueNorm === null) {
                         $incorrectValue = true;
                     } else {
                         $param = $this->adapter->createNamedParameter($qb, $valueNorm);
@@ -1497,7 +1499,7 @@ class SearchResources extends AbstractPlugin
                     break;
                 case 'lt':
                     $valueNorm = $this->getDateTimeFromValue($value, true);
-                    if (is_null($valueNorm)) {
+                    if ($valueNorm === null) {
                         $incorrectValue = true;
                     } else {
                         $param = $this->adapter->createNamedParameter($qb, $valueNorm);
@@ -1853,9 +1855,9 @@ class SearchResources extends AbstractPlugin
      *
      * @param string $value
      * @param bool $defaultFirst
-     * @return array|null
+     * @return string|null
      */
-    protected function getDateTimeFromValue($value, $defaultFirst = true)
+    protected function getDateTimeFromValue($value, $defaultFirst = true): ?string
     {
         $yearMin = -292277022656;
         $yearMax = 292277026595;
@@ -1863,7 +1865,7 @@ class SearchResources extends AbstractPlugin
         static $dateTimes = [];
 
         $firstOrLast = $defaultFirst ? 'first' : 'last';
-        if (isset($dateTimes[$value][$firstOrLast])) {
+        if (array_key_exists($value, $dateTimes) && array_key_exists($firstOrLast, $dateTimes[$value])) {
             return $dateTimes[$value][$firstOrLast];
         }
 
@@ -1954,7 +1956,7 @@ class SearchResources extends AbstractPlugin
         // provided. This avoids automatic adjustments based on the server's
         // default timezone.
         // With strict type, "now" is required.
-        $dateTime['date'] = new \DateTime('now', new \DateTimeZone($dateTime['offset_normalized']));
+        $dateTime['date'] = new DateTime('now', new DateTimeZone($dateTime['offset_normalized']));
         $dateTime['date']
             ->setDate(
                 $dateTime['year'],

@@ -221,6 +221,16 @@ advanced = Filters = Advanced',
                 ],
             ])
             ->add([
+                'name' => 'attribute_form',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Add attribute "form" to input elements', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'attribute_form',
+                ],
+            ])
+            ->add([
                 'name' => 'button_reset',
                 'type' => Element\Checkbox::class,
                 'options' => [

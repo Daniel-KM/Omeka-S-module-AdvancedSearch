@@ -83,6 +83,11 @@ class MainSearchForm extends Form
     /**
      * @var array
      */
+    protected $elementAttributes = [];
+
+    /**
+     * @var array
+     */
     protected $formSettings = [];
 
     /**
@@ -121,6 +126,10 @@ class MainSearchForm extends Form
         // Check specific fields against all available fields.
         $availableFields = $this->getAvailableFields();
 
+        $this->elementAttributes = empty($this->formSettings['filters']['attribute_form'])
+            ? []
+            : ['form' => 'form-search'];
+
         // The main query is always the first element and submit the last one.
         // TODO Allow to order and to skip "q" (include it as a standard filter).
 
@@ -133,9 +142,8 @@ class MainSearchForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'q',
-                    'form' => 'form-search',
                     'data-type-field' => 'q',
-                ],
+                ] + $this->elementAttributes,
             ])
         ;
 
@@ -254,10 +262,9 @@ class MainSearchForm extends Form
                     ],
                     'attributes' => [
                         'id' => 'reset',
-                        'form' => 'form-search',
                         'type' => 'reset',
                         'class' => 'search-reset',
-                    ],
+                    ] + $this->elementAttributes,
                 ]);
         }
 
@@ -274,10 +281,9 @@ class MainSearchForm extends Form
                     ],
                     'attributes' => [
                         'id' => 'submit',
-                        'form' => 'form-search',
                         'type' => 'submit',
                         'class' => 'search-submit',
-                    ],
+                    ] + $this->elementAttributes,
                 ]);
         }
 
@@ -327,8 +333,7 @@ class MainSearchForm extends Form
             ])
             ->setAttributes([
                 'id' => 'search-filters',
-                'form' => 'form-search',
-            ])
+            ] + $this->elementAttributes)
         ;
 
         return $element;
@@ -365,9 +370,8 @@ class MainSearchForm extends Form
                     'label' => 'From', // @translate
                 ],
                 'attributes' => [
-                    'form' => 'form-search',
                     'placeholder' => 'YYYY', // @translate
-                ],
+                ] + $this->elementAttributes,
             ])
             ->add([
                 'name' => 'to',
@@ -376,9 +380,8 @@ class MainSearchForm extends Form
                     'label' => 'To', // @translate
                 ],
                 'attributes' => [
-                    'form' => 'form-search',
                     'placeholder' => 'YYYY', // @translate
-                ],
+                ] + $this->elementAttributes,
             ])
         ;
 
@@ -518,11 +521,10 @@ class MainSearchForm extends Form
             ])
             ->setAttributes([
                 'id' => 'search-resource-type',
-                'form' => 'form-search',
                 'multiple' => true,
                 'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
                 'data-placeholder' => 'Select resource type…', // @translate
-            ])
+            ] + $this->elementAttributes)
         ;
 
         return $element;
@@ -539,9 +541,8 @@ class MainSearchForm extends Form
             ])
             ->setAttributes([
                 'id' => 'search-id',
-                'form' => 'form-search',
                 'data-field-type' => $filter['type'] === 'MultiText' ? 'multitext' : 'text',
-            ])
+            ] + $this->elementAttributes)
         ;
 
         return $element;
@@ -556,9 +557,8 @@ class MainSearchForm extends Form
             ])
             ->setAttributes([
                 'id' => 'search-is-public',
-                'form' => 'form-search',
                 'data-field-type' => 'checkbox',
-            ])
+            ] + $this->elementAttributes)
         ;
 
         return $element;
@@ -570,9 +570,8 @@ class MainSearchForm extends Form
         $fieldset
             ->setAttributes([
                 'id' => 'search-owners',
-                'form' => 'form-search',
                 'data-field-type' => 'owner',
-            ])
+            ] + $this->elementAttributes)
             ->add([
                 'name' => 'id',
                 'type' => $filter['type'] === 'MultiCheckbox'
@@ -585,11 +584,10 @@ class MainSearchForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'search-owner-id',
-                    'form' => 'form-search',
                     'multiple' => true,
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
                     'data-placeholder' => 'Select owners…', // @translate
-                ],
+                ] + $this->elementAttributes,
             ])
         ;
 
@@ -602,9 +600,8 @@ class MainSearchForm extends Form
         $fieldset
             ->setAttributes([
                 'id' => 'search-sites',
-                'form' => 'form-search',
                 'data-field-type' => 'site',
-            ])
+            ] + $this->elementAttributes)
             ->add([
                 'name' => 'id',
                 'type' => $filter['type'] === 'MultiCheckbox'
@@ -617,11 +614,10 @@ class MainSearchForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'search-site-id',
-                    'form' => 'form-search',
                     'multiple' => true,
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
                     'data-placeholder' => 'Select sites…', // @translate
-                ],
+                ] + $this->elementAttributes,
             ])
         ;
 
@@ -636,9 +632,8 @@ class MainSearchForm extends Form
         $fieldset = new Fieldset('class');
         $fieldset->setAttributes([
             'id' => 'search-classes',
-            'form' => 'form-search',
             'data-field-type' => 'class',
-        ]);
+        ] + $this->elementAttributes);
 
         /** @var \Omeka\Form\Element\ResourceClassSelect $element */
         $element = $this->formElementManager->get(OmekaElement\ResourceClassSelect::class);
@@ -686,11 +681,10 @@ class MainSearchForm extends Form
             ->setName('id')
             ->setAttributes([
                 'id' => 'search-class-id',
-                'form' => 'form-search',
                 'multiple' => true,
                 'class' => 'chosen-select',
                 'data-placeholder' => 'Select classes…', // @translate
-            ]);
+            ] + $this->elementAttributes);
 
         $fieldset
             ->add($element);
@@ -708,9 +702,8 @@ class MainSearchForm extends Form
         $fieldset = new Fieldset('template');
         $fieldset->setAttributes([
             'id' => 'search-templates',
-            'form' => 'form-search',
             'data-field-type' => 'template',
-        ]);
+        ] + $this->elementAttributes);
 
         /** @var \Omeka\Form\Element\ResourceTemplateSelect $element */
         $element = $this->formElementManager->get(OmekaElement\ResourceTemplateSelect::class);
@@ -725,11 +718,10 @@ class MainSearchForm extends Form
             ])
             ->setAttributes([
                 'id' => 'search-template-id',
-                'form' => 'form-search',
                 'multiple' => true,
                 'class' => 'chosen-select',
                 'data-placeholder' => 'Select templates…', // @translate
-            ]);
+            ] + $this->elementAttributes);
 
         $hasValues = false;
         if ($this->siteSetting && $this->siteSetting->__invoke('advancedsearch_restrict_templates', false)) {
@@ -749,11 +741,10 @@ class MainSearchForm extends Form
                             ],
                             'attributes' => [
                                 'id' => 'search-template-id',
-                                'form' => 'form-search',
                                 'multiple' => true,
                                 'class' => 'chosen-select',
                                 'data-placeholder' => 'Select templates…', // @translate
-                            ],
+                            ] + $this->elementAttributes,
                         ])
                     ;
                 }
@@ -776,9 +767,8 @@ class MainSearchForm extends Form
         $fieldset
             ->setAttributes([
                 'id' => 'search-item-sets',
-                'form' => 'form-search',
                 'data-field-type' => 'itemset',
-            ])
+            ] + $this->elementAttributes)
             ->add([
                 'name' => 'id',
                 'type' => $filter['type'] === 'MultiCheckbox'
@@ -791,12 +781,11 @@ class MainSearchForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'search-item-set-id',
-                    'form' => 'form-search',
                     'multiple' => true,
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
                     // End users understand "collections" more than "item sets".
                     'data-placeholder' => 'Select collections…', // @translate
-                ],
+                ] + $this->elementAttributes,
             ])
         ;
 
@@ -812,9 +801,8 @@ class MainSearchForm extends Form
         $fieldset
             ->setAttributes([
                 'id' => 'search-item-sets-tree',
-                'form' => 'form-search',
                 'data-field-type' => 'itemset',
-            ])
+            ] + $this->elementAttributes)
             ->add([
                 'name' => 'id',
                 'type' => $filter['type'] === 'MultiCheckbox'
@@ -827,12 +815,11 @@ class MainSearchForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'search-item-sets-tree',
-                    'form' => 'form-search',
                     'multiple' => true,
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
                     // End users understand "collections" more than "item sets".
                     'data-placeholder' => 'Select collections…', // @translate
-                ],
+                ] + $this->elementAttributes,
             ])
         ;
 
@@ -856,9 +843,8 @@ class MainSearchForm extends Form
         $fieldset
             ->setAttributes([
                 'id' => 'search-access',
-                'form' => 'form-search',
                 'data-field-type' => 'access',
-            ])
+            ] + $this->elementAttributes)
             ->add([
                 'name' => 'id',
                 'type' => $filter['type'] === 'Radio'
@@ -871,11 +857,10 @@ class MainSearchForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'search-access',
-                    'form' => 'form-search',
                     // 'multiple' => false,
                     'class' => $filter['type'] === 'Radio' ? '' : 'chosen-select',
                     'data-placeholder' => 'Select access…', // @translate
-                ],
+                ] + $this->elementAttributes,
             ])
         ;
 

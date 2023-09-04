@@ -1410,7 +1410,8 @@ class SearchResources extends AbstractPlugin
      *   - ex: has any value
      *   - nex: has no value
      * - datetime[{index}][value]: search date time (sql format: "2017-11-07 17:21:17",
-     *   partial date/time allowed ("2018-05", etc.).
+     *   partial date/time allowed ("2018-05", etc.). Human values are allowed:
+     *   "+1 day", "last Monday"… See php function `strtotime()`.
      *
      * @param QueryBuilder $qb
      * @param array $query The query should be cleaned first.
@@ -1437,7 +1438,7 @@ class SearchResources extends AbstractPlugin
             // clear for the user. And it doesn't allow partial date/time.
             switch ($type) {
                 case 'gt':
-                    $valueNorm = $this->getDateTimeFromValue($value, false);
+                    $valueNorm = $this->getDateTimeFromValue($value, false) ?? $this->getDateTimeViaAnyString($value);
                     if ($valueNorm === null) {
                         $incorrectValue = true;
                     } else {
@@ -1446,7 +1447,7 @@ class SearchResources extends AbstractPlugin
                     }
                     break;
                 case 'gte':
-                    $valueNorm = $this->getDateTimeFromValue($value, true);
+                    $valueNorm = $this->getDateTimeFromValue($value, true) ?? $this->getDateTimeViaAnyString($value);
                     if ($valueNorm === null) {
                         $incorrectValue = true;
                     } else {
@@ -1455,8 +1456,8 @@ class SearchResources extends AbstractPlugin
                     }
                     break;
                 case 'eq':
-                    $valueFromNorm = $this->getDateTimeFromValue($value, true);
-                    $valueToNorm = $this->getDateTimeFromValue($value, false);
+                    $valueFromNorm = $this->getDateTimeFromValue($value, true) ?? $this->getDateTimeViaAnyString($value);
+                    $valueToNorm = $this->getDateTimeFromValue($value, false) ?? $this->getDateTimeViaAnyString($value);
                     if ($valueFromNorm === null || $valueToNorm === null) {
                         $incorrectValue = true;
                     } else {
@@ -1471,8 +1472,8 @@ class SearchResources extends AbstractPlugin
                     }
                     break;
                 case 'neq':
-                    $valueFromNorm = $this->getDateTimeFromValue($value, true);
-                    $valueToNorm = $this->getDateTimeFromValue($value, false);
+                    $valueFromNorm = $this->getDateTimeFromValue($value, true) ?? $this->getDateTimeViaAnyString($value);
+                    $valueToNorm = $this->getDateTimeFromValue($value, false) ?? $this->getDateTimeViaAnyString($value);
                     if ($valueFromNorm === null || $valueToNorm === null) {
                         $incorrectValue = true;
                     } else {
@@ -1489,7 +1490,7 @@ class SearchResources extends AbstractPlugin
                     }
                     break;
                 case 'lte':
-                    $valueNorm = $this->getDateTimeFromValue($value, false);
+                    $valueNorm = $this->getDateTimeFromValue($value, false) ?? $this->getDateTimeViaAnyString($value);
                     if ($valueNorm === null) {
                         $incorrectValue = true;
                     } else {
@@ -1498,7 +1499,7 @@ class SearchResources extends AbstractPlugin
                     }
                     break;
                 case 'lt':
-                    $valueNorm = $this->getDateTimeFromValue($value, true);
+                    $valueNorm = $this->getDateTimeFromValue($value, true) ?? $this->getDateTimeViaAnyString($value);
                     if ($valueNorm === null) {
                         $incorrectValue = true;
                     } else {
@@ -1972,6 +1973,20 @@ class SearchResources extends AbstractPlugin
         // Cache the date/time as a sql date time.
         $dateTimes[$value][$firstOrLast] = $dateTime['date']->format('Y-m-d H:i:s');
         return $dateTimes[$value][$firstOrLast];
+    }
+
+    /**
+     * Get a sql-formatted date time via any string managed by php.
+     */
+    protected function getDateTimeViaAnyString($value): ?string
+    {
+        // Don't use strtotime() directly in order to use the same date time
+        // zone than the method getDateTimeFromValue().
+        try {
+            return (new DateTime((string) $value))->format('Y-m-d H:i:s');
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     /**

@@ -114,14 +114,15 @@ class UserBarDelegator extends UserBar
 
         // The resource is used only to create a class in partial.
         $links[] = [
-            'resource' => 'advanced-search',
+            // Don't use class "advanced-search" that is used in theme.
+            'resource' => 'advanced-search-config',
             'action' => 'browse',
             'text' => $translate('Search manager'), // @translate
             'url' => $url('admin/search'),
         ];
 
         $links[] = [
-            'resource' => 'advanced-search',
+            'resource' => 'advanced-search-config',
             'action' => 'browse',
             'text' => $translate('Search config'), // @translate
             'url' => $url('admin/search/config-id', ['id' => $params['id'], 'action' => 'configure']),

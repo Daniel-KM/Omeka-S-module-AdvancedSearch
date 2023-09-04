@@ -258,6 +258,8 @@ return [
             'display_list' => 'available',
             'display_submit' => 'above',
             'display_reset' => 'above',
+            'label_submit' => 'Apply facets',
+            'label_reset' => 'Reset facets',
             'display_active' => true,
             'display_count' => true,
         ],

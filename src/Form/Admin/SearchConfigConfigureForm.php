@@ -775,6 +775,32 @@ nlres = is not linked with resource with ID
                 ],
             ])
             ->add([
+                'name' => 'label_submit',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Label for submit', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'label_submit',
+                    'required' => false,
+                    'value' => 'Apply facets', // @translate
+                    'placeholder' => 'Apply facets', // @translate
+                ],
+            ])
+            ->add([
+                'name' => 'label_reset',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Label for reset', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'label_reset',
+                    'required' => false,
+                    'value' => 'Reset facets', // @translate
+                    'placeholder' => 'Reset facets', // @translate
+                ],
+            ])
+            ->add([
                 'name' => 'display_active',
                 'type' => Element\Checkbox::class,
                 'options' => [

@@ -29,6 +29,8 @@ $isFacetModeButton = $searchConfig->subSetting('facet', 'mode') !== 'link';
 $displayFacetButton = $isFacetModeButton && !empty($facets);
 $displaySubmit = $displayFacetButton ? $searchConfig->subSetting('facet', 'display_submit', 'above') : 'none';
 $displayReset = $searchConfig->subSetting('facet', 'display_reset', 'above');
+$labelSubmit = $displaySubmit ? $searchConfig->subSetting('facet', 'label_submit', $translate('Apply facets')) : null;
+$labelReset = $displayReset ? $searchConfig->subSetting('facet', 'label_reset', $translate('Reset facets')) : null;
 
 $facetActives = $plugins->get('facetActives');
 $facetLabel = $plugins->get('facetLabel');
@@ -69,10 +71,10 @@ $options = $searchConfig->setting('facet', []);
         <?php if ($r || $s): ?>
         <div class="apply-facets apply-facets-top">
             <?php if ($s): ?>
-            <button id="apply-facets" type="submit"><?= $translate('Apply facets') ?></button>
+            <button id="apply-facets" type="submit"><?= $labelSubmit ?></button>
             <?php endif ?>
             <?php if ($r): ?>
-            <button id="reset-facets" type="reset"><?= $translate('Reset facets') ?></button>
+            <button id="reset-facets" type="reset"><?= $labelReset ?></button>
             <?php endif ?>
         </div>
         <?php endif; ?>
@@ -104,10 +106,10 @@ $options = $searchConfig->setting('facet', []);
         <?php if ($r || $s): ?>
         <div class="apply-facets apply-facets-bottom">
             <?php if ($s): ?>
-            <button id="apply-facets" type="submit"><?= $translate('Apply facets') ?></button>
+            <button id="apply-facets" type="submit"><?= $labelSubmit ?></button>
             <?php endif ?>
             <?php if ($r): ?>
-            <button id="reset-facets" type="reset" form="form-facets"><?= $translate('Reset facets') ?></button>
+            <button id="reset-facets" type="reset"><?= $labelReset ?></button>
             <?php endif ?>
         </div>
         <?php endif; ?>

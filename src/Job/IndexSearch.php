@@ -153,7 +153,7 @@ class IndexSearch extends AbstractJob
             if ($startResourceId) {
                 $dql .= " WHERE resource.id >= $startResourceId";
             }
-            $dql .= " ORDER BY resource.id";
+            $dql .= " ORDER BY resource.id ASC";
 
             do {
                 if ($this->shouldStop()) {

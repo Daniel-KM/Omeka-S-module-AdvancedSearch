@@ -27,7 +27,7 @@ SELECT DISTINCT(media_type)
 FROM media
 WHERE media_type IS NOT NULL
     AND media_type != ""
-ORDER BY media_type;
+ORDER BY media_type ASC;
 SQL;
         $result = $connection->executeQuery($sql)->fetchFirstColumn();
         return array_combine($result, $result);

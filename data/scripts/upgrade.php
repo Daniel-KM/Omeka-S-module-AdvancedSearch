@@ -64,7 +64,7 @@ if (version_compare($oldVersion, '3.3.6.3', '<')) {
     // connection.
     // $searchConfigPaths = $api->search('search_configs', [], ['returnScalar' => 'path'])->getContent();
     $sql = <<<'SQL'
-SELECT `id`, `path` FROM `search_config` ORDER BY `id`;
+SELECT `id`, `path` FROM `search_config` ORDER BY `id` ASC;
 SQL;
     $searchConfigPaths = $connection->fetchAllAssociative($sql);
     $searchConfigPaths = array_column($searchConfigPaths, 'path', 'id');

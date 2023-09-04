@@ -1183,7 +1183,7 @@ class Module extends AbstractModule
 SELECT `id`
 FROM `search_engine`
 WHERE `adapter` = "internal"
-ORDER BY `id`;
+ORDER BY `id` ASC;
 SQL;
         $searchEngineId = (int) $connection->fetchOne($sqlSearchEngineId);
 
@@ -1217,7 +1217,7 @@ SQL;
 SELECT `id`
 FROM `search_suggester`
 WHERE `engine_id` = $searchEngineId
-ORDER BY `id`
+ORDER BY `id` ASC
 LIMIT 1;
 SQL;
         $suggesterId = (int) $connection->fetchOne($sqlSuggesterId);
@@ -1258,7 +1258,7 @@ SQL;
 SELECT `id`
 FROM `search_config`
 WHERE `engine_id` = $searchEngineId
-ORDER BY `id`;
+ORDER BY `id` ASC;
 SQL;
         $searchConfigId = (int) $connection->fetchOne($sqlSearchConfigId);
 

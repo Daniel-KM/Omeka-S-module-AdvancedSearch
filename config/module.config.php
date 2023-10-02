@@ -378,6 +378,7 @@ return [
             'advancedsearch_main_config' => 1,
             'advancedsearch_configs' => [1],
             'advancedsearch_api_config' => '',
+            'advancedsearch_disable_index_batch_edit' => true,
             'advancedsearch_batch_size' => 100,
             // Hidden value.
             'advancedsearch_all_configs' => [1 => 'find'],

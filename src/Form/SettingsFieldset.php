@@ -89,6 +89,18 @@ class SettingsFieldset extends Fieldset
                     'id' => 'advancedsearch_api_config',
                 ],
             ])
+            ->add([
+                'name' => 'advancedsearch_disable_index_batch_edit',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'element_group' => 'advanced_search',
+                    'label' => 'Disable indexing after a batch edit process', // @translate
+                    'info' => 'On some complex databases, an issue may occur after a batch process.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearch_disable_index_batch_edit',
+                ],
+            ])
             // TODO Remove this useless option.
             ->add([
                 'name' => 'advancedsearch_batch_size',

@@ -859,6 +859,11 @@ class Module extends AbstractModule
             return;
         }
 
+        $settings = $this->getServiceLocator()->get('Omeka\Settings');
+        if ($settings->get('advancedsearch_disable_index_batch_edit')) {
+            return;
+        }
+
         /** @var \Omeka\Api\Request $request */
         $request = $event->getParam('request');
         // Unlike module Bulk Edit, "append" was used, because a

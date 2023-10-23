@@ -339,3 +339,42 @@ ALTER TABLE `search_suggester` CHANGE `created` `created` datetime NOT NULL DEFA
 SQL;
     $connection->executeStatement($sql);
 }
+
+if (version_compare($oldVersion, '3.4.14', '<')) {
+    /** @see https://github.com/omeka/omeka-s/pull/2096 */
+    try {
+        $connection->executeStatement('ALTER TABLE `resource` ADD INDEX `idx_public_type_id_title` (`is_public`,`resource_type`,`id`,`title` (190));');
+    } catch (\Exception $e) {
+        // Index exists.
+    }
+    try {
+        $connection->executeStatement('ALTER TABLE `value` ADD INDEX `idx_public_resource_property` (`is_public`,`resource_id`,`property_id`);');
+    } catch (\Exception $e) {
+        // Index exists.
+    }
+
+    /** @see https://github.com/omeka/omeka-s/pull/2105 */
+    try {
+        $connection->executeStatement('ALTER TABLE `resource` ADD INDEX `is_public` (`is_public`);');
+    } catch (\Exception $e) {
+        // Index exists.
+    }
+    try {
+        $connection->executeStatement('ALTER TABLE `value` ADD INDEX `is_public` (`is_public`);');
+    } catch (\Exception $e) {
+        // Index exists.
+    }
+    try {
+        $connection->executeStatement('ALTER TABLE `site_page` ADD INDEX `is_public` (`is_public`);');
+    } catch (\Exception $e) {
+        // Index exists.
+    }
+
+    $settings->set('advancedsearch_index_batch_edit', $settings->get('advancedsearch_disable_index_batch_edit') ? 'none' : 'sync');
+    $settings->delete('advancedsearch_disable_index_batch_edit');
+
+    $message = new Message(
+        'A new settings allows to skip indexing after a batch process because an issue can occurs in some cases.' // @translate
+    );
+    $messenger->addWarning($message);
+}

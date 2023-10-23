@@ -864,7 +864,8 @@ class Module extends AbstractModule
         }
 
         $settings = $this->getServiceLocator()->get('Omeka\Settings');
-        if ($settings->get('advancedsearch_disable_index_batch_edit')) {
+        $indexBatchEdit = $settings->get('advancedsearch_index_batch_edit', 'async');
+        if ($indexBatchEdit === 'none') {
             return;
         }
 
@@ -887,6 +888,11 @@ class Module extends AbstractModule
         $response = $event->getParam('response');
         $resources = $response->getContent();
         $resourceType = $request->getResource();
+
+        if ($indexBatchEdit === 'async') {
+            $this->runJobIndexSearch($resourceType, $request->getIds());
+            return;
+        }
 
         $services = $this->getServiceLocator();
         $api = $services->get('Omeka\ApiManager');
@@ -916,6 +922,55 @@ class Module extends AbstractModule
         }
 
         $this->isBatchUpdate = false;
+    }
+
+    /**
+     * Adapted:
+     * @see \AdvancedSearch\Controller\Admin\SearchEngineController::indexAction()
+     */
+    protected function runJobIndexSearch(string $resourceType, array $ids): void
+    {
+        $ids = array_filter(array_map('intval', $ids));
+        if (!$ids) {
+            return;
+        }
+
+        $services = $this->getServiceLocator();
+        $api = $services->get('Omeka\ApiManager');
+        $logger = $services->get('Omeka\Logger');
+        $messenger = $services->get('ControllerPluginManager')->get('messenger');
+        $jobDispatcher = $services->get('Omeka\Job\Dispatcher');
+
+        /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
+        $searchEngines = $api->search('search_engines')->getContent();
+        $first = true;
+        foreach ($searchEngines as $searchEngine) {
+            $indexer = $searchEngine->indexer();
+            if ($indexer->canIndex($resourceType)
+                && in_array($resourceType, $searchEngine->setting('resources', []))
+            ) {
+                $jobArgs = [];
+                $jobArgs['search_engine_id'] = $searchEngine->id();
+                $jobArgs['resource_ids'] = $ids;
+                $jobArgs['resource_names'] = [$resourceType];
+                // Most of the time, there is only one solr index.
+                // TODO Improve indexing of multiple search engines after batch process.
+                $jobArgs['force'] = !$first;
+                try {
+                    $jobDispatcher->dispatch(\AdvancedSearch\Job\IndexSearch::class, $jobArgs);
+                    $first = false;
+                } catch (\Exception $e) {
+                    $logger->err(new Message(
+                        'Unable to launch index metadata for search engine "%1$s": %2$s', // @translate
+                        $searchEngine->name(), $e->getMessage()
+                    ));
+                    $messenger->addWarning(new Message(
+                        'Unable to launch indexing for the search engine "%s": see log.', // @translate
+                        $searchEngine->name()
+                    ));
+                }
+            }
+        }
     }
 
     public function preUpdateSearchEngineMedia(Event $event): void

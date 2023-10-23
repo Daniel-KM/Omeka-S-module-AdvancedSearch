@@ -89,16 +89,22 @@ class SettingsFieldset extends Fieldset
                     'id' => 'advancedsearch_api_config',
                 ],
             ])
+            // TODO Remove this option if there is no issue with async (except multiple search engines).
             ->add([
-                'name' => 'advancedsearch_disable_index_batch_edit',
-                'type' => Element\Checkbox::class,
+                'name' => 'advancedsearch_index_batch_edit',
+                'type' => AdvancedSearchElement\OptionalRadio::class,
                 'options' => [
                     'element_group' => 'advanced_search',
-                    'label' => 'Disable indexing after a batch edit process', // @translate
+                    'label' => 'Indexing after a batch edit process', // @translate
                     'info' => 'On some complex databases, an issue may occur after a batch process.', // @translate
+                    'value_options' => [
+                        'async' => 'Asynchronous', // @translate
+                        'sync' => 'Synchronous', // @translate
+                        'none' => 'None', // @translate
+                    ],
                 ],
                 'attributes' => [
-                    'id' => 'advancedsearch_disable_index_batch_edit',
+                    'id' => 'advancedsearch_index_batch_edit',
                 ],
             ])
             // TODO Remove this useless option.

@@ -161,6 +161,13 @@ class SearchEngineController extends AbstractActionController
             ->setTemplate('advanced-search/admin/search-engine/index-confirm-details');
     }
 
+    /**
+     * Adapted:
+     * @see \AdvancedSearch\Module::runJobIndexSearch()
+     *
+     * {@inheritDoc}
+     * @see \Laminas\Mvc\Controller\AbstractActionController::indexAction()
+     */
     public function indexAction()
     {
         $searchEngineId = (int) $this->params('id');

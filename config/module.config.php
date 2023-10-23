@@ -378,7 +378,8 @@ return [
             'advancedsearch_main_config' => 1,
             'advancedsearch_configs' => [1],
             'advancedsearch_api_config' => '',
-            'advancedsearch_disable_index_batch_edit' => true,
+            // TODO Remove this option if there is no issue with async (except multiple search engines).
+            'advancedsearch_index_batch_edit' => 'async',
             'advancedsearch_batch_size' => 100,
             // Hidden value.
             'advancedsearch_all_configs' => [1 => 'find'],

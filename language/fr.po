@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-31 00:00+0000\n"
-"PO-Revision-Date: 2023-07-31 00:00+0000\n"
+"POT-Creation-Date: 2023-10-23 00:00+0000\n"
+"PO-Revision-Date: 2023-10-23 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.4.2\n"
+"X-Generator: Poedit 3.2.2\n"
 
 #: src/Adapter/InternalAdapter.php:84
 msgid "Asc"
@@ -34,7 +34,7 @@ msgstr "[Adaptateur « %s » manquant]"
 msgid "Filters"
 msgstr "Filtres"
 
-#: src/Controller/IndexController.php:371
+#: src/Controller/SearchController.php:371
 msgid "Logo"
 msgstr "Logo"
 
@@ -318,9 +318,14 @@ msgstr "jusqu’a %s"
 msgid "Per page"
 msgstr "Par page"
 
+#: src/View/Helper/UserBarDelegator.php:120
 #: view/advanced-search/admin/index/browse.phtml:52
 msgid "Search manager"
 msgstr "Moteurs de recherche"
+
+#: src/View/Helper/UserBarDelegator.php:127
+msgid "Search config"
+msgstr "Configuration de la recherche"
 
 #: view/advanced-search/admin/index/browse.phtml:55
 msgid "Add new search engine"
@@ -400,7 +405,7 @@ msgstr "Aucun suggéreur créé."
 msgid "Add search page"
 msgstr "Ajouter une page de recherche"
 
-#: view/advanced-search/admin/search-config/add.phtml:43
+#: view/advanced-search/admin/search-config/add.phtml:44
 #: view/advanced-search/admin/search-engine/add.phtml:43
 msgid "Add and configure"
 msgstr "Ajouter et configurer"
@@ -410,13 +415,9 @@ msgstr "Ajouter et configurer"
 msgid "Search page \"%1$s\" (%2$s)"
 msgstr "Page de recherche \"%1$s\" (%2$s)"
 
-#: view/advanced-search/admin/search-config/configure.phtml:58
-msgid "Save page"
-msgstr "Enregistrer la page"
-
-#: view/advanced-search/admin/search-config/edit.phtml:38
-msgid "Edit search page"
-msgstr "Modifier la page de recherche"
+#: view/advanced-search/admin/search-config/edit.phtml:39
+msgid "Manage search page"
+msgstr "Gérer la page de recherche"
 
 #: view/advanced-search/admin/search-engine/add.phtml:39
 msgid "Add search engine"
@@ -619,19 +620,23 @@ msgstr "Choisir ci-dessous…"
 msgid "and"
 msgstr "et"
 
-#: view/search/facets.phtml:51
-msgid "Facets"
-msgstr "Facettes"
-
-#: view/search/facets.phtml:56
-msgid "Active facets"
-msgstr "Facettes actives"
-
-#: view/search/facets.phtml:68 view/search/facets.phtml:96
+#: view/search/facets.phtml:32
 msgid "Apply facets"
 msgstr "Appliquer les facettes"
 
-#: view/search/facets.phtml:73
+#: view/search/facets.phtml:33
+msgid "Reset facets"
+msgstr "Effacer les facettes"
+
+#: view/search/facets.phtml:54
+msgid "Facets"
+msgstr "Facettes"
+
+#: view/search/facets.phtml:59
+msgid "Active facets"
+msgstr "Facettes actives"
+
+#: view/search/facets.phtml:83
 msgid "No facets."
 msgstr "Pas de facettes."
 
@@ -666,7 +671,7 @@ msgstr "Votre recherche n'a retourné aucun résultat"
 #: view/search/search.phtml:235
 msgid "An error occured and your query returned no results."
 msgstr ""
-"Une erreur est survenue et votre recherche n'a retourné aucun résultat."
+"Une erreur est survenue et votre recherche n’a retourné aucun résultat."
 
 #: data/scripts/upgrade_from_search.php:28 Module.php:110
 msgid ""
@@ -684,8 +689,7 @@ msgid "The version of the module Search should be at least %s to be upgraded."
 msgstr ""
 "La version du module Search doit être au moins %s pour être mise à niveau."
 
-#: data/scripts/upgrade_from_search.php:354
-#: data/scripts/upgrade_from_advancedsearchplus.php:79 Module.php:226
+#: data/scripts/upgrade_from_search.php:354 Module.php:226
 #, php-format
 msgid "The module \"%s\" was upgraded by module \"%s\" and uninstalled."
 msgstr "Le module « %s » a été mis à niveau par le module « %s » et supprimé."
@@ -796,8 +800,8 @@ msgid ""
 "apply facets with id=\"apply-facets\", list of facet values)."
 msgstr ""
 "Mettez à jour le thème pour gérer les nouvelles fonctionnalités pour les "
-"facettes (facettes actives, bouton pour appliquer les facettes avec id="
-"\"apply-facets\", liste des valeurs de facettes)."
+"facettes (facettes actives, bouton pour appliquer les facettes avec "
+"id=\"apply-facets\", liste des valeurs de facettes)."
 
 #: data/scripts/upgrade.php:289
 #, php-format
@@ -813,32 +817,53 @@ msgstr ""
 msgid "Some new options were added to manage facets."
 msgstr "De nouvelles options ont été ajoutées pour gérer les facettes."
 
-#: data/search_configs/default.php:191
+#: data/scripts/upgrade.php:328
+msgid ""
+"It is recommended to upgrade the module \"Reference\" to improve performance."
+msgstr ""
+"Il est recommandé de mettre à jour le module « Référence » pour améliorer "
+"les performances."
+
+#: data/scripts/upgrade.php:377
+msgid ""
+"A new settings allows to skip indexing after a batch process because an "
+"issue can occurs in some cases."
+msgstr ""
+"Un nouveau paramètre permet de modifier l’indexation après un traitement en "
+"lot car il peut y avoir un problème dans certains cas."
+
+#: data/scripts/upgrade_from_advancedsearchplus.php:79
+#, php-format
+msgid "The module \"%1$s\" was upgraded by module \"%2$s\" and uninstalled."
+msgstr ""
+"Le module « %1$s » a été mis à niveau par le module « %2$s » et désinstallé."
+
+#: data/search_configs/default.php:192
 #: src/View/Helper/SearchPaginationPerPageSelector.php:42
 #, php-format
 msgid "Results by %d"
 msgstr "Par %d résultats"
 
-#: data/search_configs/default.php:192
+#: data/search_configs/default.php:193
 msgid "Results by 10"
 msgstr "Par 10 résultats"
 
-#: data/search_configs/default.php:194
+#: data/search_configs/default.php:195
 msgid "Results by 25"
 msgstr "Par 25 résultats"
 
-#: data/search_configs/default.php:195
+#: data/search_configs/default.php:196
 msgid "Results by 50"
 msgstr "Par 50 résultats"
 
-#: data/search_configs/default.php:196
+#: data/search_configs/default.php:197
 msgid "Results by 100"
 msgstr "Par 100 résultats"
 
 #: Module.php:115
 msgid ""
-"To be automatically upgraded and replaced by this module, the module \"Search"
-"\" should be updated first to version 3.5.23.3 or greater."
+"To be automatically upgraded and replaced by this module, the module "
+"\"Search\" should be updated first to version 3.5.23.3 or greater."
 msgstr ""
 "Pour être automatiquement mis à niveau et remplacé par ce module, le module "
 "« Search » doit d’abord être mis à jour à la version 3.5.23.3 ou supérieure."
@@ -889,49 +914,71 @@ msgstr ""
 msgid "The module %s can be reenabled."
 msgstr "Le module %s peut être réactivé."
 
-#: Module.php:876
+#: Module.php:916
 #, php-format
 msgid "Unable to batch index metadata for search engine \"%1$s\": %2$s"
 msgstr ""
 "Impossible d’indexer les métadonnées en lot pour le moteur de recherche "
 "« %1$s » : « %2$s »"
 
-#: Module.php:881
+#: Module.php:921
 #, php-format
 msgid "Unable to batch update the search engine \"%s\": see log."
 msgstr ""
 "Impossible de mettre à jour le moteur de recherche \"%s\" : voir les "
 "journaux."
 
-#: Module.php:971
+#: Module.php:969
 #, php-format
-msgid "Unable to delete the search index for resource #%1$d: %2$s"
+msgid "Unable to launch index metadata for search engine \"%1$s\": %2$s"
 msgstr ""
-"Impossible de supprimer l’index de recherche pour la ressource #%1$d : %2$s"
+"Impossible d’indexer les métadonnées en lot pour le moteur de recherche "
+"« %1$s » : %2$s"
 
-#: Module.php:976
+#: Module.php:973
 #, php-format
-msgid ""
-"Unable to delete the search index for the deleted resource #%d: see log."
+msgid "Unable to launch indexing for the search engine \"%s\": see log."
 msgstr ""
-"Impossible de supprimer l’index de recherche pour la ressource supprimée #"
-"%d : voir les journaux."
-
-#: Module.php:996
-#, php-format
-msgid "Unable to index metadata of resource #%1$d for search: %2$s"
-msgstr ""
-"Impossible d’indexer les métadonnées de la ressource #%1$d pour la "
-"recherche : %2$s"
-
-#: Module.php:1001
-#, php-format
-msgid "Unable to update the search index for resource #%d: see log."
-msgstr ""
-"Impossible de mettre à jour l’index pour la ressource #%d : voir les "
+"Impossible de mettre à jour le moteur de recherche « %s » : voir les "
 "journaux."
 
-#: Module.php:1190
+#: Module.php:1071
+#, php-format
+msgid ""
+"Unable to delete the search index for resource #%1$d in search engine "
+"\"%2$s\": %3$s"
+msgstr ""
+"Impossible de supprimer l’index de recherche pour la ressource #%1$d dans le "
+"moteur « %2$s » : %3$s"
+
+#: Module.php:1076
+#, php-format
+msgid ""
+"Unable to delete the search index for the deleted resource #%1$d in search "
+"engine \"%2$s\": see log."
+msgstr ""
+"Impossible de supprimer l’index de recherche pour la ressource supprimée #%d "
+"dans le moteur « %2$s » : voir les journaux."
+
+#: Module.php:1097
+#, php-format
+msgid ""
+"Unable to index metadata of resource #%1$d for search in search engine "
+"\"%2$s\": %3$s"
+msgstr ""
+"Impossible d’indexer les métadonnées de la ressource #%1$d dans le moteur "
+"« %2$s » : %3$s"
+
+#: Module.php:1102
+#, php-format
+msgid ""
+"Unable to update the search index for resource #%1$d in search engine "
+"\"%2$s\": see log."
+msgstr ""
+"Impossible de mettre à jour l’index pour la ressource #%d dans le moteur "
+"« %2$s » : voir les journaux."
+
+#: Module.php:1291
 #, php-format
 msgid ""
 "The internal search engine (sql) is available. Configure it in the %ssearch "
@@ -940,7 +987,7 @@ msgstr ""
 "Le moteur de recherche interne (sql) est disponible et peut être configuré "
 "dans le menu %sMoteurs de recherche%s."
 
-#: Module.php:1231
+#: Module.php:1332
 #, php-format
 msgid ""
 "The internal suggester (sql) will be available after indexation. Configure "
@@ -949,11 +996,12 @@ msgstr ""
 "Le suggéreur interne (sql) sera disponible après indexation. Configurer le "
 "dans le menu %sMoteurs de recherche%s."
 
-#: Module.php:1265
+#: Module.php:1366
 #, php-format
 msgid ""
-"The default search page is available. Configure it in the %ssearch manager"
-"%s, in the main settings (for admin) and in site settings (for public)."
+"The default search page is available. Configure it in the %ssearch "
+"manager%s, in the main settings (for admin) and in site settings (for "
+"public)."
 msgstr ""
 "La page de recherche par défaut est disponible et peut être configurée dans "
 "le bloc %sMoteurs de recherche%s des paramètres généraux (pour l’admin et "
@@ -991,7 +1039,7 @@ msgstr "La page de recherche n’a plus d’adaptateur pour le formulaire."
 msgid "Form adapter \"%s\" not found."
 msgstr "Adaptateur de formulaire \"%s\" non trouvé."
 
-#: src/Mvc/Controller/Plugin/SearchRequestToResponse.php:248
+#: src/Mvc/Controller/Plugin/SearchRequestToResponse.php:245
 #, php-format
 msgid ""
 "Query error: %s\n"
@@ -1038,8 +1086,8 @@ msgstr ""
 #: src/Job/IndexSuggestions.php:99
 #, php-format
 msgid ""
-"Suggester #%d (\"%s\"): There are already %d other jobs \"Index Suggestions"
-"\" and the current one is not forced."
+"Suggester #%d (\"%s\"): There are already %d other jobs \"Index "
+"Suggestions\" and the current one is not forced."
 msgstr ""
 "Le suggéreur #%d (« %s ») : il y a déjà %d autres tâches « Indextion des "
 "Suggestions » et la tâche actuelle n’a pas été forcée."
@@ -1095,7 +1143,15 @@ msgstr "%d/%d valeurs traitées."
 msgid "End of process: %d/%d processed (index mode: %s)."
 msgstr "Fin du process : %d/%d traitées (mode d’indexation : %s)"
 
-#: src/Job/IndexSearch.php:95
+#: src/Job/IndexSearch.php:90
+#, php-format
+msgid ""
+"Search index #%d (\"%s\"): the list of resource ids contains invalid ids."
+msgstr ""
+"Index de recherche #%d (« %s ») : la liste des ids des ressources contient "
+"des ids incorrects."
+
+#: src/Job/IndexSearch.php:111
 #, php-format
 msgid ""
 "Search index #%d (\"%s\"): there is no resource type to index or the "
@@ -1104,7 +1160,7 @@ msgstr ""
 "Index de recherche #%d (« %s ») : il n’y a aucun type de ressource à indexer "
 "ou l’indexation est inutile."
 
-#: src/Job/IndexSearch.php:107
+#: src/Job/IndexSearch.php:123
 #, php-format
 msgid ""
 "Search index #%d (\"%s\"): There are already %d other jobs \"Index Search\" "
@@ -1113,7 +1169,7 @@ msgstr ""
 "Index de recherche #%d (« %s ») : il y a déjà %d autres tâches d’indexation "
 "et la tâche en cours n’a pas été forcée."
 
-#: src/Job/IndexSearch.php:113
+#: src/Job/IndexSearch.php:129
 #, php-format
 msgid ""
 "There are already %d other jobs \"Index Search\". Slowdowns may occur on the "
@@ -1122,19 +1178,19 @@ msgstr ""
 "Il y a déjà %d autres tâches « Indexation Recherche ». Cela peut ralentir le "
 "site."
 
-#: src/Job/IndexSearch.php:120
+#: src/Job/IndexSearch.php:136
 #, php-format
 msgid "Search index #%d (\"%s\"): start of indexing"
 msgstr "Index de recherche #%d (« %s ») : début de l’indexation"
 
-#: src/Job/IndexSearch.php:132
+#: src/Job/IndexSearch.php:149
 #, php-format
 msgid "Search index is not cleared: reindexing starts at resource #%d."
 msgstr ""
 "L’index de recherche n’a pas été effacé : réindexation à partir de la "
 "ressource #%d."
 
-#: src/Job/IndexSearch.php:161
+#: src/Job/IndexSearch.php:184
 #, php-format
 msgid ""
 "Search index #%d (\"%s\"): the indexing was stopped. Nothing was indexed."
@@ -1142,12 +1198,12 @@ msgstr ""
 "Index de recherche #%d (« %s ») : l’indexation a été arrétée. Rien n’a été "
 "indexé."
 
-#: src/Job/IndexSearch.php:166 src/Job/IndexSearch.php:201
+#: src/Job/IndexSearch.php:189 src/Job/IndexSearch.php:228
 #, php-format
 msgid "%s: %d indexed"
 msgstr "%s : %d indexés"
 
-#: src/Job/IndexSearch.php:170
+#: src/Job/IndexSearch.php:193
 #, php-format
 msgid ""
 "Search index #%d (\"%s\"): the indexing was stopped. Last indexed resource: "
@@ -1156,7 +1212,7 @@ msgstr ""
 "Index de recherche #%d (« %s ») : l’indexation a été arrétée. Dernière "
 "ressource indexée : %s #%d ; %s. Temps d’exécution : %d secondes."
 
-#: src/Job/IndexSearch.php:206
+#: src/Job/IndexSearch.php:233
 #, php-format
 msgid ""
 "Search index #%d (\"%s\"): end of indexing. %s. Execution time: %s seconds. "
@@ -1252,10 +1308,34 @@ msgid "Select the config for quick api search…"
 msgstr "Choisir la configuration pour la recherche api rapide…"
 
 #: src/Form/SettingsFieldset.php:98
+msgid "Indexing after a batch edit process"
+msgstr "Indexation après traitement en lot"
+
+#: src/Form/SettingsFieldset.php:99
+msgid "On some complex databases, an issue may occur after a batch process."
+msgstr "Certaines bases complexes crée un problème après un traitement en lot."
+
+#: src/Form/SettingsFieldset.php:100
+msgid "value_options"
+msgstr "value_options"
+
+#: src/Form/SettingsFieldset.php:103
+msgid "Synchronous"
+msgstr "Synchrone"
+
+#: src/Form/SettingsFieldset.php:104
+msgid "Asynchronous"
+msgstr "Asynchrone"
+
+#: src/Form/SettingsFieldset.php:105
+msgid "Integrated"
+msgstr "Intégré"
+
+#: src/Form/SettingsFieldset.php:119
 msgid "Search batch size for reindexation"
 msgstr "Taille de la réindexation en lot"
 
-#: src/Form/SettingsFieldset.php:99
+#: src/Form/SettingsFieldset.php:120
 msgid ""
 "Default is 100, but it can be adapted according to your resource average "
 "size, your mapping and your architecture."
@@ -1290,10 +1370,6 @@ msgstr ""
 "L’argument « wrap » de la méthode %1$s doit être nul ou une chaîne "
 "alphanumérique et non « %2$s »."
 
-#: src/Form/Element/TraitGroupByOwner.php:64
-msgid "[No owner]"
-msgstr "[Pas de propriétaire]"
-
 #: src/Form/Admin/InternalConfigFieldset.php:18
 msgid ""
 "Partial word search for main field (instead of standard full text search)"
@@ -1315,9 +1391,9 @@ msgstr "Multi-champs (filtres et facettes)"
 
 #: src/Form/Admin/InternalConfigFieldset.php:30
 msgid ""
-"List of fields that refers to multiple properties, formatted \"name = label"
-"\", then the list of properties and an empty line. The name must not be a "
-"property term or a reserved keyword."
+"List of fields that refers to multiple properties, formatted \"name = "
+"label\", then the list of properties and an empty line. The name must not be "
+"a property term or a reserved keyword."
 msgstr ""
 "Liste des champs qui renvoient à une ou plusieurs propriétés, formatées "
 "\"nom = libellé\", puis la liste des propriétés et une ligne vide. Le nom ne "
@@ -1381,46 +1457,46 @@ msgstr "Id de modèle de ressource"
 msgid "Item set id"
 msgstr "Id de collection"
 
-#: src/Form/Admin/ApiFormConfigFieldset.php:260
+#: src/Form/Admin/ApiFormConfigFieldset.php:274
 msgid "Mapping between source (omeka) and destination (search engine)"
 msgstr ""
 "Alignement entre la source (Omeka) et la destination (moteur de recherche)"
 
-#: src/Form/Admin/ApiFormConfigFieldset.php:275
+#: src/Form/Admin/ApiFormConfigFieldset.php:289
 msgid "Available source fields for mapping"
 msgstr "Champs source disponibles pour la correspondance"
 
-#: src/Form/Admin/ApiFormConfigFieldset.php:276
+#: src/Form/Admin/ApiFormConfigFieldset.php:290
 msgid "List of all available properties to use above."
 msgstr "Liste des propriétés disponibles pour copie ci-dessus."
 
-#: src/Form/Admin/ApiFormConfigFieldset.php:290
+#: src/Form/Admin/ApiFormConfigFieldset.php:304
 msgid "Available destination fields for mapping"
 msgstr "Champs disponibles pour la destination"
 
-#: src/Form/Admin/ApiFormConfigFieldset.php:291
+#: src/Form/Admin/ApiFormConfigFieldset.php:305
 msgid "List of all available fields to use above."
 msgstr "Tous les champs disponibles pour copie ci-dessus."
 
-#: src/Form/Admin/ApiFormConfigFieldset.php:312
+#: src/Form/Admin/ApiFormConfigFieldset.php:326
 msgid "Sort (for internal use only, don’t modify it)"
 msgstr "Trier (pour usage interne, ne pas modifier)"
 
-#: src/Form/Admin/SearchConfigForm.php:86
+#: src/Form/Admin/SearchConfigForm.php:87
 #: src/Form/Admin/SearchSuggesterForm.php:44
 #: src/Form/Admin/SearchSuggesterForm.php:62
 msgid "Select a search engine below…"
 msgstr "Choisir un moteur de recherche ci-dessous…"
 
-#: src/Form/Admin/SearchConfigForm.php:100
+#: src/Form/Admin/SearchConfigForm.php:101
 msgid "Select a form below…"
 msgstr "Choisir un formulaire…"
 
-#: src/Form/Admin/SearchConfigForm.php:112
+#: src/Form/Admin/SearchConfigForm.php:113
 msgid "Set as default search page for sites"
 msgstr "Définir comme page de recherche par défaut pour les sites"
 
-#: src/Form/Admin/SearchConfigForm.php:114
+#: src/Form/Admin/SearchConfigForm.php:115
 msgid ""
 "The page will be made available on all selected sites. This param can be set "
 "in each site settings too."
@@ -1428,23 +1504,23 @@ msgstr ""
 "La page sera disponible dans tous les sites indiqués. Ce paramètre peut "
 "également être modifié dans la configuration de chaque site."
 
-#: src/Form/Admin/SearchConfigForm.php:131
+#: src/Form/Admin/SearchConfigForm.php:132
 msgid "Availability on sites"
 msgstr "Disponible sur les sites"
 
-#: src/Form/Admin/SearchConfigForm.php:132
+#: src/Form/Admin/SearchConfigForm.php:133
 msgid "The admin settings are not modified."
 msgstr "Les paramètres admin n’ont pas été modifiés."
 
-#: src/Form/Admin/SearchConfigForm.php:134
+#: src/Form/Admin/SearchConfigForm.php:135
 msgid "Make unavailable in all sites"
 msgstr "Rendre indisponible dans tous les sites"
 
-#: src/Form/Admin/SearchConfigForm.php:135
+#: src/Form/Admin/SearchConfigForm.php:136
 msgid "Don’t modify"
 msgstr "Ne pas modifier"
 
-#: src/Form/Admin/SearchConfigForm.php:136
+#: src/Form/Admin/SearchConfigForm.php:137
 msgid "Make available in all sites"
 msgstr "Rendre disponible dans tous les sites"
 
@@ -1625,69 +1701,75 @@ msgstr ""
 "Pour un point Solr, cela doit être \"suggest.q\", sinon \"q\" est utilisé "
 "par défaut."
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:188
-msgid "Advanced form"
-msgstr "Formulaire avancé"
-
 #: src/Form/Admin/SearchConfigConfigureForm.php:198
 msgid ""
 "List of filters that will be displayed in the search form. Format is \"field "
-"= Label = Type = options\". The field should exist in all resources fields."
+"= Label = Type = Options\". The field should exist in all resources fields."
 msgstr ""
-"Liste des filtres qui seront affichés dans le formulaire de recherche. Le "
-"format est \"champ = Libellé = Type = options\". Le champ doit exister dans "
-"la liste des champs de toutes les ressources."
+"Liste des filtres affichés dans le formulaire de recherche. Le format est "
+"« Champ = Libellé = Type = Options ». Le champ doit exister dans la liste "
+"des champs de toutes les ressources."
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:227
-msgid "Add a button \"reset\""
-msgstr "Ajouter un bouton \"Effacer les champs\""
+msgid "Add attribute \"form\" to input elements"
+msgstr "Ajouter l’attribut « form » aux éléments « input »"
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:237
+msgid "Add a button \"reset\""
+msgstr "Ajouter un bouton « Effacer les champs »"
+
+#: src/Form/Admin/SearchConfigConfigureForm.php:247
+msgid "Add a button \"submit\""
+msgstr "Ajouter un bouton « Soumettre »"
+
+#: src/Form/Admin/SearchConfigConfigureForm.php:257
 msgid "Available filters"
 msgstr "Champs de filtre disponibles"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:238
+#: src/Form/Admin/SearchConfigConfigureForm.php:258
 msgid "List of all available filters, among which some can be copied above."
 msgstr "Liste des filtres disponibles et pouvant être copiés ci-dessus."
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:253
+#: src/Form/Admin/SearchConfigConfigureForm.php:273
 msgid "Advanced filters"
 msgstr "Filtres avancés"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:254
+#: src/Form/Admin/SearchConfigConfigureForm.php:274
 msgid ""
 "List of filters that will be displayed in the search form. Format is \"term "
-"= Label\". The field should exist in all resources fields."
+"= Label\". The field should exist in all resources fields. Only properties "
+"are managed for internal search engine."
 msgstr ""
 "Liste des filtres qui seront affichés dans le formulaire de recherche. Le "
 "format est \"terme = Libellé\". Le champ doit exister dans la liste des "
-"champs de toutes les ressources."
+"champs de toutes les ressources. Seules les propriétés sont gérées pour le "
+"moteur de recherche interne."
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:273
+#: src/Form/Admin/SearchConfigConfigureForm.php:293
 msgid "Number of advanced filters to display"
 msgstr "Nombre de filtres avancés à afficher"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:274
+#: src/Form/Admin/SearchConfigConfigureForm.php:294
 msgid "The filters may be managed via js for a better display."
 msgstr "Les filtres peuvent être gérés par js pour un meilleur affichage."
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:290
+#: src/Form/Admin/SearchConfigConfigureForm.php:310
 msgid "Add the joiner (\"and\" or \"or\") to the advanced filters"
 msgstr "Ajouter la jointure (\"et\" ou \"ou\") aux filtres avancés"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:300
+#: src/Form/Admin/SearchConfigConfigureForm.php:320
 msgid "Add the joiner \"not\" to the advanced filters"
 msgstr "Ajouter la jointure (\"sauf\") aux filtres avancés"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:310
+#: src/Form/Admin/SearchConfigConfigureForm.php:330
 msgid "Add the operator (\"equal\", \"in\", etc.) to the advanced filters"
 msgstr "Ajouter le type (\"égal\", \"dans\", etc.) aux filtres avancés"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:320
+#: src/Form/Admin/SearchConfigConfigureForm.php:340
 msgid "List of operators"
 msgstr "Liste des opérateurs"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:321
+#: src/Form/Admin/SearchConfigConfigureForm.php:341
 msgid ""
 "The default list is: eq, neq, in, nin, sw, nsw, ew, new, ex, nex, res, nres. "
 "Negative operators are removed when the joiner \"not\" is used. The default "
@@ -1697,102 +1779,103 @@ msgstr ""
 "nres. Les opérateurs négatifs sont supprimés quand le type « not » est "
 "utilisé. Les opérateurs par défaut sont utilisés quand le champ est vide."
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:354
+#: src/Form/Admin/SearchConfigConfigureForm.php:374
 msgid "Results display (when supported by theme)"
 msgstr "Affichage des résultats (si le thème le supporte)"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:362
+#: src/Form/Admin/SearchConfigConfigureForm.php:382
 msgid "List of query filters"
 msgstr "Liste des filtres de recherche"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:365
-#: src/Form/Admin/SearchConfigConfigureForm.php:382
-#: src/Form/Admin/SearchConfigConfigureForm.php:399
-#: src/Form/Admin/SearchConfigConfigureForm.php:416
-#: src/Form/Admin/SearchConfigConfigureForm.php:433
-#: src/Form/Admin/SearchConfigConfigureForm.php:450
-#: src/Form/Admin/SearchConfigConfigureForm.php:467
+#: src/Form/Admin/SearchConfigConfigureForm.php:385
+#: src/Form/Admin/SearchConfigConfigureForm.php:402
+#: src/Form/Admin/SearchConfigConfigureForm.php:419
+#: src/Form/Admin/SearchConfigConfigureForm.php:436
+#: src/Form/Admin/SearchConfigConfigureForm.php:453
+#: src/Form/Admin/SearchConfigConfigureForm.php:470
+#: src/Form/Admin/SearchConfigConfigureForm.php:487
 msgid "Results header"
 msgstr "Avant les résultats"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:366
-#: src/Form/Admin/SearchConfigConfigureForm.php:383
-#: src/Form/Admin/SearchConfigConfigureForm.php:400
-#: src/Form/Admin/SearchConfigConfigureForm.php:417
-#: src/Form/Admin/SearchConfigConfigureForm.php:434
-#: src/Form/Admin/SearchConfigConfigureForm.php:451
-#: src/Form/Admin/SearchConfigConfigureForm.php:468
+#: src/Form/Admin/SearchConfigConfigureForm.php:386
+#: src/Form/Admin/SearchConfigConfigureForm.php:403
+#: src/Form/Admin/SearchConfigConfigureForm.php:420
+#: src/Form/Admin/SearchConfigConfigureForm.php:437
+#: src/Form/Admin/SearchConfigConfigureForm.php:454
+#: src/Form/Admin/SearchConfigConfigureForm.php:471
+#: src/Form/Admin/SearchConfigConfigureForm.php:488
 msgid "Results footer"
 msgstr "Après les résultats"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:367
-#: src/Form/Admin/SearchConfigConfigureForm.php:384
-#: src/Form/Admin/SearchConfigConfigureForm.php:401
-#: src/Form/Admin/SearchConfigConfigureForm.php:418
-#: src/Form/Admin/SearchConfigConfigureForm.php:435
-#: src/Form/Admin/SearchConfigConfigureForm.php:452
-#: src/Form/Admin/SearchConfigConfigureForm.php:469
-#: src/Form/Admin/SearchConfigConfigureForm.php:726
+#: src/Form/Admin/SearchConfigConfigureForm.php:387
+#: src/Form/Admin/SearchConfigConfigureForm.php:404
+#: src/Form/Admin/SearchConfigConfigureForm.php:421
+#: src/Form/Admin/SearchConfigConfigureForm.php:438
+#: src/Form/Admin/SearchConfigConfigureForm.php:455
+#: src/Form/Admin/SearchConfigConfigureForm.php:472
+#: src/Form/Admin/SearchConfigConfigureForm.php:489
+#: src/Form/Admin/SearchConfigConfigureForm.php:750
+#: src/Form/Admin/SearchConfigConfigureForm.php:768
 msgid "Both"
 msgstr "Les deux"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:379
+#: src/Form/Admin/SearchConfigConfigureForm.php:399
 msgid "List of active facets"
 msgstr "Liste des facettes actives"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:396
+#: src/Form/Admin/SearchConfigConfigureForm.php:416
 msgid "Total results"
 msgstr "Total des résultats"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:413
+#: src/Form/Admin/SearchConfigConfigureForm.php:433
 msgid "Paginator"
 msgstr "Paginateur"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:430
+#: src/Form/Admin/SearchConfigConfigureForm.php:450
 msgid "Pagination per page"
 msgstr "Pagination par page"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:464
+#: src/Form/Admin/SearchConfigConfigureForm.php:484
 msgid "Grid / list"
 msgstr "Grille / liste"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:481
+#: src/Form/Admin/SearchConfigConfigureForm.php:501
 msgid "Grid / list default mode"
 msgstr "Mode grille / liste par défaut"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:483
+#: src/Form/Admin/SearchConfigConfigureForm.php:503
 msgid "Auto (previous user choice)"
 msgstr "Automatique (précédent choix de l’utilisateur)"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:484
+#: src/Form/Admin/SearchConfigConfigureForm.php:504
 msgid "Grid"
 msgstr "Grille"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:485
+#: src/Form/Admin/SearchConfigConfigureForm.php:505
 msgid "List"
 msgstr "Liste"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:486
+#: src/Form/Admin/SearchConfigConfigureForm.php:506
 msgid "Only grid"
 msgstr "Uniquement en grille"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:487
+#: src/Form/Admin/SearchConfigConfigureForm.php:507
 msgid "Only list"
 msgstr "Uniquement en liste"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:515
+#: src/Form/Admin/SearchConfigConfigureForm.php:535
 msgid "If any, the search page will display a select to paginate results."
 msgstr "Affiche un menu déroulant pour la pagination des résultats."
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:538
+#: src/Form/Admin/SearchConfigConfigureForm.php:558
 msgid "Sorting"
 msgstr "Tri"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:547
+#: src/Form/Admin/SearchConfigConfigureForm.php:567
 msgid "Sort fields"
 msgstr "Champs de tri"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:548
+#: src/Form/Admin/SearchConfigConfigureForm.php:568
 msgid ""
 "List of sort fields that will be displayed in the search page. Format is "
 "\"term dir = Label\"."
@@ -1800,75 +1883,81 @@ msgstr ""
 "Liste des champs de tri qui seront affichés dans la page de recherche. Le "
 "format est \"terme dir = Libellé\"."
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:566
+#: src/Form/Admin/SearchConfigConfigureForm.php:586
 msgid "Available sort fields"
 msgstr "Champs de tri disponibles"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:567
+#: src/Form/Admin/SearchConfigConfigureForm.php:587
 msgid ""
 "List of all available sort fields, among which some can be copied above."
 msgstr "Liste des champs de tri disponibles et pouvant être copiés ci-dessus."
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:597
+#: src/Form/Admin/SearchConfigConfigureForm.php:617
 msgid "Label above the list of facets"
 msgstr "Afficher le libellé au dessus de la liste des facettes"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:608
+#: src/Form/Admin/SearchConfigConfigureForm.php:628
 msgid "List of facets"
 msgstr "Liste des facettes"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:609
+#: src/Form/Admin/SearchConfigConfigureForm.php:629
 msgid ""
 "List of facets that will be displayed in the search page. Format is \"field "
-"= Label\" and optionnally \" = Select\" or \" = SelectRange\". With internal "
-"sql engine, \"SelectRange\" orders values alphabetically. With Solr, "
-"\"SelectRange\" works only with date and numbers. \"Tree\" can be used for "
-"item sets when module ItemSetsTree is enabled and data indexed recursively."
+"= Label = Input type = Options\". Input types may be \"Select\" or "
+"\"SelectRange\". With internal sql engine, \"SelectRange\" orders values "
+"alphabetically. With Solr, \"SelectRange\" works only with date and numbers. "
+"\"Tree\" can be used for item sets when module ItemSetsTree is enabled and "
+"data indexed recursively. Options are a comma separateted list of arguments. "
+"For now, the main type (\"literal\", \"uri\" or \"resource\") can be "
+"specified to output only this main type."
 msgstr ""
 "Liste des facettes à afficher sur la page de recherche. Le format est "
 "« champ = libellé » et éventuellement « = Select » ou « = SelectRange ». "
 "Avec le moteur sql, « SelectRange » trie les valeurs alphabétiquement. Avec "
 "Solr, « SelectRange » fonctionne uniquement avec les dates et les nombres. "
 "« Arborescence » peut être utilisé pour les collections lorsque le module "
-"ItemSetsTree est installé et que les données sont indexées récursivement."
+"ItemSetsTree est installé et que les données sont indexées récursivement. "
+"Les options sont une liste d’arguments séparés par des virgules. "
+"Actuellement, le type principal (« texte », « uri » ou « ressource ») peut "
+"être indiqué pour extraire seulement ce type principal."
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:628
+#: src/Form/Admin/SearchConfigConfigureForm.php:652
 msgid "Available facets"
 msgstr "Facettes disponibles"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:629
+#: src/Form/Admin/SearchConfigConfigureForm.php:653
 msgid "List of all available facets, among which some can be copied above."
 msgstr "Liste des facettes disponibles et pouvant être copiés ci-dessus."
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:644
+#: src/Form/Admin/SearchConfigConfigureForm.php:668
 msgid "Maximum number of facet by field"
 msgstr "Nombre maximum de facette par champ"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:645
+#: src/Form/Admin/SearchConfigConfigureForm.php:669
 msgid "The maximum number of values fetched for each facet"
 msgstr "Le nombre maximum de valeurs récupérées pour chaque facette"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:658
+#: src/Form/Admin/SearchConfigConfigureForm.php:682
 msgid "Order of facet items"
 msgstr "Ordre des valeurs des facettes"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:660
+#: src/Form/Admin/SearchConfigConfigureForm.php:684
 msgid "Native"
 msgstr "Par défaut"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:662
+#: src/Form/Admin/SearchConfigConfigureForm.php:686
 msgid "Count (biggest first)"
 msgstr "Total (du plus grand)"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:663
+#: src/Form/Admin/SearchConfigConfigureForm.php:687
 msgid "Count (smallest first)"
 msgstr "Total (du plus petit)"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:676
+#: src/Form/Admin/SearchConfigConfigureForm.php:700
 msgid "Get facets from specific languages"
 msgstr "Utiliser les facettes à partir de langues spécifiques"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:677
+#: src/Form/Admin/SearchConfigConfigureForm.php:701
 msgid ""
 "Generally, facets are translated in the view, but in some cases, facet "
 "values may be translated directly in a multivalued property. Use \"|\" to "
@@ -1885,47 +1974,61 @@ msgstr ""
 "sont des facettes, la langue vide doit être indiquée pour avoir des "
 "résultats."
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:689
+#: src/Form/Admin/SearchConfigConfigureForm.php:713
 msgid "Display list of facets"
 msgstr "Afficher la liste des facettes actives"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:691
+#: src/Form/Admin/SearchConfigConfigureForm.php:715
 msgid "All facets, even with 0 results"
 msgstr "Toutes les facettes, même avec 0 résultat"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:692
+#: src/Form/Admin/SearchConfigConfigureForm.php:716
 msgid "Available facets only"
 msgstr "Facettes disponibles"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:705
+#: src/Form/Admin/SearchConfigConfigureForm.php:729
 msgid "Facet mode"
 msgstr "Mode des facettes"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:707
+#: src/Form/Admin/SearchConfigConfigureForm.php:731
 msgid "Send request with a button"
 msgstr "Utiliser un bouton pour envoyer la requête"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:708
+#: src/Form/Admin/SearchConfigConfigureForm.php:732
 msgid "Send request directly"
 msgstr "Suivre le lien directement"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:721
+#: src/Form/Admin/SearchConfigConfigureForm.php:745
 msgid "Position of the button \"Apply filters\""
 msgstr "Position du bouton « Appliquer les filtres »"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:724
+#: src/Form/Admin/SearchConfigConfigureForm.php:748
+#: src/Form/Admin/SearchConfigConfigureForm.php:766
 msgid "Above facets"
 msgstr "Au-dessus des facettes"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:725
+#: src/Form/Admin/SearchConfigConfigureForm.php:749
+#: src/Form/Admin/SearchConfigConfigureForm.php:767
 msgid "Below facets"
 msgstr "En dessous des facettes"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:739
+#: src/Form/Admin/SearchConfigConfigureForm.php:763
+msgid "Position of the button \"Reset facets\""
+msgstr "Position du bouton « Effacer les facettes »"
+
+#: src/Form/Admin/SearchConfigConfigureForm.php:781
+msgid "Label for submit"
+msgstr "Libellé pour « Soumettre »"
+
+#: src/Form/Admin/SearchConfigConfigureForm.php:794
+msgid "Label for reset"
+msgstr "Libellé pour « Effacer »"
+
+#: src/Form/Admin/SearchConfigConfigureForm.php:807
 msgid "Display the list of active facets"
 msgstr "Afficher la liste des facettes actives"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:751
+#: src/Form/Admin/SearchConfigConfigureForm.php:819
 msgid "Display the count of each facet item"
 msgstr "Afficher le total de chaque valeur de facette"
 
@@ -2005,52 +2108,56 @@ msgstr ""
 "Les modèles sont dans le dossier « common/block-layout » du thème et doivent "
 "commencer par « searching-form »."
 
-#: src/Form/MainSearchForm.php:238
+#: src/Form/MainSearchForm.php:258
 msgid "Reset fields"
 msgstr "Effacer les champs"
 
-#: src/Form/MainSearchForm.php:345
+#: src/Form/MainSearchForm.php:370
 msgid "From"
 msgstr "De"
 
-#: src/Form/MainSearchForm.php:348 src/Form/MainSearchForm.php:358
+#: src/Form/MainSearchForm.php:373 src/Form/MainSearchForm.php:383
 msgid "YYYY"
 msgstr "AAAA"
 
-#: src/Form/MainSearchForm.php:355
+#: src/Form/MainSearchForm.php:380
 msgid "To"
 msgstr "À"
 
-#: src/Form/MainSearchForm.php:485
-msgid "Select resource type…"
-msgstr "Choisir le type de ressource…"
-
-#: src/Form/MainSearchForm.php:488 src/Form/MainSearchForm.php:511
-#: src/Form/MainSearchForm.php:527 src/Form/MainSearchForm.php:548
-#: src/Form/MainSearchForm.php:578 src/Form/MainSearchForm.php:609
-#: src/Form/MainSearchForm.php:641 src/Form/MainSearchForm.php:680
-#: src/Form/MainSearchForm.php:705 src/Form/MainSearchForm.php:745
-#: src/Form/MainSearchForm.php:776
+#: src/Form/MainSearchForm.php:515 src/Form/MainSearchForm.php:540
+#: src/Form/MainSearchForm.php:556 src/Form/MainSearchForm.php:581
+#: src/Form/MainSearchForm.php:611 src/Form/MainSearchForm.php:642
+#: src/Form/MainSearchForm.php:674 src/Form/MainSearchForm.php:713
+#: src/Form/MainSearchForm.php:738 src/Form/MainSearchForm.php:778
+#: src/Form/MainSearchForm.php:812 src/Form/MainSearchForm.php:854
 msgid "label"
 msgstr "libellé"
 
-#: src/Form/MainSearchForm.php:556
+#: src/Form/MainSearchForm.php:526
+msgid "Select resource type…"
+msgstr "Choisir le type de ressource…"
+
+#: src/Form/MainSearchForm.php:589
 msgid "Select owners…"
 msgstr "Choisir des propiétaires…"
 
-#: src/Form/MainSearchForm.php:653
+#: src/Form/MainSearchForm.php:686
 msgid "Select classes…"
 msgstr "Choisir des classes…"
 
-#: src/Form/MainSearchForm.php:690 src/Form/MainSearchForm.php:713
+#: src/Form/MainSearchForm.php:723 src/Form/MainSearchForm.php:746
 msgid "Select templates…"
 msgstr "Choisir des modèles…"
 
-#: src/Form/MainSearchForm.php:754 src/Form/MainSearchForm.php:785
+#: src/Form/MainSearchForm.php:787 src/Form/MainSearchForm.php:821
 msgid "Select collections…"
 msgstr "Choisir des collections…"
 
-#: src/Api/Adapter/SearchConfigAdapter.php:151
+#: src/Form/MainSearchForm.php:862
+msgid "Select access…"
+msgstr "Choisir l’accès…"
+
+#: src/Api/Adapter/SearchConfigAdapter.php:152
 #, php-format
 msgid "The path \"%s\" is already taken."
 msgstr "Le chemin \"%s\" est déjà utilisé."
@@ -2138,19 +2245,19 @@ msgstr "L’index de recherche « %s » a été configuré avec succès."
 msgid "Don’t forget to run the indexation of the search engine."
 msgstr "N’oubliez pas de lancer l’indexation du moteur de recherche."
 
-#: src/Controller/Admin/SearchEngineController.php:184
+#: src/Controller/Admin/SearchEngineController.php:191
 #, php-format
 msgid "Indexing of \"%1$s\" started in job %2$s#%3$d%4$s (%5$slogs%4$s)"
 msgstr ""
-"L'indexation de \"%1$s\" a commencé dans la tâche %2$s#%3$d%4$s (%5$slogs"
-"%4$s)"
+"L'indexation de \"%1$s\" a commencé dans la tâche %2$s#%3$d%4$s "
+"(%5$slogs%4$s)"
 
-#: src/Controller/Admin/SearchEngineController.php:223
+#: src/Controller/Admin/SearchEngineController.php:230
 #, php-format
 msgid "Search index \"%s\" successfully deleted"
 msgstr "L’index de recherche « %s » a été supprimé"
 
-#: src/Controller/Admin/SearchEngineController.php:228
+#: src/Controller/Admin/SearchEngineController.php:235
 #, php-format
 msgid "Search index \"%s\" could not be deleted"
 msgstr "L’index de recherche « %s » ne peut pas être supprimé"
@@ -2238,33 +2345,33 @@ msgstr ""
 "À noter : si vous n’indiquer pas le \"|\" final, toutes les valeurs sans "
 "langue seront supprimées des résultats."
 
-#: src/Controller/IndexController.php:123
-#: src/Controller/IndexController.php:148
+#: src/Controller/SearchController.php:123
+#: src/Controller/SearchController.php:148
 msgid "No query."
 msgstr "Pas de requête."
 
-#: src/Controller/IndexController.php:169
-#: src/Controller/IndexController.php:262
+#: src/Controller/SearchController.php:169
+#: src/Controller/SearchController.php:262
 msgid "An error occurred."
 msgstr "Une erreur est survenue."
 
-#: src/Controller/IndexController.php:201
+#: src/Controller/SearchController.php:201
 msgid "This action requires an ajax request."
 msgstr "Cette action nécessite une requête ajax."
 
-#: src/Controller/IndexController.php:226
+#: src/Controller/SearchController.php:226
 msgid "Not a search page for this site."
 msgstr "Page de recherche indisponible dans ce site."
 
-#: src/Controller/IndexController.php:243
+#: src/Controller/SearchController.php:243
 msgid "The search page has no suggester."
 msgstr "La page de recherche n’a pas de suggéreur."
 
-#: src/Controller/IndexController.php:253
+#: src/Controller/SearchController.php:253
 msgid "The search page has no more suggester."
 msgstr "La page de recherche n’a plus de suggéreur."
 
-#: src/Controller/IndexController.php:313
+#: src/Controller/SearchController.php:313
 msgid "Rss are available only via public interface."
 msgstr "Les fils rss sont disponibles seulement sur l’interface publique."
 
@@ -2329,31 +2436,35 @@ msgstr ""
 "La requête « %1$s » utilise %2$d propriétés, ce qui est plus que la limite "
 "de %3$d champs. La requête a été tronquée."
 
-#: config/module.config.php:298
+#: config/module.config.php:330
+msgid "Manage"
+msgstr "Gérer"
+
+#: config/module.config.php:354
 msgid "Automatic mapping of empty values"
 msgstr "Correspondance automatique des valeurs vides"
 
-#: config/module.config.php:299
+#: config/module.config.php:355
 msgid "Available"
 msgstr "Disponibles"
 
-#: config/module.config.php:300
+#: config/module.config.php:356
 msgid "Enabled"
 msgstr "Activé"
 
-#: config/module.config.php:301
+#: config/module.config.php:357
 msgid "Find"
 msgstr "Trouver"
 
-#: config/module.config.php:302
+#: config/module.config.php:358
 msgid "Find resources…"
 msgstr "Trouver des ressources…"
 
-#: config/module.config.php:303
+#: config/module.config.php:359
 msgid "Processing…"
 msgstr "En traitement…"
 
-#: config/module.config.php:304
+#: config/module.config.php:360
 msgid ""
 "Try to map automatically the metadata and the properties that are not mapped "
 "yet with the fields of the index"
@@ -2361,13 +2472,25 @@ msgstr ""
 "Essaie d’aligner les métadonnées et les propriétés qui ne le sont pas déjà "
 "avec les champs de l’'index"
 
-#: config/module.config.php:364
+#: config/module.config.php:422
 msgid "Full text"
 msgstr "Plein texte"
 
-#: config/module.config.php:376
+#: config/module.config.php:434
 msgid "Date time"
 msgstr "Date / heure"
+
+#~ msgid "Save page"
+#~ msgstr "Enregistrer la page"
+
+#~ msgid "Edit search page"
+#~ msgstr "Modifier la page de recherche"
+
+#~ msgid "[No owner]"
+#~ msgstr "[Pas de propriétaire]"
+
+#~ msgid "Advanced form"
+#~ msgstr "Formulaire avancé"
 
 #~ msgid " "
 #~ msgstr " "

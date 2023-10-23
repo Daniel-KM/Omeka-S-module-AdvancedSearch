@@ -436,6 +436,8 @@ class Module extends AbstractModule
             [$this, 'addSearchConfigToSite']
         );
 
+        // Listeners for configs.
+
         $sharedEventManager->attach(
             \Omeka\Form\SettingForm::class,
             'form.add_elements',
@@ -851,6 +853,8 @@ class Module extends AbstractModule
     }
 
     /**
+     * Update multiple resources after a batch process.
+     *
      * @fixme Indexation when there is process "remove" or "append".
      */
     public function postBatchUpdateSearchEngine(Event $event): void
@@ -864,8 +868,12 @@ class Module extends AbstractModule
             return;
         }
 
-        /** @var \Omeka\Api\Request $request */
+        /**
+         * @var \Omeka\Api\Request $request
+         * @var \Omeka\Api\Response $response
+         */
         $request = $event->getParam('request');
+
         // Unlike module Bulk Edit, "append" was used, because a
         // hidden element was added to manage indexation at the end.
         // Nevertheless, it makes "remove" and "append" not indexed.
@@ -876,23 +884,24 @@ class Module extends AbstractModule
             return;
         }
 
-        $requestResource = $request->getResource();
         $response = $event->getParam('response');
         $resources = $response->getContent();
+        $resourceType = $request->getResource();
 
-        $serviceLocator = $this->getServiceLocator();
-        $api = $serviceLocator->get('Omeka\ApiManager');
+        $services = $this->getServiceLocator();
+        $api = $services->get('Omeka\ApiManager');
+        $logger = $services->get('Omeka\Logger');
 
         /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
         $searchEngines = $api->search('search_engines')->getContent();
         foreach ($searchEngines as $searchEngine) {
-            if (in_array($requestResource, $searchEngine->setting('resources', []))) {
-                $indexer = $searchEngine->indexer();
+            $indexer = $searchEngine->indexer();
+            if ($indexer->canIndex($resourceType)
+                && in_array($resourceType, $searchEngine->setting('resources', []))
+            ) {
                 try {
                     $indexer->indexResources($resources);
                 } catch (\Exception $e) {
-                    $services = $this->getServiceLocator();
-                    $logger = $services->get('Omeka\Logger');
                     $logger->err(new Message(
                         'Unable to batch index metadata for search engine "%1$s": %2$s', // @translate
                         $searchEngine->name(), $e->getMessage()
@@ -919,15 +928,19 @@ class Module extends AbstractModule
         $request->setContent($data);
     }
 
+    /**
+     * Index a single resource in search engines.
+     */
     public function updateSearchEngine(Event $event): void
     {
         if ($this->isBatchUpdate) {
             return;
         }
 
-        $serviceLocator = $this->getServiceLocator();
-        $api = $serviceLocator->get('Omeka\ApiManager');
+        $services = $this->getServiceLocator();
+        $api = $services->get('Omeka\ApiManager');
 
+        /** @var \Omeka\Api\Request $request */
         $request = $event->getParam('request');
         $response = $event->getParam('response');
         $requestResource = $request->getResource();
@@ -935,8 +948,10 @@ class Module extends AbstractModule
         /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
         $searchEngines = $api->search('search_engines')->getContent();
         foreach ($searchEngines as $searchEngine) {
-            if (in_array($requestResource, $searchEngine->setting('resources', []))) {
-                if ($request->getOperation() == 'delete') {
+            if ($searchEngine->indexer()->canIndex($requestResource)
+                && in_array($requestResource, $searchEngine->setting('resources', []))
+            ) {
+                if ($request->getOperation() === 'delete') {
                     $id = $request->getId();
                     $this->deleteIndexResource($searchEngine, $requestResource, $id);
                 } else {
@@ -947,14 +962,17 @@ class Module extends AbstractModule
         }
     }
 
+    /**
+     * Index a single media in search engines.
+     */
     public function updateSearchEngineMedia(Event $event): void
     {
         if ($this->isBatchUpdate) {
             return;
         }
 
-        $serviceLocator = $this->getServiceLocator();
-        $api = $serviceLocator->get('Omeka\ApiManager');
+        $services = $this->getServiceLocator();
+        $api = $services->get('Omeka\ApiManager');
 
         $request = $event->getParam('request');
         $response = $event->getParam('response');
@@ -966,7 +984,9 @@ class Module extends AbstractModule
         /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
         $searchEngines = $api->search('search_engines')->getContent();
         foreach ($searchEngines as $searchEngine) {
-            if (in_array('items', $searchEngine->setting('resources', []))) {
+            if ($searchEngine->indexer()->canIndex('items')
+                && in_array('items', $searchEngine->setting('resources', []))
+            ) {
                 $this->updateIndexResource($searchEngine, $item);
             }
         }

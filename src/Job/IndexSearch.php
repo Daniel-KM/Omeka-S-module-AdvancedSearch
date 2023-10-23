@@ -181,12 +181,12 @@ class IndexSearch extends AbstractJob
 
                 // TODO Use doctrine large iterable data-processing? See https://www.doctrine-project.org/projects/doctrine-orm/en/latest/reference/batch-processing.html#iterating-large-results-for-data-processing
                 $offset = $batchSize * ($searchConfig - 1);
-                $q = $entityManager
+                $qb = $entityManager
                     ->createQuery($dql)
                     ->setFirstResult($offset)
                     ->setMaxResults($batchSize);
                 /** @var \Omeka\Entity\Resource[] $resources */
-                $resources = $q->getResult();
+                $resources = $qb->getResult();
 
                 $indexer->indexResources($resources);
 

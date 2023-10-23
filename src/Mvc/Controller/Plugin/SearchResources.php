@@ -1034,7 +1034,7 @@ class SearchResources extends AbstractPlugin
 
             // Note: a list of "or" with the same property should be optimized
             // early with type "list".
-            // TODO Optimize early search type "or" with same properties.
+            // TODO Optimize early search type "or" with same properties and type.
 
             // Consecutive OR optimization
             //

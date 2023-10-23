@@ -77,10 +77,26 @@ class IndexSearch extends AbstractJob
 
         $searchEngineId = $this->getArg('search_engine_id');
         $startResourceId = (int) $this->getArg('start_resource_id');
+        $resourceIds = $this->getArg('resource_ids', []) ?: [];
 
         /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation $searchEngine */
         $searchEngine = $api->read('search_engines', $searchEngineId)->getContent();
         $indexer = $searchEngine->indexer();
+
+        // Clean resource ids to avoid check later.
+        $ids = array_filter(array_map('intval', $resourceIds));
+        if (count($resourceIds) !== count($ids)) {
+            $this->logger->notice(new Message(
+                'Search index #%d ("%s"): the list of resource ids contains invalid ids.', // @translate
+                $searchEngine->id(), $searchEngine->name()
+            ));
+            return;
+        }
+        $resourceIds = $ids;
+        unset($ids);
+        if ($resourceIds) {
+            $startResourceId = 1;
+        }
 
         $resourceNames = $searchEngine->setting('resources', []);
         $selectedResourceNames = $this->getArg('resource_names', []);
@@ -122,12 +138,13 @@ class IndexSearch extends AbstractJob
 
         $rNames = $resourceNames;
         sort($rNames);
-        $fullClearIndex = $startResourceId <= 0
+        $fullClearIndex = empty($resourceIds)
+            && $startResourceId <= 0
             && array_values($rNames) === ['item_sets', 'items'];
 
         if ($fullClearIndex) {
             $indexer->clearIndex();
-        } elseif ($startResourceId > 0) {
+        } elseif (empty($resourceIds) && $startResourceId > 0) {
             $this->logger->info(new Message(
                 'Search index is not cleared: reindexing starts at resource #%d.', // @translate
                 $startResourceId
@@ -137,7 +154,7 @@ class IndexSearch extends AbstractJob
         $resources = [];
         $totals = [];
         foreach ($resourceNames as $resourceName) {
-            if (!$fullClearIndex && $startResourceId <= 0) {
+            if (!$fullClearIndex && empty($resourceIds) && $startResourceId <= 0) {
                 $query = new Query();
                 $query
                     // By default the query process public resources only.
@@ -150,8 +167,14 @@ class IndexSearch extends AbstractJob
             $searchConfig = 1;
             $entityClass = $apiAdapters->get($resourceName)->getEntityClass();
             $dql = "SELECT resource FROM $entityClass resource";
-            if ($startResourceId) {
-                $dql .= " WHERE resource.id >= $startResourceId";
+            $parameter = null;
+            if (count($resourceIds)) {
+                // The list of ids is cleaned above.
+                $dql .= ' WHERE resource.id IN (:resource_ids)';
+                $parameter = ['name' => 'resource_ids', 'bind' => $resourceIds, 'type' => \Doctrine\DBAL\Connection::PARAM_INT_ARRAY];
+            } elseif ($startResourceId) {
+                $dql .= ' WHERE resource.id >= :start_resource_id';
+                $parameter = ['name' => 'start_resource_id', 'bind' => $startResourceId, 'type' => \Doctrine\DBAL\ParameterType::INTEGER];
             }
             $dql .= " ORDER BY resource.id ASC";
 
@@ -185,6 +208,10 @@ class IndexSearch extends AbstractJob
                     ->createQuery($dql)
                     ->setFirstResult($offset)
                     ->setMaxResults($batchSize);
+                if ($parameter) {
+                    $qb
+                        ->setParameter($parameter['name'], $parameter['bind'], $parameter['type']);
+                }
                 /** @var \Omeka\Entity\Resource[] $resources */
                 $resources = $qb->getResult();
 

@@ -98,8 +98,11 @@ class SettingsFieldset extends Fieldset
                     'label' => 'Indexing after a batch edit process', // @translate
                     'info' => 'On some complex databases, an issue may occur after a batch process.', // @translate
                     'value_options' => [
-                        'async' => 'Asynchronous', // @translate
+                        // TODO Use async indexation when short batch edit and sync when background batch edit?
+                        // 'auto' => 'Automatic', // @translate
                         'sync' => 'Synchronous', // @translate
+                        'async' => 'Asynchronous', // @translate
+                        'integrated' => 'Integrated', // @translate
                         'none' => 'None', // @translate
                     ],
                 ],

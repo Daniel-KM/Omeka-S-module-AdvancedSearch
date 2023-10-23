@@ -864,7 +864,7 @@ class Module extends AbstractModule
         }
 
         $settings = $this->getServiceLocator()->get('Omeka\Settings');
-        $indexBatchEdit = $settings->get('advancedsearch_index_batch_edit', 'async');
+        $indexBatchEdit = $settings->get('advancedsearch_index_batch_edit', 'sync');
         if ($indexBatchEdit === 'none') {
             return;
         }
@@ -889,10 +889,14 @@ class Module extends AbstractModule
         $resources = $response->getContent();
         $resourceType = $request->getResource();
 
-        if ($indexBatchEdit === 'async') {
-            $this->runJobIndexSearch($resourceType, $request->getIds());
+        // TODO Use async indexation when short batch edit and sync when background batch edit?
+        if ($indexBatchEdit === 'sync' || $indexBatchEdit === 'async') {
+            $this->runJobIndexSearch($resourceType, $request->getIds(), $indexBatchEdit === 'sync');
             return;
         }
+
+        // Integrated indexation.
+        // TODO A doctrine issue "new entity was found" may occur when there are multiple linked resources.
 
         $services = $this->getServiceLocator();
         $api = $services->get('Omeka\ApiManager');
@@ -928,7 +932,7 @@ class Module extends AbstractModule
      * Adapted:
      * @see \AdvancedSearch\Controller\Admin\SearchEngineController::indexAction()
      */
-    protected function runJobIndexSearch(string $resourceType, array $ids): void
+    protected function runJobIndexSearch(string $resourceType, array $ids, bool $sync): void
     {
         $ids = array_filter(array_map('intval', $ids));
         if (!$ids) {
@@ -940,6 +944,7 @@ class Module extends AbstractModule
         $logger = $services->get('Omeka\Logger');
         $messenger = $services->get('ControllerPluginManager')->get('messenger');
         $jobDispatcher = $services->get('Omeka\Job\Dispatcher');
+        $strategy = $sync ? $services->get('Omeka\Job\DispatchStrategy\Synchronous') : null;
 
         /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
         $searchEngines = $api->search('search_engines')->getContent();
@@ -957,7 +962,7 @@ class Module extends AbstractModule
                 // TODO Improve indexing of multiple search engines after batch process.
                 $jobArgs['force'] = !$first;
                 try {
-                    $jobDispatcher->dispatch(\AdvancedSearch\Job\IndexSearch::class, $jobArgs);
+                    $jobDispatcher->dispatch(\AdvancedSearch\Job\IndexSearch::class, $jobArgs, $strategy);
                     $first = false;
                 } catch (\Exception $e) {
                     $logger->err(new Message(

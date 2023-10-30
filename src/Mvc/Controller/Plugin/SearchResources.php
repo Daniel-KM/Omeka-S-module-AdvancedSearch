@@ -333,12 +333,19 @@ class SearchResources extends AbstractPlugin
             ) {
                 unset($query[$key]);
             } elseif ($key === 'id') {
-                $values = is_array($value) ? $value : [$value];
-                $values = array_filter($values, function ($id) {
-                    return $id !== '' && $id !== null;
-                });
-                if (count($values)) {
-                    $query['id'] = $values;
+                /** @see \Omeka\Api\Adapter\AbstractEntityAdapter::buildBaseQuery() */
+                // Avoid a strict type issue, so convert ids as string.
+                if (is_int($value)) {
+                    $value = [(string) $value];
+                } elseif (is_string($value)) {
+                    $value = strpos($value, ',')  === false? [$value] : explode(',', $value);
+                } elseif (!is_array($value)) {
+                    $value = [];
+                }
+                $value = array_map('trim', $value);
+                $value = array_filter($value, 'strlen');
+                if (count($value)) {
+                    $query['id'] = $value;
                 } else {
                     unset($query['id']);
                 }

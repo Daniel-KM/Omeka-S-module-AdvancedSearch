@@ -556,6 +556,21 @@ class SearchResources extends AbstractPlugin
                 } else {
                     unset($query['numeric']);
                 }
+            } elseif ($key === 'sort_ids') {
+                if (is_int($value)) {
+                    $value = [(string) $value];
+                } elseif (is_string($value)) {
+                    $value = strpos($value, ',')  === false? [$value] : explode(',', $value);
+                } elseif (!is_array($value)) {
+                    $value = [];
+                }
+                $value = array_map('trim', $value);
+                $value = array_filter($value, 'strlen');
+                if (count($value)) {
+                    $query['sort_ids'] = $value;
+                } else {
+                    unset($query['sort_ids']);
+                }
             }
         }
 
@@ -827,6 +842,45 @@ class SearchResources extends AbstractPlugin
                         $itemSetAlias, Join::WITH,
                         $expr->in("$itemSetAlias.id", $this->adapter->createNamedParameter($qb, $itemSetIds))
                     );
+            }
+        }
+
+        // Sort by listed id.
+        // The list is the one set in key "sort_ids" or in main query key "id".
+        // The sort order is "desc" for resource/browse (see plugin SetBrowseDefault::__invoke())
+        // and as "asc" in api (see AbstractEntityAdapter::buildQuery()).
+        if (isset($query['sort_by'])
+            && $query['sort_by'] === 'ids'
+            && (!empty($query['sort_ids']) || !empty($query['id']))
+        ) {
+            /** @see \Omeka\Api\Adapter\AbstractEntityAdapter::buildBaseQuery() */
+            // Avoid a strict type issue, so convert ids as string.
+            // Normally, the query is cleaned before.
+            $ids = empty($query['sort_ids']) ? $query['id'] : $query['sort_ids'];
+            if (is_int($ids)) {
+                $ids = [(string) $ids];
+            } elseif (is_string($ids)) {
+                $ids = strpos($ids, ',')  === false? [$ids] : explode(',', $ids);
+            } elseif (!is_array($ids)) {
+                $ids = [];
+            }
+            $ids = array_map('trim', $ids);
+            $ids = array_filter($ids, 'strlen');
+            if ($ids) {
+                $idsAlias = $this->adapter->createAlias();
+                $idsPlaceholder = ':' . $idsAlias;
+                $qb
+                    ->setParameter($idsAlias, $ids, Connection::PARAM_INT_ARRAY)
+                    ->addOrderBy("FIELD(omeka_root.id, $idsPlaceholder)", $query['sort_order'])
+                    // In AbstractEntityAdapter::search(), the countQb is a
+                    // clone of this qb that removes the orderBy part, but not
+                    // the parameters associated to it. So a fake argument Where
+                    // is added , to avoid a doctrine issue.
+                    // TODO Patch omeka: get the dql part orderBy, get the parameter associated to it, check if is used somewhere before removing it.
+                    ->andWhere($expr->in(
+                        $this->adapter->createNamedParameter($qb, reset($ids)),
+                        $idsPlaceholder
+                    ));
             }
         }
     }

@@ -3,6 +3,7 @@
 namespace AdvancedSearch\View\Helper;
 
 use Laminas\View\Helper\AbstractHelper;
+use Omeka\Stdlib\Message;
 
 class SearchingUrl extends AbstractHelper
 {
@@ -18,16 +19,26 @@ class SearchingUrl extends AbstractHelper
     {
         $view = $this->getView();
 
-        // Check if the current site has a search form.
-        $searchMainPage = $view->siteSetting('advancedsearch_main_config');
+        // Check if the current site/admin has a search form.
+        $isSiteRequest = $view->status()->isSiteRequest();
+        $searchMainPage = $isSiteRequest
+            ? $view->siteSetting('advancedsearch_main_config')
+            : $view->setting('advancedsearch_main_config');
         if ($searchMainPage) {
             /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
             $searchConfig = $view->api()->searchOne('search_configs', ['id' => $searchMainPage])->getContent();
             if ($searchConfig) {
-                return $view->url('search-page-' . $searchConfig->id(), [], $options, true);
+                try {
+                    return $view->url('search-page-' . $searchConfig->id(), [], $options, true);
+                } catch (\Exception $e) {
+                    $this->getView()->logger()->err(new Message(
+                        'Search engine %1$s (#%1$d) is not available.', // @translate
+                        $searchConfig->name(), $searchConfig->id()
+                    ));
+                }
             }
         }
 
-        return $view->url('site/resource', ['controller' => 'item', 'action' => $useItemSearch ? 'search' : 'browse'], $options, true);
+        return $view->url($isSiteRequest ? 'site/resource' : 'admin/default', ['controller' => 'item', 'action' => $useItemSearch ? 'search' : 'browse'], $options, true);
     }
 }

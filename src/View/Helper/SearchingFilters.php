@@ -167,7 +167,7 @@ class SearchingFilters extends AbstractHelper
                     $filters[$filterLabel][$this->urlQuery($key)] = $value;
                     break;
 
-                    // Resource type is "items", "item_sets", etc.
+                // Resource type is "items", "item_sets", etc.
                 case 'resource_type':
                     $resourceTypes = [
                         'items' => $translate('Items'),
@@ -179,9 +179,9 @@ class SearchingFilters extends AbstractHelper
                     }
                     break;
 
-                    // Resource id.
+                // Resource id.
                 case 'id':
-                    $filterLabel = $translate('Resource id'); // @translate
+                    $filterLabel = $translate('ID'); // @translate
                     foreach (array_filter(array_map('intval', $flatArray($value))) as $subKey => $subValue) {
                         $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $subValue;
                     }
@@ -417,6 +417,10 @@ class SearchingFilters extends AbstractHelper
      * @param string|int $key
      * @param string|int|null $subKey
      * @return string
+     *
+     * Copy:
+     * @see \AdvancedSearch\View\Helper\SearchFilters::urlQuery()
+     * @see \AdvancedSearch\View\Helper\SearchingFilters::urlQuery()
      */
     protected function urlQuery($key, $subKey = null): string
     {

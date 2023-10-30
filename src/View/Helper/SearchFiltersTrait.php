@@ -55,6 +55,7 @@ trait SearchFiltersTrait
                 'lt' => $translate('lower than'), // @translate
             ];
         }
+
         return $queryTypesLabels;
     }
 }

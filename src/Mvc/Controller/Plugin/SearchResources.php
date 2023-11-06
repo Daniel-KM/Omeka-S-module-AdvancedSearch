@@ -1076,7 +1076,7 @@ class SearchResources extends AbstractPlugin
                 && !in_array($query, ['nexs', 'nexm'], true)
             ) {
                 $positive = false;
-                $queryType = self::PROPERTY_QUERY['reciprocal'];
+                $queryType = self::PROPERTY_QUERY['reciprocal'][$queryType];
             } else {
                 $positive = true;
             }

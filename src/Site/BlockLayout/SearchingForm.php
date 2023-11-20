@@ -45,7 +45,7 @@ class SearchingForm extends AbstractBlockLayout
         $defaultSettings = $services->get('Config')['advancedsearch']['block_settings']['searchingForm'];
         $blockFieldset = \AdvancedSearch\Form\SearchingFormFieldset::class;
 
-        $data = $block ? $block->data() + $defaultSettings : $defaultSettings;
+        $data = $block ? ($block->data() ?? []) + $defaultSettings : $defaultSettings;
 
         $dataForm = [];
         foreach ($data as $key => $value) {

@@ -46,7 +46,6 @@ class SiteSettingsFieldset extends Fieldset
             $this->defaultSearchFields[$key] = $defaultSearchField['label'] ?? $key;
         }
 
-        $selectAllTerms = $this->settings->get('advancedsearch_restrict_used_terms', false);
         $searchFields = $this->settings->get('advancedsearch_search_fields') ?: $defaultSelectedFields;
 
         $this
@@ -61,20 +60,6 @@ class SiteSettingsFieldset extends Fieldset
                 ],
                 'attributes' => [
                     'style' => 'font-weight: bold; font-style: italic; margin: 0 0 16px;',
-                ],
-            ])
-            /** @deprecated Since Omeka v3.1 */
-            ->add([
-                'name' => 'advancedsearch_restrict_used_terms',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'element_group' => 'search',
-                    'label' => 'Restrict to used properties and resources classes', // @translate
-                    'info' => 'If checked, restrict the list of properties and resources classes to the used ones in advanced search form.', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'advancedsearch_restrict_used_terms',
-                    'value' => $selectAllTerms,
                 ],
             ])
             ->add([

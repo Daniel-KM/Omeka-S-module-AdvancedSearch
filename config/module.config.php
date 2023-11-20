@@ -385,7 +385,6 @@ return [
             'advancedsearch_all_configs' => [1 => 'find'],
         ],
         'site_settings' => [
-            'advancedsearch_restrict_used_terms' => true,
             'advancedsearch_search_fields' => [
                 'common/advanced-search/fulltext',
                 'common/advanced-search/properties',

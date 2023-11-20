@@ -690,11 +690,10 @@ class Module extends AbstractModule
         $qb = $event->getParam('queryBuilder');
         $adapter = $event->getTarget();
 
-        /** @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResources::endOverrideRequest() */
-        $searchResources = $this->getServiceLocator()->get('ControllerPluginManager')
-            ->get('searchResources');
-
-        $searchResources
+        /** @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResources::startOverrideRequest() */
+        /** @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResources::buildInitialQuery() */
+        $this->getServiceLocator()->get('ControllerPluginManager')
+            ->get('searchResources')
             ->endOverrideRequest($request)
             ->setAdapter($adapter)
             // Process the query for overridden keys.

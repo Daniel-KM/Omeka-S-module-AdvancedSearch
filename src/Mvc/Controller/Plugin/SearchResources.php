@@ -739,8 +739,8 @@ class SearchResources extends AbstractPlugin
                 $qb
                     ->andWhere($expr->eq(
                         "$userAlias.id",
-                        $this->adapter->createNamedParameter($qb, $query['owner_id']))
-                    );
+                        $this->adapter->createNamedParameter($qb, $query['owner_id'])
+                    ));
             }
         }
 

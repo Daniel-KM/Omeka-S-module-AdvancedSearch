@@ -590,6 +590,8 @@ class SearchResources extends AbstractPlugin
         // and variants: not equal to not in list, and types "and" and "except".
         // On a base > 10000 items and more than three or four subjects with OR,
         // mysql never ends request.
+        // The issue is fixed in Omeka S v4.1.
+        /** @see https://github.com/omeka/omeka-s/commits/consecutive-or-optimize */
         foreach ($shortProperties as $shortProperty) {
             if ($shortProperty['total'] < 2 || !isset(self::PROPERTY_QUERY['optimize'][$shortProperty['type']])) {
                 continue;

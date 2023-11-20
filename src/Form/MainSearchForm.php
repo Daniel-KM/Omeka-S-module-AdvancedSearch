@@ -41,7 +41,6 @@ use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Form\Element as OmekaElement;
 use Omeka\Settings\Settings;
 use Omeka\View\Helper\Setting;
-use Reference\Mvc\Controller\Plugin\References;
 
 class MainSearchForm extends Form
 {
@@ -69,11 +68,6 @@ class MainSearchForm extends Form
      * @var \Doctrine\ORM\EntityManager
      */
     protected $entityManager;
-
-    /**
-     * @var \Reference\Mvc\Controller\Plugin\References|null
-     */
-    protected $references;
 
     /**
      * @var string
@@ -931,6 +925,9 @@ class MainSearchForm extends Form
      * @todo Use a suggester for big lists.
      * @todo Support any resources, not only item.
      *
+     * Note: In version previous 3.4.15, the module Reference was used, that
+     * managed languages, but a lot slower for big databases.
+     *
      * @todo Factorize with \AdvancedSearch\Querier\InternalQuerier::fillFacetResponse()
      * @see \AdvancedSearch\Querier\InternalQuerier::fillFacetResponse()
      */
@@ -960,42 +957,36 @@ class MainSearchForm extends Form
             ?? $multifields[$field]['fields']
             ?? $field;
 
-        if ($this->references) {
-            $list = $this->references->__invoke(
-                $fields,
-                $this->site ? ['site_id' => $this->site->id()] : [],
-                ['output' => 'values']
-            )->list();
-            $list = reset($list)['o:references'];
-        } else {
-            // Simplified from References::listDataForProperty().
-            $fields = reset($fields);
-            if (!is_array($fields)) {
-                $fields = [$fields];
-            }
-            $propertyIds = array_intersect_key($this->getPropertyIds(), array_flip($fields));
-            if (!$propertyIds) {
-                return [];
-            }
-            $qb = $this->entityManager->createQueryBuilder();
-            $expr = $qb->expr();
-            $qb
-                ->select('COALESCE(value.value, valueResource.title, value.uri) AS val')
-                ->from(\Omeka\Entity\Value::class, 'value')
-                // This join allow to check visibility automatically too.
-                ->innerJoin(\Omeka\Entity\Item::class, 'resource', Join::WITH, $expr->eq('value.resource', 'resource'))
-                // The values should be distinct for each type.
-                ->leftJoin(\Omeka\Entity\Item::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'))
-                ->andWhere($expr->in('value.property', ':properties'))
-                ->setParameter('properties', implode(',', $propertyIds))
-                ->groupBy('val')
-                ->orderBy('val', 'asc')
-            ;
-            $list = array_column($qb->getQuery()->getScalarResult(), 'val', 'val');
-            // Fix false empty duplicate or values without title.
-            $list = array_keys(array_flip($list));
-            unset($list['']);
+        // Simplified from References::listDataForProperty().
+        /** @see \Reference\Mvc\Controller\Plugin\References::listDataForProperties() */
+        $fields = reset($fields);
+        if (!is_array($fields)) {
+            $fields = [$fields];
         }
+        $propertyIds = array_intersect_key($this->getPropertyIds(), array_flip($fields));
+        if (!$propertyIds) {
+            return [];
+        }
+
+        $qb = $this->entityManager->createQueryBuilder();
+        $expr = $qb->expr();
+        $qb
+            ->select('COALESCE(value.value, valueResource.title, value.uri) AS val')
+            ->from(\Omeka\Entity\Value::class, 'value')
+            // This join allow to check visibility automatically too.
+            ->innerJoin(\Omeka\Entity\Item::class, 'resource', Join::WITH, $expr->eq('value.resource', 'resource'))
+            // The values should be distinct for each type.
+            ->leftJoin(\Omeka\Entity\Item::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'))
+            ->andWhere($expr->in('value.property', ':properties'))
+            ->setParameter('properties', implode(',', $propertyIds))
+            ->groupBy('val')
+            ->orderBy('val', 'asc')
+        ;
+        $list = array_column($qb->getQuery()->getScalarResult(), 'val', 'val');
+        // Fix false empty duplicate or values without title.
+        $list = array_keys(array_flip($list));
+        unset($list['']);
+
         return array_combine($list, $list);
     }
 
@@ -1122,12 +1113,6 @@ class MainSearchForm extends Form
     public function setEntityManager(EntityManager $entityManager): Form
     {
         $this->entityManager = $entityManager;
-        return $this;
-    }
-
-    public function setReferences(?References $references): Form
-    {
-        $this->references = $references;
         return $this;
     }
 }

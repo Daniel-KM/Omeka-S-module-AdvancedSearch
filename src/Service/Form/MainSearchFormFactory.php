@@ -51,7 +51,6 @@ class MainSearchFormFactory implements FactoryInterface
             ->setSiteSetting($siteSetting)
             ->setFormElementManager($services->get('FormElementManager'))
             ->setEntityManager($services->get('Omeka\EntityManager'))
-            ->setReferences($plugins->has('references') ? $plugins->get('references') : null)
         ;
     }
 }

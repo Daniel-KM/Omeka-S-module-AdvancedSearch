@@ -964,9 +964,9 @@ class MainSearchForm extends Form
             $list = $this->references->__invoke(
                 $fields,
                 $this->site ? ['site_id' => $this->site->id()] : [],
-                ['output' => 'associative']
+                ['output' => 'values']
             )->list();
-            $list = array_keys(reset($list)['o:references']);
+            $list = reset($list)['o:references'];
         } else {
             // Simplified from References::listDataForProperty().
             $fields = reset($fields);

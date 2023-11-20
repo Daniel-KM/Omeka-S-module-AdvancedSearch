@@ -7,7 +7,7 @@ namespace AdvancedSearch\Adapter;
  */
 class NoopAdapter extends AbstractAdapter
 {
-    protected $label = 'Noop'; // @translate
+    protected $label = 'No operation (noop)'; // @translate
 
     protected $configFieldsetClass = null;
 

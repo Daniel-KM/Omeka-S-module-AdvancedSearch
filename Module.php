@@ -140,6 +140,8 @@ class Module extends AbstractModule
                 $messenger->addNotice($message);
             }
         }
+
+        $this->installResources();
     }
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
@@ -1158,9 +1160,6 @@ class Module extends AbstractModule
         $this->createDefaultSearchConfig();
     }
 
-    /**
-     * @todo Replace this method by the standard InstallResources() when the upgrade from Search will be removed.
-     */
     protected function createDefaultSearchConfig(): int
     {
         // Note: during installation or upgrade, the api may not be available
@@ -1191,7 +1190,7 @@ INSERT INTO `search_engine`
 VALUES
 (?, ?, ?, NOW());
 SQL;
-            $searchEngineConfig = require __DIR__ . '/data/search_engines/internal.php';
+            $searchEngineConfig = require __DIR__ . '/data/configs/search_engine.internal.php';
             $connection->executeStatement($sql, [
                 $searchEngineConfig['o:name'],
                 $searchEngineConfig['o:adapter'],
@@ -1199,9 +1198,9 @@ SQL;
             ]);
             $searchEngineId = $connection->fetchOne($sqlSearchEngineId);
             $message = new Message(
-                'The internal search engine (sql) is available. Configure it in the %ssearch manager%s.', // @translate
+                'The internal search engine (sql) can be edited in the %1$ssearch manager%2$s.', // @translate
                 // Don't use the url helper, the route is not available during install.
-                sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager'),
+                sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager/engine/' . $searchEngineId . '/edit'),
                 '</a>'
             );
             $message->setEscapeHtml(false);
@@ -1226,23 +1225,15 @@ INSERT INTO `search_suggester`
 VALUES
 ($searchEngineId, 'Internal suggester (sql)', ?, NOW());
 SQL;
-            $suggesterSettings = [
-                'direct' => false,
-                'mode_index' => 'start',
-                'mode_search' => 'start',
-                'limit' => 25,
-                'length' => 50,
-                'fields' => [],
-                'excluded_fields' => [],
-            ];
+            $suggesterSettings = require __DIR__ . '/data/configs/search_suggester.internal.php';
             $connection->executeStatement($sql, [
                 json_encode($suggesterSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
             ]);
-            // $suggesterId = $connection->fetchColumn($sqlSuggesterId);
+            $suggesterId = (int) $connection->fetchOne($sqlSuggesterId);
             $message = new Message(
-                'The internal suggester (sql) will be available after indexation. Configure it in the %ssearch manager%s.', // @translate
+                'The %1$sinternal suggester%2$s (sql) will be available after indexation.', // @translate
                 // Don't use the url helper, the route is not available during install.
-                sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager'),
+                sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager/suggester/' . $suggesterId . '/edit'),
                 '</a>'
             );
             $message->setEscapeHtml(false);
@@ -1265,7 +1256,7 @@ INSERT INTO `search_config`
 VALUES
 ($searchEngineId, ?, ?, ?, ?, NOW());
 SQL;
-            $searchConfigConfig = require __DIR__ . '/data/search_configs/default.php';
+            $searchConfigConfig = require __DIR__ . '/data/configs/search_config.default.php';
             $connection->executeStatement($sql, [
                 $searchConfigConfig['o:name'],
                 $searchConfigConfig['o:path'],
@@ -1273,11 +1264,13 @@ SQL;
                 json_encode($searchConfigConfig['o:settings'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
             ]);
 
+            $searchConfigId = $connection->fetchOne($sqlSearchConfigId);
             $message = new Message(
-                'The default search page is available. Configure it in the %ssearch manager%s, in the main settings (for admin) and in site settings (for public).', // @translate
+                'The default search config can be %1$sedited%2$s and configured in the %3$smain settings%2$s for admin search and in each site settings for public search.', // @translate
                 // Don't use the url helper, the route is not available during install.
-                sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager/suggester/1/edit'),
-                '</a>'
+                sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager/config/' . $searchConfigId . '/edit'),
+                '</a>',
+                sprintf('<a href="%s">', $urlHelper('admin') . '/setting#advancedsearch_main_config')
             );
             $message->setEscapeHtml(false);
             $messenger->addSuccess($message);

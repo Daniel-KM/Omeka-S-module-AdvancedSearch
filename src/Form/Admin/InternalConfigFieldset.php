@@ -28,7 +28,7 @@ class InternalConfigFieldset extends Fieldset
                 'options' => [
                     'label' => 'Multi-fields (filters and facets)', // @translate
                     'info' => 'List of fields that refers to multiple properties, formatted "name = label", then the list of properties and an empty line. The name must not be a property term or a reserved keyword.', // @translate
-                    'documentation' => 'https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch/-/blob/master/data/search_engines/internal.php',
+                    'documentation' => 'https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch/-/blob/master/data/configs/search_engine.internal.php',
                     'as_key_value' => true,
                     'key_value_separator' => '=',
                     'data_keys' => [
@@ -57,7 +57,7 @@ dcterms:date
 dcterms:created
 dcterms:issued
 ',
-                    'rows' => 12,
+                    'rows' => 30,
                 ],
             ])
         ;

@@ -199,7 +199,7 @@ class SearchSuggesterController extends AbstractActionController
 
         // Check if the name is single in the database.
         $params = $this->params()->fromPost();
-        $id = $this->params('id');
+        $id = (int) $this->params('id');
         $name = trim($params['o:name']);
 
         $names = $this->api()
@@ -210,7 +210,7 @@ class SearchSuggesterController extends AbstractActionController
                 $this->messenger()->addError('The name should be unique.'); // @translate
                 return false;
             }
-            $suggesterId = $this->api()
+            $suggesterId = (int) $this->api()
                 ->searchOne('search_suggesters', ['name' => $name], ['returnScalar' => 'id'])
                 ->getContent();
             if ($id !== $suggesterId) {

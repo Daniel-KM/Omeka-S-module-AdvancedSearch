@@ -4,25 +4,13 @@ namespace AdvancedSearch\Adapter;
 
 class InternalAdapter extends AbstractAdapter
 {
-    public function getLabel(): string
-    {
-        return 'Internal [sql]'; // @translate
-    }
+    protected $label = 'Internal [sql]'; // @translate
 
-    public function getConfigFieldset(): ?\Laminas\Form\Fieldset
-    {
-        return new \AdvancedSearch\Form\Admin\InternalConfigFieldset;
-    }
+    protected $configFieldsetClass = \AdvancedSearch\Form\Admin\InternalConfigFieldset::class;
 
-    public function getIndexerClass(): string
-    {
-        return \AdvancedSearch\Indexer\InternalIndexer::class;
-    }
+    protected $indexerClass = \AdvancedSearch\Indexer\InternalIndexer::class;
 
-    public function getQuerierClass(): string
-    {
-        return \AdvancedSearch\Querier\InternalQuerier::class;
-    }
+    protected $querierClass = \AdvancedSearch\Querier\InternalQuerier::class;
 
     public function getAvailableFields(): array
     {

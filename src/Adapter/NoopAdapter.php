@@ -7,23 +7,11 @@ namespace AdvancedSearch\Adapter;
  */
 class NoopAdapter extends AbstractAdapter
 {
-    public function getLabel(): string
-    {
-        return 'Noop'; // @translate
-    }
+    protected $label = 'Noop'; // @translate
 
-    public function getConfigFieldset(): ?\Laminas\Form\Fieldset
-    {
-        return null;
-    }
+    protected $configFieldsetClass = null;
 
-    public function getIndexerClass(): string
-    {
-        return \AdvancedSearch\Indexer\NoopIndexer::class;
-    }
+    protected $indexerClass = \AdvancedSearch\Indexer\NoopIndexer::class;
 
-    public function getQuerierClass(): string
-    {
-        return \AdvancedSearch\Querier\NoopQuerier::class;
-    }
+    protected $querierClass = \AdvancedSearch\Querier\NoopQuerier::class;
 }

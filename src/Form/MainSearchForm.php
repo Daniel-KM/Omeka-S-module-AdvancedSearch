@@ -46,22 +46,17 @@ use Reference\Mvc\Controller\Plugin\References;
 class MainSearchForm extends Form
 {
     /**
-     * @var string
+     * @var \AdvancedSearch\View\Helper\EasyMeta
      */
-    protected $basePath;
+    protected $easyMeta;
 
     /**
-     * @var SiteRepresentation
-     */
-    protected $site;
-
-    /**
-     * @var Settings
+     * @var \Omeka\Settings\Settings
      */
     protected $settings;
 
     /**
-     * @var Setting
+     * @var \Omeka\View\Helper\Setting
      */
     protected $siteSetting;
 
@@ -79,6 +74,21 @@ class MainSearchForm extends Form
      * @var \Reference\Mvc\Controller\Plugin\References|null
      */
     protected $references;
+
+    /**
+     * @var string
+     */
+    protected $basePath;
+
+    /**
+     * @var \Omeka\Api\Representation\SiteRepresentation
+     */
+    protected $site;
+
+    /**
+     * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation
+     */
+    protected $searchConfig;
 
     /**
      * @var array
@@ -119,9 +129,9 @@ class MainSearchForm extends Form
         }
         unset($name);
 
-        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
-        $searchConfig = $this->getOption('search_config');
-        $this->formSettings = $searchConfig ? $searchConfig->settings() : [];
+        $this->searchConfig = $this->getOption('search_config');
+
+        $this->formSettings = $this->searchConfig ? $this->searchConfig->settings() : [];
 
         // Check specific fields against all available fields.
         $availableFields = $this->getAvailableFields();
@@ -152,7 +162,7 @@ class MainSearchForm extends Form
             $suggester = $this->formSettings['autosuggest']['suggester'] ?? null;
             if ($suggester) {
                 // TODO Use url helper.
-                $autoSuggestUrl = $this->basePath . ($this->site ? '/s/' . $this->site->slug() : '/admin') . '/' . ($searchConfig ? $searchConfig->path() : 'search') . '/suggest';
+                $autoSuggestUrl = $this->basePath . ($this->site ? '/s/' . $this->site->slug() : '/admin') . '/' . ($this->searchConfig ? $this->searchConfig->path() : 'search') . '/suggest';
             }
         }
         if ($autoSuggestUrl) {
@@ -1053,14 +1063,8 @@ class MainSearchForm extends Form
 
     protected function getAvailableFields(): array
     {
-        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
-        $searchConfig = $this->getOption('search_config');
-        $searchEngine = $searchConfig->engine();
-        $searchAdapter = $searchEngine->adapter();
-        if (empty($searchAdapter)) {
-            return [];
-        }
-        return $searchAdapter->setSearchEngine($searchEngine)->getAvailableFields();
+        $adapter = $this->searchConfig->searchAdapter();
+        return $adapter ? $adapter->getAvailableFields() : [];
     }
 
     /**
@@ -1068,24 +1072,26 @@ class MainSearchForm extends Form
      */
     protected function getPropertyTerm($termOrId): ?string
     {
-        return $this->getOption('search_config')->getServiceLocator()->get('ViewHelperManager')
-            ->get('easyMeta')->propertyTerms($termOrId);
+        return $this->easyMeta->propertyTerms($termOrId);
     }
 
     /**
      * Get all property ids by term.
-     *
-     * @return array Associative array of ids by term.
      */
     protected function getPropertyIds(): array
     {
-        return $this->getOption('search_config')->getServiceLocator()->get('ViewHelperManager')
-            ->get('easyMeta')->propertyIds();
+        return $this->easyMeta->propertyIds();
     }
 
     public function setBasePath(string $basePath): Form
     {
         $this->basePath = $basePath;
+        return $this;
+    }
+
+    public function setEasyMeta($easyMeta): Form
+    {
+        $this->easyMeta = $easyMeta;
         return $this;
     }
 
@@ -1095,7 +1101,7 @@ class MainSearchForm extends Form
         return $this;
     }
 
-    public function setSettings(?Settings $settings = null): Form
+    public function setSettings(Settings $settings): Form
     {
         $this->settings = $settings;
         return $this;

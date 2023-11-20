@@ -129,6 +129,18 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
             : null;
     }
 
+    public function searchAdapter(): ?\AdvancedSearch\Adapter\AdapterInterface
+    {
+        $engine = $this->engine();
+        if ($engine) {
+            $adapter = $engine->adapter();
+            return $adapter
+                ? $adapter->setSearchEngine($engine)
+                : null;
+        }
+        return null;
+    }
+
     public function formAdapterName(): ?string
     {
         return $this->resource->getFormAdapter();
@@ -254,6 +266,8 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
     private function formInit(): self
     {
         $this->isFormInit = true;
+        $this->formAdapter = null;
+        $this->form = null;
 
         $formAdapterManager = $this->getServiceLocator()->get('Search\FormAdapterManager');
         $formAdapterName = $this->formAdapterName();

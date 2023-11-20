@@ -89,38 +89,19 @@ class Module extends AbstractModule
     protected function preInstall(): void
     {
         $services = $this->getServiceLocator();
-        $moduleManager = $services->get('Omeka\ModuleManager');
 
-        // Check upgrade from old module Search if any.
+        /** @var \Omeka\Module\Manager $moduleManager */
+        $moduleManager = $services->get('Omeka\ModuleManager');
         $module = $moduleManager->getModule('Search');
-        if (!$module || in_array($module->getState(), [
+        if ($module && !in_array($module->getState(), [
             \Omeka\Module\Manager::STATE_NOT_INSTALLED,
             \Omeka\Module\Manager::STATE_NOT_FOUND ,
             \Omeka\Module\Manager::STATE_INVALID_MODULE,
             \Omeka\Module\Manager::STATE_INVALID_INI ,
             \Omeka\Module\Manager::STATE_INVALID_OMEKA_VERSION,
         ])) {
-            return;
-        }
-
-        $version = (string) $module->getIni('version');
-        if (version_compare($version, '3.5.7', '<')) {
-            // Check the module Search of BibLibre.
             throw new \Omeka\Module\Exception\ModuleCannotInstallException(
-                'Compatibility of this module with module "Search" of BibLibre has not been checked. Uninstall it first, or upgrade it with its fork at https://gitlab.com/Daniel-KM/Omeka-S-module-Search.' // @translate
-            );
-        }
-        if (version_compare($version, '3.5.23.3', '<')) {
-            throw new \Omeka\Module\Exception\ModuleCannotInstallException(
-                'To be automatically upgraded and replaced by this module, the module "Search" should be updated first to version 3.5.23.3 or greater.' // @translate
-            );
-        }
-
-        $module = $moduleManager->getModule('AdvancedSearch');
-        $version = $module ? (string) $module->getIni('version') : null;
-        if (version_compare($version, '3.3.6.6', '>')) {
-            throw new \Omeka\Module\Exception\ModuleCannotInstallException(
-                'To be automatically upgraded and replaced by this module, use version 3.3.6.6 or below, then upgrade it.' // @translate
+                'This module is not compatible with mocule "Search". Disable or uninstall it first. To upgrade from it, update it to version 3.5.23.3 or greater and downgrade this module to version 3.4.14.' // @translate
             );
         }
     }
@@ -137,62 +118,6 @@ class Module extends AbstractModule
             $messenger->addWarning('The module Reference is required to use the facets with the default internal adapter, but not for the Solr adapter.'); // @translate
         }
 
-        // Upgrade from old modules AdvancedSearchPlus and Search.
-
-        $module = $moduleManager->getModule('AdvancedSearch');
-        $version = $module ? $module->getIni('version') : null;
-        if (version_compare($version, '3.3.6.6', '<=')) {
-            $module = $moduleManager->getModule('AdvancedSearchPlus');
-            if ($module && in_array($module->getState(), [
-                \Omeka\Module\Manager::STATE_ACTIVE,
-                \Omeka\Module\Manager::STATE_NOT_ACTIVE,
-                \Omeka\Module\Manager::STATE_NEEDS_UPGRADE,
-            ])) {
-                try {
-                    $filepath = $this->modulePath() . '/data/scripts/upgrade_from_advancedsearchplus.php';
-                    require_once $filepath;
-                } catch (\Exception $e) {
-                    $message = new Message(
-                        'An error occurred during migration of module "%s". Check the config and uninstall it manually.', // @translate
-                        'AdvancedSearchPlus'
-                    );
-                    $messenger->addError($message);
-                }
-            }
-
-            $module = $moduleManager->getModule('Search');
-            if ($module && in_array($module->getState(), [
-                \Omeka\Module\Manager::STATE_ACTIVE,
-                \Omeka\Module\Manager::STATE_NOT_ACTIVE,
-                \Omeka\Module\Manager::STATE_NEEDS_UPGRADE,
-            ])) {
-                try {
-                    $filepath = $this->modulePath() . '/data/scripts/upgrade_from_search.php';
-                    require_once $filepath;
-                } catch (\Exception $e) {
-                    $message = new Message(
-                        'An error occurred during migration of module "%s". Check the config and uninstall it manually.', // @translate
-                        'Search'
-                    );
-                    $messenger->addError($message);
-                }
-            }
-        } else {
-            $has = false;
-            foreach (['Search', 'AdvancedSearchPlus', 'PslSearchForm', 'Solr'] as $module) {
-                $module = $moduleManager->getModule($module);
-                $has = $has || ($module && in_array($module->getState(), [
-                    \Omeka\Module\Manager::STATE_ACTIVE,
-                    \Omeka\Module\Manager::STATE_NOT_ACTIVE,
-                    \Omeka\Module\Manager::STATE_NEEDS_UPGRADE,
-                ]));
-            }
-            if ($has) {
-                $messenger->addWarning('The modules Search, Advanced Search Plus, PSL Search Form, and Search Solr cannot be upgraded with a version of Advanced Search greater than 3.3.6.6.'); // @translate
-                $this->installResources();
-            }
-        }
-
         // The module is automatically disabled when Search is uninstalled.
         $module = $moduleManager->getModule('SearchSolr');
         if ($module && in_array($module->getState(), [
@@ -201,10 +126,10 @@ class Module extends AbstractModule
             \Omeka\Module\Manager::STATE_NEEDS_UPGRADE,
         ])) {
             $version = $module->getIni('version');
-            if (version_compare($version, '3.5.27.3', '<')) {
+            if (version_compare($version, '3.5.45', '<')) {
                 $message = new Message(
                     'The module %1$s should be upgraded to version %2$s or later.', // @translate
-                    'SearchSolr', '3.5.27.3'
+                    'SearchSolr', '3.5.45'
                 );
                 $messenger->addWarning($message);
             } elseif ($module->getState() !== \Omeka\Module\Manager::STATE_ACTIVE) {
@@ -214,19 +139,6 @@ class Module extends AbstractModule
                 );
                 $messenger->addNotice($message);
             }
-        }
-
-        // The module is automatically disabled when Search is uninstalled.
-        $module = $moduleManager->getModule('PslSearchForm');
-        if ($module) {
-            $sql = 'DELETE FROM `module` WHERE `id` = "PslSearchForm";';
-            $connection = $services->get('Omeka\Connection');
-            $connection->executeStatement($sql);
-            $message = new Message(
-                'The module "%s" was upgraded by module "%s" and uninstalled.', // @translate
-                'PslSearchForm', 'Advanced Search'
-            );
-            $messenger->addWarning($message);
         }
     }
 

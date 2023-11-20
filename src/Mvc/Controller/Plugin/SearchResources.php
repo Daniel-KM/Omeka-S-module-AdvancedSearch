@@ -338,7 +338,7 @@ class SearchResources extends AbstractPlugin
                 if (is_int($value)) {
                     $value = [(string) $value];
                 } elseif (is_string($value)) {
-                    $value = strpos($value, ',')  === false? [$value] : explode(',', $value);
+                    $value = strpos($value, ',') === false ? [$value] : explode(',', $value);
                 } elseif (!is_array($value)) {
                     $value = [];
                 }
@@ -560,7 +560,7 @@ class SearchResources extends AbstractPlugin
                 if (is_int($value)) {
                     $value = [(string) $value];
                 } elseif (is_string($value)) {
-                    $value = strpos($value, ',')  === false? [$value] : explode(',', $value);
+                    $value = strpos($value, ',') === false ? [$value] : explode(',', $value);
                 } elseif (!is_array($value)) {
                     $value = [];
                 }
@@ -860,7 +860,7 @@ class SearchResources extends AbstractPlugin
             if (is_int($ids)) {
                 $ids = [(string) $ids];
             } elseif (is_string($ids)) {
-                $ids = strpos($ids, ',')  === false? [$ids] : explode(',', $ids);
+                $ids = strpos($ids, ',') === false ? [$ids] : explode(',', $ids);
             } elseif (!is_array($ids)) {
                 $ids = [];
             }
@@ -1118,7 +1118,7 @@ class SearchResources extends AbstractPlugin
                 $valuesAlias = $previousAlias;
                 $usePrevious = true;
             } else {
-                $valuesAlias = $this->adapter->createAlias();;
+                $valuesAlias = $this->adapter->createAlias();
                 $usePrevious = false;
             }
 

@@ -210,7 +210,7 @@ class SearchFilters extends AbstractHelper
                     if (!is_array($value)) {
                         $value = [$value];
                     }
-                    $filterLabel = $translate('Item set'); // @translate
+                    $filterLabel = $translate('In item set'); // @translate
                     foreach ($value as $subKey => $subValue) {
                         if (!is_numeric($subValue)) {
                             continue;
@@ -335,7 +335,8 @@ class SearchFilters extends AbstractHelper
                     break;
 
                 case 'is_public':
-                    $filters[$translate('Visibility')][$this->urlQuery($key)] = $value
+                    $filterLabel = $translate('Visibility'); // @translate
+                    $filters[$filterLabel][$this->urlQuery($key)] = $value
                         ? $translate('Public') // @translate
                         : $translate('Not public'); // @translate
                     break;
@@ -382,7 +383,7 @@ class SearchFilters extends AbstractHelper
                     if (is_int($ids)) {
                         $ids = [(string) $ids];
                     } elseif (is_string($ids)) {
-                        $ids = strpos($ids, ',')  === false? [$ids] : explode(',', $ids);
+                        $ids = strpos($ids, ',') === false ? [$ids] : explode(',', $ids);
                     } elseif (!is_array($ids)) {
                         $ids = [];
                     }

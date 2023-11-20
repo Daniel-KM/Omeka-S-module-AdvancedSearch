@@ -52,17 +52,6 @@ class SiteSettingsFieldset extends Fieldset
             ->setAttribute('id', 'advanced-search')
             ->setOption('element_groups', $this->elementGroups)
             ->add([
-                'name' => 'advancedsearch_note_core',
-                'type' => AdvancedSearchElement\Note::class,
-                'options' => [
-                    'element_group' => 'search',
-                    'text' => 'Core advanced search page', // @translate
-                ],
-                'attributes' => [
-                    'style' => 'font-weight: bold; font-style: italic; margin: 0 0 16px;',
-                ],
-            ])
-            ->add([
                 'name' => 'advancedsearch_search_fields',
                 'type' => AdvancedSearchElement\OptionalMultiCheckbox::class,
                 'options' => [
@@ -77,17 +66,6 @@ class SiteSettingsFieldset extends Fieldset
                 ],
             ])
 
-            ->add([
-                'name' => 'advancedsearch_note_page',
-                'type' => AdvancedSearchElement\Note::class,
-                'options' => [
-                    'element_group' => 'advanced_search',
-                    'text' => 'Module search pages', // @translate
-                ],
-                'attributes' => [
-                    'style' => 'font-weight: bold; font-style: italic; margin: 16px 0;',
-                ],
-            ])
             ->add([
                 'name' => 'advancedsearch_main_config',
                 'type' => AdvancedSearchElement\OptionalSelect::class,

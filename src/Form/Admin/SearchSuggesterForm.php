@@ -81,14 +81,6 @@ class SearchSuggesterForm extends Form
 
         $isInternal = (bool) $this->getOption('is_internal');
         if (!$isInternal) {
-            $fieldset
-                ->add([
-                    'name' => 'note',
-                    'type' => AdvancedSearchElement\Note::class,
-                    'options' => [
-                        'text' => 'Only the internal adapter can have settings for now. For external suggesters, use the direct url in the search config.', // @translate
-                    ],
-                ]);
             return;
         }
 

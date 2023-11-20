@@ -7,27 +7,20 @@
 $translate = $this->plugin('translate');
 ?>
 
-<div id="hasthumbnails-queries" class="field" role="group" aria-labelledby="by-has-thumbnails-label">
-    <div class="field-meta">
-        <span id="by-has-thumbnails-label" class="label"><?= $translate('Has thumbnails') ?></span>
-    </div>
-    <div class="inputs">
-        <div class="value">
-            <?php
-            $select = (new \Laminas\Form\Element\Radio())
-                ->setName('has_thumbnails')
-                ->setValueOptions([
-                    '1' => 'Yes', // @translate
-                    '0' => 'No', // @translate
-                    '' => 'Any', // @translate
-                ])
-                ->setAttributes([
-                    'class' => 'query-has-thumbnails',
-                    'value' => $query['has_thumbnails'] ?? '',
-                    'aria-label' => $translate('Has thumbnails'), // @translate
-                ]);
-            echo $this->formRadio($select);
-            ?>
-        </div>
-    </div>
-</div>
+<?php
+$element = new \Laminas\Form\Element\Radio('has_thumbnails');
+$element
+    ->setLabel('Presence of thumbnails') // @translate
+    ->setValueOptions([
+        '1' => 'Has thumbnails', // @translate
+        '0' => 'Has no thumbnails', // @translate
+        '' => 'Any', // @translate
+    ])
+    ->setValue($query['has_thumbnails'] ?? '')
+    ->setAttributes([
+        'id' => 'has_thumbnails',
+        'class' => 'query-has-thumbnails',
+        'value' => $query['has_thumbnails'] ?? '',
+        'aria-label' => $translate('Search by presence of thumbnails'), // @translate
+    ]);
+echo $this->formRow($element);

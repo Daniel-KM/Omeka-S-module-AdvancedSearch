@@ -623,14 +623,12 @@ class Module extends AbstractModule
     }
 
     /**
-     * Display the advanced search form via partial.
+     * Display the advanced search form via partial for sites.
      *
      * @param Event $event
      */
     public function displayAdvancedSearch(Event $event): void
     {
-        // Adapted from the advanced-search/properties.phtml template.
-
         // The advanced search form can be used anywhere, so load it in all cases.
         $view = $event->getTarget();
         $assetUrl = $view->plugin('assetUrl');
@@ -648,6 +646,8 @@ class Module extends AbstractModule
             $view->headScript()
                 ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.js', 'Omeka'), 'text/javascript', ['defer' => 'defer']);
         }
+
+        // Adapted from the advanced-search/properties.phtml template.
 
         $query = $event->getParam('query', []);
 

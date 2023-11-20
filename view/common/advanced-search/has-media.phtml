@@ -2,32 +2,29 @@
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var array $query
+ *
+ * Same as core template, with:
+ * - use radio
+ * - short echo.
  */
 
 $translate = $this->plugin('translate');
 ?>
 
-<div id="hasmedia-queries" class="field" role="group" aria-labelledby="by-has-media-label">
-    <div class="field-meta">
-        <span id="by-has-media-label" class="label"><?= $translate('Has media') ?></span>
-    </div>
-    <div class="inputs">
-        <div class="value">
-            <?php
-            $select = (new \Laminas\Form\Element\Radio())
-                ->setName('has_media')
-                ->setValueOptions([
-                    '1' => 'Yes', // @translate
-                    '0' => 'No', // @translate
-                    '' => 'Any', // @translate
-                ])
-                ->setAttributes([
-                    'class' => 'query-has-media',
-                    'value' => $query['has_media'] ?? '',
-                    'aria-label' => $translate('Has media'), // @translate
-                ]);
-            echo $this->formRadio($select);
-            ?>
-        </div>
-    </div>
-</div>
+<?php
+$element = new \Laminas\Form\Element\Radio('has_media');
+$element
+    ->setLabel('Search by media presence') // @translate
+    ->setValueOptions([
+        '1' => 'Has media', // @translate
+        '0' => 'Has no media', // @translate
+        '' => 'Any', // @translate
+    ])
+    ->setValue($query['has_media'] ?? '')
+    ->setAttributes([
+        'id' => 'has_media',
+        'class' => 'query-has-media',
+        'value' => $query['has_media'] ?? '',
+        'aria-label' => $translate('Search by media presence'), // @translate
+    ]);
+echo $this->formRow($element);

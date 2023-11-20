@@ -10,16 +10,21 @@
  */
 
 $plugins = $this->getHelperPluginManager();
+$status = $plugins->get('status');
 $translate = $plugins->get('translate');
 $hyperlink = $plugins->get('hyperlink');
+$siteSetting = $plugins->get('siteSetting');
 $resourceTemplateSelect = $plugins->get('resourceTemplateSelect');
+
+$isSiteRequest = $status->isSiteRequest();
+$applyTemplates = $isSiteRequest ? $siteSetting('search_apply_templates') : false;
 
 // Prepare the resource template query.
 $ids = $query['resource_template_id'] ?? [];
 if (!is_array($ids)) {
     $ids = [$ids];
 }
-$ids = array_filter($ids, 'is_numeric') ?: [null];
+$ids = array_filter($ids) ?: [null];
 ?>
 
 <div id="resource-templates" class="field removable multi-value" role="group">
@@ -40,6 +45,7 @@ $ids = array_filter($ids, 'is_numeric') ?: [null];
                     'prepend_value_options' => [
                         '0' => '[none]',
                     ],
+                    'apply_templates' => $applyTemplates,
                 ],
                 'attributes' => [
                     'value' => $id,

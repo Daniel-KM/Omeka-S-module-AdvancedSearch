@@ -378,3 +378,20 @@ if (version_compare($oldVersion, '3.4.14', '<')) {
     );
     $messenger->addWarning($message);
 }
+
+if (version_compare($oldVersion, '3.4.15', '<')) {
+    $sql = <<<'SQL'
+DELETE FROM `site_setting`
+WHERE `id` = "advancedsearch_restrict_used_terms";
+SQL;
+
+    $message = new Message(
+        'The performance was improved in many places, in particular for large databases.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new Message(
+        'It is now possible to order results by a list of ids with argument "sort_by=ids".' // @translate
+    );
+    $messenger->addSuccess($message);
+}

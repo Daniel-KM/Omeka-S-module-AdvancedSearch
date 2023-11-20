@@ -30,11 +30,15 @@
 
 namespace AdvancedSearch\FormAdapter;
 
+use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
+
 interface FormAdapterInterface
 {
     public function getLabel(): string;
 
-    public function setForm(?\Laminas\Form\Form $form): \AdvancedSearch\FormAdapter\FormAdapterInterface;
+    public function setSearchConfig(?SearchConfigRepresentation $searchConfig): \AdvancedSearch\FormAdapter\FormAdapterInterface;
+
+    public function getConfigFormClass(): ?string;
 
     public function getForm(): ?\Laminas\Form\Form;
 
@@ -52,7 +56,18 @@ interface FormAdapterInterface
 
     public function getFormPartial(): ?string;
 
-    public function getConfigFormClass(): ?string;
+    /**
+     * Render the form.
+     *
+     * @param array $options Default keys:
+     *   - template (string): Use a specific template instead of the default one.
+     *   This is the template of the form, not the main template of the search page.
+     *   - skip_form_action (bool): Don't set form action, so use the current page.
+     *   - skip_partial_headers (bool): Skip partial headers.
+     *   Other options are passed to the partial.
+     * @return string Html form.
+     */
+    public function renderForm(array $options = []): string;
 
     /**
      * Convert a user query from a form into a search query via a form mapping.

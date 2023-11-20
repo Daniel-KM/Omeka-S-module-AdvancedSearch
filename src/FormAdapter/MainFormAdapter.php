@@ -31,23 +31,11 @@ namespace AdvancedSearch\FormAdapter;
 
 class MainFormAdapter extends AbstractFormAdapter implements FormAdapterInterface
 {
-    public function getLabel(): string
-    {
-        return 'Main'; // @translate
-    }
+    protected $formClass = \AdvancedSearch\Form\MainSearchForm::class;
 
-    public function getFormClass(): ?string
-    {
-        return \AdvancedSearch\Form\MainSearchForm::class;
-    }
+    protected $formPartial = 'search/search-form-main';
 
-    public function getFormPartialHeaders(): ?string
-    {
-        return 'search/search-form-main-headers';
-    }
+    protected $formPartialHeaders = 'search/search-form-main-headers';
 
-    public function getFormPartial(): ?string
-    {
-        return 'search/search-form-main';
-    }
+    protected $label = 'Main'; // @translate
 }

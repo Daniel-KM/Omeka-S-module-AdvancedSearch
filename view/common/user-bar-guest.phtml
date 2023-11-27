@@ -4,6 +4,7 @@
  * @var \Omeka\Api\Representation\SiteRepresentation $site
  * @var \Omeka\Entity\User $user
  * @var array $links
+ * @var string|null $userLocale
  */
 
 $plugins = $this->getHelperPluginManager();
@@ -35,12 +36,12 @@ $this->headLink()
             $url = $isGuest
                 ? ($hasGuest ? $urlHelper('site/guest', ['site-slug' => $site->slug(), 'action' => 'me']) : '')
                 : $urlHelper('admin/id', ['controller' => 'user', 'id' => $user->getId()]);
-            echo sprintf($translate('Signed in as %s'), $url && ($hasGuest || !$isGuest) ? $hyperlink($user->getName(), $url) : $user->getName());
+            echo sprintf($translate('Signed in as %s', null, $userLocale), $url && ($hasGuest || !$isGuest) ? $hyperlink($user->getName(), $url) : $user->getName());
             ?>
         </span>
         <?php
         $url = $hasGuest ? $urlHelper('site/guest/guest', ['site-slug' => $site->slug(), 'action' => 'logout'], ['query' => $this->params()->fromQuery() ?: []], true) : $urlHelper('logout');
-        echo $hyperlink($translate('Logout'), $url, ['class' => 'logout']);
+        echo $hyperlink($translate('Logout', null, $userLocale), $url, ['class' => 'logout']);
         ?>
     </div>
 <?php else: ?>

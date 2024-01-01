@@ -309,28 +309,28 @@ $(document).ready(function() {
             ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'resq', 'nresq', 'lex', 'nlex', 'lkq', 'nlkq', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu'].includes(queryType.val()));
     };
 
+    /**
+     * Add chosen-select when possible.
+     */
     if (hasChosenSelect) {
         /**
          * @see application/asset/js/chosen-options.js
          */
-        var chosenOptions = chosenOptions || {
-            allow_single_deselect: true,
-            disable_search_threshold: 10,
-            width: '100%',
-            include_group_label_in_selected: true,
-        };
-        $('.chosen-select').chosen(chosenOptions);
+        var chosenOptions = chosenOptions || Search.chosenOptions;
+        // Group labels are too long for sidebar selects.
+        var chosenOptionsSidebar = chosenOptions;
+        chosenOptionsSidebar.include_group_label_in_selected = false;
 
-        $('body.search').find('#resource-templates .value select, #item-sets .value select, #site_id, #owner_id, #datetime-queries .value select')
-            .addClass('chosen-select').chosen(chosenOptions);
-        $('#property-queries, #resource-class').on('o:value-created', '.value', function(e) {
-            $('.chosen-select').chosen(chosenOptions);
-        });
-        $('#resource-templates, #item-sets').on('o:value-created', '.value', function(e) {
-            $(this).find('select').addClass('chosen-select').chosen(chosenOptions);
-        });
-        $('#datetime-queries').on('o:value-created', '.value', function(e) {
-            $(this).find('select').addClass('chosen-select').chosen(chosenOptions);
+        $('#advanced-search').find('#property-queries .value select, #resource-class .value select, #resource-templates .value select, #item-sets .value select, #datetime-queries .value select, select#site_id, select#owner_id')
+            .addClass('chosen-select');
+        $('#advanced-search select.chosen-select').chosen(chosenOptions);
+        $('#advanced-search select.chosen-select option[value=""][selected]').prop('selected',  false).parent().trigger('chosen:updated');
+
+        $(document).on('o:value-created', '#property-queries .value, #resource-class .value, #resource-templates .value, #item-sets .value, #datetime-queries .value', function(e) {
+            const newValue = $(this);
+            newValue.find('select').chosen('destroy');
+            newValue.find('.chosen-container').remove();
+            newValue.find('select').addClass('chosen-select').chosen(chosenOptions);
         });
     }
 
@@ -347,7 +347,7 @@ $(document).ready(function() {
      * Handle clearing fields on new property multi-value.
      * @see application/asset/js/advanced-search.js.
      */
-    $(document).on('o:value-created', '.value', function(e) {
+    $(document).on('o:value-created', '#property-queries .value', function(e) {
         // In advanced-search.js, "children" is used, but it is not possible here,
         // because a div is inserted to manage sub-query form.
         // Furthermore, there is a hidden input.
@@ -359,21 +359,21 @@ $(document).ready(function() {
             newValue.find(".query-type option[value='lkq']").remove();
             newValue.find(".query-type option[value='nlkq']").remove();
             newValue.find('.query-form-element').remove();
+        } else {
+            newValue.find('.query-form-element').attr('data-query', '').hide();
+            newValue.find('.query-form-element input[type="hidden"]').val(null);
+            newValue.find('.query-form-element .search-filters').empty().html(Omeka.jsTranslate('[Edit below]'));
         }
         newValue.children().children('input[type="text"]').val(null);
         newValue.children().children('select').prop('selectedIndex', 0);
         newValue.children().children('.query-property').find('option:selected').prop('selected', false);
+        disableQueryTextInput(newValue.find('.query-type'));
         if (hasChosenSelect) {
             if (isSidebar) {
-                var chosenOptions = Search.chosenOptions;
-                chosenOptions.include_group_label_in_selected = false;
-                newValue.children().children('select.chosen-select').chosen(chosenOptions);
+                newValue.children().children('select.chosen-select').chosen(chosenOptionsSidebar);
             }
             newValue.children().children('select.chosen-select').trigger('chosen:updated');
         }
-        newValue.find('.query-form-element').attr('data-query', '').hide();
-        newValue.find('.query-form-element input[type="hidden"]').val(null);
-        newValue.find('.query-form-element .search-filters').empty().html(Omeka.jsTranslate('[Edit below]'));
         --Omeka.propertySearchIndex;
         newValue.find(':input').attr('name', function () {
             return this.name.replace(/\[\d\]/, '[' + Omeka.propertySearchIndex + ']');
@@ -387,16 +387,17 @@ $(document).ready(function() {
      */
     $(document).on('o:sidebar-content-loaded', '#query-sidebar-edit', function(e) {
         // Don't allow sub-sub-queries for now.
-        $(this).find(".query-type option[value='resq']").remove();
-        $(this).find(".query-type option[value='nresq']").remove();
-        $(this).find(".query-type option[value='lkq']").remove();
-        $(this).find(".query-type option[value='nlkq']").remove();
-        $(this).find('.query-form-element').remove();
+        const sidebar = $(this);
+        sidebar.find(".query-type option[value='resq']").remove();
+        sidebar.find(".query-type option[value='nresq']").remove();
+        sidebar.find(".query-type option[value='lkq']").remove();
+        sidebar.find(".query-type option[value='nlkq']").remove();
+        sidebar.find('.query-form-element').remove();
         if (hasChosenSelect) {
-            // Group labels are too long for sidebar selects.
-            var chosenOptions = Search.chosenOptions;
-            chosenOptions.include_group_label_in_selected = false;
-            $(this).find('select.chosen-select').chosen(chosenOptions);
+            sidebar.find('select.item-set-select-type, select#site_id, select#owner_id').addClass('chosen-select');
+            sidebar.find('select.chosen-select').chosen(chosenOptionsSidebar);
+            sidebar.find('select.chosen-select option[value=""][selected]').prop('selected',  false).parent().trigger('chosen:updated');
+            sidebar.find('select.chosen-select').trigger('chosen:update');
         }
     });
 });

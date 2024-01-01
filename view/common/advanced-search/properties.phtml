@@ -89,6 +89,10 @@ if ($isSiteRequest) {
             $propertyList = isset($property['property'])
                 ? (is_array($property['property']) ? $property['property'] : [$property['property']])
                 : [null];
+            $isSubQuery = in_array($property['type'] ?? null, ['resq', 'nresq', 'lkq', 'nlkq']) && isset($property['text']) ? $property['text'] : null;
+            $queryInput
+                ->setName($stem . '[text]')
+                ->setValue($isSubQuery ? $property['text'] : null);
         ?>
         <div class="value">
             <div class="value-common value-fields">
@@ -153,12 +157,11 @@ if ($isSiteRequest) {
                 <?= $queryOption('dtp', $property, 'type', $translate('has data type')) ?>
                 <?= $queryOption('ndtp', $property, 'type', $translate('has not data type')) ?>
             </select>
-            <?= $queryText($property, $index) ?>
+            <?= $queryText($isSubQuery ? [] : $property, $index) ?>
             <button type="button" class="o-icon-delete remove-value button" aria-label="<?= $translate('Remove value') ?>" title="<?= $translate('Remove value') ?>"></button>
             </div>
             <div class="value-common sub-query">
-                <?php $queryInput->setValue(in_array($property['type'] ?? null, ['resq', 'nresq', 'lkq', 'nlkq']) && isset($property['text']) ? $property['text'] : null); ?>
-                <?= $formQuery($queryInput->setName($stem . '[text]')) ?>
+                <?= $formQuery($queryInput) ?>
             </div>
         </div>
         <?php

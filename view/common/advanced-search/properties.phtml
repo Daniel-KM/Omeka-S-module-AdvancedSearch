@@ -17,6 +17,7 @@ $escape = $plugins->get('escapeHtml');
 $translate = $plugins->get('translate');
 $siteSetting = $plugins->get('siteSetting');
 $formQuery = $plugins->get('formQuery');
+$formSelect = $plugins->get('formSelect');
 $queryInput = $plugins->get('queryInput');
 $propertySelect = $plugins->get('propertySelect');
 $dataTypeHelper = $plugins->get('dataType');
@@ -27,6 +28,22 @@ $usedTerms = $isSiteRequest ? false : $setting('advancedsearch_restrict_used_ter
 
 $resourceTypesToNames = ['item' => 'items', 'item-set' => 'item_sets', 'media' => 'media'];
 $resourceName = $resourceTypesToNames[$this->resourceType ?? null] ?? 'items';
+
+$selectMainDataType = new \Laminas\Form\Element\Select;
+$selectMainDataType
+    ->setOptions([
+        'empty_option' => '',
+        'value_options' => [
+            'literal' => 'literal', // @translate
+            'resource' => 'resource', // @translate
+            'uri' => 'uri', // @translate
+        ],
+    ])
+    ->setAttributes([
+        'class' => 'query-text query-main-type chosen-select',
+        'aria-label' => $translate('Properties'), // @translate
+        'data-placeholder' => 'Select main data type…', // @translate
+    ]);
 
 $queryInput = $queryInput();
 $queryInput->setOption('query_resource_type', $resourceName);
@@ -147,10 +164,8 @@ if ($isSiteRequest) {
                 <?= $queryOption('nlkq', $property, 'type', $translate('is not linked with resources matching query')) ?>
                 <?= $queryOption('dtp', $property, 'type', $translate('has data type')) ?>
                 <?= $queryOption('ndtp', $property, 'type', $translate('has not data type')) ?>
-                <?php /* // TODO Require a js to force value to be "literal", "uri" or "resource". ?>
                 <?= $queryOption('tp', $property, 'type', $translate('has main type')) ?>
                 <?= $queryOption('ntp', $property, 'type', $translate('has not main type')) ?>
-                <?php */ ?>
                 <?= $queryOption('tpl', $property, 'type', $translate('has type literal-like')) ?>
                 <?= $queryOption('ntpl', $property, 'type', $translate('has not type literal-like')) ?>
                 <?= $queryOption('tpr', $property, 'type', $translate('has type resource-like')) ?>
@@ -160,6 +175,7 @@ if ($isSiteRequest) {
             </select>
             <?= $queryText($isSubQuery ? [] : $property, $index) ?>
             <?= $dataTypeHelper->getSelect($stem . '[text]', "property[$index][text]" ?? null, ['multiple' => false, 'class' => 'query-text query-data-type chosen-select', 'aria-label' => 'Data types', 'data-placeholder' => $translate('Select data type…')]) // TODO Manage search on property for multiple data types. ?>
+            <?= $formSelect($selectMainDataType->setName($stem . '[text]')->setValue("property[$index][text]" ?? null)) ?>
             <button type="button" class="o-icon-delete remove-value button" aria-label="<?= $translate('Remove value') ?>" title="<?= $translate('Remove value') ?>"></button>
             </div>
             <div class="value-common sub-query">

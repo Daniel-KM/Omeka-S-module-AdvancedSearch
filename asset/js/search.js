@@ -120,8 +120,6 @@ var Search = (function() {
 
 $(document).ready(function() {
 
-    const hasChosenSelect = typeof $.fn.chosen === 'function';
-
     /**
      * When the simple and the advanced form are the same form.
      */
@@ -299,26 +297,29 @@ $(document).ready(function() {
      */
 
     /**
-     * Disable query text according to some query types without values.
+     * Handle query text according to some query types.
      * @see application/asset/js/global.js
      */
     function disableQueryTextInput(queryType) {
         queryType = queryType ? queryType : $(this);
-        const queryText = queryType.siblings('.query-text');
+        const typeQuery = queryType.val();
+        const isTypeWithoutText = ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'lex', 'nlex', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu'].includes(typeQuery);
+        const isTypeSubQuery = ['resq', 'nresq', 'lkq', 'nlkq'].includes(typeQuery);
+        const isTypeDataType = ['dtp', 'ndtp'].includes(typeQuery);
+        const isTypeMainType = ['tp', 'ntp'].includes(typeQuery);
+        const queryTextInput = queryType.siblings('.query-text:not(.query-data-type):not(.query-main-type)');
         const queryTextDataType = queryType.siblings('.query-data-type');
-        queryText.prop('disabled',
-            ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'resq', 'nresq', 'lex', 'nlex', 'lkq', 'nlkq', 'dtp', 'ndtp', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu'].includes(queryType.val()));
-        const isTypeDataType = ['dtp', 'ndtp'].includes(queryType.val());
+        const queryTextMainType = queryType.siblings('.query-main-type');
+        queryTextInput.prop('disabled', isTypeWithoutText || isTypeSubQuery || isTypeDataType || isTypeMainType);
         queryTextDataType.prop('disabled', !isTypeDataType);
+        queryTextMainType.prop('disabled', !isTypeMainType);
         if (hasChosenSelect) {
             queryTextDataType.chosen('destroy');
             queryTextDataType.find('+ .chosen-container').remove();
-            if (isTypeDataType) {
-                queryTextDataType.show();
-                queryTextDataType.chosen(chosenOptions);
-            } else {
-                queryTextDataType.hide();
-            }
+            queryTextDataType.chosen(chosenOptions);
+            queryTextMainType.chosen('destroy');
+            queryTextMainType.find('+ .chosen-container').remove();
+            queryTextMainType.chosen(chosenOptions);
         }
     };
 
@@ -412,6 +413,7 @@ $(document).ready(function() {
             sidebar.find('select.chosen-select option[value=""][selected]').prop('selected',  false).parent().trigger('chosen:updated');
             sidebar.find('select.chosen-select').trigger('chosen:update');
         }
-        disableQueryTextInput($(this).find('.query-type'));
+        disableQueryTextInput(sidebar.find('.query-type'));
     });
+
 });

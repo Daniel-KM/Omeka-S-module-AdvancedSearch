@@ -2,6 +2,15 @@
  * Manage the improvements of the standard advanced search.
  */
 
+/**
+ * Improve methods "disableQueryTextInput" and "cleanSearchQuery"
+ * of Omeka from application/asset/js/global.js.
+ * In some themes or pages, the js variable Omeka may be missing.
+ */
+var Omeka = Omeka || {
+    jsTranslate: function(str) { return str; },
+};
+
 $(document).ready(function() {
 
     const hasChosenSelect = typeof $.fn.chosen === 'function';
@@ -26,9 +35,9 @@ $(document).ready(function() {
 
     /**
      * Handle query text according to some query types.
-     * @see application/asset/js/global.js
+     * @see application/asset/js/global.js Omeka.disableQueryTextInput()
      */
-    function disableQueryTextInput(queryType) {
+    Omeka.handleQueryTextInput = function(queryType) {
         queryType = queryType ? queryType : $(this);
         const typeQuery = queryType.val();
         const isTypeWithoutText = ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'lex', 'nlex', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu'].includes(typeQuery);
@@ -83,13 +92,15 @@ $(document).ready(function() {
         });
     }
 
+    // Skip core functions (global.js), since is is improved above.
+    $(document).off('change', '.query-type');
     $(document).on('change', '.query-type', function () {
-         disableQueryTextInput($(this));
+         Omeka.handleQueryTextInput($(this));
     });
 
     // Updating querying should be done on load too.
     $('#property-queries .query-type').each(function() {
-         disableQueryTextInput($(this));
+         Omeka.handleQueryTextInput($(this));
     });
 
     /**
@@ -116,7 +127,7 @@ $(document).ready(function() {
         newValue.children().children('input[type="text"]').val(null);
         newValue.children().children('select').prop('selectedIndex', 0);
         newValue.children().children('.query-property').find('option:selected').prop('selected', false);
-        disableQueryTextInput(newValue.find('.query-type'));
+        Omeka.handleQueryTextInput(newValue.find('.query-type'));
         if (hasChosenSelect) {
             if (isSidebar) {
                 newValue.children().children('select.chosen-select').chosen(chosenOptionsSidebar);
@@ -148,7 +159,7 @@ $(document).ready(function() {
             sidebar.find('select.chosen-select option[value=""][selected]').prop('selected',  false).parent().trigger('chosen:updated');
             sidebar.find('select.chosen-select').trigger('chosen:update');
         }
-        disableQueryTextInput(sidebar.find('.query-type'));
+        Omeka.handleQueryTextInput(sidebar.find('.query-type'));
     });
 
 });

@@ -91,10 +91,10 @@ if ($isSiteRequest) {
                     'value' => $propertyList,
                     'aria-label' => $translate('Properties'), // @translate
                     'multiple' => true,
-                    'data-placeholder' => 'Select properties…', // @translate
+                    'data-placeholder' => '[any property]', // @translate
                 ],
                 'options' => [
-                    'empty_option' => '[Any Property]', // @translate
+                    'empty_option' => '',
                     'apply_templates' => $applyTemplates,
                     'query' => $optionsQuery,
                     // Used terms in site are already managed by vocabulary scope, but only for items.

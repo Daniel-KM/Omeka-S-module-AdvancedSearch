@@ -309,26 +309,4 @@ $(document).ready(function() {
          disableQueryTextInput($(this));
     });
 
-    /**
-     * Avoid to select "All properties" in the advanced search form by default.
-     * It should be done on load for empty request and on append for new fields.
-     * @see application/asset/js/advanced-search.js.
-     */
-    const propertyValues = $('body.search #advanced-search #property-queries .inputs > .value');
-    if (propertyValues.length === 1) {
-        const searchParams = new URLSearchParams(document.location.search);
-        if ((!searchParams.has('property[0][property]') && !searchParams.has('property[0][property][0]') && !searchParams.has('property[0][property][]'))
-            || (['', 'eq'].includes(searchParams.get('property[0][type]')) && searchParams.get('property[0][text]') === '')
-        ) {
-            const selectProperty = $(propertyValues[0]).find('.query-property');
-            selectProperty.find('option:selected').prop('selected', false);
-            selectProperty.trigger('chosen:updated');
-        }
-    }
-    $(document).on('click', '#property-queries.multi-value .add-value', function(e) {
-        const selectProperty = $(this).closest('#property-queries').find('.inputs > .value:last-child .query-property');
-        selectProperty.find('option:selected').prop('selected', false);
-        selectProperty.trigger('chosen:updated');
-    });
-
 });

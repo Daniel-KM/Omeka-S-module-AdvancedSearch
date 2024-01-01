@@ -346,6 +346,7 @@ return [
         // Override internals assets. Only for Omeka assets: modules can use another filename.
         'internals' => [
             'js/global.js' => 'AdvancedSearch',
+            'js/query-form.js' => 'AdvancedSearch',
         ],
     ],
     'js_translate_strings' => [

@@ -64,6 +64,7 @@ return [
             'easyMeta' => Service\ViewHelper\EasyMetaFactory::class,
             'matchedRouteName' => Service\ViewHelper\MatchedRouteNameFactory::class,
             'mediaTypeSelect' => Service\ViewHelper\MediaTypeSelectFactory::class,
+            'queryInput' => Service\ViewHelper\QueryInputFactory::class,
             'searchEngineConfirm' => Service\ViewHelper\SearchEngineConfirmFactory::class,
             'searchSuggesterConfirm' => Service\ViewHelper\SearchSuggesterConfirmFactory::class,
             // Allow to call EasyMeta, used in AdvancedSearch and Annotate.

@@ -17,6 +17,7 @@ $escape = $plugins->get('escapeHtml');
 $translate = $plugins->get('translate');
 $siteSetting = $plugins->get('siteSetting');
 $formQuery = $plugins->get('formQuery');
+$queryInput = $plugins->get('queryInput');
 $propertySelect = $plugins->get('propertySelect');
 
 $isSiteRequest = $status->isSiteRequest();
@@ -26,9 +27,7 @@ $usedTerms = $isSiteRequest ? false : $setting('advancedsearch_restrict_used_ter
 $resourceTypesToNames = ['item' => 'items', 'item-set' => 'item_sets', 'media' => 'media'];
 $resourceName = $resourceTypesToNames[$this->resourceType ?? null] ?? 'items';
 
-// TODO Add a view helper to get the Omeka form element Query (or any other way).
-/** @var \Omeka\Form\Element\Query $queryInput */
-$queryInput = $this->api()->read('vocabularies', 1)->getContent()->getServiceLocator()->get('FormElementManager')->get(\Omeka\Form\Element\Query::class);
+$queryInput = $queryInput();
 $queryInput->setOption('query_resource_type', $resourceName);
 if ($this->site) {
     $queryInput->setOption('query_preview_append_query', ['site_id' => $this->site->id()]);

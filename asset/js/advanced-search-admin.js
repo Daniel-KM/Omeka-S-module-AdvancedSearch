@@ -1,3 +1,6 @@
+/**
+ * Manage the simple search field in admin board.
+ */
 $(document).ready(function() {
 
     var searchHtml = `

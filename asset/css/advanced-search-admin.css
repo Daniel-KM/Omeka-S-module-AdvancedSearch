@@ -1,4 +1,7 @@
-/* Adaptation from application/asset/sass/_screen.scss */
+/**
+ * Manage the simple search field in admin board.
+ * Adapted from application/asset/sass/_screen.scss
+ */
 @media screen {
     #search-form-quick {
         width: 100%;
@@ -71,101 +74,5 @@
 
     input[type=submit][disabled] {
         cursor: unset;
-    }
-
-    #advanced-search .item-set-select-type + .chosen-container {
-        margin: .25rem .25rem 0 0;
-        max-width: 25%;
-    }
-    #advanced-search .item-set-select + .chosen-container {
-        margin: .25rem .25rem 0 0;
-    }
-    #advanced-search.advanced-search-sidebar .item-set-select-type,
-    #advanced-search.advanced-search-sidebar .item-set-select-type + .chosen-container {
-        margin: 0 0 .25rem 0;
-        max-width: fit-content;
-    }
-    #advanced-search.advanced-search-sidebar .item-set-select,
-    #advanced-search.advanced-search-sidebar .item-set-select + .chosen-container {
-        margin: 0 0 .25rem 0;
-        max-width: initial;
-    }
-    #advanced-search #datetime-queries .value {
-        align-items: baseline;
-        gap: 0.25rem;
-    }
-    #advanced-search #property-queries .inputs > .value .joiner + .chosen-container,
-    #advanced-search #datetime-queries .inputs > .value .joiner + .chosen-container {
-        max-width: fit-content;
-    }
-
-    #advanced-search #property-queries .query-text:disabled,
-    #advanced-search #property-queries .chosen-disabled,
-    #advanced-search #property-queries.multi-value .value:first-child .joiner:first-of-type,
-    #advanced-search #property-queries.multi-value .value:first-child .chosen-container:first-of-type,
-    #advanced-search #datetime-queries .query-text:disabled,
-    #advanced-search #datetime-queries.multi-value .value:first-child .joiner:first-of-type
-    #advanced-search #datetime-queries.multi-value .value:first-child .chosen-container:first-of-type {
-       display: none;
-    }
-    #advanced-search .inputs .chosen-choices li.search-choice span {
-        padding: 4px;
-    }
-
-    #advanced-search #property-queries .chosen-container-multi .chosen-choices .search-choice {
-        max-width: 24em;
-    }
-
-    #advanced-search #property-queries .query-form-element {
-        display: none;
-    }
-    #advanced-search #property-queries .query-text.hide {
-        display: none;
-    }
-
-    #advanced-search #property-queries .inputs > .value {
-        display: flex;
-        flex-direction: column;
-        gap: .25rem 0;
-    }
-    #advanced-search .inputs > .value .value-fields {
-        display: flex;
-        flex-wrap: wrap;
-        flex-direction: row;
-        align-items: center;
-        gap: .25rem;
-    }
-    #advanced-search .inputs > .value .value-fields .chosen-container,
-    #advanced-search .inputs > .value .value-fields .query-text {
-        flex: 1;
-    }
-
-    #advanced-search .inputs > .value .sub-query {
-        width: 100%;
-    }
-    #advanced-search .inputs > .value .sub-query .query-display {
-        min-height: 35px;
-    }
-    #advanced-search .inputs > .value .sub-query .query-form-element {
-        flex: 1;
-        margin-top: 0.25rem;
-        margin-bottom: 0.5rem;
-    }
-
-    #advanced-search.advanced-search-sidebar .inputs > .value .value-fields {
-        flex-direction: column;
-        align-items: initial;
-    }
-    #advanced-search.advanced-search-sidebar .inputs > .value .value-fields > * {
-        margin: 0;
-    }
-    #advanced-search.advanced-search-sidebar .inputs label.type-radio,
-    #advanced-search.advanced-search-sidebar #mapping-geographic-location .inputs label {
-        margin: auto;
-        padding: initial;
-    }
-    #advanced-search.advanced-search-sidebar .inputs label.type-radio::after,
-    #advanced-search.advanced-search-sidebar #mapping-geographic-location .inputs label::after {
-        background: initial;
     }
 }

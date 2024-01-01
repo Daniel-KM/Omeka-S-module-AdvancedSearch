@@ -631,25 +631,29 @@ class Module extends AbstractModule
      */
     public function displayAdvancedSearch(Event $event): void
     {
-        // The advanced search form can be used anywhere, so load it in all cases.
         $view = $event->getTarget();
-        $assetUrl = $view->plugin('assetUrl');
-        $view->headScript()
-            ->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
-        if ($view->status()->isAdminRequest()) {
-            // For the main search field in the left sidebar in admin.
-            $view->headLink()
-                ->appendStylesheet($assetUrl('css/advanced-search-admin.css', 'AdvancedSearch'));
-            $view->headScript()
-                ->appendFile($assetUrl('js/advanced-search-admin.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
-        } else {
-            $view->headLink()
+
+        $plugins = $view->getHelperPluginManager();
+        $status = $plugins->get('status');
+        $assetUrl = $plugins->get('assetUrl');
+        $headLink = $plugins->get('headLink');
+        $headScript = $plugins->get('headScript');
+
+        // Include chosen-select in sites.
+        $isSite = $status->isSiteRequest();
+        if ($isSite) {
+            $headLink
                 ->prependStylesheet($assetUrl('vendor/chosen-js/chosen.min.css', 'Omeka'));
-            $view->headScript()
+            $headScript
                 ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.js', 'Omeka'), 'text/javascript', ['defer' => 'defer']);
         }
 
-        // Adapted from the advanced-search/properties.phtml template.
+        $headLink
+            ->appendStylesheet($assetUrl('css/advanced-search-form.css', 'AdvancedSearch'));
+        $headScript
+            ->appendFile($assetUrl('js/advanced-search-form.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
+
+        // Adapted from application/view/common/advanced-search.phtml.
 
         $query = $event->getParam('query', []);
 
@@ -664,7 +668,7 @@ class Module extends AbstractModule
         $query['datetime'] ??= '';
         $partials[] = 'common/advanced-search/date-time';
 
-        $partials[] = 'common/advanced-search/visibility';
+        // Visibility filter was included in Omeka S v4.0.
 
         if ($resourceType === 'item') {
             $query['has_media'] ??= '';
@@ -683,20 +687,29 @@ class Module extends AbstractModule
             $partials[] = 'common/advanced-search/media-type';
         }
 
+        $partials = array_unique($partials);
+
         $event->setParam('query', $query);
         $event->setParam('partials', $partials);
     }
 
     /**
-     * Display the advanced search form via partial.
+     * Update partials (search fields) to the advanced search form.
      *
      * @param Event $event
      */
     public function displayAdvancedSearchPost(Event $event): void
     {
+        $config = $this->getServiceLocator()->get('Config');
+        $defaultSearchFields = $config['advancedsearch']['search_fields'];
+
         $view = $event->getTarget();
         $partials = $event->getParam('partials', []);
-        $defaultSearchFields = $this->getDefaultSearchFields();
+
+        $partials = array_unique($partials);
+
+        // Don't add new partials, only remove existing ones: by default, they
+        // are forbidden partials for sites.
         $searchFields = $view->siteSetting('advancedsearch_search_fields', $defaultSearchFields) ?: [];
         foreach ($partials as $key => $partial) {
             if (isset($defaultSearchFields[$partial]) && !in_array($partial, $searchFields)) {
@@ -705,12 +718,6 @@ class Module extends AbstractModule
         }
 
         $event->setParam('partials', $partials);
-    }
-
-    protected function getDefaultSearchFields()
-    {
-        $config = $this->getServiceLocator()->get('Config');
-        return $config['advancedsearch']['search_fields'];
     }
 
     /**

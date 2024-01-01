@@ -126,7 +126,7 @@ $(document).ready(function () {
     $('#content').on('click', '.query-form-set', function (e) {
         Omeka.closeSidebar(sidebarEdit);
         const form = $('.sidebar-content #advanced-search');
-        Omeka.cleanSearchQuery(form);
+        Omeka.cleanFormSearchQuery(form);
         const url = selectingElement.data('searchFiltersUrl');
         const query = form.serialize();
         $.get(`${url}?${query}`, function(data) {

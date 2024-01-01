@@ -60,6 +60,148 @@ $(document).ready(function() {
         }
     };
 
+    Omeka.cleanFormSearchQuery = function(form) {
+        const inputNames = [
+            'fulltext_search',
+            'resource_class_id[]',
+            'resource_template_id[]',
+            'item_set_id[]',
+            'not_item_set_id[]',
+            'site_id',
+            'owner_id',
+            'media_type',
+            'sort_by',
+            'sort_order',
+            'is_public',
+            'has_media',
+            'id',
+            // Modules.
+            // Access.
+            'access',
+            // Advanced Search.
+            'has_original',
+            'has_thumbnails',
+            // Data Type Geometry.
+            'geo[box]',
+            'geo[zone]',
+            'geo[mapbox]',
+            'geo[area]',
+            // Mapping.
+            'has_markers',
+        ];
+        const inputFakes = [
+            // Data Type Geometry.
+            'geo[mode]',
+            // Numeric Data Types
+             'numeric-toggle-time-checkbox',
+            'year',
+            'month',
+            'day',
+            'hour',
+            'minute',
+            'second',
+            'offset',
+            'years',
+            'months',
+            'days',
+            'hours',
+            'minutes',
+            'seconds',
+            'integer',
+        ];
+        const propertyQueryTypeWithText = ['eq', 'neq', 'in', 'nin', 'res', 'nres', 'resq', 'nresq', 'list', 'nlist', 'sw', 'nsw', 'ew', 'new', 'near', 'nnear', 'lres', 'nlres', 'lkq', 'nlkq', 'dtp', 'ndtp', 'tp', 'ntp', 'gt', 'gte', 'lte', 'lt'];
+        form.find(":input[name][name!='']:not(:disabled)").each(function(index) {
+            const input = $(this);
+            const inputName = input.attr('name');
+            const inputValue = input.val();
+            var match;
+            if (inputFakes.includes(inputName)) {
+                input.prop('name', '');
+            }
+            // Module Data Type Geometry.
+            else if (['geo[around][x]', 'geo[around][y]', 'geo[around][latitude]', 'geo[around][longitude]', 'geo[around][radius]'].includes(inputName)) {
+                const xInput = form.find('[name="geo[around][x]"]');
+                const yInput = form.find('[name="geo[around][y]"]');
+                const hasPosition = $.isNumeric(xInput.val()) && $.isNumeric(yInput.val()) ;
+                const latitudeInput = form.find('[name="geo[around][latitude]"]');
+                const longitudeInput = form.find('[name="geo[around][longitude]"]');
+                const hasCoordinates = $.isNumeric(latitudeInput.val()) && $.isNumeric(longitudeInput.val()) ;
+                const radiusInput = form.find('[name="geo[around][radius]"]');
+                const unitInput = form.find('[name="geo[around][unit]"]');
+                const hasRadius = radiusInput.val() !== '';
+                if (hasRadius) {
+                    if (!hasPosition) {
+                        xInput.prop('name', '');
+                        yInput.prop('name', '');
+                    }
+                    if (!hasCoordinates) {
+                        latitudeInput.prop('name', '');
+                        longitudeInput.prop('name', '');
+                        unitInput.prop('name', '');
+                    }
+                    if (!hasPosition && !hasCoordinates) {
+                        radiusInput.prop('name', '');
+                        unitInput.prop('name', '');
+                    }
+                } else {
+                    xInput.prop('name', '');
+                    yInput.prop('name', '');
+                    latitudeInput.prop('name', '');
+                    longitudeInput.prop('name', '');
+                    radiusInput.prop('name', '');
+                    unitInput.prop('name', '');
+                }
+            }
+            // Empty values.
+            else if (inputName && '' === inputValue) {
+                if (inputNames.includes(inputName)) {
+                    input.prop('name', '');
+                } else if (match = inputName.match(/property\[(\d+)\]\[text\]/)) {
+                    const propertyType = form.find(`[name="property[${match[1]}][type]"]`);
+                    if (propertyQueryTypeWithText.includes(propertyType.val())) {
+                        form.find(`[name="property[${match[1]}][joiner]"]`).prop('name', '');
+                        form.find(`[name="property[${match[1]}][property]"]`).prop('name', '');
+                        form.find(`[name="property[${match[1]}][text]"]`).prop('name', '');
+                        propertyType.prop('name', '');
+                    }
+                }
+                // Module Advanced Search.
+                else if (match = inputName.match(/datetime\[(\d+)\]\[(field|type|value)\]/)) {
+                    form.find(`[name="datetime[${match[1]}][joiner]"]`).prop('name', '');
+                    form.find(`[name="datetime[${match[1]}][field]"]`).prop('name', '');
+                    form.find(`[name="datetime[${match[1]}][type]"]`).prop('name', '');
+                    form.find(`[name="datetime[${match[1]}][value]"]`).prop('name', '');
+                }
+                // Module Mapping.
+                else if (['mapping_address', 'mapping_radius', 'mapping_radius_unit'].includes(inputName)) {
+                    const address = form.find('[name="mapping_address"]').val();
+                    const radius = form.find('[name="mapping_radius"]').val();
+                    if (!address || address.trim() === '' || !radius || !parseFloat(radius)) {
+                        form.find('[name="mapping_address"]').prop('name', '');
+                        form.find('[name="mapping_radius"]').prop('name', '');
+                        form.find('[name="mapping_radius_unit"]').prop('name', '');
+                    }
+                }
+                // Module Numeric Data Types.
+                else if (match = inputName.match(/numeric\[(ts\]\[gte|ts\]\[lte|dur\]\[gt|dur\]\[lt|ivl|int\]\[gt|int\]\[lt)\]\[(pid|val)\]/)) {
+                    const pidOrVal = match[2] === 'pid' ? 'val' : 'pid';
+                    const pidOrValInput = form.find(`[name="numeric[${match[1]}][${pidOrVal}]"]`);
+                    input.prop('name', '');
+                    pidOrValInput.prop('name', '');
+                }
+            }
+            // Empty order.
+            else if (inputName === 'sort_order') {
+                const sortByInput = form.find('[name="sort_by"]');
+                const sortBy = sortByInput.val();
+                if (!sortBy || sortBy.trim() === '') {
+                    sortByInput.prop('name', '');
+                    input.prop('name', '');
+                }
+            }
+        });
+    };
+
     /**
      * Handle negative item set search  when js is removed from template.
      * @see application/view/common/advanced-search/item-sets.phtml
@@ -160,6 +302,12 @@ $(document).ready(function() {
             sidebar.find('select.chosen-select').trigger('chosen:update');
         }
         Omeka.handleQueryTextInput(sidebar.find('.query-type'));
+    });
+
+    // Clean the query before submitting the form.
+    $(document).off('submit', '#advanced-search');
+    $(document).on('submit', '#advanced-search', function(e) {
+        Omeka.cleanFormSearchQuery($(this));
     });
 
 });

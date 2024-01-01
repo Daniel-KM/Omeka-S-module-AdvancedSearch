@@ -422,7 +422,7 @@ TODO
 - [ ] Update index when item pool of a site change.
 - [ ] Genericize and move the value extractor from module SearchSolr to this module.
 - [ ] Improve the check of presence of an item in sites for real time indexation.
-- [ ] Updated index in batch, not one by one.
+- [x] Updated index in batch, not one by one.
 - [ ] Add an option to replace the default Omeka search form.
 - [ ] Improve the internal autosuggester to return the list of next words when space.
 - [x] Use a "or" for facets of each group.

@@ -395,3 +395,10 @@ SQL;
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.16', '<')) {
+    $message = new Message(
+        'It is now possible to do a standard search with a sub-query, for example to get all items with creators born in 1789.' // @translate
+    );
+    $messenger->addSuccess($message);
+}

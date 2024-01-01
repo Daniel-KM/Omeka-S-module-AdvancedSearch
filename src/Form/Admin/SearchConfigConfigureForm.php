@@ -338,12 +338,13 @@ advanced = Filters = Advanced',
                 'type' => OmekaElement\ArrayTextarea::class,
                 'options' => [
                     'label' => 'List of operators', // @translate
-                    'info' => 'The default list is: eq, neq, in, nin, sw, nsw, ew, new, ex, nex, res, nres. Negative operators are removed when the joiner "not" is used. The default operators are used when empty.', // @translate
+                    'info' => 'The default list is: eq, neq, in, nin, sw, nsw, ew, new, ex, nex, res, nres. Negative operators are removed when the joiner "not" is used. The default operators are used when empty. Other advanced operators can be used.', // @translate
                     'as_key_value' => true,
                     'key_value_separator' => '=',
                 ],
                 'attributes' => [
                     'id' => 'field_operators',
+                    // This placeholder does not contain all query types.
                     'placeholder' => 'eq = is exactly
 neq = is not exactly
 in = contains

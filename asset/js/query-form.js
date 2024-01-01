@@ -121,10 +121,11 @@ $(document).ready(function () {
             : show('.query-form-restore');
         hide('.query-form-clear');
     });
+
     // Handle the button that sets the query string from the search sidebar.
     $('#content').on('click', '.query-form-set', function (e) {
         Omeka.closeSidebar(sidebarEdit);
-        const form = $('#advanced-search');
+        const form = $('.sidebar-content #advanced-search');
         Omeka.cleanSearchQuery(form);
         const url = selectingElement.data('searchFiltersUrl');
         const query = form.serialize();
@@ -144,7 +145,7 @@ $(document).ready(function () {
     $('#content').on('click', '.query-form-preview', function (e) {
         Omeka.openSidebar(sidebarPreview);
         const url = selectingElement.data('sidebar-preview-url');
-        const query = $('#advanced-search').serialize();
+        const query = $('.sidebar-content #advanced-search').serialize();
         Omeka.populateSidebarContent(sidebarPreview, `${url}?${query}`, {
             query_resource_type: selectingElement.data('resourceType'),
             query_preview_append_query: JSON.stringify(selectingElement.data('previewAppendQuery'))
@@ -158,4 +159,21 @@ $(document).ready(function () {
             query_partial_excludelist: JSON.stringify(selectingElement.data('partialExcludelist'))
         });
     });
+
+    /**
+     * Handle sub-query form according to property types (resq, nresq).
+     *
+     * Note: ".query-type" is used instead of "[name^='property['][name$='][type]']".
+     */
+    const subQueryTypes= ['resq', 'nresq'];
+    $('#property-queries').on('change', '.query-type', function () {
+        $(this).closest('.value').find('.query-form-element').css({
+            display:  subQueryTypes.includes($(this).val()) ? 'block' : 'none',
+        });
+    });
+    // On load.
+    $('#property-queries .value .query-form-element').filter(function() {
+        return subQueryTypes.includes($(this).closest('.value').find('.query-type').val());
+    }).show();
+
 });

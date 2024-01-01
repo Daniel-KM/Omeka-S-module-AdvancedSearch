@@ -323,7 +323,8 @@ var Omeka = {
     disableQueryTextInput: function() {
         var queryType = $(this);
         var queryText = queryType.siblings('.query-text');
-        queryText.prop('disabled', ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'lex', 'nlex', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu'].includes(queryType.val()));
+        queryText.prop('disabled',
+            ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'resq', 'nresq', 'lex', 'nlex', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu'].includes(queryType.val()));
     },
 
     // Clean the search query of empty or otherwise unneeded inputs.
@@ -353,7 +354,7 @@ var Omeka = {
                     const match = inputName.match(/property\[(\d+)\]\[text\]/);
                     if (match) {
                         const propertyType = form.find(`[name="property[${match[1]}][type]"]`);
-                        if (['eq', 'neq', 'in', 'nin', 'res', 'nres', 'list', 'nlist', 'sw', 'nsw', 'ew', 'new', 'near', 'nnear', 'lres', 'nlres', 'tp', 'ntp', 'dtp', 'ndtp', 'gt', 'gte', 'lte', 'lt']
+                        if (['eq', 'neq', 'in', 'nin', 'res', 'nres', 'resq', 'nresq', 'list', 'nlist', 'sw', 'nsw', 'ew', 'new', 'near', 'nnear', 'lres', 'nlres', 'tp', 'ntp', 'dtp', 'ndtp', 'gt', 'gte', 'lte', 'lt']
                             .includes(propertyType.val())
                         ) {
                             form.find(`[name="property[${match[1]}][joiner]"]`).prop('name', '');

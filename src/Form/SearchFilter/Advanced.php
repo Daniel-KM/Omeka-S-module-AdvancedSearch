@@ -111,6 +111,8 @@ class Advanced extends Fieldset
                 'nexm' => 'has not multiple values', // @translate
                 'res' => 'is resource with ID', // @translate
                 'nres' => 'is not resource with ID', // @translate
+                'resq' => 'is resource matching query', // @translate
+                'nresq' => 'is not resource matching query', // @translate
                 'lex' => 'is a linked resource', // @translate
                 'nlex' => 'is not a linked resource', // @translate
                 'lres' => 'is linked with resource with ID', // @translate
@@ -127,6 +129,7 @@ class Advanced extends Fieldset
                     $operators['nexs'],
                     $operators['nexm'],
                     $operators['nres'],
+                    $operators['nresq'],
                     $operators['nlex'],
                     $operators['nlres']
                 );

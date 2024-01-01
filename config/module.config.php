@@ -357,6 +357,7 @@ return [
         'Find resources…', // @translate
         'Processing…', // @translate
         'Try to map automatically the metadata and the properties that are not mapped yet with the fields of the index', // @translate
+        '[Edit below]', // @translate
     ],
     'search_adapters' => [
         'factories' => [

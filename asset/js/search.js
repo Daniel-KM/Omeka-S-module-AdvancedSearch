@@ -1,6 +1,6 @@
 /*
  * Copyright BibLibre, 2016
- * Copyright Daniel Berthereau, 2017-2023
+ * Copyright Daniel Berthereau, 2017-2024
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -119,6 +119,8 @@ var Search = (function() {
 })();
 
 $(document).ready(function() {
+
+    const hasChosenSelect = typeof $.fn.chosen === 'function';
 
     /**
      * When the simple and the advanced form are the same form.
@@ -293,17 +295,18 @@ $(document).ready(function() {
     }
 
     /********
-     * Improved standard advanced search form.
+     * Improvements for standard advanced search form.
      */
 
     /**
      * Disable query text according to some query types without values.
-     * @see application/asset/js/global.js.
+     * @see application/asset/js/global.js
      */
     function disableQueryTextInput(queryType) {
+        queryType = queryType ? queryType : $(this);
         var queryText = queryType.siblings('.query-text');
         queryText.prop('disabled',
-            ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'lex', 'nlex', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu'].includes(queryType.val()));
+            ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'resq', 'nresq', 'lex', 'nlex', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu'].includes(queryType.val()));
     };
 
     if (hasChosenSelect) {
@@ -340,4 +343,56 @@ $(document).ready(function() {
          disableQueryTextInput($(this));
     });
 
+    /**
+     * Handle clearing fields on new property multi-value.
+     * @see application/asset/js/advanced-search.js.
+     */
+    $(document).on('o:value-created', '.value', function(e) {
+        // In advanced-search.js, "children" is used, but it is not possible here,
+        // because a div is inserted to manage sub-query form.
+        // Furthermore, there is a hidden input.
+        const newValue = $(this);
+        const isSidebar = newValue.parents('.sidebar').length > 0;
+        if (isSidebar) {
+            newValue.find(".query-type option[value='resq']").remove();
+            newValue.find(".query-type option[value='nresq']").remove();
+            newValue.find('.query-form-element').remove();
+        }
+        newValue.children().children('input[type="text"]').val(null);
+        newValue.children().children('select').prop('selectedIndex', 0);
+        newValue.children().children('.query-property').find('option:selected').prop('selected', false);
+        if (hasChosenSelect) {
+            if (isSidebar) {
+                var chosenOptions = Search.chosenOptions;
+                chosenOptions.include_group_label_in_selected = false;
+                newValue.children().children('select.chosen-select').chosen(chosenOptions);
+            }
+            newValue.children().children('select.chosen-select').trigger('chosen:updated');
+        }
+        newValue.find('.query-form-element').attr('data-query', '').hide();
+        newValue.find('.query-form-element input[type="hidden"]').val(null);
+        newValue.find('.query-form-element .search-filters').empty().html(Omeka.jsTranslate('[Edit below]'));
+        --Omeka.propertySearchIndex;
+        newValue.find(':input').attr('name', function () {
+            return this.name.replace(/\[\d\]/, '[' + Omeka.propertySearchIndex + ']');
+        });
+        ++Omeka.propertySearchIndex;
+    });
+
+    /**
+     * Copy of resource-selector for sidebar (not loaded in search form).
+     * @see application/asset/js/resource-selector.js
+     */
+    $(document).on('o:sidebar-content-loaded', '#query-sidebar-edit', function(e) {
+        // Don't allow sub-sub-queries for now.
+        $(this).find(".query-type option[value='resq']").remove();
+        $(this).find(".query-type option[value='nresq']").remove();
+        $(this).find('.query-form-element').remove();
+        if (hasChosenSelect) {
+            // Group labels are too long for sidebar selects.
+            var chosenOptions = Search.chosenOptions;
+            chosenOptions.include_group_label_in_selected = false;
+            $(this).find('select.chosen-select').chosen(chosenOptions);
+        }
+    });
 });

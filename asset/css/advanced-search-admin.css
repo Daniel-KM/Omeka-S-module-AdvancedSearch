@@ -98,6 +98,7 @@
     #advanced-search #datetime-queries .inputs > .value .joiner + .chosen-container {
         max-width: fit-content;
     }
+
     #advanced-search #property-queries.multi-value .value:first-child .joiner:first-of-type,
     #advanced-search #property-queries.multi-value .value:first-child .chosen-container:first-of-type,
     #advanced-search #datetime-queries .query-text:disabled,
@@ -113,8 +114,48 @@
         max-width: 24em;
     }
 
-    #advanced-search.advanced-search-sidebar .inputs .joiner {
-        margin-right: 0;
+    #advanced-search #property-queries .query-form-element {
+        display: none;
+    }
+    #advanced-search #property-queries .query-text.hide {
+        display: none;
+    }
+
+    #advanced-search #property-queries .inputs > .value {
+        display: flex;
+        flex-direction: column;
+        gap: .25rem 0;
+    }
+    #advanced-search .inputs > .value .value-fields {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        align-items: center;
+        gap: .25rem;
+    }
+    #advanced-search .inputs > .value .value-fields .chosen-container,
+    #advanced-search .inputs > .value .value-fields .query-text {
+        flex: 1;
+    }
+
+    #advanced-search .inputs > .value .sub-query {
+        width: 100%;
+    }
+    #advanced-search .inputs > .value .sub-query .query-display {
+        min-height: 35px;
+    }
+    #advanced-search .inputs > .value .sub-query .query-form-element {
+        flex: 1;
+        margin-top: 0.25rem;
+        margin-bottom: 0.5rem;
+    }
+
+    #advanced-search.advanced-search-sidebar .inputs > .value .value-fields {
+        flex-direction: column;
+        align-items: initial;
+    }
+    #advanced-search.advanced-search-sidebar .inputs > .value .value-fields > * {
+        margin: 0;
     }
     #advanced-search.advanced-search-sidebar .inputs label.type-radio,
     #advanced-search.advanced-search-sidebar #mapping-geographic-location .inputs label {

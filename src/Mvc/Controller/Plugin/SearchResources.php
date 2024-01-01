@@ -79,6 +79,12 @@ class SearchResources extends AbstractPlugin
             'nnear' => 'near',
             'res' => 'nres',
             'nres' => 'res',
+            'resq' => 'nresq',
+            'nresq' => 'resq',
+            'lex' => 'nlex',
+            'nlex' => 'lex',
+            'lres' => 'nlres',
+            'nlres' => 'lres',
             'tp' => 'ntp',
             'ntp' => 'tp',
             'tpl' => 'ntpl',
@@ -89,10 +95,6 @@ class SearchResources extends AbstractPlugin
             'ntpu' => 'tpu',
             'dtp' => 'ndtp',
             'ndtp' => 'dtp',
-            'lex' => 'nlex',
-            'nlex' => 'lex',
-            'lres' => 'nlres',
-            'nlres' => 'lres',
             'gt' => 'lte',
             'gte' => 'lt',
             'lte' => 'gt',
@@ -109,19 +111,22 @@ class SearchResources extends AbstractPlugin
             'new',
             'nnear',
             'nres',
+            'nresq',
+            'nlex',
+            'nlres',
             'ntp',
             'ntpl',
             'ntpr',
             'ntpu',
             'ndtp',
-            'nlex',
-            'nlres',
         ],
         'value_array' => [
             'list',
             'nlist',
             'res',
             'nres',
+            'resq',
+            'nresq',
             'lres',
             'nlres',
             'dtp',
@@ -949,6 +954,12 @@ class SearchResources extends AbstractPlugin
      *   - nnear: is not similar to
      *   - res: has resource (core)
      *   - nres: has no resource (core)
+     *   - resq: has resource matching query
+     *   - nresq: has no resource matching query
+     *   - lex: is a linked resource
+     *   - nlex: is not a linked resource
+     *   - lres: is linked with resource #id
+     *   - nlres: is not linked with resource #id
      *   - tp: has main type (literal-like, resource-like, uri-like)
      *   - ntp: has not main type (literal-like, resource-like, uri-like)
      *   - tpl: has type literal-like
@@ -959,10 +970,6 @@ class SearchResources extends AbstractPlugin
      *   - ntpu: has not type uri-like
      *   - dtp: has data type
      *   - ndtp: has not data type
-     *   - lex: is a linked resource
-     *   - nlex: is not a linked resource
-     *   - lres: is linked with resource #id
-     *   - nlres: is not linked with resource #id
      *   Comparisons
      *   Warning: Comparisons are mysql comparisons, so alphabetic ones.
      *   TODO Add specific types to compare date and time (probably useless: use module NumericDataTypes).
@@ -1234,6 +1241,24 @@ class SearchResources extends AbstractPlugin
                     }
                     break;
 
+                case 'resq':
+                    // TODO For now, only one sub-query (and the sub-query may be a complex one and it is largely enough in most of the cases).
+                    // TODO Allow to pass an array instead of encoded url args (but it is cleaned above).
+                    // $value = is_numeric(key($value)) ? reset($value) : $value;
+                    $value = reset($value);
+                    if (!is_array($value)) {
+                        $aValue = null;
+                        parse_str($value, $aValue);
+                        $value = $aValue;
+                    }
+                    // TODO Use a subquery.
+                    $api = $this->adapter->getServiceLocator()->get('Omeka\ApiManager');
+                    $value = $api->search($this->adapter->getResourceName(), $value, ['returnScalar' => 'id'])->getContent();
+                    $param = $this->adapter->createNamedParameter($qb, $value);
+                    $qb->setParameter(substr($param, 1), $value, Connection::PARAM_INT_ARRAY);
+                    $predicateExpr = $expr->in("$valuesAlias.valueResource", $param);
+                    break;
+
                 case 'ex':
                     $predicateExpr = $expr->isNotNull("$valuesAlias.id");
                     break;
@@ -1319,7 +1344,7 @@ class SearchResources extends AbstractPlugin
                         ->where($expr->isNotNull("$subValuesAlias.valueResource"));
                     // Warning: the property check should be done on subjects,
                     // so the predicate expression is finalized below.
-                    if (is_array($value)) {
+                    if (in_array($queryType, ['lres', 'nlres'])) {
                         // In fact, "lres" is the list of linked resources.
                         if (count($value) <= 1) {
                             $param = $this->adapter->createNamedParameter($qb, (int) reset($value));
@@ -1330,6 +1355,7 @@ class SearchResources extends AbstractPlugin
                             $subQb->andWhere($expr->in("$subValuesAlias.resource", $param));
                         }
                     }
+                    // "nlex" and "lex'" have no value.
                     break;
 
                 // TODO Manage uri and resources with gt, gte, lte, lt (it has a meaning at least for resource ids, but separate).

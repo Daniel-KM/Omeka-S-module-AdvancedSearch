@@ -69,22 +69,44 @@
         border-bottom: 1px solid #000;
     }
 
-    #advanced-search #datetime-queries .query-text:disabled,
-    #advanced-search #property-queries.multi-value .value:first-child .chosen-container:first-of-type,
-    #advanced-search #datetime-queries.multi-value .value:first-child .chosen-container:first-of-type,
-    #advanced-search #property-queries.multi-value .value:first-child .joiner:first-of-type,
-    #advanced-search #datetime-queries.multi-value .value:first-child .joiner:first-of-type {
-       display: none;
+    input[type=submit][disabled] {
+        cursor: unset;
     }
-    #advanced-search .inputs .chosen-container {
-      margin-top: 3px;
+
+    #advanced-search .item-set-select-type + .chosen-container {
+        margin: .25rem .25rem 0 0;
+        max-width: 25%;
+    }
+    #advanced-search .item-set-select + .chosen-container {
+        margin: .25rem .25rem 0 0;
+    }
+    #advanced-search.advanced-search-sidebar .item-set-select-type,
+    #advanced-search.advanced-search-sidebar .item-set-select-type + .chosen-container {
+        margin: 0 0 .25rem 0;
+        max-width: fit-content;
+    }
+    #advanced-search.advanced-search-sidebar .item-set-select,
+    #advanced-search.advanced-search-sidebar .item-set-select + .chosen-container {
+        margin: 0 0 .25rem 0;
+        max-width: initial;
+    }
+    #advanced-search #datetime-queries .value {
+        align-items: baseline;
+        gap: 0.25rem;
+    }
+    #advanced-search #property-queries .inputs > .value .joiner + .chosen-container,
+    #advanced-search #datetime-queries .inputs > .value .joiner + .chosen-container {
+        max-width: fit-content;
+    }
+    #advanced-search #property-queries.multi-value .value:first-child .joiner:first-of-type,
+    #advanced-search #property-queries.multi-value .value:first-child .chosen-container:first-of-type,
+    #advanced-search #datetime-queries .query-text:disabled,
+    #advanced-search #datetime-queries.multi-value .value:first-child .joiner:first-of-type
+    #advanced-search #datetime-queries.multi-value .value:first-child .chosen-container:first-of-type {
+       display: none;
     }
     #advanced-search .inputs .chosen-choices li.search-choice span {
         padding: 4px;
-    }
-
-    input[type=submit][disabled] {
-        cursor: unset;
     }
 
     #advanced-search #property-queries .chosen-container-multi .chosen-choices .search-choice {

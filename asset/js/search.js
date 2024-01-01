@@ -324,6 +324,21 @@ $(document).ready(function() {
     };
 
     /**
+     * Handle negative item set search  when js is removed from template.
+     * @see application/view/common/advanced-search/item-sets.phtml
+     * @see Pull request "fix/advanced_search_templates" on https://github.com/omeka/omeka-s
+     */
+    $(document).on('change', '#advanced-search .item-set-select-type', function() {
+        const typeSelect = $(this);
+        const itemSetSelect = typeSelect.closest('.value').find('.item-set-select');
+        if ('not_in' === typeSelect.val()) {
+            itemSetSelect.attr('name', 'not_item_set_id[]');
+        } else {
+            itemSetSelect.attr('name', 'item_set_id[]');
+        }
+    });
+
+    /**
      * Add chosen-select when possible.
      */
     if (hasChosenSelect) {

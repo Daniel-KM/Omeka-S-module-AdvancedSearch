@@ -112,4 +112,17 @@
     #advanced-search #property-queries .chosen-container-multi .chosen-choices .search-choice {
         max-width: 24em;
     }
+
+    #advanced-search.advanced-search-sidebar .inputs .joiner {
+        margin-right: 0;
+    }
+    #advanced-search.advanced-search-sidebar .inputs label.type-radio,
+    #advanced-search.advanced-search-sidebar #mapping-geographic-location .inputs label {
+        margin: auto;
+        padding: initial;
+    }
+    #advanced-search.advanced-search-sidebar .inputs label.type-radio::after,
+    #advanced-search.advanced-search-sidebar #mapping-geographic-location .inputs label::after {
+        background: initial;
+    }
 }

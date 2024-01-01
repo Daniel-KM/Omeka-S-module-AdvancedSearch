@@ -11,10 +11,11 @@ $translate = $this->plugin('translate');
 $element = new \Laminas\Form\Element\Radio('has_thumbnails');
 $element
     ->setLabel('Presence of thumbnails') // @translate
+    ->setLabelAttributes(['class' => 'type-radio'])
     ->setValueOptions([
+        '' => 'Any', // @translate
         '1' => 'Has thumbnails', // @translate
         '0' => 'Has no thumbnails', // @translate
-        '' => 'Any', // @translate
     ])
     ->setValue($query['has_thumbnails'] ?? '')
     ->setAttributes([

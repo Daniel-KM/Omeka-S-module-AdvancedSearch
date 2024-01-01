@@ -11,10 +11,11 @@ $translate = $this->plugin('translate');
 $element = new \Laminas\Form\Element\Radio('has_original');
 $element
     ->setLabel('Presence of original file') // @translate
+    ->setLabelAttributes(['class' => 'type-radio'])
     ->setValueOptions([
+        '' => 'Any', // @translate
         '1' => 'Has original file', // @translate
         '0' => 'Has no original file', // @translate
-        '' => 'Any', // @translate
     ])
     ->setValue($query['has_original'] ?? '')
     ->setAttributes([

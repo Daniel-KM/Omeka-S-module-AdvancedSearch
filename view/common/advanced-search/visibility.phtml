@@ -4,7 +4,8 @@
  * @var array $query
  *
  * Same as core template, with:
- * - use radio
+ * - use radio;
+ * - add "any";
  * - short echo.
  */
 
@@ -15,10 +16,11 @@ $translate = $this->plugin('translate');
 $element = new \Laminas\Form\Element\Radio('is_public');
 $element
     ->setLabel('Search by visibility') // @translate
+    ->setLabelAttributes(['class' => 'type-radio'])
     ->setValueOptions([
+        '' => 'Any', // @translate
         '1' => 'Public', // @translate
         '0' => 'Not public', // @translate
-        '' => 'Any', // @translate
     ])
     ->setValue($query['is_public'] ?? '')
     ->setAttributes([

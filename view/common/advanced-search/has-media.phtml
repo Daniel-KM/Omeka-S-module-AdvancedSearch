@@ -4,7 +4,8 @@
  * @var array $query
  *
  * Same as core template, with:
- * - use radio
+ * - use radio;
+ * - add "any";
  * - short echo.
  */
 
@@ -15,10 +16,11 @@ $translate = $this->plugin('translate');
 $element = new \Laminas\Form\Element\Radio('has_media');
 $element
     ->setLabel('Search by media presence') // @translate
+    ->setLabelAttributes(['class' => 'type-radio'])
     ->setValueOptions([
+        '' => 'Any', // @translate
         '1' => 'Has media', // @translate
         '0' => 'Has no media', // @translate
-        '' => 'Any', // @translate
     ])
     ->setValue($query['has_media'] ?? '')
     ->setAttributes([

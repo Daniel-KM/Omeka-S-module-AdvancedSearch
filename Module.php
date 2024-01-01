@@ -204,6 +204,7 @@ class Module extends AbstractModule
             'Omeka\Controller\Admin\Item',
             'Omeka\Controller\Admin\ItemSet',
             'Omeka\Controller\Admin\Media',
+            'Omeka\Controller\Admin\Query',
             'Omeka\Controller\Site\Item',
             'Omeka\Controller\Site\ItemSet',
             'Omeka\Controller\Site\Media',
@@ -214,7 +215,7 @@ class Module extends AbstractModule
             $sharedEventManager->attach(
                 $controller,
                 'view.advanced_search',
-                [$this, 'displayAdvancedSearch']
+                [$this, 'handleViewAdvancedSearch']
             );
         }
         $controllers = [
@@ -223,11 +224,11 @@ class Module extends AbstractModule
             'Omeka\Controller\Site\Media',
         ];
         foreach ($controllers as $controller) {
-            // Specify fields to add to the advanced search form.
+            // Specify fields to filter from the advanced search form.
             $sharedEventManager->attach(
                 $controller,
                 'view.advanced_search',
-                [$this, 'displayAdvancedSearchPost'],
+                [$this, 'handleViewAdvancedSearchPost'],
                 -100
             );
         }
@@ -629,7 +630,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function displayAdvancedSearch(Event $event): void
+    public function handleViewAdvancedSearch(Event $event): void
     {
         $view = $event->getTarget();
 
@@ -653,6 +654,11 @@ class Module extends AbstractModule
         $headScript
             ->appendFile($assetUrl('js/advanced-search-form.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
 
+        $this->handlePartialsAdvancedSearch($event);
+    }
+
+    public function handlePartialsAdvancedSearch(Event $event): void
+    {
         // Adapted from application/view/common/advanced-search.phtml.
 
         $query = $event->getParam('query', []);
@@ -698,7 +704,7 @@ class Module extends AbstractModule
      *
      * @param Event $event
      */
-    public function displayAdvancedSearchPost(Event $event): void
+    public function handleViewAdvancedSearchPost(Event $event): void
     {
         $config = $this->getServiceLocator()->get('Config');
         $defaultSearchFields = $config['advancedsearch']['search_fields'];

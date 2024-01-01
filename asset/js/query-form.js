@@ -161,11 +161,11 @@ $(document).ready(function () {
     });
 
     /**
-     * Handle sub-query form according to property types (resq, nresq).
+     * Handle sub-query form according to property types (resq, nresq, lkq, nlkq).
      *
      * Note: ".query-type" is used instead of "[name^='property['][name$='][type]']".
      */
-    const subQueryTypes= ['resq', 'nresq'];
+    const subQueryTypes= ['resq', 'nresq', 'lkq', 'nlkq'];
     $('#property-queries').on('change', '.query-type', function () {
         $(this).closest('.value').find('.query-form-element').css({
             display:  subQueryTypes.includes($(this).val()) ? 'block' : 'none',

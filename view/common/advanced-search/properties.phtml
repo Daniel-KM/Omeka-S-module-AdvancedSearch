@@ -139,6 +139,8 @@ if ($isSiteRequest) {
                 <?= $queryOption('nlex', $property, 'type', $translate('is not a linked resource')) ?>
                 <?= $queryOption('lres', $property, 'type', $translate('is linked with resource with ID')) ?>
                 <?= $queryOption('nlres', $property, 'type', $translate('is not linked with resource with ID')) ?>
+                <?= $queryOption('lkq', $property, 'type', $translate('is linked with resources matching query')) ?>
+                <?= $queryOption('nlkq', $property, 'type', $translate('is not linked with resources matching query')) ?>
                 <?php /* // TODO Require a js to force value to be "literal", "uri" or "resource". ?>
                 <?= $queryOption('tp', $property, 'type', $translate('has main type')) ?>
                 <?= $queryOption('ntp', $property, 'type', $translate('has not main type')) ?>
@@ -156,7 +158,7 @@ if ($isSiteRequest) {
             <button type="button" class="o-icon-delete remove-value button" aria-label="<?= $translate('Remove value') ?>" title="<?= $translate('Remove value') ?>"></button>
             </div>
             <div class="value-common sub-query">
-                <?php $queryInput->setValue(in_array($property['type'] ?? null, ['resq', 'nresq']) && isset($property['text']) ? $property['text'] : null); ?>
+                <?php $queryInput->setValue(in_array($property['type'] ?? null, ['resq', 'nresq', 'lkq', 'nlkq']) && isset($property['text']) ? $property['text'] : null); ?>
                 <?= $formQuery($queryInput->setName($stem . '[text]')) ?>
             </div>
         </div>

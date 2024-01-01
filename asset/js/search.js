@@ -306,7 +306,7 @@ $(document).ready(function() {
         queryType = queryType ? queryType : $(this);
         var queryText = queryType.siblings('.query-text');
         queryText.prop('disabled',
-            ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'resq', 'nresq', 'lex', 'nlex', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu'].includes(queryType.val()));
+            ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'resq', 'nresq', 'lex', 'nlex', 'lkq', 'nlkq', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu'].includes(queryType.val()));
     };
 
     if (hasChosenSelect) {
@@ -356,6 +356,8 @@ $(document).ready(function() {
         if (isSidebar) {
             newValue.find(".query-type option[value='resq']").remove();
             newValue.find(".query-type option[value='nresq']").remove();
+            newValue.find(".query-type option[value='lkq']").remove();
+            newValue.find(".query-type option[value='nlkq']").remove();
             newValue.find('.query-form-element').remove();
         }
         newValue.children().children('input[type="text"]').val(null);
@@ -387,6 +389,8 @@ $(document).ready(function() {
         // Don't allow sub-sub-queries for now.
         $(this).find(".query-type option[value='resq']").remove();
         $(this).find(".query-type option[value='nresq']").remove();
+        $(this).find(".query-type option[value='lkq']").remove();
+        $(this).find(".query-type option[value='nlkq']").remove();
         $(this).find('.query-form-element').remove();
         if (hasChosenSelect) {
             // Group labels are too long for sidebar selects.

@@ -85,6 +85,8 @@ class SearchResources extends AbstractPlugin
             'nlex' => 'lex',
             'lres' => 'nlres',
             'nlres' => 'lres',
+            'lkq' => 'nlkq',
+            'nlkq' => 'lkq',
             'tp' => 'ntp',
             'ntp' => 'tp',
             'tpl' => 'ntpl',
@@ -114,6 +116,7 @@ class SearchResources extends AbstractPlugin
             'nresq',
             'nlex',
             'nlres',
+            'nlkq',
             'ntp',
             'ntpl',
             'ntpr',
@@ -129,6 +132,8 @@ class SearchResources extends AbstractPlugin
             'nresq',
             'lres',
             'nlres',
+            'lkq',
+            'nlkq',
             'dtp',
             'ndtp',
         ],
@@ -159,6 +164,8 @@ class SearchResources extends AbstractPlugin
             'nlex',
             'lres',
             'nlres',
+            'lkq',
+            'nlkq',
         ],
         'optimize' => [
             'eq' => 'list',
@@ -960,6 +967,8 @@ class SearchResources extends AbstractPlugin
      *   - nlex: is not a linked resource
      *   - lres: is linked with resource #id
      *   - nlres: is not linked with resource #id
+     *   - lkq: is linked with resources matching query
+     *   - nlkq: is not linked with resources matching query
      *   - tp: has main type (literal-like, resource-like, uri-like)
      *   - ntp: has not main type (literal-like, resource-like, uri-like)
      *   - tpl: has type literal-like
@@ -1283,6 +1292,59 @@ class SearchResources extends AbstractPlugin
                     $qb->having($expr->gt("COUNT($valuesAlias.id)", 1));
                     break;
 
+                // The linked resources (subject values) use the same sub-query.
+                case 'lex':
+                case 'lres':
+                case 'lkq':
+                    $subValuesAlias = $this->adapter->createAlias();
+                    $subResourceAlias = $this->adapter->createAlias();
+                    // Use a subquery so rights are automatically managed.
+                    $subQb = $entityManager
+                        ->createQueryBuilder()
+                        ->select("IDENTITY($subValuesAlias.valueResource)")
+                        ->from(\Omeka\Entity\Value::class, $subValuesAlias)
+                        ->innerJoin("$subValuesAlias.resource", $subResourceAlias)
+                        ->where($expr->isNotNull("$subValuesAlias.valueResource"));
+                    // Warning: the property check should be done on subjects,
+                    // so the predicate expression is finalized below.
+                    if (in_array($queryType, ['lres', 'nlres'])) {
+                        // In fact, "lres" is the list of linked resources.
+                        if (count($value) <= 1) {
+                            $param = $this->adapter->createNamedParameter($qb, (int) reset($value));
+                            $subQb->andWhere($expr->eq("$subValuesAlias.resource", $param));
+                        } else {
+                            $param = $this->adapter->createNamedParameter($qb, $value);
+                            $qb->setParameter(substr($param, 1), $value, Connection::PARAM_INT_ARRAY);
+                            $subQb->andWhere($expr->in("$subValuesAlias.resource", $param));
+                        }
+                    } elseif (in_array($queryType, ['lkq', 'nlkq'])) {
+                        // Only a single level: see above "resq"/"nresq".
+                        $value = reset($value);
+                        if (!is_array($value)) {
+                            $aValue = null;
+                            parse_str($value, $aValue);
+                            $value = $aValue;
+                        }
+                        /* // TODO Create a full sub sub dql query from the adapter instead of querying ids first.
+                        $subSubQuery = $entityManager
+                            ->createQueryBuilder()
+                            ->select("IDENTITY($subValuesAlias.valueResource)")
+                            ->from(\Omeka\Entity\Value::class, $subValuesAlias)
+                            ->innerJoin("$subValuesAlias.resource", $subResourceAlias)
+                            ->where($expr->isNotNull("$subValuesAlias.valueResource"));
+                        $param = $this->adapter->createNamedParameter($qb, $value);
+                        $qb->setParameter(substr($param, 1), $value, Connection::PARAM_INT_ARRAY);
+                        $subQb->andWhere($expr->in("$subValuesAlias.resource", $subSubQuery->getDQL()));
+                         */
+                        $api = $this->adapter->getServiceLocator()->get('Omeka\ApiManager');
+                        $value = $api->search($this->adapter->getResourceName(), $value, ['returnScalar' => 'id'])->getContent();
+                        $param = $this->adapter->createNamedParameter($qb, $value);
+                        $qb->setParameter(substr($param, 1), $value, Connection::PARAM_INT_ARRAY);
+                        $subQb->andWhere($expr->in("$subValuesAlias.resource", $param));
+                    }
+                    // "nlex" and "lex'" have no value.
+                    break;
+
                 case 'tp':
                     if ($value === 'literal') {
                         // Because a resource or a uri can have a label stored
@@ -1328,34 +1390,6 @@ class SearchResources extends AbstractPlugin
                         $qb->setParameter($dataTypeAlias, $value, Connection::PARAM_STR_ARRAY);
                         $predicateExpr = $expr->in("$valuesAlias.type", ":$dataTypeAlias");
                     }
-                    break;
-
-                // The linked resources (subject values) use the same sub-query.
-                case 'lex':
-                case 'lres':
-                    $subValuesAlias = $this->adapter->createAlias();
-                    $subResourceAlias = $this->adapter->createAlias();
-                    // Use a subquery so rights are automatically managed.
-                    $subQb = $entityManager
-                        ->createQueryBuilder()
-                        ->select("IDENTITY($subValuesAlias.valueResource)")
-                        ->from(\Omeka\Entity\Value::class, $subValuesAlias)
-                        ->innerJoin("$subValuesAlias.resource", $subResourceAlias)
-                        ->where($expr->isNotNull("$subValuesAlias.valueResource"));
-                    // Warning: the property check should be done on subjects,
-                    // so the predicate expression is finalized below.
-                    if (in_array($queryType, ['lres', 'nlres'])) {
-                        // In fact, "lres" is the list of linked resources.
-                        if (count($value) <= 1) {
-                            $param = $this->adapter->createNamedParameter($qb, (int) reset($value));
-                            $subQb->andWhere($expr->eq("$subValuesAlias.resource", $param));
-                        } else {
-                            $param = $this->adapter->createNamedParameter($qb, $value);
-                            $qb->setParameter(substr($param, 1), $value, Connection::PARAM_INT_ARRAY);
-                            $subQb->andWhere($expr->in("$subValuesAlias.resource", $param));
-                        }
-                    }
-                    // "nlex" and "lex'" have no value.
                     break;
 
                 // TODO Manage uri and resources with gt, gte, lte, lt (it has a meaning at least for resource ids, but separate).

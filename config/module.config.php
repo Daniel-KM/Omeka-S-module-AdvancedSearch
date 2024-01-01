@@ -71,6 +71,9 @@ return [
             View\Helper\EasyMeta::class => Service\ViewHelper\EasyMetaFactory::class,
         ],
         'delegators' => [
+            \Omeka\Form\View\Helper\FormQuery::class=> [
+                Service\ViewHelper\FormQueryDelegatorFactory::class,
+            ],
             'Laminas\Form\View\Helper\FormElement' => [
                 Service\Delegator\FormElementDelegatorFactory::class,
             ],

@@ -110,7 +110,7 @@ $(document).ready(function() {
             'integer',
         ];
         const propertyQueryTypeWithText = ['eq', 'neq', 'in', 'nin', 'res', 'nres', 'resq', 'nresq', 'list', 'nlist', 'sw', 'nsw', 'ew', 'new', 'near', 'nnear', 'lres', 'nlres', 'lkq', 'nlkq', 'dtp', 'ndtp', 'tp', 'ntp', 'gt', 'gte', 'lte', 'lt'];
-        form.find(":input[name][name!='']:not(:disabled)").each(function(index) {
+        form.find(":input[name]:not([name='']):not(:disabled)").each(function(index) {
             const input = $(this);
             const inputName = input.attr('name');
             const inputValue = input.val();

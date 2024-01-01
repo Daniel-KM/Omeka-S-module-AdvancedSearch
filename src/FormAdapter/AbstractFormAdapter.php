@@ -428,9 +428,10 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                         // TODO Don't check form, but settings['filters'] with field = name and type.
                         // TODO Simplify these checks (or support multi-values anywhere).
                         $valueArray = $flatArray($value);
-                        if ($this->form
-                            && $this->form->has($name)
-                            && ($element = $this->form->get($name)) instanceof \Laminas\Form\Element\Text
+                        $form = $this->getForm();
+                        if ($form
+                            && $form->has($name)
+                            && ($element = $form->get($name)) instanceof \Laminas\Form\Element\Text
                         ) {
                             if ($element instanceof \AdvancedSearch\Form\Element\TextExact
                                 || $element instanceof \AdvancedSearch\Form\Element\MultiText

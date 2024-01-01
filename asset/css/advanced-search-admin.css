@@ -99,6 +99,8 @@
         max-width: fit-content;
     }
 
+    #advanced-search #property-queries .query-text:disabled,
+    #advanced-search #property-queries .chosen-disabled,
     #advanced-search #property-queries.multi-value .value:first-child .joiner:first-of-type,
     #advanced-search #property-queries.multi-value .value:first-child .chosen-container:first-of-type,
     #advanced-search #datetime-queries .query-text:disabled,

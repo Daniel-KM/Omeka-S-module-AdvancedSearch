@@ -19,6 +19,7 @@ $siteSetting = $plugins->get('siteSetting');
 $formQuery = $plugins->get('formQuery');
 $queryInput = $plugins->get('queryInput');
 $propertySelect = $plugins->get('propertySelect');
+$dataTypeHelper = $plugins->get('dataType');
 
 $isSiteRequest = $status->isSiteRequest();
 $applyTemplates = $isSiteRequest ? $siteSetting('search_apply_templates') : false;
@@ -144,6 +145,8 @@ if ($isSiteRequest) {
                 <?= $queryOption('nlres', $property, 'type', $translate('is not linked with resource with ID')) ?>
                 <?= $queryOption('lkq', $property, 'type', $translate('is linked with resources matching query')) ?>
                 <?= $queryOption('nlkq', $property, 'type', $translate('is not linked with resources matching query')) ?>
+                <?= $queryOption('dtp', $property, 'type', $translate('has data type')) ?>
+                <?= $queryOption('ndtp', $property, 'type', $translate('has not data type')) ?>
                 <?php /* // TODO Require a js to force value to be "literal", "uri" or "resource". ?>
                 <?= $queryOption('tp', $property, 'type', $translate('has main type')) ?>
                 <?= $queryOption('ntp', $property, 'type', $translate('has not main type')) ?>
@@ -154,10 +157,9 @@ if ($isSiteRequest) {
                 <?= $queryOption('ntpr', $property, 'type', $translate('has not type resource-like')) ?>
                 <?= $queryOption('tplu', $property, 'type', $translate('has type uri-like')) ?>
                 <?= $queryOption('ntpu', $property, 'type', $translate('has not type uri-like')) ?>
-                <?= $queryOption('dtp', $property, 'type', $translate('has data type')) ?>
-                <?= $queryOption('ndtp', $property, 'type', $translate('has not data type')) ?>
             </select>
             <?= $queryText($isSubQuery ? [] : $property, $index) ?>
+            <?= $dataTypeHelper->getSelect($stem . '[text]', "property[$index][text]" ?? null, ['multiple' => false, 'class' => 'query-text query-data-type chosen-select', 'aria-label' => 'Data types', 'data-placeholder' => $translate('Select data type…')]) // TODO Manage search on property for multiple data types. ?>
             <button type="button" class="o-icon-delete remove-value button" aria-label="<?= $translate('Remove value') ?>" title="<?= $translate('Remove value') ?>"></button>
             </div>
             <div class="value-common sub-query">

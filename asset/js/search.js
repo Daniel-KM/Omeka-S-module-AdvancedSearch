@@ -304,9 +304,22 @@ $(document).ready(function() {
      */
     function disableQueryTextInput(queryType) {
         queryType = queryType ? queryType : $(this);
-        var queryText = queryType.siblings('.query-text');
+        const queryText = queryType.siblings('.query-text');
+        const queryTextDataType = queryType.siblings('.query-data-type');
         queryText.prop('disabled',
-            ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'resq', 'nresq', 'lex', 'nlex', 'lkq', 'nlkq', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu'].includes(queryType.val()));
+            ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'resq', 'nresq', 'lex', 'nlex', 'lkq', 'nlkq', 'dtp', 'ndtp', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu'].includes(queryType.val()));
+        const isTypeDataType = ['dtp', 'ndtp'].includes(queryType.val());
+        queryTextDataType.prop('disabled', !isTypeDataType);
+        if (hasChosenSelect) {
+            queryTextDataType.chosen('destroy');
+            queryTextDataType.find('+ .chosen-container').remove();
+            if (isTypeDataType) {
+                queryTextDataType.show();
+                queryTextDataType.chosen(chosenOptions);
+            } else {
+                queryTextDataType.hide();
+            }
+        }
     };
 
     /**
@@ -399,5 +412,6 @@ $(document).ready(function() {
             sidebar.find('select.chosen-select option[value=""][selected]').prop('selected',  false).parent().trigger('chosen:updated');
             sidebar.find('select.chosen-select').trigger('chosen:update');
         }
+        disableQueryTextInput($(this).find('.query-type'));
     });
 });

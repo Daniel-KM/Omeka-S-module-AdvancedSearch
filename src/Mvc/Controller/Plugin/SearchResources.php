@@ -2158,7 +2158,7 @@ class SearchResources extends AbstractPlugin
     /**
      * Get one or more property ids by JSON-LD terms or by numeric ids.
      *
-     * @todo Factorize with \AdvancedSearch\View\Helper\EasyMeta::propertyIds() (differences: return array and used properties).
+     * @fixme Factorize with \AdvancedSearch\View\Helper\EasyMeta::propertyIds() (differences: return used properties).
      *
      * @param array|int|string|null $termsOrIds One or multiple ids or terms.
      * @return int[] The property ids matching terms or ids, or all properties
@@ -2230,6 +2230,8 @@ class SearchResources extends AbstractPlugin
 
     /**
      * Prepare the list of resource classes and used resource classes by term.
+     *
+     * @fixme Factorize with \AdvancedSearch\View\Helper\EasyMeta::resourceClassIds() (differences: return used classes).
      */
     protected function prepareResourceClasses(): self
     {

@@ -151,7 +151,7 @@ class IndexSuggestions extends AbstractJob
         // FIXME Fields are not only properties, but titles, classes and templates.
         $fields = $suggester->setting('fields') ?: [];
         $fields = $easyMeta->propertyIds($fields);
-        $excludedFields = $suggester->setting('excuded_fields') ?: [];
+        $excludedFields = $suggester->setting('excluded_fields') ?: [];
         $excludedFields = $easyMeta->propertyIds($excludedFields);
 
         $modeIndex = $suggester->setting('mode_index') ?: 'start';

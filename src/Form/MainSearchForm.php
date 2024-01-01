@@ -953,7 +953,7 @@ class MainSearchForm extends Form
         $multifields = $searchEngine->settingAdapter('multifields', []);
         $fields = [];
         $fields[$field] = $metadataFieldsToNames[$field]
-            ?? $this->getPropertyTerm($field)
+            ?? $this->easyMeta->propertyTerm($field)
             ?? $multifields[$field]['fields']
             ?? $field;
 
@@ -963,7 +963,7 @@ class MainSearchForm extends Form
         if (!is_array($fields)) {
             $fields = [$fields];
         }
-        $propertyIds = array_intersect_key($this->getPropertyIds(), array_flip($fields));
+        $propertyIds = $this->easyMeta->propertyIds($fields);
         if (!$propertyIds) {
             return [];
         }
@@ -1056,22 +1056,6 @@ class MainSearchForm extends Form
     {
         $adapter = $this->searchConfig->searchAdapter();
         return $adapter ? $adapter->getAvailableFields() : [];
-    }
-
-    /**
-     * Get a property term or id.
-     */
-    protected function getPropertyTerm($termOrId): ?string
-    {
-        return $this->easyMeta->propertyTerms($termOrId);
-    }
-
-    /**
-     * Get all property ids by term.
-     */
-    protected function getPropertyIds(): array
-    {
-        return $this->easyMeta->propertyIds();
     }
 
     public function setBasePath(string $basePath): Form

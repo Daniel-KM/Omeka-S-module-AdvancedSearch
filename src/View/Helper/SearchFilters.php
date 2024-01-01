@@ -151,7 +151,7 @@ class SearchFilters extends AbstractHelper
                             $propertyLabel = [];
                             $properties = is_array($queriedProperties) ? $queriedProperties : [$queriedProperties];
                             foreach ($properties as $property) {
-                                $label = $easyMeta->propertyLabels($property);
+                                $label = $easyMeta->propertyLabel($property);
                                 $propertyLabel[] = $label ? $translate($label) : $translate('Unknown property'); // @translate
                             }
                             $propertyLabel = implode(' ' . $translate('OR') . ' ', $propertyLabel);
@@ -439,20 +439,5 @@ class SearchFilters extends AbstractHelper
         return $newQuery
             ? $this->baseUrl . '?' . http_build_query($newQuery, '', '&', PHP_QUERY_RFC3986)
             : $this->baseUrl;
-    }
-
-    /**
-     * Get one or more property ids by JSON-LD terms or by numeric ids.
-     *
-     * @param array|int|string|null $termsOrIds One or multiple ids or terms.
-     * @return int[] The property ids matching terms or ids, or all properties
-     * by terms.
-     */
-    protected function getPropertyIds($termsOrIds = null): array
-    {
-        if (is_scalar($termsOrIds)) {
-            $termsOrIds = [$termsOrIds];
-        }
-        return $this->view->easyMeta()->propertyIds($termsOrIds);
     }
 }

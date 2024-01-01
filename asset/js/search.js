@@ -26,6 +26,8 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
+const hasChosenSelect = typeof $.fn.chosen === 'function';
+
 var Search = (function() {
     var self = {};
 
@@ -200,7 +202,7 @@ $(document).ready(function() {
                 && $(this).prop('value') === String(facetValue)
             ) {
                 $(this).prop('selected', false);
-                if ($.isFunction($.fn.chosen)) {
+                if (hasChosenSelect) {
                     $(this).closest('select').trigger('chosen:updated');
                 }
             }
@@ -280,30 +282,59 @@ $(document).ready(function() {
     }
     $('.search-view-type-' + view_type).click();
 
-    if ($.isFunction($.fn.autocomplete)) {
+    if (typeof $.fn.autocomplete === 'function') {
         let searchElement = $('.form-search .autosuggest[name=q]');
         let autosuggestOptions = Search.autosuggestOptions(searchElement);
         if (autosuggestOptions) searchElement.autocomplete(autosuggestOptions);
     }
 
-    if ($.isFunction($.fn.chosen)) {
+    if (hasChosenSelect) {
         $('.chosen-select').chosen(Search.chosenOptions);
     }
 
     /********
-     * Standard advanced search form.
+     * Improved standard advanced search form.
      */
 
-    // Disable query text according to some query types without values.
-    // See global.js.
+    /**
+     * Disable query text according to some query types without values.
+     * @see application/asset/js/global.js.
+     */
     function disableQueryTextInput(queryType) {
         var queryText = queryType.siblings('.query-text');
         queryText.prop('disabled',
             ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'lex', 'nlex', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu'].includes(queryType.val()));
     };
+
+    if (hasChosenSelect) {
+        /**
+         * @see application/asset/js/chosen-options.js
+         */
+        var chosenOptions = chosenOptions || {
+            allow_single_deselect: true,
+            disable_search_threshold: 10,
+            width: '100%',
+            include_group_label_in_selected: true,
+        };
+        $('.chosen-select').chosen(chosenOptions);
+
+        $('body.search').find('#resource-templates .value select, #item-sets .value select, #site_id, #owner_id, #datetime-queries .value select')
+            .addClass('chosen-select').chosen(chosenOptions);
+        $('#property-queries, #resource-class').on('o:value-created', '.value', function(e) {
+            $('.chosen-select').chosen(chosenOptions);
+        });
+        $('#resource-templates, #item-sets').on('o:value-created', '.value', function(e) {
+            $(this).find('select').addClass('chosen-select').chosen(chosenOptions);
+        });
+        $('#datetime-queries').on('o:value-created', '.value', function(e) {
+            $(this).find('select').addClass('chosen-select').chosen(chosenOptions);
+        });
+    }
+
     $(document).on('change', '.query-type', function () {
          disableQueryTextInput($(this));
     });
+
     // Updating querying should be done on load too.
     $('#property-queries .query-type').each(function() {
          disableQueryTextInput($(this));

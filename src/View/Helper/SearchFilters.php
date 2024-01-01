@@ -170,6 +170,9 @@ class SearchFilters extends AbstractHelper
                                 $filterLabel = $translate('AND') . ' ' . $filterLabel;
                             }
                         }
+                        if (in_array($queryType, ['resq', 'nresq', 'lkq', 'nlkq']) && !$noValue) {
+                            $value = array_map('urldecode', $value);
+                        }
                         $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $noValue
                             ? $queryTypesLabels[$queryType]
                             : implode(', ', $flatArray($value));

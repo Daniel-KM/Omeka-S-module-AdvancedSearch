@@ -59,18 +59,26 @@ Added fields are:
 Moreover, it adds new search query operator for properties (some are available
 only via api, not in the advanced search form for now):
 
-- `exs`: has a single value
-- `nexs`: has not a single value
-- `exm`: has multiple values
-- `nexm`: has not multiple values
-- `list`: is in list
-- `nlist`: is not in list
 - `sw`: starts with
 - `nsw`: does not start with
 - `ew`: ends with
 - `new`: does not end with
 - `near`: is similar to (algorithm [Soundex], based on British English phonetic)
 - `nnear`: is not similar to
+- `exs`: has a single value
+- `nexs`: has not a single value
+- `exm`: has multiple values
+- `nexm`: has not multiple values
+- `list`: is in list
+- `nlist`: is not in list
+- `resq`: is resource matching query
+- `nresq`: is not resource matching query
+- `lex`: is a linked resource
+- `nlex`: is not a linked resource
+- `lres`: is linked with resource #id
+- `nlres`: is not linked with resource #id
+- `lkq`: is linked with resources matching query
+- `nlkq`: is not linked with resources matching query
 - `tp`: has main type (literal-like, resource-like, uri-like)
 - `ntp`: has not main type (literal-like, resource-like, uri-like)
 - `tpl`: has type literal-like
@@ -81,10 +89,6 @@ only via api, not in the advanced search form for now):
 - `ntpu`: has not type uri-like
 - `dtp`: has data type
 - `ndtp`: has not data type
-- `lex`: is a linked resource
-- `nlex`: is not a linked resource
-- `lres`: is linked with resource #id
-- `nlres`: is not linked with resource #id
 - `gt`: greater than
 - `gte`: greater than or equal
 - `lte`: lower than or equal
@@ -491,7 +495,7 @@ Copyright
 See commits for full list of contributors.
 
 * Copyright BibLibre, 2016-2017 (see [BibLibre])
-* Copyright Daniel Berthereau, 2017-2023 (see [Daniel-KM])
+* Copyright Daniel Berthereau, 2017-2024 (see [Daniel-KM])
 * Copyright Tomas Kirda 2017 (library jQuery-Autocomplete)
 
 This module is a merge of features from the deprecated modules [Advanced Search Plus],

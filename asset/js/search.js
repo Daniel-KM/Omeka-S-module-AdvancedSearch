@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  * Copyright BibLibre, 2016
  * Copyright Daniel Berthereau, 2017-2024

@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Manage the simple search field in admin board.
  */

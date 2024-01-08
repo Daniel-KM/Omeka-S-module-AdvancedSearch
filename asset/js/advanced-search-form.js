@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Manage the improvements of the standard advanced search.
  */

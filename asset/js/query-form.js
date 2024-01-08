@@ -1,3 +1,5 @@
+'use strict';
+
 $(document).ready(function () {
     let selectingElement;
     let currentQuery = '';

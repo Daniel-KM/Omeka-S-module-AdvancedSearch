@@ -146,7 +146,7 @@ class IndexSuggestions extends AbstractJob
         ];
         $resourceNames = array_intersect_key($mapResources, array_flip($resourceNames));
 
-        $easyMeta = $this->getServiceLocator()->get('ViewHelperManager')->get('easyMeta');
+        $easyMeta = $this->getServiceLocator()->get('EasyMeta');
 
         // FIXME Fields are not only properties, but titles, classes and templates.
         $fields = $suggester->setting('fields') ?: [];

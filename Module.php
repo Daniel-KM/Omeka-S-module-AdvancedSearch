@@ -34,14 +34,13 @@
  */
 namespace AdvancedSearch;
 
-if (!class_exists(\Generic\AbstractModule::class)) {
-    require file_exists(dirname(__DIR__) . '/Generic/AbstractModule.php')
-        ? dirname(__DIR__) . '/Generic/AbstractModule.php'
-        : __DIR__ . '/src/Generic/AbstractModule.php';
+if (!class_exists(\Common\TraitModule::class)) {
+    require_once dirname(__DIR__) . '/Common/TraitModule.php';
 }
 
 use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
-use Generic\AbstractModule;
+use Common\TraitModule;
+use Omeka\Module\AbstractModule;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
 use Laminas\ModuleManager\ModuleManager;
@@ -52,6 +51,12 @@ use Omeka\Stdlib\Message;
 class Module extends AbstractModule
 {
     const NAMESPACE = __NAMESPACE__;
+
+    use TraitModule;
+
+    protected $dependencies = [
+        'Common',
+    ];
 
     /**
      * @var bool

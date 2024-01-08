@@ -3,6 +3,7 @@
 namespace AdvancedSearch\Form;
 
 use AdvancedSearch\Form\Element as AdvancedSearchElement;
+use Common\Form\Element as CommonElement;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 
@@ -51,7 +52,7 @@ class SettingsFieldset extends Fieldset
             ])
             ->add([
                 'name' => 'advancedsearch_main_config',
-                'type' => AdvancedSearchElement\OptionalSelect::class,
+                'type' => CommonElement\OptionalSelect::class,
                 'options' => [
                     'element_group' => 'advanced_search',
                     'label' => 'Default search page (admin)', // @translate
@@ -65,7 +66,7 @@ class SettingsFieldset extends Fieldset
             ])
             ->add([
                 'name' => 'advancedsearch_configs',
-                'type' => AdvancedSearchElement\OptionalMultiCheckbox::class,
+                'type' => CommonElement\OptionalMultiCheckbox::class,
                 'options' => [
                     'element_group' => 'advanced_search',
                     'label' => 'Available search pages', // @translate
@@ -77,7 +78,7 @@ class SettingsFieldset extends Fieldset
             ])
             ->add([
                 'name' => 'advancedsearch_api_config',
-                'type' => AdvancedSearchElement\OptionalSelect::class,
+                'type' => CommonElement\OptionalSelect::class,
                 'options' => [
                     'element_group' => 'advanced_search',
                     'label' => 'Quick api search via external search engine', // @translate
@@ -92,7 +93,7 @@ class SettingsFieldset extends Fieldset
             // TODO Remove this option if there is no issue with async (except multiple search engines).
             ->add([
                 'name' => 'advancedsearch_index_batch_edit',
-                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'type' => CommonElement\OptionalRadio::class,
                 'options' => [
                     'element_group' => 'advanced_search',
                     'label' => 'Indexing after a batch edit process', // @translate

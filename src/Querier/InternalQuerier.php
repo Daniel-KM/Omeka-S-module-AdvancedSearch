@@ -1138,7 +1138,7 @@ SQL;
      */
     protected function getPropertyIds($termsOrIds = null): array
     {
-        return $this->services->get('ViewHelperManager')->get('easyMeta')->propertyIds($termsOrIds);
+        return $this->services->get('EasyMeta')->propertyIds($termsOrIds);
     }
 
     /**
@@ -1148,7 +1148,7 @@ SQL;
      */
     protected function getPropertyTerm($termOrId): ?string
     {
-        return $this->services->get('ViewHelperManager')->get('easyMeta')->propertyTerm($termOrId);
+        return $this->services->get('EasyMeta')->propertyTerm($termOrId);
     }
 
     /**
@@ -1158,7 +1158,7 @@ SQL;
      */
     protected function getResourceClassIds($termsOrIds = null): array
     {
-        return $this->services->get('ViewHelperManager')->get('easyMeta')->resourceClassIds($termsOrIds);
+        return $this->services->get('EasyMeta')->resourceClassIds($termsOrIds);
     }
 
     /**
@@ -1168,6 +1168,6 @@ SQL;
      */
     protected function getResourceTemplateIds($labelsOrIds = null): array
     {
-        return $this->services->get('ViewHelperManager')->get('easyMeta')->resourceTemplateIds($labelsOrIds);
+        return $this->services->get('EasyMeta')->resourceTemplateIds($labelsOrIds);
     }
 }

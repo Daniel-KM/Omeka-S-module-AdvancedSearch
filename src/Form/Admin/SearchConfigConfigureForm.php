@@ -31,6 +31,7 @@
 namespace AdvancedSearch\Form\Admin;
 
 use AdvancedSearch\Form\Element as AdvancedSearchElement;
+use Common\Form\Element as CommonElement;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
@@ -118,7 +119,7 @@ class SearchConfigConfigureForm extends Form
             ])
             ->add([
                 'name' => 'hidden_query_filters',
-                'type' => AdvancedSearchElement\UrlQuery::class,
+                'type' => CommonElement\UrlQuery::class,
                 'options' => [
                     'label' => 'Hidden query filter to limit results', // @translate
                     'info' => 'These args are appended to all queries. The format of the query depends on the search form and the search engine.', // @translated
@@ -140,7 +141,7 @@ class SearchConfigConfigureForm extends Form
             ->get('autosuggest')
             ->add([
                 'name' => 'suggester',
-                'type' => AdvancedSearchElement\OptionalSelect::class,
+                'type' => CommonElement\OptionalSelect::class,
                 'options' => [
                     'label' => 'Suggester', // @translate
                     'value_options' => $this->suggesters,
@@ -155,7 +156,7 @@ class SearchConfigConfigureForm extends Form
             ])
             ->add([
                 'name' => 'url',
-                'type' => AdvancedSearchElement\OptionalUrl::class,
+                'type' => CommonElement\OptionalUrl::class,
                 'options' => [
                     'label' => 'Direct endpoint', // @translate
                     // @see https://solr.apache.org/guide/suggester.html#suggest-request-handler-parameters
@@ -378,7 +379,7 @@ nlres = is not linked with resource with ID
             ->get('display')
             ->add([
                 'name' => 'search_filters',
-                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'type' => CommonElement\OptionalRadio::class,
                 'options' => [
                     'label' => 'List of query filters', // @translate
                     'value_options' => [
@@ -395,7 +396,7 @@ nlres = is not linked with resource with ID
             ])
             ->add([
                 'name' => 'active_facets',
-                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'type' => CommonElement\OptionalRadio::class,
                 'options' => [
                     'label' => 'List of active facets', // @translate
                     'value_options' => [
@@ -412,7 +413,7 @@ nlres = is not linked with resource with ID
             ])
             ->add([
                 'name' => 'total_results',
-                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'type' => CommonElement\OptionalRadio::class,
                 'options' => [
                     'label' => 'Total results', // @translate
                     'value_options' => [
@@ -429,7 +430,7 @@ nlres = is not linked with resource with ID
             ])
             ->add([
                 'name' => 'paginator',
-                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'type' => CommonElement\OptionalRadio::class,
                 'options' => [
                     'label' => 'Paginator', // @translate
                     'value_options' => [
@@ -446,7 +447,7 @@ nlres = is not linked with resource with ID
             ])
             ->add([
                 'name' => 'per_pages',
-                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'type' => CommonElement\OptionalRadio::class,
                 'options' => [
                     'label' => 'Pagination per page', // @translate
                     'value_options' => [
@@ -463,7 +464,7 @@ nlres = is not linked with resource with ID
             ])
             ->add([
                 'name' => 'sort',
-                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'type' => CommonElement\OptionalRadio::class,
                 'options' => [
                     'label' => 'Sort', // @translate
                     'value_options' => [
@@ -480,7 +481,7 @@ nlres = is not linked with resource with ID
             ])
             ->add([
                 'name' => 'grid_list',
-                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'type' => CommonElement\OptionalRadio::class,
                 'options' => [
                     'label' => 'Grid / list', // @translate
                     'value_options' => [
@@ -497,7 +498,7 @@ nlres = is not linked with resource with ID
             ])
             ->add([
                 'name' => 'grid_list_mode',
-                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'type' => CommonElement\OptionalRadio::class,
                 'options' => [
                     'label' => 'Grid / list default mode', // @translate
                     'value_options' => [
@@ -678,7 +679,7 @@ nlres = is not linked with resource with ID
             ])
             ->add([
                 'name' => 'order',
-                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'type' => CommonElement\OptionalRadio::class,
                 'options' => [
                     'label' => 'Order of facet items', // @translate
                     'value_options' => [
@@ -709,7 +710,7 @@ nlres = is not linked with resource with ID
             ])
             ->add([
                 'name' => 'display_list',
-                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'type' => CommonElement\OptionalRadio::class,
                 'options' => [
                     'label' => 'Display list of facets', // @translate
                     'value_options' => [
@@ -725,7 +726,7 @@ nlres = is not linked with resource with ID
             ])
             ->add([
                 'name' => 'mode',
-                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'type' => CommonElement\OptionalRadio::class,
                 'options' => [
                     'label' => 'Facet mode', // @translate
                     'value_options' => [
@@ -741,7 +742,7 @@ nlres = is not linked with resource with ID
             ])
             ->add([
                 'name' => 'display_submit',
-                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'type' => CommonElement\OptionalRadio::class,
                 'options' => [
                     'label' => 'Position of the button "Apply filters"', // @translate
                     'value_options' => [
@@ -759,7 +760,7 @@ nlres = is not linked with resource with ID
             ])
             ->add([
                 'name' => 'display_reset',
-                'type' => AdvancedSearchElement\OptionalRadio::class,
+                'type' => CommonElement\OptionalRadio::class,
                 'options' => [
                     'label' => 'Position of the button "Reset facets"', // @translate
                     'value_options' => [

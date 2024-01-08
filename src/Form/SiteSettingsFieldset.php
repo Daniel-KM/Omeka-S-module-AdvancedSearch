@@ -3,6 +3,7 @@
 namespace AdvancedSearch\Form;
 
 use AdvancedSearch\Form\Element as AdvancedSearchElement;
+use Common\Form\Element as CommonElement;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Omeka\Settings\AbstractSettings;
@@ -53,7 +54,7 @@ class SiteSettingsFieldset extends Fieldset
             ->setOption('element_groups', $this->elementGroups)
             ->add([
                 'name' => 'advancedsearch_search_fields',
-                'type' => AdvancedSearchElement\OptionalMultiCheckbox::class,
+                'type' => CommonElement\OptionalMultiCheckbox::class,
                 'options' => [
                     'element_group' => 'search',
                     'label' => 'Display only following fields', // @translate
@@ -68,7 +69,7 @@ class SiteSettingsFieldset extends Fieldset
 
             ->add([
                 'name' => 'advancedsearch_main_config',
-                'type' => AdvancedSearchElement\OptionalSelect::class,
+                'type' => CommonElement\OptionalSelect::class,
                 'options' => [
                     'element_group' => 'advanced_search',
                     'label' => 'Default search page', // @translate
@@ -81,7 +82,7 @@ class SiteSettingsFieldset extends Fieldset
             ])
             ->add([
                 'name' => 'advancedsearch_configs',
-                'type' => AdvancedSearchElement\OptionalMultiCheckbox::class,
+                'type' => CommonElement\OptionalMultiCheckbox::class,
                 'options' => [
                     'element_group' => 'advanced_search',
                     'label' => 'Available search pages', // @translate

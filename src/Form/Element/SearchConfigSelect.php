@@ -2,6 +2,7 @@
 
 namespace AdvancedSearch\Form\Element;
 
+use Common\Form\Element\TraitOptionalElement;
 use Laminas\Form\Element\Select;
 
 class SearchConfigSelect extends Select

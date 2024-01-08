@@ -121,6 +121,8 @@ advanced search form, with chosen-select.
 Installation
 ------------
 
+This module is dependant of module [Common], that should be installed first.
+
 The module uses an external library [jQuery-Autocomplete], so use the release
 zip to install it, or use and init the source.
 
@@ -516,6 +518,7 @@ for the future digital library [Corpus du Louvre].
 [Soundex]: https://en.wikipedia.org/wiki/Soundex
 [Installing a module]: https://omeka.org/s/docs/user-manual/modules/#installing-modules
 [this patch]: https://github.com/omeka/omeka-s/pull/1519/files
+[Common]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common
 [jQuery-Autocomplete]: https://github.com/devbridge/jQuery-Autocomplete
 [Reference]: https://gitlab.com/Daniel-KM/Omeka-S-module-Reference
 [Advanced Search Plus]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearchPlus

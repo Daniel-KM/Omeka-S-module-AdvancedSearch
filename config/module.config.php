@@ -100,6 +100,15 @@ return [
             Form\SearchingFormFieldset::class => Service\Form\SearchingFormFieldsetFactory::class,
             Form\SettingsFieldset::class => Service\Form\SettingsFieldsetFactory::class,
             Form\SiteSettingsFieldset::class => Service\Form\SiteSettingsFieldsetFactory::class,
+            // These three elements are overridden from core in order to be able to fix prepend value "0".
+            Form\Element\ItemSetSelect::class => Service\Form\Element\ItemSetSelectFactory::class,
+            Form\Element\ResourceTemplateSelect::class => Service\Form\Element\ResourceTemplateSelectFactory::class,
+            Form\Element\SiteSelect::class => Service\Form\Element\SiteSelectFactory::class,
+        ],
+        'aliases' => [
+            \Omeka\Form\Element\ItemSetSelect::class => Form\Element\ItemSetSelect::class,
+            \Omeka\Form\Element\ResourceTemplateSelect::class => Form\Element\ResourceTemplateSelect::class,
+            \Omeka\Form\Element\SiteSelect::class => Form\Element\SiteSelect::class,
         ],
     ],
     'controllers' => [

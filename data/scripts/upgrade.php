@@ -402,3 +402,23 @@ if (version_compare($oldVersion, '3.4.16', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.18', '<')) {
+    /** @var \Omeka\Module\Manager $moduleManager */
+    $moduleManager = $services->get('Omeka\ModuleManager');
+    $module = $moduleManager->getModule('Common');
+    if ($module && in_array($module->getState(), [
+        \Omeka\Module\Manager::STATE_ACTIVE,
+        \Omeka\Module\Manager::STATE_NOT_ACTIVE,
+        \Omeka\Module\Manager::STATE_NEEDS_UPGRADE,
+    ])) {
+        $version = $module->getIni('version');
+        if (version_compare($version, '3.4.47', '<')) {
+            $message = new Message(
+                'The module %1$s should be upgraded to version %2$s or later.', // @translate
+                'Common', '3.4.47'
+            );
+            throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
+        }
+    }
+}

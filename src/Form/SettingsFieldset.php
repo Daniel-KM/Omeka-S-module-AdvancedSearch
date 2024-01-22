@@ -2,7 +2,6 @@
 
 namespace AdvancedSearch\Form;
 
-use AdvancedSearch\Form\Element as AdvancedSearchElement;
 use Common\Form\Element as CommonElement;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
@@ -19,11 +18,6 @@ class SettingsFieldset extends Fieldset
      */
     protected $searchConfigsApi = [];
 
-    /**
-     * @var bool
-     */
-    protected $restrictUsedTerms = false;
-
     protected $label = 'Advanced Search (admin board)'; // @translate
 
     protected $elementGroups = [
@@ -36,20 +30,6 @@ class SettingsFieldset extends Fieldset
         $this
             ->setAttribute('id', 'advanced-search')
             ->setOption('element_groups', $this->elementGroups)
-            /** @deprecated Since Omeka v3.1 */
-            ->add([
-                'name' => 'advancedsearch_restrict_used_terms',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'element_group' => 'search',
-                    'label' => 'Restrict to used properties and resources classes', // @translate
-                    'info' => 'If checked, restrict the list of properties and resources classes to the used ones in advanced search form.', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'advancedsearch_restrict_used_terms',
-                    'value' => $this->restrictUsedTerms,
-                ],
-            ])
             ->add([
                 'name' => 'advancedsearch_main_config',
                 'type' => CommonElement\OptionalSelect::class,
@@ -123,12 +103,6 @@ class SettingsFieldset extends Fieldset
     public function setSearchConfigsApi(array $searchConfigsApi): self
     {
         $this->searchConfigsApi = $searchConfigsApi;
-        return $this;
-    }
-
-    public function setRestrictUsedTerms(bool $restrictUsedTerms): self
-    {
-        $this->restrictUsedTerms = $restrictUsedTerms;
         return $this;
     }
 }

@@ -12,7 +12,6 @@
 
 $plugins = $this->getHelperPluginManager();
 $status = $plugins->get('status');
-$setting = $plugins->get('setting');
 $translate = $plugins->get('translate');
 $hyperlink = $plugins->get('hyperlink');
 $siteSetting = $plugins->get('siteSetting');
@@ -20,7 +19,7 @@ $resourceClassSelect = $plugins->get('resourceClassSelect');
 
 $isSiteRequest = $status->isSiteRequest();
 $applyTemplates = $isSiteRequest ? $siteSetting('search_apply_templates') : false;
-$usedTerms = $isSiteRequest ? false : $setting('advancedsearch_restrict_used_terms', true);
+$usedTerms = !$isSiteRequest;
 
 // Prepare the resource class query.
 $ids = $query['resource_class_id'] ?? [];

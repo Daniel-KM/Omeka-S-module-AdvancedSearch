@@ -364,7 +364,6 @@ return [
     ],
     'advancedsearch' => [
         'settings' => [
-            'advancedsearch_restrict_used_terms' => true,
             'advancedsearch_main_config' => 1,
             'advancedsearch_configs' => [1],
             'advancedsearch_api_config' => '',

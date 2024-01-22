@@ -388,6 +388,7 @@ if (version_compare($oldVersion, '3.4.15', '<')) {
 DELETE FROM `site_setting`
 WHERE `id` = "advancedsearch_restrict_used_terms";
 SQL;
+    $connection->executeStatement($sql);
 
     $message = new Message(
         'The performance was improved in many places, in particular for large databases.' // @translate
@@ -415,4 +416,14 @@ if (version_compare($oldVersion, '3.4.18', '<')) {
         );
         throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
     }
+}
+
+if (version_compare($oldVersion, '3.4.19', '<')) {
+    // Repeated because of an issue in previous version.
+    $settings->delete('advancedsearch_restrict_used_terms');
+    $sql = <<<'SQL'
+DELETE FROM `site_setting`
+WHERE `id` = "advancedsearch_restrict_used_terms";
+SQL;
+    $connection->executeStatement($sql);
 }

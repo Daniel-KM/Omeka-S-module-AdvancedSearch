@@ -25,6 +25,6 @@ class SettingsFieldsetFactory implements FactoryInterface
         return $fieldset
             ->setSearchConfigs($valueOptions)
             ->setSearchConfigsApi($apiOptions)
-            ->setRestrictUsedTerms((bool) $services->get('Omeka\Settings')->get('advancedsearch_restrict_used_terms'));
+        ;
     }
 }

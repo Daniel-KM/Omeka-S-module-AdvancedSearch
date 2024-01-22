@@ -133,20 +133,25 @@ return [
             'totalJobs' => Service\ControllerPlugin\TotalJobsFactory::class,
         ],
     ],
-    'listeners' => [
-        Mvc\MvcListeners::class,
-    ],
     'service_manager' => [
         'invokables' => [
             Mvc\MvcListeners::class => Mvc\MvcListeners::class,
-        ],
-        'delegators' => [
-            'Omeka\ApiManager' => [Service\ApiManagerDelegatorFactory::class],
         ],
         'factories' => [
             'Search\AdapterManager' => Service\AdapterManagerFactory::class,
             'Search\FormAdapterManager' => Service\FormAdapterManagerFactory::class,
         ],
+        'delegators' => [
+            'Omeka\ApiManager' => [
+                Service\Delegator\ApiManagerDelegatorFactory::class,
+            ],
+            'Omeka\FulltextSearch' => [
+                Service\Delegator\FulltextSearchDelegatorFactory::class,
+            ],
+        ],
+    ],
+    'listeners' => [
+        Mvc\MvcListeners::class,
     ],
     'navigation_links' => [
         'invokables' => [

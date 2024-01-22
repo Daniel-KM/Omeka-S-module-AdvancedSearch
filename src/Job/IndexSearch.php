@@ -60,7 +60,6 @@ class IndexSearch extends AbstractJob
 
         $apiAdapters = $services->get('Omeka\ApiAdapterManager');
         $api = $services->get('Omeka\ApiManager');
-        $settings = $services->get('Omeka\Settings');
         $this->logger = $services->get('Omeka\Logger');
 
         // The reference id is the job id for now.
@@ -70,10 +69,7 @@ class IndexSearch extends AbstractJob
             $this->logger->addProcessor($referenceIdProcessor);
         }
 
-        $batchSize = (int) $settings->get('advancedsearch_batch_size');
-        if ($batchSize <= 0) {
-            $batchSize = self::BATCH_SIZE;
-        }
+        $batchSize = self::BATCH_SIZE;
 
         $searchEngineId = $this->getArg('search_engine_id');
         $startResourceId = (int) $this->getArg('start_resource_id');
@@ -220,7 +216,7 @@ class IndexSearch extends AbstractJob
                 ++$searchConfig;
                 $totals[$resourceName] += count($resources);
                 $entityManager->clear();
-            } while (count($resources) == $batchSize);
+            } while (count($resources) === $batchSize);
         }
 
         $totalResults = [];

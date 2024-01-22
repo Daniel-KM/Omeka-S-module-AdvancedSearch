@@ -111,20 +111,7 @@ class SettingsFieldset extends Fieldset
                     'id' => 'advancedsearch_index_batch_edit',
                 ],
             ])
-            // TODO Remove this useless option.
-            ->add([
-                'name' => 'advancedsearch_batch_size',
-                'type' => Element\Number::class,
-                'options' => [
-                    'element_group' => 'advanced_search',
-                    'label' => 'Search batch size for reindexation', // @translate
-                    'info' => 'Default is 100, but it can be adapted according to your resource average size, your mapping and your architecture.', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'advancedsearch_batch_size',
-                    'min' => 1,
-                ],
-            ]);
+        ;
     }
 
     public function setSearchConfigs(array $searchConfigs): self

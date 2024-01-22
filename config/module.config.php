@@ -370,7 +370,6 @@ return [
             'advancedsearch_api_config' => '',
             // TODO Remove this option if there is no issue with sync or async (except multiple search engines).
             'advancedsearch_index_batch_edit' => 'sync',
-            'advancedsearch_batch_size' => 100,
             // Hidden value.
             'advancedsearch_all_configs' => [1 => 'find'],
         ],

@@ -118,6 +118,7 @@ class SearchFilters extends AbstractHelper
                 // Search values (by property or all)
                 case 'property':
                     $queryTypesLabels = $this->getQueryTypesLabels();
+                    /** @var \Common\Stdlib\EasyMeta $easyMeta */
                     $easyMeta = $plugins->get('easyMeta')();
                     // TODO The array may be more than zero when firsts are standard (see core too for inverse).
                     $index = 0;

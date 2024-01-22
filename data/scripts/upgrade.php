@@ -419,6 +419,14 @@ if (version_compare($oldVersion, '3.4.18', '<')) {
 }
 
 if (version_compare($oldVersion, '3.4.19', '<')) {
+    if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.48')) {
+        $message = new Message(
+            'The module %1$s should be upgraded to version %2$s or later.', // @translate
+            'Common', '3.4.48'
+        );
+        throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
+    }
+
     // Repeated because of an issue in previous version.
     $settings->delete('advancedsearch_restrict_used_terms');
     $sql = <<<'SQL'

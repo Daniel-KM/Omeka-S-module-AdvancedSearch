@@ -10,6 +10,13 @@ class FulltextSearchDelegatorFactory implements DelegatorFactoryInterface
 {
     public function __invoke(ContainerInterface $services, $name, callable $callback, array $options = null)
     {
+        // Skip delegator if not enabled.
+        $settings = $services->get('Omeka\Settings');
+        $fulltextSearch = (bool) $settings->get('advancedsearch_fulltextsearch_alto');
+        if (!$fulltextSearch) {
+            return $callback();
+        }
+
         $config = $services->get('Config');
         $basePath = $config['file_store']['local']['base_path'] ?: (OMEKA_PATH . '/files');
         return new FulltextSearchDelegator(

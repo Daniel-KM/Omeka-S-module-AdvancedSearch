@@ -369,6 +369,7 @@ return [
     ],
     'advancedsearch' => [
         'settings' => [
+            'advancedsearch_fulltextsearch_alto' => false,
             'advancedsearch_main_config' => 1,
             'advancedsearch_configs' => [1],
             'advancedsearch_api_config' => '',

@@ -31,6 +31,18 @@ class SettingsFieldset extends Fieldset
             ->setAttribute('id', 'advanced-search')
             ->setOption('element_groups', $this->elementGroups)
             ->add([
+                'name' => 'advancedsearch_fulltextsearch_alto',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'element_group' => 'search',
+                    'label' => 'Add xml alto text to full text search', // @translate
+                    'info' => 'Allow to search text stored in xml alto files without including it in a property.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearch_fulltextsearch_alto',
+                ],
+            ])
+            ->add([
                 'name' => 'advancedsearch_main_config',
                 'type' => CommonElement\OptionalSelect::class,
                 'options' => [

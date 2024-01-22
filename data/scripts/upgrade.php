@@ -161,10 +161,10 @@ SQL;
 
     // Add the default search partial process for internal engine.
     // Add the default multi-fields to internal engine.
-    if (file_exists(__DIR__ . '/../../data/search_engines/internal.php';)) {
+    if (file_exists(__DIR__ . '/../../data/search_engines/internal.php')) {
         $searchEngineConfig = require __DIR__ . '/../../data/search_engines/internal.php';
     } else {
-        searchEngineConfig = [];
+        $searchEngineConfig = [];
     }
     $defaultAdapterSettings = $searchEngineConfig['o:settings']['adapter']
         ?? ['default_search_partial_word' => false, 'multifields' => []];

@@ -1311,6 +1311,6 @@ SQL;
             $messenger->addSuccess($message);
         }
 
-        return $searchConfigId;
+        return (int) $searchConfigId;
     }
 }

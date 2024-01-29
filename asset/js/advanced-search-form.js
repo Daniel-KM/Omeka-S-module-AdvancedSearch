@@ -37,6 +37,7 @@ $(document).ready(function() {
 
     /**
      * Handle query text according to some query types.
+     *
      * @see application/asset/js/global.js Omeka.disableQueryTextInput()
      */
     Omeka.handleQueryTextInput = function(queryType) {
@@ -159,20 +160,22 @@ $(document).ready(function() {
                 if (inputNames.includes(inputName)) {
                     input.prop('name', '');
                 } else if (match = inputName.match(/property\[(\d+)\]\[text\]/)) {
-                    const propertyType = form.find(`[name="property[${match[1]}][type]"]`);
+                    const subIndex = match[1];
+                    const propertyType = form.find(`[name="property[${subIndex}][type]"]`);
                     if (propertyQueryTypeWithText.includes(propertyType.val())) {
-                        form.find(`[name="property[${match[1]}][joiner]"]`).prop('name', '');
-                        form.find(`[name="property[${match[1]}][property]"]`).prop('name', '');
-                        form.find(`[name="property[${match[1]}][text]"]`).prop('name', '');
+                        form.find(`[name="property[${subIndex}][joiner]"]`).prop('name', '');
+                        form.find(`[name="property[${subIndex}][property]"]`).prop('name', '');
+                        form.find(`[name="property[${subIndex}][text]"]`).prop('name', '');
                         propertyType.prop('name', '');
                     }
                 }
                 // Module Advanced Search.
                 else if (match = inputName.match(/datetime\[(\d+)\]\[(field|type|value)\]/)) {
-                    form.find(`[name="datetime[${match[1]}][joiner]"]`).prop('name', '');
-                    form.find(`[name="datetime[${match[1]}][field]"]`).prop('name', '');
-                    form.find(`[name="datetime[${match[1]}][type]"]`).prop('name', '');
-                    form.find(`[name="datetime[${match[1]}][value]"]`).prop('name', '');
+                    const subIndex = match[1];
+                    form.find(`[name="datetime[${subIndex}][joiner]"]`).prop('name', '');
+                    form.find(`[name="datetime[${subIndex}][field]"]`).prop('name', '');
+                    form.find(`[name="datetime[${subIndex}][type]"]`).prop('name', '');
+                    form.find(`[name="datetime[${subIndex}][value]"]`).prop('name', '');
                 }
                 // Module Mapping.
                 else if (['mapping_address', 'mapping_radius', 'mapping_radius_unit'].includes(inputName)) {
@@ -186,8 +189,9 @@ $(document).ready(function() {
                 }
                 // Module Numeric Data Types.
                 else if (match = inputName.match(/numeric\[(ts\]\[gte|ts\]\[lte|dur\]\[gt|dur\]\[lt|ivl|int\]\[gt|int\]\[lt)\]\[(pid|val)\]/)) {
+                    const numericType = match[1];
                     const pidOrVal = match[2] === 'pid' ? 'val' : 'pid';
-                    const pidOrValInput = form.find(`[name="numeric[${match[1]}][${pidOrVal}]"]`);
+                    const pidOrValInput = form.find(`[name="numeric[${numericType}][${pidOrVal}]"]`);
                     input.prop('name', '');
                     pidOrValInput.prop('name', '');
                 }
@@ -206,6 +210,7 @@ $(document).ready(function() {
 
     /**
      * Handle negative item set search  when js is removed from template.
+     *
      * @see application/view/common/advanced-search/item-sets.phtml
      * @see Pull request "fix/advanced_search_templates" on https://github.com/omeka/omeka-s
      */
@@ -236,19 +241,9 @@ $(document).ready(function() {
         });
     }
 
-    // Skip core functions (global.js), since is is improved above.
-    $(document).off('change', '.query-type');
-    $(document).on('change', '.query-type', function () {
-         Omeka.handleQueryTextInput($(this));
-    });
-
-    // Updating querying should be done on load too.
-    $('#property-queries .query-type').each(function() {
-         Omeka.handleQueryTextInput($(this));
-    });
-
     /**
      * Handle clearing fields on new property multi-value.
+     *
      * @see application/asset/js/advanced-search.js.
      */
     $(document).on('o:value-created', '#property-queries .value', function(e) {
@@ -258,10 +253,10 @@ $(document).ready(function() {
         const newValue = $(this);
         const isSidebar = newValue.parents('.sidebar').length > 0;
         if (isSidebar) {
-            newValue.find(".query-type option[value='resq']").remove();
-            newValue.find(".query-type option[value='nresq']").remove();
-            newValue.find(".query-type option[value='lkq']").remove();
-            newValue.find(".query-type option[value='nlkq']").remove();
+            newValue.find('.query-type option[value="resq"]').remove();
+            newValue.find('.query-type option[value="nresq"]').remove();
+            newValue.find('.query-type option[value="lkq"]').remove();
+            newValue.find('.query-type option[value="nlkq"]').remove();
             newValue.find('.query-form-element').remove();
         } else {
             newValue.find('.query-form-element').attr('data-query', '').hide();
@@ -287,15 +282,16 @@ $(document).ready(function() {
 
     /**
      * Copy of resource-selector for sidebar (not loaded in search form).
+     *
      * @see application/asset/js/resource-selector.js
      */
     $(document).on('o:sidebar-content-loaded', '#query-sidebar-edit', function(e) {
         // Don't allow sub-sub-queries for now.
         const sidebar = $(this);
-        sidebar.find(".query-type option[value='resq']").remove();
-        sidebar.find(".query-type option[value='nresq']").remove();
-        sidebar.find(".query-type option[value='lkq']").remove();
-        sidebar.find(".query-type option[value='nlkq']").remove();
+        sidebar.find('.query-type option[value="resq"]').remove();
+        sidebar.find('.query-type option[value="nresq"]').remove();
+        sidebar.find('.query-type option[value="kq"]').remove();
+        sidebar.find('.query-type option[value="nlkq"]').remove();
         sidebar.find('.query-form-element').remove();
         if (hasChosenSelect) {
             sidebar.find('select.item-set-select-type, select#site_id, select#owner_id').addClass('chosen-select');
@@ -306,10 +302,30 @@ $(document).ready(function() {
         Omeka.handleQueryTextInput(sidebar.find('.query-type'));
     });
 
-    // Clean the query before submitting the form.
+    /**
+     * Clean the query before submitting the form.
+     *
+     * Skip core functions, since they are improved above.
+     *
+     * @see application/asset/js//advanced-search.js
+     * @see application/asset/js/global.js
+     * @see application/asset/js/query-form.js
+     */
+    $(document).off('change', '.query-type');
+    $(document).on('change', '.query-type', function () {
+         Omeka.handleQueryTextInput($(this));
+    });
+
     $(document).off('submit', '#advanced-search');
     $(document).on('submit', '#advanced-search', function(e) {
         Omeka.cleanFormSearchQuery($(this));
+    });
+
+    /**
+     * Handle preparation of the advanced search form for property part on load.
+     */
+    $('.query-type').each(function() {
+        Omeka.handleQueryTextInput($(this));
     });
 
 });

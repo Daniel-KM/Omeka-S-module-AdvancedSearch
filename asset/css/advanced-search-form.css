@@ -1,6 +1,7 @@
 /**
  * Manage the improvements of the standard advanced search.
- * Adapted from application/asset/sass/_screen.scss
+ *
+ * Adapted from application/asset/sass/_screen.scss and application/asset/sass/advanced-search-form.scss.
  */
 @media screen {
     #advanced-search .item-set-select-type + .chosen-container {

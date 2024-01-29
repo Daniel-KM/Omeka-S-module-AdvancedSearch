@@ -127,7 +127,7 @@ $(document).ready(function () {
     // Handle the button that sets the query string from the search sidebar.
     $('#content').on('click', '.query-form-set', function (e) {
         Omeka.closeSidebar(sidebarEdit);
-        const form = $('.sidebar-content #advanced-search');
+        const form = $('.sidebar #advanced-search');
         Omeka.cleanFormSearchQuery(form);
         const url = selectingElement.data('searchFiltersUrl');
         const query = form.serialize();
@@ -147,7 +147,7 @@ $(document).ready(function () {
     $('#content').on('click', '.query-form-preview', function (e) {
         Omeka.openSidebar(sidebarPreview);
         const url = selectingElement.data('sidebar-preview-url');
-        const query = $('.sidebar-content #advanced-search').serialize();
+        const query = $('.sidebar #advanced-search').serialize();
         Omeka.populateSidebarContent(sidebarPreview, `${url}?${query}`, {
             query_resource_type: selectingElement.data('resourceType'),
             query_preview_append_query: JSON.stringify(selectingElement.data('previewAppendQuery'))

@@ -48,9 +48,11 @@ $(document).ready(function() {
         const isTypeDataType = ['dtp', 'ndtp'].includes(typeQuery);
         const isTypeMainType = ['tp', 'ntp'].includes(typeQuery);
         const queryTextInput = queryType.siblings('.query-text:not(.query-data-type):not(.query-main-type)');
+        const queryTextSubQuery = queryType.closest('.value').find('.sub-query .query-form-query');
         const queryTextDataType = queryType.siblings('.query-data-type');
         const queryTextMainType = queryType.siblings('.query-main-type');
         queryTextInput.prop('disabled', isTypeWithoutText || isTypeSubQuery || isTypeDataType || isTypeMainType);
+        queryTextSubQuery.prop('disabled', !isTypeSubQuery);
         queryTextDataType.prop('disabled', !isTypeDataType);
         queryTextMainType.prop('disabled', !isTypeMainType);
         if (hasChosenSelect) {
@@ -62,6 +64,10 @@ $(document).ready(function() {
             queryTextMainType.chosen(chosenOptions);
         }
     };
+
+    Omeka.disableQueryTextInput = function() {
+        Omeka.handleQueryTextInput($(this));
+    }
 
     Omeka.cleanFormSearchQuery = function(form) {
         const inputNames = [

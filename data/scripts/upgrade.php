@@ -409,20 +409,20 @@ if (version_compare($oldVersion, '3.4.16', '<')) {
 }
 
 if (version_compare($oldVersion, '3.4.18', '<')) {
-    if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.48')) {
+    if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.49')) {
         $message = new Message(
             'The module %1$s should be upgraded to version %2$s or later.', // @translate
-            'Common', '3.4.48'
+            'Common', '3.4.49'
         );
         throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
     }
 }
 
 if (version_compare($oldVersion, '3.4.19', '<')) {
-    if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.48')) {
+    if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.49')) {
         $message = new Message(
             'The module %1$s should be upgraded to version %2$s or later.', // @translate
-            'Common', '3.4.48'
+            'Common', '3.4.49'
         );
         throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
     }

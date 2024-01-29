@@ -4,35 +4,32 @@
  * @var \Laminas\Form\Form $form
  * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
  * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchPage Alias of $searchConfig
+ *
+ * The simple form is similar to the standard search form and keeps only:
+ * - the main field ("q"),
+ * - the hidden elements,
+ * - the button submit.
  */
-
-// This quick form displays only the field "q", similarly to the standard search form.
-
-$plugins = $this->getHelperPluginManager();
-$translate = $plugins->get('translate');
-$formHelper = $plugins->get('form');
-$formElement = $plugins->get('formElement');
 
 $params = $this->params()->fromQuery() ?: [];
 $form
     ->setData($params)
     ->prepare();
 
-if ($form->has('q')) {
-    $q = $form->get('q');
-} else {
-    foreach ($form->getElements() as $element) {
-        if (!($element instanceof \Laminas\Form\Element\Search)) continue;
-        $q = $element;
-        break;
+foreach ($form->getElements() as $name => $element) {
+    if (in_array($name, ['q', 'submit'])
+        || $element instanceof \Laminas\Form\Element\Csrf
+        || $element instanceof \Laminas\Form\Element\Hidden
+        || $element instanceof \Laminas\Form\Element\Submit
+    ) {
+        continue;
     }
-    if (empty($q)) return;
+    $form->remove($name);
+}
+
+foreach ($form->getFieldsets() as $name => $fieldset) {
+    $form->remove($name);
 }
 ?>
 
-<?= $formHelper->openTag($form) ?>
-    <?= $formElement($q
-        ->setAttribute('placeholder', $translate('Search'))
-        ->setAttribute('aria-label', $translate('Search'))) ?>
-    <button type="submit"><?= $translate('Search') ?></button>
-<?= $formHelper->closeTag() ?>
+<?= $this->form($form) ?>

@@ -171,6 +171,7 @@ return [
                 ],
                 */
             ],
+            'attribute_form' => false,
             'button_reset' => true,
             'button_submit' => true,
         ],

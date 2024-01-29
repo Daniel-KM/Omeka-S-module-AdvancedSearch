@@ -113,69 +113,79 @@ if ($isSiteRequest) {
         ?>
         <div class="value">
             <div class="value-common value-fields">
-            <select class="joiner chosen-select" name="<?= $escape($stem . '[joiner]') ?>" aria-label="<?= $translate('Joiner') ?>">
-                <?= $queryOption('and', $property, 'joiner', $translate('AND')) ?>
-                <?= $queryOption('or', $property, 'joiner', $translate('OR')) ?>
-            </select>
-            <?= $propertySelect([
-                'name' => $stem . '[property]',
-                'attributes' => [
-                    'class' => 'query-property chosen-select',
-                    'value' => $propertyList,
-                    'aria-label' => $translate('Properties'), // @translate
-                    'multiple' => true,
-                    'data-placeholder' => '[any property]', // @translate
-                ],
-                'options' => [
-                    'empty_option' => '',
-                    'apply_templates' => $applyTemplates,
-                    'query' => $optionsQuery,
-                    // Used terms in site are already managed by vocabulary scope, but only for items.
-                    'used_terms' => $usedTerms,
-                ],
-            ]) ?>
-            <select class="query-type chosen-select" name="<?= $escape($stem . '[type]') ?>" aria-label="<?= $translate('Query type') ?>">
-                <?= $queryOption('eq', $property, 'type', $translate('is exactly')) ?>
-                <?= $queryOption('neq', $property, 'type', $translate('is not exactly')) ?>
-                <?= $queryOption('in', $property, 'type', $translate('contains')) ?>
-                <?= $queryOption('nin', $property, 'type', $translate('does not contain')) ?>
-                <?= $queryOption('sw', $property, 'type', $translate('starts with')) ?>
-                <?= $queryOption('nsw', $property, 'type', $translate('does not start with')) ?>
-                <?= $queryOption('ew', $property, 'type', $translate('ends with')) ?>
-                <?= $queryOption('new', $property, 'type', $translate('does not end with')) ?>
-                <?= $queryOption('near', $property, 'type', $translate('is similar to')) ?>
-                <?= $queryOption('nnear', $property, 'type', $translate('is not similar to')) ?>
-                <?= $queryOption('res', $property, 'type', $translate('is resource with ID')) ?>
-                <?= $queryOption('nres', $property, 'type', $translate('is not resource with ID')) ?>
-                <?= $queryOption('resq', $property, 'type', $translate('is resource matching query')) ?>
-                <?= $queryOption('nresq', $property, 'type', $translate('is not resource matching query')) ?>
-                <?= $queryOption('ex', $property, 'type', $translate('has any value')) ?>
-                <?= $queryOption('nex', $property, 'type', $translate('has no values')) ?>
-                <?= $queryOption('exs', $property, 'type', $translate('has a single value')) ?>
-                <?= $queryOption('nexs', $property, 'type', $translate('has not a single value')) ?>
-                <?= $queryOption('exm', $property, 'type', $translate('has multiple values')) ?>
-                <?= $queryOption('nexm', $property, 'type', $translate('has not multiple values')) ?>
-                <?= $queryOption('lex', $property, 'type', $translate('is a linked resource')) ?>
-                <?= $queryOption('nlex', $property, 'type', $translate('is not a linked resource')) ?>
-                <?= $queryOption('lres', $property, 'type', $translate('is linked with resource with ID')) ?>
-                <?= $queryOption('nlres', $property, 'type', $translate('is not linked with resource with ID')) ?>
-                <?= $queryOption('lkq', $property, 'type', $translate('is linked with resources matching query')) ?>
-                <?= $queryOption('nlkq', $property, 'type', $translate('is not linked with resources matching query')) ?>
-                <?= $queryOption('dtp', $property, 'type', $translate('has data type')) ?>
-                <?= $queryOption('ndtp', $property, 'type', $translate('has not data type')) ?>
-                <?= $queryOption('tp', $property, 'type', $translate('has main type')) ?>
-                <?= $queryOption('ntp', $property, 'type', $translate('has not main type')) ?>
-                <?= $queryOption('tpl', $property, 'type', $translate('has type literal-like')) ?>
-                <?= $queryOption('ntpl', $property, 'type', $translate('has not type literal-like')) ?>
-                <?= $queryOption('tpr', $property, 'type', $translate('has type resource-like')) ?>
-                <?= $queryOption('ntpr', $property, 'type', $translate('has not type resource-like')) ?>
-                <?= $queryOption('tplu', $property, 'type', $translate('has type uri-like')) ?>
-                <?= $queryOption('ntpu', $property, 'type', $translate('has not type uri-like')) ?>
-            </select>
-            <?= $queryText($isSubQuery ? [] : $property, $index) ?>
-            <?= $dataTypeHelper->getSelect($stem . '[text]', "property[$index][text]" ?? null, ['multiple' => false, 'class' => 'query-text query-data-type chosen-select', 'aria-label' => 'Data types', 'data-placeholder' => $translate('Select data type…')]) // TODO Manage search on property for multiple data types. ?>
-            <?= $formSelect($selectMainDataType->setName($stem . '[text]')->setValue("property[$index][text]" ?? null)) ?>
-            <button type="button" class="o-icon-delete remove-value button" aria-label="<?= $translate('Remove value') ?>" title="<?= $translate('Remove value') ?>"></button>
+                <select class="joiner chosen-select" name="<?= $escape($stem . '[joiner]') ?>" aria-label="<?= $translate('Joiner') ?>">
+                    <?= $queryOption('and', $property, 'joiner', $translate('AND')) ?>
+                    <?= $queryOption('or', $property, 'joiner', $translate('OR')) ?>
+                </select>
+                <?= $propertySelect([
+                    'name' => $stem . '[property]',
+                    'attributes' => [
+                        'class' => 'query-property chosen-select',
+                        'value' => $propertyList,
+                        'aria-label' => $translate('Properties'), // @translate
+                        'multiple' => true,
+                        'data-placeholder' => '[any property]', // @translate
+                    ],
+                    'options' => [
+                        'empty_option' => '',
+                        'apply_templates' => $applyTemplates,
+                        'query' => $optionsQuery,
+                        // Used terms in site are already managed by vocabulary scope, but only for items.
+                        'used_terms' => $usedTerms,
+                    ],
+                ]) ?>
+                <select class="query-type chosen-select" name="<?= $escape($stem . '[type]') ?>" aria-label="<?= $translate('Query type') ?>">
+                    <optgroup label="<?= $translate('Value') ?>">
+                        <?= $queryOption('eq', $property, 'type', $translate('is exactly')) ?>
+                        <?= $queryOption('neq', $property, 'type', $translate('is not exactly')) ?>
+                        <?= $queryOption('in', $property, 'type', $translate('contains')) ?>
+                        <?= $queryOption('nin', $property, 'type', $translate('does not contain')) ?>
+                        <?= $queryOption('sw', $property, 'type', $translate('starts with')) ?>
+                        <?= $queryOption('nsw', $property, 'type', $translate('does not start with')) ?>
+                        <?= $queryOption('ew', $property, 'type', $translate('ends with')) ?>
+                        <?= $queryOption('new', $property, 'type', $translate('does not end with')) ?>
+                        <?= $queryOption('near', $property, 'type', $translate('is similar to')) ?>
+                        <?= $queryOption('nnear', $property, 'type', $translate('is not similar to')) ?>
+                    </optgroup>
+                    <optgroup label="<?= $translate('Resource') ?>">
+                        <?= $queryOption('res', $property, 'type', $translate('is resource with ID')) ?>
+                        <?= $queryOption('nres', $property, 'type', $translate('is not resource with ID')) ?>
+                        <?= $queryOption('resq', $property, 'type', $translate('is resource matching query')) ?>
+                        <?= $queryOption('nresq', $property, 'type', $translate('is not resource matching query')) ?>
+                    </optgroup>
+                    <optgroup label="<?= $translate('Linked resource') ?>">
+                        <?= $queryOption('lex', $property, 'type', $translate('is a linked resource')) ?>
+                        <?= $queryOption('nlex', $property, 'type', $translate('is not a linked resource')) ?>
+                        <?= $queryOption('lres', $property, 'type', $translate('is linked with resource with ID')) ?>
+                        <?= $queryOption('nlres', $property, 'type', $translate('is not linked with resource with ID')) ?>
+                        <?= $queryOption('lkq', $property, 'type', $translate('is linked with resources matching query')) ?>
+                        <?= $queryOption('nlkq', $property, 'type', $translate('is not linked with resources matching query')) ?>
+                    </optgroup>
+                    <optgroup label="<?= $translate('Count') ?>">
+                        <?= $queryOption('ex', $property, 'type', $translate('has any value')) ?>
+                        <?= $queryOption('nex', $property, 'type', $translate('has no values')) ?>
+                        <?= $queryOption('exs', $property, 'type', $translate('has a single value')) ?>
+                        <?= $queryOption('nexs', $property, 'type', $translate('has not a single value')) ?>
+                        <?= $queryOption('exm', $property, 'type', $translate('has multiple values')) ?>
+                        <?= $queryOption('nexm', $property, 'type', $translate('has not multiple values')) ?>
+                    </optgroup>
+                    <optgroup label="<?= $translate('Data type') ?>">
+                        <?= $queryOption('dtp', $property, 'type', $translate('has data type')) ?>
+                        <?= $queryOption('ndtp', $property, 'type', $translate('has not data type')) ?>
+                        <?= $queryOption('tp', $property, 'type', $translate('has main type')) ?>
+                        <?= $queryOption('ntp', $property, 'type', $translate('has not main type')) ?>
+                        <?= $queryOption('tpl', $property, 'type', $translate('has type literal-like')) ?>
+                        <?= $queryOption('ntpl', $property, 'type', $translate('has not type literal-like')) ?>
+                        <?= $queryOption('tpr', $property, 'type', $translate('has type resource-like')) ?>
+                        <?= $queryOption('ntpr', $property, 'type', $translate('has not type resource-like')) ?>
+                        <?= $queryOption('tplu', $property, 'type', $translate('has type uri-like')) ?>
+                        <?= $queryOption('ntpu', $property, 'type', $translate('has not type uri-like')) ?>
+                    </optgroup>
+                </select>
+                <?= $queryText($isSubQuery ? [] : $property, $index) ?>
+                <?= $dataTypeHelper->getSelect($stem . '[text]', "property[$index][text]" ?? null, ['multiple' => false, 'class' => 'query-text query-data-type chosen-select', 'aria-label' => 'Data types', 'data-placeholder' => $translate('Select data type…')]) // TODO Manage search on property for multiple data types. ?>
+                <?= $formSelect($selectMainDataType->setName($stem . '[text]')->setValue("property[$index][text]" ?? null)) ?>
+                <button type="button" class="o-icon-delete remove-value button" aria-label="<?= $translate('Remove value') ?>" title="<?= $translate('Remove value') ?>"></button>
             </div>
             <div class="value-common sub-query">
                 <?= $formQuery($queryInput) ?>

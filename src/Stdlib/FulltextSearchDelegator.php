@@ -10,6 +10,9 @@ use Omeka\Stdlib\FulltextSearch;
 use Omeka\Entity\Item;
 use Omeka\Entity\Media;
 
+/**
+ * This delegator is skipped in factory when the option is not set.
+ */
 class FulltextSearchDelegator extends FulltextSearch
 {
     /**
@@ -43,6 +46,8 @@ class FulltextSearchDelegator extends FulltextSearch
     public function save(ResourceInterface $resource, AdapterInterface $adapter)
     {
         $this->realFulltextSearch->save($resource, $adapter);
+
+        // TODO Add a specific index for full text in the internal database.
 
         if ($resource instanceof Item) {
             $text = '';

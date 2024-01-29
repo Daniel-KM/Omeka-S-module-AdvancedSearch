@@ -495,7 +495,11 @@ SQL;
 
         // Full text search is the default Omeka mode.
         // TODO It uses fulltext_search, but when more than 50% results, no results, not understandable by end user (or use boolean mode).
-        $this->args['fulltext_search'] = $q;
+        if ($this->query->getRecordOrFullText() === 'record') {
+            $this->args['search'] = $q;
+        } else {
+            $this->args['fulltext_search'] = $q;
+        }
     }
 
     /**

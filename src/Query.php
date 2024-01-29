@@ -50,6 +50,11 @@ class Query implements \JsonSerializable
     protected $isPublic = true;
 
     /**
+     * @deprecated Will be removed in a future version.
+     */
+    protected $recordOrFullText = 'all';
+
+    /**
      * @var array
      */
     protected $filters = [];
@@ -197,6 +202,23 @@ class Query implements \JsonSerializable
     public function getIsPublic(): bool
     {
         return $this->isPublic;
+    }
+
+    /**
+     * @deprecated Will be removed in a future version.
+     */
+    public function setRecordOrFullText(?string $recordOrFullText): self
+    {
+        $this->recordOrFullText = $recordOrFullText === 'record' ? 'record' : 'all';
+        return $this;
+    }
+
+    /**
+     * @deprecated Will be removed in a future version.
+     */
+    public function getRecordOrFullText(): string
+    {
+        return $this->recordOrFullText;
     }
 
     /**

@@ -234,7 +234,16 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
             $name = (string) $name;
             switch ($name) {
                 case 'q':
-                    $query->setQuery($request['q']);
+                    $query->setQuery($value);
+                    continue 2;
+
+                case 'rft':
+                    // Two values: record only or all (record and full text).
+                    // There is only one full text search index in internal
+                    // querier, but inversely a specific index for Solr, so it
+                    // is managed via a specific filter via the adapter.
+                    // TODO Add a specific index for full text in the internal database, so it will be a normal filter.
+                    $query->setRecordOrFullText($value);
                     continue 2;
 
                 // Special fields of the main form and internal adapter are

@@ -173,6 +173,10 @@ class MainSearchForm extends Form
             }
         }
 
+        // Add the button for record or full text search.
+        $rft = $this->formSettings['search']['fulltext_search'] ?? null;
+        $this->appendRecordOrFullText($rft);
+
         foreach ($this->formSettings['form']['filters'] ?? [] as $filter) {
             if (empty($filter['field'])) {
                 continue;
@@ -296,6 +300,69 @@ class MainSearchForm extends Form
         }
 
         $this->appendInputFilters();
+    }
+
+    /**
+     * Add a simple filter to limit search to record or not.
+     */
+    protected function appendRecordOrFullText(?string $rft): self
+    {
+        switch ($rft) {
+            case 'fulltext_checkbox':
+                $element = new Element\Checkbox('rft');
+                $element
+                    ->setLabel('Search full text') // @translate
+                    ->setOptions([
+                        'unchecked_value' => 'record',
+                        'checked_value' => 'all',
+                    ])
+                    ->setAttribute('id', 'rft')
+                    ->setAttribute('form', 'form-search')
+                ;
+                return $this->add($element);
+            case 'record_checkbox':
+                $element = new Element\Checkbox('rft');
+                $element
+                    ->setLabel('Record only') // @translate
+                    ->setOptions([
+                        'unchecked_value' => 'all',
+                        'checked_value' => 'record',
+                    ])
+                    ->setAttribute('id', 'rft')
+                    ->setAttribute('form', 'form-search')
+                ;
+                return $this->add($element);
+            case 'fulltext_radio':
+                $element = new CommonElement\OptionalRadio('rft');
+                $element
+                    // The empty label allows to have a fieldset wrapping radio.
+                    ->setLabel(' ')
+                    ->setValueOptions([
+                        'all' => 'Full text', // @ŧranslate
+                        'record' => 'Record only', // @ŧranslate
+                    ])
+                    ->setAttribute('id', 'rft')
+                    ->setAttribute('form', 'form-search')
+                    ->setValue('all')
+                ;
+                return $this->add($element);
+            case 'record_radio':
+                $element = new CommonElement\OptionalRadio('rft');
+                $element
+                    // The empty label allows to have a fieldset wrapping radio.
+                    ->setLabel(' ')
+                    ->setValueOptions([
+                        'record' => 'Record only', // @ŧranslate
+                        'all' => 'Full text', // @ŧranslate
+                    ])
+                    ->setAttribute('id', 'rft')
+                    ->setAttribute('form', 'form-search')
+                    ->setValue('record')
+                ;
+                return $this->add($element);
+            default:
+                return $this;
+        }
     }
 
     /**

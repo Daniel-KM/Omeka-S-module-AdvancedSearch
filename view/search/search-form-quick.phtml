@@ -7,6 +7,7 @@
  *
  * The quick form keeps only:
  * - the main field ("q"),
+ * - the record or fulltext option ("rft"),
  * - the required and hidden elements,
  * - the button submit.
  */
@@ -17,7 +18,7 @@ $form
     ->prepare();
 
 foreach ($form->getElements() as $name => $element) {
-    if (in_array($name, ['q', 'submit'])
+    if (in_array($name, ['q', 'rft', 'submit'])
         || $element instanceof \Laminas\Form\Element\Csrf
         || $element instanceof \Laminas\Form\Element\Hidden
         || $element instanceof \Laminas\Form\Element\Submit

@@ -128,6 +128,24 @@ class SearchConfigConfigureForm extends Form
                     'id' => 'hidden_query_filters',
                 ],
             ])
+            ->add([
+                'name' => 'fulltext_search',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Add a button to search record or full text (for content not stored in a property)', // @translate
+                    'value_options' => [
+                        '' => 'None', // @translate
+                        'fulltext_checkbox' => 'Check box "Search full text"', // @translate
+                        'record_checkbox' => 'Check box "Record only"', // @translate
+                        'fulltext_radio' => 'Radio "Full text" and "Record only"', // @translate
+                        'record_radio' => 'Radio "Record only" and "Full text"', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'fulltext_search',
+                    'value' => '',
+                ],
+            ])
         ;
 
         $this

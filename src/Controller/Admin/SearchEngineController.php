@@ -33,11 +33,11 @@ namespace AdvancedSearch\Controller\Admin;
 use AdvancedSearch\Adapter\Manager as SearchAdapterManager;
 use AdvancedSearch\Form\Admin\SearchEngineConfigureForm;
 use AdvancedSearch\Form\Admin\SearchEngineForm;
+use Common\Stdlib\PsrMessage;
 use Doctrine\ORM\EntityManager;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Omeka\Form\ConfirmForm;
-use Omeka\Stdlib\Message;
 
 class SearchEngineController extends AbstractActionController
 {
@@ -74,9 +74,9 @@ class SearchEngineController extends AbstractActionController
             }
             $formData = $form->getData();
             $engine = $this->api()->create('search_engines', $formData)->getContent();
-            $this->messenger()->addSuccess(new Message(
-                'Search index "%s" created.', // @translate
-                $engine->name()
+            $this->messenger()->addSuccess(new PsrMessage(
+                'Search index "{name}" created.', // @translate
+                ['name' => $engine->name()]
             ));
             return $this->redirect()->toUrl($engine->url('edit'));
         }
@@ -91,8 +91,9 @@ class SearchEngineController extends AbstractActionController
         $searchEngine = $this->entityManager->find(\AdvancedSearch\Entity\SearchEngine::class, $id);
         $searchEngineAdapterName = $searchEngine->getAdapter();
         if (!$this->searchAdapterManager->has($searchEngineAdapterName)) {
-            $this->messenger()->addError(new Message('The search adapter "%s" is not available.', // @translate
-                $searchEngineAdapterName
+            $this->messenger()->addError(new PsrMessage(
+                'The search adapter "{name}" is not available.', // @translate
+                ['name' => $searchEngineAdapterName]
             ));
             return $this->redirect()->toRoute('admin/search', ['action' => 'browse'], true);
         }
@@ -134,9 +135,9 @@ class SearchEngineController extends AbstractActionController
                 ->setSettings($formData);
             $this->entityManager->persist($searchEngine);
             $this->entityManager->flush();
-            $this->messenger()->addSuccess(new Message(
-                'Search index "%s" successfully configured.',  // @translate
-                $searchEngine->getName()
+            $this->messenger()->addSuccess(new PsrMessage(
+                'Search index "{name}" successfully configured.',  // @translate
+                ['name' => $searchEngine->getName()]
             ));
             $this->messenger()->addWarning('Don’t forget to run the indexation of the search engine.'); // @translate
             return $this->redirect()->toRoute('admin/search', ['action' => 'browse'], true);
@@ -187,13 +188,15 @@ class SearchEngineController extends AbstractActionController
         $job = $this->jobDispatcher()->dispatch(\AdvancedSearch\Job\IndexSearch::class, $jobArgs);
 
         $urlHelper = $this->viewHelpers()->get('url');
-        $message = new Message(
-            'Indexing of "%1$s" started in job %2$s#%3$d%4$s (%5$slogs%4$s)', // @translate
-            $searchEngine->name(),
-            sprintf('<a href="%1$s">', $urlHelper('admin/id', ['controller' => 'job', 'id' => $job->getId()])),
-            $job->getId(),
-            '</a>',
-            sprintf('<a href="%1$s">', class_exists('Log\Stdlib\PsrMessage') ? $urlHelper('admin/default', ['controller' => 'log'], ['query' => ['job_id' => $job->getId()]]) : $urlHelper('admin/id', ['controller' => 'job', 'action' => 'log', 'id' => $job->getId()]))
+        $message = new PsrMessage(
+            'Indexing of "{name}" started in job {link_job}#{job_id}{link_end} ({link_log}logs{link_end}).', // @translate
+            [
+                'name' => $searchEngine->name(),
+                'link_job' => sprintf('<a href="%1$s">', $urlHelper('admin/id', ['controller' => 'job', 'id' => $job->getId()])),
+                'job_id' => $job->getId(),
+                'link_end' => '</a>',
+                'link_log' => sprintf('<a href="%1$s">', class_exists('Log\Module') ? $urlHelper('admin/default', ['controller' => 'log'], ['query' => ['job_id' => $job->getId()]]) : $urlHelper('admin/id', ['controller' => 'job', 'action' => 'log', 'id' => $job->getId()])),
+            ]
         );
         $message->setEscapeHtml(false);
         $this->messenger()->addSuccess($message);
@@ -226,14 +229,14 @@ class SearchEngineController extends AbstractActionController
             $engineName = $this->api()->read('search_engines', $engineId)->getContent()->name();
             if ($form->isValid()) {
                 $this->api()->delete('search_engines', $engineId);
-                $this->messenger()->addSuccess(new Message(
-                    'Search index "%s" successfully deleted', // @translate
-                    $engineName
+                $this->messenger()->addSuccess(new PsrMessage(
+                    'Search index "{name}" successfully deleted', // @translate
+                    ['name' => $engineName]
                 ));
             } else {
-                $this->messenger()->addError(new Message(
-                    'Search index "%s" could not be deleted', // @translate
-                    $engineName
+                $this->messenger()->addError(new PsrMessage(
+                    'Search index "{name}" could not be deleted', // @translate
+                    ['name' => $engineName]
                 ));
             }
         }

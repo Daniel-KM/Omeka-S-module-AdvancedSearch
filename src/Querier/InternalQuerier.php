@@ -4,7 +4,7 @@ namespace AdvancedSearch\Querier;
 
 use AdvancedSearch\Querier\Exception\QuerierException;
 use AdvancedSearch\Response;
-use Omeka\Stdlib\Message;
+use Common\Stdlib\PsrMessage;
 
 class InternalQuerier extends AbstractQuerier
 {
@@ -420,16 +420,20 @@ SQL;
             $req = urldecode(http_build_query(array_filter($req), '', '&', PHP_QUERY_RFC3986));
             $messenger = $plugins->get('messenger');
             if ($this->query->getExcludedFields()) {
-                $message = new Message('The query "%1$s" uses %2$d properties, that is more than the %3$d supported currently. Excluded fields are removed.', // @translate
-                    $req, count($this->args['property']), self::REQUEST_MAX_ARGS);
+                $message = new PsrMessage(
+                    'The query "{query}" uses {count} properties, that is more than the {total} supported currently. Excluded fields are removed.', // @translate
+                    ['query' => $req, 'count' => count($this->args['property']), 'total' => self::REQUEST_MAX_ARGS]
+                );
                 $this->query->setExcludedFields([]);
                 $messenger->addWarning($message);
                 $this->logger->warn($message);
                 return $this->getPreparedQuery();
             }
 
-            $message = new Message('The query "%1$s" uses %2$d properties, that is more than the %3$d supported currently. Request is troncated.', // @translate
-                $req, count($this->args['property']), self::REQUEST_MAX_ARGS);
+            $message = new PsrMessage(
+                'The query "{query}" uses {count} properties, that is more than the {total} supported currently. Request is troncated.', // @translate
+                ['query' => $req, 'count' => count($this->args['property']), 'total' => self::REQUEST_MAX_ARGS]
+            );
             $messenger->addWarning($message);
             $this->logger->warn($message);
             $this->args['property'] = array_slice($this->args['property'], 0, self::REQUEST_MAX_ARGS);

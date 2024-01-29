@@ -8,8 +8,8 @@ use AdvancedSearch\Querier\Exception\QuerierException;
 use Laminas\EventManager\Event;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use Omeka\Api\Representation\SiteRepresentation;
-use Omeka\Stdlib\Message;
 use Omeka\Stdlib\Paginator;
+use Common\Stdlib\PsrMessage;
 
 /**
  * FIXME Remove or simplify this class or use it to convert the query directly to a omeka (or sql) or a solarium query.
@@ -43,25 +43,30 @@ class SearchRequestToResponse extends AbstractPlugin
         // The controller may not be available.
         $services = $searchConfig->getServiceLocator();
         $plugins = $services->get('ControllerPluginManager');
+        $logger = $services->get('Omeka\Logger');
+        $translator = $services->get('MvcTranslator');
 
         $formAdapterName = $searchConfig->formAdapterName();
         if (!$formAdapterName) {
-            $message = new Message('This search config has no form adapter.'); // @translate
-            $plugins->get('logger')()->err($message);
+            $message = new PsrMessage('This search config has no form adapter.'); // @translate
+            $logger->err($message->getMessage());
             return [
                 'status' => 'error',
-                'message' => $message,
+                'message' => $message->setTranslator($translator),
             ];
         }
 
         /** @var \AdvancedSearch\FormAdapter\FormAdapterInterface $formAdapter */
         $formAdapter = $searchConfig->formAdapter();
         if (!$formAdapter) {
-            $message = new Message('Form adapter "%s" not found.', $formAdapterName); // @translate
-            $plugins->get('logger')()->err($message);
+            $message = new PsrMessage(
+                'Form adapter "{name}" not found.', // @translate
+                ['name' => $formAdapterName]
+            );
+            $logger->err($message->getMessage(), $message->getContext());
             return [
                 'status' => 'error',
-                'message' => $message,
+                'message' => $message->setTranslator($translator),
             ];
         }
 
@@ -242,11 +247,14 @@ class SearchRequestToResponse extends AbstractPlugin
         try {
             $response = $querier->query();
         } catch (QuerierException $e) {
-            $message = new Message("Query error: %s\nQuery: %s", $e->getMessage(), json_encode($query->jsonSerialize(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)); // @translate
-            $plugins->get('logger')()->err($message);
+            $message = new PsrMessage(
+                "Query error: {message}\nQuery: {json_query}", // @translate
+                ['message' => $e->getMessage(), 'json_query' => json_encode($query->jsonSerialize(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)]
+            );
+            $logger->err($message->getMessage(), $message->getContext());
             return [
                 'status' => 'error',
-                'message' => $message,
+                'message' => $message->setTranslator($translator),
             ];
         }
 

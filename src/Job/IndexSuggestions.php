@@ -6,7 +6,6 @@ use AdvancedSearch\Api\Representation\SearchSuggesterRepresentation;
 use AdvancedSearch\Entity\SearchSuggestion;
 use Doctrine\Common\Collections\Criteria;
 use Omeka\Job\AbstractJob;
-use Omeka\Stdlib\Message;
 
 /**
  * @todo This is an internal indexer, not the generic suggestion indexer.
@@ -21,14 +20,14 @@ class IndexSuggestions extends AbstractJob
     const SQL_LIMIT = 1000;
 
     /**
-     * @var \Laminas\Log\Logger
-     */
-    protected $logger;
-
-    /**
      * @var \Omeka\Api\Manager
      */
     protected $api;
+
+    /**
+     * @var \Doctrine\DBAL\Connection
+     */
+    protected $connection;
 
     /**
      * @var \Doctrine\ORM\EntityManager
@@ -36,9 +35,9 @@ class IndexSuggestions extends AbstractJob
     protected $entityManager;
 
     /**
-     * @var \Doctrine\DBAL\Connection
+     * @var \Laminas\Log\Logger
      */
-    protected $connection;
+    protected $logger;
 
     public function perform(): void
     {
@@ -47,18 +46,15 @@ class IndexSuggestions extends AbstractJob
          * @var \Doctrine\ORM\EntityManager $entityManager
          */
         $services = $this->getServiceLocator();
-
-        $this->entityManager = $services->get('Omeka\EntityManager');
-        $this->connection = $this->entityManager->getConnection();
+        $this->api = $services->get('Omeka\ApiManager');
         $this->logger = $services->get('Omeka\Logger');
-        $this->api = $services->get('ControllerPluginManager')->get('api');
+        $this->connection = $this->entityManager->getConnection();
+        $this->entityManager = $services->get('Omeka\EntityManager');
 
         // The reference id is the job id for now.
-        if (class_exists('Log\Stdlib\PsrMessage')) {
-            $referenceIdProcessor = new \Laminas\Log\Processor\ReferenceId();
-            $referenceIdProcessor->setReferenceId('search/suggester/job_' . $this->job->getId());
-            $this->logger->addProcessor($referenceIdProcessor);
-        }
+        $referenceIdProcessor = new \Laminas\Log\Processor\ReferenceId();
+        $referenceIdProcessor->setReferenceId('search/suggester/job_' . $this->job->getId());
+        $this->logger->addProcessor($referenceIdProcessor);
 
         $suggesterId = $this->getArg('search_suggester_id');
         /** @var \AdvancedSearch\Api\Representation\SearchSuggesterRepresentation $suggester */
@@ -67,10 +63,10 @@ class IndexSuggestions extends AbstractJob
         $engine = $suggester->engine();
         $searchAdapter = $engine->adapter();
         if (!$searchAdapter || !($searchAdapter instanceof \AdvancedSearch\Adapter\InternalAdapter)) {
-            $this->logger->err(new Message(
-                'Suggester #%d ("%s"): Only search engine with the intenal adapter (sql) can be indexed currently.', // @translate
-                $suggester->id(), $suggester->name()
-            ));
+            $this->logger->err(
+                'Suggester #{search_suggester_id} ("{name}"): Only search engine with the intenal adapter (sql) can be indexed currently.', // @translate
+                ['search_suggester_id' => $suggester->id(), 'name' => $suggester->name()]
+            );
             return;
         }
 
@@ -83,10 +79,10 @@ class IndexSuggestions extends AbstractJob
         ];
         $resourceNames = array_intersect_key($mapResources, array_flip($resourceNames));
         if (!$resourceNames) {
-            $this->logger->notice(new Message(
-                'Suggester #%d ("%s"): there is no resource type to index or the indexation is not needed.', // @translate
-                $suggester->id(), $suggester->name()
-            ));
+            $this->logger->notice(
+                'Suggester #{search_suggester_id} ("{name}"): there is no resource type to index or the indexation is not needed.', // @translate
+                ['search_suggester_id' => $suggester->id(), 'name' => $suggester->name()]
+            );
             return;
         }
 
@@ -95,16 +91,16 @@ class IndexSuggestions extends AbstractJob
         $force = $this->getArg('force');
         if ($totalJobs > 1) {
             if (!$force) {
-                $this->logger->err(new Message(
-                    'Suggester #%d ("%s"): There are already %d other jobs "Index Suggestions" and the current one is not forced.', // @translate
-                    $suggester->id(), $suggester->name(), $totalJobs - 1
-                ));
+                $this->logger->err(
+                    'Suggester #{search_suggester_id} ("{name}"): There are already {count} other jobs "Index Suggestions" and the current one is not forced.', // @translate
+                    ['search_suggester_id' => $suggester->id(), 'name' => $suggester->name(), 'count' => $totalJobs - 1]
+                );
                 return;
             }
-            $this->logger->warn(new Message(
-                'There are already %d other jobs "Index Suggestions". Slowdowns may occur on the site.', // @translate
-                $totalJobs - 1
-            ));
+            $this->logger->warn(
+                'There are already {count} other jobs "Index Suggestions". Slowdowns may occur on the site.', // @translate
+                ['count' => $totalJobs - 1]
+            );
         }
 
         $timeStart = microtime(true);
@@ -113,8 +109,10 @@ class IndexSuggestions extends AbstractJob
 
         $processMode = $this->getArg('process_mode') === 'sql' ? 'sql' : 'orm';
 
-        $this->logger->notice(new Message('Suggester #%d ("%s"): start of indexing (index mode: %s, process mode: %s).', // @translate
-            $suggester->id(), $suggester->name(), $modeIndex, $processMode));
+        $this->logger->notice(
+            'Suggester #{search_suggester_id} ("{name}"): start of indexing (index mode: {mode}, process mode: {mode_2}).', // @translate
+            ['search_suggester_id' => $suggester->id(), 'name' => $suggester->name(), 'mode' => $modeIndex, 'mode_2' => $processMode]
+        );
 
         $this->process($suggester, $processMode);
 
@@ -122,9 +120,10 @@ class IndexSuggestions extends AbstractJob
 
         $totalResults = $this->entityManager->getRepository(SearchSuggestion::class)->count(['suggester' => $suggester->id()]);
 
-        $this->logger->notice(new Message('Suggester #%d ("%s"): end of indexing. %s suggestions indexed. Execution time: %s seconds.', // @translate
-            $suggester->id(), $suggester->name(), $totalResults, $timeTotal
-        ));
+        $this->logger->notice(
+            'Suggester #{search_suggester_id} ("{name}"): end of indexing. {total} suggestions indexed. Execution time: {duration} seconds.', // @translate
+            ['search_suggester_id' => $suggester->id(), 'name' => $suggester->name(), 'total' => $totalResults, 'duration' => $timeTotal]
+        );
     }
 
     protected function process(SearchSuggesterRepresentation $suggester, string $processMode): self
@@ -133,9 +132,10 @@ class IndexSuggestions extends AbstractJob
         $query = $this->entityManager->createQuery($dql);
         $totalDeleted = $query->execute();
 
-        $this->logger->notice(new Message('Suggester #%d ("%s"): %d suggestions deleted.', // @translate
-            $suggester->id(), $suggester->name(), $totalDeleted
-        ));
+        $this->logger->notice(
+            'Suggester #{search_suggester_id} ("{name}"): {total} suggestions deleted.', // @translate
+            ['search_suggester_id' => $suggester->id(), 'name' => $suggester->name(), 'total' => $totalDeleted]
+        );
 
         $resourceNames = $suggester->engine()->setting('resources', []);
         $mapResources = [
@@ -550,10 +550,10 @@ SQL;
         $collection = $valueRepository->matching($criteria);
 
         $totalToProcess = $collection->count();
-        $this->logger->notice(new Message(
-            'Indexing suggestions for %d resource values.', // @translate
-            $totalToProcess
-        ));
+        $this->logger->notice(
+            'Indexing suggestions for {total} resource values.', // @translate
+            ['total' => $totalToProcess]
+        );
 
         // The suggestions are empty.
         $suggesterId = $suggester->id();
@@ -617,18 +617,18 @@ SQL;
             }
 
             if ($this->shouldStop()) {
-                $this->logger->warn(new Message(
-                    'Job stopped: %d/%d processed (index mode: %s).', // @translate
-                    $totalProcessed, $totalToProcess, $modeIndex
-                ));
+                $this->logger->warn(
+                    'Job stopped: {count}/{total} processed (index mode: {mode}).', // @translate
+                    ['count' => $totalProcessed, 'total' => $totalToProcess, 'mode' => $modeIndex]
+                );
                 return $this;
             }
 
             if ($totalProcessed) {
-                $this->logger->info(new Message(
-                    '%d/%d values processed.', // @translate
-                    $totalProcessed, $totalToProcess
-                ));
+                $this->logger->info(
+                    '{count}/{total} values processed.', // @translate
+                    ['count' => $totalProcessed, 'total' => $totalToProcess]
+                );
             }
 
             // Get it each loop because of the entity manager clearing clearing.
@@ -720,10 +720,10 @@ SQL;
             $offset += self::SQL_LIMIT;
         }
 
-        $this->logger->warn(new Message(
-            'End of process: %d/%d processed (index mode: %s).', // @translate
-            $totalProcessed, $totalToProcess, $modeIndex
-        ));
+        $this->logger->warn(
+            'End of process: {count}/{total} processed (index mode: {mode}).', // @translate
+            ['count' => $totalProcessed, 'total' => $totalToProcess, 'mode' => $modeIndex]
+        );
 
         return $this;
     }

@@ -35,11 +35,11 @@ use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use AdvancedSearch\Form\Admin\SearchConfigConfigureForm;
 use AdvancedSearch\Form\Admin\SearchConfigForm;
 use AdvancedSearch\FormAdapter\Manager as SearchFormAdapterManager;
+use Common\Stdlib\PsrMessage;
 use Doctrine\ORM\EntityManager;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Omeka\Form\ConfirmForm;
-use Omeka\Stdlib\Message;
 
 class SearchConfigController extends AbstractActionController
 {
@@ -84,9 +84,9 @@ class SearchConfigController extends AbstractActionController
         $response = $this->api()->create('search_configs', $formData);
         $searchConfig = $response->getContent();
 
-        $this->messenger()->addSuccess(new Message(
-            'Search page "%s" created.', // @translate
-            $searchConfig->name()
+        $this->messenger()->addSuccess(new PsrMessage(
+            'Search page "{name}" created.', // @translate
+            ['name' => $searchConfig->name()]
         ));
         $this->manageSearchConfigOnSites(
             $searchConfig,
@@ -136,9 +136,9 @@ class SearchConfigController extends AbstractActionController
             ->update('search_configs', $id, $formData, [], ['isPartial' => true])
             ->getContent();
 
-        $this->messenger()->addSuccess(new Message(
-            'Search page "%s" saved.', // @translate
-            $searchConfig->name()
+        $this->messenger()->addSuccess(new PsrMessage(
+            'Search page "{name}" saved.', // @translate
+            ['name' => $searchConfig->name()]
         ));
 
         $this->manageSearchConfigOnSites(
@@ -167,9 +167,9 @@ class SearchConfigController extends AbstractActionController
         $engine = $searchConfig->engine();
         $adapter = $engine ? $engine->adapter() : null;
         if (empty($adapter)) {
-            $message = new Message(
-                'The engine adapter "%s" is unavailable.', // @translate
-                $engine->adapterLabel()
+            $message = new PsrMessage(
+                'The engine adapter "{label}" is unavailable.', // @translate
+                ['label' => $engine->adapterLabel()]
             );
             $this->messenger()->addError($message); // @translate
             return $view;
@@ -177,9 +177,9 @@ class SearchConfigController extends AbstractActionController
 
         $form = $this->getConfigureForm($searchConfig);
         if (empty($form)) {
-            $message = new Message(
-                'This engine adapter "%s" has no config form.', // @translate
-                $engine->adapterLabel()
+            $message = new PsrMessage(
+                'This engine adapter "{label}" has no config form.', // @translate
+                ['label' => $engine->adapterLabel()]
             );
             $this->messenger()->addWarning($message); // @translate
             return $view;
@@ -219,9 +219,9 @@ class SearchConfigController extends AbstractActionController
         $searchConfig->setSettings($params);
         $this->entityManager->flush();
 
-        $this->messenger()->addSuccess(new Message(
-            'Configuration "%s" saved.', // @translate
-            $searchConfig->getName()
+        $this->messenger()->addSuccess(new PsrMessage(
+            'Configuration "{name}" saved.', // @translate
+            ['name' => $searchConfig->getName()]
         ));
 
         return $this->redirect()->toRoute('admin/search');
@@ -250,14 +250,14 @@ class SearchConfigController extends AbstractActionController
             $searchConfigName = $this->api()->read('search_configs', $id)->getContent()->name();
             if ($form->isValid()) {
                 $this->api()->delete('search_configs', $this->params('id'));
-                $this->messenger()->addSuccess(new Message(
-                    'Search page "%s" successfully deleted', // @translate
-                    $searchConfigName
+                $this->messenger()->addSuccess(new PsrMessage(
+                    'Search page "{name}" successfully deleted', // @translate
+                    ['name' => $searchConfigName]
                 ));
             } else {
-                $this->messenger()->addError(new Message(
-                    'Search page "%s" could not be deleted', // @translate
-                    $searchConfigName
+                $this->messenger()->addError(new PsrMessage(
+                    'Search page "{name}" could not be deleted', // @translate
+                    ['name' => $searchConfigName]
                 ));
             }
         }

@@ -31,10 +31,10 @@ class SearchingUrl extends AbstractHelper
                 try {
                     return $view->url('search-page-' . $searchConfig->id(), [], $options, true);
                 } catch (\Exception $e) {
-                    $this->getView()->logger()->err(new Message(
-                        'Search engine %1$s (#%1$d) is not available.', // @translate
-                        $searchConfig->name(), $searchConfig->id()
-                    ));
+                    $this->getView()->logger()->err(
+                        'Search engine {name} (#{search_config_id}) is not available.', // @translate
+                        ['name' => $searchConfig->name(), 'search_config_id' => $searchConfig->id()]
+                    );
                 }
             }
         }

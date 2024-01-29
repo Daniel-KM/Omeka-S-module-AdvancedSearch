@@ -5,9 +5,9 @@ namespace AdvancedSearch\Api\Representation;
 use AdvancedSearch\Querier\Exception\QuerierException;
 use AdvancedSearch\Query;
 use AdvancedSearch\Response;
+use Common\Stdlib\PsrMessage;
 use Omeka\Api\Representation\AbstractEntityRepresentation;
 use Omeka\Api\Representation\SiteRepresentation;
-use Omeka\Stdlib\Message;
 
 class SearchSuggesterRepresentation extends AbstractEntityRepresentation
 {
@@ -135,8 +135,11 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
         try {
             return $querier->querySuggestions();
         } catch (QuerierException $e) {
-            $message = new Message("Query error: %s\nQuery:%s", $e->getMessage(), json_encode($query->jsonSerialize(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)); // @translate
-            $this->logger()->err($message);
+            $message = new PsrMessage(
+                "Query error: {message}\nQuery:{json_query}", // @translate
+                ['message' => $e->getMessage(), 'json_query' => json_encode($query->jsonSerialize(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)]
+            );
+            $this->logger()->err($message->getMessage(), $message->getContext());
             return (new Response)
                 ->setMessage($message);
         }

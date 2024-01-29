@@ -39,6 +39,7 @@ if (!class_exists(\Common\TraitModule::class)) {
 }
 
 use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
+use Common\Stdlib\PsrMessage;
 use Common\TraitModule;
 use Omeka\Module\AbstractModule;
 use Laminas\EventManager\Event;
@@ -46,7 +47,6 @@ use Laminas\EventManager\SharedEventManagerInterface;
 use Laminas\ModuleManager\ModuleManager;
 use Laminas\Mvc\MvcEvent;
 use Omeka\Entity\Resource;
-use Omeka\Stdlib\Message;
 
 class Module extends AbstractModule
 {
@@ -97,7 +97,7 @@ class Module extends AbstractModule
         $translate = $services->get('ControllerPluginManager')->get('translate');
 
         if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.49')) {
-            $message = new Message(
+            $message = new \Omeka\Stdlib\Message(
                 $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
                 'Common', '3.4.49'
             );
@@ -132,15 +132,15 @@ class Module extends AbstractModule
         ])) {
             $version = $module->getIni('version');
             if (version_compare($version, '3.5.45', '<')) {
-                $message = new Message(
-                    'The module %1$s should be upgraded to version %2$s or later.', // @translate
-                    'SearchSolr', '3.5.45'
+                $message = new PsrMessage(
+                    'The module {module} should be upgraded to version {version} or later.', // @translate
+                    ['module' => 'SearchSolr', 'version' => '3.5.45']
                 );
                 $messenger->addWarning($message);
             } elseif ($module->getState() !== \Omeka\Module\Manager::STATE_ACTIVE) {
-                $message = new Message(
-                    'The module %s can be reenabled.', // @translate
-                    'SearchSolr'
+                $message = new PsrMessage(
+                    'The module {module} can be reenabled.', // @translate
+                    ['module' => 'SearchSolr']
                 );
                 $messenger->addNotice($message);
             }
@@ -843,14 +843,14 @@ class Module extends AbstractModule
                 try {
                     $indexer->indexResources($resources);
                 } catch (\Exception $e) {
-                    $logger->err(new Message(
-                        'Unable to batch index metadata for search engine "%1$s": %2$s', // @translate
-                        $searchEngine->name(), $e->getMessage()
-                    ));
+                    $logger->err(
+                        'Unable to batch index metadata for search engine "{name}": {message}', // @translate
+                        ['name' => $searchEngine->name(), 'message' => $e->getMessage()]
+                    );
                     $messenger = $services->get('ControllerPluginManager')->get('messenger');
-                    $messenger->addWarning(new Message(
-                        'Unable to batch update the search engine "%s": see log.', // @translate
-                        $searchEngine->name()
+                    $messenger->addWarning(new PsrMessage(
+                        'Unable to batch update the search engine "{name}": see log.', // @translate
+                        ['name' => $searchEngine->name()]
                     ));
                 }
             }
@@ -896,13 +896,13 @@ class Module extends AbstractModule
                     $jobDispatcher->dispatch(\AdvancedSearch\Job\IndexSearch::class, $jobArgs, $strategy);
                     $first = false;
                 } catch (\Exception $e) {
-                    $logger->err(new Message(
-                        'Unable to launch index metadata for search engine "%1$s": %2$s', // @translate
-                        $searchEngine->name(), $e->getMessage()
-                    ));
-                    $messenger->addWarning(new Message(
-                        'Unable to launch indexing for the search engine "%s": see log.', // @translate
-                        $searchEngine->name()
+                    $logger->err(
+                        'Unable to launch index metadata for search engine "{name}": {message}', // @translate
+                        ['name' => $searchEngine->name(), 'message' => $e->getMessage()]
+                    );
+                    $messenger->addWarning(new PsrMessage(
+                        'Unable to launch indexing for the search engine "{name}": see log.', // @translate
+                        ['name' => $searchEngine->name()]
                     ));
                 }
             }
@@ -998,14 +998,14 @@ class Module extends AbstractModule
         } catch (\Exception $e) {
             $services = $this->getServiceLocator();
             $logger = $services->get('Omeka\Logger');
-            $logger->err(new Message(
-                'Unable to delete the search index for resource #%1$d in search engine "%2$s": %3$s', // @translate
-                $id, $searchEngine->name(), $e->getMessage()
-            ));
+            $logger->err(
+                'Unable to delete the search index for resource #{resource_id} in search engine "{name}": {message}', // @translate
+                ['resource_id' => $id, 'name' => $searchEngine->name(), 'message' => $e->getMessage()]
+            );
             $messenger = $services->get('ControllerPluginManager')->get('messenger');
-            $messenger->addWarning(new Message(
-                'Unable to delete the search index for the deleted resource #%1$d in search engine "%2$s": see log.', // @translate
-                $id, $searchEngine->name()
+            $messenger->addWarning(new PsrMessage(
+                'Unable to delete the search index for the deleted resource #{resource_id} in search engine "{name}": see log.', // @translate
+                ['resource_id' => $id, 'name' => $searchEngine->name()]
             ));
         }
     }
@@ -1024,14 +1024,14 @@ class Module extends AbstractModule
         } catch (\Exception $e) {
             $services = $this->getServiceLocator();
             $logger = $services->get('Omeka\Logger');
-            $logger->err(new Message(
-                'Unable to index metadata of resource #%1$d for search in search engine "%2$s": %3$s', // @translate
-                $resource->getId(), $searchEngine->name(), $e->getMessage()
-            ));
+            $logger->err(
+                'Unable to index metadata of resource #{resource_id} for search in search engine "{name}": {message}', // @translate
+                ['resource_id' => $resource->getId(), 'name' => $searchEngine->name(), 'message' => $e->getMessage()]
+            );
             $messenger = $services->get('ControllerPluginManager')->get('messenger');
-            $messenger->addWarning(new Message(
-                'Unable to update the search index for resource #%1$d in search engine "%2$s": see log.', // @translate
-                $resource->getId(), $searchEngine->name()
+            $messenger->addWarning(new PsrMessage(
+                'Unable to update the search index for resource #{resource_id} in search engine "{name}": see log.', // @translate
+                ['resource_id' => $resource->getId(), 'name' => $searchEngine->name()]
             ));
         }
     }
@@ -1215,11 +1215,13 @@ SQL;
                 json_encode($searchEngineConfig['o:settings'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
             ]);
             $searchEngineId = $connection->fetchOne($sqlSearchEngineId);
-            $message = new Message(
-                'The internal search engine (sql) can be edited in the %1$ssearch manager%2$s.', // @translate
-                // Don't use the url helper, the route is not available during install.
-                sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager/engine/' . $searchEngineId . '/edit'),
-                '</a>'
+            $message = new PsrMessage(
+                'The internal search engine (sql) can be edited in the {link_url}search manager{link_end}.', // @translate
+                [
+                    // Don't use the url helper, the route is not available during install.
+                    'link_url' => sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager/engine/' . $searchEngineId . '/edit'),
+                    'link_end' => '</a>',
+                ]
             );
             $message->setEscapeHtml(false);
             $messenger->addSuccess($message);
@@ -1248,11 +1250,13 @@ SQL;
                 json_encode($suggesterSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
             ]);
             $suggesterId = (int) $connection->fetchOne($sqlSuggesterId);
-            $message = new Message(
-                'The %1$sinternal suggester%2$s (sql) will be available after indexation.', // @translate
-                // Don't use the url helper, the route is not available during install.
-                sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager/suggester/' . $suggesterId . '/edit'),
-                '</a>'
+            $message = new PsrMessage(
+                'The {link_url}internal suggester{link_end} (sql) will be available after indexation.', // @translate
+                [
+                    // Don't use the url helper, the route is not available during install.
+                    'link_url' => sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager/suggester/' . $suggesterId . '/edit'),
+                    'link_end' => '</a>',
+                ]
             );
             $message->setEscapeHtml(false);
             $messenger->addSuccess($message);
@@ -1283,12 +1287,14 @@ SQL;
             ]);
 
             $searchConfigId = $connection->fetchOne($sqlSearchConfigId);
-            $message = new Message(
-                'The default search config can be %1$sedited%2$s and configured in the %3$smain settings%2$s for admin search and in each site settings for public search.', // @translate
-                // Don't use the url helper, the route is not available during install.
-                sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager/config/' . $searchConfigId . '/edit'),
-                '</a>',
-                sprintf('<a href="%s">', $urlHelper('admin') . '/setting#advancedsearch_main_config')
+            $message = new PsrMessage(
+                'The default search config can be {link_url}edited{link_end} and configured in the {link_url_2}main settings{link_end} for admin search and in each site settings for public search.', // @translate
+                [
+                    // Don't use the url helper, the route is not available during install.
+                    'link_url' => sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager/config/' . $searchConfigId . '/edit'),
+                    'link_end' => '</a>',
+                    'link_url_2' => sprintf('<a href="%s">', $urlHelper('admin') . '/setting#advancedsearch_main_config'),
+                ]
             );
             $message->setEscapeHtml(false);
             $messenger->addSuccess($message);

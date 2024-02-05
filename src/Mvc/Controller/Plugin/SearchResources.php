@@ -761,10 +761,9 @@ class SearchResources extends AbstractPlugin
         if (isset($query['resource_class_id'])
             && $query['resource_class_id'] !== ''
             && $query['resource_class_id'] !== []
-            && $query['resource_class_id'] !== null
         ) {
             $resourceClassIds = is_array($query['resource_class_id'])
-                ? array_values($query['resource_class_id'])
+                ? array_values(array_unique($query['resource_class_id']))
                 : [$query['resource_class_id']];
             if (array_values($resourceClassIds) === [0]) {
                 $qb
@@ -792,7 +791,6 @@ class SearchResources extends AbstractPlugin
         if (isset($query['resource_template_id'])
             && $query['resource_template_id'] !== ''
             && $query['resource_template_id'] !== []
-            && $query['resource_template_id'] !== null
         ) {
             $resourceTemplateIds = is_array($query['resource_template_id'])
                 ? array_values($query['resource_template_id'])
@@ -820,10 +818,10 @@ class SearchResources extends AbstractPlugin
             }
         }
 
-        if ($this->adapter instanceof ItemAdapter && isset($query['item_set_id'])
+        if ($this->adapter instanceof ItemAdapter
+            && isset($query['item_set_id'])
             && $query['item_set_id'] !== ''
             && $query['item_set_id'] !== []
-            && $query['item_set_id'] !== null
         ) {
             $itemSetIds = is_array($query['item_set_id'])
                 ? array_values($query['item_set_id'])

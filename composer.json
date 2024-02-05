@@ -39,16 +39,23 @@
         }
     ],
     "require": {
-        "oomphinc/composer-installers-extender": "^2.0",
-        "devbridge/jquery-autocomplete": "1.4.11",
-        "laminas/laminas-feed": "^2.18"
+        "cweagans/composer-patches": "^1.7",
+        "devbridge/jquery-autocomplete": "^1.4.11",
+        "laminas/laminas-feed": "^2.18",
+        "oomphinc/composer-installers-extender": "^2.0"
     },
     "replace": {
         "laminas/laminas-escaper": "*",
+        "laminas/laminas-servicemanager": "3.14",
         "laminas/laminas-stdlib": "*"
     },
     "require-dev": {
         "biblibre/omeka-s-test-helper": "dev-master"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "AdvancedSearchTest\\": "test/AdvancedSearchTest/"
+        }
     },
     "extra": {
         "installer-types": ["omeka-addon-asset"],
@@ -56,26 +63,19 @@
             "asset/vendor/{$name}/": [
                 "type:omeka-addon-asset"
             ]
+        },
+        "installer-name" : "AdvancedSearch",
+        "patches": {
+            "devbridge/jquery-autocomplete": {
+                "Fix slow clicker (see https://github.com/devbridge/jQuery-Autocomplete/pull/811)": "patches/jquery-autocomplete-omeka.patch"
+            }
         }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "AdvancedSearchTest\\": "test/AdvancedSearchTest/"
-        }
-    },
-    "scripts": {
-        "post-install-cmd": [
-            "# Fix https://github.com/devbridge/jQuery-Autocomplete/pull/811",
-            "@php -r '$f = __DIR__ . \"/asset/vendor/jquery-autocomplete/jquery.autocomplete.min.js\"; file_put_contents($f, str_replace(\",200)\", \",350)\", file_get_contents($f)));'"
-        ],
-        "post-update-cmd": [
-            "# Fix https://github.com/devbridge/jQuery-Autocomplete/pull/811",
-            "@php -r '$f = __DIR__ . \"/asset/vendor/jquery-autocomplete/jquery.autocomplete.min.js\"; file_put_contents($f, str_replace(\",200)\", \",350)\", file_get_contents($f)));'"
-        ]
     },
     "config": {
+        "platform": {"php": "7.4"},
         "allow-plugins": {
             "composer/installers": true,
+            "cweagans/composer-patches": true,
             "oomphinc/composer-installers-extender": true
         }
     }

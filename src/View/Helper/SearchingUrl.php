@@ -3,7 +3,6 @@
 namespace AdvancedSearch\View\Helper;
 
 use Laminas\View\Helper\AbstractHelper;
-use Omeka\Stdlib\Message;
 
 class SearchingUrl extends AbstractHelper
 {

@@ -63,7 +63,7 @@ return [
             'searchSuggesterConfirm' => Service\ViewHelper\SearchSuggesterConfirmFactory::class,
         ],
         'delegators' => [
-            \Omeka\Form\View\Helper\FormQuery::class=> [
+            \Omeka\Form\View\Helper\FormQuery::class => [
                 Service\ViewHelper\FormQueryDelegatorFactory::class,
             ],
             'Laminas\Form\View\Helper\FormElement' => [

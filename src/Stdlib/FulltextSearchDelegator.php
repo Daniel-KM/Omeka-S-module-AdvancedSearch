@@ -6,10 +6,10 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Omeka\Api\Adapter\AdapterInterface;
 use Omeka\Api\ResourceInterface;
-use PDO;
-use Omeka\Stdlib\FulltextSearch;
 use Omeka\Entity\Item;
 use Omeka\Entity\Media;
+use Omeka\Stdlib\FulltextSearch;
+use PDO;
 
 /**
  * This delegator is skipped in factory when the option is not set.

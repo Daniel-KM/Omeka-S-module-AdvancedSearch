@@ -41,12 +41,12 @@ if (!class_exists(\Common\TraitModule::class)) {
 use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
 use Common\Stdlib\PsrMessage;
 use Common\TraitModule;
-use Omeka\Module\AbstractModule;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
 use Laminas\ModuleManager\ModuleManager;
 use Laminas\Mvc\MvcEvent;
 use Omeka\Entity\Resource;
+use Omeka\Module\AbstractModule;
 
 class Module extends AbstractModule
 {

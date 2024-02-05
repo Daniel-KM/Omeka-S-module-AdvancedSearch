@@ -5,11 +5,11 @@ namespace AdvancedSearch\Mvc\Controller\Plugin;
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
 use AdvancedSearch\Querier\Exception\QuerierException;
+use Common\Stdlib\PsrMessage;
 use Laminas\EventManager\Event;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Stdlib\Paginator;
-use Common\Stdlib\PsrMessage;
 
 /**
  * FIXME Remove or simplify this class or use it to convert the query directly to a omeka (or sql) or a solarium query.
@@ -164,7 +164,7 @@ class SearchRequestToResponse extends AbstractPlugin
         $accessToAdmin = $user && in_array($userRole, $omekaRoles);
         if ($accessToAdmin) {
             $query->setIsPublic(false);
-        // } elseif ($user && !in_array($userRole, $omekaRoles)) {
+            // } elseif ($user && !in_array($userRole, $omekaRoles)) {
             // This is the default.
             // $query->setIsPublic(true);
         }

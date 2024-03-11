@@ -21,7 +21,6 @@ foreach ($form->getElements() as $name => $element) {
     if (in_array($name, ['q', 'rft', 'submit'])
         || $element instanceof \Laminas\Form\Element\Csrf
         || $element instanceof \Laminas\Form\Element\Hidden
-        || $element instanceof \Laminas\Form\Element\Submit
         || $element->getOption('required')
     ) {
         continue;

@@ -55,6 +55,12 @@ trait SearchFiltersTrait
                 'ndtp' => $translate('has not data type'), // @translate
                 'dup' => $translate('has duplicate values'), // @translate
                 'ndup' => $translate('has not duplicate values'), // @translate
+                'dupt' => $translate('has duplicate values and type'), // @translate
+                'ndupt' => $translate('has not duplicate values and type'), // @translate
+                'dupl' => $translate('has duplicate values and language'), // @translate
+                'ndupl' => $translate('has not duplicate values and language'), // @translate
+                'duptl' => $translate('has duplicate values, type and language'), // @translate
+                'nduptl' => $translate('has not duplicate values, type and language'), // @translate
                 'gt' => $translate('greater than'), // @translate
                 'gte' => $translate('greater than or equal'), // @translate
                 'lte' => $translate('lower than or equal'), // @translate

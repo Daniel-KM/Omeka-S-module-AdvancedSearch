@@ -184,6 +184,12 @@ if ($isSiteRequest) {
                     <optgroup label="<?= $translate('Curation') ?>">
                         <?= $queryOption('dup', $property, 'type', $translate('has duplicate values')) ?>
                         <?= $queryOption('ndup', $property, 'type', $translate('has not duplicate values')) ?>
+                        <?= $queryOption('dupt', $property, 'type', $translate('has duplicate values and type')) ?>
+                        <?= $queryOption('ndupt', $property, 'type', $translate('has not duplicate values and type')) ?>
+                        <?= $queryOption('dupl', $property, 'type', $translate('has duplicate values and language')) ?>
+                        <?= $queryOption('ndupl', $property, 'type', $translate('has not duplicate values and language')) ?>
+                        <?= $queryOption('duptl', $property, 'type', $translate('has duplicate values, type and language')) ?>
+                        <?= $queryOption('nduptl', $property, 'type', $translate('has not duplicate values, type and language')) ?>
                     </optgroup>
                 </select>
                 <?= $queryText($isSubQuery ? [] : $property, $index) ?>

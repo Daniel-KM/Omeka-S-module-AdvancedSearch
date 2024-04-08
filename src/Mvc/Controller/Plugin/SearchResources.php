@@ -99,6 +99,12 @@ class SearchResources extends AbstractPlugin
             'ndtp' => 'dtp',
             'dup' => 'ndup',
             'ndup' => 'dup',
+            'dupl' => 'ndupl',
+            'ndupl' => 'dupl',
+            'dupt' => 'ndupt',
+            'ndupt' => 'dupt',
+            'duptl' => 'nduptl',
+            'nduptl' => 'duptl',
             'gt' => 'lte',
             'gte' => 'lt',
             'lte' => 'gt',
@@ -125,6 +131,9 @@ class SearchResources extends AbstractPlugin
             'ntpu',
             'ndtp',
             'ndup',
+            'ndupl',
+            'ndupt',
+            'nduptl',
         ],
         'value_array' => [
             'list',
@@ -163,6 +172,12 @@ class SearchResources extends AbstractPlugin
             'ntpu',
             'dup',
             'ndup',
+            'dupl',
+            'ndupl',
+            'dupt',
+            'ndupt',
+            'duptl',
+            'nduptl',
         ],
         'value_subject' => [
             'lex',
@@ -984,6 +999,12 @@ class SearchResources extends AbstractPlugin
      *   - ndtp: has not data type
      *   - dup: has duplicate values
      *   - ndup: has not duplicate values
+     *   - dupt: has duplicate values and type
+     *   - ndupt: has not duplicate values and type
+     *   - dupl: has duplicate values and language
+     *   - ndupl: has not duplicate values and language
+     *   - duptl: has duplicate values, type and language
+     *   - nduptl: has not duplicate values, type and language
      *   Comparisons
      *   Warning: Comparisons are mysql comparisons, so alphabetic ones.
      *   TODO Add specific types to compare date and time (probably useless: use module NumericDataTypes).
@@ -991,6 +1012,8 @@ class SearchResources extends AbstractPlugin
      *   - gte: greater than or equal
      *   - lte: lower than or equal
      *   - lt: lower than
+     *
+     * @todo Duplicates with value annotations.
      *
      * Reserved for future implementation (already in Solr):
      *   - ma: matches a simple regex
@@ -1398,6 +1421,9 @@ class SearchResources extends AbstractPlugin
                     break;
 
                 case 'dup':
+                case 'dupl':
+                case 'dupt':
+                case 'duptl':
                     // Has duplicate values: same value, value resource, uri
                     // and data type and lang.
                     $subqueryAlias = $this->adapter->createAlias();
@@ -1406,13 +1432,20 @@ class SearchResources extends AbstractPlugin
                         "$subqueryAlias.resource",
                         "$subqueryAlias.property",
                         // Duplicates are one of the three values.
+                        // TODO Duplicate only on value, or only on resource, or only on uri.
                         "$subqueryAlias.value",
                         "$subqueryAlias.valueResource",
                         "$subqueryAlias.uri",
-                        // Duplicates are strict: same data type and language.
-                        "$subqueryAlias.type",
-                        "$subqueryAlias.lang",
                     ];
+                    // Duplicates may be strict: same data type and language.
+                    if ($queryType === 'dupl') {
+                        $groupBy[] = "$subqueryAlias.lang";
+                    } elseif ($queryType === 'dupt') {
+                        $groupBy[] = "$subqueryAlias.type";
+                    } elseif ($queryType === 'duptl') {
+                        $groupBy[] = "$subqueryAlias.type";
+                        $groupBy[] = "$subqueryAlias.lang";
+                    }
                     $subquery = $entityManager
                         ->createQueryBuilder()
                         ->select("IDENTITY($subqueryAlias.resource)")

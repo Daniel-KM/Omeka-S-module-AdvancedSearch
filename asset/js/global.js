@@ -324,7 +324,8 @@ var Omeka = {
         var queryType = $(this);
         var queryText = queryType.siblings('.query-text');
         queryText.prop('disabled',
-            ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'resq', 'nresq', 'lex', 'nlex', 'lkq', 'nlkq', 'dtp', 'ndtp', 'tp', 'ntp', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu'].includes(queryType.val()));
+            ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'resq', 'nresq', 'lex', 'nlex', 'lkq', 'nlkq', 'dtp', 'ndtp', 'tp', 'ntp', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu', 'dup', 'ndup']
+                .includes(queryType.val()));
     },
 
     // Clean the search query of empty or otherwise unneeded inputs.

@@ -43,7 +43,7 @@ $(document).ready(function() {
     Omeka.handleQueryTextInput = function(queryType) {
         queryType = queryType ? queryType : $(this);
         const typeQuery = queryType.val();
-        const isTypeWithoutText = ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'lex', 'nlex', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu'].includes(typeQuery);
+        const isTypeWithoutText = ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'lex', 'nlex', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu', 'dup', 'ndup'].includes(typeQuery);
         const isTypeSubQuery = ['resq', 'nresq', 'lkq', 'nlkq'].includes(typeQuery);
         const isTypeDataType = ['dtp', 'ndtp'].includes(typeQuery);
         const isTypeMainType = ['tp', 'ntp'].includes(typeQuery);

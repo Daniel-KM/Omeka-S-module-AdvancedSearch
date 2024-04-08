@@ -53,6 +53,8 @@ trait SearchFiltersTrait
                 'ntpu' => $translate('has not type uri-like'), // @translate
                 'dtp' => $translate('has data type'), // @translate
                 'ndtp' => $translate('has not data type'), // @translate
+                'dup' => $translate('has duplicate values'), // @translate
+                'ndup' => $translate('has not duplicate values'), // @translate
                 'gt' => $translate('greater than'), // @translate
                 'gte' => $translate('greater than or equal'), // @translate
                 'lte' => $translate('lower than or equal'), // @translate

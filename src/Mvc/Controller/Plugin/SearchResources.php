@@ -97,6 +97,8 @@ class SearchResources extends AbstractPlugin
             'ntpu' => 'tpu',
             'dtp' => 'ndtp',
             'ndtp' => 'dtp',
+            'dup' => 'ndup',
+            'ndup' => 'dup',
             'gt' => 'lte',
             'gte' => 'lt',
             'lte' => 'gt',
@@ -122,6 +124,7 @@ class SearchResources extends AbstractPlugin
             'ntpr',
             'ntpu',
             'ndtp',
+            'ndup',
         ],
         'value_array' => [
             'list',
@@ -158,6 +161,8 @@ class SearchResources extends AbstractPlugin
             'ntpr',
             'tpu',
             'ntpu',
+            'dup',
+            'ndup',
         ],
         'value_subject' => [
             'lex',
@@ -977,6 +982,8 @@ class SearchResources extends AbstractPlugin
      *   - ntpu: has not type uri-like
      *   - dtp: has data type
      *   - ndtp: has not data type
+     *   - dup: has duplicate values
+     *   - ndup: has not duplicate values
      *   Comparisons
      *   Warning: Comparisons are mysql comparisons, so alphabetic ones.
      *   TODO Add specific types to compare date and time (probably useless: use module NumericDataTypes).
@@ -1388,6 +1395,40 @@ class SearchResources extends AbstractPlugin
                         $qb->setParameter($dataTypeAlias, $value, Connection::PARAM_STR_ARRAY);
                         $predicateExpr = $expr->in("$valuesAlias.type", ":$dataTypeAlias");
                     }
+                    break;
+
+                case 'dup':
+                    // Has duplicate values: same value, value resource, uri
+                    // and data type and lang.
+                    $subqueryAlias = $this->adapter->createAlias();
+                    $groupBy = [
+                        // Find duplicates in each resource and each property.
+                        "$subqueryAlias.resource",
+                        "$subqueryAlias.property",
+                        // Duplicates are one of the three values.
+                        "$subqueryAlias.value",
+                        "$subqueryAlias.valueResource",
+                        "$subqueryAlias.uri",
+                        // Duplicates are strict: same data type and language.
+                        "$subqueryAlias.type",
+                        "$subqueryAlias.lang",
+                    ];
+                    $subquery = $entityManager
+                        ->createQueryBuilder()
+                        ->select("IDENTITY($subqueryAlias.resource)")
+                        ->from(\Omeka\Entity\Value::class, $subqueryAlias)
+                        ->groupBy(...$groupBy)
+                        ->having($expr->gt("COUNT($subqueryAlias.resource)", 1));
+                    if ($propertyIds) {
+                        // The property alias used in subquery is bound to main
+                        // query because the subquery is dqlized in main query.
+                        $propAlias = $this->adapter->createAlias();
+                        $subquery
+                            ->andWhere($expr->in("$subqueryAlias.property", ":$propAlias"));
+                        $qb
+                            ->setParameter($propAlias, $propertyIds, Connection::PARAM_INT_ARRAY);
+                    }
+                    $predicateExpr = $expr->in("$valuesAlias.resource", $subquery->getDQL());
                     break;
 
                 // TODO Manage uri and resources with gt, gte, lte, lt (it has a meaning at least for resource ids, but separate).

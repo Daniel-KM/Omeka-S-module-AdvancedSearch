@@ -181,6 +181,10 @@ if ($isSiteRequest) {
                         <?= $queryOption('tplu', $property, 'type', $translate('has type uri-like')) ?>
                         <?= $queryOption('ntpu', $property, 'type', $translate('has not type uri-like')) ?>
                     </optgroup>
+                    <optgroup label="<?= $translate('Curation') ?>">
+                        <?= $queryOption('dup', $property, 'type', $translate('has duplicate values')) ?>
+                        <?= $queryOption('ndup', $property, 'type', $translate('has not duplicate values')) ?>
+                    </optgroup>
                 </select>
                 <?= $queryText($isSubQuery ? [] : $property, $index) ?>
                 <?= $dataTypeHelper->getSelect($stem . '[text]', "property[$index][text]" ?? null, ['multiple' => false, 'class' => 'query-text query-data-type chosen-select', 'aria-label' => 'Data types', 'data-placeholder' => $translate('Select data type…')]) // TODO Manage search on property for multiple data types. ?>

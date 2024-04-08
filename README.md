@@ -59,48 +59,46 @@ Added fields are:
 Moreover, it adds new search query operator for properties (some are available
 only via api, not in the advanced search form for now):
 
-- `sw`: starts with
-- `nsw`: does not start with
-- `ew`: ends with
-- `new`: does not end with
-- `near`: is similar to (algorithm [Soundex], based on British English phonetic)
-- `nnear`: is not similar to
-- `exs`: has a single value
-- `nexs`: has not a single value
-- `exm`: has multiple values
-- `nexm`: has not multiple values
-- `list`: is in list
-- `nlist`: is not in list
-- `resq`: is resource matching query
-- `nresq`: is not resource matching query
-- `lex`: is a linked resource
-- `nlex`: is not a linked resource
-- `lres`: is linked with resource #id
-- `nlres`: is not linked with resource #id
-- `lkq`: is linked with resources matching query
-- `nlkq`: is not linked with resources matching query
-- `tp`: has main type (literal-like, resource-like, uri-like)
-- `ntp`: has not main type (literal-like, resource-like, uri-like)
-- `tpl`: has type literal-like
-- `ntpl`: has not type literal-like
-- `tpr`: has type resource-like
-- `ntpr`: has not type resource-like
-- `tpu`: has type uri-like
-- `ntpu`: has not type uri-like
-- `dtp`: has data type
-- `ndtp`: has not data type
-- `gt`: greater than
-- `gte`: greater than or equal
-- `lte`: lower than or equal
-- `lt`: lower than
-- exclude one or multiple properties (except title)
+- Values:
+    - `eq`/`neq`: is or is not exactly (default Omeka)
+    - `in`/`nin`: contains or does not contains (default Omeka)
+    - `sw`/`nsw`: starts or does not start with
+    - `ew`/`new`: ends or does not end with
+    - `near`/`nnear`: is or is not similar to (algorithm [Soundex], based on British English phonetic)
+    - `list`/`nlist`: is or is not in list (api only)
+- Resources:
+    - `res`/`nres`: has resource or has no resource (default Omeka)
+    - `resq`/`nresq`: is or is not resource matching query
+- Linked resources:
+    - `lex`/`nlex`: is or is not a linked resource
+    - `lres`/`nlres`: is or is not linked with resource #id
+    - `lkq`/`nlkq`: is or is not linked with resources matching query
+- Count:
+    - `ex`/`nex`: has any value or has no value (default Omeka)
+    - `exs`/`nexs`: has or has not a single value
+    - `exm`/`nexm`: has or has not multiple values
+- Data Type:
+    - `tp`/`ntp`: has or has not main type (literal-like, resource-like, uri-like)
+    - `tpl`/`ntpl`: has or has not type literal-like
+    - `tpr`/`ntpr`: has or has not type resource-like
+    - `tpu`/`ntpu`: has or has not type uri-like
+    - `dtp`/`ndtp`: has or has not data type
+- Comparisons (api only):
+    - `gt`: greater than
+    - `gte`: greater than or equal
+    - `lte`: lower than or equal
+    - `lt`: lower than
+- Curation:
+    - `dup` and variants: has duplicate values, linked resources, uris, types and languages
+      The variants allows to check duplicate for simple values only, linked
+      resources only, uris only, including or not types or languages.
 
 __Warning__: With the internal sql engine, comparisons are mysql comparisons, so
 alphabetic ones. They works for string and four digit years and standard dates,
 not for numbers nor variable dates.
 
 Furthermore:
-
+- the search can exclude one or more properties (except title).
 - search in multiple properties at a time, for example `dcterms:creator or dcterms:contributor are equal to value "Anonymous"`.
 - search resources without without template, class, item set, site and owner.
   This feature is included directly in the advanced search form in each select.
@@ -141,7 +139,7 @@ the module to `AdvancedSearch`, and go to the root module, and run:
 composer install --no-dev
 ```
 
-See general end user documentation for [Installing a module].
+See general end user documentation for [installing a module].
 
 ### Optional dependencies
 
@@ -438,6 +436,8 @@ TODO
 - [ ] Factorize and separate config, form and adapter.
 - [ ] Create index for Soundex and non-English algorithms.
 - [ ] Remove SearchingForm?
+- [ ] Restructure form config: separate form and results and allows to mix them, in particular to get multiple form (quick, simple) with same results, or different facets (facets by item sets or main results).
+- [ ] Allow to config the names of the form variants: simple, quick, basic, etc.
 
 
 Warning
@@ -516,7 +516,7 @@ for the future digital library [Corpus du Louvre].
 [Search Solr]: https://gitlab.com/Daniel-KM/Omeka-S-module-SearchSolr
 [SearchSolr]: https://gitlab.com/Daniel-KM/Omeka-S-module-SearchSolr
 [Soundex]: https://en.wikipedia.org/wiki/Soundex
-[Installing a module]: https://omeka.org/s/docs/user-manual/modules/#installing-modules
+[installing a module]: https://omeka.org/s/docs/user-manual/modules/#installing-modules
 [this patch]: https://github.com/omeka/omeka-s/pull/1519/files
 [Common]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common
 [jQuery-Autocomplete]: https://github.com/devbridge/jQuery-Autocomplete

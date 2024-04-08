@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-29 00:00+0000\n"
+"POT-Creation-Date: 2024-03-25 00:00+0000"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -181,12 +181,10 @@ msgid "is not a linked resource"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:40
-#: view/common/advanced-search/properties.phtml:159
 msgid "is linked with resource with ID"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:41
-#: view/common/advanced-search/properties.phtml:160
 msgid "is not linked with resource with ID"
 msgstr ""
 
@@ -257,18 +255,178 @@ msgid "has not data type"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:56
-msgid "greater than"
+#: view/common/advanced-search/properties.phtml:185
+msgid "has duplicate values"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:57
-msgid "greater than or equal"
+#: view/common/advanced-search/properties.phtml:186
+msgid "has not duplicate values"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:58
-msgid "lower than or equal"
+#: view/common/advanced-search/properties.phtml:187
+msgid "has duplicate values and type"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:59
+#: view/common/advanced-search/properties.phtml:188
+msgid "has not duplicate values and type"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:60
+#: view/common/advanced-search/properties.phtml:189
+msgid "has duplicate values and language"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:61
+#: view/common/advanced-search/properties.phtml:190
+msgid "has not duplicate values and language"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:62
+#: view/common/advanced-search/properties.phtml:191
+msgid "has duplicate values, type and language"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:63
+#: view/common/advanced-search/properties.phtml:192
+msgid "has not duplicate values, type and language"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:64
+#: view/common/advanced-search/properties.phtml:193
+msgid "has duplicate simple values"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:65
+#: view/common/advanced-search/properties.phtml:194
+msgid "has not duplicate simple values"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:66
+#: view/common/advanced-search/properties.phtml:195
+msgid "has duplicate simple values and type"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:67
+#: view/common/advanced-search/properties.phtml:196
+msgid "has not duplicate simple values and type"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:68
+#: view/common/advanced-search/properties.phtml:197
+msgid "has duplicate simple values and language"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:69
+#: view/common/advanced-search/properties.phtml:198
+msgid "has not duplicate simple values and language"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:70
+#: view/common/advanced-search/properties.phtml:199
+msgid "has duplicate simple values, type and language"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:71
+#: view/common/advanced-search/properties.phtml:200
+msgid "has not duplicate simple values, type and language"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:72
+#: view/common/advanced-search/properties.phtml:201
+msgid "has duplicate linked resources"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:73
+#: view/common/advanced-search/properties.phtml:202
+msgid "has not duplicate linked resources"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:74
+#: view/common/advanced-search/properties.phtml:203
+msgid "has duplicate linked resources and type"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:75
+#: view/common/advanced-search/properties.phtml:204
+msgid "has not duplicate linked resources and type"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:76
+#: view/common/advanced-search/properties.phtml:205
+msgid "has duplicate linked resources and language"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:77
+#: view/common/advanced-search/properties.phtml:206
+msgid "has not duplicate linked resources and language"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:78
+#: view/common/advanced-search/properties.phtml:207
+msgid "has duplicate linked resources, type and language"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:79
+#: view/common/advanced-search/properties.phtml:208
+msgid "has not duplicate linked resources, type and language"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:80
+#: view/common/advanced-search/properties.phtml:209
+msgid "has duplicate uris"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:81
+#: view/common/advanced-search/properties.phtml:210
+msgid "has not duplicate uris"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:82
+#: view/common/advanced-search/properties.phtml:211
+msgid "has duplicate uris and type"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:83
+#: view/common/advanced-search/properties.phtml:212
+msgid "has not duplicate uris and type"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:84
+#: view/common/advanced-search/properties.phtml:213
+msgid "has duplicate uris and language"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:85
+#: view/common/advanced-search/properties.phtml:214
+msgid "has not duplicate uris and language"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:86
+#: view/common/advanced-search/properties.phtml:215
+msgid "has duplicate uris, type and language"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:87
+#: view/common/advanced-search/properties.phtml:216
+msgid "has not duplicate uris, type and language"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:88
+msgid "greater than"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:89
+msgid "greater than or equal"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:90
+msgid "lower than or equal"
+msgstr ""
+
+#: src/View/Helper/SearchFiltersTrait.php:91
 msgid "lower than"
 msgstr ""
 
@@ -565,12 +723,20 @@ msgstr ""
 msgid "Linked resource"
 msgstr ""
 
+#: view/common/advanced-search/properties.phtml:159
+msgid "is linked with resource with ID (expert)"
+msgstr ""
+
+#: view/common/advanced-search/properties.phtml:160
+msgid "is not linked with resource with ID (expert)"
+msgstr ""
+
 #: view/common/advanced-search/properties.phtml:161
-msgid "is linked with resources matching query"
+msgid "is linked with resources matching query (expert)"
 msgstr ""
 
 #: view/common/advanced-search/properties.phtml:162
-msgid "is not linked with resources matching query"
+msgid "is not linked with resources matching query (expert)"
 msgstr ""
 
 #: view/common/advanced-search/properties.phtml:164
@@ -581,7 +747,11 @@ msgstr ""
 msgid "Data type"
 msgstr ""
 
-#: view/common/advanced-search/properties.phtml:186
+#: view/common/advanced-search/properties.phtml:184
+msgid "Curation"
+msgstr ""
+
+#: view/common/advanced-search/properties.phtml:220
 msgid "Select data type…"
 msgstr ""
 
@@ -665,64 +835,64 @@ msgstr ""
 msgid "An error occured and your query returned no results."
 msgstr ""
 
-#: data/scripts/upgrade.php:205
+#: data/scripts/upgrade.php:213
 #, php-format
 msgid "The module %s should be updated to version %s."
 msgstr ""
 
-#: data/scripts/upgrade.php:212
+#: data/scripts/upgrade.php:220
 msgid ""
 "It is now possible to aggregate properties with the internal (sql) adapter. "
 "See config of the internal search engine."
 msgstr ""
 
-#: data/scripts/upgrade.php:217
+#: data/scripts/upgrade.php:225
 msgid "It is now possible to add a pagination per-page to the search page."
 msgstr ""
 
-#: data/scripts/upgrade.php:222
+#: data/scripts/upgrade.php:230
 msgid "It is now possible to use \"not\" in advanced filters."
 msgstr ""
 
-#: data/scripts/upgrade.php:227
+#: data/scripts/upgrade.php:235
 msgid ""
 "It is now possible to display the used search filters in the results header."
 msgstr ""
 
-#: data/scripts/upgrade.php:232
+#: data/scripts/upgrade.php:240
 msgid ""
 "Some field types have been renamed for filters in the form. To use the core "
 "input elements, the type should be \"Omeka\" (or prepend \"Omeka/\" if "
 "needed). See the default config page."
 msgstr ""
 
-#: data/scripts/upgrade.php:239
+#: data/scripts/upgrade.php:247
 msgid ""
 "It is now possible to query ressources with linked ressources in the "
 "standard advanced form."
 msgstr ""
 
-#: data/scripts/upgrade.php:246
+#: data/scripts/upgrade.php:254
 msgid ""
 "A new option was added to display the resources mixed (by default) or item "
 "sets and items separately (old behavior)."
 msgstr ""
 
-#: data/scripts/upgrade.php:250
+#: data/scripts/upgrade.php:258
 msgid "The template for the sort selector has been updated."
 msgstr ""
 
-#: data/scripts/upgrade.php:254
+#: data/scripts/upgrade.php:262
 msgid "A helper for the pagination per page has been added."
 msgstr ""
 
-#: data/scripts/upgrade.php:261
+#: data/scripts/upgrade.php:269
 msgid ""
 "It’s now possible to search resources by multiples properties, and resources "
 "without class, template, item set, site or owner."
 msgstr ""
 
-#: data/scripts/upgrade.php:268
+#: data/scripts/upgrade.php:276
 msgid ""
 "It’s now possible to use facet range with a double select (from/to). With "
 "internal sql engine, order is alphabetic only for now: it works for strings "
@@ -731,60 +901,60 @@ msgid ""
 "to be updated."
 msgstr ""
 
-#: data/scripts/upgrade.php:272
+#: data/scripts/upgrade.php:280
 msgid ""
 "The property query types lower/greater have been updated to use alphabetic "
 "order, no more date-time only. For integer and date-time, use numeric data "
 "types."
 msgstr ""
 
-#: data/scripts/upgrade.php:276
+#: data/scripts/upgrade.php:284
 msgid ""
 "Update your theme to support new features for facets (active facets, button "
 "apply facets with id=\"apply-facets\", list of facet values)."
 msgstr ""
 
-#: data/scripts/upgrade.php:293
+#: data/scripts/upgrade.php:301
 #, php-format
 msgid ""
 "It’s now possible to search values similar other ones (via %1$sSoundex%2$s, "
 "designed for British English phonetic)."
 msgstr ""
 
-#: data/scripts/upgrade.php:302
+#: data/scripts/upgrade.php:310
 msgid "Some new options were added to manage facets."
 msgstr ""
 
-#: data/scripts/upgrade.php:332
+#: data/scripts/upgrade.php:340
 msgid ""
 "It is recommended to upgrade the module \"Reference\" to improve performance."
 msgstr ""
 
-#: data/scripts/upgrade.php:381
+#: data/scripts/upgrade.php:389
 msgid ""
 "A new settings allows to skip indexing after a batch process because an "
 "issue can occurs in some cases."
 msgstr ""
 
-#: data/scripts/upgrade.php:394
+#: data/scripts/upgrade.php:402
 msgid ""
 "The performance was improved in many places, in particular for large "
 "databases."
 msgstr ""
 
-#: data/scripts/upgrade.php:399
+#: data/scripts/upgrade.php:407
 msgid ""
 "It is now possible to order results by a list of ids with argument "
 "\"sort_by=ids\"."
 msgstr ""
 
-#: data/scripts/upgrade.php:406
+#: data/scripts/upgrade.php:414
 msgid ""
 "It is now possible to do a standard search with a sub-query, for example to "
 "get all items with creators born in 1789."
 msgstr ""
 
-#: data/scripts/upgrade.php:449
+#: data/scripts/upgrade.php:431
 msgid ""
 "When full text is managed in alto files, it is now possible to search full "
 "text or record only."
@@ -978,7 +1148,7 @@ msgstr ""
 msgid "No operation (noop)"
 msgstr ""
 
-#: src/View/Helper/SearchingUrl.php:35
+#: src/View/Helper/SearchingUrl.php:34
 msgid "Search engine {name} (#{search_config_id}) is not available."
 msgstr ""
 
@@ -1096,32 +1266,32 @@ msgid ""
 "checked manually."
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:33 src/Form/SiteSettingsFieldset.php:37
+#: src/Form/SiteSettingsFieldset.php:32 src/Form/SiteSettingsFieldset.php:36
 #: src/Form/SettingsFieldset.php:25
 msgid "Advanced Search (module)"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:60
+#: src/Form/SiteSettingsFieldset.php:59
 msgid "Display only following fields"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:75
+#: src/Form/SiteSettingsFieldset.php:74
 msgid "Default search page"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:77
+#: src/Form/SiteSettingsFieldset.php:76
 msgid "Select the default search engine for the site…"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:88 src/Form/SettingsFieldset.php:64
+#: src/Form/SiteSettingsFieldset.php:87 src/Form/SettingsFieldset.php:64
 msgid "Available search pages"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:101
+#: src/Form/SiteSettingsFieldset.php:100
 msgid "Redirect item set page to search"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:102
+#: src/Form/SiteSettingsFieldset.php:101
 msgid ""
 "By default, item-set/show is redirected to item/browse. This option "
 "redirects it to the search page."
@@ -1197,6 +1367,14 @@ msgstr ""
 
 #: src/Form/SearchFilter/Advanced.php:58
 msgid "not"
+msgstr ""
+
+#: src/Form/SearchFilter/Advanced.php:120
+msgid "is linked with resources matching query"
+msgstr ""
+
+#: src/Form/SearchFilter/Advanced.php:121
+msgid "is not linked with resources matching query"
 msgstr ""
 
 #: src/Form/Admin/InternalConfigFieldset.php:18
@@ -1300,8 +1478,8 @@ msgid "Sort (for internal use only, don’t modify it)"
 msgstr ""
 
 #: src/Form/Admin/SearchConfigForm.php:87
-#: src/Form/Admin/SearchSuggesterForm.php:45
-#: src/Form/Admin/SearchSuggesterForm.php:63
+#: src/Form/Admin/SearchSuggesterForm.php:44
+#: src/Form/Admin/SearchSuggesterForm.php:62
 msgid "Select a search engine below…"
 msgstr ""
 
@@ -1339,78 +1517,78 @@ msgstr ""
 msgid "Make available in all sites"
 msgstr ""
 
-#: src/Form/Admin/SearchSuggesterForm.php:76
+#: src/Form/Admin/SearchSuggesterForm.php:75
 msgid "Suggester settings"
 msgstr ""
 
-#: src/Form/Admin/SearchSuggesterForm.php:96
+#: src/Form/Admin/SearchSuggesterForm.php:95
 msgid "Direct query in database (without index, but site specific)"
 msgstr ""
 
-#: src/Form/Admin/SearchSuggesterForm.php:106
+#: src/Form/Admin/SearchSuggesterForm.php:105
 msgid "Mode to index values"
 msgstr ""
 
-#: src/Form/Admin/SearchSuggesterForm.php:108
+#: src/Form/Admin/SearchSuggesterForm.php:107
 msgid "First words of values"
 msgstr ""
 
-#: src/Form/Admin/SearchSuggesterForm.php:109
+#: src/Form/Admin/SearchSuggesterForm.php:108
 msgid "All words"
 msgstr ""
 
-#: src/Form/Admin/SearchSuggesterForm.php:110
+#: src/Form/Admin/SearchSuggesterForm.php:109
 msgid "Full value"
 msgstr ""
 
-#: src/Form/Admin/SearchSuggesterForm.php:111
+#: src/Form/Admin/SearchSuggesterForm.php:110
 msgid "First words of values and full value"
 msgstr ""
 
-#: src/Form/Admin/SearchSuggesterForm.php:112
+#: src/Form/Admin/SearchSuggesterForm.php:111
 msgid "All words and full value"
 msgstr ""
 
-#: src/Form/Admin/SearchSuggesterForm.php:125
+#: src/Form/Admin/SearchSuggesterForm.php:124
 msgid "Mode to search suggestions"
 msgstr ""
 
-#: src/Form/Admin/SearchSuggesterForm.php:127
+#: src/Form/Admin/SearchSuggesterForm.php:126
 msgid "Start of a word"
 msgstr ""
 
-#: src/Form/Admin/SearchSuggesterForm.php:128
+#: src/Form/Admin/SearchSuggesterForm.php:127
 msgid "In word"
 msgstr ""
 
-#: src/Form/Admin/SearchSuggesterForm.php:141
+#: src/Form/Admin/SearchSuggesterForm.php:140
 msgid "Max number of results"
 msgstr ""
 
-#: src/Form/Admin/SearchSuggesterForm.php:154
+#: src/Form/Admin/SearchSuggesterForm.php:153
 msgid "Max number of characters of a result"
 msgstr ""
 
-#: src/Form/Admin/SearchSuggesterForm.php:168
+#: src/Form/Admin/SearchSuggesterForm.php:167
 msgid "Limit query to specific fields"
 msgstr ""
 
-#: src/Form/Admin/SearchSuggesterForm.php:169
+#: src/Form/Admin/SearchSuggesterForm.php:168
 msgid ""
 "With the internal search engine, it is not recommended to use full text "
 "content."
 msgstr ""
 
-#: src/Form/Admin/SearchSuggesterForm.php:177
-#: src/Form/Admin/SearchSuggesterForm.php:193
+#: src/Form/Admin/SearchSuggesterForm.php:176
+#: src/Form/Admin/SearchSuggesterForm.php:192
 msgid "Select fields…"
 msgstr ""
 
-#: src/Form/Admin/SearchSuggesterForm.php:184
+#: src/Form/Admin/SearchSuggesterForm.php:183
 msgid "Exclude fields"
 msgstr ""
 
-#: src/Form/Admin/SearchSuggesterForm.php:185
+#: src/Form/Admin/SearchSuggesterForm.php:184
 msgid ""
 "Allow to skip the full text content, that may be useless for suggestions."
 msgstr ""
@@ -1883,62 +2061,62 @@ msgid ""
 "start with \"searching-form\"."
 msgstr ""
 
-#: src/Form/MainSearchForm.php:270
+#: src/Form/MainSearchForm.php:300
 msgid "Reset fields"
 msgstr ""
 
-#: src/Form/MainSearchForm.php:314
+#: src/Form/MainSearchForm.php:344
 msgid "Search full text"
 msgstr ""
 
-#: src/Form/MainSearchForm.php:326
+#: src/Form/MainSearchForm.php:356
 msgid "Record only"
 msgstr ""
 
-#: src/Form/MainSearchForm.php:445
+#: src/Form/MainSearchForm.php:475
 msgid "From"
 msgstr ""
 
-#: src/Form/MainSearchForm.php:448 src/Form/MainSearchForm.php:458
+#: src/Form/MainSearchForm.php:478 src/Form/MainSearchForm.php:488
 msgid "YYYY"
 msgstr ""
 
-#: src/Form/MainSearchForm.php:455
+#: src/Form/MainSearchForm.php:485
 msgid "To"
 msgstr ""
 
-#: src/Form/MainSearchForm.php:590 src/Form/MainSearchForm.php:615
-#: src/Form/MainSearchForm.php:631 src/Form/MainSearchForm.php:656
-#: src/Form/MainSearchForm.php:686 src/Form/MainSearchForm.php:717
-#: src/Form/MainSearchForm.php:749 src/Form/MainSearchForm.php:788
-#: src/Form/MainSearchForm.php:813 src/Form/MainSearchForm.php:853
-#: src/Form/MainSearchForm.php:887 src/Form/MainSearchForm.php:929
+#: src/Form/MainSearchForm.php:620 src/Form/MainSearchForm.php:645
+#: src/Form/MainSearchForm.php:661 src/Form/MainSearchForm.php:686
+#: src/Form/MainSearchForm.php:716 src/Form/MainSearchForm.php:747
+#: src/Form/MainSearchForm.php:780 src/Form/MainSearchForm.php:819
+#: src/Form/MainSearchForm.php:847 src/Form/MainSearchForm.php:887
+#: src/Form/MainSearchForm.php:921 src/Form/MainSearchForm.php:963
 #: src/Controller/Admin/SearchConfigController.php:172
 #: src/Controller/Admin/SearchConfigController.php:182
 msgid "label"
 msgstr ""
 
-#: src/Form/MainSearchForm.php:601
+#: src/Form/MainSearchForm.php:631
 msgid "Select resource type…"
 msgstr ""
 
-#: src/Form/MainSearchForm.php:664
+#: src/Form/MainSearchForm.php:694
 msgid "Select owners…"
 msgstr ""
 
-#: src/Form/MainSearchForm.php:761
+#: src/Form/MainSearchForm.php:792
 msgid "Select classes…"
 msgstr ""
 
-#: src/Form/MainSearchForm.php:798 src/Form/MainSearchForm.php:821
+#: src/Form/MainSearchForm.php:829 src/Form/MainSearchForm.php:855
 msgid "Select templates…"
 msgstr ""
 
-#: src/Form/MainSearchForm.php:862 src/Form/MainSearchForm.php:896
+#: src/Form/MainSearchForm.php:896 src/Form/MainSearchForm.php:930
 msgid "Select collections…"
 msgstr ""
 
-#: src/Form/MainSearchForm.php:937
+#: src/Form/MainSearchForm.php:971
 msgid "Select access…"
 msgstr ""
 

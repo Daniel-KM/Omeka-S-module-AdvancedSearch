@@ -324,7 +324,7 @@ var Omeka = {
         var queryType = $(this);
         var queryText = queryType.siblings('.query-text');
         queryText.prop('disabled',
-            ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'resq', 'nresq', 'lex', 'nlex', 'lkq', 'nlkq', 'dtp', 'ndtp', 'tp', 'ntp', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu', 'dup', 'ndup', 'dupl', 'ndupl', 'dupt', 'ndupt', 'duptl', 'nduptl']
+            ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'resq', 'nresq', 'lex', 'nlex', 'lkq', 'nlkq', 'dtp', 'ndtp', 'tp', 'ntp', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu', 'dup', 'ndup', 'dupl', 'ndupl', 'dupt', 'ndupt', 'duptl', 'nduptl', 'dupv', 'ndupv', 'dupvl', 'ndupvl', 'dupvt', 'ndupvt', 'dupvtl', 'ndupvtl', 'dupr', 'ndupr', 'duprl', 'nduprl', 'duprt', 'nduprt', 'duprtl', 'nduprtl', 'dupu', 'ndupu', 'dupul', 'ndupul', 'duput', 'nduput', 'duputl', 'nduputl']
                 .includes(queryType.val()));
     },
 

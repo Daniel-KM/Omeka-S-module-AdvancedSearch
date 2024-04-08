@@ -190,6 +190,30 @@ if ($isSiteRequest) {
                         <?= $queryOption('ndupl', $property, 'type', $translate('has not duplicate values and language')) ?>
                         <?= $queryOption('duptl', $property, 'type', $translate('has duplicate values, type and language')) ?>
                         <?= $queryOption('nduptl', $property, 'type', $translate('has not duplicate values, type and language')) ?>
+                        <?= $queryOption('dupv', $property, 'type', $translate('has duplicate simple values')) ?>
+                        <?= $queryOption('ndupv', $property, 'type', $translate('has not duplicate simple values')) ?>
+                        <?= $queryOption('dupvt', $property, 'type', $translate('has duplicate simple values and type')) ?>
+                        <?= $queryOption('ndupvt', $property, 'type', $translate('has not duplicate simple values and type')) ?>
+                        <?= $queryOption('dupvl', $property, 'type', $translate('has duplicate simple values and language')) ?>
+                        <?= $queryOption('ndupvl', $property, 'type', $translate('has not duplicate simple values and language')) ?>
+                        <?= $queryOption('dupvtl', $property, 'type', $translate('has duplicate simple values, type and language')) ?>
+                        <?= $queryOption('ndupvtl', $property, 'type', $translate('has not duplicate simple values, type and language')) ?>
+                        <?= $queryOption('dupr', $property, 'type', $translate('has duplicate linked resources')) ?>
+                        <?= $queryOption('ndupr', $property, 'type', $translate('has not duplicate linked resources')) ?>
+                        <?= $queryOption('duprt', $property, 'type', $translate('has duplicate linked resources and type')) ?>
+                        <?= $queryOption('nduprt', $property, 'type', $translate('has not duplicate linked resources and type')) ?>
+                        <?= $queryOption('duprl', $property, 'type', $translate('has duplicate linked resources and language')) ?>
+                        <?= $queryOption('nduprl', $property, 'type', $translate('has not duplicate linked resources and language')) ?>
+                        <?= $queryOption('duprtl', $property, 'type', $translate('has duplicate linked resources, type and language')) ?>
+                        <?= $queryOption('nduprtl', $property, 'type', $translate('has not duplicate linked resources, type and language')) ?>
+                        <?= $queryOption('dupu', $property, 'type', $translate('has duplicate uris')) ?>
+                        <?= $queryOption('ndupu', $property, 'type', $translate('has not duplicate uris')) ?>
+                        <?= $queryOption('duput', $property, 'type', $translate('has duplicate uris and type')) ?>
+                        <?= $queryOption('nduput', $property, 'type', $translate('has not duplicate uris and type')) ?>
+                        <?= $queryOption('dupul', $property, 'type', $translate('has duplicate uris and language')) ?>
+                        <?= $queryOption('ndupul', $property, 'type', $translate('has not duplicate uris and language')) ?>
+                        <?= $queryOption('duputl', $property, 'type', $translate('has duplicate uris, type and language')) ?>
+                        <?= $queryOption('nduputl', $property, 'type', $translate('has not duplicate uris, type and language')) ?>
                     </optgroup>
                 </select>
                 <?= $queryText($isSubQuery ? [] : $property, $index) ?>

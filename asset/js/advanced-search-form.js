@@ -43,7 +43,7 @@ $(document).ready(function() {
     Omeka.handleQueryTextInput = function(queryType) {
         queryType = queryType ? queryType : $(this);
         const typeQuery = queryType.val();
-        const isTypeWithoutText = ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'lex', 'nlex', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu', 'dup', 'ndup', 'dupl', 'ndupl', 'dupt', 'ndupt', 'duptl', 'nduptl'].includes(typeQuery);
+        const isTypeWithoutText = ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'lex', 'nlex', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu', 'dup', 'ndup', 'dupl', 'ndupl', 'dupt', 'ndupt', 'duptl', 'nduptl', 'dupv', 'ndupv', 'dupvl', 'ndupvl', 'dupvt', 'ndupvt', 'dupvtl', 'ndupvtl', 'dupr', 'ndupr', 'duprl', 'nduprl', 'duprt', 'nduprt', 'duprtl', 'nduprtl', 'dupu', 'ndupu', 'dupul', 'ndupul', 'duput', 'nduput', 'duputl', 'nduputl'].includes(typeQuery);
         const isTypeSubQuery = ['resq', 'nresq', 'lkq', 'nlkq'].includes(typeQuery);
         const isTypeDataType = ['dtp', 'ndtp'].includes(typeQuery);
         const isTypeMainType = ['tp', 'ntp'].includes(typeQuery);

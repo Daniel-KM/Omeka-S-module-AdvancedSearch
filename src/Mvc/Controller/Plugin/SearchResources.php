@@ -105,6 +105,30 @@ class SearchResources extends AbstractPlugin
             'ndupt' => 'dupt',
             'duptl' => 'nduptl',
             'nduptl' => 'duptl',
+            'dupv' => 'ndupv',
+            'ndupv' => 'dupv',
+            'dupvl' => 'ndupvl',
+            'ndupvl' => 'dupvl',
+            'dupvt' => 'ndupvt',
+            'ndupvt' => 'dupvt',
+            'dupvtl' => 'ndupvtl',
+            'ndupvtl' => 'dupvtl',
+            'dupr' => 'ndupr',
+            'ndupr' => 'dupr',
+            'duprl' => 'nduprl',
+            'nduprl' => 'duprl',
+            'duprt' => 'nduprt',
+            'nduprt' => 'duprt',
+            'duprtl' => 'nduprtl',
+            'nduprtl' => 'duprtl',
+            'dupu' => 'ndupu',
+            'ndupu' => 'dupu',
+            'dupul' => 'ndupul',
+            'ndupul' => 'dupul',
+            'duput' => 'nduput',
+            'nduput' => 'duput',
+            'duputl' => 'nduputl',
+            'nduputl' => 'duputl',
             'gt' => 'lte',
             'gte' => 'lt',
             'lte' => 'gt',
@@ -134,6 +158,18 @@ class SearchResources extends AbstractPlugin
             'ndupl',
             'ndupt',
             'nduptl',
+            'ndupv',
+            'ndupvl',
+            'ndupvt',
+            'ndupvtl',
+            'ndupr',
+            'nduprl',
+            'nduprt',
+            'nduprtl',
+            'ndupu',
+            'ndupul',
+            'nduput',
+            'nduputl',
         ],
         'value_array' => [
             'list',
@@ -178,6 +214,30 @@ class SearchResources extends AbstractPlugin
             'ndupt',
             'duptl',
             'nduptl',
+            'dupv',
+            'ndupv',
+            'dupvl',
+            'ndupvl',
+            'dupvt',
+            'ndupvt',
+            'dupvtl',
+            'ndupvtl',
+            'dupr',
+            'ndupr',
+            'duprl',
+            'nduprl',
+            'duprt',
+            'nduprt',
+            'duprtl',
+            'nduprtl',
+            'dupu',
+            'ndupu',
+            'dupul',
+            'ndupul',
+            'duput',
+            'nduput',
+            'duputl',
+            'nduputl',
         ],
         'value_subject' => [
             'lex',
@@ -997,6 +1057,8 @@ class SearchResources extends AbstractPlugin
      *   - ntpu: has not type uri-like
      *   - dtp: has data type
      *   - ndtp: has not data type
+     *   Curation:
+     *   Curation duplicate all (values as generic):
      *   - dup: has duplicate values
      *   - ndup: has not duplicate values
      *   - dupt: has duplicate values and type
@@ -1005,6 +1067,33 @@ class SearchResources extends AbstractPlugin
      *   - ndupl: has not duplicate values and language
      *   - duptl: has duplicate values, type and language
      *   - nduptl: has not duplicate values, type and language
+     *   Curation duplicate values (values as strict):
+     *   - dupv: has duplicate simple values
+     *   - ndupv: has not duplicate simple values
+     *   - dupvt: has duplicate simple values and type
+     *   - ndupvt: has not duplicate simple values and type
+     *   - dupvl: has duplicate simple values and language
+     *   - ndupvl: has not duplicate simple values and language
+     *   - dupvtl: has duplicate simple values, type and language
+     *   - ndupvtl: has not duplicate simple values, type and language
+     *   Curation duplicate linked resources:
+     *   - dupr: has duplicate linked resources
+     *   - ndupr: has not duplicate linked resources
+     *   - duprt: has duplicate linked resources and type
+     *   - nduprt: has not duplicate linked resources and type
+     *   - duprl: has duplicate linked resources and language
+     *   - nduprl: has not duplicate linked resources and language
+     *   - duprtl: has duplicate linked resources, type and language
+     *   - nduprtl: has not duplicate linked resources, type and language
+     *   Curation duplicate uris:
+     *   - dupu: has duplicate uris
+     *   - ndupu: has not duplicate uris
+     *   - duput: has duplicate uris and type
+     *   - nduput: has not duplicate uris and type
+     *   - dupul: has duplicate uris and language
+     *   - ndupul: has not duplicate uris and language
+     *   - duputl: has duplicate uris, type and language
+     *   - nduputl: has not duplicate uris, type and language
      *   Comparisons
      *   Warning: Comparisons are mysql comparisons, so alphabetic ones.
      *   TODO Add specific types to compare date and time (probably useless: use module NumericDataTypes).
@@ -1013,7 +1102,10 @@ class SearchResources extends AbstractPlugin
      *   - lte: lower than or equal
      *   - lt: lower than
      *
+     * @todo The multiple types of duplicates are related to the database structure, only first should be needed.
+     * @todo Duplicates with or (dupo: duplicate literal value or duplicate linked resource or duplicate uri)
      * @todo Duplicates with value annotations.
+     * @todo La recherche des doublons nécessite que les valeurs soient propres (espaces et nuls).
      *
      * Reserved for future implementation (already in Solr):
      *   - ma: matches a simple regex
@@ -1424,25 +1516,44 @@ class SearchResources extends AbstractPlugin
                 case 'dupl':
                 case 'dupt':
                 case 'duptl':
-                    // Has duplicate values: same value, value resource, uri
-                    // and data type and lang.
+                case 'dupv':
+                case 'dupvl':
+                case 'dupvt':
+                case 'dupvtl':
+                case 'dupr':
+                case 'duprl':
+                case 'duprt':
+                case 'duprtl':
+                case 'dupu':
+                case 'dupul':
+                case 'duput':
+                case 'duputl':
+                    // Has duplicate values: same value, value resource, uri,
+                    // data type and language.
                     $subqueryAlias = $this->adapter->createAlias();
+                    // Find duplicates for each resource and each property.
                     $groupBy = [
-                        // Find duplicates in each resource and each property.
                         "$subqueryAlias.resource",
                         "$subqueryAlias.property",
-                        // Duplicates are one of the three values.
-                        // TODO Duplicate only on value, or only on resource, or only on uri.
-                        "$subqueryAlias.value",
-                        "$subqueryAlias.valueResource",
-                        "$subqueryAlias.uri",
                     ];
+                    // Duplicates may be values, linked resources and uris.
+                    if (in_array($queryType, ['dup', 'dupl', 'dupt', 'duptl'])) {
+                        $groupBy[] = "$subqueryAlias.value";
+                        $groupBy[] = "$subqueryAlias.valueResource";
+                        $groupBy[] = "$subqueryAlias.uri";
+                    } elseif (in_array($queryType, ['dupv', 'dupvl', 'dupvt', 'dupvtl'])) {
+                        $groupBy[] = "$subqueryAlias.value";
+                    } elseif (in_array($queryType, ['dupr', 'duprl', 'duprt', 'duprtl'])) {
+                        $groupBy[] = "$subqueryAlias.valueResource";
+                    } elseif (in_array($queryType, ['dupu', 'dupul', 'duput', 'duputl'])) {
+                        $groupBy[] = "$subqueryAlias.uri";
+                    }
                     // Duplicates may be strict: same data type and language.
-                    if ($queryType === 'dupl') {
+                    if (in_array($queryType, ['dupl', 'dupvl', 'duprl', 'dupul'])) {
                         $groupBy[] = "$subqueryAlias.lang";
-                    } elseif ($queryType === 'dupt') {
+                    } elseif (in_array($queryType, ['dupt', 'dupvt', 'duprt', 'duput'])) {
                         $groupBy[] = "$subqueryAlias.type";
-                    } elseif ($queryType === 'duptl') {
+                    } elseif (in_array($queryType, ['duptl', 'dupvtl', 'duprtl', 'duputl'])) {
                         $groupBy[] = "$subqueryAlias.type";
                         $groupBy[] = "$subqueryAlias.lang";
                     }

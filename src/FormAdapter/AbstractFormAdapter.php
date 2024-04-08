@@ -96,7 +96,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
         return $this->formPartial;
     }
 
-    public function getForm(): ?\Laminas\Form\Form
+    public function getForm(array $options = []): ?\Laminas\Form\Form
     {
         if (!$this->formClass || !$this->searchConfig) {
             return null;
@@ -106,25 +106,24 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
         if (!$formElementManager->has($this->formClass)) {
             return null;
         }
+        $options['search_config'] = $this->searchConfig;
         return $formElementManager
-            ->get($this->formClass, [
-                'search_config' => $this->searchConfig,
-            ])
+            ->get($this->formClass, $options)
             ->setAttribute('method', 'GET');
     }
 
     public function renderForm(array $options = []): string
     {
-        $form = $this->getForm();
-        if (!$form) {
-            return '';
-        }
-
         $options += [
             'template' => null,
             'skip_form_action' => false,
             'skip_partial_headers' => false,
         ];
+
+        $form = $this->getForm($options);
+        if (!$form) {
+            return '';
+        }
 
         /** @var \Laminas\View\HelperPluginManager $plugins  */
         $plugins = $this->searchConfig->getServiceLocator()->get('ViewHelperManager');

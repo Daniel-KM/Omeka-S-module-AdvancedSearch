@@ -68,7 +68,7 @@ class ApiFormAdapter implements FormAdapterInterface
         return null;
     }
 
-    public function getForm(): ?\Laminas\Form\Form
+    public function getForm(array $options = []): ?\Laminas\Form\Form
     {
         return null;
     }

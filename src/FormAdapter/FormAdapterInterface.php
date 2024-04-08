@@ -40,7 +40,16 @@ interface FormAdapterInterface
 
     public function getConfigFormClass(): ?string;
 
-    public function getForm(): ?\Laminas\Form\Form;
+    /**
+     * Get the search form.
+     *
+     * @param array $options Options are same than renderForm() except template.
+     *   Default keys:
+     *   - skip_form_action (bool): Don't set form action, so use the current page.
+     *   - skip_partial_headers (bool): Skip partial headers.
+     *   Other options are passed to the partial.
+     */
+    public function getForm(array $options = []): ?\Laminas\Form\Form;
 
     /**
      * The form class to use to build the search form, if any.
@@ -59,7 +68,8 @@ interface FormAdapterInterface
     /**
      * Render the form.
      *
-     * @param array $options Default keys:
+     * @param array $options Options are same than getForm() except template.
+     *   Default keys:
      *   - template (string): Use a specific template instead of the default one.
      *   This is the template of the form, not the main template of the search page.
      *   - skip_form_action (bool): Don't set form action, so use the current page.

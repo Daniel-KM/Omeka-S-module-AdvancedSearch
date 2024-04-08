@@ -118,6 +118,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
             'template' => null,
             'skip_form_action' => false,
             'skip_partial_headers' => false,
+            'variant' => null,
         ];
 
         $form = $this->getForm($options);

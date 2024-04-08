@@ -47,6 +47,8 @@ interface FormAdapterInterface
      *   Default keys:
      *   - skip_form_action (bool): Don't set form action, so use the current page.
      *   - skip_partial_headers (bool): Skip partial headers.
+     *   - variant: name of a variant of the form, "quick" or "simple".
+     *     To use a variant allows a quicker process than template alone.
      *   Other options are passed to the partial.
      */
     public function getForm(array $options = []): ?\Laminas\Form\Form;
@@ -74,6 +76,8 @@ interface FormAdapterInterface
      *   This is the template of the form, not the main template of the search page.
      *   - skip_form_action (bool): Don't set form action, so use the current page.
      *   - skip_partial_headers (bool): Skip partial headers.
+     *   - variant: name of a variant of the form, "quick" or "simple".
+     *     To use a variant allows a quicker process than template alone.
      *   Other options are passed to the partial.
      * @return string Html form.
      */

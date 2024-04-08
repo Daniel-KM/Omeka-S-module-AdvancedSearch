@@ -166,11 +166,14 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
     /**
      * Render the form.
      *
-     * @param array $options
+     * @param array $options Options are same than renderForm() in interface.
+     *   Default keys:
      *   - template (string): Use a specific template instead of the default one.
      *   This is the template of the form, not the main template of the search page.
      *   - skip_form_action (bool): Don't set form action, so use the current page.
      *   - skip_partial_headers (bool): Skip partial headers.
+     *   - variant: name of a variant of the form, "quick" or "simple".
+     *     To use variant allows a quicker process than template alone.
      *   Other options are passed to the partial.
      *
      * @uses \AdvancedSearch\FormAdapter\FormAdapterInterface::renderForm()

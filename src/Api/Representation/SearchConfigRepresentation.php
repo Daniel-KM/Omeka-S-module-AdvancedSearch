@@ -172,6 +172,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
      *   This is the template of the form, not the main template of the search page.
      *   - skip_form_action (bool): Don't set form action, so use the current page.
      *   - skip_partial_headers (bool): Skip partial headers.
+     *   - skip_values: Does not init form element values (quicker results).
      *   - variant: name of a variant of the form, "quick" or "simple".
      *     To use variant allows a quicker process than template alone.
      *   Other options are passed to the partial.

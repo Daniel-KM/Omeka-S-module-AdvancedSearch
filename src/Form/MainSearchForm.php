@@ -102,6 +102,11 @@ class MainSearchForm extends Form
     protected $listInputFilters = [];
 
     /**
+     * @var bool
+     */
+    protected $skipValues = false;
+
+    /**
      * Variant may be "quick" or "simple".
      *
      * @var string
@@ -133,6 +138,8 @@ class MainSearchForm extends Form
         unset($name);
 
         $this->searchConfig = $this->getOption('search_config');
+
+        $this->skipValues = (bool) $this->getOption('skip_values');
 
         $this->variant = $this->getOption('variant');
 
@@ -677,7 +684,7 @@ class MainSearchForm extends Form
                     : CommonElement\OptionalSelect::class,
                 'options' => [
                     'label' => $filter['label'], // @translate
-                    'value_options' => $this->getOwnerOptions(),
+                    'value_options' => $this->skipValues ? [] : $this->getOwnerOptions(),
                     'empty_option' => '',
                 ],
                 'attributes' => [
@@ -707,7 +714,7 @@ class MainSearchForm extends Form
                     : CommonElement\OptionalSelect::class,
                 'options' => [
                     'label' => $filter['label'], // @translate
-                    'value_options' => $this->getSiteOptions(),
+                    'value_options' => $this->skipValues ? [] : $this->getSiteOptions(),
                     'empty_option' => '',
                 ],
                 'attributes' => [
@@ -749,6 +756,7 @@ class MainSearchForm extends Form
         /* @deprecated (Omeka v3.1): use option "disable_group_by_vocabulary" */
         if ($filter['type'] === 'SelectFlat'
             && version_compare(\Omeka\Module::VERSION, '3.1', '<')
+            && !$this->skipValues
         ) {
             $valueOptions = $element->getValueOptions();
             $result = [];
@@ -822,7 +830,10 @@ class MainSearchForm extends Form
             ] + $this->elementAttributes);
 
         $hasValues = false;
-        if ($this->siteSetting && $this->siteSetting->__invoke('advancedsearch_restrict_templates', false)) {
+        if ($this->siteSetting
+            && $this->siteSetting->__invoke('advancedsearch_restrict_templates', false)
+            && !$this->skipValues
+        ) {
             $values = $this->siteSetting->__invoke('advancedsearch_apply_templates', []);
             if ($values) {
                 $values = array_intersect_key($element->getValueOptions(), array_flip($values));
@@ -874,7 +885,7 @@ class MainSearchForm extends Form
                     : CommonElement\OptionalSelect::class,
                 'options' => [
                     'label' => $filter['label'], // @translate
-                    'value_options' => $this->getItemSetsOptions($filter['type'] !== 'MultiCheckbox'),
+                    'value_options' => $this->skipValues ? [] : $this->getItemSetsOptions($filter['type'] !== 'MultiCheckbox'),
                     'empty_option' => '',
                 ],
                 'attributes' => [
@@ -908,7 +919,7 @@ class MainSearchForm extends Form
                     : CommonElement\OptionalSelect::class,
                 'options' => [
                     'label' => $filter['label'], // @translate
-                    'value_options' => $this->getItemSetsTreeOptions($filter['type'] !== 'MultiCheckbox'),
+                    'value_options' => $this->skipValues ? [] : $this->getItemSetsTreeOptions($filter['type'] !== 'MultiCheckbox'),
                     'empty_option' => '',
                 ],
                 'attributes' => [
@@ -998,6 +1009,10 @@ class MainSearchForm extends Form
      */
     protected function prepareValueOptions(array $filter): array
     {
+        if ($this->skipValues) {
+            return [];
+        }
+
         $options = $filter['options'];
         if ($options === null || $options === [] || $options === '') {
             return $this->listValuesForProperty($filter['field']);

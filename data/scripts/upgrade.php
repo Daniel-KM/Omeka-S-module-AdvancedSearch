@@ -23,10 +23,10 @@ $connection = $services->get('Omeka\Connection');
 $messenger = $plugins->get('messenger');
 $entityManager = $services->get('Omeka\EntityManager');
 
-if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.54')) {
+if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.55')) {
     $message = new Message(
         'The module %1$s should be upgraded to version %2$s or later.', // @translate
-        'Common', '3.4.54'
+        'Common', '3.4.55'
     );
     throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
 }
@@ -429,6 +429,18 @@ SQL;
 if (version_compare($oldVersion, '3.4.20', '<')) {
     $message = new Message(
         'When full text is managed in alto files, it is now possible to search full text or record only.' // @translate
+    );
+    $messenger->addSuccess($message);
+}
+
+if (version_compare($oldVersion, '3.4.21', '<')) {
+    $message = new Message(
+        'It is now possible to search resources with duplicated values to help curation.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new Message(
+        'The speed of the derivative forms were improved and can be called directly from the search config with option "variant". Upgrade your theme if it was customized.' // @translate
     );
     $messenger->addSuccess($message);
 }

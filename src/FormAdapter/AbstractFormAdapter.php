@@ -437,6 +437,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                         // TODO Don't check form, but settings['filters'] with field = name and type.
                         // TODO Simplify these checks (or support multi-values anywhere).
                         $valueArray = $flatArray($value);
+                        // FIXME For quicker process, get only the names and types of the elements, no value options.
                         $form = $this->getForm();
                         if ($form
                             && $form->has($name)

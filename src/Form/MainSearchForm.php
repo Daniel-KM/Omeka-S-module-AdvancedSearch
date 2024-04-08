@@ -101,6 +101,13 @@ class MainSearchForm extends Form
      */
     protected $listInputFilters = [];
 
+    /**
+     * Variant may be "quick" or "simple".
+     *
+     * @var string
+     */
+    protected $variant = null;
+
     public function init(): void
     {
         // The id is different from the Omeka search to avoid issues in js. The
@@ -127,9 +134,12 @@ class MainSearchForm extends Form
 
         $this->searchConfig = $this->getOption('search_config');
 
+        $this->variant = $this->getOption('variant');
+
         $this->formSettings = $this->searchConfig ? $this->searchConfig->settings() : [];
 
         // Check specific fields against all available fields.
+        // TODO Limit available fields early with variant?
         $availableFields = $this->getAvailableFields();
 
         $this->elementAttributes = empty($this->formSettings['filters']['attribute_form'])
@@ -174,7 +184,7 @@ class MainSearchForm extends Form
         }
 
         // Add the button for record or full text search.
-        $rft = $this->formSettings['search']['fulltext_search'] ?? null;
+        $rft = $this->variant === 'simple' ? null : ($this->formSettings['search']['fulltext_search'] ?? null);
         $this->appendRecordOrFullText($rft);
 
         foreach ($this->formSettings['form']['filters'] ?? [] as $filter) {
@@ -193,6 +203,19 @@ class MainSearchForm extends Form
 
             $field = $filter['field'];
             $type = $filter['type'];
+
+            // Don't create useless elements.
+            // In particular, it allows to skip creation of selects, that is
+            // slow for now in big databases.
+            if (in_array($this->variant, ['quick', 'simple'])
+                // The type may be missing.
+                && !in_array($type, ['', 'Hidden', 'hidden', \Laminas\Form\Element\Hidden::class, 'Csrf', 'csrf', \Laminas\Form\Element\Csrf::class])
+                // No need to check the field name here: "q", "rft" and "submit"
+                // are managed separately.
+                // TODO Required elements for "quick" cannot be checked for now.
+            ) {
+                continue;
+            }
 
             $element = null;
 
@@ -261,7 +284,7 @@ class MainSearchForm extends Form
             }
         }
 
-        if (!empty($this->formSettings['form']['button_reset'])) {
+        if (!empty($this->formSettings['form']['button_reset']) && !in_array($this->variant, ['quick', 'simple'])) {
             $this
                 ->add([
                     'name' => 'reset',

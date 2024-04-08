@@ -17,6 +17,9 @@ $form
     ->setData($params)
     ->prepare();
 
+// This check is useless when the form is called with option "variant" = "quick".
+// TODO This check and this template will be removed in a future version.
+
 foreach ($form->getElements() as $name => $element) {
     if (in_array($name, ['q', 'rft', 'submit'])
         || $element instanceof \Laminas\Form\Element\Csrf

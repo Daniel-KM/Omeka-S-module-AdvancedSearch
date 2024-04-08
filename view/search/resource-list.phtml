@@ -37,7 +37,7 @@ $bodyTerm = $setting('browse_body_property_term');
 
 $gridListMode = $searchConfig ? $searchConfig->subSetting('display', 'grid_list_mode', 'auto') : 'auto';
 
-$defaultThumbnail = '<img src="' . $assetUrl('thumbnails/default.png', 'Omeka', true) . '" title="' . $translate('No media') . '"/>';
+$defaultThumbnail = '<img loading="lazy" src="' . $assetUrl('thumbnails/default.png', 'Omeka', true) . '" title="' . $translate('No media') . '"/>';
 ?>
 
 <?php if ($title): ?>

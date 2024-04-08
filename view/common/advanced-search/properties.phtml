@@ -156,10 +156,10 @@ if ($isSiteRequest) {
                     <optgroup label="<?= $translate('Linked resource') ?>">
                         <?= $queryOption('lex', $property, 'type', $translate('is a linked resource')) ?>
                         <?= $queryOption('nlex', $property, 'type', $translate('is not a linked resource')) ?>
-                        <?= $queryOption('lres', $property, 'type', $translate('is linked with resource with ID')) ?>
-                        <?= $queryOption('nlres', $property, 'type', $translate('is not linked with resource with ID')) ?>
-                        <?= $queryOption('lkq', $property, 'type', $translate('is linked with resources matching query')) ?>
-                        <?= $queryOption('nlkq', $property, 'type', $translate('is not linked with resources matching query')) ?>
+                        <?= $queryOption('lres', $property, 'type', $translate('is linked with resource with ID (expert)')) ?>
+                        <?= $queryOption('nlres', $property, 'type', $translate('is not linked with resource with ID (expert)')) ?>
+                        <?= $queryOption('lkq', $property, 'type', $translate('is linked with resources matching query (expert)')) ?>
+                        <?= $queryOption('nlkq', $property, 'type', $translate('is not linked with resources matching query (expert)')) ?>
                     </optgroup>
                     <optgroup label="<?= $translate('Count') ?>">
                         <?= $queryOption('ex', $property, 'type', $translate('has any value')) ?>

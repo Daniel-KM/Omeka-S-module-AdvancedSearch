@@ -23,21 +23,23 @@ if (!$formId) {
 $reset = null;
 $submit = null;
 if ($form->has('reset')) {
-    $reset = $form->get('reset')->setAttribute('form', $formId);
+    $reset = $form->get('reset');
     $form->remove('reset');
 }
 if ($form->has('submit')) {
-    $submit = $form->get('submit')->setAttribute('form', $formId);
+    $submit = $form->get('submit');
     $form->remove('submit');
 }
 ?>
 
 <div id="advanced-search-form-wrapper">
     <div id="advanced-search-form">
-        <?= $this->form($form) ?>
+        <?= $this->form()->openTag($form) ?>
+        <?= $this->formCollection($form) ?>
         <div class="search-form-buttons">
             <?= $reset ? $this->formButton($reset) : null ?>
             <?= $submit ? $this->formButton($submit) : null ?>
         </div>
+        <?= $this->form()->closeTag() ?>
     </div>
 </div>

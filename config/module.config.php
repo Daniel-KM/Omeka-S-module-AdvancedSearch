@@ -143,10 +143,10 @@ return [
         ],
         'delegators' => [
             'Omeka\ApiManager' => [
-                Service\Delegator\ApiManagerDelegatorFactory::class,
+                __NAMESPACE__ => Service\Delegator\ApiManagerDelegatorFactory::class,
             ],
             'Omeka\FulltextSearch' => [
-                Service\Delegator\FulltextSearchDelegatorFactory::class,
+                __NAMESPACE__ => Service\Delegator\FulltextSearchDelegatorFactory::class,
             ],
         ],
     ],

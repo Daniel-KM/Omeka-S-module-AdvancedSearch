@@ -195,7 +195,7 @@ class SearchEngineController extends AbstractActionController
                 'link_job' => sprintf('<a href="%1$s">', $urlHelper('admin/id', ['controller' => 'job', 'id' => $job->getId()])),
                 'job_id' => $job->getId(),
                 'link_end' => '</a>',
-                'link_log' => sprintf('<a href="%1$s">', class_exists('Log\Module') ? $urlHelper('admin/default', ['controller' => 'log'], ['query' => ['job_id' => $job->getId()]]) : $urlHelper('admin/id', ['controller' => 'job', 'action' => 'log', 'id' => $job->getId()])),
+                'link_log' => sprintf('<a href="%1$s">', class_exists('Log\Module', false) ? $urlHelper('admin/default', ['controller' => 'log'], ['query' => ['job_id' => $job->getId()]]) : $urlHelper('admin/id', ['controller' => 'job', 'action' => 'log', 'id' => $job->getId()])),
             ]
         );
         $message->setEscapeHtml(false);

@@ -143,7 +143,7 @@ class IndexSearch extends AbstractJob
             $indexer->clearIndex();
         } elseif (empty($resourceIds) && $startResourceId > 0) {
             $this->logger->info(
-                'Search index is not cleared: reindexing starts at resource #%d.', // @translate
+                'Search index is not cleared: reindexing starts at resource #{resource_id}.', // @translate
                 ['resource_id' => $startResourceId]
             );
         }

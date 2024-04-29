@@ -48,8 +48,8 @@ class IndexSuggestions extends AbstractJob
         $services = $this->getServiceLocator();
         $this->api = $services->get('Omeka\ApiManager');
         $this->logger = $services->get('Omeka\Logger');
-        $this->connection = $this->entityManager->getConnection();
         $this->entityManager = $services->get('Omeka\EntityManager');
+        $this->connection = $this->entityManager->getConnection();
 
         // The reference id is the job id for now.
         $referenceIdProcessor = new \Laminas\Log\Processor\ReferenceId();

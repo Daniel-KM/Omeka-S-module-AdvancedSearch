@@ -725,7 +725,7 @@ nlres = is not linked with resource with ID
             ])
             ->add([
                 'name' => 'languages',
-                'type' => AdvancedSearchElement\ArrayText::class,
+                'type' => CommonElement\ArrayText::class,
                 'options' => [
                     'label' => 'Get facets from specific languages', // @translate
                     'info' => 'Generally, facets are translated in the view, but in some cases, facet values may be translated directly in a multivalued property. Use "|" to separate multiple languages. Use a trailing "|" for values without language. When fields with languages (like subjects) and fields without language (like date) are facets, the empty language must be set to get results.', // @translate

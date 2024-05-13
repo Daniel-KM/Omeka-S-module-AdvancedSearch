@@ -107,7 +107,7 @@ class MainSearchForm extends Form
     protected $skipValues = false;
 
     /**
-     * Variant may be "quick" or "simple".
+     * Variant may be "quick" or "simple", or "csrf" (internal use).
      *
      * @var string
      */
@@ -115,6 +115,9 @@ class MainSearchForm extends Form
 
     public function init(): void
     {
+        // The attribute "form" is appended to all fields to simplify themes,
+        // unless the settings skip it.
+
         // The id is different from the Omeka search to avoid issues in js. The
         // css should be adapted.
         $this
@@ -123,7 +126,13 @@ class MainSearchForm extends Form
                 'class' => 'search-form form-search',
             ]);
 
-        // The attribute "form" is appended to all fields to simplify themes.
+        $this->searchConfig = $this->getOption('search_config');
+
+        $this->skipValues = (bool) $this->getOption('skip_values');
+
+        $this->variant = $this->getOption('variant');
+
+        $this->formSettings = $this->searchConfig ? $this->searchConfig->settings() : [];
 
         // Omeka adds a csrf automatically in \Omeka\Form\Initializer\Csrf.
         // Remove the csrf, because it is useless for a search form and the url
@@ -137,17 +146,15 @@ class MainSearchForm extends Form
         }
         unset($name);
 
-        $this->searchConfig = $this->getOption('search_config');
-
-        $this->skipValues = (bool) $this->getOption('skip_values');
-
-        $this->variant = $this->getOption('variant');
-
-        $this->formSettings = $this->searchConfig ? $this->searchConfig->settings() : [];
+        // TODO Currently, the csrf is removed, so it is never checked.
+        if ($this->variant === 'csrf') {
+            return;
+        }
 
         // Check specific fields against all available fields.
-        // TODO Limit available fields early with variant?
-        $availableFields = $this->getAvailableFields();
+        // For speed, don't get available fields with variants "simple" and "csrf".
+        // TODO Check the required options for variant "quick" to skip available fields early.
+        $availableFields = in_array($this->variant, ['simple', 'csrf']) ? [] : $this->getAvailableFields();
 
         $this->elementAttributes = empty($this->formSettings['filters']['attribute_form'])
             ? []
@@ -191,7 +198,7 @@ class MainSearchForm extends Form
         }
 
         // Add the button for record or full text search.
-        $rft = $this->variant === 'simple' ? null : ($this->formSettings['search']['fulltext_search'] ?? null);
+        $rft = in_array($this->variant, ['simple', 'csrf']) ? null : ($this->formSettings['search']['fulltext_search'] ?? null);
         $this->appendRecordOrFullText($rft);
 
         foreach ($this->formSettings['form']['filters'] ?? [] as $filter) {
@@ -214,7 +221,7 @@ class MainSearchForm extends Form
             // Don't create useless elements.
             // In particular, it allows to skip creation of selects, that is
             // slow for now in big databases.
-            if (in_array($this->variant, ['quick', 'simple'])
+            if (in_array($this->variant, ['quick', 'simple', 'csrf'])
                 // The type may be missing.
                 && !in_array($type, ['', 'Hidden', 'hidden', \Laminas\Form\Element\Hidden::class, 'Csrf', 'csrf', \Laminas\Form\Element\Csrf::class])
                 // No need to check the field name here: "q", "rft" and "submit"
@@ -291,7 +298,7 @@ class MainSearchForm extends Form
             }
         }
 
-        if (!empty($this->formSettings['form']['button_reset']) && !in_array($this->variant, ['quick', 'simple'])) {
+        if (!empty($this->formSettings['form']['button_reset']) && !in_array($this->variant, ['quick', 'simple', 'csrf'])) {
             $this
                 ->add([
                     'name' => 'reset',

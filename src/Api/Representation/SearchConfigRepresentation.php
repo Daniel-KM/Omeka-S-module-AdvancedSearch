@@ -153,13 +153,16 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
     /**
      * Get the form from the adapter.
      *
+     * See options in renderForm().
+     * @see \AdvancedSearch\Api\Representation\SearchConfigRepresentation::renderForm()
+     *
      * @uses \AdvancedSearch\FormAdapter\FormAdapterInterface::getForm()
      */
-    public function form(): ?\Laminas\Form\Form
+    public function form(array $options = []): ?\Laminas\Form\Form
     {
         $formAdapter = $this->formAdapter();
         return $formAdapter
-            ? $formAdapter->getForm()
+            ? $formAdapter->getForm($options)
             : null;
     }
 
@@ -169,12 +172,14 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
      * @param array $options Options are same than renderForm() in interface.
      *   Default keys:
      *   - template (string): Use a specific template instead of the default one.
-     *   This is the template of the form, not the main template of the search page.
+     *     This is the template of the form, not the main template of the search
+     *     config.
      *   - skip_form_action (bool): Don't set form action, so use the current page.
      *   - skip_partial_headers (bool): Skip partial headers.
      *   - skip_values: Does not init form element values (quicker results).
-     *   - variant: name of a variant of the form, "quick" or "simple".
-     *     To use variant allows a quicker process than template alone.
+     *   - variant: Name of a variant of the form, "quick" or "simple", or
+     *     "csrf" (internal use).
+     *     To use a variant allows a quicker process than a template alone.
      *   Other options are passed to the partial.
      *
      * @uses \AdvancedSearch\FormAdapter\FormAdapterInterface::renderForm()

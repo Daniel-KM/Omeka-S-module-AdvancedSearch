@@ -146,6 +146,16 @@ class SearchConfigConfigureForm extends Form
                     'value' => '',
                 ],
             ])
+            ->add([
+                'name' => 'validate_form',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Validate user query (useless in most of the cases)', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'validate_form',
+                ],
+            ])
         ;
 
         $this

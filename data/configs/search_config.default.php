@@ -24,6 +24,7 @@ return [
             'default_query_post' => '',
             'hidden_query_filters' => '',
             'fulltext_search' => '',
+            'validate_form' => false,
         ],
 
         'autosuggest' => [

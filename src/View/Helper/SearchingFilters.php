@@ -381,6 +381,30 @@ class SearchingFilters extends AbstractHelper
                     }
                     break;
 
+                case 'thesaurus':
+                    /** @var \Common\Stdlib\EasyMeta $easyMeta */
+                    $easyMeta = $plugins->get('easyMeta')();
+                    $is = $translate('is'); // @translate
+                    foreach ($query['thesaurus'] as $term => $itemIds) {
+                        if (!$itemIds) {
+                            continue;
+                        }
+                        $propertyLabel = $easyMeta->propertyLabel($term);
+                        if (!$propertyLabel) {
+                            continue;
+                        }
+                        $filterLabel = $propertyLabel . ' ' . $is;
+                        $itemTitles = $api->search('items', ['id' => $itemIds, 'return_scalar' => 'title'])->getContent();
+                        if ($itemTitles) {
+                            foreach ($itemTitles as $itemId => $itemTitle) {
+                                $filters[$filterLabel][$this->urlQuery($key, $itemId)] = $itemTitle;
+                            }
+                        } else {
+                            $filters[$filterLabel][$this->urlQuery($key)] = '–';
+                        }
+                    }
+                    break;
+
                 default:
                     // Append only fields that are not yet processed somewhere
                     // else, included searchFilters helper.

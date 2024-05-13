@@ -145,8 +145,6 @@ $this->headScript()
             <?= $partial('search/results-header-footer', [
                 'site' => $site,
                 'searchConfig' => $searchConfig,
-                // Kept for compatibility with old themes.
-                'searchPage' => $searchConfig,
                 'query' => $query,
                 'response' => $response,
                 'itemSet' => $itemSet,
@@ -161,7 +159,6 @@ $this->headScript()
             <?= $partial('search/resource-list', [
                 'site' => $site,
                 'searchConfig' => $searchConfig,
-                'searchPage' => $searchConfig,
                 'query' => $query,
                 'response' => $response,
                 'title' => sprintf($translatePlural('%s item set', '%s item sets', $itemSetsCount), $itemSetsCount),
@@ -173,7 +170,6 @@ $this->headScript()
             <?= $partial('search/resource-list', [
                 'site' => $site,
                 'searchConfig' => $searchConfig,
-                'searchPage' => $searchConfig,
                 'query' => $query,
                 'response' => $response,
                 'title' => sprintf($translatePlural('%s item', '%s items', $itemsCount), $itemsCount),
@@ -187,7 +183,6 @@ $this->headScript()
             <?= $partial('search/results-header-footer', [
                 'site' => $site,
                 'searchConfig' => $searchConfig,
-                'searchPage' => $searchConfig,
                 'query' => $query,
                 'response' => $response,
                 'itemSet' => $itemSet,
@@ -221,7 +216,6 @@ $this->headScript()
     <?= $partial('search/facets', [
         'site' => $site,
         'searchConfig' => $searchConfig,
-        'searchPage' => $searchConfig,
         'query' => $query,
         'response' => $response,
         'itemSet' => $itemSet,

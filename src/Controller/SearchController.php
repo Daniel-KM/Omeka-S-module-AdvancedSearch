@@ -73,8 +73,6 @@ class SearchController extends AbstractActionController
         $view = new ViewModel([
             // The form is set via searchConfig.
             'searchConfig' => $searchConfig,
-            // "searchPage" is kept to simplify migration.
-            'searchPage' => $searchConfig,
             'site' => $site,
             // Set a default empty query and response to simplify view.
             'query' => new Query,
@@ -191,9 +189,7 @@ class SearchController extends AbstractActionController
 
         return $view
             ->setVariables($result['data'], true)
-            ->setVariable('searchConfig', $searchConfig)
-            // "searchPage" is kept to simplify migration.
-            ->setVariable('searchPage', $searchConfig);
+            ->setVariable('searchConfig', $searchConfig);
     }
 
     public function suggestAction()

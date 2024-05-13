@@ -52,6 +52,16 @@ class MainSearchForm extends Form
     protected $easyMeta;
 
     /**
+     * @var \Doctrine\ORM\EntityManager
+     */
+    protected $entityManager;
+
+    /**
+     * @var \Laminas\Form\FormElementManager
+     */
+    protected $formElementManager;
+
+    /**
      * @var \Omeka\Settings\Settings
      */
     protected $settings;
@@ -62,29 +72,19 @@ class MainSearchForm extends Form
     protected $siteSetting;
 
     /**
-     * @var \Laminas\Form\FormElementManager
-     */
-    protected $formElementManager;
-
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    protected $entityManager;
-
-    /**
      * @var string
      */
     protected $basePath;
 
     /**
-     * @var \Omeka\Api\Representation\SiteRepresentation
-     */
-    protected $site;
-
-    /**
      * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation
      */
     protected $searchConfig;
+
+    /**
+     * @var \Omeka\Api\Representation\SiteRepresentation
+     */
+    protected $site;
 
     /**
      * @var array
@@ -620,8 +620,8 @@ class MainSearchForm extends Form
     protected function searchResourceType(array $filter): ?ElementInterface
     {
         $element = $filter['type'] === 'MultiCheckbox'
-            ? CommonElement\OptionalMultiCheckbox('resource_type')
-            : CommonElement\OptionalSelect('resource_type');
+            ? new CommonElement\OptionalMultiCheckbox('resource_type')
+            : new CommonElement\OptionalSelect('resource_type');
         $element
             ->setOptions([
                 'label' => $filter['label'], // @translate
@@ -1025,7 +1025,8 @@ class MainSearchForm extends Form
             return $this->listValuesForProperty($filter['field']);
         }
         if (is_string($options)) {
-            $options = array_filter(array_map('trim', explode($options)), 'strlen');
+            // TODO Explode may use another string than "|".
+            $options = array_filter(array_map('trim', explode('|', $options)), 'strlen');
         } elseif (!is_array($options)) {
             return [(string) $options => $options];
         }

@@ -7,34 +7,9 @@ use Laminas\View\Helper\AbstractHelper;
 class AbstractFacet extends AbstractHelper
 {
     /**
-     * @var string
-     */
-    protected $partial;
-
-    /**
-     * @var bool
-     */
-    protected $isTree = false;
-
-    /**
      * @var \Omeka\View\Helper\Api
      */
     protected $api;
-
-    /**
-     * @var \Omeka\View\Helper\Url
-     */
-    protected $urlHelper;
-
-    /**
-     * @var \Laminas\I18n\View\Helper\Translate
-     */
-    protected $translate;
-
-    /**
-     * @var \Laminas\View\Helper\Partial
-     */
-    protected $partialHelper;
 
     /**
      * @var \ItemSetsTree\ViewHelper\ItemSetsTree
@@ -42,14 +17,39 @@ class AbstractFacet extends AbstractHelper
     protected $itemSetsTree;
 
     /**
-     * @var int
+     * @var \Laminas\View\Helper\Partial
      */
-    protected $siteId;
+    protected $partialHelper;
+
+    /**
+     * @var \Laminas\I18n\View\Helper\Translate
+     */
+    protected $translate;
+
+    /**
+     * @var \Omeka\View\Helper\Url
+     */
+    protected $urlHelper;
+
+    /**
+     * @var bool
+     */
+    protected $isTree = false;
+
+    /**
+     * @var string
+     */
+    protected $partial;
 
     /**
      * @var string
      */
     protected $route = '';
+
+    /**
+     * @var int
+     */
+    protected $siteId;
 
     /**
      * @var array

@@ -32,13 +32,10 @@ return [
     ],
     'view_helpers' => [
         'invokables' => [
-            'facetActive' => View\Helper\FacetActive::class,
             'facetActives' => View\Helper\FacetActives::class,
-            'facetCheckbox' => View\Helper\FacetCheckbox::class,
             'facetCheckboxes' => View\Helper\FacetCheckboxes::class,
             'facetCheckboxesTree' => View\Helper\FacetCheckboxesTree::class,
             'facetLabel' => View\Helper\FacetLabel::class,
-            'facetLink' => View\Helper\FacetLink::class,
             'facetLinks' => View\Helper\FacetLinks::class,
             'facetLinksTree' => View\Helper\FacetLinksTree::class,
             'facetSelect' => View\Helper\FacetSelect::class,

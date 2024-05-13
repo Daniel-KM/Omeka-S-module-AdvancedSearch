@@ -17,6 +17,11 @@ class DataTextarea extends ArrayTextarea
     protected $dataArrayKeys = [];
 
     /**
+     * @var array
+     */
+    protected $dataOptions = [];
+
+    /**
      * @var string
      *
      * May be "by_line" (one line by data, default) or "last_is_list".
@@ -34,6 +39,9 @@ class DataTextarea extends ArrayTextarea
         }
         if (array_key_exists('data_array_keys', $this->options)) {
             $this->setDataArrayKeys($this->options['data_array_keys']);
+        }
+        if (array_key_exists('data_options', $this->options)) {
+            $this->setDataOptions($this->options['data_options']);
         }
         if (array_key_exists('data_text_mode', $this->options)) {
             $this->setDataTextMode($this->options['data_text_mode']);
@@ -79,6 +87,18 @@ class DataTextarea extends ArrayTextarea
      * array.
      * With option "as_key_value", the first value will be the used as key for
      * the main array too.
+     *
+     * @example When passing options to an element:
+     * ```php
+     *     'data_keys' => [
+     *         'field',
+     *         'label',
+     *         'type',
+     *         'options',
+     *     ],
+     * ```
+     *
+     * @deprecated Use setDataOptions() instead.
      */
     public function setDataKeys(array $dataKeys)
     {
@@ -88,10 +108,15 @@ class DataTextarea extends ArrayTextarea
 
     /**
      * Get the list of data keys.
+     *
+     * The data keys are the name of each value of a row in order to get an
+     * associative array instead of a simple list.
+     *
+     * @deprecated Use getDataOptions() instead.
      */
     public function getDataKeys(): array
     {
-        return aray_keys($this->dataKeys);
+        return array_keys($this->dataKeys);
     }
 
     /**
@@ -101,6 +126,15 @@ class DataTextarea extends ArrayTextarea
      *
      * It is not recommended to set the first key when option "as_key_value" is
      *  set. In that case, the whole value is used as key before to be splitted.
+     *
+     * @example When passing options to an element:
+     * ```php
+     *     'data_array_keys' => [
+     *         'options' => '|',
+     *     ],
+     * ```
+     *
+     *  @deprecated Use setDataOptions() instead.
      */
     public function setDataArrayKeys(array $dataArrayKeys)
     {
@@ -110,10 +144,62 @@ class DataTextarea extends ArrayTextarea
 
     /**
      * Get the option to separate values into multiple values.
+     *
+     *  @deprecated Use getDataOptions() instead.
      */
     public function getDataArrayKeys(): array
     {
         return $this->dataArrayKeys;
+    }
+
+    /**
+     * Set the ordered list of keys to use for each line and their options.
+     *
+     * This option allows to get an associative array instead of a simple list
+     * for each row and to specify options for each of them.
+     *
+     * Each specified key will be used as the keys of each part of each line.
+     * There is no default keys: in that case, the values are a simple array of
+     * array.
+     * With option "as_key_value", the first value will be the used as key for
+     * the main array too.
+     *
+     * @example When passing options to an element:
+     * ```php
+     *     'data_options' => [
+     *         'field' => null,
+     *         'label' => null,
+     *         'type' => null,
+     *         'options' => [
+     *             'separator' => '|',
+     *         ],
+     *     ],
+     * ```
+     */
+    public function setDataOptions(array $dataOptions)
+    {
+        $this->dataOptions = $dataOptions;
+        // TODO For compatibility as long as code is not updated to use dataOptions.
+        $this->dataKeys = array_fill_keys(array_keys($dataOptions), null);
+        $arrayKeys = array_filter($dataOptions);
+        foreach ($arrayKeys as $key => $value) {
+            if (is_array($value)) {
+                if (isset($value['separator'])) {
+                    $arrayKeys[$key] = (string) $value['separator'];
+                }
+            } elseif (is_scalar($value)) {
+                $arrayKeys[$key] = $value;
+            } else {
+                unset($arrayKeys[$key]);
+            }
+        }
+        $this->dataArrayKeys = $arrayKeys;
+        return $this;
+    }
+
+    public function getDataOptions(): array
+    {
+        return $this->dataOptions;
     }
 
     /**

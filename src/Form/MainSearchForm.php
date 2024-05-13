@@ -62,6 +62,11 @@ class MainSearchForm extends Form
     protected $formElementManager;
 
     /**
+     * @var \ItemSetsTree\ViewHelper\ItemSetsTree
+     */
+    protected $itemSetsTree;
+
+    /**
      * @var \Omeka\Settings\Settings
      */
     protected $settings;
@@ -1045,6 +1050,11 @@ class MainSearchForm extends Form
         return $fieldset;
     }
 
+    protected function searchTree(array $filter): ?ElementInterface
+    {
+        return $this->searchItemSetsTree($filter);
+    }
+
     /**
      * Add input filters.
      *
@@ -1191,30 +1201,40 @@ class MainSearchForm extends Form
         return $valueOptions;
     }
 
+    /**
+     * @todo Use form element itemSetsTreeSelect when exists (only a view helper for now).
+     * @see \ItemSetsTree\ViewHelper\ItemSetsTreeSelect
+     */
     protected function getItemSetsTreeOptions($byOwner = false): array
     {
-        if (!$this->formElementManager->has('itemSetsTreeSelect')) {
-            return [];
+        if (!$this->itemSetsTree) {
+            return $this->getItemSetsOptions($byOwner);
         }
 
-        /** @var \Omeka\Form\Element\ItemSetSelect $select */
-        $select = $this->formElementManager->get(\Omeka\Form\Element\ItemSetSelect::class, []);
+        $options = [];
         if ($this->site) {
-            $select->setOptions([
-                'query' => ['site_id' => $this->site->id(), 'sort_by' => 'dcterms:title', 'sort_order' => 'asc'],
-                'disable_group_by_owner' => true,
-            ]);
-            // By default, sort is case sensitive. So use a case insensitive sort.
-            $valueOptions = $select->getValueOptions();
-            natcasesort($valueOptions);
-        } else {
-            $select->setOptions([
-                'query' => ['sort_by' => 'dcterms:title', 'sort_order' => 'asc'],
-                'disable_group_by_owner' => !$byOwner,
-            ]);
-            $valueOptions = $select->getValueOptions();
+            $options['site_id'] = $this->site->id();
         }
-        return $valueOptions;
+
+        $itemSetsTree = $this->itemSetsTree->getItemSetsTree(null, $options);
+
+        $itemSetsTreeValueOptions = null;
+        $itemSetsTreeValueOptions = function ($itemSetsTree, $depth = 0) use (&$itemSetsTreeValueOptions): array {
+            $valueOptions = [];
+            foreach ($itemSetsTree as $itemSetsTreeNode) {
+                $itemSet = $itemSetsTreeNode['itemSet'];
+                $valueOptions[$itemSet->id()] = [
+                    'value' => $itemSet->id(),
+                    'label' => str_repeat('‒', $depth) . ' ' . $itemSet->displayTitle(),
+                ];
+                $valueOptions = array_merge($valueOptions, $itemSetsTreeValueOptions($itemSetsTreeNode['children'], $depth + 1));
+            }
+            return $valueOptions;
+        };
+
+        $valueOptions = $itemSetsTreeValueOptions($itemSetsTree);
+
+        return array_column($valueOptions, 'label', 'value');
     }
 
     protected function getOwnerOptions(): array
@@ -1246,6 +1266,12 @@ class MainSearchForm extends Form
     public function setEasyMeta(EasyMeta $easyMeta): Form
     {
         $this->easyMeta = $easyMeta;
+        return $this;
+    }
+
+    public function setItemSetsTree($itemSetsTree): Form
+    {
+        $this->itemSetsTree = $itemSetsTree;
         return $this;
     }
 

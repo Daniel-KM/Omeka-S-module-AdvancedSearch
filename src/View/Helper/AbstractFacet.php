@@ -142,24 +142,11 @@ class AbstractFacet extends AbstractHelper
 
         foreach ($facetValues as /* $facetIndex => */ &$facetValue) {
             $facetValueValue = (string) $facetValue['value'];
-            $query = $this->queryBase;
 
             // The facet value is compared against a string (the query args).
             $facetValueLabel = (string) $this->facetValueLabel($facetField, $facetValueValue);
             if (strlen($facetValueLabel)) {
-                if (isset($query['facet'][$facetField]) && array_search($facetValueValue, $query['facet'][$facetField]) !== false) {
-                    $values = $query['facet'][$facetField];
-                    // TODO Remove this filter to keep all active facet values?
-                    $values = array_filter($values, function ($v) use ($facetValueValue) {
-                        return $v !== $facetValueValue;
-                    });
-                    $query['facet'][$facetField] = $values;
-                    $active = true;
-                } else {
-                    $query['facet'][$facetField][] = $facetValueValue;
-                    $active = false;
-                }
-                $url = $isFacetModeDirect ? $this->urlHelper->__invoke($this->route, $this->params, ['query' => $query]) : '';
+                [$active, $url] = $this->prepareActiveAndUrl($facetField, $facetValueValue, $isFacetModeDirect);
             } else {
                 $active = false;
                 $url = '';
@@ -178,6 +165,32 @@ class AbstractFacet extends AbstractHelper
             'options' => $options,
             'tree' => null,
         ];
+    }
+
+    protected function prepareActiveAndUrl(string $facetField, string $facetValueValue, bool $isFacetModeDirect): array
+    {
+        $query = $this->queryBase;
+
+        if (isset($query['facet'][$facetField])
+            && array_search($facetValueValue, $query['facet'][$facetField]) !== false
+        ) {
+            $values = $query['facet'][$facetField];
+            // TODO Remove this filter to keep all active facet values?
+            $values = array_filter($values, function ($v) use ($facetValueValue) {
+                return $v !== $facetValueValue;
+            });
+            $query['facet'][$facetField] = $values;
+            $active = true;
+        } else {
+            $query['facet'][$facetField][] = $facetValueValue;
+            $active = false;
+        }
+
+        $url = $isFacetModeDirect
+            ? $this->urlHelper->__invoke($this->route, $this->params, ['query' => $query])
+            : '';
+
+        return [$active, $url];
     }
 
     /**

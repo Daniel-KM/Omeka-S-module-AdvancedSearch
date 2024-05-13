@@ -31,7 +31,7 @@ class AbstractFacetTree extends AbstractFacet
         } elseif ($this->isTree && $options['facets'][$facetField]['type'] === 'Thesaurus') {
             $this->tree = $this->thesaurusQuick($facetField, $options);
             $result = parent::prepareFacetData($facetField, $facetValues, $options);
-            $result['facetValues'] = $this->thesaurusReorderAndCompleteFacets($result['facetValues'], $options);
+            $result['facetValues'] = $this->thesaurusReorderAndCompleteFacets($facetField, $result['facetValues'], $options);
         } else {
             return parent::prepareFacetData($facetField, $facetValues, $options);
         }
@@ -289,7 +289,7 @@ SQL;
     /**
      * Order facets according to tree for correct indentation and add ancestors.
      */
-    protected function thesaurusReorderAndCompleteFacets(array $facetValues, array $options): array
+    protected function thesaurusReorderAndCompleteFacets(string $facetField, array $facetValues, array $options): array
     {
         if (!$this->tree || count($this->tree) <= 1) {
             return $facetValues;
@@ -309,6 +309,7 @@ SQL;
 
         // Prepend ancestors to each facet.
         $result = [];
+        $isFacetModeDirect = ($options['mode'] ?? '') === 'link';
         foreach (array_intersect_key($treeValues, $facetValuesByLabels) as $facetLabel => $treeId) {
             $treeElement = $this->tree[$treeId];
             if ($treeElement['top']) {
@@ -324,14 +325,14 @@ SQL;
             $ancestors = $this->ancestors($treeElement);
             foreach (array_reverse($ancestors, true) as $ancestor) {
                 if (!isset($result[$ancestor['title']])) {
+                    [$active, $url] = $this->prepareActiveAndUrl($facetField, $ancestor['title'], $isFacetModeDirect);
                     $result[$ancestor['title']] = [
                         'id' => $ancestor['id'],
                         'value' => $ancestor['title'],
                         'count' => 0,
                         'label' => $ancestor['title'],
-                        'active' => false,
-                        // TODO Url.
-                        'url' => '',
+                        'active' => $active,
+                        'url' => $url,
                     ];
                 }
             }

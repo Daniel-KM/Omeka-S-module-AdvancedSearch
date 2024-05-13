@@ -421,6 +421,30 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                     }
                     break;
 
+                case 'thesaurus':
+                    if (!$checkAvailableField($name)) {
+                        continue 2;
+                    }
+
+                    if (is_string($value)
+                        || $isSimpleList($value)
+                    ) {
+                        continue 2;
+                    }
+
+                    foreach ($value as $field => $vals) {
+                        if (!$checkAvailableField($field)) {
+                            continue;
+                        }
+                        if (!is_string($vals) && !$isSimpleList($vals)) {
+                            continue;
+                        }
+                        foreach ($flatArray($vals) as $val) {
+                            $query->addFilterQuery($field, $val, 'res');
+                        }
+                    }
+                    break;
+
                 default:
                     if (!$checkAvailableField($name)) {
                         continue 2;

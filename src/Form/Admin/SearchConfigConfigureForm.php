@@ -245,7 +245,7 @@ resource_class_id = Class = Omeka/SelectFlat
 dcterms:title = Title = Text
 dcterms:date = Date = DateRange
 dcterms:subject = Subject = MultiCheckbox = alpha | beta | gamma
-dcterms:spatial = Place = Thesaurus = 151
+dcterms:spatial = Place = Thesaurus = id = 151 | ascendance = true
 advanced = Filters = Advanced',
                     'rows' => 12,
                 ],

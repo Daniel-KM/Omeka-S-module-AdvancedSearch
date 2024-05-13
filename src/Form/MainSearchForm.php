@@ -618,6 +618,59 @@ class MainSearchForm extends Form
     }
 
     /**
+     * Manage hierachical values for module Thesaurus.
+     */
+    protected function searchThesaurus(array $filter): ?ElementInterface
+    {
+        $filterOptions = $this->explodeOptionsAsKeyValues($filter['options']);
+        if (empty($filterOptions['id']) && empty($filterOptions['thesaurus'])) {
+            $thesaurusId = (int) reset($filterOptions);
+            $k = key($filterOptions);
+            unset($filterOptions[$k]);
+        } else {
+            $thesaurusId = (int) ($filterOptions['thesaurus'] ?? $filterOptions['id'] ?? 0);
+            unset($filterOptions['id'], $filterOptions['thesaurus']);
+        }
+        if (!$thesaurusId) {
+            return null;
+        }
+        $filterOptions['thesaurus'] = $thesaurusId;
+
+        // A thesaurus search should be like an advanced filter, because the
+        // search is done on item id, not value text. The issue is only on
+        // internal search, because the index may be managed in solr.
+        // So the form adapter manage it directly via main key "thesaurus".
+
+        $fieldset = new Fieldset('thesaurus');
+        $fieldset
+            ->setAttributes([
+                'id' => 'search-thesaurus',
+                'data-field-type' => 'thesaurus',
+            ] + $this->elementAttributes);
+
+        /** @var \Thesaurus\Form\Element\ThesaurusSelect::class $element */
+        $element = $this->formElementManager->get(\Thesaurus\Form\Element\ThesaurusSelect::class);
+        $element
+            ->setName($filter['field'])
+            ->setOptions([
+                'label' => $filter['label'], // @translate
+                'empty_option' => '',
+            ] + $filterOptions)
+            ->setAttributes([
+                'id' => 'search-thesaurus',
+                'multiple' => true,
+                'class' => 'chosen-select',
+                'data-placeholder' => ' ',
+            ] + $this->elementAttributes)
+        ;
+
+        $fieldset
+            ->add($element);
+
+        return $fieldset;
+    }
+
+    /**
      * The resource type is the main type for end user, but the name in omeka.
      */
     protected function searchResourceType(array $filter): ?ElementInterface
@@ -987,61 +1040,6 @@ class MainSearchForm extends Form
     }
 
     /**
-     * Manage hierachical values for module Thesaurus.
-     */
-    protected function searchThesaurus(array $filter): ?ElementInterface
-    {
-        $thesaurusId = $filter['options'] ? (int) reset($filter['options']) : 0;
-        $fieldset = new Fieldset('thesaurus');
-        $fieldset
-            ->setAttributes([
-                'id' => 'search-thesaurus-' . $thesaurusId,
-                'data-field-type' => 'thesaurus',
-            ] + $this->elementAttributes)
-            /*
-            ->add([
-                'name' => 'id',
-                'type' => \Thesaurus\Form\Element\ThesaurusSelect::class,
-                'options' => [
-                    'label' => $filter['label'], // @translate
-                    'empty_option' => '',
-                    'thesaurus' => $thesaurusId,
-                    'ascendance' => true,
-                ],
-                'attributes' => [
-                    'id' => 'search-thesaurus-' . $thesaurusId,
-                    'multiple' => true,
-                    'class' => 'chosen-select',
-                    'data-placeholder' => ' ',
-                ] + $this->elementAttributes,
-            ])
-            */
-        ;
-        // TODO Check why the factory of ThesaurusSelect and other elements is not called when added directly.
-        /** @var \Thesaurus\Form\Element\ThesaurusSelect::class $element */
-        $element = $this->formElementManager->get(\Thesaurus\Form\Element\ThesaurusSelect::class);
-        $element
-            ->setName('id')
-            ->setOptions([
-                'label' => $filter['label'], // @translate
-                'empty_option' => '',
-                'thesaurus' => $thesaurusId,
-                'ascendance' => true,
-            ])
-            ->setAttributes([
-                'id' => 'search-thesaurus-' . $thesaurusId,
-                'multiple' => true,
-                'class' => 'chosen-select',
-                'data-placeholder' => ' ',
-            ] + $this->elementAttributes)
-        ;
-        $fieldset
-            ->add($element);
-
-        return $fieldset;
-    }
-
-    /**
      * Add input filters.
      *
      * It is recommended to use an optional element to avoid input filters: this
@@ -1091,6 +1089,27 @@ class MainSearchForm extends Form
         // Avoid issue with duplicates.
         $options = array_filter(array_keys(array_flip($options)), 'strlen');
         return array_combine($options, $options);
+    }
+
+    /**
+     * Fill an array with an ini-like list.
+     *
+     * When the key is missing, a numeric key is set.
+     */
+    protected function explodeOptionsAsKeyValues(array $array): array
+    {
+        $result = [];
+        $key = null;
+        $value = null;
+        foreach ($array as $keyValue) {
+            if (strpos($keyValue, '=') === false) {
+                $result[] = $keyValue;
+            } else {
+                [$key, $value] = explode('=', (string) $keyValue, 2);
+                $result[$key] = $value;
+            }
+        }
+        return $result;
     }
 
     /**

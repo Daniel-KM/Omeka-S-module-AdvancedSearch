@@ -885,6 +885,12 @@ SQL;
                 ?? $facetField;
         }
 
+        // Manage an exception for module ItemSetsTree: search item sets.
+        $hasItemSetsTree = isset($fields['item_sets_tree']);
+        if ($hasItemSetsTree) {
+            $fields['item_sets_tree'] = 'o:item_set';
+        }
+
         // Facet counts don't make a distinction by resource type, so they
         // should be merged here. This is needed as long as there is no single
         // query for resource (items and item sets together).

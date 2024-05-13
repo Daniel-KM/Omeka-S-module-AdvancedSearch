@@ -52,6 +52,10 @@ class AbstractFacetTree extends AbstractFacet
      *
      * @todo Simplify ordering: by sql (for children too) or store.
      *
+     * Important:
+     * If the list of collections is incomplete, go to /admin/item-sets-tree/edit
+     * and save it.
+     *
      * @return array
      */
     protected function itemSetsTreeQuick(): array

@@ -235,6 +235,13 @@ class InternalAdapter extends AbstractAdapter
                 'from' => 'item_sets_tree',
                 'to' => 'item_sets_tree',
             ],
+            // Module Thesaurus.
+            'thesaurus' => [
+                'name' => 'thesaurus',
+                'label' => 'Thesaurus',
+                'from' => 'item/o:id',
+                'to' => 'thesaurus',
+            ],
         ];
     }
 }

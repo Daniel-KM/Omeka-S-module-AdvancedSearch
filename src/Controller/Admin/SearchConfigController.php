@@ -527,6 +527,7 @@ class SearchConfigController extends AbstractActionController
             'select' => 'Select',
             'selectflat' => 'SelectFlat',
             'text' => 'Text',
+            'thesaurus' => 'Thesaurus',
         ];
 
         // The field "advanced" is only for display, so save it with filters.

@@ -278,6 +278,9 @@ class MainSearchForm extends Form
                     case 'item_sets_tree':
                         $element = $this->searchItemSetsTree($filter);
                         break;
+                    case 'thesaurus':
+                        $element = $this->searchThesaurus($filter);
+                        break;
                     default:
                         $method = 'search' . $type;
                         $element = method_exists($this, $method)
@@ -979,6 +982,61 @@ class MainSearchForm extends Form
                 ] + $this->elementAttributes,
             ])
         ;
+
+        return $fieldset;
+    }
+
+    /**
+     * Manage hierachical values for module Thesaurus.
+     */
+    protected function searchThesaurus(array $filter): ?ElementInterface
+    {
+        $thesaurusId = $filter['options'] ? (int) reset($filter['options']) : 0;
+        $fieldset = new Fieldset('thesaurus');
+        $fieldset
+            ->setAttributes([
+                'id' => 'search-thesaurus-' . $thesaurusId,
+                'data-field-type' => 'thesaurus',
+            ] + $this->elementAttributes)
+            /*
+            ->add([
+                'name' => 'id',
+                'type' => \Thesaurus\Form\Element\ThesaurusSelect::class,
+                'options' => [
+                    'label' => $filter['label'], // @translate
+                    'empty_option' => '',
+                    'thesaurus' => $thesaurusId,
+                    'ascendance' => true,
+                ],
+                'attributes' => [
+                    'id' => 'search-thesaurus-' . $thesaurusId,
+                    'multiple' => true,
+                    'class' => 'chosen-select',
+                    'data-placeholder' => ' ',
+                ] + $this->elementAttributes,
+            ])
+            */
+        ;
+        // TODO Check why the factory of ThesaurusSelect and other elements is not called when added directly.
+        /** @var \Thesaurus\Form\Element\ThesaurusSelect::class $element */
+        $element = $this->formElementManager->get(\Thesaurus\Form\Element\ThesaurusSelect::class);
+        $element
+            ->setName('id')
+            ->setOptions([
+                'label' => $filter['label'], // @translate
+                'empty_option' => '',
+                'thesaurus' => $thesaurusId,
+                'ascendance' => true,
+            ])
+            ->setAttributes([
+                'id' => 'search-thesaurus-' . $thesaurusId,
+                'multiple' => true,
+                'class' => 'chosen-select',
+                'data-placeholder' => ' ',
+            ] + $this->elementAttributes)
+        ;
+        $fieldset
+            ->add($element);
 
         return $fieldset;
     }

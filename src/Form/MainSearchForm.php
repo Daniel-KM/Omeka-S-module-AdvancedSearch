@@ -622,7 +622,7 @@ class MainSearchForm extends Form
      */
     protected function searchThesaurus(array $filter): ?ElementInterface
     {
-        $filterOptions = $this->explodeOptionsAsKeyValues($filter['options']);
+        $filterOptions = $filter['options'];
         if (empty($filterOptions['id']) && empty($filterOptions['thesaurus'])) {
             $thesaurusId = (int) reset($filterOptions);
             $k = key($filterOptions);
@@ -635,6 +635,9 @@ class MainSearchForm extends Form
             return null;
         }
         $filterOptions['thesaurus'] = $thesaurusId;
+        // Set ascendance to true by default, else the type Thesaurus is useless
+        // anyway.
+        $filterOptions['ascendance'] = !in_array($filterOptions['ascendance'] ?? null, [0, false, '0', 'false'], true);
 
         // A thesaurus search should be like an advanced filter, because the
         // search is done on item id, not value text. The issue is only on
@@ -1089,27 +1092,6 @@ class MainSearchForm extends Form
         // Avoid issue with duplicates.
         $options = array_filter(array_keys(array_flip($options)), 'strlen');
         return array_combine($options, $options);
-    }
-
-    /**
-     * Fill an array with an ini-like list.
-     *
-     * When the key is missing, a numeric key is set.
-     */
-    protected function explodeOptionsAsKeyValues(array $array): array
-    {
-        $result = [];
-        $key = null;
-        $value = null;
-        foreach ($array as $keyValue) {
-            if (strpos($keyValue, '=') === false) {
-                $result[] = $keyValue;
-            } else {
-                [$key, $value] = explode('=', (string) $keyValue, 2);
-                $result[$key] = $value;
-            }
-        }
-        return $result;
     }
 
     /**

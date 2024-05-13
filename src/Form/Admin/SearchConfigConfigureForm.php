@@ -227,14 +227,14 @@ class SearchConfigConfigureForm extends Form
                     'info' => 'List of filters that will be displayed in the search form. Format is "field = Label = Type = Options". The field should exist in all resources fields.', // @translate
                     'as_key_value' => false,
                     'key_value_separator' => '=',
-                    'data_keys' => [
-                        'field',
-                        'label',
-                        'type',
-                        'options',
-                    ],
-                    'data_array_keys' => [
-                        'options' => '|',
+                    'data_options' => [
+                        'field' => null,
+                        'label' => null,
+                        'type' => null,
+                        'options' => [
+                            'separator' => '|',
+                            'associative' => '=',
+                        ],
                     ],
                 ],
                 'attributes' => [
@@ -245,7 +245,7 @@ resource_class_id = Class = Omeka/SelectFlat
 dcterms:title = Title = Text
 dcterms:date = Date = DateRange
 dcterms:subject = Subject = MultiCheckbox = alpha | beta | gamma
-dcterms:spatial = Place = Thesaurus = id = 151 | ascendance = true
+dcterms:spatial = Place = Thesaurus = 151
 advanced = Filters = Advanced',
                     'rows' => 12,
                 ],
@@ -660,14 +660,14 @@ nlres = is not linked with resource with ID
                     'info' => 'List of facets that will be displayed in the search page. Format is "field = Label = Input type = Options". Input types may be "Select" or "SelectRange". With internal sql engine, "SelectRange" orders values alphabetically. With Solr, "SelectRange" works only with date and numbers. "Tree" can be used for item sets when module ItemSetsTree is enabled and data indexed recursively. Options are a comma separateted list of arguments. For now, the main type ("literal", "uri" or "resource") can be specified to output only this main type.', // @translate
                     'as_key_value' => true,
                     'key_value_separator' => '=',
-                    'data_keys' => [
-                        'name',
-                        'label',
-                        'type',
-                        'options',
-                    ],
-                    'data_array_keys' => [
-                        'options' => '|',
+                    'data_options' => [
+                        'name' => null,
+                        'label' => null,
+                        'type' => null,
+                        'options' => [
+                            'separator' => '|',
+                            'associative' => '=',
+                        ],
                     ],
                 ],
                 'attributes' => [

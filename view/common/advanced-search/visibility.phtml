@@ -18,9 +18,10 @@ $element
     ->setLabel('Search by visibility') // @translate
     ->setLabelAttributes(['class' => 'type-radio'])
     ->setValueOptions([
-        '' => 'Any', // @translate
         '1' => 'Public', // @translate
         '0' => 'Not public', // @translate
+        // Should be last because of "0".
+        '' => 'Any', // @translate
     ])
     ->setValue($query['is_public'] ?? '')
     ->setAttributes([

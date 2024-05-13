@@ -13,9 +13,10 @@ $element
     ->setLabel('Presence of original file') // @translate
     ->setLabelAttributes(['class' => 'type-radio'])
     ->setValueOptions([
-        '' => 'Any', // @translate
         '1' => 'Has original file', // @translate
         '0' => 'Has no original file', // @translate
+        // Should be last because of "0".
+        '' => 'Any', // @translate
     ])
     ->setValue($query['has_original'] ?? '')
     ->setAttributes([

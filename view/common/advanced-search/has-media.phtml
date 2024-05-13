@@ -18,9 +18,10 @@ $element
     ->setLabel('Search by media presence') // @translate
     ->setLabelAttributes(['class' => 'type-radio'])
     ->setValueOptions([
-        '' => 'Any', // @translate
         '1' => 'Has media', // @translate
         '0' => 'Has no media', // @translate
+        // Should be last because of "0".
+        '' => 'Any', // @translate
     ])
     ->setValue($query['has_media'] ?? '')
     ->setAttributes([

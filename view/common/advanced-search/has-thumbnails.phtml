@@ -13,9 +13,10 @@ $element
     ->setLabel('Presence of thumbnails') // @translate
     ->setLabelAttributes(['class' => 'type-radio'])
     ->setValueOptions([
-        '' => 'Any', // @translate
         '1' => 'Has thumbnails', // @translate
         '0' => 'Has no thumbnails', // @translate
+        // Should be last because of "0".
+        '' => 'Any', // @translate
     ])
     ->setValue($query['has_thumbnails'] ?? '')
     ->setAttributes([

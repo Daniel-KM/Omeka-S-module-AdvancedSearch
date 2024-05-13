@@ -64,23 +64,25 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         $options = [
             'force_canonical' => $canonical,
         ];
-
         return $url('admin/search/config-id', $params, $options);
     }
 
     /**
      * Url of the real search page.
      */
-    public function adminSearchUrl($canonical = false): string
+    public function adminSearchUrl($canonical = false, array $query = []): string
     {
         $url = $this->getViewHelper('Url');
         $options = [
             'force_canonical' => $canonical,
         ];
+        if ($query) {
+            $options['query'] = $query;
+        }
         return $url('search-admin-page-' . $this->id(), [], $options);
     }
 
-    public function siteUrl($siteSlug = null, $canonical = false)
+    public function siteUrl($siteSlug = null, $canonical = false, array $query = [])
     {
         if (!$siteSlug) {
             $siteSlug = $this->getServiceLocator()->get('Application')
@@ -92,6 +94,9 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         $options = [
             'force_canonical' => $canonical,
         ];
+        if ($query) {
+            $options['query'] = $query;
+        }
         $url = $this->getViewHelper('Url');
         // The urls use "search-page-" to simplify migration.
         return $url('search-page-' . $this->id(), $params, $options);

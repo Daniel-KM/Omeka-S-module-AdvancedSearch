@@ -194,12 +194,13 @@ To create a new config for a page with a search engine, follow these steps.
        search engine.
        With the internal adapter, the fields `item_set_id`, `resource_class_id`,
        and `resource_template_id` display a select by default. You may have to
-       use `Omeka/Select`, `Omeka/MultiCheckbox`, or variants to get option
-       values automatically.
+       use `Omeka/Select`, `Omeka/MultiCheckbox`, `Thesaurus`, or variants to
+       get option values automatically.
        Note that some indexers may have fields that seem duplicated, but they
        aren’t: some of them allow to prepare search engines and some other
        facets or sort indexes. Some of them may be used for all uses. This is
-       not the case for the internal indexer, that is a simpler search engine.
+       not the case for the internal indexer, that is a simpler search engine
+       based on the omeka sql database.
        For example, you can use `dcterms:type`, `dcterms:subject`, `dcterms:creator`,
        `dcterms:date`, `dcterms:spatial`, `dcterms:language` and `dcterms:rights`
        as facets, and `dcterms:title`, `dcterms:date`, and `dcterms:creator` as

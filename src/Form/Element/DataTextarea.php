@@ -19,6 +19,11 @@ class DataTextarea extends ArrayTextarea
     /**
      * @var array
      */
+    protected $dataAssociativeKeys = [];
+
+    /**
+     * @var array
+     */
     protected $dataOptions = [];
 
     /**
@@ -82,6 +87,9 @@ class DataTextarea extends ArrayTextarea
     /**
      * Set the ordered list of keys to use for each line.
      *
+     * This option allows to get an associative array instead of a simple list
+     * for each row.
+     *
      * Each specified key will be used as the keys of each part of each line.
      * There is no default keys: in that case, the values are a simple array of
      * array.
@@ -122,10 +130,15 @@ class DataTextarea extends ArrayTextarea
     /**
      * Set the option to separate values into multiple values.
      *
-     * It should be a subset of the data keys.
+     * This option allows to create an array for specific values of the row.
+     * Each value of the row can have its own separator.
+     *
+     * The keys should be a subset of the data keys, so they must be defined.
      *
      * It is not recommended to set the first key when option "as_key_value" is
      *  set. In that case, the whole value is used as key before to be splitted.
+     *
+     *  This option as no effect for last key when option "last_is_list" is set.
      *
      * @example When passing options to an element:
      * ```php
@@ -157,6 +170,10 @@ class DataTextarea extends ArrayTextarea
      *
      * This option allows to get an associative array instead of a simple list
      * for each row and to specify options for each of them.
+     * Managed sub-options are:
+     * - separator (string): allow to create a sub-array
+     * - associative (string): allow to create an associative sub-array. This
+     *   option as no effect for last key when option "last_is_list" is set.
      *
      * Each specified key will be used as the keys of each part of each line.
      * There is no default keys: in that case, the values are a simple array of
@@ -172,28 +189,33 @@ class DataTextarea extends ArrayTextarea
      *         'type' => null,
      *         'options' => [
      *             'separator' => '|',
+     *             'associative' => '=',
      *         ],
      *     ],
      * ```
+     * @todo Allow data_options for sub-options to get associative sub-array automatically.
      */
     public function setDataOptions(array $dataOptions)
     {
         $this->dataOptions = $dataOptions;
         // TODO For compatibility as long as code is not updated to use dataOptions.
         $this->dataKeys = array_fill_keys(array_keys($dataOptions), null);
-        $arrayKeys = array_filter($dataOptions);
-        foreach ($arrayKeys as $key => $value) {
+        $arrayKeys = [];
+        $associativeKeys = [];
+        foreach (array_filter($dataOptions) as $key => $value) {
             if (is_array($value)) {
                 if (isset($value['separator'])) {
                     $arrayKeys[$key] = (string) $value['separator'];
                 }
+                if (isset($value['associative'])) {
+                    $associativeKeys[$key] = (string) $value['associative'];
+                }
             } elseif (is_scalar($value)) {
                 $arrayKeys[$key] = $value;
-            } else {
-                unset($arrayKeys[$key]);
             }
         }
         $this->dataArrayKeys = $arrayKeys;
+        $this->dataAssociativeKeys = $associativeKeys;
         return $this;
     }
 
@@ -207,10 +229,11 @@ class DataTextarea extends ArrayTextarea
      *
      * - "by_line" (default: all the data are on the same line):
      * ```
-     * x = y = z = a, b, c
+     * x = y = z = a | b | c
      * ```
      *
-     * - "last_is_list" (the last field is exploded and an empty line is added):
+     * - "last_is_list" (the last field is exploded and an empty line is added),
+     *   allowing to create groups:
      * ```
      * x = y = z
      * a
@@ -245,8 +268,18 @@ class DataTextarea extends ArrayTextarea
                 $data = array_replace($this->dataKeys, $values);
                 // Manage sub-values.
                 foreach ($arrayKeys as $arrayKey => $arraySeparator) {
-                    $separator = ' ' . $arraySeparator;
-                    $data[$arrayKey] = implode($separator, array_map('strval', isset($data[$arrayKey]) ? (array) $data[$arrayKey] : []));
+                    $separator = ' ' . $arraySeparator . ' ';
+                    $list = array_map('strval', isset($data[$arrayKey]) ? (array) $data[$arrayKey] : []);
+                    if (isset($this->dataAssociativeKeys[$arrayKey]) && !$this->arrayIsList($list)) {
+                        $subSeparator = ' ' . $this->dataAssociativeKeys[$arrayKey] . ' ';
+                        $kvList = [];
+                        foreach ($list as $k => $v) {
+                            $kvList[] = $k . $subSeparator . $v;
+                        }
+                        $data[$arrayKey] = implode($separator, $kvList);
+                    } else {
+                        $data[$arrayKey] = implode($separator, $list);
+                    }
                 }
                 $string .= implode(' ' . $this->keyValueSeparator . ' ', array_map('strval', $data)) . "\n";
             }
@@ -281,7 +314,17 @@ class DataTextarea extends ArrayTextarea
                 foreach ($arrayKeys as $arrayKey => $arraySeparator) {
                     $isLastKey = $arrayKey === $lastKey;
                     $separator = $isLastKey ? "\n" : ' ' . $arraySeparator . ' ';
-                    $data[$arrayKey] = implode($separator, array_map('strval', isset($data[$arrayKey]) ? (array) $data[$arrayKey] : []));
+                    $list = array_map('strval', isset($data[$arrayKey]) ? (array) $data[$arrayKey] : []);
+                    if (isset($this->dataAssociativeKeys[$arrayKey]) && !$this->arrayIsList($list)) {
+                        $subSeparator = ' ' . $this->dataAssociativeKeys[$arrayKey] . ' ';
+                        $kvList = [];
+                        foreach ($list as $k => $v) {
+                            $kvList[] = $k . $subSeparator . $v;
+                        }
+                        $data[$arrayKey] = implode($separator, $kvList);
+                    } else {
+                        $data[$arrayKey] = implode($separator, $list);
+                    }
                 }
                 // Don't add the key value separator for the last field, and
                 // append a line break to add an empty line.
@@ -321,6 +364,18 @@ class DataTextarea extends ArrayTextarea
                     $data[$arrayKey] = $data[$arrayKey] === ''
                         ? []
                         : array_map('trim', explode($arraySeparator, $data[$arrayKey]));
+                    if ($data[$arrayKey] && isset($this->dataAssociativeKeys[$arrayKey])) {
+                        $asso = [];
+                        foreach ($data[$arrayKey] as $k => $v) {
+                            if (strpos($v, $this->dataAssociativeKeys[$arrayKey]) !== false) {
+                                [$kk, $vv] = array_map('trim', explode($this->dataAssociativeKeys[$arrayKey], $v, 2));
+                                $asso[$kk] = $vv;
+                            } else {
+                                $asso[$k] = $v;
+                            }
+                        }
+                        $data[$arrayKey] = $asso;
+                    }
                 }
                 $this->asKeyValue
                     ? $array[reset($data)] = $data
@@ -368,12 +423,25 @@ class DataTextarea extends ArrayTextarea
                 // Manage sub-values.
                 foreach ($arrayKeys as $arrayKey => $arraySeparator) {
                     $isLastKey = $arrayKey === $lastKey;
+                    // The option "last is list" means the last key is a simple list, in any case.
                     if ($isLastKey) {
                         continue;
                     }
                     $data[$arrayKey] = $data[$arrayKey] === ''
                         ? []
                         : array_map('trim', explode($arraySeparator, $data[$arrayKey]));
+                    if ($data[$arrayKey] && isset($this->dataAssociativeKeys[$arrayKey])) {
+                        $asso = [];
+                        foreach ($data[$arrayKey] as $k => $v) {
+                            if (strpos($v, $this->dataAssociativeKeys[$arrayKey]) !== false) {
+                                [$kk, $vv] = array_map('trim', explode($this->dataAssociativeKeys[$arrayKey], $v, 2));
+                                $asso[$kk] = $vv;
+                            } else {
+                                $asso[$k] = $v;
+                            }
+                        }
+                        $data[$arrayKey] = $asso;
+                    }
                 }
                 $this->asKeyValue
                     ? $array[reset($data)] = $data
@@ -391,5 +459,14 @@ class DataTextarea extends ArrayTextarea
             }
         }
         return $array;
+    }
+
+    protected function arrayIsList(array $array): bool
+    {
+        if (function_exists('array_is_list')) {
+            return array_is_list($array);
+        }
+        return $array === []
+            || array_keys($array) === range(0, count($array) - 1);
     }
 }

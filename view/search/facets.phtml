@@ -90,7 +90,7 @@ $options = $searchConfig->setting('facet', []);
                 <?= $facetSelect($name, $facetValues, $options) ?>
                 <?php elseif ($facetType === 'SelectRange'): ?>
                 <?= $facetSelectRange($name, $facetValues, $options) ?>
-                <?php elseif ($facetType === 'Tree'): ?>
+                <?php elseif ($facetType === 'Tree' || $facetType === 'Thesaurus'): ?>
                 <?= $facetElementsTree($name, $facetValues, $options) ?>
                 <?php else: ?>
                 <?= $facetElements($name, $facetValues, $options) ?>

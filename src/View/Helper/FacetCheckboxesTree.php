@@ -2,9 +2,7 @@
 
 namespace AdvancedSearch\View\Helper;
 
-class FacetCheckboxesTree extends AbstractFacet
+class FacetCheckboxesTree extends AbstractFacetTree
 {
     protected $partial = 'search/facet-checkboxes';
-
-    protected $isTree = true;
 }

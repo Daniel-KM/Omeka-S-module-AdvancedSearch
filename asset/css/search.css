@@ -135,40 +135,52 @@
         padding-left: 0;
         list-style: none;
     }
-    .search-facet-items li[data-level="1"] a {
+    .search-facet-items li[data-level="1"] a,
+    .search-facet-items li[data-level="1"] input {
         margin-left: 12px;
     }
-    .search-facet-items li[data-level="2"] a {
+    .search-facet-items li[data-level="2"] a,
+    .search-facet-items li[data-level="2"] input {
         margin-left: 24px;
     }
-    .search-facet-items li[data-level="3"] a {
+    .search-facet-items li[data-level="3"] a,
+    .search-facet-items li[data-level="3"] input {
         margin-left: 36px;
     }
-    .search-facet-items li[data-level="4"] a {
+    .search-facet-items li[data-level="4"] a,
+    .search-facet-items li[data-level="4"] input {
         margin-left: 48px;
     }
-    .search-facet-items li[data-level="5"] a {
+    .search-facet-items li[data-level="5"] a,
+    .search-facet-items li[data-level="5"] input {
         margin-left: 60px;
     }
-    .search-facet-items li[data-level="6"] a {
+    .search-facet-items li[data-level="6"] a,
+    .search-facet-items li[data-level="6"] input {
         margin-left: 72px;
     }
-    .search-facet-items li[data-level="7"] a {
+    .search-facet-items li[data-level="7"] a,
+    .search-facet-items li[data-level="7"] input {
         margin-left: 84px;
     }
-    .search-facet-items li[data-level="8"] a {
+    .search-facet-items li[data-level="8"] a,
+    .search-facet-items li[data-level="8"] input {
         margin-left: 96px;
     }
-    .search-facet-items li[data-level="9"] a {
+    .search-facet-items li[data-level="9"] a,
+    .search-facet-items li[data-level="9"] input {
         margin-left: 108px;
     }
-    .search-facet-items li[data-level="10"] a {
+    .search-facet-items li[data-level="10"] a,
+    .search-facet-items li[data-level="10"] input {
         margin-left: 120px;
     }
-    .search-facet-items li[data-level="11"] a {
+    .search-facet-items li[data-level="11"] a,
+    .search-facet-items li[data-level="11"] input {
         margin-left: 132px;
     }
-    .search-facet-items li[data-level="12"] a {
+    .search-facet-items li[data-level="12"] a,
+    .search-facet-items li[data-level="12"] input {
         margin-left: 144px;
     }
     .search-facet-item {

@@ -619,6 +619,9 @@ class MainSearchForm extends Form
 
     /**
      * Manage hierachical values for module Thesaurus.
+     *
+     * @see \AdvancedSearch\Form\MainSearchForm::searchThesaurus()
+     * @see \AdvancedSearch\View\Helper\AbstractFacetTree::thesaurusQuick()
      */
     protected function searchThesaurus(array $filter): ?ElementInterface
     {

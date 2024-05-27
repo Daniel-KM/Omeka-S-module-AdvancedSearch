@@ -40,6 +40,7 @@
  */
 
 $plugins = $this->getHelperPluginManager();
+$url = $plugins->get('url');
 $api = $plugins->get('api');
 $partial = $plugins->get('partial');
 $escape = $plugins->get('escapeHtml');
@@ -52,7 +53,8 @@ $breadcrumbs = $plugins->has('breadcrumbs') ? $plugins->get('breadcrumbs') : nul
 
 $vars = $this->vars();
 
-$setting = $plugins->get(isset($site) ? 'siteSetting' : 'setting');
+$isAdmin = !isset($site);
+$setting = $plugins->get($isAdmin ? 'setting' : 'siteSetting');
 
 $filterLocale = (bool) $setting('filter_locale_values');
 $lang = $this->lang();
@@ -91,18 +93,25 @@ $this->headScript()
 <?php if ($breadcrumbs): ?>
     <?= $breadcrumbs() ?>
 <?php else: ?>
-<nav id="breadcrumb" class="breadcrumbs">
-    <ul>
-        <?php if (isset($site)): ?>
-        <li><?= $hyperlink($translate('Home'), $site->siteUrl()) ?></li>
-        <?php endif; ?>
-        <?php if ($itemSet): ?>
-        <li><?= $translate('Collections') ?></li>
-        <li><span><?= isset($site) ? $itemSet->siteUrl($site->slug()) : $itemSet->adminUrl() ?></span></li>
-        <?php endif; ?>
-        <li><span><?= $escape($translate('Search')) ?></span></li>
-    </ul>
-</nav>
+<div class="breadcrumbs-parent">
+    <nav id="breadcrumb" class="breadcrumbs" aria-label="<?= $translate('Breadcrumb') ?>">
+        <ul>
+            <?php if (!$isAdmin): ?>
+            <li><?= $hyperlink($translate('Home'), $site->siteUrl()) ?></li>
+            <?php endif; ?>
+            <?php if ($itemSet): ?>
+            <li><?= $hyperlink($translate('Collections'), $url($isAdmin ? 'admin/default' : 'site/resource', ['controller' => 'item-set', 'action' => 'browse'], true)) ?></li>
+            <?php // It may be a span or a link + search. ?>
+            <li><span aria-current="page"><?= $escape($itemSet->displayTitle(null, $langTitle)) ?></span></li>
+            <?php /*
+            <li><?= $hyperlink($itemSet->displayTitle(null, $langTitle), $isAdmin ? $itemSet->adminUrl() : $itemSet->siteUrl($site->slug())) ?></li>
+            */ ?>
+            <?php else: ?>
+            <li><span aria-current="page"><?= $escape($translate('Search')) ?></span></li>
+            <?php endif; ?>
+        </ul>
+    </nav>
+</div>
 <?php endif; ?>
 
 <div id="search-page">

@@ -1207,8 +1207,15 @@ class MainSearchForm extends Form
      */
     protected function getItemSetsTreeOptions($byOwner = false): array
     {
+        // Fallback when the module ItemSetsTree is not present.
         if (!$this->itemSetsTree) {
             return $this->getItemSetsOptions($byOwner);
+        }
+
+        if ($this->formElementManager->has(\ItemSetsTree\Form\Element\ItemSetsTreeSelect::class)) {
+            /** @var \ItemSetsTree\Form\Element\ItemSetsTreeSelect $element */
+            $element = $this->formElementManager->get(\ItemSetsTree\Form\Element\ItemSetsTreeSelect::class);
+            return $element->getValueOptions();
         }
 
         $options = [];

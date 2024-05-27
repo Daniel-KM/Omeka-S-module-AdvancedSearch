@@ -32,11 +32,6 @@ class AbstractFacet extends AbstractHelper
     protected $urlHelper;
 
     /**
-     * @var bool
-     */
-    protected $isTree = false;
-
-    /**
      * @var string
      */
     protected $partial;
@@ -98,18 +93,6 @@ class AbstractFacet extends AbstractHelper
                 ->getRoot()
                 ->getVariable('site')
                 ->id();
-        }
-
-        if ($this->isTree) {
-            if ($plugins->has('itemSetsTree')) {
-                $this->itemSetsTree = $plugins->get('itemSetsTree');
-            }
-            if ($plugins->has('thesaurus')) {
-                $this->thesaurus = $plugins->get('thesaurus')();
-            }
-            if (!$this->itemSetsTree && !$this->thesaurus) {
-                $this->isTree = false;
-            }
         }
 
         unset($this->queryBase['page']);

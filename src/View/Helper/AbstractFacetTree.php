@@ -14,21 +14,36 @@ class AbstractFacetTree extends AbstractFacet
      */
     protected $thesaurus;
 
-    protected $isTree = true;
-
     /**
      * @var array
      */
     protected $tree;
 
+    public function __invoke(?string $facetField, array $facetValues, array $options = [], bool $asData = false)
+    {
+        $view = $this->getView();
+        $plugins = $view->getHelperPluginManager();
+        if ($plugins->has('itemSetsTree')) {
+            $this->itemSetsTree = $plugins->get('itemSetsTree');
+        }
+        if ($plugins->has('thesaurus')) {
+            $this->thesaurus = $plugins->get('thesaurus')();
+        }
+        return parent::__invoke($facetField, $facetValues, $options, $asData);
+    }
+
     protected function prepareFacetData(string $facetField, array $facetValues, array $options): array
     {
-        $isItemSetsTree = $this->isTree && substr($facetField, 0, 14) === 'item_sets_tree' /*&& in_array($facetField, ['item_set', 'item_set_id']) */;
+        $isItemSetsTree = $this->itemSetsTree
+            && substr($facetField, 0, 14) === 'item_sets_tree';
+            // && in_array($facetField, ['item_set', 'item_set_id']);
+        $isThesaurus = $this->thesaurus
+            && $options['facets'][$facetField]['type'] === 'Thesaurus';
         if ($isItemSetsTree) {
             $this->tree = $this->itemSetsTreeQuick();
             $result = parent::prepareFacetData($facetField, $facetValues, $options);
             $result['facetValues'] = $this->itemSetsTreeReorderFacets($result['facetValues']);
-        } elseif ($this->isTree && $options['facets'][$facetField]['type'] === 'Thesaurus') {
+        } elseif ($isThesaurus) {
             $this->tree = $this->thesaurusQuick($facetField, $options);
             $result = parent::prepareFacetData($facetField, $facetValues, $options);
             $result['facetValues'] = $this->thesaurusReorderAndCompleteFacets($facetField, $result['facetValues'], $options);

@@ -18,6 +18,26 @@ return [
             dirname(__DIR__) . '/data/doctrine-proxies',
         ],
     ],
+    'service_manager' => [
+        'invokables' => [
+            Mvc\MvcListeners::class => Mvc\MvcListeners::class,
+        ],
+        'factories' => [
+            'Search\AdapterManager' => Service\AdapterManagerFactory::class,
+            'Search\FormAdapterManager' => Service\FormAdapterManagerFactory::class,
+        ],
+        'delegators' => [
+            'Omeka\ApiManager' => [
+                __NAMESPACE__ => Service\Delegator\ApiManagerDelegatorFactory::class,
+            ],
+            'Omeka\FulltextSearch' => [
+                __NAMESPACE__ => Service\Delegator\FulltextSearchDelegatorFactory::class,
+            ],
+        ],
+    ],
+    'listeners' => [
+        Mvc\MvcListeners::class,
+    ],
     'view_manager' => [
         'template_path_stack' => [
             dirname(__DIR__) . '/view',
@@ -108,6 +128,11 @@ return [
             \Omeka\Form\Element\SiteSelect::class => Form\Element\SiteSelect::class,
         ],
     ],
+    'navigation_links' => [
+        'invokables' => [
+            'search-page' => Site\Navigation\Link\SearchPage::class,
+        ],
+    ],
     'controllers' => [
         'invokables' => [
             Controller\Admin\IndexController::class => Controller\Admin\IndexController::class,
@@ -128,31 +153,6 @@ return [
             'apiSearchOne' => Service\ControllerPlugin\ApiSearchOneFactory::class,
             'searchResources' => Service\ControllerPlugin\SearchResourcesFactory::class,
             'totalJobs' => Service\ControllerPlugin\TotalJobsFactory::class,
-        ],
-    ],
-    'service_manager' => [
-        'invokables' => [
-            Mvc\MvcListeners::class => Mvc\MvcListeners::class,
-        ],
-        'factories' => [
-            'Search\AdapterManager' => Service\AdapterManagerFactory::class,
-            'Search\FormAdapterManager' => Service\FormAdapterManagerFactory::class,
-        ],
-        'delegators' => [
-            'Omeka\ApiManager' => [
-                __NAMESPACE__ => Service\Delegator\ApiManagerDelegatorFactory::class,
-            ],
-            'Omeka\FulltextSearch' => [
-                __NAMESPACE__ => Service\Delegator\FulltextSearchDelegatorFactory::class,
-            ],
-        ],
-    ],
-    'listeners' => [
-        Mvc\MvcListeners::class,
-    ],
-    'navigation_links' => [
-        'invokables' => [
-            'search-page' => Site\Navigation\Link\SearchPage::class,
         ],
     ],
     'router' => [

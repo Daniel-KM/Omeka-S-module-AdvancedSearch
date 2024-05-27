@@ -449,38 +449,36 @@ if (version_compare($oldVersion, '3.4.21', '<')) {
 if (version_compare($oldVersion, '3.4.22', '<')) {
     // Check themes that use old view helpers "FacetActive", "FacetCheckbox" and
     // "FacetLink".
-    $paths = glob(OMEKA_PATH . '/themes/*/view/search/*');
     $checks = [
-        "'facetActive'" => 'facetActive',
-        '"facetActive"' => 'facetActive',
-        '>facetActive(' => 'facetActive',
-        '$facetActive(' => 'facetActive',
-        "'facetCheckbox'" => 'facetCheckbox',
-        '"facetCheckbox"' => 'facetCheckbox',
-        '>facetCheckbox(' => 'facetCheckbox',
-        '$facetCheckbox(' => 'facetCheckbox',
-        "'facetLink'" => 'facetLink',
-        '"facetLink"' => 'facetLink',
-        '>facetLink(' => 'facetLink',
-        '$facetLink(' => 'facetLink',
+        'facetActive' => [
+            "'facetActive'",
+            '"facetActive"',
+            '>facetActive(',
+            '$facetActive(',
+        ],
+        'facetCheckbox' => [
+            "'facetCheckbox'",
+            '"facetCheckbox"',
+            '>facetCheckbox(',
+            '$facetCheckbox(',
+        ],
+        'facetLink' => [
+            "'facetLink'",
+            '"facetLink"',
+            '>facetLink(',
+            '$facetLink(',
+        ],
     ];
-    $result = [];
-    $start = mb_strlen(OMEKA_PATH . '/themes/');
-    foreach ($paths as $filepath) {
-        if (!is_file($filepath) || !is_readable($filepath)) {
-            continue;
-        }
-        $phtml = file_get_contents($filepath);
-        foreach ($checks as $check => $name) {
-            if (strpos($phtml, $check)) {
-                $result[$name][] = mb_substr($filepath, $start);
-            }
-        }
+    $manageModuleAndResources = $this->getManageModuleAndResources();
+    $results = [];
+    foreach ($checks as $name => $strings) {
+        $results[$name] = $manageModuleAndResources->checkStringsInFiles($strings, 'themes/*/view/search/*');
     }
+    $result = array_filter($results);
     if ($result) {
         $result = array_map('array_values', array_map('array_unique', $result));
         $message = new PsrMessage(
-            'View helpers "FacetActive", "FacetCheckbox" and "FacetLink" and associate theme files were removed in favor of plural view helpers. Check your theme if you customized it. For a quick fix (not recommended), copy the three view helpers in your theme (with AbstractFacetElement) and declare them in theme.ini. Matching files: {json}', // @translate
+            'View helpers "FacetActive", "FacetCheckbox" and "FacetLink" and associate theme files were removed in favor of plural view helpers. Check your theme if you customized it. Matching files: {json}', // @translate
             ['json' => json_encode($result, 448)]
         );
         throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message->setTranslator($translator));

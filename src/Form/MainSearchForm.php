@@ -998,7 +998,7 @@ class MainSearchForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'search-item-sets-tree',
-                    'multiple' => true,
+                    'multiple' => false,
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
                     // End users understand "collections" more than "item sets".
                     'data-placeholder' => 'Select collections…', // @translate

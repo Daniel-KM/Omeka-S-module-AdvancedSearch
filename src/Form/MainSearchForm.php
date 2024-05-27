@@ -630,6 +630,13 @@ class MainSearchForm extends Form
      */
     protected function searchThesaurus(array $filter): ?ElementInterface
     {
+        // No fallback when the thesaurus select is not present, because the
+        // collection id or the customvocab id are not known.
+        if (!$this->formElementManager->has(\Thesaurus\Form\Element\ThesaurusSelect::class)) {
+            // TODO Add a fallback for ThesaurusSelect.
+            return null;
+        }
+
         $filterOptions = $filter['options'];
         if (empty($filterOptions['id']) && empty($filterOptions['thesaurus'])) {
             $thesaurusId = (int) reset($filterOptions);

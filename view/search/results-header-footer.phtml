@@ -40,14 +40,10 @@ $multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['lis
 
 <?php if (isset($displayParts['active_facets']) && $activeFacets = $response->getActiveFacets()): ?>
     <?php
-    $facetActive = $plugins->get('facetActive');
+    $facetActives = $plugins->get('facetActives');
     $options = $searchConfig->setting('facet', []);
     ?>
-<ul class="search-facets-active">
-    <?php foreach ($activeFacets as $name => $facetValues) foreach ($facetValues as $facetKey => $facetValue): ?>
-    <li><?= $facetActive($name, ['value' => $facetValue, 'count' => null, 'key' => $facetKey], $options) ?></li>
-    <?php endforeach; ?>
-</ul>
+<?= $facetActives(null, $activeFacets, $options) ?>
 <?= $this->searchingFilters($searchConfig, $query, ['template' => 'common/search-filters-links']) ?>
 <?php endif; ?>
 

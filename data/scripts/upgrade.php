@@ -491,6 +491,7 @@ if (version_compare($oldVersion, '3.4.24', '<')) {
      *
      * Replace filled settting "heading" by a specific block "Heading".
      * Replace filled settting "html" by a specific block "Html".
+     * Move setting template to block layout template.
      *
      * @var \Laminas\Log\Logger $logger
      *
@@ -506,6 +507,7 @@ if (version_compare($oldVersion, '3.4.24', '<')) {
     $hasBlockPlus = $this->isModuleActive('BlockPlus');
 
     $pagesUpdated = [];
+    $pagesUpdated2 = [];
     foreach ($pageRepository->findAll() as $page) {
         $pageId = $page->getId();
         $pageSlug = $page->getSlug();
@@ -559,7 +561,18 @@ if (version_compare($oldVersion, '3.4.24', '<')) {
             }
             unset($data['html']);
 
+            $template = $data['template'] ?? '';
+            $layoutData = $block->getLayoutData() ?? [];
+            $existingTemplateName = $layoutData['template_name'] ?? null;
+            $templateName = pathinfo($template, PATHINFO_FILENAME);
+            if ($templateName && $templateName !== 'searching-form' && (!$existingTemplateName || $existingTemplateName === 'searching-form')) {
+                $layoutData['template_name'] = $templateName;
+                $pagesUpdated2[$siteSlug][$pageSlug] = $pageSlug;
+            }
+            unset($data['template']);
+
             $block->setData($data);
+            $block->setLayoutData($layoutData);
         }
     }
 
@@ -572,6 +585,23 @@ if (version_compare($oldVersion, '3.4.24', '<')) {
             ['json' => json_encode($result, 448)]
         );
         $messenger->addWarning($message);
+        $logger->warn($message->getMessage(), $message->getContext());
+    }
+
+    if ($pagesUpdated2) {
+        $result = array_map('array_values', $pagesUpdated2);
+        $message = new PsrMessage(
+            'The setting "template" was moved to the new block layout settings available since Omeka S v4.1. You may check pages for styles: {json}', // @translate
+            ['json' => json_encode($result, 448)]
+        );
+        $messenger->addWarning($message);
+        $logger->warn($message->getMessage(), $message->getContext());
+
+        $message = new PsrMessage(
+            'The template files for the block Searching Form should be moved from "view/common/block-layout" to "view/common/block-template" in your themes. You may check your themes for pages: {json}', // @translate
+            ['json' => json_encode($result, 448)]
+        );
+        $messenger->addError($message);
         $logger->warn($message->getMessage(), $message->getContext());
     }
 }

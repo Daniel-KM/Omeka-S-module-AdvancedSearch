@@ -498,6 +498,23 @@ if (version_compare($oldVersion, '3.4.24', '<')) {
      * @see \Omeka\Db\Migrations\MigrateBlockLayoutData
      */
 
+    // Check themes that use "$heading" and "$html" and "$cssClass" in block
+    // Searching Form.
+    $strings = [
+        '$heading',
+        '$html',
+        '$cssClass',
+    ];
+    $manageModuleAndResources = $this->getManageModuleAndResources();
+    $result = $manageModuleAndResources->checkStringsInFiles($strings, 'themes/*/view/common/block-layout/searching-form*');
+    if ($result) {
+        $message = new PsrMessage(
+            'The variables "$heading", "$html" and "$cssClass" were removed from block Searching Form. Fix it in the following files before upgrading: {json}', // @translate
+            ['json' => json_encode($result, 448)]
+        );
+        throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message->setTranslator($translator));
+    }
+
     $logger = $services->get('Omeka\Logger');
     $pageRepository = $entityManager->getRepository(\Omeka\Entity\SitePage::class);
     $blocksRepository = $entityManager->getRepository(\Omeka\Entity\SitePageBlock::class);

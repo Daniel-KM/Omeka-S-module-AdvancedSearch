@@ -1183,6 +1183,12 @@ class Module extends AbstractModule
 
         $services = $this->getServiceLocator();
 
+        /**
+         * @var \Laminas\I18n\View\Helper\Translate $translate
+         *
+         * Translate is used in search_config.default.php.
+         */
+        $translate = $services->get('ViewHelperManager')->get('translate');
         $urlHelper = $services->get('ViewHelperManager')->get('url');
         $messenger = $services->get('ControllerPluginManager')->get('messenger');
 

@@ -12,7 +12,7 @@ return [
     '@id' => null,
     '@type' => 'o:SearchConfig',
     'o:id' => null,
-    'o:name' => 'Default',
+    'o:name' => $translate('Default'),
     'o:path' => 'find',
     'o:engine' => ['o:id' => 1],
     'o:form' => 'main',
@@ -40,66 +40,66 @@ return [
                 // Ordered list of specific filters.
                 [
                     'field' => 'item_set_id',
-                    'label' => 'Collection',
+                    'label' => $translate('Collection'),
                     'type' => 'Omeka/MultiSelect',
                 ],
                 [
                     'field' => 'resource_class_id',
-                    'label' => 'Class',
+                    'label' => $translate('Class'),
                     'type' => 'Omeka/MultiSelectFlat',
                 ],
                 [
                     'field' => 'resource_template_id',
-                    'label' => 'Template',
+                    'label' => $translate('Template'),
                     'type' => 'Omeka/Radio',
                 ],
                 [
                     'field' => 'title',
-                    'label' => 'Title',
+                    'label' => $translate('Title'),
                     'type' => null,
                 ],
                 [
                     'field' => 'author',
-                    'label' => 'Author',
+                    'label' => $translate('Author'),
                     'type' => null,
                 ],
                 [
                     'field' => 'dcterms:subject',
-                    'label' => 'Subject',
+                    'label' => $translate('Subject'),
                     'type' => null,
                 ],
                 [
                     'field' => 'advanced',
-                    'label' => 'Filters',
-                    'type' => 'Advanced',
+                    'label' => $translate('Filters'),
+                    'type' => $translate('Advanced'),
                     'fields' => [
                         'title' => [
                             'value' => 'title',
-                            'label' => 'Title',
+                            'label' => $translate('Title'),
                         ],
                         'author' => [
                             'value' => 'author',
-                            'label' => 'Author',
+                            'label' => $translate('Author'),
                         ],
                         'dcterms:creator' => [
                             'value' => 'dcterms:creator',
-                            'label' => 'Creator',
+                            'label' => $translate('Creator'),
                         ],
                         'dcterms:subject' => [
                             'value' => 'dcterms:subject',
-                            'label' => 'Subject',
+                            'label' => $translate('Subject'),
                         ],
                         'date' => [
                             'value' => 'date',
-                            'label' => 'Date',
+                            'label' => $translate('Date'),
                         ],
                         'description' => [
                             'value' => 'description',
-                            'label' => 'Description',
+                            'label' => $translate('Description'),
                         ],
                         'resource_class_id' => [
                             'value' => 'resource_class_id',
-                            'label' => 'Class',
+                            'label' => $translate('Class'),
                         ],
                     ],
                     'max_number' => '5',
@@ -107,29 +107,29 @@ return [
                     'field_joiner_not' => true,
                     'field_operator' => true,
                     'field_operators' => [
-                        'eq' => 'is exactly', // @translate
-                        'in' => 'contains', // @translate
-                        'sw' => 'starts with', // @translate
-                        'ew' => 'ends with', // @translate
-                        'ex' => 'has any value', // @translate
-                        'res' => 'is resource with ID', // @translate
+                        'eq' => $translate('is exactly'), // @translate
+                        'in' => $translate('contains'), // @translate
+                        'sw' => $translate('starts with'), // @translate
+                        'ew' => $translate('ends with'), // @translate
+                        'ex' => $translate('has any value'), // @translate
+                        'res' => $translate('is resource with ID'), // @translate
                     ],
                 ],
                 [
                     'field' => 'dcterms:date',
-                    'label' => 'Date range',
+                    'label' => $translate('Date range'),
                     'type' => 'DateRange',
                 ],
                 // Other available filters.
                 /*
                 [
                     'field' => 'dcterms:created',
-                    'label' => 'Number',
+                    'label' => $translate('Number'),
                     'type' => 'Number',
                 ],
                 [
                     'field' => 'dcterms:valid',
-                    'label' => 'Number',
+                    'label' => $translate('Number'),
                     'type' => 'NumberRange',
                 ],
                 [
@@ -149,12 +149,12 @@ return [
                 /*
                 [
                     'field' => 'date',
-                    'label' => 'Date',
+                    'label' => $translate('Date'),
                     'type' => 'Date',
                 ],
                 [
                     'field' => 'date_range',
-                    'label' => 'Date range',
+                    'label' => $translate('Date range'),
                     'type' => 'DateRangeStartEnd',
                     'options' => [
                         'from' => 'dcterms:created',
@@ -163,12 +163,12 @@ return [
                 ],
                 [
                     'field' => 'dcterms:spatial',
-                    'label' => 'Place',
+                    'label' => $translate('Place'),
                     'type' => 'Spatial',
                 ],
                 [
                     'field' => 'dcterms:spatial',
-                    'label' => 'Place',
+                    'label' => $translate('Place'),
                     'type' => 'SpatialBox',
                 ],
                 */
@@ -194,33 +194,33 @@ return [
         'pagination' => [
             'per_pages' => [
                 // For translation only.
-                10 => 'Results by %d', // @translate
-                10 => 'Results by 10', // @translate
+                10 => $translate('Results by %d'), // @translate
+                10 => $translate('Results by 10'), // @translate
                 // This is the default for Omeka.
-                25 => 'Results by 25', // @translate
-                50 => 'Results by 50', // @translate
-                100 => 'Results by 100', // @translate
+                25 => $translate('Results by 25'), // @translate
+                50 => $translate('Results by 50'), // @translate
+                100 => $translate('Results by 100'), // @translate
             ],
         ],
 
         'sort' => [
-            'label' => 'Sort',
+            'label' => $translate('Sort'),
             'fields' => [
                 'dcterms:title asc' => [
                     'name' => 'dcterms:title asc',
-                    'label' => 'Title',
+                    'label' => $translate('Title'),
                 ],
                 'dcterms:title desc' => [
                     'name' => 'dcterms:title desc',
-                    'label' => 'Title (from z to a)',
+                    'label' => $translate('Title (from z to a)'),
                 ],
                 'dcterms:date asc' => [
                     'name' => 'dcterms:date asc',
-                    'label' => 'Date',
+                    'label' => $translate('Date'),
                 ],
                 'dcterms:date desc' => [
                     'name' => 'dcterms:date desc',
-                    'label' => 'Date (most recent first)',
+                    'label' => $translate('Date (most recent first)'),
                 ],
             ],
         ],
@@ -230,31 +230,31 @@ return [
             'facets' => [
                 'item_set_id' => [
                     'name' => 'item_set_id',
-                    'label' => 'Collections',
+                    'label' => $translate('Collection'),
                 ],
                 'resource_class_id' => [
                     'name' => 'resource_class_id',
-                    'label' => 'Classes',
+                    'label' => $translate('Classe'),
                 ],
                 'dcterms:subject' => [
                     'name' => 'dcterms:subject',
-                    'label' => 'Subject',
+                    'label' => $translate('Subject'),
                 ],
                 'dcterms:type' => [
                     'name' => 'dcterms:type',
-                    'label' => 'Type',
+                    'label' => $translate('Type'),
                 ],
                 'author' => [
                     'name' => 'author',
-                    'label' => 'Author',
+                    'label' => $translate('Author'),
                 ],
                 'date' => [
                     'name' => 'date',
-                    'label' => 'Date',
+                    'label' => $translate('Date'),
                 ],
                 'dcterms:language' => [
                     'name' => 'dcterms:language',
-                    'label' => 'Language',
+                    'label' => $translate('Language'),
                 ],
             ],
             'languages' => [],
@@ -264,8 +264,8 @@ return [
             'display_list' => 'available',
             'display_submit' => 'above',
             'display_reset' => 'above',
-            'label_submit' => 'Apply facets',
-            'label_reset' => 'Reset facets',
+            'label_submit' => $translate('Apply facets'),
+            'label_reset' => $translate('Reset facets'),
             'display_active' => true,
             'display_count' => true,
         ],

@@ -8,7 +8,6 @@
  * @var array $link
  * @var bool $skipFormAction Allow to display results on same form.
  * @var bool $displayResults Display results in the same block.
- * @var string $cssClass
  * @var \AdvancedSearch\Response $response
  */
 
@@ -17,7 +16,7 @@ $escape = $plugins->get('escapeHtml');
 $hyperlink = $plugins->get('hyperlink');
 ?>
 
-<div class="block block-search <?= $cssClass ?>">
+<div class="block block-search">
     <?= $searchConfig->renderForm([
         'template' => $displayResults ? 'search/search' :  null,
         'skip_form_action' => $skipFormAction,

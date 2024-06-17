@@ -58,7 +58,7 @@ $multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['lis
 <?php if (isset($displayParts['total_results'])): ?>
 <div class="search-results-count-total">
     <?php $totalResults = $response->getTotalResults(); ?>
-    <?=  sprintf($translatePlural('%s item', '%s items', $totalResults), $totalResults) ?>
+    <?= sprintf($translatePlural('%s resource', '%s resources', $totalResults), $totalResults) ?>
 </div>
 <?php endif; ?>
 

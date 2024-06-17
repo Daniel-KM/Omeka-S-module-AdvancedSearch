@@ -204,8 +204,8 @@ class MainSearchForm extends Form
         }
 
         // Add the button for record or full text search.
-        $rft = in_array($this->variant, ['simple', 'csrf']) ? null : ($this->formSettings['search']['fulltext_search'] ?? null);
-        $this->appendRecordOrFullText($rft);
+        $recordOrFullText = in_array($this->variant, ['simple', 'csrf']) ? null : ($this->formSettings['search']['fulltext_search'] ?? null);
+        $this->appendRecordOrFullText($recordOrFullText);
 
         foreach ($this->formSettings['form']['filters'] ?? [] as $filter) {
             if (empty($filter['field'])) {
@@ -240,7 +240,7 @@ class MainSearchForm extends Form
             $element = null;
 
             // Manage exceptions for special fields, mostly for internal engine.
-            // TODO In fact, they are standard field with autosuggestion, so it will be fixed when autosuggestion (or short list) will be added.
+            // TODO In fact, they are standard fields with autosuggestion, so it will be fixed when autosuggestion (or short list) will be added.
             $isSpecialField = substr($filter['type'], 0, 5) === 'Omeka';
             if ($isSpecialField) {
                 if (!isset($availableFields[$field]['from'])) {
@@ -351,9 +351,9 @@ class MainSearchForm extends Form
     /**
      * Add a simple filter to limit search to record or not.
      */
-    protected function appendRecordOrFullText(?string $rft): self
+    protected function appendRecordOrFullText(?string $recordOrFullText): self
     {
-        switch ($rft) {
+        switch ($recordOrFullText) {
             case 'fulltext_checkbox':
                 $element = new Element\Checkbox('rft');
                 $element

@@ -47,14 +47,13 @@ $defaultThumbnail = '<img loading="lazy" src="' . $assetUrl('thumbnails/default.
     foreach ($resources as $resource):
         // Can be simplified in the public theme.
         $resourceUrl = $site ? $resource->siteUrl($siteSlug) : $resource->adminUrl($siteSlug);
-        $resourceType = $resource->resourceName();
-        $resourceThumbnail = $thumbnail($resource, 'medium') ?: $defaultThumbnail;
         $heading = $headingTerm ? $resource->value($headingTerm, ['lang' => $langValue]) : null;
         $heading = $heading ? $heading->asHtml() : $escape($resource->displayTitle($untitled, $lang));
         $body = $bodyTerm ? $resource->value($bodyTerm, ['lang' => $langValue]) : null;
         $body = $body ? $body->asHtml() : $escape($resource->displayDescription(null, $lang));
+        $resourceType = $resource->getControllerName();
+        $resourceThumbnail = $thumbnail($resource, 'medium') ?: $defaultThumbnail;
     ?>
-
     <li class="resource <?= $resourceType ?>">
         <div class="resource-thumbnail">
             <?= $hyperlink->raw($resourceThumbnail, $resourceUrl, ['class' => 'resource-link']) ?>
@@ -66,6 +65,5 @@ $defaultThumbnail = '<img loading="lazy" src="' . $assetUrl('thumbnails/default.
             </div>
         </div>
     </li>
-
     <?php endforeach; ?>
 </ul>

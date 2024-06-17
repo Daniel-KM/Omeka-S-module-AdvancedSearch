@@ -5,8 +5,6 @@
  * @var \Omeka\Api\Representation\SiteRepresentation $site
  * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
  * @var \AdvancedSearch\Query|null $query
- * @var string $heading
- * @var string $html
  * @var array $link
  * @var bool $skipFormAction Allow to display results on same form.
  * @var bool $displayResults Display results in the same block.
@@ -20,10 +18,6 @@ $hyperlink = $plugins->get('hyperlink');
 ?>
 
 <div class="block block-search <?= $cssClass ?>">
-    <?php if (!empty($heading)): ?>
-    <h2><?= $escape($heading) ?></h2>
-    <?php endif; ?>
-    <?= $html ?>
     <?= $searchConfig->renderForm([
         'template' => $displayResults ? 'search/search' :  null,
         'skip_form_action' => $skipFormAction,

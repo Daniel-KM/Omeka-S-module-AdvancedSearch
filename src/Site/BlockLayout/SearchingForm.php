@@ -104,8 +104,6 @@ class SearchingForm extends AbstractBlockLayout
         $vars = [
             'block' => $block,
             'site' => $site,
-            'heading' => $data['heading'] ?? '',
-            'html' => $data['html'] ?? '',
             'link' => $link,
             'searchConfig' => $searchConfig,
             'query' => null,

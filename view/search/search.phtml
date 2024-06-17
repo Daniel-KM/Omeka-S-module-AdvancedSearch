@@ -89,6 +89,7 @@ $this->headScript()
 ?>
 
 <?php if (empty($isPartial)): ?>
+<?php if ($searchConfig->subSetting('display', 'breadcrumbs')): ?>
 <?php if ($breadcrumbs): ?>
     <?= $breadcrumbs() ?>
 <?php else: ?>
@@ -111,6 +112,7 @@ $this->headScript()
         </ul>
     </nav>
 </div>
+<?php endif; ?>
 <?php endif; ?>
 
 <div id="search-page">

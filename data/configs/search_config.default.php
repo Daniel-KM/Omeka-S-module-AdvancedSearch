@@ -180,6 +180,7 @@ return [
 
         'display' => [
             'template' => null,
+            'breadcrumbs' => false,
             'search_filters' => 'header',
             'active_facets' => 'none',
             'total_results' => 'header',

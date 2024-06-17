@@ -418,6 +418,16 @@ nlres = is not linked with resource with ID
                 ],
             ])
             ->add([
+                'name' => 'breadcrumbs',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Breadcrumbs', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'breadcrumbs',
+                ],
+            ])
+            ->add([
                 'name' => 'search_filters',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [

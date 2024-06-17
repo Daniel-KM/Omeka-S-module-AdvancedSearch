@@ -484,3 +484,94 @@ if (version_compare($oldVersion, '3.4.22', '<')) {
         throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message->setTranslator($translator));
     }
 }
+
+if (version_compare($oldVersion, '3.4.24', '<')) {
+    /**
+     * Migrate blocks of this module to new blocks of Omeka S v4.1.
+     *
+     * Replace filled settting "heading" by a specific block "Heading".
+     * Replace filled settting "html" by a specific block "Html".
+     *
+     * @var \Laminas\Log\Logger $logger
+     *
+     * @see \Omeka\Db\Migrations\MigrateBlockLayoutData
+     */
+
+    $logger = $services->get('Omeka\Logger');
+    $pageRepository = $entityManager->getRepository(\Omeka\Entity\SitePage::class);
+    $blocksRepository = $entityManager->getRepository(\Omeka\Entity\SitePageBlock::class);
+
+    $viewHelpers = $services->get('ViewHelperManager');
+    $escape = $viewHelpers->get('escapeHtml');
+    $hasBlockPlus = $this->isModuleActive('BlockPlus');
+
+    $pagesUpdated = [];
+    foreach ($pageRepository->findAll() as $page) {
+        $pageId = $page->getId();
+        $pageSlug = $page->getSlug();
+        $siteSlug = $page->getSite()->getSlug();
+        $position = 0;
+        foreach ($page->getBlocks() as $block) {
+            $block->setPosition(++$position);
+            $layout = $block->getLayout();
+            if ($layout !== 'searchingForm') {
+                continue;
+            }
+            $blockId = $block->getId();
+            $data = $block->getData() ?: [];
+
+            $heading = $data['heading'] ?? '';
+            if (strlen($heading)) {
+                $b = new \Omeka\Entity\SitePageBlock();
+                $b->setPage($page);
+                $b->setPosition(++$position);
+                if ($hasBlockPlus) {
+                    $b->setLayout('heading');
+                    $b->setData([
+                        'text' => $heading,
+                        'level' => 2,
+                    ]);
+                } else {
+                    $b->setLayout('html');
+                    $b->setData([
+                        'html' => '<h2>' . $escape($heading) . '</h2>',
+                    ]);
+                }
+                $entityManager->persist($b);
+                $block->setPosition(++$position);
+                $pagesUpdated[$siteSlug][$pageSlug] = $pageSlug;
+            }
+            unset($data['heading']);
+
+            $html = $data['html'] ?? '';
+            $hasHtml = !in_array(str_replace([' ', "\n", "\r", "\t"], '', $html), ['', '<div></div>', '<p></p>']);
+            if ($hasHtml) {
+                $b = new \Omeka\Entity\SitePageBlock();
+                $b->setLayout('html');
+                $b->setPage($page);
+                $b->setPosition(++$position);
+                $b->setData([
+                    'html' => $html,
+                ]);
+                $entityManager->persist($b);
+                $block->setPosition(++$position);
+                $pagesUpdated[$siteSlug][$pageSlug] = $pageSlug;
+            }
+            unset($data['html']);
+
+            $block->setData($data);
+        }
+    }
+
+    $entityManager->flush();
+
+    if ($pagesUpdated) {
+        $result = array_map('array_values', $pagesUpdated);
+        $message = new PsrMessage(
+            'The settings "heading" and "html" was removed from block Searching Form. New block "Heading" or "Html" were prepended to all blocks that had a filled heading or html. You may check pages for styles: {json}', // @translate
+            ['json' => json_encode($result, 448)]
+        );
+        $messenger->addWarning($message);
+        $logger->warn($message->getMessage(), $message->getContext());
+    }
+}

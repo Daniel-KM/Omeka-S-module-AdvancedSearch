@@ -136,6 +136,7 @@ class MainSearchForm extends Form
         $this->skipValues = (bool) $this->getOption('skip_values');
 
         $this->variant = $this->getOption('variant');
+        $hasVariant = in_array($this->variant, ['quick', 'simple', 'csrf']);
 
         $this->formSettings = $this->searchConfig ? $this->searchConfig->settings() : [];
 
@@ -173,7 +174,7 @@ class MainSearchForm extends Form
                 'name' => 'q',
                 'type' => Element\Search::class,
                 'options' => [
-                    'label' => 'Search', // @translate
+                    'label' => $hasVariant ? null : 'Search', // @translate
                 ],
                 'attributes' => [
                     'id' => 'q',
@@ -226,7 +227,7 @@ class MainSearchForm extends Form
             // Don't create useless elements.
             // In particular, it allows to skip creation of selects, that is
             // slow for now in big databases.
-            if (in_array($this->variant, ['quick', 'simple', 'csrf'])
+            if ($hasVariant
                 // The type may be missing.
                 && !in_array($type, ['', 'Hidden', 'hidden', \Laminas\Form\Element\Hidden::class, 'Csrf', 'csrf', \Laminas\Form\Element\Csrf::class])
                 // No need to check the field name here: "q", "rft" and "submit"

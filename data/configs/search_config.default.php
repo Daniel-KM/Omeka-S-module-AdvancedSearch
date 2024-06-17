@@ -189,6 +189,7 @@ return [
             'sort' => 'header',
             'grid_list' => 'header',
             'grid_list_mode' => 'auto',
+            'facets' => 'before',
         ],
 
         'pagination' => [

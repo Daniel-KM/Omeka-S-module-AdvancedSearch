@@ -564,6 +564,22 @@ nlres = is not linked with resource with ID
                     'value' => 'auto',
                 ],
             ])
+            ->add([
+                'name' => 'facets',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Block of facets', // @translate
+                    'value_options' => [
+                        'none' => 'No', // @translate
+                        'before' => 'Before results', // @translate
+                        'after' => 'After results', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'facets',
+                    'value' => 'before',
+                ],
+            ])
         ;
 
         // Settings for the results (pagination).

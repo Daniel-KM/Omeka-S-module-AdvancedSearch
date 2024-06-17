@@ -59,9 +59,9 @@ $this->headScript()
     <?php endif; ?>
 </div>
 
-<h2><?= $translate('Search engines') ?></h2>
+<h2 id="table-caption-engines"><?= $translate('Search engines') ?></h2>
 <?php if (count($engines) > 0): ?>
-    <table class="tablesaw" data-tablesaw-mode="stack">
+    <table aria-labelledby="table-caption-engines" class="tablesaw" data-tablesaw-mode="stack">
         <thead>
             <tr>
                 <th><?= $translate('Name') ?></th>
@@ -118,9 +118,9 @@ $this->headScript()
     <p><?= $translate('No search engines created yet.') ?></p>
 <?php endif; ?>
 
-<h2><?= $translate('Page configs') ?></h2>
+<h2 id="table-caption-configs"><?= $translate('Page configs') ?></h2>
 <?php if (count($searchConfigs) > 0): ?>
-    <table class="tablesaw" data-tablesaw-mode="stack">
+    <table aria-labelledby="table-caption-configs" class="tablesaw" data-tablesaw-mode="stack">
         <thead>
             <tr>
                 <th><?= $translate('Name') ?></th>
@@ -178,9 +178,9 @@ $this->headScript()
     <p><?= $translate('No search page configs created yet.') ?></p>
 <?php endif; ?>
 
-<h2><?= $translate('Suggesters') ?></h2>
+<h2 id="table-caption-suggesters"><?= $translate('Suggesters') ?></h2>
 <?php if (count($suggesters) > 0): ?>
-    <table class="tablesaw" data-tablesaw-mode="stack">
+    <table aria-labelledby="table-caption-suggesters" class="tablesaw" data-tablesaw-mode="stack">
         <thead>
             <tr>
                 <th><?= $translate('Name') ?></th>

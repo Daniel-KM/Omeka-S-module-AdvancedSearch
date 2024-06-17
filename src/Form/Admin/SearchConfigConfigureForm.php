@@ -479,6 +479,40 @@ nlres = is not linked with resource with ID
                 ],
             ])
             ->add([
+                'name' => 'search_form_simple',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Search form simple', // @translate
+                    'value_options' => [
+                        'none' => 'No', // @translate
+                        'header' => 'Results header', // @translate
+                        'footer' => 'Results footer', // @translate
+                        'both' => 'Both', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'search_form_simple',
+                    'value' => 'none',
+                ],
+            ])
+            ->add([
+                'name' => 'search_form_quick',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Search form quick', // @translate
+                    'value_options' => [
+                        'none' => 'No', // @translate
+                        'header' => 'Results header', // @translate
+                        'footer' => 'Results footer', // @translate
+                        'both' => 'Both', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'search_form_quick',
+                    'value' => 'none',
+                ],
+            ])
+            ->add([
                 'name' => 'paginator',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [

@@ -19,6 +19,8 @@ $displayParts = [
     'search_filters' => 'header',
     'active_facets' => 'none',
     'total_results' => 'header',
+    'search_form_simple' => 'none',
+    'search_form_quick' => 'none',
     'paginator' => 'header',
     'per_pages' => 'header',
     'sort' => 'header',
@@ -34,9 +36,13 @@ $gridListMode = $searchConfig->subSetting('display', 'grid_list_mode', 'auto');
 $multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['list_only', 'grid_only']);
 ?>
 
+<?php // Search filters. ?>
+
 <?php if (isset($displayParts['search_filters'])): ?>
 <?= $this->searchingFilters($searchConfig, $query, ['template' => 'common/search-filters-links']) ?>
 <?php endif; ?>
+
+<?php // Active Facets. ?>
 
 <?php if (isset($displayParts['active_facets']) && $activeFacets = $response->getActiveFacets()): ?>
     <?php
@@ -47,6 +53,8 @@ $multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['lis
 <?= $this->searchingFilters($searchConfig, $query, ['template' => 'common/search-filters-links']) ?>
 <?php endif; ?>
 
+<?php // Total results. ?>
+
 <?php if (isset($displayParts['total_results'])): ?>
 <div class="search-results-count-total">
     <?php $totalResults = $response->getTotalResults(); ?>
@@ -54,19 +62,39 @@ $multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['lis
 </div>
 <?php endif; ?>
 
+<?php // Search form simple. ?>
+
+<?php if (isset($displayParts['search_form_simple'])): ?>
+<?= $searchConfig->renderForm(['variant' => 'simple', 'skip_form_action' => true]) ?>
+<?php endif; ?>
+
+<?php // Search form quick. ?>
+
+<?php if (isset($displayParts['search_form_quick'])): ?>
+<?= $searchConfig->renderForm(['variant' => 'quick', 'skip_form_action' => true]) ?>
+<?php endif; ?>
+
+<?php // Pagination. ?>
+
 <?php if (isset($displayParts['paginator'])): ?>
 <div class="search-results-count <?= isset($displayParts['total_results']) ? 'no-total-results' : '' ?>">
     <?= $this->pagination('common/pagination') ?>
 </div>
 <?php endif; ?>
 
+<?php // Pagination per page. ?>
+
 <?php if (count($paginationPerPages)): ?>
 <?= $this->searchPaginationPerPageSelector($query, $paginationPerPages, true) ?>
 <?php endif; ?>
 
+<?php // Sort. ?>
+
 <?php if (count($sortFields)): ?>
 <?= $this->searchSortSelector($query, $sortFields, ['as_url' => true, 'label' => $searchConfig->subSetting('sort', 'label')]) ?>
 <?php endif; ?>
+
+<?php // Grid/list. ?>
 
 <?php if ($multiMode): ?>
 <div class="search-results-display">

@@ -184,6 +184,8 @@ return [
             'search_filters' => 'header',
             'active_facets' => 'none',
             'total_results' => 'header',
+            'search_form_simple' => 'none',
+            'search_form_quick' => 'none',
             'paginator' => 'header',
             'per_pages' => 'header',
             'sort' => 'header',

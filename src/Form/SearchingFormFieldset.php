@@ -77,23 +77,6 @@ class SearchingFormFieldset extends Fieldset
                 ],
             ])
         ;
-
-        if (class_exists('BlockPlus\Form\Element\TemplateSelect')) {
-            $this
-                ->add([
-                    'name' => 'o:block[__blockIndex__][o:data][template]',
-                    'type' => \BlockPlus\Form\Element\TemplateSelect::class,
-                    'options' => [
-                        'label' => 'Template to display', // @translate
-                        'info' => 'Templates are in folder "common/block-layout" of the theme and should start with "searching-form".', // @translate
-                        'template' => 'common/block-layout/searching-form',
-                    ],
-                    'attributes' => [
-                        'id' => 'searching-form-template',
-                        'class' => 'chosen-select',
-                    ],
-                ]);
-        }
     }
 
     public function setSearchConfigs(array $searchConfigs): self

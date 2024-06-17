@@ -403,7 +403,6 @@ return [
                 'display_results' => false,
                 'query' => '',
                 'query_filter' => '',
-                'template' => '',
             ],
         ],
         // This is the default list of all possible fields, allowing other modules

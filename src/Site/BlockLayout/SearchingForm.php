@@ -145,10 +145,7 @@ class SearchingForm extends AbstractBlockLayout
             }
         }
 
-        $template = $block->dataValue('template', self::PARTIAL_NAME);
-        return $template !== self::PARTIAL_NAME && $view->resolver($template)
-            ? $view->partial($template, $vars)
-            : $view->partial(self::PARTIAL_NAME, $vars);
+        return $view->partial(self::PARTIAL_NAME, $vars);
     }
 
     /**

@@ -79,6 +79,11 @@ class SearchController extends AbstractActionController
             'response' => new Response,
         ]);
 
+        $template = $isSiteRequest ? $searchConfig->subSetting('display', 'template') : null;
+        if ($template && $template !== 'search/search') {
+            $view->setTemplate($template);
+        }
+
         $request = $this->params()->fromQuery();
 
         // Here, only the csrf is needed, if any.

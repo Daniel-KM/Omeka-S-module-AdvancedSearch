@@ -407,6 +407,17 @@ nlres = is not linked with resource with ID
             ])
             ->get('display')
             ->add([
+                'name' => 'template',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Template', // @translate
+                    'info' => 'The template to use in your theme. Default is search/search.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'template',
+                ],
+            ])
+            ->add([
                 'name' => 'search_filters',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [

@@ -229,7 +229,7 @@ class MainSearchForm extends Form
             // slow for now in big databases.
             if ($hasVariant
                 // The type may be missing.
-                && !in_array($type, ['', 'Hidden', 'hidden', \Laminas\Form\Element\Hidden::class, 'Csrf', 'csrf', \Laminas\Form\Element\Csrf::class])
+                && !in_array($type, ['Hidden', 'hidden', \Laminas\Form\Element\Hidden::class, 'Csrf', 'csrf', \Laminas\Form\Element\Csrf::class])
                 // No need to check the field name here: "q", "rft" and "submit"
                 // are managed separately.
                 // TODO Required elements for "quick" cannot be checked for now.

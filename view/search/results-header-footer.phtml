@@ -28,7 +28,7 @@ $displayParts = [
     'grid_list_mode' => 'auto',
 ];
 $displayParts = $searchConfig ? $searchConfig->setting('display', $displayParts) : $displayParts;
-$displayParts = array_filter($displayParts, function ($v) use ($resultPart) { return in_array($v, [$resultPart, 'both']); });
+$displayParts = array_filter($displayParts, fn ($v) => in_array($v, [$resultPart, 'both']));
 
 $paginationPerPages = isset($displayParts['per_pages']) ? $searchConfig->subSetting('pagination', 'per_pages') : [];
 $sortFields = isset($displayParts['sort']) ? $searchConfig->subSetting('sort', 'fields') : [];

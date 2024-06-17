@@ -38,9 +38,7 @@ class FacetActives extends AbstractFacet
 
                 $values = $query['facet'][$facetField];
                 // TODO Remove this filter to keep all active facet values?
-                $values = array_filter($values, function ($v) use ($facetValueValue) {
-                    return $v !== $facetValueValue;
-                });
+                $values = array_filter($values, fn ($v) => $v !== $facetValueValue);
                 $query['facet'][$facetField] = $values;
 
                 $url = $isFacetModeDirect ? $this->urlHelper->__invoke($this->route, $this->params, ['query' => $query]) : '';

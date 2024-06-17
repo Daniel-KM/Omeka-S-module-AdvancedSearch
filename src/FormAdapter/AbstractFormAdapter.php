@@ -178,18 +178,12 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
         if ($onlyAvailableFields) {
             $availableFields = $formSettings['available_fields'] ?? [];
             if ($availableFields) {
-                $checkAvailableField = function ($field) use ($availableFields) {
-                    return isset($availableFields[$field]);
-                };
+                $checkAvailableField = fn ($field) => isset($availableFields[$field]);
             } else {
-                $checkAvailableField = function ($field) {
-                    return false;
-                };
+                $checkAvailableField = fn ($field) => false;
             }
         } else {
-            $checkAvailableField = function ($field) {
-                return true;
-            };
+            $checkAvailableField = fn ($field) => true;
         }
 
         // TODO Manage the "browse_attached_items" / "site_attachments_only".

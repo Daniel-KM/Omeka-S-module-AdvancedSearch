@@ -338,9 +338,7 @@ class ApiSearch extends AbstractPlugin
 
         // TODO Manage returnScalar.
 
-        $totalResults = array_map(function ($resource) use ($searchResponse) {
-            return $searchResponse->getResourceTotalResults($resource);
-        }, $this->engine->setting('resources', []));
+        $totalResults = array_map(fn ($resource) => $searchResponse->getResourceTotalResults($resource), $this->engine->setting('resources', []));
 
         // Get entities from the search response.
         $ids = $this->extractIdsFromResponse($searchResponse, $resource);
@@ -505,8 +503,6 @@ SQL;
      */
     protected function extractIdsFromResponse(SearchResponse $searchResponse, $resource)
     {
-        return array_map(function ($v) {
-            return $v['id'];
-        }, $searchResponse->getResults($resource));
+        return array_map(fn ($v) => $v['id'], $searchResponse->getResults($resource));
     }
 }

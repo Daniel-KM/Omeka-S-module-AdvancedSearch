@@ -73,8 +73,8 @@ if ($documentCount) {
     $itemSetsCount = $response->getResourceTotalResults('item_sets');
     $itemsCount = $response->getResourceTotalResults('items');
     $displayParts = $searchConfig->setting('display', []);
-    $displayPartsHeader = array_filter($displayParts, function ($v) { return in_array($v, ['header', 'both']); });
-    $displayPartsFooter = array_filter($displayParts, function ($v) { return in_array($v, ['footer', 'both']); });
+    $displayPartsHeader = array_filter($displayParts, fn ($v) => in_array($v, ['header', 'both']));
+    $displayPartsFooter = array_filter($displayParts, fn ($v) => in_array($v, ['footer', 'both']));
 } else {
     $itemSetsCount = 0;
     $itemsCount = 0;

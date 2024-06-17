@@ -81,9 +81,7 @@ class InternalQuerier extends AbstractQuerier
             }
             $this->response->setResourceTotalResults($resourceType, $totalResults);
             if ($totalResults) {
-                $result = array_map(function ($v) {
-                    return ['id' => $v];
-                }, $result);
+                $result = array_map(fn ($v) => ['id' => $v], $result);
             } else {
                 $result = [];
             }

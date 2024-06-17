@@ -1128,9 +1128,7 @@ class SearchResources extends AbstractPlugin
         $valuesJoin = 'omeka_root.values';
         $where = '';
 
-        $escapeSqlLike = function ($string) {
-            return str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], (string) $string);
-        };
+        $escapeSqlLike = fn ($string) => str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], (string) $string);
 
         // See below "Consecutive OR optimization" comment
         $previousPropertyIds = null;

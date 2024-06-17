@@ -98,9 +98,7 @@ class IndexSearch extends AbstractJob
         if ($selectedResourceNames) {
             $resourceNames = array_intersect($resourceNames, $selectedResourceNames);
         }
-        $resourceNames = array_filter($resourceNames, function ($resourceName) use ($indexer) {
-            return $indexer->canIndex($resourceName);
-        });
+        $resourceNames = array_filter($resourceNames, fn ($resourceName) => $indexer->canIndex($resourceName));
         if (empty($resourceNames)) {
             $this->logger->notice(
                 'Search index #{search_engine_id} ("{name}"): there is no resource type to index or the indexation is not needed.', // @translate

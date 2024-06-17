@@ -66,9 +66,7 @@ class ManagerDelegator extends \Omeka\Api\Manager
                         unset($query[$key]);
                     } elseif ($key === 'id') {
                         $values = is_array($value) ? $value : [$value];
-                        $values = array_filter($values, function ($id) {
-                            return $id !== '' && $id !== null;
-                        });
+                        $values = array_filter($values, fn ($id) => $id !== '' && $id !== null);
                         if (count($values)) {
                             $query[$key] = $values;
                         } else {

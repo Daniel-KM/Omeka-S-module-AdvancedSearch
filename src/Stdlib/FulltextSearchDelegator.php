@@ -57,7 +57,7 @@ class FulltextSearchDelegator extends FulltextSearch
      * {@inheritDoc}
      * @see \Omeka\Stdlib\FulltextSearch::save()
      */
-    public function save(ResourceInterface $resource, AdapterInterface $adapter)
+    public function save(ResourceInterface $resource, AdapterInterface $adapter): void
     {
         $this->realFulltextSearch->save($resource, $adapter);
 

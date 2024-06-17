@@ -52,9 +52,7 @@ if ($this->site) {
 
 // Prepare the property queries.
 $properties = $query['property'] ?? [];
-$properties = array_filter($properties, function ($value) {
-    return isset($value['text']) ? '' !== trim($value['text']) : true;
-});
+$properties = array_filter($properties, fn ($value) => isset($value['text']) ? '' !== trim($value['text']) : true);
 if (!$properties) {
     $properties[] = [];
 }

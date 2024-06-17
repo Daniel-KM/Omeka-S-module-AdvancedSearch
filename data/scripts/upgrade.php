@@ -19,15 +19,16 @@ use Common\Stdlib\PsrMessage;
 $plugins = $services->get('ControllerPluginManager');
 $api = $plugins->get('api');
 $settings = $services->get('Omeka\Settings');
+$translate = $plugins->get('translate');
 $translator = $services->get('MvcTranslator');
 $connection = $services->get('Omeka\Connection');
 $messenger = $plugins->get('messenger');
 $entityManager = $services->get('Omeka\EntityManager');
 
-if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.58')) {
+if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.59')) {
     $message = new \Omeka\Stdlib\Message(
-        'The module %1$s should be upgraded to version %2$s or later.', // @translate
-        'Common', '3.4.58'
+        $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
+        'Common', '3.4.59'
     );
     throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
 }

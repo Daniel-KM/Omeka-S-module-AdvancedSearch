@@ -634,10 +634,36 @@ if (version_compare($oldVersion, '3.4.24', '<')) {
         $logger->warn($message->getMessage(), $message->getContext());
 
         $message = new PsrMessage(
-            'The template files for the block Searching Form should be moved from "view/common/block-layout" to "view/common/block-template" in your themes. You may check your themes for pages: {json}', // @translate
+            'The template files for the block Searching Form should be moved from "view/common/block-layout" to "view/common/block-template" in your themes. This process can be done automatically via a task of the module Easy Admin before upgrading the module (important: backup your themes first). You may check your themes for pages: {json}', // @translate
             ['json' => json_encode($result, 448)]
         );
         $messenger->addError($message);
         $logger->warn($message->getMessage(), $message->getContext());
     }
+
+    $message = new PsrMessage(
+        'New options were added in search config: the choice of the theme template (search/search) and an option to display the breadcrumbs.' // @translate
+    );
+    $messenger->addSuccess($message);
+}
+
+if (version_compare($oldVersion, '3.4.24', '<')) {
+    // Add sort label.
+    $sortLabel = $translate('Sort by');
+    $sql = <<<SQL
+UPDATE `search_config`
+SET
+    `settings` = REPLACE(`settings`, '"sort":{"fields":', '"sort":{"label":"$sortLabel","fields":')
+;
+SQL;
+    $connection->executeStatement($sql);
+
+    // Add option to enable facets.
+    $sql = <<<SQL
+UPDATE `search_config`
+SET
+    `settings` = REPLACE(`settings`, '"display":{', '"display":{"facets":"after"')
+;
+SQL;
+    $connection->executeStatement($sql);
 }

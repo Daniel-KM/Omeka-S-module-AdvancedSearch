@@ -607,11 +607,23 @@ nlres = is not linked with resource with ID
                 'name' => 'sort',
                 'type' => Fieldset::class,
                 'options' => [
+                    // Avoid a bad translation.
                     'label' => 'Sorting', // @translate
                 ],
             ])
             ->get('sort')
             // field (term + asc/desc) = label (+ asc/desc) (order means weight).
+            ->add([
+                'name' => 'label',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Sort label', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'sorting_label',
+                    'value' => 'Sort',
+                ],
+            ])
             ->add([
                 'name' => 'fields',
                 'type' => AdvancedSearchElement\DataTextarea::class,

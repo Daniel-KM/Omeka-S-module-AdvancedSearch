@@ -204,6 +204,7 @@ return [
         ],
 
         'sort' => [
+            'label' => 'Sort',
             'fields' => [
                 'dcterms:title asc' => [
                     'name' => 'dcterms:title asc',

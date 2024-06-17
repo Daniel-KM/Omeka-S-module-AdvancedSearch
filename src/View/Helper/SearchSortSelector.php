@@ -21,7 +21,7 @@ class SearchSortSelector extends AbstractHelper
      *
      * @todo Merge with Omeka SortSelector and SortLink?
      */
-    public function __invoke(Query $query, array $options, $asUrl = false, ?string $partial = null): string
+    public function __invoke(Query $query, array $options, $asUrl = false, ?string $partial = null, ?string $label = null): string
     {
         if (!count($options)) {
             return '';
@@ -39,7 +39,17 @@ class SearchSortSelector extends AbstractHelper
             ? $this->asUrl($query, $options)
             : $this->asForm($query, $options);
 
-        return $this->getView()->partial($partial ?: $this->partial, [
+        $view = $this->getView();
+
+        $label = is_null($label)
+            ? $view->translate('Sort by') // @translate
+            : $label;
+        if ($label !== '') {
+            $select
+                ->setLabel($label);
+        }
+
+        return $view->partial($partial ?: $this->partial, [
             'query' => $query,
             'options' => $options,
             'select' => $select,
@@ -62,8 +72,7 @@ class SearchSortSelector extends AbstractHelper
         $options = array_map($translate, $options);
         return (new Select('sort'))
             ->setValueOptions($options)
-            ->setValue($query->getSort())
-            ->setLabel($translate('Sort by')); // @translate
+            ->setValue($query->getSort());
     }
 
     protected function asUrl(Query $query, array $options): Select
@@ -92,7 +101,6 @@ class SearchSortSelector extends AbstractHelper
 
         return (new Select('sort'))
             ->setValueOptions($optionsWithUrl)
-            ->setValue($currentSort)
-            ->setLabel($translate('Sort by')); // @translate
+            ->setValue($currentSort);
     }
 }

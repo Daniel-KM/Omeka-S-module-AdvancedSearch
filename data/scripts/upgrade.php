@@ -571,6 +571,21 @@ if (version_compare($oldVersion, '3.4.24', '<')) {
             }
             unset($data['template']);
 
+            if (empty($data['query'])) {
+                $data['query'] = [];
+            } elseif (!is_array($data['query'])) {
+                $query = [];
+                parse_str(ltrim($data['query'], "? \t\n\r\0\x0B"), $query);
+                $data['query'] = array_filter($query, fn ($v) => $v !== '' && $v !== [] && $v !== null);
+            }
+            if (empty($data['query_filter'])) {
+                $data['query_filter'] = [];
+            } elseif (!is_array($data['query_filter'])) {
+                $query = [];
+                parse_str(ltrim($data['query_filter'], "? \t\n\r\0\x0B"), $query);
+                $data['query_filter'] = array_filter($query, fn ($v) => $v !== '' && $v !== [] && $v !== null);
+            }
+
             $block->setData($data);
             $block->setLayoutData($layoutData);
         }

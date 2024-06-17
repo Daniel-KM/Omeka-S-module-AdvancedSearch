@@ -22,15 +22,29 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
 
     public function getLabel()
     {
-        return 'Search form (module Search)'; // @translate
+        return 'Search form (module Advanced Search)'; // @translate
     }
 
     public function onHydrate(SitePageBlock $block, ErrorStore $errorStore): void
     {
-        $data = $block->getData() + ['query' => '', 'query_filter' => ''];
-        $data['query'] = ltrim($data['query'], "? \t\n\r\0\x0B");
-        $data['query_filter'] = ltrim($data['query_filter'], "? \t\n\r\0\x0B");
-        // TODO Store queries as array to avoid to parse them each time.
+        $data = ($block->getData() ?? []) + ['query' => '', 'query_filter' => ''];
+
+        if (empty($data['query'])) {
+            $data['query'] = [];
+        } elseif (!is_array($data['query'])) {
+            $query = [];
+            parse_str(ltrim($data['query'], "? \t\n\r\0\x0B"), $query);
+            $data['query'] = array_filter($query, fn ($v) => $v !== '' && $v !== [] && $v !== null);
+        }
+
+        if (empty($data['query_filter'])) {
+            $data['query_filter'] = [];
+        } elseif (!is_array($data['query_filter'])) {
+            $query = [];
+            parse_str(ltrim($data['query_filter'], "? \t\n\r\0\x0B"), $query);
+            $data['query_filter'] = array_filter($query, fn ($v) => $v !== '' && $v !== [] && $v !== null);
+        }
+
         $block->setData($data);
     }
 
@@ -47,6 +61,9 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
         $blockFieldset = \AdvancedSearch\Form\SearchingFormFieldset::class;
 
         $data = $block ? ($block->data() ?? []) + $defaultSettings : $defaultSettings;
+
+        $data['query'] = http_build_query($data['query'] ?? [], '', '&', PHP_QUERY_RFC3986);
+        $data['query_filter'] = http_build_query($data['query_filter'] ?? [], '', '&', PHP_QUERY_RFC3986);
 
         $dataForm = [];
         foreach ($data as $key => $value) {
@@ -116,23 +133,19 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
         ];
 
         if ($displayResults) {
-            $query = [];
-            parse_str((string) ($data['query'] ?? ''), $query);
-            $query = array_filter($query);
-
-            $filterQuery = [];
-            parse_str((string) $block->dataValue('query_filter'), $filterQuery);
-            $filterQuery = array_filter($filterQuery);
+            $query = $data['query'] ?? [];
+            $filterQuery = $data['query_filter'] ?? [];
 
             $query += $filterQuery;
 
             $request = $view->params()->fromQuery();
-            $request = array_filter($request);
+            $request = array_filter($query, fn ($v) => $v !== '' && $v !== [] && $v !== null);
             if ($request) {
                 $request += $filterQuery;
                 $request = $this->validateSearchRequest($searchConfig, $form, $request) ?: $query;
             } else {
                 $request = $query;
+                $vars['query'] = $request;
             }
 
             $plugins = $block->getServiceLocator()->get('ControllerPluginManager');

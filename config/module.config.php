@@ -401,8 +401,8 @@ return [
                 // Name "search_page" is kept to simplify migration.
                 'search_page' => null,
                 'display_results' => false,
-                'query' => '',
-                'query_filter' => '',
+                'query' => [],
+                'query_filter' => [],
             ],
         ],
         // This is the default list of all possible fields, allowing other modules

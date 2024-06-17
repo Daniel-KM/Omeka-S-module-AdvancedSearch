@@ -65,7 +65,7 @@ $multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['lis
 <?php endif; ?>
 
 <?php if (count($sortFields)): ?>
-<?= $this->searchSortSelector($query, $sortFields, true) ?>
+<?= $this->searchSortSelector($query, $sortFields, ['as_url' => true, 'label' => $searchConfig->subSetting('sort', 'label')]) ?>
 <?php endif; ?>
 
 <?php if ($multiMode): ?>

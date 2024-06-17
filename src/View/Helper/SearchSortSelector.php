@@ -14,82 +14,100 @@ class SearchSortSelector extends AbstractHelper
     protected $partial = 'search/sort-selector';
 
     /**
-     * Option $asUrl allows to include the select in the main form or not.
-     * When set, a js reloads the page directly.
-     * Anyway, the js can rebuild the url from the values.
-     * @todo To avoid a js, a css select (replace select by ul/li + a) can be created in theme.
+     * Create the search sort selector for the advanced search results.
      *
      * @todo Merge with Omeka SortSelector and SortLink?
+     *
+     * @var array|bool $params If boolean, the option is "$asUrl" and next
+     *   arguments are used. If array, may be:
+     *   - as_url (bool): when set, a js reloads the page directly. Anyway, the
+     *     js can rebuild the url from the values.
+     *   - label (string|null): the label of the select.
+     *   - template (string): the partial to use.
+     * @var string $partial Deprecated: use $params['template'].
+     * @var string $label Deprecated: use $params['label'].
+     *
+     * @todo To avoid a js, a css select (replace select by ul/li + a) can be created in theme.
      */
-    public function __invoke(Query $query, array $options, $asUrl = false, ?string $partial = null, ?string $label = null): string
+    public function __invoke(Query $query, array $valueOptions, $params = [], ?string $partial = null, ?string $label = null): string
     {
-        if (!count($options)) {
+        if (!count($valueOptions)) {
             return '';
         }
 
         /* @deprecated Since 3.5.23.3. Kept for old themes. */
-        if (!is_array(reset($options))) {
-            foreach ($options as $name => &$sortOption) {
+        if (!is_array(reset($valueOptions))) {
+            foreach ($valueOptions as $name => &$sortOption) {
                 $sortOption = ['name' => $name, 'label' => $sortOption];
             }
             unset($sortOption);
         }
 
-        $select = $asUrl
-            ? $this->asUrl($query, $options)
-            : $this->asForm($query, $options);
+        if (is_array($params)) {
+            $params += [
+                'label' => $label,
+                'as_url' => false,
+                'template' => $partial,
+            ];
+        } else {
+            $params = [
+                'label' => $label,
+                'as_url' => (bool) $params,
+                'template' => $partial,
+            ];
+        }
 
         $view = $this->getView();
 
-        $label = is_null($label)
+        $select = $params['as_url']
+            ? $this->asUrl($query, $valueOptions)
+            : $this->asForm($query, $valueOptions);
+
+        $label = is_null($params['label'])
             ? $view->translate('Sort by') // @translate
-            : $label;
+            : $params['label'];
         if ($label !== '') {
             $select
                 ->setLabel($label);
         }
 
-        return $view->partial($partial ?: $this->partial, [
+        return $view->partial($params['template'] ?: $this->partial, [
             'query' => $query,
-            'options' => $options,
             'select' => $select,
-            'asUrl' => $asUrl,
-            // Deprecated since 3.3.6.12.
-            'sortOptions' => $options,
-            'sortSelect' => $select,
-            'asSortUrls' => $asUrl,
+            'params' => $params,
+            // Kept for old themes.
+            'asUrl' => $params['as_url'],
         ]);
     }
 
-    protected function asForm(Query $query, array $options): Select
+    protected function asForm(Query $query, array $valueOptions): Select
     {
         $plugins = $this->getView()->getHelperPluginManager();
         $translate = $plugins->get('translate');
-        foreach ($options as $name => &$sortOption) {
+        foreach ($valueOptions as $name => &$sortOption) {
             $sortOption = $sortOption['label'] ? $translate($sortOption['label']) : $name;
         }
         unset($sortOption);
-        $options = array_map($translate, $options);
+        $valueOptions = array_map($translate, $valueOptions);
         return (new Select('sort'))
-            ->setValueOptions($options)
+            ->setValueOptions($valueOptions)
             ->setValue($query->getSort());
     }
 
-    protected function asUrl(Query $query, array $options): Select
+    protected function asUrl(Query $query, array $valueOptions): Select
     {
         $plugins = $this->getView()->getHelperPluginManager();
         $params = $plugins->get('params');
-        $translate = $plugins->get('translate');
         $serverUrl = $plugins->get('serverUrl');
 
         // Prepare urls directly as values to avoid a click. Use current url for a quick build.
         $currentUrl = strtok($serverUrl(true), '?');
         $currentQuery = $params->fromQuery();
         $currentSort = $query->getSort();
-        $optionsWithUrl = [];
-        foreach ($options as $name => $sortOption) {
+        $valueOptionsWithUrl = [];
+        foreach ($valueOptions as $name => $sortOption) {
             $url = $currentUrl . '?' . http_build_query(['page' => 1, 'sort' => $name] + $currentQuery, '', '&', PHP_QUERY_RFC3986);
-            $optionsWithUrl[$name] = [
+            $valueOptionsWithUrl[$name] = [
                 'value' => $name,
                 // The label is automatically translated by Laminas.
                 'label' => $sortOption['label'] ?: $name,
@@ -100,7 +118,7 @@ class SearchSortSelector extends AbstractHelper
         }
 
         return (new Select('sort'))
-            ->setValueOptions($optionsWithUrl)
+            ->setValueOptions($valueOptionsWithUrl)
             ->setValue($currentSort);
     }
 }

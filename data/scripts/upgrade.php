@@ -586,6 +586,9 @@ if (version_compare($oldVersion, '3.4.24', '<')) {
                 $data['query_filter'] = array_filter($query, fn ($v) => $v !== '' && $v !== [] && $v !== null);
             }
 
+            $data['search_config'] = $data['search_config'] ?? $data['search_page'] ?? 'default';
+            unset($data['search_page']);
+
             $block->setData($data);
             $block->setLayoutData($layoutData);
         }

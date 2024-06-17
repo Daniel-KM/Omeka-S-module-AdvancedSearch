@@ -398,8 +398,7 @@ return [
         'block_settings' => [
             'searchingForm' => [
                 'link' => '',
-                // Name "search_page" is kept to simplify migration.
-                'search_page' => null,
+                'search_config' => null,
                 'display_results' => false,
                 'query' => [],
                 'query_filter' => [],

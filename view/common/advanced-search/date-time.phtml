@@ -9,7 +9,7 @@ $escape = $this->plugin('escapeHtml');
 
 // Prepare the datetime queries.
 $datetimes = isset($query['datetime']) ? (is_array($query['datetime']) ? $query['datetime'] : [['value' => $query['datetime']]]) : [];
-$datetimes = array_filter($datetimes, fn ($v) => isset($v['value']) ? trim($v['value']) !== '' : (isset($v['type']) && in_array($v['type'], ['ex', 'nex']));
+$datetimes = array_filter($datetimes, fn ($v) => isset($v['value']) ? trim($v['value']) !== '' : (isset($v['type']) && in_array($v['type'], ['ex', 'nex'])));
 // Allows to display one empty field.
 if (empty($datetimes)) $datetimes = [[]];
 

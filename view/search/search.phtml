@@ -78,11 +78,12 @@ if ($documentCount) {
 } else {
     $itemSetsCount = 0;
     $itemsCount = 0;
+    $displayParts = [];
     $displayPartsHeader = [];
     $displayPartsFooter = [];
 }
 
-$displayFacets = $displayParts['facets'] ?? 'before';
+$displayFacets = $displayParts ? $displayParts['facets'] ?? 'before' : 'none';
 
 $this->headLink()
     ->appendStylesheet($assetUrl('css/search.css', 'AdvancedSearch'));

@@ -55,7 +55,17 @@ class Response implements \JsonSerializable
     /**
      * @var int
      */
-    protected $totalResults = 0;
+    protected $currentPage = \Omeka\Stdlib\Paginator::CURRENT_PAGE;
+
+    /**
+     * @var int
+     */
+    protected $perPage = \Omeka\Stdlib\Paginator::PER_PAGE;
+
+    /**
+     * @var int
+     */
+    protected $totalResults = \Omeka\Stdlib\Paginator::TOTAL_COUNT;
 
     /**
      * @var array
@@ -119,6 +129,34 @@ class Response implements \JsonSerializable
     public function getMessage(): ?string
     {
         return (string) $this->message ?: null;
+    }
+
+    /**
+     * @param int $page
+     */
+    public function setCurrentPage(?int $page): self
+    {
+        $this->currentPage = (int) $page;
+        return $this;
+    }
+
+    public function getCurrentPage(): int
+    {
+        return $this->currentPage;
+    }
+
+    /**
+     * @param int $perPage
+     */
+    public function setPerPage(?int $perPage): self
+    {
+        $this->perPage = (int) $perPage;
+        return $this;
+    }
+
+    public function getPerPage(): int
+    {
+        return $this->perPage;
     }
 
     /**
@@ -439,6 +477,8 @@ class Response implements \JsonSerializable
         return [
             'success' => $this->isSuccess(),
             'message' => $this->getMessage(),
+            'current_page' => $this->getCurrentPage(),
+            'per_page' => $this->getPerPage(),
             'total_results' => $this->getTotalResults(),
             'resource_total_results' => $this->getResourceTotalResults(),
             'results' => $this->getResults(),

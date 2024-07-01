@@ -88,6 +88,9 @@ class InternalQuerier extends AbstractQuerier
             $this->response->addResults($resourceType, $result);
         }
 
+        $this->response->setCurrentPage($limit ? 1 + (int) floor($offset / $limit) : 1);
+        $this->response->setPerPage($limit);
+
         $totalResults = array_sum($this->response->getResourceTotalResults());
         $this->response->setTotalResults($totalResults);
 

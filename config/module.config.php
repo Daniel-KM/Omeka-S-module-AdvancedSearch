@@ -85,7 +85,7 @@ return [
                 Service\ViewHelper\FormQueryDelegatorFactory::class,
             ],
             'Laminas\Form\View\Helper\FormElement' => [
-                __NAMESPACE__ => Service\Delegator\FormElementDelegatorFactory::class,
+                Service\Delegator\FormElementDelegatorFactory::class,
             ],
             \Omeka\View\Helper\UserBar::class => [
                 Service\ViewHelper\UserBarDelegatorFactory::class,

@@ -500,18 +500,38 @@ if (version_compare($oldVersion, '3.4.24', '<')) {
      */
 
     // Check themes that use "$heading" and "$html" and "$cssClass" in block
-    // Searching Form.
+    // Searching Form and "$html" and "$captionPosition" in block Media and ExternalContent.
     $strings = [
-        '$heading',
-        '$html',
-        '$cssClass',
+        'themes/*/view/common/block-layout/external-content*' => [
+            '$html',
+            '$captionPosition',
+        ],
+        'themes/*/view/common/block-layout/media-*' => [
+            '$html',
+            '$captionPosition',
+        ],
+        'themes/*/view/common/block-layout/*resource-text*' => [
+            '$html',
+            '$captionPosition',
+        ],
+        'themes/*/view/common/block-layout/searching-form*' => [
+            '$heading',
+            '$html',
+            '$cssClass',
+        ],
     ];
     $manageModuleAndResources = $this->getManageModuleAndResources();
-    $result = $manageModuleAndResources->checkStringsInFiles($strings, 'themes/*/view/common/block-layout/searching-form*');
-    if ($result) {
+    $results = [];
+    foreach ($strings as $path => $strings) {
+        $result = $manageModuleAndResources->checkStringsInFiles($strings, $path);
+        if ($result) {
+            $results[trim(basename($path), '*')] = $result;
+        }
+    }
+    if ($results) {
         $message = new PsrMessage(
-            'The variables "$heading", "$html" and "$cssClass" were removed from block Searching Form. Fix it in the following files before upgrading: {json}', // @translate
-            ['json' => json_encode($result, 448)]
+            'The variables "$heading", "$html" and "$cssClass" were removed from block Searching Form. Fix them in the following files before upgrading: {json}', // @translate
+            ['json' => json_encode($results, 448)]
         );
         throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message->setTranslator($translator));
     }
@@ -617,7 +637,7 @@ if (version_compare($oldVersion, '3.4.24', '<')) {
     if ($pagesUpdated) {
         $result = array_map('array_values', $pagesUpdated);
         $message = new PsrMessage(
-            'The settings "heading" and "html" was removed from block Searching Form. New block "Heading" or "Html" were prepended to all blocks that had a filled heading or html. You may check pages for styles: {json}', // @translate
+            'The settings "heading" and "html" were removed from block Searching Form. New blocks "Heading" or "Html" were prepended to all blocks that had a filled heading or html. You may check pages for styles: {json}', // @translate
             ['json' => json_encode($result, 448)]
         );
         $messenger->addWarning($message);
@@ -666,4 +686,19 @@ SET
 ;
 SQL;
     $connection->executeStatement($sql);
+}
+
+if (version_compare($oldVersion, '3.4.25', '<')) {
+    $siteSettings = $services->get('Omeka\Settings\Site');
+    $siteIds = $api->search('sites', [], ['returnScalar' => 'id'])->getContent();
+    foreach ($siteIds as $siteId) {
+        $siteSettings->setTargetId($siteId);
+        $siteSettings->set('advancedsearch_redirect_itemset',
+            $siteSettings->get('advancedsearch_redirect_itemset') ? 'first' : ''
+        );
+    }
+    $message = new PsrMessage(
+        'The option to redirect item set to search was improved to manage all pages.' // @translate
+    );
+    $messenger->addSuccess($message);
 }

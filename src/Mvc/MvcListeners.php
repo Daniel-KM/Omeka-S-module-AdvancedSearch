@@ -34,7 +34,10 @@ class MvcListeners extends AbstractListenerAggregate
         $services = $event->getApplication()->getServiceManager();
         $siteSettings = $services->get('Omeka\Settings\Site');
 
-        if (!$siteSettings->get('advancedsearch_redirect_itemset')) {
+        // The other options are managed in templates search/search and
+        // search/results-header-footer.
+        $redirectItemSet = $siteSettings->get('advancedsearch_redirect_itemset');
+        if (!$redirectItemSet) {
             return;
         }
 

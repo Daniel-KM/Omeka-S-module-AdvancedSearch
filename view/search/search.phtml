@@ -52,6 +52,7 @@ $breadcrumbs = $plugins->has('breadcrumbs') ? $plugins->get('breadcrumbs') : nul
 
 $vars = $this->vars();
 
+$site ??= null;
 $isAdmin = !isset($site);
 $setting = $plugins->get($isAdmin ? 'setting' : 'siteSetting');
 
@@ -84,6 +85,13 @@ if ($documentCount) {
 }
 
 $displayFacets = $displayParts ? $displayParts['facets'] ?? 'before' : 'none';
+
+if ($itemSet && $site) {
+    $redirectItemSet = $this->siteSetting('advancedsearch_redirect_itemset');
+    $displayItemSet = $redirectItemSet === 'all' || ($redirectItemSet === 'first' && $response->getCurrentPage() === 1);
+} else {
+    $displayItemSet = false;
+}
 
 $this->headLink()
     ->appendStylesheet($assetUrl('css/search.css', 'AdvancedSearch'));
@@ -121,7 +129,7 @@ $this->headScript()
 <div id="search-page">
 <?php endif; ?>
 
-<?php if ($itemSet): ?>
+<?php if ($displayItemSet): ?>
 
     <?php
     $vars->offsetSet('itemSet', $itemSet);

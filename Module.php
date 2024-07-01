@@ -1168,7 +1168,7 @@ class Module extends AbstractModule
         $siteSettings->setTargetId($site->getId());
         $siteSettings->set('advancedsearch_main_config', $searchConfig->id());
         $siteSettings->set('advancedsearch_configs', [$searchConfig->id()]);
-        $siteSettings->set('advancedsearch_redirect_itemset', true);
+        $siteSettings->set('advancedsearch_redirect_itemset', 'first');
     }
 
     protected function installResources(): void

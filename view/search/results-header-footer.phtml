@@ -79,7 +79,7 @@ $multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['lis
 
 <?php if (isset($displayParts['paginator'])): ?>
 <div class="search-results-count <?= isset($displayParts['total_results']) ? 'no-total-results' : '' ?>">
-    <?= $itemSet
+    <?= $itemSet && $site && 'all' === $this->siteSetting('advancedsearch_redirect_itemset')
         ? $this->paginationSearch('common/pagination', $response->getTotalResults(), $response->getCurrentPage(), $response->getPerPage())
         : $this->pagination('common/pagination') ?>
 </div>

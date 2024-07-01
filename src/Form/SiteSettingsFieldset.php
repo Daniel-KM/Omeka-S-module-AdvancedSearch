@@ -94,15 +94,20 @@ class SiteSettingsFieldset extends Fieldset
             // TODO Move the option to redirect item set to search page or a search page setting?
             ->add([
                 'name' => 'advancedsearch_redirect_itemset',
-                'type' => Element\Checkbox::class,
+                'type' => CommonElement\OptionalRadio::class,
                 'options' => [
                     'element_group' => 'advanced_search',
                     'label' => 'Redirect item set page to search', // @translate
+                    'value_options' => [
+                        '' => 'No', // @translate
+                        'first' => 'First page only (default Omeka)', // @translate
+                        'all' => 'All pages', // @translate
+                    ],
                     'info' => 'By default, item-set/show is redirected to item/browse. This option redirects it to the search page.', // @translate
                 ],
                 'attributes' => [
                     'id' => 'advancedsearch_redirect_itemset',
-                    'value' => true,
+                    'value' => '',
                 ],
             ])
         ;

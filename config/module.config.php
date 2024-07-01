@@ -394,7 +394,7 @@ return [
             ],
             'advancedsearch_main_config' => 1,
             'advancedsearch_configs' => [1],
-            'advancedsearch_redirect_itemset' => true,
+            'advancedsearch_redirect_itemset' => 'first',
         ],
         'block_settings' => [
             'searchingForm' => [

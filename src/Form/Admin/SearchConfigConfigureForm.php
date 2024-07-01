@@ -564,6 +564,23 @@ nlres = is not linked with resource with ID
                 ],
             ])
             ->add([
+                'name' => 'facets_filters',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Facets as filters', // @translate
+                    'value_options' => [
+                        'none' => 'No', // @translate
+                        'header' => 'Results header', // @translate
+                        'footer' => 'Results footer', // @translate
+                        'both' => 'Both', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'facets_filters',
+                    'value' => 'none',
+                ],
+            ])
+            ->add([
                 'name' => 'grid_list',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [

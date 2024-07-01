@@ -6,6 +6,8 @@
  * Some form fields are useless, they are added as an example.
  *
  * When created, it can be modified in the admin board.
+ *
+ * @var \Laminas\I18n\View\Helper\Translate $translate
  */
 return [
     '@context' => null,
@@ -189,6 +191,7 @@ return [
             'paginator' => 'header',
             'per_pages' => 'header',
             'sort' => 'header',
+            'facets_filters' => 'none',
             'grid_list' => 'header',
             'grid_list_mode' => 'auto',
             'facets' => 'before',

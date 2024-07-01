@@ -51,7 +51,7 @@ if (!empty($itemSet)) {
 $options = $searchConfig->setting('facet', []);
 ?>
 
-<aside class="search-facets">
+<div class="search-facets search-facets-filters">
 
     <?php if ($facetsLabel = $searchConfig->subSetting('facet', 'label', $translate('Facets'))): ?>
     <h3><?= $escape($facetsLabel) ?></h3>
@@ -118,4 +118,4 @@ $options = $searchConfig->setting('facet', []);
 
     </form>
 
-</aside>
+</div>

@@ -427,7 +427,7 @@ TODO
 - [ ] Add an option to replace the default Omeka search form.
 - [ ] Improve the internal autosuggester to return the list of next words when space.
 - [x] Use a "or" for facets of each group.
-- [ ] Manage pagination when item set is redirected to search.
+- [x] Manage pagination when item set is redirected to search.
 - [ ] Reorder items in items set (from module Next, see MvcListeners).
 - [ ] Integrate the override in a way a direct call to adapter->buildQuery() can work with advanced property search (see Reference and some other modules).
 - [ ] Rename search config "name" by "title" or "label".

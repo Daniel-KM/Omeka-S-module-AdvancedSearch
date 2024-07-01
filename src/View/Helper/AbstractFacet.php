@@ -287,7 +287,7 @@ class AbstractFacet extends AbstractHelper
                 if (!is_numeric($value)) {
                     return $value;
                 }
-                if ($this->tree) {
+                if (!empty($this->tree)) {
                     if (is_numeric($value)) {
                         return $this->tree[$value]['title'] ?? $value;
                     }

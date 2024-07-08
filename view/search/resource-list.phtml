@@ -48,9 +48,9 @@ $defaultThumbnail = '<img loading="lazy" src="' . $assetUrl('thumbnails/default.
         // Can be simplified in the public theme.
         $resourceUrl = $site ? $resource->siteUrl($siteSlug) : $resource->adminUrl($siteSlug);
         $heading = $headingTerm ? $resource->value($headingTerm, ['lang' => $langValue]) : null;
-        $heading = $heading ? $heading->asHtml() : $escape($resource->displayTitle($untitled, $lang));
+        $heading = $heading ? $heading->asHtml() : $escape($resource->displayTitle($untitled, $langValue));
         $body = $bodyTerm ? $resource->value($bodyTerm, ['lang' => $langValue]) : null;
-        $body = $body ? $body->asHtml() : $escape($resource->displayDescription(null, $lang));
+        $body = $body ? $body->asHtml() : $escape($resource->displayDescription(null, $langValue));
         $resourceType = $resource->getControllerName();
         $resourceThumbnail = $thumbnail($resource, 'medium') ?: $defaultThumbnail;
     ?>

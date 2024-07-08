@@ -410,7 +410,8 @@ class Module extends AbstractModule
 
         /** @var \Omeka\Mvc\Status $status */
         $status = $services->get('Omeka\Status');
-        if ($status->isApiRequest()) {
+        $isApiRequest = $status->isApiRequest();
+        if ($isApiRequest) {
             return;
         }
 
@@ -423,7 +424,12 @@ class Module extends AbstractModule
         $searchConfigs = $settings->get('advancedsearch_all_configs', []);
 
         // A specific check to manage site admin or public site.
+        // The site slug is required to build public routes in background job.
         $siteSlug = $status->getRouteParam('site-slug');
+        if (!$siteSlug) {
+            $defaultSite = $services->get('ViewHelperManager')->get('defaultSite');
+            $siteSlug = $defaultSite('slug');
+        }
 
         $isAdminRequest = $status->isAdminRequest();
         if ($isAdminRequest) {

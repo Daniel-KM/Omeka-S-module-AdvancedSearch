@@ -1470,12 +1470,18 @@ class SearchResources extends AbstractPlugin
                         // resource and without uri.
                         $predicateExpr = $expr->andX(
                             $expr->isNull("$valuesAlias.valueResource"),
-                            $expr->isNull("$valuesAlias.uri")
+                            $expr->orX(
+                                $expr->isNull("$valuesAlias.uri"),
+                                $expr->eq("$valuesAlias.uri", '')
+                            )
                         );
                     } elseif ($value === 'resource') {
                         $predicateExpr = $expr->isNotNull("$valuesAlias.valueResource");
                     } elseif ($value === 'uri') {
-                        $predicateExpr = $expr->isNotNull("$valuesAlias.uri");
+                        $predicateExpr = $expr->andX(
+                            $expr->isNotNull("$valuesAlias.uri"),
+                            $expr->neq("$valuesAlias.uri", '')
+                        );
                     } else {
                         $predicateExpr = $expr->eq(1, 0);
                     }
@@ -1487,7 +1493,10 @@ class SearchResources extends AbstractPlugin
                     // resource and without uri.
                     $predicateExpr = $expr->andX(
                         $expr->isNull("$valuesAlias.valueResource"),
-                        $expr->isNull("$valuesAlias.uri")
+                        $expr->orX(
+                            $expr->isNull("$valuesAlias.uri"),
+                            $expr->eq("$valuesAlias.uri", '')
+                        )
                     );
                     break;
 
@@ -1496,7 +1505,10 @@ class SearchResources extends AbstractPlugin
                     break;
 
                 case 'tpu':
-                    $predicateExpr = $expr->isNotNull("$valuesAlias.uri");
+                    $predicateExpr = $expr->andX(
+                        $expr->isNotNull("$valuesAlias.uri"),
+                        $expr->neq("$valuesAlias.uri", '')
+                    );
                     break;
 
                 case 'dtp':

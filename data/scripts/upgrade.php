@@ -682,7 +682,7 @@ SQL;
     $sql = <<<SQL
 UPDATE `search_config`
 SET
-    `settings` = REPLACE(`settings`, '"display":{', '"display":{"facets":"after"')
+    `settings` = REPLACE(`settings`, '"display":{', '"display":{"facets":"after",')
 ;
 SQL;
     $connection->executeStatement($sql);
@@ -701,4 +701,25 @@ if (version_compare($oldVersion, '3.4.25', '<')) {
         'The option to redirect item set to search was improved to manage all pages.' // @translate
     );
     $messenger->addSuccess($message);
+}
+
+if (version_compare($oldVersion, '3.4.26', '<')) {
+    // Fixed upgrade to 3.4.24.
+    $sql = <<<SQL
+UPDATE `search_config`
+SET
+    `settings` = REPLACE(
+    REPLACE(
+    REPLACE(
+    REPLACE(
+    REPLACE(
+    `settings`,
+    '"after""', '"after","'),
+    '""search_filters"', ',","search_filters"'),
+    '"after"search_filters"', '"after","search_filters"'),
+    ':",', ':"",'),
+    ':"}', ':""}')
+;
+SQL;
+    $connection->executeStatement($sql);
 }

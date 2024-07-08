@@ -461,11 +461,12 @@ class SearchConfigController extends AbstractActionController
         }
 
         $advanced = $settings['form']['filters'][$keyAdvancedFilter];
-        $settings['form']['advanced'] = $advanced['fields'];
-        $settings['form']['max_number'] = $advanced['max_number'];
-        $settings['form']['field_joiner'] = (bool) $advanced['field_joiner'];
+        $settings['form']['advanced'] = $advanced['fields'] ?? [];
+        $settings['form']['default_number'] = (int) ($advanced['default_number'] ?? 1);
+        $settings['form']['max_number'] = (int) ($advanced['max_number'] ?? 10);
+        $settings['form']['field_joiner'] = (bool) ($advanced['field_joiner'] ?? false);
         $settings['form']['field_joiner_not'] = (bool) ($advanced['field_joiner_not'] ?? false);
-        $settings['form']['field_operator'] = (bool) $advanced['field_operator'];
+        $settings['form']['field_operator'] = (bool) ($advanced['field_operator'] ?? false);
         $settings['form']['field_operators'] = $advanced['field_operators'] ?? [];
         $settings['form']['filters'][$keyAdvancedFilter] = [
             'field' => 'advanced',
@@ -560,6 +561,7 @@ class SearchConfigController extends AbstractActionController
             if (!$advanced) {
                 unset(
                     $params['form']['advanced'],
+                    $params['form']['default_number'],
                     $params['form']['max_number'],
                     $params['form']['field_joiner'],
                     $params['form']['field_joiner_not'],
@@ -577,13 +579,15 @@ class SearchConfigController extends AbstractActionController
         }
 
         $params['form']['filters'][$keyAdvanced]['fields'] = $advanced;
-        $params['form']['filters'][$keyAdvanced]['max_number'] = $params['form']['max_number'] ?? 5;
+        $params['form']['filters'][$keyAdvanced]['default_number'] = $params['form']['default_number'] ?? 1;
+        $params['form']['filters'][$keyAdvanced]['max_number'] = $params['form']['max_number'] ?? 10;
         $params['form']['filters'][$keyAdvanced]['field_joiner'] = $params['form']['field_joiner'] ?? false;
         $params['form']['filters'][$keyAdvanced]['field_joiner_not'] = $params['form']['field_joiner_not'] ?? false;
         $params['form']['filters'][$keyAdvanced]['field_operator'] = $params['form']['field_operator'] ?? false;
         $params['form']['filters'][$keyAdvanced]['field_operators'] = $params['form']['field_operators'] ?? [];
         unset(
             $params['form']['advanced'],
+            $params['form']['default_number'],
             $params['form']['max_number'],
             $params['form']['field_joiner'],
             $params['form']['field_joiner_not'],

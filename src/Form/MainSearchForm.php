@@ -427,7 +427,9 @@ class MainSearchForm extends Form
 
     protected function searchAdvanced(array $filter): ?ElementInterface
     {
-        if (empty($filter['max_number'])) {
+        $defaultNumber = empty($filter['default_number']) ? 0 : (int) $filter['default_number'];
+        $maxNumber = empty($filter['max_number']) ? 0 : (int) $filter['max_number'];
+        if (!$defaultNumber && !$maxNumber) {
             return null;
         }
 
@@ -446,7 +448,8 @@ class MainSearchForm extends Form
             ->setAttribute('data-field-type', 'filter')
             ->setOptions([
                 'label' => $filter['label'],
-                'count' => (int) $filter['max_number'],
+                // TODO The max number is required to fill the current query?
+                'count' => max($defaultNumber, $maxNumber),
                 'should_create_template' => true,
                 'allow_add' => true,
                 'target_element' => $advanced,
@@ -454,6 +457,9 @@ class MainSearchForm extends Form
             ])
             ->setAttributes([
                 'id' => 'search-filters',
+                // TODO Remove this attribute data and use only search config.
+                'data-count-default' => $defaultNumber,
+                'data-count-max' => $maxNumber,
             ] + $this->elementAttributes)
         ;
 

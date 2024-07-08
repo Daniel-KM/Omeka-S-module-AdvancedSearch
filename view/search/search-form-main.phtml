@@ -29,6 +29,22 @@ if ($form->has('submit')) {
     $submit = $form->get('submit');
     $form->remove('submit');
 }
+
+// To avoid to display all advanced search filters, so the js just add new ones:
+// TODO This new mechanism requires to update the js.
+/** @var \Laminas\Form\Fieldset $filters */
+/*
+$filters = $form->get('filter');
+if ($filters) {
+    $defaultCount = (int) $filters->getAttribute('data-count-default');
+    $i = 0;
+    foreach ($filters->getFieldsets() as $name => $element) {
+        if (++$i > max($defaultCount, count($params['filter']))) {
+            $filters->remove($name);
+        }
+    }
+}
+*/
 ?>
 
 <div id="advanced-search-form-wrapper">

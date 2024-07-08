@@ -722,4 +722,14 @@ SET
 ;
 SQL;
     $connection->executeStatement($sql);
+
+    // Add option "default_number" for advanced filters.
+    $sortLabel = $translate('Sort by');
+    $sql = <<<SQL
+UPDATE `search_config`
+SET
+    `settings` = REPLACE(`settings`, '"max_number":', '"default_number":1,"max_number":')
+;
+SQL;
+    $connection->executeStatement($sql);
 }

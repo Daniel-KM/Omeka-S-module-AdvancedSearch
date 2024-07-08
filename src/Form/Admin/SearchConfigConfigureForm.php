@@ -317,16 +317,32 @@ advanced = Filters = Advanced',
                 ],
             ])
             ->add([
-                'name' => 'max_number',
+                'name' => 'default_number',
                 'type' => Element\Number::class,
                 'options' => [
                     'label' => 'Number of advanced filters to display', // @translate
                     'info' => 'The filters may be managed via js for a better display.', // @translate
                 ],
                 'attributes' => [
+                    'id' => 'default_number',
+                    'required' => false,
+                    'value' => '1',
+                    'min' => '0',
+                    // A mysql query supports 61 arguments maximum.
+                    'max' => '49',
+                    'step' => '1',
+                ],
+            ])
+            ->add([
+                'name' => 'max_number',
+                'type' => Element\Number::class,
+                'options' => [
+                    'label' => 'Maximum number of advanced filters to display', // @translate
+                ],
+                'attributes' => [
                     'id' => 'max_number',
                     'required' => false,
-                    'value' => '5',
+                    'value' => '10',
                     'min' => '0',
                     // A mysql query supports 61 arguments maximum.
                     'max' => '49',
@@ -980,6 +996,10 @@ nlres = is not linked with resource with ID
         if ($inputFilter->has('form')) {
             $inputFilter
                 ->get('form')
+                ->add([
+                    'name' => 'default_number',
+                    'required' => false,
+                ])
                 ->add([
                     'name' => 'max_number',
                     'required' => false,

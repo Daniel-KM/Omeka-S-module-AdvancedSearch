@@ -2,7 +2,7 @@
 
 namespace AdvancedSearch\Form\Admin;
 
-use AdvancedSearch\Form\Element as AdvancedSearchElement;
+use Common\Form\Element as CommonElement;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 
@@ -24,7 +24,7 @@ class InternalConfigFieldset extends Fieldset
             ])
             ->add([
                 'name' => 'multifields',
-                'type' => AdvancedSearchElement\DataTextarea::class,
+                'type' => CommonElement\DataTextarea::class,
                 'options' => [
                     'label' => 'Multi-fields (filters and facets)', // @translate
                     'info' => 'List of fields that refers to multiple properties, formatted "name = label", then the list of properties and an empty line. The name must not be a property term or a reserved keyword.', // @translate

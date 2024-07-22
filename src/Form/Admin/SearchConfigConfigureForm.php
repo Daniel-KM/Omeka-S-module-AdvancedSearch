@@ -30,7 +30,6 @@
 
 namespace AdvancedSearch\Form\Admin;
 
-use AdvancedSearch\Form\Element as AdvancedSearchElement;
 use Common\Form\Element as CommonElement;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
@@ -221,7 +220,7 @@ class SearchConfigConfigureForm extends Form
 
             ->add([
                 'name' => 'filters',
-                'type' => AdvancedSearchElement\DataTextarea::class,
+                'type' => CommonElement\DataTextarea::class,
                 'options' => [
                     'label' => 'Filters', // @translate
                     'info' => 'List of filters that will be displayed in the search form. Format is "field = Label = Type = Options". The field should exist in all resources fields.', // @translate
@@ -298,7 +297,7 @@ advanced = Filters = Advanced',
             ])
             ->add([
                 'name' => 'advanced',
-                'type' => AdvancedSearchElement\DataTextarea::class,
+                'type' => CommonElement\DataTextarea::class,
                 'options' => [
                     'label' => 'Advanced filters', // @translate
                     'info' => 'List of filters that will be displayed in the search form. Format is "term = Label". The field should exist in all resources fields. Only properties are managed for internal search engine.', // @translate
@@ -709,7 +708,7 @@ nlres = is not linked with resource with ID
             ])
             ->add([
                 'name' => 'fields',
-                'type' => AdvancedSearchElement\DataTextarea::class,
+                'type' => CommonElement\DataTextarea::class,
                 'options' => [
                     'label' => 'Sort fields', // @translate
                     'info' => 'List of sort fields that will be displayed in the search page. Format is "term dir = Label".', // @translate
@@ -770,7 +769,7 @@ nlres = is not linked with resource with ID
             ])
             ->add([
                 'name' => 'facets',
-                'type' => AdvancedSearchElement\DataTextarea::class,
+                'type' => CommonElement\DataTextarea::class,
                 'options' => [
                     'label' => 'List of facets', // @translate
                     'info' => 'List of facets that will be displayed in the search page. Format is "field = Label = Input type = Options". Input types may be "Select" or "SelectRange". With internal sql engine, "SelectRange" orders values alphabetically. With Solr, "SelectRange" works only with date and numbers. "Tree" can be used for item sets when module ItemSetsTree is enabled and data indexed recursively. "Thesaurus = #xxx" can be used for properties when module Thesaurus is enabled. Options are a comma separateted list of arguments. For now, the main type ("literal", "uri" or "resource") can be specified to output only this main type.', // @translate

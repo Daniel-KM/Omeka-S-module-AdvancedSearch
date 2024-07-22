@@ -139,7 +139,7 @@ $this->headScript()
     <?= $this->pageTitle($itemSet->displayTitle(null, $langTitle), 2) ?>
     <h3><?= $translate('Item set') ?></h3>
     <div class="metadata">
-        <?= $itemSet->displayValues() ?>
+        <?= $this->resourcePageBlocks($itemSet)->getBlocks() ?>
     </div>
     <div class="item-set-items">
         <h3><?= $translate('Items') ?></h3>

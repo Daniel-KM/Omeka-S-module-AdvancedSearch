@@ -427,8 +427,20 @@ class Module extends AbstractModule
         // The site slug is required to build public routes in background job.
         $siteSlug = $status->getRouteParam('site-slug');
         if (!$siteSlug) {
-            $defaultSite = $services->get('ViewHelperManager')->get('defaultSite');
-            $siteSlug = $defaultSite('slug');
+            $helpers = $services->get('ViewHelperManager');
+            if ($helpers->has('defaultSite')) {
+                $defaultSite = $helpers->get('defaultSite');
+                $siteSlug = $defaultSite('slug');
+            } else {
+                $defaultSite = (int) $settings->get('default_site');
+                if ($defaultSite) {
+                    try {
+                        $site = $api->read('sites', ['id' => $defaultSite])->getContent();
+                        $siteSlug = $site->slug();
+                    } catch (\Exception $e) {
+                    }
+                }
+            }
         }
 
         $isAdminRequest = $status->isAdminRequest();
@@ -1136,11 +1148,17 @@ class Module extends AbstractModule
 
         // Take the search config of the default site or the first site, else the
         // default search config.
-        $defaultSite = (int) $settings->get('default_site');
-        if ($defaultSite) {
-            try {
-                $site = $api->read('sites', ['id' => $defaultSite])->getContent();
-            } catch (\Exception $e) {
+        $helpers = $services->get('ViewHelperManager');
+        if ($helpers->has('defaultSite')) {
+            $defaultSite = $helpers->get('defaultSite');
+            $site = $defaultSite();
+        } else {
+            $defaultSite = (int) $settings->get('default_site');
+            if ($defaultSite) {
+                try {
+                    $site = $api->read('sites', ['id' => $defaultSite])->getContent();
+                } catch (\Exception $e) {
+                }
             }
         }
         if ($site) {

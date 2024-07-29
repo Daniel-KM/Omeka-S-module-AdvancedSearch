@@ -446,6 +446,8 @@ class Module extends AbstractModule
         }
 
         // To avoid collision with module Search, the routes use the slug.
+        // The search slug is stored in options to simplify checks.
+        // TODO Where is it used? So keep it for now.
 
         $isAdminRequest = $status->isAdminRequest();
         if ($isAdminRequest) {
@@ -470,8 +472,8 @@ class Module extends AbstractModule
                                 'controller' => \AdvancedSearch\Controller\SearchController::class,
                                 'action' => 'search',
                                 'id' => $searchConfigId,
-                                // Store the page slug to simplify checks.
                                 'page-slug' => $searchConfigSlug,
+                                'search-slug' => $searchConfigSlug,
                             ],
                         ],
                         'may_terminate' => true,
@@ -486,8 +488,8 @@ class Module extends AbstractModule
                                         'controller' => \AdvancedSearch\Controller\SearchController::class,
                                         'action' => 'suggest',
                                         'id' => $searchConfigId,
-                                        // Store the page slug to simplify checks.
                                         'page-slug' => $searchConfigSlug,
+                                        'search-slug' => $searchConfigSlug,
                                     ],
                                 ],
                             ],
@@ -531,8 +533,8 @@ class Module extends AbstractModule
                             'controller' => \AdvancedSearch\Controller\SearchController::class,
                             'action' => 'search',
                             'id' => $searchConfigId,
-                            // Store the page slug to simplify checks.
                             'page-slug' => $searchConfigSlug,
+                            'search-slug' => $searchConfigSlug,
                         ],
                     ],
                     'may_terminate' => true,
@@ -547,8 +549,8 @@ class Module extends AbstractModule
                                     'controller' => \AdvancedSearch\Controller\SearchController::class,
                                     'action' => 'suggest',
                                     'id' => $searchConfigId,
-                                    // Store the page slug to simplify checks.
                                     'page-slug' => $searchConfigSlug,
+                                    'search-slug' => $searchConfigSlug,
                                 ],
                             ],
                         ],
@@ -563,8 +565,8 @@ class Module extends AbstractModule
                                     'action' => 'rss',
                                     'feed' => 'atom',
                                     'id' => $searchConfigId,
-                                    // Store the page slug to simplify checks.
                                     'page-slug' => $searchConfigSlug,
+                                    'search-slug' => $searchConfigSlug,
                                 ],
                             ],
                         ],
@@ -579,8 +581,8 @@ class Module extends AbstractModule
                                     'action' => 'rss',
                                     'feed' => 'rss',
                                     'id' => $searchConfigId,
-                                    // Store the page slug to simplify checks.
                                     'page-slug' => $searchConfigSlug,
+                                    'search-slug' => $searchConfigSlug,
                                 ],
                             ],
                         ],

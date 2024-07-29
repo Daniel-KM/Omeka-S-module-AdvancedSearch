@@ -5,7 +5,6 @@ namespace AdvancedSearch\Mvc;
 use Laminas\EventManager\AbstractListenerAggregate;
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\Mvc\MvcEvent;
-
 use Laminas\Router\Http\RouteMatch;
 
 class MvcListeners extends AbstractListenerAggregate
@@ -73,6 +72,7 @@ class MvcListeners extends AbstractListenerAggregate
             'id' => $searchConfigId,
             'item-set-id' => $itemSetId,
             'page-slug' => $searchConfigSlug,
+            'search-slug' => $searchConfigSlug,
         ];
         $routeMatch = new RouteMatch($params);
         $routeMatch->setMatchedRouteName('search-page-' . $searchConfigSlug);

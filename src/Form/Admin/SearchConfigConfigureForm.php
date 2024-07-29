@@ -917,8 +917,8 @@ new = does not end with
                 'name' => 'facets',
                 'type' => CommonElement\IniTextarea::class,
                 'options' => [
-                    'label' => 'List of facets', // @translate
-                    'info' => 'List of facets that will be displayed in the search page, formatted as ini. The section is a unique name. Keys are: field, label, type, order, limit, languages, data_types, main_types, values, display_count, and specific options, like thesaurus, min and max.', // @translate
+                    'label' => 'Facets', // @translate
+                    'info' => 'List of facets that will be displayed in the search page, formatted as ini. The section is a unique name. Keys are: field, label, type, order, limit, more, languages, data_types, main_types, values, display_count, and specific options, like thesaurus, min and max.', // @translate
                     // TODO Convert documentation into help. See application/view/common/form-row.phtml
                     'documentation' => nl2br(<<<'MARKDOWN'
                         #"></a><div class="field-description">
@@ -988,20 +988,6 @@ new = does not end with
                 ])
                 ->add([
                     'name' => 'max_number',
-                    'required' => false,
-                ])
-            ;
-        }
-
-        if ($inputFilter->has('facet')) {
-            $inputFilter
-                ->get('facet')
-                ->add([
-                    'name' => 'limit',
-                    'required' => false,
-                ])
-                ->add([
-                    'name' => 'languages',
                     'required' => false,
                 ])
             ;

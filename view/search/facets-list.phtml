@@ -18,6 +18,7 @@ if (!count($searchFacets)) return;
 $plugins = $this->getHelperPluginManager();
 $escape = $plugins->get('escapeHtml');
 $translate = $plugins->get('translate');
+$escapeAttr = $plugins->get('escapeHtmlAttr');
 
 $facets = $response->getFacetCounts();
 $activeFacets = $response->getActiveFacets();
@@ -87,6 +88,11 @@ if (!empty($itemSet)) {
             <li class="facet">
                 <h4><?= $escape($translate($facetOptions['label'] ?? $name)) ?></h4>
                 <?= $facetElements($name, $facetValues, $facetOptions) ?>
+                <?php if (($facetOptions['more'] ?? '') !== '' && in_array($facetOptions['type'] ?? '', ['', 'Checkbox']) && count($facetValues) > (int) $facetOptions['more']): ?>
+                <div class="facet-see-more">
+                    <button type="button" class="facet-see-more-or-less expand" data-default-count="<?= (int) $facetOptions['more'] ?>" data-more-count="<?= count($facetValues) - (int) $facetOptions['more'] ?>" data-label-see-more="<?= $escapeAttr($translate('See more')) ?>" data-label-see-less="<?= $escapeAttr($translate('See less')) ?>"><?= $escape($translate('See more')) ?></button>
+                </div>
+                <?php endif; ?>
             </li>
             <?php endforeach; ?>
         </ul>

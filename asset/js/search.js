@@ -264,6 +264,30 @@ $(document).ready(function() {
         }
     });
 
+    function facetSeeMoreOrLess(button) {
+        button = $(button);
+        if (button.hasClass('expand')) {
+            button.text(button.attr('data-label-see-more') ? button.attr('data-label-see-more') : Omeka.jsTranslate('See more'));
+            const defaultCount = Number(button.attr('data-default-count')) + 1;
+            button.closest('.facet').find('.facet-items .facet-item:nth-child(n+' + defaultCount + ')').attr('hidden', 'hidden');
+        } else {
+            button.text(button.attr('data-label-see-less') ? button.attr('data-label-see-less') : Omeka.jsTranslate('See less'));
+            button.closest('.facet').find('.facet-items .facet-item').removeAttr('hidden');
+        }
+    }
+
+    $('.facets').on('click', '.facet-see-more-or-less', function() {
+        const button = $(this);
+        if (button.hasClass('expand')) {
+            $(this).removeClass('expand').addClass('collapse');
+        } else {
+            $(this).removeClass('collapse').addClass('expand');
+        }
+        facetSeeMoreOrLess(button);
+    });
+
+    $('.facet-see-more-or-less').each((index, button) => facetSeeMoreOrLess(button));
+
     /**
      * Search range double / sliders
      *

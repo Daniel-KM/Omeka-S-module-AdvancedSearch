@@ -206,10 +206,11 @@
     /* Search facets */
 
     .search-facets {
-        flex-basis: 25%;
+        /* flex-basis: 18.75%;*/
         order: -1;
         padding: 0 0.5em;
         min-width: 240px;
+        max-width: 400px;
     }
 
     .facets .facets-list {
@@ -278,9 +279,6 @@
     .facet-items li[data-level="12"] input {
         margin-left: 144px;
     }
-    .facet-item {
-        display: block;
-    }
     .facet-item input[type=checkbox] {
         vertical-align: initial;
     }
@@ -292,6 +290,27 @@
     }
     .facet-item .active a::before {
         content: "\f14a";
+    }
+
+    .facet-see-more {
+        /* text-align: right; */
+        margin: 0.5em 0
+    }
+    .facet-see-more-or-less {
+        display: inline-block;
+        background: initial;
+        border: none;
+        box-shadow: initial;
+        text-align: center;
+        cursor: pointer;
+        padding: 6px 10px;
+        margin: 0;
+    }
+    .facet-see-more-or-less::after {
+        margin-left: 6px;
+    }
+    .facet-see-more-or-less.collapse::after {
+        content: "";
     }
 
     /* Search range */

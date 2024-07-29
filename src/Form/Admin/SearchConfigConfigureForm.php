@@ -880,7 +880,7 @@ new = does not end with
                 'type' => CommonElement\IniTextarea::class,
                 'options' => [
                     'label' => 'List of facets', // @translate
-                    'info' => 'List of facets that will be displayed in the search page, formatted as ini. The section is a unique name. Keys are: field, label, type, order, limit, languages, data_types, main_types, values, display_list, display_count, options.', // @translate
+                    'info' => 'List of facets that will be displayed in the search page, formatted as ini. The section is a unique name. Keys are: field, label, type, order, limit, languages, data_types, main_types, values, display_list, display_count, and specific options, like thesaurus.', // @translate
                     // TODO Convert documentation into help. See application/view/common/form-row.phtml
                     'documentation' => nl2br(<<<'MARKDOWN'
                         #"></a>
@@ -888,7 +888,7 @@ new = does not end with
                         - With internal sql engine, "SelectRange" orders values alphabetically. With Solr, "SelectRange" works only with date and numbers.
                         - With type "Thesaurus", the option "thesaurus" should be set with the id. It requires the module Thesaurus.
                         - "Tree" can be used for item sets when module ItemSetsTree is enabled and data indexed recursively.
-                        - Order may be "default", "alphabetic asc", "alphabetic desc", "total asc", "total desc", "values asc", "values desc".
+                        - Order may be "alphabetic" (asc), "alphabetic desc", "total" (desc), "total asc", "values" (asc), "values desc".
                         - "languages" allows to filter values by language. It is a single or list of language codes. To get the values without language too, use "null".
                         - "data_types" allows to filter values by some specific data types, for example a custom vocab.
                         - "main_types" allows to filter values by main data type ("literal", "uri" or "resource").

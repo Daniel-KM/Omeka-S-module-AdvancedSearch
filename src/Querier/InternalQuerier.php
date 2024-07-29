@@ -878,12 +878,22 @@ SQL;
         ];
 
         $facetOrders = [
+            // Default alphabetic order is asc.
+            'alphabetic' => [
+                'sort_by' => 'alphabetic',
+                'sort_order' => 'ASC',
+            ],
             'alphabetic asc' => [
                 'sort_by' => 'alphabetic',
                 'sort_order' => 'ASC',
             ],
             'alphabetic desc' => [
                 'sort_by' => 'alphabetic',
+                'sort_order' => 'DESC',
+            ],
+            // Default total order is desc.
+            'total' => [
+                'sort_by' => 'total',
                 'sort_order' => 'DESC',
             ],
             'total asc' => [
@@ -894,6 +904,11 @@ SQL;
                 'sort_by' => 'total',
                 'sort_order' => 'DESC',
             ],
+            // Default values order is asc.
+            'values' => [
+                'sort_by' => 'values',
+                'sort_order' => 'ASC',
+            ],
             'values asc' => [
                 'sort_by' => 'values',
                 'sort_order' => 'ASC',
@@ -902,6 +917,7 @@ SQL;
                 'sort_by' => 'values',
                 'sort_order' => 'DESC',
             ],
+            // Default values order is alphabetic asc.
             'default' => [
                 'sort_by' => 'alphabetic',
                 'sort_order' => 'ASC',

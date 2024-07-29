@@ -5,8 +5,7 @@
  * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
  * @var \AdvancedSearch\Query $query
  * @var \AdvancedSearch\Response $response
- * @var string $title
- * @var string $resourceName
+ * @var ?string $resourceName
  */
 
 // A check is done: when page is not first, the resources may be empty even with results.
@@ -40,9 +39,6 @@ $gridListMode = $searchConfig ? $searchConfig->subSetting('display', 'grid_list_
 $defaultThumbnail = sprintf('<img loading="lazy" src="%1$s" title="%2$s"/>', $assetUrl('thumbnails/default.png', 'Omeka', true), $translate('No media'));
 ?>
 
-<?php if ($title): ?>
-<h3><?= $escape($title) ?></h3>
-<?php endif; ?>
 <ul class="resource-list search-results-list<?= $gridListMode === 'list_only' ? ' list' : ($gridListMode === 'grid_only' ? ' grid' : '') ?>">
     <?php /** @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource */
     foreach ($resources as $resource):

@@ -58,17 +58,20 @@ $setting = $plugins->get($isAdmin ? 'setting' : 'siteSetting');
 $filterLocale = (bool) $setting('filter_locale_values');
 $lang = $this->lang();
 $langTitle = $filterLocale ? $lang : null;
-$langValue = $filterLocale ? [$lang, ''] : null;
+// $langValue = $filterLocale ? [$lang, ''] : null;
 
-// Used in case of a redirect of item-set/show to search, when used like item/browse.
-$itemSetId = $this->params()->fromRoute('item-set-id');
 // TODO Use site item set ?
+// Used in case of a redirect of item-set/show to search, when used like item/browse.
 /** @var \Omeka\Api\Representation\ItemSetRepresentation $itemSet */
-$itemSet = $itemSetId ? $api->searchOne('item_sets', ['id' => $itemSetId])->getContent() : null;
+$itemSetId = (int) $this->params()->fromRoute('item-set-id');
+$itemSet = $itemSetId ? $api->read('item_sets', ['id' => $itemSetId])->getContent() : null;
+$vars->offsetSet('itemSet', $itemSet);
+
+$variables = $vars->getArrayCopy();
 
 $isPartial = $skipFormAction = !empty($skipFormAction);
 
-$documentCount = isset($response) ? $response->getTotalResults() : 0;
+$documentCount = $response->getTotalResults();
 if ($documentCount) {
     $itemSetsCount = $response->getResourceTotalResults('item_sets');
     $itemsCount = $response->getResourceTotalResults('items');
@@ -126,12 +129,11 @@ $this->headScript()
 <?php endif; ?>
 
 <div id="search-page">
-<?php endif; ?>
+<?php endif; // End isPartial. ?>
 
 <?php if ($displayItemSet): ?>
 
     <?php
-    $vars->offsetSet('itemSet', $itemSet);
     $vars->offsetSet('resourceType', 'item_sets'); // TODO Check if really needed.
     $this->htmlElement('body')->appendAttribute('class', 'search-page item-set resource browse');
     ?>
@@ -153,18 +155,12 @@ $this->headScript()
 
 <?= $searchConfig->renderForm(['template' => null, 'skip_form_action' => $skipFormAction]) ?>
 
-<?php if (isset($response)): ?>
-
 <div class="search-results-wrapper">
 
     <?php if ($displayFacets === 'before'): ?>
-    <?= $partial('search/facets-list', [
-        'site' => $site,
-        'searchConfig' => $searchConfig,
-        'query' => $query,
-        'response' => $response,
-        'itemSet' => $itemSet,
-    ]) ?>
+    <aside class="search-facets">
+        <?= $partial('search/facets-list') ?>
+    </aside>
     <?php endif; ?>
 
     <div class="search-results">
@@ -173,98 +169,56 @@ $this->headScript()
 
         <?php if ($displayPartsHeader): ?>
         <div class="search-results-part search-results-header">
-            <?= $partial('search/results-header-footer', [
-                'site' => $site,
-                'searchConfig' => $searchConfig,
-                'query' => $query,
-                'response' => $response,
-                'itemSet' => $itemSet,
-                'resultPart' => 'header',
-                'documentCount' => $documentCount,
-            ]) ?>
+            <?= $partial('search/results-header-footer', $variables + ['resultPart' => 'header']) ?>
         </div>
         <?php endif; ?>
 
         <div class="search-results-part search-results-list">
-            <?php if ($itemSetsCount): ?>
-            <?= $partial('search/results', [
-                'site' => $site,
-                'searchConfig' => $searchConfig,
-                'query' => $query,
-                'response' => $response,
-                'title' => sprintf($translatePlural('%s item set', '%s item sets', $itemSetsCount), $itemSetsCount),
-                'resourceName' => 'item_sets',
-            ]) ?>
+            <?php if ($itemSetsCount): // Title is kept temporarily for compatibility with old themes. ?>
+            <h3><?= $escape($title = sprintf($translatePlural('%d item set', '%d item sets', $itemSetsCount), $itemSetsCount)) ?></h3>
+            <?= $partial('search/results', $variables + ['resourceName' => 'item_sets', 'title' => $title]) ?>
             <?php endif; ?>
 
             <?php if ($itemsCount): ?>
-            <?= $partial('search/results', [
-                'site' => $site,
-                'searchConfig' => $searchConfig,
-                'query' => $query,
-                'response' => $response,
-                'title' => sprintf($translatePlural('%s item', '%s items', $itemsCount), $itemsCount),
-                'resourceName' => 'items',
-            ]) ?>
+            <h3><?= $escape($title = sprintf($translatePlural('%d item', '%d items', $itemsCount), $itemsCount)) ?></h3>
+            <?= $partial('search/results', $variables + ['resourceName' => 'items', 'title' => $title]) ?>
             <?php endif; ?>
         </div>
 
         <?php if ($displayPartsFooter): ?>
         <div class="search-results-part search-results-footer">
-            <?= $partial('search/results-header-footer', [
-                'site' => $site,
-                'searchConfig' => $searchConfig,
-                'query' => $query,
-                'response' => $response,
-                'itemSet' => $itemSet,
-                'resultPart' => 'footer',
-                'documentCount' => $documentCount,
-            ]) ?>
+            <?= $partial('search/results-header-footer', $variables + ['resultPart' => 'footer']) ?>
         </div>
         <?php endif; ?>
 
         <?php else: ?>
 
-            <div class="noresults">
-                <?php if (empty($query) && !$itemSet): ?>
-                <?= $translate('Fill a query and get results.') ?>
-                <?php elseif (empty($query) && $itemSet): ?>
-                <?= $translate('This item set has no items.') ?>
-                <?php else: ?>
-                <?php if (in_array($searchConfig->subSetting('display', 'search_filters', 'header'), ['header', 'both'])): ?>
-                <div class="search-results-part search-results-header">
-                    <?= $this->searchingFilters($searchConfig, $query, ['template' => 'common/search-filters-links']) ?>
-                </div>
-                <?php endif; ?>
-                <?= $translate('Your query returned no results') ?>
-                <?php endif; ?>
+        <div class="noresults">
+            <?php if (empty($query) && !$itemSet): ?>
+            <?= $translate('Fill a query and get results.') ?>
+            <?php elseif (empty($query) && $itemSet): ?>
+            <?= $translate('This item set has no items.') ?>
+            <?php else: ?>
+            <?php if (in_array($searchConfig->subSetting('display', 'search_filters', 'header'), ['header', 'both'])): ?>
+            <div class="search-results-part search-results-header">
+                <?= $this->searchingFilters($searchConfig, $query, ['template' => 'common/search-filters-links']) ?>
             </div>
+            <?php endif; ?>
+            <?= $translate('The query returned no results') ?>
+            <?php endif; ?>
+        </div>
 
         <?php endif; ?>
 
     </div>
 
     <?php if ($displayFacets === 'after'): ?>
-    <?= $partial('search/facets-list', [
-        'site' => $site,
-        'searchConfig' => $searchConfig,
-        'query' => $query,
-        'response' => $response,
-        'itemSet' => $itemSet,
-    ]) ?>
+    <aside class="search-facets">
+        <?= $partial('search/facets-list') ?>
+    </aside>
     <?php endif; ?>
 
 </div>
-
-<?php else: ?>
-
-<div class="search-results-wrapper">
-    <div class="search-results">
-        <div class="noresults"><?= $translate('An error occured and your query returned no results.') ?></div>
-    </div>
-</div>
-
-<?php endif; ?>
 
 <?php if (empty($isPartial)): ?>
 </div>

@@ -3,9 +3,7 @@
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var string $name
  * @var array $facetValues With value, count, active, label and url when needed, and is_from and is_to.
- * @var array $options Facets options.
- * @var string|null $from
- * @var string|null $to
+ * @var array $options
  * @var int $total Total resources matching range.
  */
 
@@ -24,7 +22,7 @@ $displayCount = !empty($options['display_count']);
         <option value=""></option>
         <?php foreach ($facetValues as $facetValue): ?>
         <option value="<?= $escapeAttr($facetValue['value']) ?>"<?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($facetValue['url_from']) . '"' : '' ?><?= $facetValue['is_from'] ? ' selected="selected"' : '' ?>>
-            <?= $escape($facetValue['value']) ?><?php if ($displayCount): ?> (<span class="count"><?= $facetValue['count'] ?></span>)<?php endif; ?>
+            <?= $displayCount ? sprintf('%1$s (<span class="count">%2$s</span>)', $escape($facetValue['value']), $facetValue['count']) : $escape($facetValue['value']) ?>
         </option>
         <?php endforeach; ?>
     </select>
@@ -33,7 +31,7 @@ $displayCount = !empty($options['display_count']);
         <option value=""></option>
         <?php foreach ($facetValues as $facetValue): ?>
         <option value="<?= $escapeAttr($facetValue['value']) ?>"<?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($facetValue['url_to']) . '"' : '' ?><?= $facetValue['is_to'] ? ' selected="selected"' : '' ?>>
-            <?= $escape($facetValue['value']) ?><?php if ($displayCount): ?> (<span class="count"><?= $facetValue['count'] ?></span>)<?php endif; ?>
+            <?= $displayCount ? sprintf('%1$s (<span class="count">%2$s</span>)', $escape($facetValue['value']), $facetValue['count']) : $escape($facetValue['value']) ?>
         </option>
         <?php endforeach; ?>
     </select>

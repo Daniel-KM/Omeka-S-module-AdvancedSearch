@@ -339,6 +339,7 @@ class Query implements \JsonSerializable
      * - display_count
      * - start for range facets
      * - end for range facets
+     * - step for range facets
      * - thesaurus for thesaurus facets.
      * Other keys may be managed via module Search Solr, but not internal sql.
      * No check is done here.
@@ -441,6 +442,7 @@ class Query implements \JsonSerializable
     /**
      * Exclude fields from main search query, for example to exclude full text.
      * It is used for suggest queries too.
+     * @todo Clarify if excluded fields should be set separately for filters and facets.
      */
     public function setExcludedFields(array $excludedFields): self
     {

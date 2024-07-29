@@ -201,6 +201,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
 
     public function toQuery(array $request, array $formSettings): Query
     {
+        // TODO Prepare the full query here for simplification.
         $query = new Query;
 
         // Solr doesn't allow unavailable args anymore (invalid or unknown).
@@ -424,20 +425,32 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                     foreach ($value as $facetName => $facetValues) {
                         $firstFacetKey = key($facetValues);
                         if ($firstFacetKey === 'from' || $firstFacetKey === 'to') {
-                            // Reorder early when needed.
-                            // TODO Move to Query?
+                            // Don't reorder: if user wants something illogic,
+                            // return empty.
                             $facetRangeFrom = isset($facetValues['from']) && $facetValues['from'] !== ''
-                                ? $facetValues['from']
+                                ? (string) $facetValues['from']
                                 : null;
                             $facetRangeTo = isset($facetValues['to']) && $facetValues['to'] !== ''
-                                ? $facetValues['to']
+                                ? (string) $facetValues['to']
                                 : null;
-                            if (!is_null($facetRangeFrom) && !is_null($facetRangeTo) && ($facetRangeFrom <=> $facetRangeTo) > 0) {
-                                $facetRangeFromFrom = $facetRangeFrom;
-                                $facetRangeFrom = $facetRangeTo;
-                                $facetRangeTo = $facetRangeFromFrom;
+                            // Do not append a range from/to if it is the same
+                            // than the default value: it avoids useless active
+                            // facets. Of course, the facet range min/max should
+                            // be defined.
+                            $facetData = $formSettings['facet']['facets'][$facetName] ?? null;
+                            if ($facetData) {
+                                $min = ($facetData['min'] ?? '') === '' ? null : (string) $facetData['min'];
+                                if ($min !== null && $min === $facetRangeFrom) {
+                                    $facetRangeFrom = null;
+                                }
+                                $max = ($facetData['max'] ?? '') === '' ? null : (string) $facetData['max'];
+                                if ($max !== null && $max === $facetRangeTo) {
+                                    $facetRangeTo = null;
+                                }
                             }
-                            $query->addActiveFacetRange($facetName, $facetRangeFrom, $facetRangeTo);
+                            if ($facetRangeFrom !== null || $facetRangeTo !== null) {
+                                $query->addActiveFacetRange($facetName, $facetRangeFrom, $facetRangeTo);
+                            }
                         } else {
                             foreach ($facetValues as $facetValue) {
                                 $query->addActiveFacet($facetName, $facetValue);

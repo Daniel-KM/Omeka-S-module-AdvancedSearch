@@ -124,8 +124,6 @@ class FacetSelectRange extends AbstractFacet
             'name' => $facetField,
             'facetValues' => $facetValues,
             'options' => $options,
-            'from' => $rangeFrom,
-            'to' => $rangeTo,
             'total' => $total,
         ];
     }

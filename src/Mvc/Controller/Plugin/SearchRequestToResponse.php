@@ -79,6 +79,8 @@ class SearchRequestToResponse extends AbstractPlugin
             $request = ['*' => ''] + $request;
         }
 
+        // TODO Prepare the full query here for simplification (or in FormAdapter).
+
         $searchFormSettings = $searchConfigSettings['form'] ?? [];
 
         $this->searchEngine = $searchConfig->engine();
@@ -127,6 +129,10 @@ class SearchRequestToResponse extends AbstractPlugin
             $perPage = (int) $settings->get('pagination_per_page', Paginator::PER_PAGE);
         }
         $searchFormSettings['search']['per_page'] = $perPage ?: Paginator::PER_PAGE;
+
+        // Facets are needed to check active facets with range, where the
+        // default value should be skipped.
+        $searchFormSettings['facet'] = $searchConfigSettings['facet'] ?? [];
 
         /** @var \AdvancedSearch\Query $query */
         $query = $formAdapter->toQuery($request, $searchFormSettings);

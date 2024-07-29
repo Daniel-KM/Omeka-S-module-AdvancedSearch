@@ -19,12 +19,12 @@ $escapeAttr = $plugins->get('escapeHtmlAttr');
 
 $isFacetModeDirect = ($options['mode'] ?? '') === 'link';
 
-$min = $options['min'] ?? null;
-$max = $options['max'] ?? null;
-$step = $options['step'] ?? null;
-$minMaxStep = ($min === null || $min === '' ? '' : ' min="' . $escapeAttr($min) . '"')
-    . ($max === null  || $max === '' ? '' : ' max="' . $escapeAttr($max) . '"')
-    . ($step === null  || $step === '' ? '' : ' step="' . $escapeAttr($step) . '"');
+$min = (string) ($options['min'] ?? '');
+$max = (string) ($options['max'] ?? '');
+$step = (string) ($options['step'] ?? '');
+$minMaxStep = ($min === '' ? '' : ' min="' . $escapeAttr($min) . '"')
+    . ($max === '' ? '' : ' max="' . $escapeAttr($max) . '"')
+    . ($step === '' ? '' : ' step="' . $escapeAttr($step) . '"');
 ?>
 
 <div class="facet-range-double range-double">

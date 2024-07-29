@@ -537,7 +537,7 @@ new = does not end with
                 ],
             ])
             ->add([
-                'name' => 'per_pages',
+                'name' => 'per_page',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [
                     'label' => 'Pagination per page', // @translate
@@ -549,7 +549,7 @@ new = does not end with
                     ],
                 ],
                 'attributes' => [
-                    'id' => 'per_pages',
+                    'id' => 'per_page',
                     'value' => 'header',
                 ],
             ])
@@ -637,7 +637,7 @@ new = does not end with
             ])
             ->get('pagination')
             ->add([
-                'name' => 'per_pages',
+                'name' => 'per_page',
                 'type' => OmekaElement\ArrayTextarea::class,
                 'options' => [
                     'label' => 'Results per page', // @translate
@@ -646,7 +646,7 @@ new = does not end with
                     'key_value_separator' => '=',
                 ],
                 'attributes' => [
-                    'id' => 'per_pages',
+                    'id' => 'per_page',
                     'placeholder' => '10 = Results by 10
 25 = Results by 25
 50 = Results by 50

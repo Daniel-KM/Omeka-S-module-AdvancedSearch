@@ -189,7 +189,7 @@ return [
             'search_form_simple' => 'none',
             'search_form_quick' => 'none',
             'paginator' => 'header',
-            'per_pages' => 'header',
+            'per_page' => 'header',
             'sort' => 'header',
             'grid_list' => 'header',
             'grid_list_mode' => 'auto',
@@ -197,7 +197,7 @@ return [
         ],
 
         'pagination' => [
-            'per_pages' => [
+            'per_page' => [
                 // For translation only.
                 10 => $translate('Results by %d'), // @translate
                 10 => $translate('Results by 10'), // @translate

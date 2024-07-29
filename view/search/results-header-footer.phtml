@@ -22,7 +22,7 @@ $displayParts = [
     'search_form_simple' => 'none',
     'search_form_quick' => 'none',
     'paginator' => 'header',
-    'per_pages' => 'header',
+    'per_page' => 'header',
     'sort' => 'header',
     'grid_list' => 'header',
     'grid_list_mode' => 'auto',
@@ -30,7 +30,7 @@ $displayParts = [
 $displayParts = $searchConfig ? $searchConfig->setting('display', $displayParts) : $displayParts;
 $displayParts = array_filter($displayParts, fn ($v) => in_array($v, [$resultPart, 'both']));
 
-$paginationPerPages = isset($displayParts['per_pages']) ? $searchConfig->subSetting('pagination', 'per_pages') : [];
+$paginationPerPages = isset($displayParts['per_page']) ? $searchConfig->subSetting('pagination', 'per_page') : [];
 $sortFields = isset($displayParts['sort']) ? $searchConfig->subSetting('sort', 'fields') : [];
 $gridListMode = $searchConfig->subSetting('display', 'grid_list_mode', 'auto');
 $multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['list_only', 'grid_only']);

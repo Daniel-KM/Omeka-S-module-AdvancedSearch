@@ -16,6 +16,7 @@
         gap: 0.25rem;
     }
     #advanced-search #property-queries .inputs > .value .joiner + .chosen-container,
+    #advanced-search #filter-queries .inputs > .value .joiner + .chosen-container,
     #advanced-search #datetime-queries .inputs > .value .joiner + .chosen-container {
         max-width: fit-content;
     }
@@ -24,6 +25,10 @@
     #advanced-search #property-queries .chosen-disabled,
     #advanced-search #property-queries.multi-value .value:first-child .joiner:first-of-type,
     #advanced-search #property-queries.multi-value .value:first-child .chosen-container:first-of-type,
+    #advanced-search #filter-queries .query-text:disabled,
+    #advanced-search #filter-queries .chosen-disabled,
+    #advanced-search #filter-queries.multi-value .value:first-child .joiner:first-of-type,
+    #advanced-search #filter-queries.multi-value .value:first-child .chosen-container:first-of-type,
     #advanced-search #datetime-queries .query-text:disabled,
     #advanced-search #datetime-queries.multi-value .value:first-child .joiner:first-of-type
     #advanced-search #datetime-queries.multi-value .value:first-child .chosen-container:first-of-type {
@@ -33,18 +38,22 @@
         padding: 4px;
     }
 
-    #advanced-search #property-queries .chosen-container-multi .chosen-choices .search-choice {
+    #advanced-search #property-queries .chosen-container-multi .chosen-choices .search-choice,
+    #advanced-search #filter-queries .chosen-container-multi .chosen-choices .search-choice {
         max-width: 24em;
     }
 
-    #advanced-search #property-queries .query-form-element {
+    #advanced-search #property-queries .query-form-element,
+    #advanced-search #filter-queries .query-form-element {
         display: none;
     }
-    #advanced-search #property-queries .query-text.hide {
+    #advanced-search #property-queries .query-text.hide,
+    #advanced-search #filter-queries .query-text.hide {
         display: none;
     }
 
-    #advanced-search #property-queries .inputs > .value {
+    #advanced-search #property-queries .inputs > .value,
+    #advanced-search #filter-queries .inputs > .value {
         display: flex;
         flex-direction: column;
         gap: .25rem 0;

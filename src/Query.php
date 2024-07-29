@@ -290,10 +290,10 @@ class Query implements JsonSerializable
      * Note: Some types and joiners may not be managed by the querier.
      * @todo Support multi-fields (name).
      */
-    public function addFilterQuery(string $name, $value, ?string $type = 'in', ?string $join = 'and'): self
+    public function addFilterQuery(string $name, $val, ?string $type = 'in', ?string $join = 'and'): self
     {
         $this->filtersQuery[$name][] = [
-            'value' => trim((string) $value),
+            'val' => trim((string) $val),
             'type' => trim((string) $type),
             'join' => trim((string) $join),
         ];

@@ -103,6 +103,7 @@ class ApiFormAdapter implements FormAdapterInterface
 
         $this->buildMetadataQuery($query, $request, $formSettings);
         $this->buildPropertyQuery($query, $request, $formSettings);
+        $this->buildFilterQuery($query, $request, $formSettings);
 
         return $query;
     }
@@ -248,6 +249,83 @@ class ApiFormAdapter implements FormAdapterInterface
                     // no break;
                 case isset(SearchResources::FIELD_QUERY['reciprocal'][$queryType]):
                     $query->addFilterQuery($propertyField, $value, $queryType);
+                    break;
+
+                default:
+                    continue 2;
+            }
+        }
+    }
+
+    /**
+     * Apply search of filters into a search query.
+     *
+     * @see \Omeka\Api\Adapter\AbstractResourceEntityAdapter::buildPropertyQuery()
+     *
+     * @todo Manage negative search and missing parameters.
+     *
+     * @param Query $query
+     * @param array $request
+     * @param array $formSettings
+     */
+    protected function buildFilterQuery(Query $query, array $request, array $formSettings): void
+    {
+        if (!isset($request['filter']) || !is_array($request['filter']) || empty($formSettings['properties'])) {
+            return;
+        }
+
+        $properties = array_filter($formSettings['properties']);
+        if (empty($properties)) {
+            return;
+        }
+
+        foreach ($request['filter'] as $queryRow) {
+            if (!(is_array($queryRow)
+                && array_key_exists('field', $queryRow)
+                && array_key_exists('type', $queryRow)
+            )) {
+                continue;
+            }
+            $field = $queryRow['field'];
+            $queryType = $queryRow['type'];
+            // $join = $queryRow['join']) ?? null;
+            $val = $queryRow['val'] ?? null;
+
+            if (($val === null || $val === '' || $val === [])
+                && !in_array($queryType, SearchResources::FIELD_QUERY['value_none'])
+            ) {
+                continue;
+            }
+
+            // Narrow to specific property, if one is selected, else use search.
+            $property = $this->easyMeta->propertyTerm($field);
+            // TODO Manage empty properties (main search and "any property").
+            if (!$property) {
+                continue;
+            }
+            if (empty($properties[$property])) {
+                continue;
+            }
+            $propertyField = $properties[$property];
+
+            // $positive = true;
+
+            switch ($queryType) {
+                case 'eq':
+                    $query->addFilter($propertyField, $val);
+                    break;
+
+                case 'nlist':
+                case 'list':
+                    $list = is_array($val) ? $val : explode("\n", $val);
+                    $list = array_filter(array_map('trim', $list), 'strlen');
+                    if (empty($list)) {
+                        continue 2;
+                    }
+                    $val = $list;
+                    // no break;
+                case isset(SearchResources::FIELD_QUERY['reciprocal'][$queryType]):
+                    $query->addFilterQuery($propertyField, $val, $queryType);
                     break;
 
                 default:

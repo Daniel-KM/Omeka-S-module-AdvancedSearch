@@ -163,18 +163,18 @@ $(document).ready(function () {
     });
 
     /**
-     * Handle sub-query form according to property types (resq, nresq, lkq, nlkq).
+     * Handle sub-query form according to filter and property types (resq, nresq, lkq, nlkq).
      *
      * Note: ".query-type" is used instead of "[name^='property['][name$='][type]']".
      */
     const subQueryTypes= ['resq', 'nresq', 'lkq', 'nlkq'];
-    $('#property-queries').on('change', '.query-type', function () {
+    $('#filter-queries, #property-queries').on('change', '.query-type', function () {
         $(this).closest('.value').find('.query-form-element').css({
             display:  subQueryTypes.includes($(this).val()) ? 'block' : 'none',
         });
     });
     // On load.
-    $('#property-queries .value .query-form-element').filter(function() {
+    $('#filter-queries .value .query-form-element, #property-queries .value .query-form-element').filter(function() {
         return subQueryTypes.includes($(this).closest('.value').find('.query-type').val());
     }).show();
 

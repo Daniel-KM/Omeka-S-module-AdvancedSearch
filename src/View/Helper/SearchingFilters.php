@@ -113,22 +113,6 @@ class SearchingFilters extends AbstractHelper
             return is_array(reset($value)) ? $value[$firstKey] : [$value[$firstKey]];
         };
 
-        $flatArrayValueResourceIds = function ($value, array $titles): array {
-            if (is_array($value)) {
-                $firstKey = key($value);
-                if (is_numeric($firstKey)) {
-                    $values = $value;
-                } else {
-                    $values = is_array(reset($value)) ? $value[$firstKey] : [$value[$firstKey]];
-                }
-            } else {
-                $values = [$value] ;
-            }
-            $values = array_unique($values);
-            $values = array_combine($values, $values);
-            return array_replace($values, $titles);
-        };
-
         $skip = [
             'page' => null,
             'offset' => null,
@@ -247,113 +231,6 @@ class SearchingFilters extends AbstractHelper
                     }
                     break;
 
-                case 'filter':
-                    $value = array_filter($value, 'is_array');
-                    if (!count($value)) {
-                        break;
-                    }
-
-                    $queryTypesLabels = $this->getQueryTypesLabels();
-
-                    // Get all resources titles with one query.
-                    $vrTitles = [];
-                    $vrIds = [];
-                    foreach ($value as $queryRow) {
-                        if (is_array($queryRow)
-                            && isset($queryRow['type'])
-                            && !empty($queryRow['value'])
-                            && in_array($queryRow['type'], SearchResources::FIELD_QUERY['value_subject'])
-                        ) {
-                            is_array($queryRow['value'])
-                                ? $vrIds = array_merge($vrIds, array_values($queryRow['value']))
-                                : $vrIds[] = $queryRow['value'];
-                        }
-                    }
-                    $vrIds = array_unique(array_filter(array_map('intval', $vrIds)));
-                    if ($vrIds) {
-                        // Currently, "resources" cannot be searched, so use adapter
-                        // directly. Rights are managed.
-                        /** @var \Doctrine\ORM\EntityManager $entityManager */
-                        $services = $this->getServiceLocator();
-                        $entityManager = $services->get('Omeka\EntityManager');
-                        $qb = $entityManager->createQueryBuilder();
-                        $qb
-                            ->select('omeka_root.id', 'omeka_root.title')
-                            ->from(\Omeka\Entity\Resource::class, 'omeka_root')
-                            ->where($qb->expr()->in('omeka_root.id', ':ids'))
-                            ->setParameter('ids', $vrIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
-                        $vrTitles = array_column($qb->getQuery()->getScalarResult(), 'title', 'id');
-                    }
-
-                    $searchFormAdvancedLabels = array_column($searchFormSettings['advanced']['fields'] ?? [], 'label', 'value');
-                    $fieldFiltersLabels = array_replace($fieldLabels, array_filter($searchFormAdvancedLabels));
-
-                    $index = 0;
-                    foreach ($value as $subKey => $queryRow) {
-                        // Default query type is "in", unlike standard search.
-                        $queryType = $queryRow['type'] ?? 'in';
-                        if (!isset(SearchResources::FIELD_QUERY['reciprocal'][$queryType])) {
-                            continue;
-                        }
-
-                        $joiner = $queryRow['join'] ?? 'and';
-                        $value = $queryRow['value'] ?? '';
-
-                        $isWithoutValue = in_array($queryType, SearchResources::FIELD_QUERY['value_none'], true);
-
-                        // A value can be an array with types "list" and "nlist".
-                        if (!is_array($value)
-                            && !strlen((string) $value)
-                            && !$isWithoutValue
-                        ) {
-                            continue;
-                        }
-
-                        if ($isWithoutValue) {
-                            $value = '';
-                        }
-
-                        // The field is currently always single: use multi-fields else.
-                        // TODO Support multi-fields.
-                        $queryField = $queryRow['field'] ?? '';
-                        /*
-                        $fieldLabel = $queryField
-                            ? $fieldFiltersLabels[$queryField] ?? $translate('Unknown field') // @ translate
-                            : $translate('[Any field]'); // @ translate
-                        */
-                        // Support default solr index names for compatibility
-                        // of custom themes.
-                        if ($queryField) {
-                            if (isset($fieldFiltersLabels[$queryField])) {
-                                $fieldLabel = $fieldFiltersLabels[$queryField];
-                            } elseif (strpos($queryField, '_')) {
-                                $fieldLabel = $fieldFiltersLabels[strtok($queryField, '_') . ':' . strtok('_')] ?? $translate('Unknown field'); // @translate
-                            } else {
-                                $fieldLabel = $translate('Unknown field'); // @translate
-                            }
-                        } else {
-                            $fieldLabel = $translate('[Any field]'); // @translate
-                        }
-
-                        $filterLabel = $fieldLabel . ' ' . $queryTypesLabels[$queryType];
-                        if ($index > 0) {
-                            $joiners = [
-                                'or' => $translate('OR'), // @translate
-                                'not' => $translate('EXCEPT'), // @translate
-                                'and' => $translate('AND'), // @translate
-                            ];
-                            $filterLabel = ($joiners[$joiner] ?? $joiners['and']) . ' ' . $filterLabel;
-                        }
-
-                        $vals = in_array($queryType, SearchResources::FIELD_QUERY['value_subject'])
-                            ? $flatArrayValueResourceIds($value, $vrTitles)
-                            : $flatArray($value);
-                        $filters[$filterLabel][$this->urlQuery($key, $subKey)] = implode(', ', $vals);
-
-                        ++$index;
-                    }
-                    break;
-
                 case 'item_sets_tree':
                     $filterLabel = $translate('Item sets tree'); // @translate
                     $isId = is_array($value) && key($value) === 'id';
@@ -405,12 +282,13 @@ class SearchingFilters extends AbstractHelper
                 case 'has_media':
                 // case 'id':
                 case 'in_sites':
+                // Added by this module.
                 case 'datetime':
-                case 'resource_class_term':
-                // Added to this module.
+                case 'filter':
                 case 'has_original':
                 case 'has_thumbnails':
                 case 'media_types':
+                case 'resource_class_term':
                     break;
 
                 default:

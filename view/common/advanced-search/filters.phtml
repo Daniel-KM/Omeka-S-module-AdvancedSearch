@@ -1,0 +1,247 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var array $query
+ *
+ * Similar to properties with:
+ * - keys are different: filter and join, field, type, val and datatype
+ *   instead of property and joiner, property, type and text;
+ * - join may be "not";
+ * - fields are not only properties and multiple properties are managed;;
+ * - more search types;
+ * - value may be a list of values;
+ * - use option to restrict to used terms in admin;
+ * - more querier options, included sub-query;
+ * - use chosen-select;
+ * - short echo.
+ */
+
+$plugins = $this->getHelperPluginManager();
+$status = $plugins->get('status');
+$escape = $plugins->get('escapeHtml');
+$translate = $plugins->get('translate');
+$siteSetting = $plugins->get('siteSetting');
+$formQuery = $plugins->get('formQuery');
+$formSelect = $plugins->get('formSelect');
+$queryInput = $plugins->get('queryInput');
+$fieldSelect = $plugins->get('fieldSelect');
+$dataTypeHelper = $plugins->get('dataType');
+
+$isSiteRequest = $status->isSiteRequest();
+$applyTemplates = $isSiteRequest ? $siteSetting('search_apply_templates') : false;
+$usedTerms = !$isSiteRequest;
+
+$resourceTypesToNames = ['item' => 'items', 'item-set' => 'item_sets', 'media' => 'media', 'annotation' => 'annotations'];
+$resourceName = $resourceTypesToNames[$this->resourceType ?? null] ?? 'items';
+
+$selectMainDataType = new \Laminas\Form\Element\Select;
+$selectMainDataType
+    ->setOptions([
+        'empty_option' => '',
+        'value_options' => [
+            'literal' => 'literal', // @translate
+            'resource' => 'resource', // @translate
+            'uri' => 'uri', // @translate
+        ],
+    ])
+    ->setAttributes([
+        'class' => 'query-text query-main-type chosen-select',
+        'aria-label' => $translate('Filters'), // @translate
+        'data-placeholder' => 'Select main data type…', // @translate
+    ]);
+
+$queryInput = $queryInput();
+$queryInput->setOption('query_resource_type', $resourceName);
+if ($this->site) {
+    $queryInput->setOption('query_preview_append_query', ['site_id' => $this->site->id()]);
+}
+
+// Prepare the filters.
+$filters = $query['filter'] ?? [];
+$filters = array_filter($filters, fn ($value) => isset($value['val']) ? '' !== trim($value['val']) : true);
+if (!$filters) {
+    $filters[] = [];
+}
+
+if (isset($query['search'])) {
+    unset($filters[0]['join']);
+    array_unshift($filters, [
+        'field' => '',
+        'type' => 'in',
+        'val' => $query['search'],
+    ]);
+}
+
+$queryOption = function ($value, array $search, $key, $text) {
+    $selected = null;
+    if (isset($search[$key]) && $value === $search[$key]) {
+        $selected = ' selected';
+    }
+    return sprintf('<option value="%s"%s>%s</option>', $value, $selected, $text);
+};
+$queryText = function (array $search, $index) use ($escape, $translate) {
+    $val = $search['val'] ?? null;
+    return sprintf('<input type="text" class="query-text" name="%s" value="%s" aria-label="%s">',
+        $escape("filter[$index][val]"),
+        $escape($val),
+        $escape($translate('Query text')));
+};
+
+$optionsQuery = [];
+if ($isSiteRequest) {
+    if ($siteSetting('vocabulary_scope') === 'sitewide') {
+        $optionsQuery['site_id'] = $this->layout()->site->id();
+    } elseif ($siteSetting('vocabulary_scope') === 'cross-site') {
+        $optionsQuery['used'] = true;
+    }
+}
+?>
+
+<div id="filter-queries" class="field removable multi-value" role="group" aria-labelledby="by-value-label">
+    <div class="field-meta">
+        <span id="by-value-label" class="label"><?= $translate('Filters') ?></span>
+        <button type="button" class="add-value o-icon-add button" aria-label="<?= $translate('Add new value') ?>" title="<?= $translate('Add new value') ?>"></button>
+    </div>
+    <div class="inputs">
+        <?php
+        $index = 0;
+        foreach ($filters as $filter):
+            $stem = "filter[$index]";
+            $fieldList = isset($filter['field'])
+                ? (is_array($filter['field']) ? $filter['field'] : [$filter['field']])
+                : [null];
+            $isSubQuery = in_array($filter['type'] ?? null, \AdvancedSearch\Stdlib\SearchResources::FIELD_QUERY['sub_query']) && isset($filter['val']) ? $filter['val'] : null;
+            $queryInput
+                ->setName($stem . '[val]')
+                ->setValue($isSubQuery ? $filter['val'] : null);
+        ?>
+        <div class="value">
+            <div class="value-common value-fields">
+                <select class="joiner chosen-select" name="<?= $escape($stem . '[join]') ?>" aria-label="<?= $translate('Joiner') ?>">
+                    <?= $queryOption('and', $filter, 'join', $translate('AND')) ?>
+                    <?= $queryOption('or', $filter, 'join', $translate('OR')) ?>
+                </select>
+                <?= $fieldSelect([
+                    'name' => $stem . '[field]',
+                    'attributes' => [
+                        'class' => 'query-filter query-property chosen-select',
+                        'value' => $fieldList,
+                        'aria-label' => $translate('Metadata'), // @translate
+                        'multiple' => true,
+                        'data-placeholder' => '[any metadata]', // @translate
+                    ],
+                    'options' => [
+                        'empty_option' => '',
+                        'apply_templates' => $applyTemplates,
+                        'query' => $optionsQuery,
+                        // Used terms in site are already managed by vocabulary scope, but only for items.
+                        'used_terms' => $usedTerms,
+                    ],
+                ]) ?>
+                <select class="query-type chosen-select" name="<?= $escape($stem . '[type]') ?>" aria-label="<?= $translate('Query type') ?>">
+                    <optgroup label="<?= $translate('Value') ?>">
+                        <?= $queryOption('eq', $filter, 'type', $translate('is exactly')) ?>
+                        <?= $queryOption('neq', $filter, 'type', $translate('is not exactly')) ?>
+                        <?= $queryOption('in', $filter, 'type', $translate('contains')) ?>
+                        <?= $queryOption('nin', $filter, 'type', $translate('does not contain')) ?>
+                        <?= $queryOption('sw', $filter, 'type', $translate('starts with')) ?>
+                        <?= $queryOption('nsw', $filter, 'type', $translate('does not start with')) ?>
+                        <?= $queryOption('ew', $filter, 'type', $translate('ends with')) ?>
+                        <?= $queryOption('new', $filter, 'type', $translate('does not end with')) ?>
+                        <?= $queryOption('near', $filter, 'type', $translate('is similar to')) ?>
+                        <?= $queryOption('nnear', $filter, 'type', $translate('is not similar to')) ?>
+                        <?= $queryOption('ma', $filter, 'type', $translate('matches')) ?>
+                        <?= $queryOption('nma', $filter, 'type', $translate('does not match')) ?>
+                        <?= $queryOption('lt', $filter, 'type', $translate('lower than')) ?>
+                        <?= $queryOption('lte', $filter, 'type', $translate('lower than or equal')) ?>
+                        <?= $queryOption('gte', $filter, 'type', $translate('greater than or equal')) ?>
+                        <?= $queryOption('gt', $filter, 'type', $translate('greater than')) ?>
+                        <?= $queryOption('<', $filter, 'type', '<') ?>
+                        <?= $queryOption('≤', $filter, 'type', '≤') ?>
+                        <?= $queryOption('≥', $filter, 'type', '≥') ?>
+                        <?= $queryOption('>', $filter, 'type', '>') ?>
+                    </optgroup>
+                    <optgroup label="<?= $translate('Resource') ?>">
+                        <?= $queryOption('res', $filter, 'type', $translate('is resource with ID')) ?>
+                        <?= $queryOption('nres', $filter, 'type', $translate('is not resource with ID')) ?>
+                        <?= $queryOption('resq', $filter, 'type', $translate('is resource matching query')) ?>
+                        <?= $queryOption('nresq', $filter, 'type', $translate('is not resource matching query')) ?>
+                    </optgroup>
+                    <optgroup label="<?= $translate('Linked resource') ?>">
+                        <?= $queryOption('lex', $filter, 'type', $translate('is a linked resource')) ?>
+                        <?= $queryOption('nlex', $filter, 'type', $translate('is not a linked resource')) ?>
+                        <?= $queryOption('lres', $filter, 'type', $translate('is linked with resource with ID (expert)')) ?>
+                        <?= $queryOption('nlres', $filter, 'type', $translate('is not linked with resource with ID (expert)')) ?>
+                        <?= $queryOption('lkq', $filter, 'type', $translate('is linked with resources matching query (expert)')) ?>
+                        <?= $queryOption('nlkq', $filter, 'type', $translate('is not linked with resources matching query (expert)')) ?>
+                    </optgroup>
+                    <optgroup label="<?= $translate('Count') ?>">
+                        <?= $queryOption('ex', $filter, 'type', $translate('has any value')) ?>
+                        <?= $queryOption('nex', $filter, 'type', $translate('has no values')) ?>
+                        <?= $queryOption('exs', $filter, 'type', $translate('has a single value')) ?>
+                        <?= $queryOption('nexs', $filter, 'type', $translate('has not a single value')) ?>
+                        <?= $queryOption('exm', $filter, 'type', $translate('has multiple values')) ?>
+                        <?= $queryOption('nexm', $filter, 'type', $translate('has not multiple values')) ?>
+                    </optgroup>
+                    <optgroup label="<?= $translate('Data type') ?>">
+                        <?= $queryOption('dtp', $filter, 'type', $translate('has data type')) ?>
+                        <?= $queryOption('ndtp', $filter, 'type', $translate('has not data type')) ?>
+                        <?= $queryOption('tp', $filter, 'type', $translate('has main type')) ?>
+                        <?= $queryOption('ntp', $filter, 'type', $translate('has not main type')) ?>
+                        <?= $queryOption('tpl', $filter, 'type', $translate('has type literal-like')) ?>
+                        <?= $queryOption('ntpl', $filter, 'type', $translate('has not type literal-like')) ?>
+                        <?= $queryOption('tpr', $filter, 'type', $translate('has type resource-like')) ?>
+                        <?= $queryOption('ntpr', $filter, 'type', $translate('has not type resource-like')) ?>
+                        <?= $queryOption('tplu', $filter, 'type', $translate('has type uri-like')) ?>
+                        <?= $queryOption('ntpu', $filter, 'type', $translate('has not type uri-like')) ?>
+                    </optgroup>
+                    <optgroup label="<?= $translate('Curation') ?>">
+                        <?= $queryOption('dup', $filter, 'type', $translate('has duplicate values')) ?>
+                        <?= $queryOption('ndup', $filter, 'type', $translate('has not duplicate values')) ?>
+                        <?= $queryOption('dupt', $filter, 'type', $translate('has duplicate values and type')) ?>
+                        <?= $queryOption('ndupt', $filter, 'type', $translate('has not duplicate values and type')) ?>
+                        <?= $queryOption('dupl', $filter, 'type', $translate('has duplicate values and language')) ?>
+                        <?= $queryOption('ndupl', $filter, 'type', $translate('has not duplicate values and language')) ?>
+                        <?= $queryOption('duptl', $filter, 'type', $translate('has duplicate values, type and language')) ?>
+                        <?= $queryOption('nduptl', $filter, 'type', $translate('has not duplicate values, type and language')) ?>
+                        <?= $queryOption('dupv', $filter, 'type', $translate('has duplicate simple values')) ?>
+                        <?= $queryOption('ndupv', $filter, 'type', $translate('has not duplicate simple values')) ?>
+                        <?= $queryOption('dupvt', $filter, 'type', $translate('has duplicate simple values and type')) ?>
+                        <?= $queryOption('ndupvt', $filter, 'type', $translate('has not duplicate simple values and type')) ?>
+                        <?= $queryOption('dupvl', $filter, 'type', $translate('has duplicate simple values and language')) ?>
+                        <?= $queryOption('ndupvl', $filter, 'type', $translate('has not duplicate simple values and language')) ?>
+                        <?= $queryOption('dupvtl', $filter, 'type', $translate('has duplicate simple values, type and language')) ?>
+                        <?= $queryOption('ndupvtl', $filter, 'type', $translate('has not duplicate simple values, type and language')) ?>
+                        <?= $queryOption('dupr', $filter, 'type', $translate('has duplicate linked resources')) ?>
+                        <?= $queryOption('ndupr', $filter, 'type', $translate('has not duplicate linked resources')) ?>
+                        <?= $queryOption('duprt', $filter, 'type', $translate('has duplicate linked resources and type')) ?>
+                        <?= $queryOption('nduprt', $filter, 'type', $translate('has not duplicate linked resources and type')) ?>
+                        <?= $queryOption('duprl', $filter, 'type', $translate('has duplicate linked resources and language')) ?>
+                        <?= $queryOption('nduprl', $filter, 'type', $translate('has not duplicate linked resources and language')) ?>
+                        <?= $queryOption('duprtl', $filter, 'type', $translate('has duplicate linked resources, type and language')) ?>
+                        <?= $queryOption('nduprtl', $filter, 'type', $translate('has not duplicate linked resources, type and language')) ?>
+                        <?= $queryOption('dupu', $filter, 'type', $translate('has duplicate uris')) ?>
+                        <?= $queryOption('ndupu', $filter, 'type', $translate('has not duplicate uris')) ?>
+                        <?= $queryOption('duput', $filter, 'type', $translate('has duplicate uris and type')) ?>
+                        <?= $queryOption('nduput', $filter, 'type', $translate('has not duplicate uris and type')) ?>
+                        <?= $queryOption('dupul', $filter, 'type', $translate('has duplicate uris and language')) ?>
+                        <?= $queryOption('ndupul', $filter, 'type', $translate('has not duplicate uris and language')) ?>
+                        <?= $queryOption('duputl', $filter, 'type', $translate('has duplicate uris, type and language')) ?>
+                        <?= $queryOption('nduputl', $filter, 'type', $translate('has not duplicate uris, type and language')) ?>
+                    </optgroup>
+                </select>
+                <?= $queryText($isSubQuery ? [] : $filter, $index) ?>
+                <?= $dataTypeHelper->getSelect($stem . '[val]', "filter[$index][val]" ?? null, ['multiple' => false, 'class' => 'query-text query-data-type chosen-select', 'aria-label' => 'Data types', 'data-placeholder' => $translate('Select data type…')]) // TODO Manage search on property for multiple data types. ?>
+                <?= $formSelect($selectMainDataType->setName($stem . '[val]')->setValue("filter[$index][val]" ?? null)) ?>
+                <button type="button" class="o-icon-delete remove-value button" aria-label="<?= $translate('Remove value') ?>" title="<?= $translate('Remove value') ?>"></button>
+            </div>
+            <div class="value-common sub-query">
+                <?= $formQuery($queryInput) ?>
+            </div>
+        </div>
+        <?php
+            ++$index;
+        endforeach;
+        ?>
+    </div>
+</div>

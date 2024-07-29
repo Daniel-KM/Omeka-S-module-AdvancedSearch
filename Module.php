@@ -762,6 +762,16 @@ class Module extends AbstractModule
 
         $partials = array_unique($partials);
 
+        // insert "filter" after "properties".
+        $p = $partials;
+        $partials = [];
+        foreach ($p as $partial) {
+            $partials[] = $partial;
+            if ($partial === 'common/advanced-search/properties') {
+                $partials[] = 'common/advanced-search/filters';
+            }
+        }
+
         $event->setParam('query', $query);
         $event->setParam('partials', $partials);
     }

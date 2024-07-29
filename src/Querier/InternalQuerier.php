@@ -499,9 +499,11 @@ SQL;
         $this->appendHiddenFilters();
         $this->filterQuery();
 
-        if (!empty($this->args['property'])
-            && count($this->args['property']) > self::REQUEST_MAX_ARGS
-        ) {
+        $totalProperties = count($this->args['property'] ?? []);
+        $totalFilters = count($this->args['filter'] ?? []);
+        $totalPropertiesAndFilters = $totalProperties + $totalFilters;
+
+        if ($totalPropertiesAndFilters > self::REQUEST_MAX_ARGS) {
             $plugins = $this->services->get('ControllerPluginManager');
             $params = $plugins->get('params');
             $req = $params->fromQuery();
@@ -510,8 +512,8 @@ SQL;
             $messenger = $plugins->get('messenger');
             if ($this->query->getExcludedFields()) {
                 $message = new PsrMessage(
-                    'The query "{query}" uses {count} properties, that is more than the {total} supported currently. Excluded fields are removed.', // @translate
-                    ['query' => $req, 'count' => count($this->args['property']), 'total' => self::REQUEST_MAX_ARGS]
+                    'The query "{query}" uses {count} properties or filters, that is more than the {total} supported currently. Excluded fields are removed.', // @translate
+                    ['query' => $req, 'count' => $totalPropertiesAndFilters, 'total' => self::REQUEST_MAX_ARGS]
                 );
                 $this->query->setExcludedFields([]);
                 $messenger->addWarning($message);
@@ -520,12 +522,21 @@ SQL;
             }
 
             $message = new PsrMessage(
-                'The query "{query}" uses {count} properties, that is more than the {total} supported currently. Request is troncated.', // @translate
-                ['query' => $req, 'count' => count($this->args['property']), 'total' => self::REQUEST_MAX_ARGS]
+                'The query "{query}" uses {count} properties or filters, that is more than the {total} supported currently. Request is troncated.', // @translate
+                ['query' => $req, 'count' => $totalPropertiesAndFilters, 'total' => self::REQUEST_MAX_ARGS]
             );
             $messenger->addWarning($message);
             $this->logger->warn($message->getMessage(), $message->getContext());
-            $this->args['property'] = array_slice($this->args['property'], 0, self::REQUEST_MAX_ARGS);
+            if ($totalProperties) {
+                $this->args['property'] = array_slice($this->args['property'] ?? [], 0, self::REQUEST_MAX_ARGS);
+            } else {
+                unset($this->args['property']);
+            }
+            if (!$totalFilters || ((self::REQUEST_MAX_ARGS - $totalProperties) <= 0)) {
+                unset($this->args['filter']);
+            } else {
+                $this->args['filter'] = array_slice($this->args['filter'] ?? [], 0, self::REQUEST_MAX_ARGS - $totalProperties);
+            }
         }
 
         $sort = $this->query->getSort();
@@ -577,11 +588,11 @@ SQL;
         }
 
         if ($this->query->getOption('default_search_partial_word', false)) {
-            $this->args['property'][] = [
-                'joiner' => 'and',
-                'property' => '',
+            $this->args['filter'][] = [
+                'join' => 'and',
+                'field' => '',
                 'type' => 'in',
-                'text' => $q,
+                'val' => $q,
             ];
             return;
         }
@@ -612,12 +623,12 @@ SQL;
         }
 
         if ($this->query->getOption('default_search_partial_word', false)) {
-            $this->args['property'][] = [
-                'joiner' => 'and',
-                'property' => '',
+            $this->args['filter'][] = [
+                'join' => 'and',
+                'field' => '',
                 'except' => $excludedFields,
                 'type' => 'in',
-                'text' => $q,
+                'val' => $q,
             ];
             return;
         }
@@ -776,27 +787,27 @@ SQL;
                 // Check for a facet range.
                 if (count($values) <= 2 && ($firstKey === 'from' || $firstKey === 'to')) {
                     if (isset($values['from']) && $values['from'] !== '') {
-                        $this->args['property'][] = [
-                            'joiner' => 'and',
-                            'property' => $field,
+                        $this->args['filter'][] = [
+                            'join' => 'and',
+                            'field' => $field,
                             'type' => '≥',
-                            'text' => $values['from'],
+                            'val' => $values['from'],
                         ];
                     }
                     if (isset($values['to']) && $values['to'] !== '') {
-                        $this->args['property'][] = [
-                            'joiner' => 'and',
-                            'property' => $field,
+                        $this->args['filter'][] = [
+                            'join' => 'and',
+                            'field' => $field,
                             'type' => '≤',
-                            'text' => $values['to'],
+                            'val' => $values['to'],
                         ];
                     }
                 } else {
-                    $this->args['property'][] = [
-                        'joiner' => 'and',
-                        'property' => $field,
+                    $this->args['filter'][] = [
+                        'join' => 'and',
+                        'field' => $field,
                         'type' => 'list',
-                        'text' => $flatArray($values),
+                        'val' => $flatArray($values),
                     ];
                 }
                 break;
@@ -813,21 +824,28 @@ SQL;
                             continue;
                         }
                         // Skip queries filters (for hidden queries).
-                        if (isset($value['joiner']) || isset($value['type']) || isset($value['text']) || isset($value['join']) || isset($value['value'])) {
+                        if (isset($value['joiner'])
+                            || isset($value['type'])
+                            || isset($value['text'])
+                            || isset($value['join'])
+                            || isset($value['val'])
+                            // Deprecated.
+                            || isset($value['value'])
+                        ) {
                             continue;
                         }
-                        $this->args['property'][] = [
-                            'joiner' => 'and',
-                            'property' => $field,
+                        $this->args['filter'][] = [
+                            'join' => 'and',
+                            'filter' => $field,
                             'type' => 'list',
-                            'text' => $value,
+                            'val' => $value,
                         ];
                     } else {
-                        $this->args['property'][] = [
-                            'joiner' => 'and',
-                            'property' => $field,
+                        $this->args['filter'][] = [
+                            'join' => 'and',
+                            'filter' => $field,
                             'type' => 'eq',
-                            'text' => $value,
+                            'val' => $value,
                         ];
                     }
                 }
@@ -845,7 +863,7 @@ SQL;
                 if (!$field) {
                     continue;
                 }
-                $argName = 'property';
+                $argName = 'filter';
             }
             foreach ($filterValues as $filterValue) {
                 // Skip simple and query filters (for hidden queries).
@@ -854,18 +872,18 @@ SQL;
                 }
                 if (isset($filterValue['from']) && strlen($filterValue['from'])) {
                     $this->args[$argName][] = [
-                        'joiner' => 'and',
-                        'property' => $field,
+                        'join' => 'and',
+                        'field' => $field,
                         'type' => '≥',
-                        'text' => $filterValue['from'],
+                        'val' => $filterValue['from'],
                     ];
                 }
                 if (isset($filterValue['to']) && strlen($filterValue['to'])) {
                     $this->args[$argName][] = [
-                        'joiner' => 'and',
-                        'property' => $field,
+                        'join' => 'and',
+                        'field' => $field,
                         'type' => '≤',
-                        'text' => $filterValue['to'],
+                        'val' => $filterValue['to'],
                     ];
                 }
             }
@@ -887,12 +905,12 @@ SQL;
                 if (!$value || !is_array($value)) {
                     continue;
                 }
-                $value += ['join' => null, 'type' => null, 'value' => null];
-                $this->args['property'][] = [
-                    'joiner' => $value['join'],
-                    'property' => $field,
+                $value += ['join' => null, 'type' => null, 'val' => null];
+                $this->args['filter'][] = [
+                    'join' => $value['join'],
+                    'field' => $field,
                     'type' => $value['type'],
-                    'text' => $value['value'],
+                    'val' => $value['val'],
                 ];
             }
         }

@@ -80,6 +80,7 @@ return [
             'apiSearchOne' => Service\ViewHelper\ApiSearchOneFactory::class,
             'cleanQuery' => Service\ViewHelper\CleanQueryFactory::class,
             'escapeValueOrGetHtml' => Service\ViewHelper\EscapeValueOrGetHtmlFactory::class,
+            'fieldSelect' => Service\ViewHelper\FieldSelectFactory::class,
             'paginationSearch' => Service\ViewHelper\PaginationSearchFactory::class,
             'queryInput' => Service\ViewHelper\QueryInputFactory::class,
             'searchEngineConfirm' => Service\ViewHelper\SearchEngineConfirmFactory::class,
@@ -117,6 +118,7 @@ return [
             Form\Admin\SearchEngineConfigureForm::class => Service\Form\GenericFormFactory::class,
             Form\Admin\SearchEngineForm::class => Service\Form\SearchEngineFormFactory::class,
             Form\Admin\SearchSuggesterForm::class => Service\Form\SearchSuggesterFormFactory::class,
+            Form\Element\FieldSelect::class => Service\Form\Element\FieldSelectFactory::class,
             Form\Element\SearchConfigSelect::class => Service\Form\Element\SearchConfigSelectFactory::class,
             Form\SearchFilter\Advanced::class => Service\Form\GenericFormFactory::class,
             Form\MainSearchForm::class => Service\Form\MainSearchFormFactory::class,
@@ -384,7 +386,8 @@ return [
             'advancedsearch_search_fields' => [
                 'common/advanced-search/sort',
                 'common/advanced-search/fulltext',
-                'common/advanced-search/properties',
+                // 'common/advanced-search/properties',
+                'common/advanced-search/filters',
                 'common/advanced-search/resource-class',
                 // 'common/advanced-search/resource-template',
                 'common/advanced-search/item-sets',
@@ -413,10 +416,11 @@ return [
         // to complete it. The partials that are not set in merged Config (included
         // config/local.config.php) are not managed by this module.
         'search_fields' => [
-            // From view/common/advanced-search'.
+            // From view/common/advanced-search' (except filters, from this module).
             'common/advanced-search/sort' => ['label' => 'Sort'], // @translate
             'common/advanced-search/fulltext' => ['label' => 'Full text'], // @translate
             'common/advanced-search/properties' => ['label' => 'Properties'], // @translate
+            'common/advanced-search/filters' => ['label' => 'Filters'], // @translate
             'common/advanced-search/resource-class' => ['label' => 'Classes'], // @translate
             'common/advanced-search/resource-template' => ['label' => 'Templates', 'default' => false], // @translate
             // This partial is managed separately by a core option.

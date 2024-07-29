@@ -97,6 +97,7 @@ $(document).ready(function() {
             'geo[area]',
             // Mapping.
             'has_markers',
+            'has_features',
         ];
         const inputFakes = [
             // Data Type Geometry.
@@ -118,7 +119,7 @@ $(document).ready(function() {
             'seconds',
             'integer',
         ];
-        const propertyQueryTypeWithText = ['eq', 'neq', 'in', 'nin', 'sw', 'nsw', 'ew', 'new', 'near', 'nnear', 'ma', 'nma', 'lt', 'lte', 'gte', 'gt', '<', '≤', '≥', '>', 'list', 'nlist', 'res', 'nres', 'resq', 'nresq', 'lres', 'nlres', 'lkq', 'nlkq', 'dtp', 'ndtp', 'tp', 'ntp'];
+        const fieldQueryTypeWithText = ['eq', 'neq', 'in', 'nin', 'sw', 'nsw', 'ew', 'new', 'near', 'nnear', 'ma', 'nma', 'lt', 'lte', 'gte', 'gt', '<', '≤', '≥', '>', 'list', 'nlist', 'res', 'nres', 'resq', 'nresq', 'lres', 'nlres', 'lkq', 'nlkq', 'dtp', 'ndtp', 'tp', 'ntp'];
         form.find(":input[name]:not([name='']):not(:disabled)").each(function(index) {
             const input = $(this);
             const inputName = input.attr('name');
@@ -168,7 +169,7 @@ $(document).ready(function() {
                 } else if (match = inputName.match(/property\[(\d+)\]\[text\]/)) {
                     const subIndex = match[1];
                     const propertyType = form.find(`[name="property[${subIndex}][type]"]`);
-                    if (propertyQueryTypeWithText.includes(propertyType.val())) {
+                    if (fieldQueryTypeWithText.includes(propertyType.val())) {
                         form.find(`[name="property[${subIndex}][joiner]"]`).prop('name', '');
                         form.find(`[name="property[${subIndex}][property]"]`).prop('name', '');
                         form.find(`[name="property[${subIndex}][text]"]`).prop('name', '');
@@ -176,6 +177,16 @@ $(document).ready(function() {
                     }
                 }
                 // Module Advanced Search.
+                else if (match = inputName.match(/filter\[(\d+)\]\[val\]/)) {
+                    const subIndex = match[1];
+                    const fieldType = form.find(`[name="filter[${subIndex}][type]"]`);
+                    if (fieldQueryTypeWithText.includes(fieldType.val())) {
+                        form.find(`[name="filter[${subIndex}][join]"]`).prop('name', '');
+                        form.find(`[name="filter[${subIndex}][field]"]`).prop('name', '');
+                        form.find(`[name="filter[${subIndex}][val]"]`).prop('name', '');
+                        fieldType.prop('name', '');
+                    }
+                }
                 else if (match = inputName.match(/datetime\[(\d+)\]\[(field|type|value)\]/)) {
                     const subIndex = match[1];
                     form.find(`[name="datetime[${subIndex}][joiner]"]`).prop('name', '');
@@ -212,6 +223,7 @@ $(document).ready(function() {
                 }
             }
         });
+
     };
 
     /**
@@ -234,18 +246,59 @@ $(document).ready(function() {
      * Add chosen-select when possible.
      */
     if (hasChosenSelect) {
-        $('#advanced-search').find('#property-queries .value select, #resource-class .value select, #resource-templates .value select, #item-sets .value select, #datetime-queries .value select, select#site_id, select#owner_id')
+        $('#advanced-search').find('#filter-queries .value select, #property-queries .value select, #resource-class .value select, #resource-templates .value select, #item-sets .value select, #datetime-queries .value select, select#site_id, select#owner_id')
             .addClass('chosen-select');
         $('#advanced-search select.chosen-select').chosen(chosenOptions);
         $('#advanced-search select.chosen-select option[value=""][selected]').prop('selected',  false).parent().trigger('chosen:updated');
 
-        $(document).on('o:value-created', '#property-queries .value, #resource-class .value, #resource-templates .value, #item-sets .value, #datetime-queries .value', function(e) {
+        $(document).on('o:value-created', '#filter-queries .value, #property-queries .value, #resource-class .value, #resource-templates .value, #item-sets .value, #datetime-queries .value', function(e) {
             const newValue = $(this);
             newValue.find('select').chosen('destroy');
             newValue.find('.chosen-container').remove();
             newValue.find('select').addClass('chosen-select').chosen(chosenOptions);
         });
     }
+
+    /**
+     * Handle clearing fields on new filter multi-value.
+     *
+     * @see application/asset/js/advanced-search.js.
+     */
+    $(document).on('o:value-created', '#filter-queries .value', function(e) {
+        // In advanced-search.js, "children" is used, but it is not possible here,
+        // because a div is inserted to manage sub-query form.
+        // Furthermore, there is a hidden input.
+        const newValue = $(this);
+        const isSidebar = newValue.parents('.sidebar').length > 0;
+        if (isSidebar) {
+            newValue.find('.query-type option[value="resq"]').remove();
+            newValue.find('.query-type option[value="nresq"]').remove();
+            newValue.find('.query-type option[value="lkq"]').remove();
+            newValue.find('.query-type option[value="nlkq"]').remove();
+            newValue.find('.query-form-element').remove();
+        } else {
+            newValue.find('.query-form-element').attr('data-query', '').hide();
+            newValue.find('.query-form-element input[type="hidden"]').val(null);
+            newValue.find('.query-form-element .search-filters').empty().html(Omeka.jsTranslate('[Edit below]'));
+        }
+        newValue.children().children('input[type="text"]').val(null);
+        newValue.children().children('select').prop('selectedIndex', 0);
+        newValue.children().children('.query-filter').find('option:selected').prop('selected', false);
+        Omeka.handleQueryTextInput(newValue.find('.query-type'));
+        if (hasChosenSelect) {
+            if (isSidebar) {
+                newValue.children().children('select.chosen-select').chosen(chosenOptionsSidebar);
+            }
+            newValue.children().children('select.chosen-select').trigger('chosen:updated');
+        }
+
+        $('#filter-queries').data('filter-search-index', $('#filter-queries').data('filter-search-index') + 1);
+
+        newValue.find(':input').attr('name', function () {
+            return this.name.replace(/\[\d\]/, '[' + $('#filter-queries').data('filter-search-index') + ']');
+        });
+
+    });
 
     /**
      * Handle clearing fields on new property multi-value.
@@ -328,10 +381,20 @@ $(document).ready(function() {
     });
 
     /**
-     * Handle preparation of the advanced search form for property part on load.
+     * Handle preparation of the advanced search form for filter and property
+     * part on load.
      */
     $('.query-type').each(function() {
         Omeka.handleQueryTextInput($(this));
     });
+
+    /**
+     * Init standard advanced search.
+     *
+     * @see application/view/common/advanced-search.phtml
+     */
+
+    // Index of filter search values.
+    $('#filter-queries').data('filter-search-index', $('#filter-queries .value').length - 1);
 
 });

@@ -87,6 +87,18 @@ class SearchFilters extends AbstractHelper
             $this->query['__searchCleanQuery']
         );
 
+        $searchAdapter = $this->searchConfig ? $this->searchConfig->searchAdapter() : null;
+        $availableFields = $searchAdapter
+            ? $searchAdapter->getAvailableFields()
+            : [];
+        $searchFormSettings = $this->searchConfig ? ($this->searchConfig->setting('form') ?: []) : [];
+
+        // Manage all fields, included those not in the form in order to support
+        // queries for long term. But use labels set in the form if any.
+        $formFieldLabels = array_column($searchFormSettings['filters'] ?? [], 'label', 'field');
+        $availableFieldLabels = array_combine(array_keys($availableFields), array_column($availableFields ?? [], 'label'));
+        $fieldLabels = array_replace($availableFieldLabels, array_filter($formFieldLabels));
+
         // This function fixes some forms that add an array level.
         // This function manages only one level, so check value when needed.
         $flatArray = function ($value): array {
@@ -98,6 +110,22 @@ class SearchFilters extends AbstractHelper
                 return $value;
             }
             return is_array(reset($value)) ? $value[$firstKey] : [$value[$firstKey]];
+        };
+
+        $flatArrayValueResourceIds = function ($value, array $titles): array {
+            if (is_array($value)) {
+                $firstKey = key($value);
+                if (is_numeric($firstKey)) {
+                    $values = $value;
+                } else {
+                    $values = is_array(reset($value)) ? $value[$firstKey] : [$value[$firstKey]];
+                }
+            } else {
+                $values = [$value] ;
+            }
+            $values = array_unique($values);
+            $values = array_combine($values, $values);
+            return array_replace($values, $titles);
         };
 
         // Normally, query is already cleaned.
@@ -152,12 +180,12 @@ class SearchFilters extends AbstractHelper
                             continue;
                         }
                         $queryType = $queryRow['type'];
-                        $value = $queryRow['text'] ?? null;
+                        $text = $queryRow['text'] ?? null;
                         $noValue = in_array($queryType, SearchResources::FIELD_QUERY['value_none'], true);
                         if ($noValue) {
-                            $value = null;
-                        } elseif ((is_array($value) && !count($value))
-                            || (!is_array($value) && !strlen((string) $value))
+                            $text = null;
+                        } elseif ((is_array($text) && !count($text))
+                            || (!is_array($text) && !strlen((string) $text))
                         ) {
                             continue;
                         }
@@ -177,7 +205,7 @@ class SearchFilters extends AbstractHelper
                                 $label = $easyMeta->propertyLabel($property);
                                 $propertyLabel[] = $label ? $translate($label) : $translate('Unknown property'); // @translate
                             }
-                            $propertyLabel = implode(' ' . $translate('OR') . ' ', $propertyLabel);
+                            $propertyLabel = implode(' ' . $translate('OR') . ' ', array_unique($propertyLabel));
                         } else {
                             $propertyLabel = $translate('[Any property]'); // @translate
                         }
@@ -194,11 +222,11 @@ class SearchFilters extends AbstractHelper
                             }
                         }
                         if (in_array($queryType, ['resq', 'nresq', 'lkq', 'nlkq']) && !$noValue) {
-                            $value = array_map('urldecode', $value);
+                            $text = array_map('urldecode', $text);
                         }
                         $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $noValue
                             ? $queryTypesLabels[$queryType]
-                            : implode(', ', $flatArray($value));
+                            : implode(', ', $flatArray($text));
                         ++$index;
                     }
                     break;
@@ -323,6 +351,125 @@ class SearchFilters extends AbstractHelper
                         : $translate('no'); // @translate
                     break;
 
+                case 'filter':
+                    $value = array_filter($value, 'is_array');
+                    if (!count($value)) {
+                        break;
+                    }
+
+                    // Get all resources titles with one query.
+                    $vrTitles = [];
+                    $vrIds = [];
+                    foreach ($value as $queryRow) {
+                        if (is_array($queryRow)
+                            && isset($queryRow['type'])
+                            && !empty($queryRow['val'])
+                            && in_array($queryRow['type'], SearchResources::FIELD_QUERY['value_subject'])
+                        ) {
+                            is_array($queryRow['val'])
+                                ? $vrIds = array_merge($vrIds, array_values($queryRow['val']))
+                                : $vrIds[] = $queryRow['val'];
+                        }
+                    }
+                    $vrIds = array_unique(array_filter(array_map('intval', $vrIds)));
+                    if ($vrIds) {
+                        // Currently, "resources" cannot be searched, so use adapter
+                        // directly. Rights are managed.
+                        /** @var \Doctrine\ORM\EntityManager $entityManager */
+                        $services = $this->getServiceLocator();
+                        $entityManager = $services->get('Omeka\EntityManager');
+                        $qb = $entityManager->createQueryBuilder();
+                        $qb
+                            ->select('omeka_root.id', 'omeka_root.title')
+                            ->from(\Omeka\Entity\Resource::class, 'omeka_root')
+                            ->where($qb->expr()->in('omeka_root.id', ':ids'))
+                            ->setParameter('ids', $vrIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
+                        $vrTitles = array_column($qb->getQuery()->getScalarResult(), 'title', 'id');
+                    }
+
+                    /** @var \Common\Stdlib\EasyMeta $easyMeta */
+                    $easyMeta = $plugins->get('easyMeta')();
+
+                    $queryTypesLabels = $this->getQueryTypesLabels();
+                    $searchFormAdvancedLabels = array_column($searchFormSettings['advanced']['fields'] ?? [], 'label', 'value');
+                    $fieldFiltersLabels = array_replace($fieldLabels, array_filter($searchFormAdvancedLabels));
+
+                    $index = 0;
+                    foreach ($value as $subKey => $queryRow) {
+                        // Default query type is "in", unlike standard search.
+                        $queryType = $queryRow['type'] ?? 'in';
+                        if (!isset(SearchResources::FIELD_QUERY['reciprocal'][$queryType])) {
+                            continue;
+                        }
+
+                        $joiner = $queryRow['join'] ?? 'and';
+                        $val = $queryRow['val'] ?? '';
+
+                        $isWithoutValue = in_array($queryType, SearchResources::FIELD_QUERY['value_none'], true);
+
+                        // A value can be an array with types "list" and "nlist".
+                        if (!is_array($val)
+                            && !strlen((string) $val)
+                            && !$isWithoutValue
+                        ) {
+                            continue;
+                        }
+
+                        if ($isWithoutValue) {
+                            $val = '';
+                        }
+
+                        $queryFields = $queryRow['field'] ?? null;
+                        // Fields may be an array with an empty value (any
+                        // field) in advanced form, so remove empty strings from
+                        // it, in which case the check should be skipped.
+                        if (is_array($queryFields) && in_array('', $queryFields, true)) {
+                            $queryFields = [];
+                        }
+
+                        // Prepare label.
+                        // Support default solr index names to simplify
+                        // compatibility of custom themes.
+                        if ($queryFields) {
+                            $fieldLabel = [];
+                            foreach (is_array($queryFields) ? $queryFields : [$queryFields] as $queryField) {
+                                if (isset($fieldFiltersLabels[$queryField])) {
+                                    $fieldLabel[] = $fieldFiltersLabels[$queryField];
+                                } elseif (strpos($queryField, '_')) {
+                                    $fieldLabel[] = $fieldFiltersLabels[strtok($queryField, '_') . ':' . strtok('_')] ?? $translate('Unknown field'); // @translate
+                                } else {
+                                    $propertyLabel = $easyMeta->propertyLabel($queryField);
+                                    if ($propertyLabel) {
+                                        $fieldLabel[] = $translate($propertyLabel);
+                                    } else {
+                                        $fieldLabel[] = $translate('Unknown field'); // @translate
+                                    }
+                                }
+                            }
+                            $fieldLabel = implode(' ' . $translate('OR') . ' ', array_unique($fieldLabel));
+                        } else {
+                            $fieldLabel = $translate('[Any field]'); // @translate
+                        }
+
+                        $filterLabel = $fieldLabel . ' ' . $queryTypesLabels[$queryType];
+                        if ($index > 0) {
+                            $joiners = [
+                                'or' => $translate('OR'), // @translate
+                                'not' => $translate('EXCEPT'), // @translate
+                                'and' => $translate('AND'), // @translate
+                            ];
+                            $filterLabel = ($joiners[$joiner] ?? $joiners['and']) . ' ' . $filterLabel;
+                        }
+
+                        $vals = in_array($queryType, SearchResources::FIELD_QUERY['value_subject'])
+                            ? $flatArrayValueResourceIds($val, $vrTitles)
+                            : $flatArray($val);
+                        $filters[$filterLabel][$this->urlQuery($key, $subKey)] = implode(', ', $vals);
+
+                        ++$index;
+                    }
+                    break;
+
                 case 'datetime':
                     $queryTypesDatetime = [
                         'lt' => $translate('before'), // @translate
@@ -338,10 +485,10 @@ class SearchFilters extends AbstractHelper
                     $value = $this->query['datetime'];
                     $engine = 0;
                     foreach ($value as $subKey => $queryRow) {
-                        $joiner = $queryRow['joiner'];
+                        $joiner = $queryRow['join'];
                         $field = $queryRow['field'];
                         $type = $queryRow['type'];
-                        $datetimeValue = $queryRow['value'];
+                        $datetimeValue = $queryRow['val'];
 
                         $fieldLabel = $field === 'modified'
                             ? $translate('Modified') // @translate

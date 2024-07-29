@@ -25,6 +25,10 @@ class MvcListeners extends AbstractListenerAggregate
      */
     public function redirectItemSetToSearch(MvcEvent $event): void
     {
+        /**
+         * @var \Omeka\Api\Manager $api
+         */
+
         $routeMatch = $event->getRouteMatch();
         $matchedRouteName = $routeMatch->getMatchedRouteName();
         if ('site/item-set' !== $matchedRouteName) {
@@ -41,8 +45,19 @@ class MvcListeners extends AbstractListenerAggregate
             return;
         }
 
-        $searchMainPage = $siteSettings->get('advancedsearch_main_config');
-        if (empty($searchMainPage)) {
+        $searchConfigId = $siteSettings->get('advancedsearch_main_config');
+        if (empty($searchConfigId)) {
+            return;
+        }
+
+        // The search config may have been removed, so check and get the slug.
+        // It should be cached by doctrine.
+        // Or use setting "'advancedsearch_all_configs".
+        $api = $services->get('Omeka\ApiManager');
+        try {
+            $searchConfig = $api->read('search_configs', ['id' => $searchConfigId], [], ['responseContent' => 'resource'])->getContent();
+            $searchConfigSlug = $searchConfig->getSlug();
+        } catch (\Exception $e) {
             return;
         }
 
@@ -55,13 +70,12 @@ class MvcListeners extends AbstractListenerAggregate
             'controller' => \AdvancedSearch\Controller\SearchController::class,
             'action' => 'search',
             'site-slug' => $siteSlug,
-            'id' => $searchMainPage,
+            'id' => $searchConfigId,
             'item-set-id' => $itemSetId,
-            // TODO Store the page slug to simplify checks.
-            // 'page-slug' => $searchConfigSlug,
+            'page-slug' => $searchConfigSlug,
         ];
         $routeMatch = new RouteMatch($params);
-        $routeMatch->setMatchedRouteName('search-page-' . $searchMainPage);
+        $routeMatch->setMatchedRouteName('search-page-' . $searchConfigSlug);
         $event->setRouteMatch($routeMatch);
 
         /** @see \Laminas\Stdlib\Parameters */

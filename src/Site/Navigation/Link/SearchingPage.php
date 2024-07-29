@@ -77,7 +77,7 @@ class SearchingPage implements LinkInterface
         }
         return [
             'label' => $data['label'],
-            'route' => 'search-page-' . $searchConfig->id(),
+            'route' => 'search-page-' . $searchConfig->slug(),
             'params' => [
                 'site-slug' => $site->slug(),
             ],

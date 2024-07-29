@@ -98,8 +98,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
             $options['query'] = $query;
         }
         $url = $this->getViewHelper('Url');
-        // The urls use "search-page-" to simplify migration.
-        return $url('search-page-' . $this->id(), $params, $options);
+        return $url('search-page-' . $this->slug(), $params, $options);
     }
 
     public function name(): string

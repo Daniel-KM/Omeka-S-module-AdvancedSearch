@@ -445,6 +445,8 @@ class Module extends AbstractModule
             }
         }
 
+        // To avoid collision with module Search, the routes use the slug.
+
         $isAdminRequest = $status->isAdminRequest();
         if ($isAdminRequest) {
             $baseRoutes = ['search-admin-page-'];
@@ -457,7 +459,7 @@ class Module extends AbstractModule
             $adminSearchConfigs = array_intersect_key($searchConfigs, array_flip($adminSearchConfigs));
             foreach ($baseRoutes as $baseRoute) foreach ($adminSearchConfigs as $searchConfigId => $searchConfigSlug) {
                 $router->addRoute(
-                    $baseRoute . $searchConfigId,
+                    $baseRoute . $searchConfigSlug,
                     [
                         'type' => \Laminas\Router\Http\Segment::class,
                         'options' => [
@@ -518,8 +520,7 @@ class Module extends AbstractModule
         $siteSearchConfigs = array_intersect_key($searchConfigs, array_flip($siteSearchConfigs));
         foreach ($siteSearchConfigs as $searchConfigId => $searchConfigSlug) {
             $router->addRoute(
-                // The urls use "search-page-" to simplify migration.
-                'search-page-' . $searchConfigId,
+                'search-page-' . $searchConfigSlug,
                 [
                     'type' => \Laminas\Router\Http\Segment::class,
                     'options' => [

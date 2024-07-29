@@ -30,7 +30,7 @@ class SearchingUrl extends AbstractHelper
             try {
                 /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
                 $searchConfig = $view->api()->read('search_configs', ['id' => $searchMainConfig])->getContent();
-                return $view->url('search-page-' . $searchConfig->id(), [], $options, true);
+                return $view->url('search-page-' . $searchConfig->slug(), [], $options, true);
             } catch (\Omeka\Api\Exception\NotFoundException $e) {
                 $view->logger()->err(
                     'Search engine #{search_config_id} does not exist.', // @translate

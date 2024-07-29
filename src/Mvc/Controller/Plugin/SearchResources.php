@@ -997,6 +997,21 @@ class SearchResources extends AbstractPlugin
                         $idsPlaceholder
                     ));
             }
+        } elseif (isset($query['sort_by'])
+            // The event "api.search.query.finalize is skipped In scalar search,
+            // so pass it here.
+            /** @see \Omeka\Module::searchFullText() */
+            && isset($query['fulltext_search'])
+            && in_array($query['sort_by'], ['relevance', 'relevance desc', 'relevance asc'])
+            && trim($query['fulltext_search']) !== ''
+        ) {
+            // The order is slightly different from the standard one, because
+            // an order by id desc is appended automatically, so all results
+            // with the same score are sorted by id desc and not randomly.
+            $matchOrder = 'MATCH(omeka_fulltext_search.title, omeka_fulltext_search.text) AGAINST (:omeka_fulltext_search)';
+            $sortOrder = $query['sort_by'] === 'relevance asc' ? 'ASC' : 'DESC';
+            $qb
+                ->addOrderBy($matchOrder, $sortOrder);
         }
     }
 

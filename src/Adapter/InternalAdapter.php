@@ -49,14 +49,24 @@ class InternalAdapter extends AbstractAdapter
 
         $availableFields = $this->getAvailableFields();
 
-        // There is no default score sort.
-        $sortFields = [];
-
         $translator = $this->getServiceLocator()->get('MvcTranslator');
 
         $directionLabels = [
             'asc' => $translator->translate('Asc'),
             'desc' => $translator->translate('Desc'),
+        ];
+
+        // There is no default score sort, except for full text search.
+        // According to mysql, the default for relevance is "desc".
+        $sortFields = [
+            'relevance desc' => [
+                'name' => 'relevance desc',
+                'label' => $translator->translate('Relevance'), // @translate
+            ],
+            'relevance asc' => [
+                'name' => 'relevance asc',
+                'label' => $translator->translate('Relevance (inversed)'), // @translate
+            ],
         ];
 
         foreach ($availableFields as $name => $availableField) {

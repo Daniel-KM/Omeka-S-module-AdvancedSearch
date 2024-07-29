@@ -211,21 +211,29 @@ return [
         'sort' => [
             'label' => $translate('Sort'),
             'fields' => [
+                'relevance desc' => [
+                    'name' => 'relevance desc',
+                    'label' => $translate('Relevance'), // @translate
+                ],
+                'relevance asc' => [
+                    'name' => 'relevance asc',
+                    'label' => $translate('Relevance (inversed)'), // @translate
+                ],
                 'dcterms:title asc' => [
                     'name' => 'dcterms:title asc',
-                    'label' => $translate('Title'),
+                    'label' => $translate('Title'), // @translate
                 ],
                 'dcterms:title desc' => [
                     'name' => 'dcterms:title desc',
-                    'label' => $translate('Title (from z to a)'),
+                    'label' => $translate('Title (from z to a)'), // @translate
                 ],
                 'dcterms:date asc' => [
                     'name' => 'dcterms:date asc',
-                    'label' => $translate('Date'),
+                    'label' => $translate('Date'), // @translate
                 ],
                 'dcterms:date desc' => [
                     'name' => 'dcterms:date desc',
-                    'label' => $translate('Date (most recent first)'),
+                    'label' => $translate('Date (most recent first)'), // @translate
                 ],
             ],
         ],

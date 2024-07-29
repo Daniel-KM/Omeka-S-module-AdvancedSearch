@@ -130,9 +130,17 @@ class SearchRequestToResponse extends AbstractPlugin
         }
         $searchFormSettings['request']['per_page'] = $perPage ?: Paginator::PER_PAGE;
 
+        // Specific options. There are options that may change the process to
+        // get the query. Anyway, they should be set one time early.
+
         // Facets are needed to check active facets with range, where the
         // default value should be skipped.
         $searchFormSettings['facet'] = $searchConfigSettings['facet'] ?? [];
+
+        $searchFormSettings['aliases'] = $this->searchConfig->subSetting('index', 'aliases', []);
+
+        // TODO Add a way to pass any dynamically configured option to the search engine.
+        $searchFormSettings['default_search_partial_word'] = $this->searchConfig->subSetting('q', 'default_search_partial_word', false);
 
         /** @var \AdvancedSearch\Query $query */
         $query = $formAdapter->toQuery($request, $searchFormSettings);
@@ -177,23 +185,6 @@ class SearchRequestToResponse extends AbstractPlugin
 
         if ($site) {
             $query->setSiteId($site->id());
-            // $siteSettings = $services->get('Omeka\Settings\Site');
-            $searchConfigId = (int) $siteSettings->get('advancedsearch_main_config');
-        } else {
-            // $settings = $services->get('Omeka\Settings');
-            $searchConfigId = (int) $settings->get('advancedsearch_main_config');
-        }
-
-        if ($searchConfigId) {
-            $api = $services->get('Omeka\ApiManager');
-            try {
-                /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig*/
-                $searchConfig = $api->read('search_configs', ['id' => $searchConfigId])->getContent();
-                $aliases = $searchConfig->subSetting('index', 'aliases', []);
-                $query->setAliases($aliases);
-            } catch (\Exception $e) {
-                // No aliases.
-            }
         }
 
         $query->setByResourceType(!empty($searchConfigSettings['display']['by_resource_type']));

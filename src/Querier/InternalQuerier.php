@@ -576,7 +576,7 @@ SQL;
             $q = trim($q, '" ');
         }
 
-        if ($this->engine->settingAdapter('default_search_partial_word', false)) {
+        if ($this->query->getOption('default_search_partial_word', false)) {
             $this->args['property'][] = [
                 'joiner' => 'and',
                 'property' => '',
@@ -611,7 +611,7 @@ SQL;
             $q = trim($q, '" ');
         }
 
-        if ($this->engine->settingAdapter('default_search_partial_word', false)) {
+        if ($this->query->getOption('default_search_partial_word', false)) {
             $this->args['property'][] = [
                 'joiner' => 'and',
                 'property' => '',

@@ -89,7 +89,8 @@ class ApiFormAdapter implements FormAdapterInterface
     {
         $query = new Query();
         $query
-            ->setAliases($formSettings['aliases'] ?? []);
+            ->setAliases($formSettings['aliases'] ?? [])
+            ->setOption('default_search_partial_word', !empty($formSettings['default_search_partial_word']));
 
         if (isset($request['search'])) {
             $query->setQuery($request['search']);

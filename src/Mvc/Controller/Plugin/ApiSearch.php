@@ -293,6 +293,9 @@ class ApiSearch extends AbstractPlugin
         $searchFormSettings['only_available_fields'] = $searchAdapter
             && $searchAdapter instanceof \SearchSolr\Adapter\SolariumAdapter;
 
+        $searchFormSettings['aliases'] = $this->searchConfig->subSetting('index', 'aliases', []);
+        $searchFormSettings['default_search_partial_word'] = $this->searchConfig->subSetting('q', 'default_search_partial_word', false);
+
         $searchQuery = $this->apiFormAdapter->toQuery($query, $searchFormSettings);
         $searchQuery->setResourceTypes([$resourceType]);
 

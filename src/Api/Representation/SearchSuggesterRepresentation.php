@@ -131,6 +131,9 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
                 $searchConfig = $api->read('search_configs', ['id' => $searchConfigId])->getContent();
                 $aliases = $searchConfig->subSetting('index', 'aliases', []);
                 $query->setAliases($aliases);
+
+                $defaultSearchPartialWord = $searchConfig->subSetting('q', 'default_search_partial_word', false);
+                $query->setOption('default_search_partial_word', $defaultSearchPartialWord);
             } catch (\Exception $e) {
                 // No aliases.
             }

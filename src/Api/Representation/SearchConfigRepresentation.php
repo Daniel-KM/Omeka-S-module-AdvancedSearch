@@ -430,6 +430,9 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         $aliases = $this->subSetting('index', 'aliases', []);
         $query->setAliases($aliases);
 
+        $defaultSearchPartialWord = $this->subSetting('q', 'default_search_partial_word', false);
+        $query->setOption('default_search_partial_word', $defaultSearchPartialWord);
+
         $fields = [];
         if ($field) {
             $metadataFieldsToNames = [

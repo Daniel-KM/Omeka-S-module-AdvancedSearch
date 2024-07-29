@@ -516,8 +516,8 @@ class Query implements JsonSerializable
     }
 
     /**
-     * @experimental Only used to pass the display list mode for facets for now.
-     * May be removed in a future version.
+     * @experimental Used to pass the display list mode for facets and the mode
+     * the fulltext search of the internal engine.
      */
     public function setOption(string $key, $value): self
     {
@@ -583,6 +583,7 @@ class Query implements JsonSerializable
             'suggest_fields' => $this->getSuggestFields(),
             'excluded_fields' => $this->getExcludedFields(),
             'site_id' => $this->getSiteId(),
+            'options' => $this->options,
         ];
     }
 }

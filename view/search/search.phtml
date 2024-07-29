@@ -158,7 +158,7 @@ $this->headScript()
 <div class="search-results-wrapper">
 
     <?php if ($displayFacets === 'before'): ?>
-    <?= $partial('search/facets', [
+    <?= $partial('search/facets-list', [
         'site' => $site,
         'searchConfig' => $searchConfig,
         'query' => $query,
@@ -245,7 +245,7 @@ $this->headScript()
     </div>
 
     <?php if ($displayFacets === 'after'): ?>
-    <?= $partial('search/facets', [
+    <?= $partial('search/facets-list', [
         'site' => $site,
         'searchConfig' => $searchConfig,
         'query' => $query,

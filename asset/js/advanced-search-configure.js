@@ -6,6 +6,9 @@ $(document).ready(function() {
 
     /**
      * Search configure form.
+     *
+     * @see module AdvancedSearch asset/js/advanced-search-configure.js
+     * @see module SingleSignOn asset/js/single-sign-on-admin.js
      */
 
     const $formConfig = $('#form-search-config-configure');
@@ -30,14 +33,14 @@ $(document).ready(function() {
             self.fieldsetUpdateLabels();
 
             // Move the button plus inside the previous fieldset.
-            $formConfig.find('.search-fieldset-plus').each(function(no, button) {
+            $formConfig.find('.config-fieldset-plus').each(function(no, button) {
                 $(button).appendTo($(button).prev('fieldset'));
             });
 
-            $formConfig.on('click', '.search-fieldset-minus', self.fieldsetRemove);
-            $formConfig.on('click', '.search-fieldset-plus', self.fieldsetAppend);
-            $formConfig.on('click', '.search-fieldset-up', self.fieldsetMoveUp);
-            $formConfig.on('click', '.search-fieldset-down', self.fieldsetMoveDown);
+            $formConfig.on('click', '.config-fieldset-minus', self.fieldsetRemove);
+            $formConfig.on('click', '.config-fieldset-plus', self.fieldsetAppend);
+            $formConfig.on('click', '.config-fieldset-up', self.fieldsetMoveUp);
+            $formConfig.on('click', '.config-fieldset-down', self.fieldsetMoveDown);
 
             $formConfig.on('change', '#form-search-config-sort select', function() {
                 const select = $(this);
@@ -101,7 +104,7 @@ $(document).ready(function() {
 
         self.fieldsetUpdateButtons = function() {
             // Remove the field wrapping new buttons.
-            $('.search-fieldset-action').each(function(no, button) {
+            $('.config-fieldset-action').each(function(no, button) {
                 const field = button.closest('.field');
                 if (field) {
                     $(button).insertBefore(field);
@@ -109,8 +112,8 @@ $(document).ready(function() {
                 }
             });
             // Enable or disable up/down buttons in each fieldset.
-            var buttons = $formConfig.find('.search-fieldset-up');
-            $formConfig.find('.search-fieldset-up').each(function(no, button) {
+            var buttons = $formConfig.find('.config-fieldset-up');
+            $formConfig.find('.config-fieldset-up').each(function(no, button) {
                 button = $(button);
                 const index = self.fieldsetIndex(button.closest('fieldset'));
                 if (index <= 1) {
@@ -119,8 +122,8 @@ $(document).ready(function() {
                     button.removeAttr('disabled');
                 }
             });
-            buttons = $formConfig.find('.search-fieldset-down');
-            $formConfig.find('.search-fieldset-down').each(function(no, button) {
+            buttons = $formConfig.find('.config-fieldset-down');
+            $formConfig.find('.config-fieldset-down').each(function(no, button) {
                 button = $(button);
                 const index = self.fieldsetIndex(button.closest('fieldset'));
                 const fieldset = button.closest('fieldset');

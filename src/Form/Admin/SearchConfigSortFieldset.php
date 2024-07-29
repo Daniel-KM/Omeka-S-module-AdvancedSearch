@@ -110,12 +110,12 @@ class SearchConfigSortFieldset extends Fieldset implements InputFilterProviderIn
                         'disable_html_escape' => true,
                     ],
                     'label_attributes' => [
-                        'class' => 'search-fieldset-action-label',
+                        'class' => 'config-fieldset-action-label',
                     ],
                 ],
                 'attributes' => [
                     // Don't use o-icon-delete.
-                    'class' => 'search-fieldset-action search-fieldset-minus fa fa-minus remove-value button',
+                    'class' => 'config-fieldset-action config-fieldset-minus fa fa-minus remove-value button',
                     'aria-label' => 'Remove this sort option', // @translate
                 ],
             ])
@@ -128,12 +128,12 @@ class SearchConfigSortFieldset extends Fieldset implements InputFilterProviderIn
                         'disable_html_escape' => true,
                     ],
                     'label_attributes' => [
-                        'class' => 'search-fieldset-action-label',
+                        'class' => 'config-fieldset-action-label',
                     ],
                 ],
                 'attributes' => [
                     // Don't use o-icon-delete.
-                    'class' => 'search-fieldset-action search-fieldset-up fa fa-arrow-up button',
+                    'class' => 'config-fieldset-action config-fieldset-up fa fa-arrow-up button',
                     'aria-label' => 'Move this sort option up', // @translate
                 ],
             ])
@@ -146,12 +146,12 @@ class SearchConfigSortFieldset extends Fieldset implements InputFilterProviderIn
                         'disable_html_escape' => true,
                     ],
                     'label_attributes' => [
-                        'class' => 'search-fieldset-action-label',
+                        'class' => 'config-fieldset-action-label',
                     ],
                 ],
                 'attributes' => [
                     // Don't use o-icon-delete.
-                    'class' => 'search-fieldset-action search-fieldset-down fa fa-arrow-down button',
+                    'class' => 'config-fieldset-action config-fieldset-down fa fa-arrow-down button',
                     'aria-label' => 'Move this sort option down', // @translate
                 ],
             ])

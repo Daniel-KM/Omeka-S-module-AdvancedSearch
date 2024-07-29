@@ -402,12 +402,12 @@ class SearchConfigConfigureForm extends Form
                         'disable_html_escape' => true,
                     ],
                     'label_attributes' => [
-                        'class' => 'search-fieldset-action-label',
+                        'class' => 'config-fieldset-action-label',
                     ],
                 ],
                 'attributes' => [
                     // Don't use o-icon-add.
-                    'class' => 'search-fieldset-action search-fieldset-plus fa fa-plus add-value button',
+                    'class' => 'config-fieldset-action config-fieldset-plus fa fa-plus add-value button',
                     'aria-label' => 'Add a filter', // @translate
                 ],
             ])
@@ -865,12 +865,12 @@ class SearchConfigConfigureForm extends Form
                         'disable_html_escape' => true,
                     ],
                     'label_attributes' => [
-                        'class' => 'search-fieldset-action-label',
+                        'class' => 'config-fieldset-action-label',
                     ],
                 ],
                 'attributes' => [
                     // Don't use o-icon-add.
-                    'class' => 'search-fieldset-action search-fieldset-plus fa fa-plus add-value button',
+                    'class' => 'config-fieldset-action config-fieldset-plus fa fa-plus add-value button',
                     'aria-label' => 'Add a sort option', // @translate
                 ],
             ])
@@ -1063,12 +1063,12 @@ class SearchConfigConfigureForm extends Form
                         'disable_html_escape' => true,
                     ],
                     'label_attributes' => [
-                        'class' => 'search-fieldset-action-label',
+                        'class' => 'config-fieldset-action-label',
                     ],
                 ],
                 'attributes' => [
                     // Don't use o-icon-add.
-                    'class' => 'search-fieldset-action search-fieldset-plus fa fa-plus add-value button',
+                    'class' => 'config-fieldset-action config-fieldset-plus fa fa-plus add-value button',
                     'aria-label' => 'Add a facet', // @translate
                 ],
             ])

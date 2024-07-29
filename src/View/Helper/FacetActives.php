@@ -19,12 +19,8 @@ class FacetActives extends AbstractFacet
     {
         $isFacetModeDirect = ($options['mode'] ?? '') === 'link';
 
-        // Normally it is useless to use facetLabel() with options.
-        /** @var \AdvancedSearch\View\Helper\FacetLabel $facetLabel */
-        $facetLabel = $this->getView()->getHelperPluginManager()->get('facetLabel');
-
         foreach ($activeFacets as $facetField => &$facetValues) {
-            $facetFieldLabel = $options['facets'][$facetField]['label'] ?? $facetLabel($facetField);
+            $facetFieldLabel = $options['facets'][$facetField]['label'] ?? $facetField;
             foreach ($facetValues as $facetKey => &$facetValue) {
                 $facetValueLabel = (string) $this->facetValueLabel($facetField, $facetValue);
                 if (!strlen($facetValueLabel)) {

@@ -32,7 +32,6 @@ $labelSubmit = $displaySubmit ? $searchConfig->subSetting('facet', 'label_submit
 $labelReset = $displayReset ? $searchConfig->subSetting('facet', 'label_reset', $translate('Reset facets')) : null;
 
 $facetActives = $plugins->get('facetActives');
-$facetLabel = $plugins->get('facetLabel');
 // Facet checkbox can be used in any case anyway, the js checks it.
 $facetElements = $isFacetModeButton ? $plugins->get('facetCheckboxes') : $plugins->get('facetLinks');
 $facetSelect = $plugins->get('facetSelect');
@@ -85,7 +84,7 @@ $options = $searchConfig->setting('facet', []);
             <?php foreach ($facets as $name => $facetValues): ?>
             <?php $facetType = empty($options['facets'][$name]['type']) ? 'Checkbox' : $options['facets'][$name]['type']; ?>
             <li class="search-facet">
-                <h4><?= $translate($facetLabel($name)) ?></h4>
+                <h4><?= $escape($translate($options['facets'][$name]['label'] ?? $name)) ?></h4>
                 <?php if ($facetType === 'Select'): ?>
                 <?= $facetSelect($name, $facetValues, $options) ?>
                 <?php elseif ($facetType === 'SelectRange'): ?>

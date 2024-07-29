@@ -982,9 +982,9 @@ SQL;
         // query for resource (items and item sets together).
         $facetCountsByField = array_fill_keys(array_keys($facets), []);
 
-        // Like Solr, get all facet values, so all existing values.
+        // Like Solr, get only available useful values or all existing values.
         /** @see https://solr.apache.org/guide/solr/latest/query-guide/faceting.html */
-        $referenceQuery = $this->query->getOption('facet_display_list', 'available') === 'all'
+        $referenceQuery = $this->query->getOption('facet_list') === 'all'
             ? $this->argsWithoutActiveFacets
             : $this->args;
 

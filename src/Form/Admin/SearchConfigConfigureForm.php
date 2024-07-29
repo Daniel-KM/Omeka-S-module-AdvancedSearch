@@ -780,7 +780,7 @@ new = does not end with
                     'label' => 'Label above the list of facets', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'label',
+                    'id' => 'facet_label_facets',
                     'value' => 'Facets',
                 ],
             ])
@@ -791,19 +791,8 @@ new = does not end with
                     'label' => 'Label "No facets"', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'label',
+                    'id' => 'facet_label_no_facets',
                     'value' => 'No facets', // @translate
-                ],
-            ])
-            ->add([
-                'name' => 'label_active_facets',
-                'type' => Element\Text::class,
-                'options' => [
-                    'label' => 'Label "Active facets"', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'label',
-                    'value' => 'Active facets', // @translate
                 ],
             ])
             ->add([
@@ -823,6 +812,23 @@ new = does not end with
                 ],
             ])
             ->add([
+                'name' => 'list',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'List of facets', // @translate
+                    'infos' => 'With the internal search engine, the option "all facets" may be slow when there are facets and filters for item sets or sites.', // @translate
+                    'value_options' => [
+                        'available' => 'Available facets only', // @translate
+                        'all' => 'All facets, even with 0 results (see info)', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'facet_list',
+                    'required' => false,
+                    'value' => 'available',
+                ],
+            ])
+            ->add([
                 'name' => 'display_active',
                 'type' => Element\Checkbox::class,
                 'options' => [
@@ -832,6 +838,17 @@ new = does not end with
                     'id' => 'facet_display_active',
                     'required' => false,
                     'value' => true,
+                ],
+            ])
+            ->add([
+                'name' => 'label_active_facets',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Label "Active facets"', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'facet_label_active_facets',
+                    'value' => 'Active facets', // @translate
                 ],
             ])
             ->add([
@@ -859,7 +876,7 @@ new = does not end with
                     'label' => 'Label for submit', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'label_submit',
+                    'id' => 'facet_label_submit',
                     'required' => false,
                     'value' => 'Apply facets', // @translate
                     'placeholder' => 'Apply facets', // @translate
@@ -890,7 +907,7 @@ new = does not end with
                     'label' => 'Label for reset', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'label_reset',
+                    'id' => 'facet_label_reset',
                     'required' => false,
                     'value' => 'Reset facets', // @translate
                     'placeholder' => 'Reset facets', // @translate
@@ -901,7 +918,7 @@ new = does not end with
                 'type' => CommonElement\IniTextarea::class,
                 'options' => [
                     'label' => 'List of facets', // @translate
-                    'info' => 'List of facets that will be displayed in the search page, formatted as ini. The section is a unique name. Keys are: field, label, type, order, limit, languages, data_types, main_types, values, display_list, display_count, and specific options, like thesaurus.', // @translate
+                    'info' => 'List of facets that will be displayed in the search page, formatted as ini. The section is a unique name. Keys are: field, label, type, order, limit, languages, data_types, main_types, values, display_count, and specific options, like thesaurus.', // @translate
                     // TODO Convert documentation into help. See application/view/common/form-row.phtml
                     'documentation' => nl2br(<<<'MARKDOWN'
                         #"></a>

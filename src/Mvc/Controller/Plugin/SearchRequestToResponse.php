@@ -207,12 +207,16 @@ class SearchRequestToResponse extends AbstractPlugin
             // Set all keys to simplify later process.
             $facetConfigDefault = [
                 'field' => null,
-                'languages' => [],
                 'label' => null,
                 'type' => null,
                 'order' => null,
-                'limit' => 25,
-                'display_list' => null,
+                'limit' => 0,
+                'languages' => [],
+                'data_types' => [],
+                'main_types' => [],
+                'values' => [],
+                // TODO "list" is currently a global setting, because the main query with the internal querier depends on it for all facets.
+                // 'list' => null,
                 'display_count' => false,
             ];
             foreach ($searchConfigSettings['facet']['facets'] as &$facetConfig) {
@@ -222,7 +226,7 @@ class SearchRequestToResponse extends AbstractPlugin
             $query->setFacets($searchConfigSettings['facet']['facets']);
         }
 
-        $query->setOption('facet_display_list', $searchConfigSettings['facet']['display_list'] ?? 'all');
+        $query->setOption('facet_list', $searchConfigSettings['facet']['list'] ?? 'available');
 
         $eventManager = $services->get('Application')->getEventManager();
         $eventArgs = $eventManager->prepareArgs([

@@ -326,7 +326,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                     $joiner = null;
                     $operator = null;
                     foreach ($formSettings['filters'] as $filter) {
-                        if ($filter['type'] === 'Advanced') {
+                        if (($filter['type'] ?? '') === 'Advanced') {
                             $joiner = (bool) $filter['field_joiner'];
                             $operator = (bool) $filter['field_operator'];
                             break;

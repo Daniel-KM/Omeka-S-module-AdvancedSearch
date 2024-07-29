@@ -309,7 +309,7 @@ class SearchingFilters extends AbstractHelper
                     $searchFormAdvancedLabels = [];
                     foreach ($searchFormSettings['filters'] as $searchFormFilter) {
                         if ($searchFormFilter['type'] === 'Advanced') {
-                            $searchFormAdvancedLabels = array_column($searchFormFilter['fields'], 'label', 'value');
+                            $searchFormAdvancedLabels = array_column($searchFormFilter['fields'] ?? [], 'label', 'value');
                             break;
                         }
                     }

@@ -33,21 +33,21 @@ const hasChosenSelect = typeof $.fn.chosen === 'function';
 var Search = (function() {
     var self = {};
 
-    self.setViewType = function(viewType) {
-        // In some themes, the mode for resource list is set with a different class.
-        var resourceLists = document.querySelectorAll('.search-results .resource-list, .search-results .resources-list-content');
-        for (var i = 0; i < resourceLists.length; i++) {
-            var resourceItem = resourceLists[i];
-            resourceItem.className = resourceItem.className.replace(' grid', '').replace(' list', '')
-                + ' ' + viewType;
-        }
-        localStorage.setItem('search_view_type', viewType);
+    /**
+     * Chosen default options.
+     * @see https://harvesthq.github.io/chosen/
+     */
+    self.chosenOptions = {
+        allow_single_deselect: true,
+        disable_search_threshold: 10,
+        width: '100%',
+        include_group_label_in_selected: true,
     };
 
     /**
      * Check if the current query is an advanced search one.
      */
-    self.isAdvancedSearchQuery = function () {
+    self.isAdvancedSearchQuery = function() {
         let searchParams = new URLSearchParams(document.location.search);
         let  params = Array.from(searchParams.entries());
         for (let i in params) {
@@ -65,40 +65,31 @@ var Search = (function() {
     }
 
     /**
-     * Chosen default options.
-     * @see https://harvesthq.github.io/chosen/
-     */
-    self.chosenOptions = {
-        allow_single_deselect: true,
-        disable_search_threshold: 10,
-        width: '100%',
-        include_group_label_in_selected: true,
-    };
-
-    var transformResult = function(response) {
-        // Managed by Solr endpoint.
-        // @see https://solr.apache.org/guide/suggester.html#example-usages
-        if (response.suggest) {
-            const answer = response.suggest[Object.keys(response.suggest)[0]];
-            const searchString = answer[Object.keys(answer)[0]];
-            return {
-                query: searchString,
-                suggestions: $.map(answer[searchString].suggestions, function(dataItem) {
-                    return {
-                        value: dataItem.term,
-                        data: dataItem.weight,
-                    };
-                }),
-            };
-        }
-        // Managed by module or try the format of jQuery-Autocomplete.
-        return response.data ? response.data : response;
-    }
-
-    /**
+     * Autocomplete or autosuggest.
+     *
      * @see https://github.com/devbridge/jQuery-Autocomplete
      */
-    self.autosuggestOptions = function (searchElement) {
+    self.autosuggestOptions = function(searchElement) {
+        var transformResult = function(response) {
+            // Managed by Solr endpoint.
+            // @see https://solr.apache.org/guide/suggester.html#example-usages
+            if (response.suggest) {
+                const answer = response.suggest[Object.keys(response.suggest)[0]];
+                const searchString = answer[Object.keys(answer)[0]];
+                return {
+                    query: searchString,
+                    suggestions: $.map(answer[searchString].suggestions, function(dataItem) {
+                        return {
+                            value: dataItem.term,
+                            data: dataItem.weight,
+                        };
+                    }),
+                };
+            }
+            // Managed by module or try the format of jQuery-Autocomplete.
+            return response.data ? response.data : response;
+        }
+
         let serviceUrl = searchElement.data('autosuggest-url');
         if (!serviceUrl || !serviceUrl.length) {
             return null;
@@ -119,6 +110,148 @@ var Search = (function() {
             },
         };
     };
+
+    /* Results */
+
+    self.setViewType = function(viewType) {
+        // In some themes, the mode for resource list is set with a different class.
+        var resourceLists = document.querySelectorAll('.search-results .resource-list, .search-results .resources-list-content');
+        for (var i = 0; i < resourceLists.length; i++) {
+            var resourceItem = resourceLists[i];
+            resourceItem.className = resourceItem.className.replace(' grid', '').replace(' list', '')
+                + ' ' + viewType;
+        }
+        localStorage.setItem('search_view_type', viewType);
+    };
+
+    /* Facets. */
+
+    self.facets = (function() {
+        var self = {};
+
+        self.expandOrCollapse = function(button) {
+            button = $(button);
+            if (button.hasClass('expand')) {
+                button.attr('aria-label', button.attr('data-label-expand') ? button.attr('data-label-expand') : Omeka.jsTranslate('Expand'));
+                button.closest('.facet').find('.facet-elements').attr('hidden', 'hidden');
+            } else {
+                button.attr('aria-label', button.attr('data-label-expand') ? button.attr('data-label-collapse') : Omeka.jsTranslate('Collapse'));
+                button.closest('.facet').find('.facet-elements').removeAttr('hidden');
+            }
+            return self;
+        }
+
+        self.seeMoreOrLess = function(button) {
+            button = $(button);
+            if (button.hasClass('expand')) {
+                button.text(button.attr('data-label-see-more') ? button.attr('data-label-see-more') : Omeka.jsTranslate('See more'));
+                const defaultCount = Number(button.attr('data-default-count')) + 1;
+                button.closest('.facet').find('.facet-items .facet-item:nth-child(n+' + defaultCount + ')').attr('hidden', 'hidden');
+            } else {
+                button.text(button.attr('data-label-see-less') ? button.attr('data-label-see-less') : Omeka.jsTranslate('See less'));
+                button.closest('.facet').find('.facet-items .facet-item').removeAttr('hidden');
+            }
+            return self;
+        }
+
+        return self;
+    })();
+
+    /* Forms tools. */
+
+    self.rangeSliderDouble = (function() {
+        var self = {};
+
+        // TODO Get slider colors from the css.
+        self.colorRangeDefault = '#a7a7a7';
+        self.colorSliderDefault = '#e9e9ed';
+
+        /**
+        * Search range double / sliders.
+        *
+        * @see https://medium.com/@predragdavidovic10/native-dual-range-slider-html-css-javascript-91e778134816
+        */
+
+        self.getRangeDoubleElements = function(element) {
+            const rangeDouble = element.closest('.range-double');
+            return rangeDouble
+                ? [
+                    rangeDouble.querySelector('.range-numeric-from'),
+                    rangeDouble.querySelector('.range-numeric-to'),
+                    rangeDouble.querySelector('.range-slider-from'),
+                    rangeDouble.querySelector('.range-slider-to'),
+                ]
+                : [null, null, null, null];
+        };
+
+        self.controlNumericFrom = function(element) {
+            const [inputFrom, inputTo, sliderFrom, sliderTo] = self.getRangeDoubleElements(element);
+            const [from, to] = self.parseTwoElementsToInt(inputFrom, inputTo);
+            [inputFrom.value, sliderFrom.value] = from > to ? [to, to] : [from, from];
+            self.fillSlider(inputFrom, inputTo, sliderTo);
+            return self;
+        };
+
+        self.controlNumericTo = function(element) {
+            const [inputFrom, inputTo, sliderFrom, sliderTo] = self.getRangeDoubleElements(element);
+            const [from, to] = self.parseTwoElementsToInt(inputFrom, inputTo);
+            [inputTo.value, sliderTo.value] = from <= to ? [to, to] : [from, from];
+            self.fillSlider(inputFrom, inputTo, sliderTo);
+            self.toggleRangeSliderAccessible(sliderTo);
+            return self;
+        }
+
+        self.controlSliderFrom = function(element) {
+            const [inputFrom, inputTo, sliderFrom, sliderTo] = self.getRangeDoubleElements(element);
+            const [from, to] = self.parseTwoElementsToInt(sliderFrom, sliderTo);
+            [inputFrom.value, sliderFrom.value] = from > to ? [to, to] : [from, from];
+            self.fillSlider(sliderFrom, sliderTo, sliderTo);
+            return self;
+        }
+
+        self.controlSliderTo = function(element) {
+            const [inputFrom, inputTo, sliderFrom, sliderTo] = self.getRangeDoubleElements(element);
+            const [from, to] = self.parseTwoElementsToInt(sliderFrom, sliderTo);
+            [inputTo.value, sliderTo.value] = from <= to ? [to, to] : [from, from];
+            self.fillSlider(sliderFrom, sliderTo, sliderTo);
+            self.toggleRangeSliderAccessible(sliderTo);
+            return self;
+        }
+
+        self.fillSlider = function(from, to, controlSlider, colorSlider, colorRange) {
+            const rangeDistance = to.max - to.min;
+            const fromPosition = from.value - to.min;
+            const toPosition = to.value - to.min;
+            colorSlider = colorSlider ? colorSlider : self.colorSliderDefault;
+            colorRange = colorRange ? colorRange : self.colorRangeDefault;
+            controlSlider.style.background = `linear-gradient(
+                to right,
+                ${colorSlider} 0%,
+                ${colorSlider} ${fromPosition / rangeDistance * 100}%,
+                ${colorRange} ${fromPosition / rangeDistance * 100}%,
+                ${colorRange} ${toPosition / rangeDistance * 100}%,
+                ${colorSlider} ${toPosition / rangeDistance * 100}%,
+                ${colorSlider} 100%)`;
+            return self;
+        }
+
+        self.toggleRangeSliderAccessible = function(sliderCurrent) {
+            const [inputFrom, inputTo, sliderFrom, sliderTo] = self.getRangeDoubleElements(sliderCurrent);
+            sliderTo.style.zIndex = (Number(sliderFrom.value) === Number(sliderTo.value))
+                || (Number(sliderTo.value) <= 0)
+                ? 2
+                : 0;
+            return self;
+        }
+
+        self.parseTwoElementsToInt = function (currentFrom, currentTo) {
+            const from = parseInt(currentFrom.value, 10);
+            const to = parseInt(currentTo.value, 10);
+            return [from, to];
+        }
+
+        return self;
+    })();
 
     return self;
 })();
@@ -143,6 +276,20 @@ $(document).ready(function() {
     });
 
     /* Results tools (sort, pagination, per-page) */
+
+    $('.search-view-type-list').on('click', function(e) {
+        e.preventDefault();
+        Search.setViewType('list');
+        $('.search-view-type').removeClass('active');
+        $('.search-view-type-list').addClass('active');
+    });
+
+    $('.search-view-type-grid').on('click', function(e) {
+        e.preventDefault();
+        Search.setViewType('grid');
+        $('.search-view-type').removeClass('active');
+        $('.search-view-type-grid').addClass('active');
+    });
 
     $('.as-url select, select.as-url').on('change', function(e) {
         const url = $(this).find('option:selected').data('url');
@@ -186,39 +333,6 @@ $(document).ready(function() {
         }
     });
 
-    /* Facets. */
-
-    const SearchFacets = (function() {
-        var self = {};
-
-        self.facetExpandOrCollapse = function (button) {
-            button = $(button);
-            if (button.hasClass('expand')) {
-                button.attr('aria-label', button.attr('data-label-expand') ? button.attr('data-label-expand') : Omeka.jsTranslate('Expand'));
-                button.closest('.facet').find('.facet-elements').attr('hidden', 'hidden');
-            } else {
-                button.attr('aria-label', button.attr('data-label-expand') ? button.attr('data-label-collapse') : Omeka.jsTranslate('Collapse'));
-                button.closest('.facet').find('.facet-elements').removeAttr('hidden');
-            }
-            return self;
-        }
-
-        self.facetSeeMoreOrLess = function (button) {
-            button = $(button);
-            if (button.hasClass('expand')) {
-                button.text(button.attr('data-label-see-more') ? button.attr('data-label-see-more') : Omeka.jsTranslate('See more'));
-                const defaultCount = Number(button.attr('data-default-count')) + 1;
-                button.closest('.facet').find('.facet-items .facet-item:nth-child(n+' + defaultCount + ')').attr('hidden', 'hidden');
-            } else {
-                button.text(button.attr('data-label-see-less') ? button.attr('data-label-see-less') : Omeka.jsTranslate('See less'));
-                button.closest('.facet').find('.facet-items .facet-item').removeAttr('hidden');
-            }
-            return self;
-        }
-
-        return self;
-    })();
-
     $('.facets-active a').on('click', function(e) {
         // Reload with the link when there is no button to apply facets.
         if (!$('.facets-apply').length) {
@@ -249,10 +363,10 @@ $(document).ready(function() {
         if (facetRange.length) {
             if (facetName.includes('[to]')) {
                 facetRange.val(facetRange.attr('max'));
-                controlSliderTo(facetRange[0]);
+                Search.rangeSliderDouble.controlSliderTo(facetRange[0]);
             } else {
                 facetRange.val(facetRange.attr('min'));
-                controlSliderFrom(facetRange[0]);
+                Search.rangeSliderDouble.controlSliderFrom(facetRange[0]);
             }
         }
     });
@@ -305,11 +419,11 @@ $(document).ready(function() {
                  ) {
                     element.value = element.max;
                     element.defaultValue = element.value;
-                    controlSliderTo(element);
+                    Search.rangeSliderDouble.controlSliderTo(element);
                 } else {
                     element.value = typeof element.min === 'undefined' ? '0' : element.min;
                     element.defaultValue = element.value;
-                    controlSliderFrom(element);
+                    Search.rangeSliderDouble.controlSliderFrom(element);
                 }
             }).end()
             .find('input[type=number]').each(function(index, element) {
@@ -318,11 +432,11 @@ $(document).ready(function() {
                  ) {
                     element.value = element.max;
                     element.defaultValue = element.value;
-                    controlNumericTo(element);
+                    Search.rangeSliderDouble.controlNumericTo(element);
                 } else {
                     element.value = typeof element.min === 'undefined' ? '0' : element.min;
                     element.defaultValue = element.value;
-                    controlNumericFrom(element);
+                    Search.rangeSliderDouble.controlNumericFrom(element);
                 }
             }).end()
             .find(':radio, :checkbox').removeAttr('checked').end()
@@ -337,99 +451,17 @@ $(document).ready(function() {
             $(this).removeClass('collapse').addClass('expand');
         }
         if (button.hasClass('facet-see-more-or-less')) {
-            SearchFacets.facetSeeMoreOrLess(button);
+            Search.facets.seeMoreOrLess(button);
         } else {
-            SearchFacets.facetExpandOrCollapse(button);
+            Search.facets.expandOrCollapse(button);
         }
     });
 
     /* Init facets */
 
-    $('.facet-see-more-or-less').each((index, button) => SearchFacets.facetSeeMoreOrLess(button));
-
-    /**
-     * Search range double / sliders
-     *
-     * @see https://medium.com/@predragdavidovic10/native-dual-range-slider-html-css-javascript-91e778134816
-     */
-
-    function getRangeDoubleElements(element) {
-        const rangeDouble = element.closest('.range-double');
-        return rangeDouble
-            ? [
-                rangeDouble.querySelector('.range-numeric-from'),
-                rangeDouble.querySelector('.range-numeric-to'),
-                rangeDouble.querySelector('.range-slider-from'),
-                rangeDouble.querySelector('.range-slider-to'),
-            ]
-            : [null, null, null, null];
-    }
-
-    function controlNumericFrom(element) {
-        const [inputFrom, inputTo, sliderFrom, sliderTo] = getRangeDoubleElements(element);
-        const [from, to] = parseTwoElementsToInt(inputFrom, inputTo);
-        [inputFrom.value, sliderFrom.value] = from > to ? [to, to] : [from, from];
-        fillSlider(inputFrom, inputTo, sliderTo);
-    }
-
-    function controlNumericTo(element) {
-        const [inputFrom, inputTo, sliderFrom, sliderTo] = getRangeDoubleElements(element);
-        const [from, to] = parseTwoElementsToInt(inputFrom, inputTo);
-        [inputTo.value, sliderTo.value] = from <= to ? [to, to] : [from, from];
-        fillSlider(inputFrom, inputTo, sliderTo);
-        toggleRangeSliderAccessible(sliderTo);
-    }
-
-    function controlSliderFrom(element) {
-        const [inputFrom, inputTo, sliderFrom, sliderTo] = getRangeDoubleElements(element);
-        const [from, to] = parseTwoElementsToInt(sliderFrom, sliderTo);
-        [inputFrom.value, sliderFrom.value] = from > to ? [to, to] : [from, from];
-        fillSlider(sliderFrom, sliderTo, sliderTo);
-    }
-
-    function controlSliderTo(element) {
-        const [inputFrom, inputTo, sliderFrom, sliderTo] = getRangeDoubleElements(element);
-        const [from, to] = parseTwoElementsToInt(sliderFrom, sliderTo);
-        [inputTo.value, sliderTo.value] = from <= to ? [to, to] : [from, from];
-        fillSlider(sliderFrom, sliderTo, sliderTo);
-        toggleRangeSliderAccessible(sliderTo);
-    }
-
-    function fillSlider(from, to, controlSlider, colorSlider, colorRange) {
-        const rangeDistance = to.max - to.min;
-        const fromPosition = from.value - to.min;
-        const toPosition = to.value - to.min;
-        colorSlider = colorSlider ? colorSlider : colorSliderDefault;
-        colorRange = colorRange ? colorRange : colorRangeDefault;
-        controlSlider.style.background = `linear-gradient(
-            to right,
-            ${colorSlider} 0%,
-            ${colorSlider} ${fromPosition / rangeDistance * 100}%,
-            ${colorRange} ${fromPosition / rangeDistance * 100}%,
-            ${colorRange} ${toPosition / rangeDistance * 100}%,
-            ${colorSlider} ${toPosition / rangeDistance * 100}%,
-            ${colorSlider} 100%)`;
-    }
-
-    function toggleRangeSliderAccessible(sliderCurrent) {
-        const [inputFrom, inputTo, sliderFrom, sliderTo] = getRangeDoubleElements(sliderCurrent);
-        sliderTo.style.zIndex = (Number(sliderFrom.value) === Number(sliderTo.value))
-            || (Number(sliderTo.value) <= 0)
-            ? 2
-            : 0;
-    }
-
-    function parseTwoElementsToInt(currentFrom, currentTo) {
-        const from = parseInt(currentFrom.value, 10);
-        const to = parseInt(currentTo.value, 10);
-        return [from, to];
-    }
+    $('.facet-see-more-or-less').each((index, button) => Search.facets.seeMoreOrLess(button));
 
     const rangeDoubles = document.querySelectorAll('.range-double');
-
-    /* TODO Get slider colors from the css. */
-    const colorRangeDefault = '#a7a7a7';
-    const colorSliderDefault = '#e9e9ed';
 
     /* Init ranges only when present. */
     if (rangeDoubles.length) {
@@ -437,32 +469,16 @@ $(document).ready(function() {
             const rangeSliderFrom = rangeDouble.querySelector('.range-slider-from');
             const rangeSliderTo = rangeDouble.querySelector('.range-slider-to');
             if (rangeSliderFrom && rangeSliderTo) {
-                fillSlider(rangeSliderFrom, rangeSliderTo, rangeSliderTo);
-                toggleRangeSliderAccessible(rangeSliderTo);
+                Search.rangeSliderDouble.fillSlider(rangeSliderFrom, rangeSliderTo, rangeSliderTo);
+                Search.rangeSliderDouble.toggleRangeSliderAccessible(rangeSliderTo);
             }
         });
 
-        $('.range-numeric-from').on('input', (event) => controlNumericFrom(event.target));
-        $('.range-numeric-to').on('input', (event) => controlNumericTo(event.target));
-        $('.range-slider-from').on('input', (event) => controlSliderFrom(event.target));
-        $('.range-slider-to').on('input', (event) => controlSliderTo(event.target));
+        $('.range-numeric-from').on('input', (event) => Search.rangeSliderDouble.controlNumericFrom(event.target));
+        $('.range-numeric-to').on('input', (event) => Search.rangeSliderDouble.controlNumericTo(event.target));
+        $('.range-slider-from').on('input', (event) => Search.rangeSliderDouble.controlSliderFrom(event.target));
+        $('.range-slider-to').on('input', (event) => Search.rangeSliderDouble.controlSliderTo(event.target));
     }
-
-    /* Results */
-
-    $('.search-view-type-list').on('click', function(e) {
-        e.preventDefault();
-        Search.setViewType('list');
-        $('.search-view-type').removeClass('active');
-        $('.search-view-type-list').addClass('active');
-    });
-
-    $('.search-view-type-grid').on('click', function(e) {
-        e.preventDefault();
-        Search.setViewType('grid');
-        $('.search-view-type').removeClass('active');
-        $('.search-view-type-grid').addClass('active');
-    });
 
     /**********
      * Initialisation.

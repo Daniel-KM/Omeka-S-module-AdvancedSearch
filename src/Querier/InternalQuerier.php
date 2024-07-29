@@ -905,8 +905,8 @@ SQL;
         $facetCountsByField = array_fill_keys(array_keys($facets), []);
 
         $facetData = $this->query->getOption('facet_display_list', 'available') === 'all'
-            ? $this->args
-            : $this->argsWithoutActiveFacets;
+            ? $this->argsWithoutActiveFacets
+            : $this->args;
 
         $facetOrders = [
             'alphabetic asc' => [

@@ -254,6 +254,102 @@ $(document).ready(function() {
         }
     });
 
+    /**
+     * Search range double / sliders
+     *
+     * @see https://medium.com/@predragdavidovic10/native-dual-range-slider-html-css-javascript-91e778134816
+     */
+
+    function controlInputFrom(sliderFrom, inputFrom, inputTo, controlSlider) {
+        const [from, to] = parseTwoElementsToInt(inputFrom, inputTo);
+        fillSlider(inputFrom, inputTo, colorSlider, colorRange, controlSlider);
+        if (from > to) {
+            sliderFrom.value = to;
+            inputFrom.value = to;
+        } else {
+            sliderFrom.value = from;
+        }
+    }
+
+    function controlInputTo(sliderTo, inputFrom, inputTo, controlSlider) {
+        const [from, to] = parseTwoElementsToInt(inputFrom, inputTo);
+        fillSlider(inputFrom, inputTo, colorSlider, colorRange, controlSlider);
+        toggleRangeSliderAccessible(inputTo);
+        if (from <= to) {
+            sliderTo.value = to;
+            inputTo.value = to;
+        } else {
+            inputTo.value = from;
+        }
+    }
+
+    function controlSliderFrom(sliderFrom, sliderTo, inputFrom) {
+        const [from, to] = parseTwoElementsToInt(sliderFrom, sliderTo);
+        fillSlider(sliderFrom, sliderTo, colorSlider, colorRange, sliderTo);
+        if (from > to) {
+            sliderFrom.value = to;
+            inputFrom.value = to;
+        } else {
+            inputFrom.value = from;
+        }
+    }
+
+    function controlSliderTo(sliderFrom, sliderTo, inputTo) {
+        const [from, to] = parseTwoElementsToInt(sliderFrom, sliderTo);
+        fillSlider(sliderFrom, sliderTo, colorSlider, colorRange, sliderTo);
+        toggleRangeSliderAccessible(sliderTo);
+        if (from <= to) {
+            sliderTo.value = to;
+            inputTo.value = to;
+        } else {
+            inputTo.value = from;
+            sliderTo.value = from;
+        }
+    }
+
+    function fillSlider(from, to, colorSlider, colorRange, controlSlider) {
+        const rangeDistance = to.max - to.min;
+        const fromPosition = from.value - to.min;
+        const toPosition = to.value - to.min;
+        controlSlider.style.background = `linear-gradient(
+            to right,
+            ${colorSlider} 0%,
+            ${colorSlider} ${fromPosition / rangeDistance * 100}%,
+            ${colorRange} ${fromPosition / rangeDistance * 100}%,
+            ${colorRange} ${toPosition / rangeDistance * 100}%,
+            ${colorSlider} ${toPosition / rangeDistance * 100}%,
+            ${colorSlider} 100%)`;
+    }
+
+    function toggleRangeSliderAccessible(sliderCurrent) {
+        if (Number(sliderCurrent.value) <= 0 ) {
+            sliderTo.style.zIndex = 2;
+        } else {
+            sliderTo.style.zIndex = 0;
+        }
+    }
+
+    function parseTwoElementsToInt(currentFrom, currentTo) {
+        const from = parseInt(currentFrom.value, 10);
+        const to = parseInt(currentTo.value, 10);
+        return [from, to];
+    }
+
+    const sliderFrom = document.querySelector('#slider-from');
+    const sliderTo = document.querySelector('#slider-to');
+    const inputFrom = document.querySelector('#numeric-from');
+    const inputTo = document.querySelector('#numeric-to');
+    const colorRange = 'rgba(61,174,233,1)';
+    const colorSlider = 'rgba(210,210,210,1)';
+
+    fillSlider(sliderFrom, sliderTo, colorSlider, colorRange, sliderTo);
+    toggleRangeSliderAccessible(sliderTo);
+
+    sliderFrom.oninput = () => controlSliderFrom(sliderFrom, sliderTo, inputFrom);
+    sliderTo.oninput = () => controlSliderTo(sliderFrom, sliderTo, inputTo);
+    inputFrom.oninput = () => controlInputFrom(sliderFrom, inputFrom, inputTo, sliderTo);
+    inputTo.oninput = () => controlInputTo(sliderTo, inputFrom, inputTo, sliderTo);
+
     /* Results */
 
     $('.search-view-type-list').on('click', function(e) {

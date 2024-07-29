@@ -35,6 +35,9 @@ class FacetElements extends AbstractHelper
             case 'Link':
                 $facetElements = $isFacetModeButton ? $plugins->get('facetCheckboxes') : $plugins->get('facetLinks');
                 break;
+            case 'RangeDouble':
+                $facetElements = $plugins->get('facetRangeDouble');
+                break;
             case 'Select':
                 $facetElements = $plugins->get('facetSelect');
                 break;

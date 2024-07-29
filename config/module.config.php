@@ -58,6 +58,7 @@ return [
             'facetElements' => View\Helper\FacetElements::class,
             'facetLinks' => View\Helper\FacetLinks::class,
             'facetLinksTree' => View\Helper\FacetLinksTree::class,
+            'facetRangeDouble' => View\Helper\FacetRangeDouble::class,
             'facetSelect' => View\Helper\FacetSelect::class,
             'facetSelectRange' => View\Helper\FacetSelectRange::class,
             'formMultiText' => Form\View\Helper\FormMultiText::class,

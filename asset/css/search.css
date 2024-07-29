@@ -279,7 +279,46 @@
         content: "\f14a";
     }
 
-    /* Autocomplete */ 
+    /* Search range */
+
+    .range-double {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+        margin: 1em auto;
+    }
+    .range-double .range-sliders {
+        position: relative;
+    }
+    .range-double input[type=range] {
+        -webkit-appearance: none;
+        appearance: none;
+        height: 6px;
+        width: 100%;
+        position: absolute;
+        pointer-events: none;
+    }
+    .range-double input[type=range]::-moz-range-thumb,
+    .range-double input[type=range]::-webkit-slider-thumb {
+        pointer-events: all;
+        cursor: pointer;
+    }
+    .range-double input#slider-from[type=range] {
+        z-index: 1;
+        background-color: rgba(0,0,0,0);
+    }
+    .range-double input#slider-to[type=range] {
+        background-color: rgba(210,210,210,1);
+    }
+    .range-double .range-numerics {
+        display: flex;
+        justify-content: space-between;
+    }
+    .range-double input[type=number] {
+        border: none;
+    }
+
+    /* Autocomplete */
 
     .autocomplete-suggestions {
         border: 1px solid #999999;

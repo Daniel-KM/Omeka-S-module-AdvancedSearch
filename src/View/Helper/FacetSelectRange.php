@@ -12,9 +12,9 @@ class FacetSelectRange extends AbstractFacet
 
         // It is simpler and better to get from/to from the query, because it
         // can manage discrete range.
-        $rangeFrom = $this->queryBase['facet'][$facetField]['from'] ?? $options['from'] ?? null;
+        $rangeFrom = $this->queryBase['facet'][$facetField]['from'] ?? $options['min'] ?? null;
         $rangeFrom = $rangeFrom === '' ? null : $rangeFrom;
-        $rangeTo = $this->queryBase['facet'][$facetField]['to'] ?? $options['to'] ?? null;
+        $rangeTo = $this->queryBase['facet'][$facetField]['to'] ?? $options['max'] ?? null;
         $rangeTo = $rangeTo === '' ? null : $rangeTo;
 
         $firstValue = count($facetValues) ? reset($facetValues) : null;
@@ -23,26 +23,27 @@ class FacetSelectRange extends AbstractFacet
             $hasRangeFromOnly = false;
             $hasRangeToOnly = false;
             $hasRangeFull = false;
-            $isNumeric = is_numeric($firstValue);
+            $isNumericRange = is_numeric($firstValue);
         } elseif (is_null($rangeTo)) {
             $hasRangeFromOnly = true;
             $hasRangeToOnly = false;
             $hasRangeFull = false;
-            $isNumeric = is_numeric($rangeFrom);
+            $isNumericRange = is_numeric($rangeFrom);
         } elseif (is_null($rangeFrom)) {
             $hasRangeFromOnly = false;
             $hasRangeToOnly = true;
             $hasRangeFull = false;
-            $isNumeric = is_numeric($rangeTo);
+            $isNumericRange = is_numeric($rangeTo);
         } else {
             $hasRangeFromOnly = false;
             $hasRangeToOnly = false;
             $hasRangeFull = true;
-            $isNumeric = is_numeric($rangeFrom) && is_numeric($rangeTo);
+            $isNumericRange = is_numeric($rangeFrom) && is_numeric($rangeTo);
         }
 
         $total = 0;
 
+        // Contains all values, with one active for "from" and one for "to".
         foreach ($facetValues as &$facetValue) {
             $query = $this->queryBase;
             $active = false;
@@ -52,15 +53,16 @@ class FacetSelectRange extends AbstractFacet
                 'to' => '',
             ];
 
-            $facetValueValue = (string) $facetValue['value'];
+            $facetValueValue = (string) ($facetValue['value'] ?? '');
             $isFrom = $facetValueValue === $rangeFrom;
             $isTo = $facetValueValue === $rangeTo;
             $fromOrTo = $isFrom ? 'from' : ($isTo ? 'to' : null);
 
-            // The facet value is compared against a string (the query args), not a numeric value.
             $facetValueLabel = (string) $this->facetValueLabel($facetField, $facetValueValue);
             if (strlen($facetValueLabel)) {
-                if ($isNumeric) {
+                // Manage discrete values.
+                // TODO Check if all this process is still needed.
+                if ($isNumericRange) {
                     // For simplicity, use float to sort any number, even it is
                     // an integer in most of the cases.
                     if ($hasRangeFromOnly) {
@@ -72,6 +74,8 @@ class FacetSelectRange extends AbstractFacet
                             && ((float) $facetValueValue <=> (float) $rangeTo) <= 0;
                     }
                 } else {
+                    // The facet value is compared against a string (the query
+                    // args), not a numeric value.
                     if ($hasRangeFromOnly) {
                         $active = ($rangeFrom <=> $facetValueValue) <= 0;
                     } elseif ($hasRangeToOnly) {

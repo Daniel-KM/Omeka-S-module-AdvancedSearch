@@ -1,0 +1,49 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var string $name
+ * @var array $facetValues With value and count.
+ * @var array $options Facets options, including "min", "max", "step".
+ * @var string|null $from
+ * @var string|null $to
+ * @var string|null $fromUrl
+ * @var string|null $toUrl
+ * @var int $total Total resources matching range. Currently always 0.
+ *
+ * @see https://medium.com/@predragdavidovic10/native-dual-range-slider-html-css-javascript-91e778134816
+ */
+
+$plugins = $this->getHelperPluginManager();
+$translate = $plugins->get('translate');
+$escapeAttr = $plugins->get('escapeHtmlAttr');
+
+$isFacetModeDirect = ($options['mode'] ?? '') === 'link';
+
+$min = $options['min'] ?? null;
+$max = $options['max'] ?? null;
+$step = $options['step'] ?? null;
+$minMaxStep = ($min === null || $min === '' ? '' : ' min="' . $escapeAttr($min) . '"')
+    . ($max === null  || $max === '' ? '' : ' max="' . $escapeAttr($max) . '"')
+    . ($step === null  || $step === '' ? '' : ' step="' . $escapeAttr($step) . '"');
+?>
+
+<div class="facet-range-double range-double">
+    <div class="range-sliders">
+        <input class="range-slider-from" type="range" name="facet[<?= $name ?>][from]" value="<?= $escapeAttr($from ?? $min) ?>"<?= $minMaxStep ?><?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($fromUrl ?? '') . '"' : '' ?>/>
+        <input class="range-slider-to" type="range" name="facet[<?= $name ?>][to]" value="<?= $escapeAttr($to ?? $max) ?>"<?= $minMaxStep ?><?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($toUrl ?? '') . '"' : '' ?>/>
+    </div>
+    <div class="range-numerics">
+        <div class="range-numeric">
+            <?php /*
+            <span class="range-numeric-label range-numeric-from-label"><?= $escape($translate('from')) ?></span>
+            */ ?>
+            <input class="range-numeric-from" aria-label="<?= $escapeAttr($translate('from')) ?>" type="number" value="<?= $escapeAttr($from ?? $min) ?>"<?= $minMaxStep ?><?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($fromUrl ?? '') . '"' : '' ?>/>
+        </div>
+        <div class="range-numeric">
+            <?php /*
+            <span class="range-numeric-label range-numeric-to-label"><?= $escape($translate('to')) ?></span>
+            */ ?>
+            <input class="range-numeric-to" aria-label="<?= $escapeAttr($translate('to')) ?>" type="number" value="<?= $escapeAttr($to ?? $max) ?>"<?= $minMaxStep ?><?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($toUrl ?? '') . '"' : '' ?>/>
+        </div>
+    </div>
+</div>

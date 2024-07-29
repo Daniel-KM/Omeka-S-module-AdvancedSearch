@@ -482,6 +482,8 @@ class SearchConfigController extends AbstractActionController
      *
      * @todo Adapt the settings via the form itself.
      * @see data/search_configs/default.php
+     *
+     * @todo Store the final form as an array to be created via factory. https://docs.laminas.dev/laminas-form/v3/form-creation/creation-via-factory/
      */
     protected function prepareDataToSave(array $params): array
     {
@@ -495,16 +497,6 @@ class SearchConfigController extends AbstractActionController
 
         if (isset($params['search']['default_query_post'])) {
             $params['search']['default_query_post'] = trim($params['search']['default_query_post'] ?? '', "? \t\n\r\0\x0B");
-        }
-
-        // Add a warning because it may be a hard to understand issue.
-        if (isset($params['facet']['languages'])) {
-            $params['facet']['languages'] = array_values(array_unique(array_map('trim', $params['facet']['languages'])));
-            if (!empty($params['facet']['languages']) && !in_array('', $params['facet']['languages'])) {
-                $this->messenger()->addWarning(
-                    'Note that you didn’t set a trailing "|", so all values without language will be removed.' // @translate
-                );
-            }
         }
 
         // Normalize filters.
@@ -595,7 +587,23 @@ class SearchConfigController extends AbstractActionController
             $params['form']['field_operators']
         );
 
-        // TODO Store the final form as an array to be created via factory. https://docs.laminas.dev/laminas-form/v3/form-creation/creation-via-factory/
+        // Add a warning for languages of facets because it may be a hard to
+        // understand issue.
+        $warnLanguage = false;
+        foreach ($params['facet']['facets'] ?? [] as &$facet) {
+            if (!empty($facet['languages'])) {
+                $facet['languages'] = array_values(array_unique(array_map('trim', $facet['languages'])));
+                if (!empty($facet['languages']) && !in_array('', $facet['languages'])) {
+                    $warnLanguage = true;
+                }
+            }
+        }
+        unset ($facet);
+        if ($warnLanguage) {
+            $this->messenger()->addWarning(
+                'Note that you didn’t set an empty language for some facets, so all values without language will be skipped in the facet.' // @translate
+            );
+        }
 
         return $params;
     }

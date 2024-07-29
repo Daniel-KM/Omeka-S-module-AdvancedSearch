@@ -25,25 +25,26 @@ $activeFacets = $response->getActiveFacets();
 // Don't display facet groups without facet elements.
 $facets = array_filter($facets);
 
-$displayActive = (bool) $searchConfig->subSetting('facet', 'display_active', true);
-
 $isFacetModeButton = $searchConfig->subSetting('facet', 'mode') !== 'link';
 $displayFacetButton = $isFacetModeButton && !empty($facets);
+$displayActive = (bool) $searchConfig->subSetting('facet', 'display_active', true);
 $displaySubmit = $displayFacetButton ? $searchConfig->subSetting('facet', 'display_submit', 'above') : 'none';
-$displayReset = $searchConfig->subSetting('facet', 'display_reset', 'above');
 $labelSubmit = $displaySubmit ? $searchConfig->subSetting('facet', 'label_submit', $translate('Apply facets')) : null;
+$displayReset = $searchConfig->subSetting('facet', 'display_reset', 'above');
 $labelReset = $displayReset ? $searchConfig->subSetting('facet', 'label_reset', $translate('Reset facets')) : null;
 
 $facetActives = $plugins->get('facetActives');
 $facetElements = $plugins->get('facetElements');
 
+// TODO Remove item sets facets early when item set redirects to search.
 // Don't display facets for item sets when browsing an item set.
 if (!empty($itemSet)) {
     unset($facets['item_set_id']);
     unset($activeFacets['item_set_id']);
 }
 
-$options = $searchConfig->setting('facet', []);
+// The only common option is the facet mode (button or direct link).
+$options = ['mode' => $isFacetModeButton ? 'button' : 'link'];
 ?>
 
 <div class="search-facets-content">

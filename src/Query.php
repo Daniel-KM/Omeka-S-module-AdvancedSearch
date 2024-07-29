@@ -345,14 +345,19 @@ class Query implements \JsonSerializable
      *
      * @param array $facetFields Key is the field name and values are the
      * details of the facet:
-     * - field: the name
-     * - type: Checkbox, Select, SelectRange
+     * - field: the index to use
+     * - label
+     * - type: Checkbox, Select, SelectRange, Thesaurus, Tree, etc.
      * - order
      * - limit
      * - languages
+     * - data_types
+     * - main_types
+     * - values
+     * - display_count
      * - start for range facets
      * - end for range facets
-     * - etc.
+     * - thesaurus for thesaurus facets.
      * Other keys may be managed via module Search Solr, but not internal sql.
      * No check is done here.
      * @see https://solr.apache.org/guide/solr/latest/query-guide/faceting.html
@@ -370,9 +375,9 @@ class Query implements \JsonSerializable
      * The option should contain the key "field" with the name.
      * No check is done here.
      */
-    public function addFacet(string $facetField, array $options = []): self
+    public function addFacet(string $facetName, array $options = []): self
     {
-        $this->facets[$facetField] = $options;
+        $this->facets[$facetName] = $options;
         return $this;
     }
 
@@ -387,9 +392,9 @@ class Query implements \JsonSerializable
     /**
      * Get options to use for a facet.
      */
-    public function getFacet(string $facetField): ?array
+    public function getFacet(string $facetName): ?array
     {
-        return $this->facets[$facetField] ?? null;
+        return $this->facets[$facetName] ?? null;
     }
 
     /**
@@ -490,16 +495,16 @@ class Query implements \JsonSerializable
         return $this;
     }
 
-    public function addActiveFacet(string $facetField, $value): self
+    public function addActiveFacet(string $facetName, $value): self
     {
-        $this->activeFacets[$facetField][] = $value;
+        $this->activeFacets[$facetName][] = $value;
         return $this;
     }
 
-    public function addActiveFacetRange(string $facetField, $from, $to): self
+    public function addActiveFacetRange(string $facetName, $from, $to): self
     {
-        $this->activeFacets[$facetField]['from'] = $from === '' ? null : $from;
-        $this->activeFacets[$facetField]['to'] = $to === '' ? null : $to;
+        $this->activeFacets[$facetName]['from'] = $from === '' ? null : $from;
+        $this->activeFacets[$facetName]['to'] = $to === '' ? null : $to;
         return $this;
     }
 
@@ -508,9 +513,9 @@ class Query implements \JsonSerializable
         return $this->activeFacets;
     }
 
-    public function getActiveFacet(string $facetField): ?array
+    public function getActiveFacet(string $facetName): ?array
     {
-        return $this->activeFacets[$facetField] ?? null;
+        return $this->activeFacets[$facetName] ?? null;
     }
 
     /**

@@ -786,107 +786,6 @@ new = does not end with
                 ],
             ])
             ->add([
-                'name' => 'facets',
-                'type' => CommonElement\DataTextarea::class,
-                'options' => [
-                    'label' => 'List of facets', // @translate
-                    'info' => 'List of facets that will be displayed in the search page. Format is "field = Label = Input type = Options". Input types may be "Select" or "SelectRange". With internal sql engine, "SelectRange" orders values alphabetically. With Solr, "SelectRange" works only with date and numbers. "Tree" can be used for item sets when module ItemSetsTree is enabled and data indexed recursively. "Thesaurus = #xxx" can be used for properties when module Thesaurus is enabled. Options are a comma separateted list of arguments. For now, the main type ("literal", "uri" or "resource") can be specified to output only this main type.', // @translate
-                    'as_key_value' => true,
-                    'key_value_separator' => '=',
-                    'data_options' => [
-                        'name' => null,
-                        'label' => null,
-                        'type' => null,
-                        'options' => [
-                            'separator' => '|',
-                            'associative' => '=',
-                        ],
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'facet_facets',
-                    'placeholder' => 'dcterms:subject = Subjects',
-                    'rows' => 12,
-                ],
-            ])
-            ->add([
-                'name' => 'available_facets',
-                'type' => OmekaElement\ArrayTextarea::class,
-                'options' => [
-                    'label' => 'Available facets', // @translate
-                    'info' => 'List of all available facets, among which some can be copied above.', // @translate
-                    'as_key_value' => true,
-                    'key_value_separator' => '=',
-                ],
-                'attributes' => [
-                    'id' => 'facet_available_facets',
-                    'value' => $this->getAvailableFacetFields(),
-                    'placeholder' => 'dcterms:subject = Subjects',
-                    'rows' => 12,
-                ],
-            ])
-            ->add([
-                'name' => 'limit',
-                'type' => Element\Number::class,
-                'options' => [
-                    'label' => 'Maximum number of facet by field', // @translate
-                    'info' => 'The maximum number of values fetched for each facet', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'facet_limit',
-                    'value' => 10,
-                    'min' => 1,
-                    'required' => false,
-                ],
-            ])
-            ->add([
-                'name' => 'order',
-                'type' => CommonElement\OptionalRadio::class,
-                'options' => [
-                    'label' => 'Order of facet items', // @translate
-                    'value_options' => [
-                        '' => 'Native', // @translate
-                        'alphabetic asc' => 'Alphabetical', // @translate
-                        'total desc' => 'Count (biggest first)', // @translate
-                        'total asc' => 'Count (smallest first)', // @translate
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'facet_order',
-                    'required' => false,
-                    'value' => '',
-                ],
-            ])
-            ->add([
-                'name' => 'languages',
-                'type' => CommonElement\ArrayText::class,
-                'options' => [
-                    'label' => 'Get facets from specific languages', // @translate
-                    'info' => 'Generally, facets are translated in the view, but in some cases, facet values may be translated directly in a multivalued property. Use "|" to separate multiple languages. Use a trailing "|" for values without language. When fields with languages (like subjects) and fields without language (like date) are facets, the empty language must be set to get results.', // @translate
-                    'value_separator' => '|',
-                ],
-                'attributes' => [
-                    'id' => 'facet_languages',
-                    'placeholder' => 'fra|way|apy|',
-                ],
-            ])
-            ->add([
-                'name' => 'display_list',
-                'type' => CommonElement\OptionalRadio::class,
-                'options' => [
-                    'label' => 'Display list of facets', // @translate
-                    'value_options' => [
-                        'all' => 'All facets, even with 0 results', // @translate
-                        'available' => 'Available facets only', // @translate
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'display_list',
-                    'required' => false,
-                    'value' => 'available',
-                ],
-            ])
-            ->add([
                 'name' => 'mode',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [
@@ -900,6 +799,18 @@ new = does not end with
                     'id' => 'facet_mode',
                     'required' => false,
                     'value' => 'button',
+                ],
+            ])
+            ->add([
+                'name' => 'display_active',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Display the list of active facets', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'facet_display_active',
+                    'required' => false,
+                    'value' => true,
                 ],
             ])
             ->add([
@@ -921,6 +832,19 @@ new = does not end with
                 ],
             ])
             ->add([
+                'name' => 'label_submit',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Label for submit', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'label_submit',
+                    'required' => false,
+                    'value' => 'Apply facets', // @translate
+                    'placeholder' => 'Apply facets', // @translate
+                ],
+            ])
+            ->add([
                 'name' => 'display_reset',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [
@@ -939,19 +863,6 @@ new = does not end with
                 ],
             ])
             ->add([
-                'name' => 'label_submit',
-                'type' => Element\Text::class,
-                'options' => [
-                    'label' => 'Label for submit', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'label_submit',
-                    'required' => false,
-                    'value' => 'Apply facets', // @translate
-                    'placeholder' => 'Apply facets', // @translate
-                ],
-            ])
-            ->add([
                 'name' => 'label_reset',
                 'type' => Element\Text::class,
                 'options' => [
@@ -965,26 +876,43 @@ new = does not end with
                 ],
             ])
             ->add([
-                'name' => 'display_active',
-                'type' => Element\Checkbox::class,
+                'name' => 'facets',
+                'type' => CommonElement\IniTextarea::class,
                 'options' => [
-                    'label' => 'Display the list of active facets', // @translate
+                    'label' => 'List of facets', // @translate
+                    'info' => 'List of facets that will be displayed in the search page, formatted as ini. The section is a unique name. Keys are: field, languages, main_types, label, type, order, limit, display_list, display_count, options.', // @translate
+                    // TODO Convert documentation into help. See application/view/common/form-row.phtml
+                    'documentation' => nl2br(<<<'MARKDOWN'
+                        #"></a>
+                        - Input types may be Checkbox, Select, SelectRange, Thesaurus, Tree.
+                        - With internal sql engine, "SelectRange" orders values alphabetically. With Solr, "SelectRange" works only with date and numbers.
+                        - With type "Thesaurus", the option "thesaurus" should be set with the id. It requires the module Thesaurus.
+                        - "Tree" can be used for item sets when module ItemSetsTree is enabled and data indexed recursively.
+                        - Order may be "default", "alphabetic asc", "alphabetic desc", "total asc", "total desc".
+                        - "languages" allows to filter values by language. It is a single or list of language codes. To get the values without language too, use "null".
+                        - "main_types" allows to filter values by main data type ("literal", "uri" or "resource").
+                        <a style="display: none" href="#
+                        MARKDOWN), // @translate
                 ],
                 'attributes' => [
-                    'id' => 'facet_display_active',
-                    'required' => false,
-                    'value' => true,
+                    'id' => 'facet_facets',
+                    'rows' => 12,
+                    'placeholder' => '',
                 ],
             ])
             ->add([
-                'name' => 'display_count',
-                'type' => Element\Checkbox::class,
+                'name' => 'available_facets',
+                'type' => OmekaElement\ArrayTextarea::class,
                 'options' => [
-                    'label' => 'Display the count of each facet item', // @translate
+                    'label' => 'Available facets', // @translate
+                    'info' => 'List of all available facets, among which some can be copied above.', // @translate
+                    'as_key_value' => true,
+                    'key_value_separator' => '=',
                 ],
                 'attributes' => [
-                    'id' => 'facet_display_count',
-                    'value' => true,
+                    'id' => 'facet_available_facets',
+                    'value' => $this->getAvailableFacetFields(),
+                    'rows' => 12,
                 ],
             ])
         ;

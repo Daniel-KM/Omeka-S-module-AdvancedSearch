@@ -6,6 +6,8 @@
  * Some form fields are useless, they are added as an example.
  *
  * When created, it can be modified in the admin board.
+ *
+ * @var \Laminas\I18n\View\Helper\Translate $translate
  */
 return [
     '@context' => null,
@@ -243,47 +245,85 @@ return [
 
         'facet' => [
             'label' => 'Facets', // @translate
-            'facets' => [
-                'item_set_id' => [
-                    'name' => 'item_set_id',
-                    'label' => $translate('Collection'),
-                ],
-                'resource_class_id' => [
-                    'name' => 'resource_class_id',
-                    'label' => $translate('Classe'),
-                ],
-                'dcterms:subject' => [
-                    'name' => 'dcterms:subject',
-                    'label' => $translate('Subject'),
-                ],
-                'dcterms:type' => [
-                    'name' => 'dcterms:type',
-                    'label' => $translate('Type'),
-                ],
-                'author' => [
-                    'name' => 'author',
-                    'label' => $translate('Author'),
-                ],
-                'date' => [
-                    'name' => 'date',
-                    'label' => $translate('Date'),
-                ],
-                'dcterms:language' => [
-                    'name' => 'dcterms:language',
-                    'label' => $translate('Language'),
-                ],
-            ],
-            'languages' => [],
             'mode' => 'button',
-            'limit' => 10,
-            'order' => '',
-            'display_list' => 'available',
+            'display_active' => true,
             'display_submit' => 'above',
             'display_reset' => 'above',
             'label_submit' => $translate('Apply facets'),
             'label_reset' => $translate('Reset facets'),
-            'display_active' => true,
-            'display_count' => true,
+            'facets' => [
+                'item_set_id' => [
+                    'field' => 'item_set_id',
+                    'languages' => [],
+                    'label' => $translate('Collection'),
+                    'type' => 'Checkbox',
+                    'order' => 'default',
+                    'limit' => 25,
+                    'display_list' => 'available',
+                    'display_count' => false,
+                ],
+                'resource_class_id' => [
+                    'field' => 'resource_class_id',
+                    'languages' => [],
+                    'label' => $translate('Class'),
+                    'type' => 'Checkbox',
+                    'order' => 'default',
+                    'limit' => 25,
+                    'display_list' => 'available',
+                    'display_count' => false,
+                ],
+                'dcterms:subject' => [
+                    'field' => 'dcterms:subject',
+                    'languages' => [],
+                    'label' => $translate('Subject'),
+                    'type' => 'Checkbox',
+                    'order' => 'default',
+                    'limit' => 25,
+                    'langs' => [],
+                    'display_list' => 'available',
+                    'display_count' => false,
+                ],
+                'dcterms:type' => [
+                    'field' => 'dcterms:type',
+                    'languages' => [],
+                    'label' => $translate('Type'),
+                    'type' => 'Checkbox',
+                    'order' => 'default',
+                    'limit' => 25,
+                    'display_list' => 'available',
+                    'display_count' => false,
+                ],
+                'author' => [
+                    'field' => 'author',
+                    'languages' => [],
+                    'label' => $translate('Author'),
+                    'type' => 'Checkbox',
+                    'order' => 'default',
+                    'limit' => 25,
+                    'display_list' => 'available',
+                    'display_count' => false,
+                ],
+                'date' => [
+                    'field' => 'date',
+                    'languages' => [],
+                    'label' => $translate('Date'),
+                    'type' => 'Checkbox',
+                    'order' => 'default',
+                    'limit' => 25,
+                    'display_list' => 'available',
+                    'display_count' => false,
+                ],
+                'dcterms:language' => [
+                    'field' => 'dcterms:language',
+                    'languages' => [],
+                    'label' => $translate('Language'),
+                    'type' => 'Checkbox',
+                    'order' => 'default',
+                    'limit' => 25,
+                    'display_list' => 'available',
+                    'display_count' => false,
+                ],
+            ],
         ],
     ],
     'o:created' => null,

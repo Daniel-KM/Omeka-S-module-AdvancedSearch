@@ -40,19 +40,20 @@ class MainSearchFormFactory implements FactoryInterface
         $plugins = $services->get('ControllerPluginManager');
         $helpers = $services->get('ViewHelperManager');
         $currentSite = $plugins->get('currentSite')();
-        $siteSetting = $currentSite
-            ? $helpers->get('siteSetting')
+        $siteSettings = $currentSite
+            ? $services->get('Omeka\Settings\Site')
             : null;
         return (new MainSearchForm(null, $options))
             ->setBasePath($helpers->get('basePath')())
             ->setSite($currentSite)
+            ->setApi($services->get('Omeka\ApiManager'))
             ->setEasyMeta($services->get('Common\EasyMeta'))
             ->setEntityManager($services->get('Omeka\EntityManager'))
             ->setEscapeHtml($helpers->get('escapeHtml'))
             ->setFormElementManager($services->get('FormElementManager'))
             ->setItemSetsTree($services->has('ItemSetsTree') ? $services->get('ItemSetsTree') : null)
             ->setSettings($services->get('Omeka\Settings'))
-            ->setSiteSetting($siteSetting)
+            ->setSiteSettings($siteSettings)
             ->setTranslator($services->get('MvcTranslator'))
         ;
     }

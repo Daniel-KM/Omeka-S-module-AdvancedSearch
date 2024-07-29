@@ -865,8 +865,8 @@ SQL;
     }
 
     /**
-     * @todo Factorize with \AdvancedSearch\Form\MainSearchForm::listValuesForProperty()
-     * @see \AdvancedSearch\Form\MainSearchForm::listValuesForProperty()
+     * @todo Factorize with \AdvancedSearch\Form\MainSearchForm::listValues()
+     * @see \AdvancedSearch\Form\MainSearchForm::listValues()
      */
     protected function fillFacetResponse(): void
     {

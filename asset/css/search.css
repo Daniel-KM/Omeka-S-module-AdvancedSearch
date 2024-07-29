@@ -8,6 +8,9 @@
         margin: 0 0 36px;
         padding: 0;
     }
+    .form-search fieldset > fieldset{
+        margin: 0;
+    }
     .form-search input[type="search"] {
         appearance: none;
         border-radius: 0;
@@ -23,6 +26,10 @@
     }
     .form-search button.search-submit {
         float: right;
+    }
+    .form-search .chosen-container-single .chosen-single,
+    .form-search .chosen-container-multi .chosen-choices {
+        height: 36px;
     }
 
     /* Search form filters */

@@ -480,6 +480,7 @@ class SearchConfigController extends AbstractActionController
         $inputTypes = [
             'advanced' => 'Advanced',
             'checkbox' => 'Checkbox',
+            'csrf' => 'Csrf',
             // 'date' => 'Date',
             'daterange' => 'DateRange',
             // 'daterangestartend' => 'DateRangeStartEnd',
@@ -487,6 +488,7 @@ class SearchConfigController extends AbstractActionController
             'multicheckbox' => 'MultiCheckbox',
             'multiselect' => 'MultiSelect',
             'multiselectflat' => 'MultiSelectFlat',
+            'multiselectgroup' => 'MultiSelectGroup',
             'multitext' => 'MultiText',
             'noop' => 'Noop',
             'number' => 'Number',
@@ -496,8 +498,12 @@ class SearchConfigController extends AbstractActionController
             'radio' => 'Radio',
             'select' => 'Select',
             'selectflat' => 'SelectFlat',
+            'selectfgroup' => 'SelectGroup',
             'text' => 'Text',
+            'access' => 'Access',
             'thesaurus' => 'Thesaurus',
+            'itemsetstree' => 'Tree',
+            'tree' => 'Tree',
         ];
 
         $filters = [];

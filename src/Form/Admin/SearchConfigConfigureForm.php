@@ -298,8 +298,16 @@ class SearchConfigConfigureForm extends Form
                     // TODO Convert documentation into help. See application/view/common/form-row.phtml
                     'documentation' => nl2br(<<<'MARKDOWN'
                         #"></a><div class="field-description">
-                        - The input types are: Text (default), Checkbox, Number, Radio, Select, SelectFlat, DateRange, Hidden, MultiCheckbox, MultiSelect, MultiSelectFlat, Thesaurus, and Advanced (list of advanced filters),
-                        - For the type Advanced, use the specific options below.
+                        - The input types are: Text (default), Advanced (list of advanced filters), Checkbox, Number, Radio, Select, SelectFlat, SelectGroup, DateRange, Hidden, MultiCheckbox, MultiSelect, MultiSelectFlat, MultiSelectGroup, MultiText, and, for modules, Access, Thesaurus, and Tree.
+                        - "Advanced": use the specific options below.
+                        - "Checkbox": the keys "unchecked_value" and "checked_value" allows to define a specific value to be returned.
+                        - "DateRange": allow to display two html input "number" for start and end year.
+                        - "Hidden": the value can be passed with key "value". If the value is not a scalar, it is serialized as json.
+                        - "Number": the keys "min", "max" and "step" can be set.
+                        - "MultiSelectFlat" and "SelectFlat" may be used to be sure that values are flatten.
+                        - "MultiSelectGroup" and "SelectGroup" may be used for some specific fields that group options by default (resource classes, resource templates), in which case the options labels are removed.
+                        - "Tree" can be used for item sets when module ItemSetsTree is enabled and data indexed recursively.
+                        - For the types MultiCheckbox, Radio, Select, and derivatives, the values can be passed with key "value_options", else the ones of the field will be used.
                         </div><a style="display: none" href="#
                         MARKDOWN), // @translate
                     'ini_typed_mode' => true,

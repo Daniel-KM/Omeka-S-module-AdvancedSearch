@@ -303,12 +303,12 @@
         pointer-events: all;
         cursor: pointer;
     }
-    .range-double input#slider-from[type=range] {
+    .range-double input.range-slider-from[type=range] {
         z-index: 1;
         background-color: rgba(0,0,0,0);
     }
-    .range-double input#slider-to[type=range] {
-        background-color: rgba(210,210,210,1);
+    .range-double input.range-slider-to[type=range] {
+        background-color: #e9e9ed;
     }
     .range-double .range-numerics {
         display: flex;

@@ -214,6 +214,16 @@ $(document).ready(function() {
                 }
             }
         });
+        var facetRange = $(`input[type=range][name="${facetName}"]`);
+        if (facetRange.length) {
+            if (facetName.includes('[to]')) {
+                facetRange.val(facetRange.attr('max'));
+                controlSliderTo(facetRange[0]);
+            } else {
+                facetRange.val(facetRange.attr('min'));
+                controlSliderFrom(facetRange[0]);
+            }
+        }
     });
 
     $('.search-facets').on('change', 'input[type=checkbox]', function() {
@@ -260,57 +270,54 @@ $(document).ready(function() {
      * @see https://medium.com/@predragdavidovic10/native-dual-range-slider-html-css-javascript-91e778134816
      */
 
-    function controlInputFrom(sliderFrom, inputFrom, inputTo, controlSlider) {
+    function getRangeDoubleElements(element) {
+        const rangeDouble = element.closest('.range-double');
+        return rangeDouble
+            ? [
+                rangeDouble.querySelector('.range-numeric-from'),
+                rangeDouble.querySelector('.range-numeric-to'),
+                rangeDouble.querySelector('.range-slider-from'),
+                rangeDouble.querySelector('.range-slider-to'),
+            ]
+            : [null, null, null, null];
+    }
+
+    function controlNumericFrom(element) {
+        const [inputFrom, inputTo, sliderFrom, sliderTo] = getRangeDoubleElements(element);
         const [from, to] = parseTwoElementsToInt(inputFrom, inputTo);
-        fillSlider(inputFrom, inputTo, colorSlider, colorRange, controlSlider);
-        if (from > to) {
-            sliderFrom.value = to;
-            inputFrom.value = to;
-        } else {
-            sliderFrom.value = from;
-        }
+        [inputFrom.value, sliderFrom.value] = from > to ? [to, to] : [from, from];
+        fillSlider(inputFrom, inputTo, sliderTo);
     }
 
-    function controlInputTo(sliderTo, inputFrom, inputTo, controlSlider) {
+    function controlNumericTo(element) {
+        const [inputFrom, inputTo, sliderFrom, sliderTo] = getRangeDoubleElements(element);
         const [from, to] = parseTwoElementsToInt(inputFrom, inputTo);
-        fillSlider(inputFrom, inputTo, colorSlider, colorRange, controlSlider);
-        toggleRangeSliderAccessible(inputTo);
-        if (from <= to) {
-            sliderTo.value = to;
-            inputTo.value = to;
-        } else {
-            inputTo.value = from;
-        }
-    }
-
-    function controlSliderFrom(sliderFrom, sliderTo, inputFrom) {
-        const [from, to] = parseTwoElementsToInt(sliderFrom, sliderTo);
-        fillSlider(sliderFrom, sliderTo, colorSlider, colorRange, sliderTo);
-        if (from > to) {
-            sliderFrom.value = to;
-            inputFrom.value = to;
-        } else {
-            inputFrom.value = from;
-        }
-    }
-
-    function controlSliderTo(sliderFrom, sliderTo, inputTo) {
-        const [from, to] = parseTwoElementsToInt(sliderFrom, sliderTo);
-        fillSlider(sliderFrom, sliderTo, colorSlider, colorRange, sliderTo);
+        [inputTo.value, sliderTo.value] = from <= to ? [to, to] : [from, from];
+        fillSlider(inputFrom, inputTo, sliderTo);
         toggleRangeSliderAccessible(sliderTo);
-        if (from <= to) {
-            sliderTo.value = to;
-            inputTo.value = to;
-        } else {
-            inputTo.value = from;
-            sliderTo.value = from;
-        }
     }
 
-    function fillSlider(from, to, colorSlider, colorRange, controlSlider) {
+    function controlSliderFrom(element) {
+        const [inputFrom, inputTo, sliderFrom, sliderTo] = getRangeDoubleElements(element);
+        const [from, to] = parseTwoElementsToInt(sliderFrom, sliderTo);
+        [inputFrom.value, sliderFrom.value] = from > to ? [to, to] : [from, from];
+        fillSlider(sliderFrom, sliderTo, sliderTo);
+    }
+
+    function controlSliderTo(element) {
+        const [inputFrom, inputTo, sliderFrom, sliderTo] = getRangeDoubleElements(element);
+        const [from, to] = parseTwoElementsToInt(sliderFrom, sliderTo);
+        [inputTo.value, sliderTo.value] = from <= to ? [to, to] : [from, from];
+        fillSlider(sliderFrom, sliderTo, sliderTo);
+        toggleRangeSliderAccessible(sliderTo);
+    }
+
+    function fillSlider(from, to, controlSlider, colorSlider, colorRange) {
         const rangeDistance = to.max - to.min;
         const fromPosition = from.value - to.min;
         const toPosition = to.value - to.min;
+        colorSlider = colorSlider ? colorSlider : colorSliderDefault;
+        colorRange = colorRange ? colorRange : colorRangeDefault;
         controlSlider.style.background = `linear-gradient(
             to right,
             ${colorSlider} 0%,
@@ -322,11 +329,11 @@ $(document).ready(function() {
     }
 
     function toggleRangeSliderAccessible(sliderCurrent) {
-        if (Number(sliderCurrent.value) <= 0 ) {
-            sliderTo.style.zIndex = 2;
-        } else {
-            sliderTo.style.zIndex = 0;
-        }
+        const [inputFrom, inputTo, sliderFrom, sliderTo] = getRangeDoubleElements(sliderCurrent);
+        sliderTo.style.zIndex = (Number(sliderFrom.value) === Number(sliderTo.value))
+            || (Number(sliderTo.value) <= 0)
+            ? 2
+            : 0;
     }
 
     function parseTwoElementsToInt(currentFrom, currentTo) {
@@ -335,20 +342,28 @@ $(document).ready(function() {
         return [from, to];
     }
 
-    const sliderFrom = document.querySelector('#slider-from');
-    const sliderTo = document.querySelector('#slider-to');
-    const inputFrom = document.querySelector('#numeric-from');
-    const inputTo = document.querySelector('#numeric-to');
-    const colorRange = 'rgba(61,174,233,1)';
-    const colorSlider = 'rgba(210,210,210,1)';
+    const rangeDoubles = document.querySelectorAll('.range-double');
 
-    fillSlider(sliderFrom, sliderTo, colorSlider, colorRange, sliderTo);
-    toggleRangeSliderAccessible(sliderTo);
+    /* TODO Get slider colors from the css. */
+    const colorRangeDefault = '#a7a7a7';
+    const colorSliderDefault = '#e9e9ed';
 
-    sliderFrom.oninput = () => controlSliderFrom(sliderFrom, sliderTo, inputFrom);
-    sliderTo.oninput = () => controlSliderTo(sliderFrom, sliderTo, inputTo);
-    inputFrom.oninput = () => controlInputFrom(sliderFrom, inputFrom, inputTo, sliderTo);
-    inputTo.oninput = () => controlInputTo(sliderTo, inputFrom, inputTo, sliderTo);
+    /* Init ranges only when present. */
+    if (rangeDoubles.length) {
+        rangeDoubles.forEach((rangeDouble) => {
+            const rangeSliderFrom = rangeDouble.querySelector('.range-slider-from');
+            const rangeSliderTo = rangeDouble.querySelector('.range-slider-to');
+            if (rangeSliderFrom && rangeSliderTo) {
+                fillSlider(rangeSliderFrom, rangeSliderTo, rangeSliderTo);
+                toggleRangeSliderAccessible(rangeSliderTo);
+            }
+        });
+
+        $('.range-numeric-from').on('input', (event) => controlNumericFrom(event.target));
+        $('.range-numeric-to').on('input', (event) => controlNumericTo(event.target));
+        $('.range-slider-from').on('input', (event) => controlSliderFrom(event.target));
+        $('.range-slider-to').on('input', (event) => controlSliderTo(event.target));
+    }
 
     /* Results */
 

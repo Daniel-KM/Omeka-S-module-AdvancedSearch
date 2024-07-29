@@ -276,6 +276,15 @@ return [
                     'display_count' => false,
                     'mode' => 'button',
                 ],
+                'date' => [
+                    'field' => 'date',
+                    'languages' => [],
+                    'label' => $translate('Date'),
+                    'type' => 'RangeDouble',
+                    'min' => 1454,
+                    'max' => 2025,
+                    'mode' => 'button',
+                ],
                 'dcterms:subject' => [
                     'field' => 'dcterms:subject',
                     'languages' => [],
@@ -305,15 +314,6 @@ return [
                     'order' => 'default',
                     'limit' => 25,
                     'display_count' => false,
-                    'mode' => 'button',
-                ],
-                'date' => [
-                    'field' => 'date',
-                    'languages' => [],
-                    'label' => $translate('Date'),
-                    'type' => 'RangeDouble',
-                    'min' => 1454,
-                    'max' => 2025,
                     'mode' => 'button',
                 ],
                 'dcterms:language' => [

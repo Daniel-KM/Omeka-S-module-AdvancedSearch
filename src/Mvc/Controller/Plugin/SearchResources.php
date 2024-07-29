@@ -408,10 +408,7 @@ class SearchResources extends AbstractPlugin
             ->buildPropertyQuery($qb, $query);
         if ($this->adapter instanceof ItemAdapter) {
             $this
-                ->searchHasMedia($qb, $query)
-                ->searchHasMediaOriginal($qb, $query)
-                ->searchHasMediaThumbnails($qb, $query)
-                ->searchByMediaType($qb, $query);
+                ->searchItemMediaData($qb, $query);
         } elseif ($this->adapter instanceof MediaAdapter) {
             $this
                 ->searchMediaByItemSet($qb, $query)
@@ -2068,116 +2065,105 @@ class SearchResources extends AbstractPlugin
     }
 
     /**
-     * Build query to check if an item has media or not.
+     * Build query to check data of medias from items.
      *
-     * The argument uses "has_media", with value "1" or "0".
+     * Use a single method in order to manage a single sql join, because they
+     * are heavy in doctrine when the resource is a discriminated one.
      */
-    protected function searchHasMedia(QueryBuilder $qb, array $query): self
+    protected function searchItemMediaData(QueryBuilder $qb, array $query): self
     {
-        if (!isset($query['has_media'])) {
-            return $this;
-        }
+        $hasOriginal = isset($query['has_original']) && (string) $query['has_original'] !== ''
+            ? (bool) $query['has_original']
+            : null;
+        $hasThumbnails = isset($query['has_thumbnails']) && (string) $query['has_thumbnails'] !== ''
+            ? (bool) $query['has_thumbnails']
+            : null;
+        $mediaTypes = isset($query['media_types'])
+            ? array_filter(array_map('trim', is_array($query['media_types']) ? $query['media_types'] : [$query['media_types']]))
+            : null;
 
-        $value = (string) $query['has_media'];
-        if ($value === '') {
-            return $this;
-        }
-
-        $expr = $qb->expr();
-
-        // With media.
-        $mediaAlias = $this->adapter->createAlias();
-        if ($value) {
-            $qb
-                ->innerJoin(
-                    \Omeka\Entity\Media::class,
-                    $mediaAlias,
-                    Join::WITH,
-                    $expr->eq($mediaAlias . '.item', 'omeka_root.id')
-                );
-        }
-        // Without media.
-        else {
-            $qb
-                ->leftJoin(
-                    \Omeka\Entity\Media::class,
-                    $mediaAlias,
-                    Join::WITH,
-                    $expr->eq($mediaAlias . '.item', 'omeka_root.id')
-                )
-                ->andWhere($expr->isNull($mediaAlias . '.id'));
-        }
-        return $this;
-    }
-
-    /**
-     * Build query to check if an item has an original file or not.
-     *
-     * The argument uses "has_original", with value "1" or "0".
-     */
-    protected function searchHasMediaOriginal(QueryBuilder $qb,array $query): self
-    {
-        return $this->searchHasMediaSpecific($qb, $query, 'has_original');
-    }
-
-    /**
-     * Build query to check if an item has thumbnails or not.
-     *
-     * The argument uses "has_thumbnails", with value "1" or "0".
-     */
-    protected function searchHasMediaThumbnails(QueryBuilder $qb, array $query): self
-    {
-        return $this->searchHasMediaSpecific($qb, $query, 'has_thumbnails');
-    }
-
-    /**
-     * Build query to check if an item has an original file or thumbnails or not.
-     *
-     * @param string $field "has_original" or "has_thumbnails".
-     */
-    protected function searchHasMediaSpecific(QueryBuilder $qb, array $query, $field): self
-    {
-        if (!isset($query[$field])) {
-            return $this;
-        }
-
-        $value = (string) $query[$field];
-        if ($value === '') {
+        if ($hasOriginal === null && $hasThumbnails === null && !$mediaTypes) {
             return $this;
         }
 
         $expr = $qb->expr();
-        $fields = [
-            'has_original' => 'hasOriginal',
-            'has_thumbnails' => 'hasThumbnails',
-        ];
 
-        // With original media.
-        $mediaAlias = $this->adapter->createAlias();
-        if ($value) {
-            $qb->innerJoin(
-                \Omeka\Entity\Media::class,
-                $mediaAlias,
-                Join::WITH,
-                $expr->andX(
-                    $expr->eq($mediaAlias . '.item', 'omeka_root.id'),
-                    $expr->eq($mediaAlias . '.' . $fields[$field], 1)
-                )
-            );
+        // Has media was reimplemented in core in Omeka S v4.0.
+        // Nevertheless, it allows to check if a inner/left join was added.
+        $hasMedia = isset($query['has_media']) && (string) $query['has_media'] !== ''
+            ? (bool) $query['has_media']
+            : null;
+
+        // If has media is set, a join is already set, so get it, else create a new one.
+        $joinInner = $hasOriginal === true || $hasThumbnails === true || $mediaTypes;
+        $joinLeft = $hasOriginal === false || $hasThumbnails === false;
+
+        $mediaAliasInner = null;
+        $mediaAliasLeft = null;
+        if ($hasMedia !== null) {
+            // Get the media alias for the existing join.
+            // The process is quick because there should be less than some
+            // joins, but it requires a sub-loop.
+            /** @var \Doctrine\ORM\Query\Expr\Join $join */
+            $dqlJoins = $qb->getDQLPart('join');
+            foreach ($dqlJoins['omeka_root'] ?? [] as $join) {
+                if ($join->getJoin() === 'omeka_root.media' && !$join->getConditionType()) {
+                    $joinType = $join->getJoinType();
+                    if ($joinType === \Doctrine\ORM\Query\Expr\Join::INNER_JOIN) {
+                        $mediaAliasInner = $join->getAlias();
+                    } elseif ($joinType === \Doctrine\ORM\Query\Expr\Join::LEFT_JOIN) {
+                        $mediaAliasLeft = $join->getAlias();
+                    }
+                }
+            }
         }
-        // Without original media.
-        else {
-            $qb
-                ->leftJoin(
-                    \Omeka\Entity\Media::class,
-                    $mediaAlias,
-                    Join::WITH,
-                    $expr->eq($mediaAlias . '.item', 'omeka_root.id')
-                )
-                ->andWhere($expr->orX(
-                    $expr->isNull($mediaAlias . '.id'),
-                    $expr->eq($mediaAlias . '.' . $fields[$field], 0)
-                ));
+
+        // Use "where" instead of modifying condition like in previsous version.
+
+        if ($joinInner) {
+            if (!$mediaAliasInner) {
+                $mediaAliasInner = $this->adapter->createAlias();
+                $qb
+                    ->innerJoin('omeka_root.media', $mediaAliasInner);
+            }
+            if ($hasOriginal === true) {
+                $qb
+                    ->andWhere($expr->eq($mediaAliasInner . '.hasOriginal', 1));
+            }
+            if ($hasThumbnails === true) {
+                $qb
+                    ->andWhere($expr->eq($mediaAliasInner . '.hasThumbnails', 1));
+            }
+            if ($mediaTypes) {
+                $qb
+                    ->andWhere($expr->in(
+                        $mediaAliasInner . '.mediaType',
+                        $this->adapter->createNamedParameter($qb, $mediaTypes)
+                    ));
+            }
+        }
+
+        if ($joinLeft) {
+            // Most of the time, there is no join left here.
+            if (!$mediaAliasLeft) {
+                $mediaAliasLeft = $this->adapter->createAlias();
+                $qb
+                    ->leftJoin('omeka_root.media', $mediaAliasLeft);
+            }
+            if ($hasOriginal === false) {
+                $qb
+                    ->andWhere($expr->orX(
+                        $expr->isNull($mediaAliasLeft . '.id'),
+                        $expr->eq($mediaAliasLeft . '.hasOriginal', 0)
+                    ));
+            }
+            if ($hasThumbnails === false) {
+                $qb
+                    ->andWhere($expr->orX(
+                        $expr->isNull($mediaAliasLeft . '.id'),
+                        $expr->eq($mediaAliasLeft . '.hasThumbnails', 0)
+                    ));
+            }
         }
 
         return $this;
@@ -2203,30 +2189,11 @@ class SearchResources extends AbstractPlugin
 
         $expr = $qb->expr();
 
-        if ($this->adapter instanceof MediaAdapter) {
-            $qb
-                ->andWhere($expr->in(
-                    'omeka_root.mediaType',
-                    $this->adapter->createNamedParameter($qb, $values)
-                ));
-            return $this;
-        }
-
-        $mediaAlias = $this->adapter->createAlias();
-
-        $qb->innerJoin(
-            \Omeka\Entity\Media::class,
-            $mediaAlias,
-            Join::WITH,
-            $expr->andX(
-                $expr->eq($mediaAlias . '.item', 'omeka_root.id'),
-                $expr->in(
-                    $mediaAlias . '.mediaType',
-                    $this->adapter->createNamedParameter($qb, $values)
-                )
-            )
-        );
-
+        $qb
+            ->andWhere($expr->in(
+                'omeka_root.mediaType',
+                $this->adapter->createNamedParameter($qb, $values)
+            ));
         return $this;
     }
 

@@ -172,12 +172,17 @@ var Search = (function() {
     }
 
     /**
-     * Autocomplete or autosuggest.
+     * Autocomplete or autosuggest for any input element.
      *
      * @see https://github.com/devbridge/jQuery-Autocomplete
      */
-    self.autosuggestOptions = function(searchElement) {
-        var transformResult = function(response) {
+    self.autosuggestOptions = function(element) {
+        let serviceUrl = element.data('autosuggest-url');
+        if (!serviceUrl || !serviceUrl.length) {
+            return null;
+        }
+
+        let transformResult = function(response) {
             // Managed by Solr endpoint.
             // @see https://solr.apache.org/guide/suggester.html#example-usages
             if (response.suggest) {
@@ -193,16 +198,14 @@ var Search = (function() {
                     }),
                 };
             }
-            // Managed by module or try the format of jQuery-Autocomplete.
+            // Managed by module, that uses the format of jQuery-Autocomplete
+            // in data, or jQuery-Autocomplete directly.
             return response.data ? response.data : response;
         }
 
-        let serviceUrl = searchElement.data('autosuggest-url');
-        if (!serviceUrl || !serviceUrl.length) {
-            return null;
-        }
-        let paramName = searchElement.data('autosuggest-param-name');
-        paramName = paramName && paramName.length ? paramName : 'q'
+        // Get the param name (always "q" for the internal suggester).
+        let paramName = element.data('autosuggest-param-name');
+        paramName = paramName && paramName.length ? paramName : 'q';
         return {
             serviceUrl: serviceUrl,
             dataType: 'json',
@@ -748,13 +751,13 @@ $(document).ready(function() {
      * Init autocompletion/autosuggestion of all specified input fields.
      */
     if (hasAutocomplete) {
-        let searchElement = $('.form-search .autosuggest[name=q]');
-        if (searchElement) {
-            let autosuggestOptions = Search.autosuggestOptions(searchElement);
+        $('input[type=search].autosuggest, input[type=text].autosuggest').each(function(index, element) {
+            element = $(element);
+            let autosuggestOptions = Search.autosuggestOptions(element);
             if (autosuggestOptions) {
-                searchElement.autocomplete(autosuggestOptions);
+                element.autocomplete(autosuggestOptions);
             }
-        }
+        });
     }
 
 });

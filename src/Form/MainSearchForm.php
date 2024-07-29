@@ -175,6 +175,8 @@ class MainSearchForm extends Form
             : ['form' => 'form-search'];
 
         // The main query is always the first element and submit the last one.
+
+        // TODO Make q a standard filter, managed like all other ones, since all fields have them features.
         // TODO Allow to order and to skip "q" (include it as a standard filter).
 
         $this
@@ -255,6 +257,10 @@ class MainSearchForm extends Form
             $filter['attributes'] = array_key_exists('attributes', $filter)
                 ? $filter['attributes'] + $this->elementAttributes
                 : $this->elementAttributes;
+
+            if (!empty($filter['options']['autosuggest'])) {
+                $filter = $this->appendAutosuggestAttributes($filter);
+            }
 
             switch ($type) {
                 default:
@@ -1003,6 +1009,22 @@ class MainSearchForm extends Form
         return $fieldset;
     }
 
+    /**
+     * Append autosuggest attributes to a filter (class, url, autocomplete off).
+     */
+    protected function appendAutosuggestAttributes(array $filter): array
+    {
+        $filter['attributes']['class'] = isset($filter['attributes']['class']) ? $filter['attributes']['class'] . ' autosuggest' : 'autosuggest';
+        $filter['attributes']['autocomplete'] = 'off';
+        // TODO Use url helper?
+        $filter['attributes']['data-autosuggest-url'] ??= $this->basePath
+            . ($this->site ? '/s/' . $this->site->slug() : '/admin')
+            . '/' . ($this->searchConfig ? $this->searchConfig->slug() : 'search')
+            . '/suggest?field=' . rawurlencode($filter['field']);
+        $filter['attributes']['data-autosuggest-fill-input'] ??= '1';
+        return $filter;
+    }
+
     protected function appendOptionsAndAttributes(Element $element, array $filter): Element
     {
         if (count($filter['options'])) {
@@ -1138,7 +1160,6 @@ class MainSearchForm extends Form
      * Get an associative list of all unique values of a property.
      *
      * @todo Use the real search engine, not the internal one.
-     * @todo Use a suggester for big lists.
      * @todo Support any resources, not only item.
      *
      * Note: In version previous 3.4.15, the module Reference was used, that

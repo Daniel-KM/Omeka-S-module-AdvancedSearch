@@ -302,6 +302,7 @@ class SearchConfigConfigureForm extends Form
                         - The key "options" can be passed to set options. All available options managed by Omeka or Laminas can be passed. For example, `options.checked_value = "yes"` or `options.value_options.first = "First"`.
                         - The key "attributes" can be passed to set attributes of the html input. It may be used for class, min, max, step, placeholder, data, etc., for example `attributes.class = "specific-class"`.
                         - The types are html input types: Text (default), Advanced (list of advanced filters), Checkbox, Hidden, Number, Radio, Range, RangeDouble, Select, SelectFlat, SelectGroup, MultiCheckbox, MultiSelect, MultiSelectFlat, MultiSelectGroup, MultiText, and, for modules, Access, Thesaurus, and Tree (item sets tree).
+                        - Text: the default html input field may be improved with an autosuggester. Enable it with option "autosuggest" and value "true". An external url can be set via attribute "'data-autosuggest-url'."
                         - Checkbox: the keys "unchecked_value" and "checked_value" allow to define a specific value to be returned.
                         - Hidden: the value can be passed with key "value". If the value is not a scalar, it is serialized as json.
                         - Number: the keys "min", "max" and "step" can be set as attributes, else they will be extracted from data. Of course, data should be numbers.

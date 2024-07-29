@@ -3,8 +3,8 @@
 namespace AdvancedSearch\FormAdapter;
 
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
-use AdvancedSearch\Mvc\Controller\Plugin\SearchResources;
 use AdvancedSearch\Query;
+use AdvancedSearch\Stdlib\SearchResources;
 use Common\Stdlib\EasyMeta;
 use Doctrine\DBAL\Connection;
 
@@ -214,7 +214,7 @@ class ApiFormAdapter implements FormAdapterInterface
             $value = $queryRow['text'] ?? null;
 
             if ((!isset($value) || $value === '' || $value === [])
-                && !in_array($queryType, SearchResources::PROPERTY_QUERY['value_none'])
+                && !in_array($queryType, SearchResources::FIELD_QUERY['value_none'])
             ) {
                 continue;
             }
@@ -246,7 +246,7 @@ class ApiFormAdapter implements FormAdapterInterface
                     }
                     $value = $list;
                     // no break;
-                case isset(SearchResources::PROPERTY_QUERY['reciprocal'][$queryType]):
+                case isset(SearchResources::FIELD_QUERY['reciprocal'][$queryType]):
                     $query->addFilterQuery($propertyField, $value, $queryType);
                     break;
 

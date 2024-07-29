@@ -3,8 +3,8 @@
 namespace AdvancedSearch\View\Helper;
 
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
-use AdvancedSearch\Mvc\Controller\Plugin\SearchResources;
 use AdvancedSearch\Query;
+use AdvancedSearch\Stdlib\SearchResources;
 use Laminas\View\Helper\AbstractHelper;
 use Omeka\Api\Exception\NotFoundException;
 
@@ -262,7 +262,7 @@ class SearchingFilters extends AbstractHelper
                         if (is_array($queryRow)
                             && isset($queryRow['type'])
                             && !empty($queryRow['value'])
-                            && in_array($queryRow['type'], SearchResources::PROPERTY_QUERY['value_subject'])
+                            && in_array($queryRow['type'], SearchResources::FIELD_QUERY['value_subject'])
                         ) {
                             is_array($queryRow['value'])
                                 ? $vrIds = array_merge($vrIds, array_values($queryRow['value']))
@@ -292,14 +292,14 @@ class SearchingFilters extends AbstractHelper
                     foreach ($value as $subKey => $queryRow) {
                         // Default query type is "in", unlike standard search.
                         $queryType = $queryRow['type'] ?? 'in';
-                        if (!isset(SearchResources::PROPERTY_QUERY['reciprocal'][$queryType])) {
+                        if (!isset(SearchResources::FIELD_QUERY['reciprocal'][$queryType])) {
                             continue;
                         }
 
                         $joiner = $queryRow['join'] ?? 'and';
                         $value = $queryRow['value'] ?? '';
 
-                        $isWithoutValue = in_array($queryType, SearchResources::PROPERTY_QUERY['value_none'], true);
+                        $isWithoutValue = in_array($queryType, SearchResources::FIELD_QUERY['value_none'], true);
 
                         // A value can be an array with types "list" and "nlist".
                         if (!is_array($value)
@@ -345,7 +345,7 @@ class SearchingFilters extends AbstractHelper
                             $filterLabel = ($joiners[$joiner] ?? $joiners['and']) . ' ' . $filterLabel;
                         }
 
-                        $vals = in_array($queryType, SearchResources::PROPERTY_QUERY['value_subject'])
+                        $vals = in_array($queryType, SearchResources::FIELD_QUERY['value_subject'])
                             ? $flatArrayValueResourceIds($value, $vrTitles)
                             : $flatArray($value);
                         $filters[$filterLabel][$this->urlQuery($key, $subKey)] = implode(', ', $vals);

@@ -25,6 +25,7 @@ return [
         'factories' => [
             'AdvancedSearch\AdapterManager' => Service\Adapter\ManagerFactory::class,
             'AdvancedSearch\FormAdapterManager' => Service\FormAdapter\ManagerFactory::class,
+            'AdvancedSearch\SearchResources' => Service\Stdlib\SearchResourcesFactory::class,
         ],
         'delegators' => [
             'Omeka\ApiManager' => [

@@ -43,7 +43,7 @@ var Search = (function() {
     /**
      * Data about search filter types.
      *
-     * @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResources
+     * @see \AdvancedSearch\Stdlib\SearchResources
      */
     self.filterTypes = {
         withValue: [

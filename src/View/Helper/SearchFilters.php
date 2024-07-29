@@ -2,7 +2,7 @@
 
 namespace AdvancedSearch\View\Helper;
 
-use AdvancedSearch\Mvc\Controller\Plugin\SearchResources;
+use AdvancedSearch\Stdlib\SearchResources;
 use Laminas\View\Helper\AbstractHelper;
 use Omeka\Api\Exception\NotFoundException;
 
@@ -147,13 +147,13 @@ class SearchFilters extends AbstractHelper
                     foreach ($value as $subKey => $queryRow) {
                         if (!is_array($queryRow)
                             || empty($queryRow['type'])
-                            || !isset(SearchResources::PROPERTY_QUERY['reciprocal'][$queryRow['type']])
+                            || !isset(SearchResources::FIELD_QUERY['reciprocal'][$queryRow['type']])
                         ) {
                             continue;
                         }
                         $queryType = $queryRow['type'];
                         $value = $queryRow['text'] ?? null;
-                        $noValue = in_array($queryType, SearchResources::PROPERTY_QUERY['value_none'], true);
+                        $noValue = in_array($queryType, SearchResources::FIELD_QUERY['value_none'], true);
                         if ($noValue) {
                             $value = null;
                         } elseif ((is_array($value) && !count($value))

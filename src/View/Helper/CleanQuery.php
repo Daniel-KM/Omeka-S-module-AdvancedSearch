@@ -2,17 +2,16 @@
 
 namespace AdvancedSearch\View\Helper;
 
-use AdvancedSearch\Mvc\Controller\Plugin\SearchResources as PluginSearchResources;
 use Laminas\View\Helper\AbstractHelper;
 
 class CleanQuery extends AbstractHelper
 {
     /**
-     * @var \AdvancedSearch\Mvc\Controller\Plugin\SearchResources
+     * @var \AdvancedSearch\Stdlib\SearchResources
      */
     protected $searchResources;
 
-    public function __construct(PluginSearchResources $searchResources)
+    public function __construct(\AdvancedSearch\Stdlib\SearchResources $searchResources)
     {
         $this->searchResources = $searchResources;
     }

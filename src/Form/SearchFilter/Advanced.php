@@ -29,7 +29,7 @@
 
 namespace AdvancedSearch\Form\SearchFilter;
 
-use AdvancedSearch\Mvc\Controller\Plugin\SearchResources;
+use AdvancedSearch\Stdlib\SearchResources;
 use AdvancedSearch\View\Helper\SearchFiltersTrait;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
@@ -98,7 +98,7 @@ class Advanced extends Fieldset
         if ($operator) {
             $operators = $this->getOption('field_operators') ?: $this->getQueryTypesLabels();
             if ($joiner && $joinerNot) {
-                $operators = array_diff_key($operators, array_flip(SearchResources::PROPERTY_QUERY['negative']));
+                $operators = array_diff_key($operators, array_flip(SearchResources::FIELD_QUERY['negative']));
             }
             $this
                 ->add([

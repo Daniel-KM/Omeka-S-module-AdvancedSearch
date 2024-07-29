@@ -11,7 +11,7 @@ class CleanQueryFactory implements FactoryInterface
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
         return new CleanQuery(
-            $services->get('ControllerPluginManager')->get('searchResources')
+            $services->get('AdvancedSearch\SearchResources')
         );
     }
 }

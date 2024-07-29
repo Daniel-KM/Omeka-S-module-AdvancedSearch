@@ -30,9 +30,9 @@
 namespace AdvancedSearch\FormAdapter;
 
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
-use AdvancedSearch\Mvc\Controller\Plugin\SearchResources;
 use AdvancedSearch\Query;
 use AdvancedSearch\Response;
+use AdvancedSearch\Stdlib\SearchResources;
 
 abstract class AbstractFormAdapter implements FormAdapterInterface
 {
@@ -351,7 +351,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                             foreach ($value as $filter) {
                                 if (isset($filter['field']) && $checkAvailableField($filter['field'])) {
                                     $type = empty($filter['type']) ? 'in' : $filter['type'];
-                                    if (in_array($type, SearchResources::PROPERTY_QUERY['value_none'])) {
+                                    if (in_array($type, SearchResources::FIELD_QUERY['value_none'])) {
                                         $query->addFilterQuery($filter['field'], null, $type);
                                     } elseif (isset($filter['value']) && trim($filter['value']) !== '') {
                                         $query->addFilterQuery($filter['field'], $filter['value'], $type);
@@ -372,7 +372,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                             foreach ($value as $filter) {
                                 if (isset($filter['field']) && $checkAvailableField($filter['field'])) {
                                     $type = empty($filter['type']) ? 'in' : $filter['type'];
-                                    if (in_array($type, SearchResources::PROPERTY_QUERY['value_none'])) {
+                                    if (in_array($type, SearchResources::FIELD_QUERY['value_none'])) {
                                         $join = isset($filter['join']) && in_array($filter['join'], ['or', 'not']) ? $filter['join'] : 'and';
                                         $query->addFilterQuery($filter['field'], null, $type, $join);
                                     } elseif (isset($filter['value']) && trim($filter['value']) !== '') {

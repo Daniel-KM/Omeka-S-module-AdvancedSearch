@@ -1140,9 +1140,9 @@ class Module extends AbstractModule
             $searchUrl = $basePath('admin/' . $searchConfig->slug());
             $script = sprintf('var searchUrl = %s;', json_encode($searchUrl, 320));
 
-            $autoSuggestUrl = $searchConfig->subSetting('autosuggest', 'url');
+            $autoSuggestUrl = $searchConfig->subSetting('q', 'suggest_url');
             if (!$autoSuggestUrl) {
-                $suggester = $searchConfig->subSetting('autosuggest', 'suggester');
+                $suggester = $searchConfig->subSetting('q', 'suggester');
                 if ($suggester) {
                     $autoSuggestUrl = $searchUrl . '/suggest';
                 }
@@ -1152,7 +1152,7 @@ class Module extends AbstractModule
                 /*
                 // Always autosubmit in admin.
                 // TODO Add a setting for autosubmit in admin quick form?
-                $autoSuggestFillInput = $searchConfig->subSetting('autosuggest', 'fill_input');
+                $autoSuggestFillInput = $searchConfig->subSetting('q', 'suggest_fill_input');
                 if ($autoSuggestFillInput) {
                     $script .= "\nvar searchAutosuggestFillInput = true;";
                 }

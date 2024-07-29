@@ -194,9 +194,9 @@ class MainSearchForm extends Form
             ])
         ;
 
-        $autoSuggestUrl = $this->formSettings['autosuggest']['url'] ?? null;
+        $autoSuggestUrl = $this->formSettings['q']['suggest_url'] ?? null;
         if (!$autoSuggestUrl) {
-            $suggester = $this->formSettings['autosuggest']['suggester'] ?? null;
+            $suggester = $this->formSettings['q']['suggester'] ?? null;
             if ($suggester) {
                 // TODO Use url helper?
                 $autoSuggestUrl = $this->basePath
@@ -209,18 +209,18 @@ class MainSearchForm extends Form
             $elementQ = $this->get('q')
                 ->setAttribute('class', 'autosuggest')
                 ->setAttribute('data-autosuggest-url', $autoSuggestUrl);
-            if (!empty($this->formSettings['autosuggest']['fill_input'])) {
+            if (!empty($this->formSettings['q']['suggest_fill_input'])) {
                 $elementQ
                     ->setAttribute('data-autosuggest-fill-input', '1');
             }
-            if (empty($suggester) && !empty($this->formSettings['autosuggest']['url_param_name'])) {
+            if (empty($suggester) && !empty($this->formSettings['q']['suggest_url_param_name'])) {
                 $elementQ
-                    ->setAttribute('data-autosuggest-param-name', $this->formSettings['autosuggest']['url_param_name']);
+                    ->setAttribute('data-autosuggest-param-name', $this->formSettings['q']['suggest_url_param_name']);
             }
         }
 
         // Add the button for record or full text search.
-        $recordOrFullText = in_array($this->variant, ['simple', 'csrf']) ? null : ($this->formSettings['search']['fulltext_search'] ?? null);
+        $recordOrFullText = in_array($this->variant, ['simple', 'csrf']) ? null : ($this->formSettings['q']['fulltext_search'] ?? null);
         $this->appendRecordOrFullText($recordOrFullText);
 
         foreach ($this->formSettings['form']['filters'] ?? [] as $filter) {
@@ -1177,7 +1177,8 @@ class MainSearchForm extends Form
     {
         // Check if the field is a special or a multifield.
 
-        $searchEngine = $this->getOption('search_config')->engine();
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
+        $searchConfig = $this->getOption('search_config');
 
         $metadataFieldsToNames = [
             'resource_name' => 'resource_type',
@@ -1194,7 +1195,7 @@ class MainSearchForm extends Form
 
         // Convert multi-fields into a list of property terms.
         // Normalize search query keys as omeka keys for items and item sets.
-        $multifields = $searchEngine->settingAdapter('multifields', []);
+        $multifields = $searchConfig->subSetting('index', 'multifields', []);
         $fields = [];
         $fields[$field] = $metadataFieldsToNames[$field]
             ?? $this->easyMeta->propertyTerm($field)

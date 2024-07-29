@@ -196,6 +196,22 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
             );
             $logger->err($message->getMessage(), $message->getContext());
             return ['request', $name, $subName];
+        } elseif ($mainName === 'autosuggest') {
+            $services = $this->getServiceLocator();
+            $logger = $services->get('Omeka\Logger');
+            $message = new PsrMessage(
+                'The search config setting "{old}" was renamed "{new}". You should update your theme.', // @translate
+                ['old' => 'autosuggest', 'new' => 'q']
+            );
+            $news = [
+                'url' => 'suggest_url',
+                'url_param_name' => 'suggest_url_param_name',
+                'limit' => 'suggest_limit',
+                'fill_input' => 'suggest_fill_input',
+            ];
+            $name = $news[$name] ?? $name;
+            $logger->err($message->getMessage(), $message->getContext());
+            return ['q', $name, $subName];
         } elseif ($mainName === 'sort') {
             $services = $this->getServiceLocator();
             $logger = $services->get('Omeka\Logger');
@@ -205,8 +221,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
             );
             if ($name === 'label') {
                 $name = 'label_sort';
-            }
-            if ($name === 'fields') {
+            } elseif ($name === 'fields') {
                 $name = 'sort_list';
             }
             $logger->err($message->getMessage(), $message->getContext());
@@ -348,7 +363,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
             // Check if the main index exists when no field is set.
             // The suggester may be the url, but in that case it's pure js and the
             // query doesn't come here (for now).
-            $suggesterId = $this->subSetting('autosuggest', 'suggester');
+            $suggesterId = $this->subSetting('q', 'suggester');
             if (!$suggesterId) {
                 $message = new PsrMessage(
                     'The search page "{search_page}" has no suggester.', // @translate
@@ -405,7 +420,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
             ];
             // Convert multi-fields into a list of property terms.
             // Normalize search query keys as omeka keys for items and item sets.
-            $multifields = $engine->settingAdapter('multifields', []);
+            $multifields = $this->subSetting('index', 'multifields', []);
             $cleanField = $metadataFieldsToNames[$field]
                 ?? $easyMeta->propertyTerm($field)
                 ?? $multifields[$field]['fields']

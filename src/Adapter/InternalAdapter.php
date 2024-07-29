@@ -6,7 +6,8 @@ class InternalAdapter extends AbstractAdapter
 {
     protected $label = 'Internal [sql]'; // @translate
 
-    protected $configFieldsetClass = \AdvancedSearch\Form\Admin\InternalConfigFieldset::class;
+    // TODO No specific engine config, but specificities in config configure.
+    protected $configFieldsetClass = null;
 
     protected $indexerClass = \AdvancedSearch\Indexer\InternalIndexer::class;
 
@@ -125,11 +126,11 @@ class InternalAdapter extends AbstractAdapter
 
         $fields = [];
         $fields['metadata'] = [
-            'label' => 'Metadata',
+            'label' => 'Metadata', // @translate
             'options' => array_column($defaultFields, 'label', 'name'),
         ];
         $fields['multifields'] = [
-            'label' => 'Aggregated fields',
+            'label' => 'Aggregated fields', // @translate
             'options' => array_replace(
                 array_column($multiFields, 'name', 'name'),
                 array_filter(array_column($multiFields, 'label', 'name'))

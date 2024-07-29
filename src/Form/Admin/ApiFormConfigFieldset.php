@@ -342,7 +342,8 @@ class ApiFormConfigFieldset extends Fieldset
     {
         return [
             'request',
-            'autosuggest',
+            'q',
+            'index',
             // The form is overwrittable.
             // 'form',
             'display',

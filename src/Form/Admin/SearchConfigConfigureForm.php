@@ -30,6 +30,7 @@
 
 namespace AdvancedSearch\Form\Admin;
 
+use AdvancedSearch\Adapter\InternalAdapter;
 use Common\Form\Element as CommonElement;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
@@ -63,10 +64,14 @@ class SearchConfigConfigureForm extends Form
     {
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $this->getOption('search_config');
-        $engine = $searchConfig->engine();
-        if (empty($engine)) {
+        $searchEngine = $searchConfig->engine();
+        if (empty($searchEngine)) {
             return;
         }
+
+        // TODO Add a method or an event to modify or append specific field to each fieldset.
+        $searchAdapter = $searchEngine->adapter();
+        $isInternalEngine = $searchAdapter && $searchAdapter instanceof InternalAdapter;
 
         // This is the settings for the search config, not the search form one.
 
@@ -139,6 +144,76 @@ class SearchConfigConfigureForm extends Form
                 ],
             ])
             ->add([
+                'name' => 'validate_form',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Validate user query (useless in most of the cases)', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'validate_form',
+                ],
+            ])
+        ;
+
+        $this
+            // The main search field is "q", not "fulltext_search" or "search".
+            ->add([
+                'name' => 'q',
+                'type' => Fieldset::class,
+                'options' => [
+                    'label' => 'Search field', // @translate
+                ],
+            ])
+            ->get('q')
+            ->add([
+                'name' => 'suggester',
+                'type' => CommonElement\OptionalSelect::class,
+                'options' => [
+                    'label' => 'Suggester', // @translate
+                    'value_options' => $this->suggesters,
+                    'empty_option' => '',
+                ],
+                'attributes' => [
+                    'id' => 'q_suggester',
+                    'multiple' => false,
+                    'class' => 'chosen-select',
+                    'data-placeholder' => ' ',
+                ],
+            ])
+            ->add([
+                'name' => 'suggest_url',
+                'type' => CommonElement\OptionalUrl::class,
+                'options' => [
+                    'label' => 'Direct endpoint', // @translate
+                    // @see https://solr.apache.org/guide/suggester.html#suggest-request-handler-parameters
+                    'info' => 'This url allows to use an external endpoint to manage keywords and is generally quicker. Needed params should be appended.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'q_suggest_url',
+                ],
+            ])
+            ->add([
+                'name' => 'suggest_url_param_name',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Optional query param name for direct endpoint', // @translate
+                    'info' => 'For a direct Solr endpoint, it should be "suggest.q", else "q" is used by default.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'q_suggest_url_param_name',
+                ],
+            ])
+            ->add([
+                'name' => 'suggest_fill_input',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Stay on form when selecting a suggestion (no auto-submit)', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'q_suggest_fill_input',
+                ],
+            ])
+            ->add([
                 'name' => 'fulltext_search',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [
@@ -156,82 +231,81 @@ class SearchConfigConfigureForm extends Form
                     'value' => '',
                 ],
             ])
-            ->add([
-                'name' => 'validate_form',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'label' => 'Validate user query (useless in most of the cases)', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'validate_form',
-                ],
-            ])
         ;
 
-        $this
-            ->add([
-                'name' => 'autosuggest',
-                'type' => Fieldset::class,
-                'options' => [
-                    'label' => 'Search field', // @translate
-                ],
-            ])
-            ->get('autosuggest')
-            ->add([
-                'name' => 'suggester',
-                'type' => CommonElement\OptionalSelect::class,
-                'options' => [
-                    'label' => 'Suggester', // @translate
-                    'value_options' => $this->suggesters,
-                    'empty_option' => '',
-                ],
-                'attributes' => [
-                    'id' => 'autosuggest_suggester',
-                    'multiple' => false,
-                    'class' => 'chosen-select',
-                    'data-placeholder' => ' ',
-                ],
-            ])
-            ->add([
-                'name' => 'url',
-                'type' => CommonElement\OptionalUrl::class,
-                'options' => [
-                    'label' => 'Direct endpoint', // @translate
-                    // @see https://solr.apache.org/guide/suggester.html#suggest-request-handler-parameters
-                    'info' => 'This url allows to use an external endpoint to manage keywords and is generally quicker. Needed params should be appended.', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'autosuggest_url',
-                ],
-            ])
-            ->add([
-                'name' => 'url_param_name',
-                'type' => Element\Text::class,
-                'options' => [
-                    'label' => 'Optional query param name for direct endpoint', // @translate
-                    'info' => 'For a direct Solr endpoint, it should be "suggest.q", else "q" is used by default.', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'autosuggest_url_param_name',
-                ],
-            ])
-            ->add([
-                'name' => 'fill_input',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'label' => 'Stay on form when selecting a suggestion (no auto-submit)', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'fill_input',
-                ],
-            ])
-        ;
+        // TODO Add the check in adapter interface, or allow specific fieldset by adapter.
+
+        if ($isInternalEngine) {
+            $this
+                ->get('q')
+                ->add([
+                    'name' => 'default_search_partial_word',
+                    'type' => Element\Checkbox::class,
+                    'options' => [
+                        'label' => 'Partial word search for main field (instead of standard full text search)', // @translate
+                        'infos' => 'Currently, this mode does not allow to exclude properties for the main search field.', // @translate
+                    ],
+                    'attributes' => [
+                        'id' => 'q_default_search_partial_word',
+                    ],
+                ])
+            ;
+        }
+
+        if ($isInternalEngine) {
+            $this
+                ->add([
+                    'name' => 'index',
+                    'type' => Fieldset::class,
+                    'options' => [
+                        'label' => 'Indexes', // @translate
+                    ],
+                ])
+                ->get('index')
+
+                ->add([
+                    'name' => 'multifields',
+                    'type' => CommonElement\DataTextarea::class,
+                    'options' => [
+                        'label' => 'Aggregated fields for filters and facets', // @translate
+                        'info' => 'List of fields that refers to multiple properties, formatted "name = label", then the list of properties and an empty line. The name must not be a property term or a reserved keyword.', // @translate
+                        'documentation' => 'https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch/-/blob/master/data/configs/search_engine.internal.php',
+                        'as_key_value' => true,
+                        'key_value_separator' => '=',
+                        'data_options' => [
+                            'name' => null,
+                            'label' => null,
+                            'fields' => ',',
+                        ],
+                        'data_text_mode' => 'last_is_list',
+                    ],
+                    'attributes' => [
+                        'id' => 'index_aggregated_fields',
+                        'placeholder' => <<<'STRING'
+                            author = Author
+                            dcterms:creator
+                            dcterms:contributor
+                            
+                            title = Title
+                            dcterms:title
+                            dcterms:alternative
+                            
+                            date = Date
+                            dcterms:date
+                            dcterms:created
+                            dcterms:issued
+                            STRING,
+                        'rows' => 30,
+                    ],
+                ])
+            ;
+        }
 
         // Settings for the form querier (advanced form and filters).
 
         /** @var \AdvancedSearch\Form\Admin\SearchConfigFilterFieldset $filterFieldset */
         $filterFieldset = $this->formElementManager->get(SearchConfigFilterFieldset::class, [
-            'search_config' => $this->getOption('search_config'),
+            'search_config' => $searchConfig,
         ]);
 
         $this
@@ -459,7 +533,7 @@ class SearchConfigConfigureForm extends Form
 
         /** @var \AdvancedSearch\Form\Admin\SearchConfigSortFieldset $sortFieldset */
         $sortFieldset = $this->formElementManager->get(SearchConfigSortFieldset::class, [
-            'search_config' => $this->getOption('search_config'),
+            'search_config' => $searchConfig,
         ]);
 
         $this
@@ -809,7 +883,7 @@ class SearchConfigConfigureForm extends Form
 
         /** @var \AdvancedSearch\Form\Admin\SearchConfigFacetFieldset $facetFieldset */
         $facetFieldset = $this->formElementManager->get(SearchConfigFacetFieldset::class, [
-            'search_config' => $this->getOption('search_config'),
+            'search_config' => $searchConfig,
         ]);
 
         $this
@@ -1013,16 +1087,6 @@ class SearchConfigConfigureForm extends Form
         $inputFilter = $this->getInputFilter();
 
         // A check is done because the specific form may remove them.
-        if ($inputFilter->has('autosuggest')) {
-            $inputFilter
-                ->get('autosuggest')
-                ->add([
-                    'name' => 'limit',
-                    'required' => false,
-                ])
-            ;
-        }
-
         if ($inputFilter->has('form')) {
             $inputFilter
                 ->get('form')

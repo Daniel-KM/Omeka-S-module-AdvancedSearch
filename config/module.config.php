@@ -65,7 +65,6 @@ return [
             'hiddenInputsFromFilteredQuery' => View\Helper\HiddenInputsFromFilteredQuery::class,
             'searchConfigCurrent' => View\Helper\SearchConfigCurrent::class,
             'searchFilters' => View\Helper\SearchFilters::class,
-            'searchForm' => View\Helper\SearchForm::class,
             'searchingFilters' => View\Helper\SearchingFilters::class,
             'searchingForm' => View\Helper\SearchingForm::class,
             'searchingUrl' => View\Helper\SearchingUrl::class,

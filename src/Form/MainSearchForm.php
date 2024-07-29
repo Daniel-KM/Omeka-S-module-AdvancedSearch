@@ -228,12 +228,6 @@ class MainSearchForm extends Form
             if (!isset($filter['type'])) {
                 $filter['type'] = '';
             }
-            if (!isset($filter['options'])) {
-                $filter['options'] = [];
-            }
-            if (!isset($filter['label'])) {
-                $filter['label'] = '';
-            }
 
             $type = ucfirst(strtolower(basename($filter['type'])));
 
@@ -252,10 +246,15 @@ class MainSearchForm extends Form
 
             $element = null;
 
-            // TODO Use more native options of Laminas form elements or fill them directly via the ini.
-            // TODO Pass any options? Early or lately? Label options?
-
             // TODO Remove deprecated types, the ones that use a fieldset: everything is an index multi-valued now.
+
+            // Append options and attributes early to simplify process.
+            // Options and attributes don't override the ones set here in form.
+            $filter['label'] ??= '';
+            $filter['options'] ??= [];
+            $filter['attributes'] = array_key_exists('attributes', $filter)
+                ? $filter['attributes'] + $this->elementAttributes
+                : $this->elementAttributes;
 
             switch ($type) {
                 default:
@@ -340,7 +339,6 @@ class MainSearchForm extends Form
             }
 
             if ($element) {
-                $element->setAttributes($this->elementAttributes);
                 $this
                     ->add($element);
             }
@@ -453,7 +451,7 @@ class MainSearchForm extends Form
         $element
             ->setLabel($filter['label'])
         ;
-        return $element;
+        return $this->appendOptionsAndAttributes($element, $filter);
     }
 
     protected function searchAdvanced(array $filter): ?ElementInterface
@@ -515,14 +513,14 @@ class MainSearchForm extends Form
                 'allow_remove' => true,
                 'target_element' => $advanced,
                 'required' => false,
-            ])
+            ] + $filter['options'])
             ->setAttributes([
                 'id' => 'search-filters',
                 'class' => 'search-filters-advanced',
                 // TODO Remove this attribute data and use only search config?
                 'data-count-default' => $defaultNumber,
                 'data-count-max' => $maxNumber,
-            ])
+            ] + $filter['attributes'])
         ;
 
         return $element;
@@ -542,7 +540,7 @@ class MainSearchForm extends Form
             $element
                 ->setOption('checked_value', $filter['checked_value']);
         }
-        return $element;
+        return $this->appendOptionsAndAttributes($element, $filter);
     }
 
     protected function searchDateRange(array $filter): ?ElementInterface
@@ -555,23 +553,22 @@ class MainSearchForm extends Form
                 'type' => Element\Number::class,
                 'options' => [
                     'label' => 'From', // @translate
-                ],
+                ] + $filter['options'],
                 'attributes' => [
                     'placeholder' => 'YYYY', // @translate
-                ] + $this->elementAttributes,
+                ] + $filter['attributes'],
             ])
             ->add([
                 'name' => 'to',
                 'type' => Element\Number::class,
                 'options' => [
                     'label' => 'To', // @translate
-                ],
+                ] + $filter['options'],
                 'attributes' => [
                     'placeholder' => 'YYYY', // @translate
-                ] + $this->elementAttributes,
+                ] + $filter['attributes'],
             ])
         ;
-
         return $fieldset;
     }
 
@@ -585,7 +582,7 @@ class MainSearchForm extends Form
         $element
             ->setValue($value)
         ;
-        return $element;
+        return $this->appendOptionsAndAttributes($element, $filter);
     }
 
     protected function searchMultiCheckbox(array $filter, array $valueOptions): ?ElementInterface
@@ -595,7 +592,7 @@ class MainSearchForm extends Form
             ->setLabel($filter['label'])
             ->setValueOptions($valueOptions)
         ;
-        return $element;
+        return $this->appendOptionsAndAttributes($element, $filter);
     }
 
     protected function searchMultiSelect(array $filter, array $valueOptions): ?ElementInterface
@@ -634,7 +631,7 @@ class MainSearchForm extends Form
         $element
             ->setLabel($filter['label'])
         ;
-        return $element;
+        return $this->appendOptionsAndAttributes($element, $filter);
     }
 
     protected function searchNumber(array $filter): ?ElementInterface
@@ -655,7 +652,7 @@ class MainSearchForm extends Form
             $element
                 ->setAttribute('step', $filter['step']);
         }
-        return $element;
+        return $this->appendOptionsAndAttributes($element, $filter);
     }
 
     protected function searchRadio(array $filter, array $valueOptions): ?ElementInterface
@@ -665,7 +662,7 @@ class MainSearchForm extends Form
             ->setLabel($filter['label'])
             ->setValueOptions($valueOptions)
         ;
-        return $element;
+        return $this->appendOptionsAndAttributes($element, $filter);
     }
 
     protected function searchSelect(array $filter, array $valueOptions): ?ElementInterface
@@ -678,12 +675,15 @@ class MainSearchForm extends Form
             ->setOptions([
                 'value_options' => $valueOptions,
                 'empty_option' => '',
-            ])
+            ] + $filter['options'])
         ;
+        // Use chosen-select by default, but without placeholder.
         if (!isset($filter['attributes']['class'])) {
-            $element
-                ->setAttribute('class', 'chosen-select');
+            $filter['attributes']['class'] = 'chosen-select';
+            $filter['attributes']['data-placeholder'] = ' ';
         }
+        $element
+            ->setAttributes($filter['attributes']);
 
         return $element;
     }
@@ -713,7 +713,7 @@ class MainSearchForm extends Form
         $element
             ->setLabel($filter['label'])
         ;
-        return $element;
+        return $this->appendOptionsAndAttributes($element, $filter);
     }
 
     /**
@@ -737,14 +737,14 @@ class MainSearchForm extends Form
                     'label' => $filter['label'], // @translate
                     'value_options' => $this->skipValues ? [] : $this->listItemSetsTree($filter['type'] !== 'MultiCheckbox'),
                     'empty_option' => '',
-                ],
+                ] + $filter['options'],
                 'attributes' => [
                     'id' => 'search-item-sets-tree',
                     'multiple' => false,
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
                     // End users understand "collections" more than "item sets".
                     'data-placeholder' => 'Select collections…', // @translate
-                ] + $this->elementAttributes,
+                ] + $filter['attributes'],
             ])
         ;
 
@@ -804,7 +804,7 @@ class MainSearchForm extends Form
                 'multiple' => true,
                 'class' => 'chosen-select',
                 'data-placeholder' => ' ',
-            ] + $this->elementAttributes)
+            ] + $filter['attributes'])
         ;
 
         $fieldset
@@ -834,13 +834,13 @@ class MainSearchForm extends Form
                     'label' => $filter['label'], // @translate
                     'value_options' => $this->skipValues ? [] : $this->listOwners(),
                     'empty_option' => '',
-                ],
+                ] + $filter['options'],
                 'attributes' => [
                     'id' => 'search-owner-id',
                     'multiple' => true,
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
                     'data-placeholder' => 'Select owners…', // @translate
-                ] + $this->elementAttributes,
+                ] + $filter['attributes'],
             ])
         ;
 
@@ -868,13 +868,13 @@ class MainSearchForm extends Form
                     'label' => $filter['label'], // @translate
                     'value_options' => $this->skipValues ? [] : $this->listSites(),
                     'empty_option' => '',
-                ],
+                ] + $filter['options'],
                 'attributes' => [
                     'id' => 'search-site-id',
                     'multiple' => true,
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
                     'data-placeholder' => 'Select sites…', // @translate
-                ] + $this->elementAttributes,
+                ] + $filter['attributes'],
             ])
         ;
 
@@ -950,14 +950,14 @@ class MainSearchForm extends Form
                     'label' => $filter['label'], // @translate
                     'value_options' => $this->skipValues ? [] : $this->listItemSets($filter['type'] !== 'MultiCheckbox'),
                     'empty_option' => '',
-                ],
+                ] + $filter['options'],
                 'attributes' => [
                     'id' => 'search-item-set-id',
                     'multiple' => true,
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
                     // End users understand "collections" more than "item sets".
                     'data-placeholder' => 'Select collections…', // @translate
-                ] + $this->elementAttributes,
+                ] + $filter['attributes'],
             ])
         ;
 
@@ -993,17 +993,28 @@ class MainSearchForm extends Form
                     'label' => $filter['label'], // @translate
                     'value_options' => $valueOptions,
                     'empty_option' => '',
-                ],
+                ] + $filter['options'],
                 'attributes' => [
                     'id' => 'search-access',
                     // 'multiple' => false,
                     'class' => $filter['type'] === 'Radio' ? '' : 'chosen-select',
                     'data-placeholder' => 'Select access…', // @translate
-                ] + $this->elementAttributes,
+                ] + $filter['attributes'],
             ])
         ;
 
         return $fieldset;
+    }
+
+    protected function appendOptionsAndAttributes(Element $element, array $filter): Element
+    {
+        if (count($filter['options'])) {
+            $element->setOptions($filter['options']);
+        }
+        if (count($filter['attributes'])) {
+            $element->setAttributes($filter['attributes']);
+        }
+        return $element;
     }
 
     /**

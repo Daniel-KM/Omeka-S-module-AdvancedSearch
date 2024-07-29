@@ -308,6 +308,8 @@ class SearchConfigConfigureForm extends Form
                         - "MultiSelectGroup" and "SelectGroup" may be used for some specific fields that group options by default (resource classes, resource templates), in which case the options labels are removed.
                         - "Tree" can be used for item sets when module ItemSetsTree is enabled and data indexed recursively.
                         - For the types MultiCheckbox, Radio, Select, and derivatives, the values can be passed with key "value_options", else the ones of the field will be used.
+                        - The key "options" can be passed to set options. All available options of Omeka and Laminas can be passed.
+                        - The key "attributes" can be passed to set attributes of the html input. It may be used for class.
                         </div><a style="display: none" href="#
                         MARKDOWN), // @translate
                     'ini_typed_mode' => true,

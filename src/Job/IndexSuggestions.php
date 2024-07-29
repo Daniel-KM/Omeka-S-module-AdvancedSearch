@@ -30,6 +30,11 @@ class IndexSuggestions extends AbstractJob
     protected $connection;
 
     /**
+     * @var \Common\Stdlib\EasyMeta
+     */
+    protected $easyMeta;
+
+    /**
      * @var \Doctrine\ORM\EntityManager
      */
     protected $entityManager;
@@ -48,6 +53,7 @@ class IndexSuggestions extends AbstractJob
         $services = $this->getServiceLocator();
         $this->api = $services->get('Omeka\ApiManager');
         $this->logger = $services->get('Omeka\Logger');
+        $this->easyMeta = $services->get('Common\EasyMeta');
         $this->entityManager = $services->get('Omeka\EntityManager');
         $this->connection = $this->entityManager->getConnection();
 
@@ -72,13 +78,15 @@ class IndexSuggestions extends AbstractJob
 
         $resourceNames = $engine->setting('resources', []);
         $mapResources = [
+            'resources' => \Omeka\Entity\Resource::class,
             'items' => \Omeka\Entity\Item::class,
             'item_sets' => \Omeka\Entity\ItemSet::class,
             'media' => \Omeka\Entity\Media::class,
+            'value_annotations' => \Omeka\Entity\ValueAnnotation::class,
             'annotations' => \Annotate\Entity\Annotation::class,
         ];
-        $resourceNames = array_intersect_key($mapResources, array_flip($resourceNames));
-        if (!$resourceNames) {
+        $resourceClasses = array_intersect_key($mapResources, array_flip($resourceNames));
+        if (!$resourceClasses) {
             $this->logger->notice(
                 'Suggester #{search_suggester_id} ("{name}"): there is no resource type to index or the indexation is not needed.', // @translate
                 ['search_suggester_id' => $suggester->id(), 'name' => $suggester->name()]
@@ -137,31 +145,34 @@ class IndexSuggestions extends AbstractJob
             ['search_suggester_id' => $suggester->id(), 'name' => $suggester->name(), 'total' => $totalDeleted]
         );
 
+        // TODO Index value annotations with resources (for now, they can't be selected individually in the config).
+
         $resourceNames = $suggester->engine()->setting('resources', []);
-        $mapResources = [
+        $mapResourcesToClasses = [
             'items' => \Omeka\Entity\Item::class,
             'item_sets' => \Omeka\Entity\ItemSet::class,
             'media' => \Omeka\Entity\Media::class,
+            'value_annotations' => \Omeka\Entity\ValueAnnotation::class,
             'annotations' => \Annotate\Entity\Annotation::class,
         ];
-        $resourceNames = array_intersect_key($mapResources, array_flip($resourceNames));
-
-        $easyMeta = $this->getServiceLocator()->get('Common\EasyMeta');
+        $resourceClasses = in_array('resources', $resourceNames)
+            ? []
+            : array_intersect_key($mapResourcesToClasses, array_flip($resourceNames));
 
         // FIXME Fields are not only properties, but titles, classes and templates.
         $fields = $suggester->setting('fields') ?: [];
-        $fields = $easyMeta->propertyIds($fields);
+        $fields = $this->easyMeta->propertyIds($fields);
         $excludedFields = $suggester->setting('excluded_fields') ?: [];
-        $excludedFields = $easyMeta->propertyIds($excludedFields);
+        $excludedFields = $this->easyMeta->propertyIds($excludedFields);
 
         $modeIndex = $suggester->setting('mode_index') ?: 'start';
 
         if ($processMode === 'sql') {
             $modeIndex === 'contain' || $modeIndex === 'contain_full'
-                ? $this->processContain($suggester, $resourceNames, $fields, $excludedFields, $modeIndex)
-                : $this->processStart($suggester, $resourceNames, $fields, $excludedFields, $modeIndex);
+                ? $this->processContain($suggester, $resourceClasses, $fields, $excludedFields, $modeIndex)
+                : $this->processStart($suggester, $resourceClasses, $fields, $excludedFields, $modeIndex);
         } else {
-            $this->processOrm($suggester, $resourceNames, $fields, $excludedFields, $modeIndex);
+            $this->processOrm($suggester, $resourceClasses, $fields, $excludedFields, $modeIndex);
         }
 
         return $this;
@@ -169,22 +180,28 @@ class IndexSuggestions extends AbstractJob
 
     protected function processStart(
         SearchSuggesterRepresentation $suggester,
-        array $resourceTypes,
+        array $resourceClassesByNames,
         array $fields,
         array $excludedFields,
         string $modeIndex
     ): self {
         $bind = [
             'suggester_id' => $suggester->id(),
-            'resource_types' => array_values($resourceTypes),
         ];
         $types = [
-            'resource_types' => $this->connection::PARAM_STR_ARRAY,
+            'suggester_id' => \Doctrine\DBAL\ParameterType::INTEGER,
         ];
+        if ($resourceClassesByNames && !isset($resourceClassesByNames['resources'])) {
+            $sqlResourceTypes = 'AND `resource`.`resource_type` IN (:resource_types)';
+            $bind['resource_types'] = array_values($resourceClassesByNames);
+            $types['resource_types'] = $this->connection::PARAM_STR_ARRAY;
+        } else {
+            $sqlResourceTypes = '';
+        }
 
         if ($fields) {
             $sqlFields = 'AND `value`.`property_id` IN (:properties)';
-            $bind['properties'] = $fields;
+            $bind['properties'] = array_values($fields);
             $types['properties'] = $this->connection::PARAM_INT_ARRAY;
         } else {
             $sqlFields = '';
@@ -259,10 +276,11 @@ SELECT
         ),
     1, 190)
 FROM `value` AS `value`
-JOIN `resource`
+INNER JOIN `resource`
     ON `resource`.`id` = `value`.`resource_id`
-    AND `resource`.`resource_type` IN (:resource_types)
-WHERE `value`.`value` IS NOT NULL
+    $sqlResourceTypes
+WHERE
+    `value`.`value` IS NOT NULL
     $sqlFields
     $sqlVisibility
 ON DUPLICATE KEY UPDATE `_suggestions_temporary`.`total_$column` = `_suggestions_temporary`.`total_$column` + 1;
@@ -273,7 +291,7 @@ SQL;
         }
 
         if ($modeIndex === 'full' || $modeIndex === 'start_full') {
-            $sql .= $this->appendSqlFull($sqlFields);
+            $sql .= $this->appendSqlFull($sqlResourceTypes, $sqlFields);
         }
 
         $sql .= <<<SQL
@@ -298,18 +316,24 @@ SQL;
 
     protected function processContain(
         SearchSuggesterRepresentation $suggester,
-        array $resourceTypes,
+        array $resourceClassesByNames,
         array $fields,
         array $excludedFields,
         string $modeIndex
     ): self {
         $bind = [
             'suggester_id' => $suggester->id(),
-            'resource_types' => array_values($resourceTypes),
         ];
         $types = [
-            'resource_types' => $this->connection::PARAM_STR_ARRAY,
+            'suggester_id' => \Doctrine\DBAL\ParameterType::INTEGER,
         ];
+        if ($resourceClassesByNames && !isset($resourceClassesByNames['resources'])) {
+            $sqlResourceTypes = 'AND `resource`.`resource_type` IN (:resource_types)';
+            $bind['resource_types'] = array_values($resourceClassesByNames);
+            $types['resource_types'] = $this->connection::PARAM_STR_ARRAY;
+        } else {
+            $sqlResourceTypes = '';
+        }
 
         if ($fields) {
             $sqlFields = 'AND `value`.`property_id` IN (:properties)';
@@ -394,8 +418,9 @@ SET @pr = CONCAT(
             FROM `value`
             JOIN `resource`
                 ON `resource`.`id` = `value`.`resource_id`
-                AND `resource`.`resource_type` IN (:resource_types)
-            WHERE `value`.`value` IS NOT NULL
+                $sqlResourceTypes
+            WHERE
+                `value`.`value` IS NOT NULL
                 $sqlFields
                 $sqlVisibility
         ),
@@ -412,7 +437,7 @@ SQL;
         }
 
         if ($modeIndex === 'full' || $modeIndex === 'contain_full') {
-            $sql .= $this->appendSqlFull($sqlFields);
+            $sql .= $this->appendSqlFull($sqlResourceTypes, $sqlFields);
         }
 
         $sql .= <<<SQL
@@ -471,7 +496,7 @@ SQL;
         return $this;
     }
 
-    protected function appendSqlFull(string $sqlFields): string
+    protected function appendSqlFull(string $sqlResourceTypes, string $sqlFields): string
     {
         $sql = '';
         $sqlsVisibility = [
@@ -486,10 +511,11 @@ INSERT INTO `_suggestions_temporary` (`text`)
 SELECT
     TRIM(SUBSTRING(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " "), 1, 190))
 FROM `value` AS `value`
-JOIN `resource`
+INNER JOIN `resource`
     ON `resource`.`id` = `value`.`resource_id`
-    AND `resource`.`resource_type` IN (:resource_types)
-WHERE `value`.`value` IS NOT NULL
+    $sqlResourceTypes
+WHERE
+    `value`.`value` IS NOT NULL
     $sqlFields
     $sqlVisibility
 ON DUPLICATE KEY UPDATE `_suggestions_temporary`.`total_$column` = `_suggestions_temporary`.`total_$column` + 1;
@@ -501,7 +527,7 @@ SQL;
 
     protected function processOrm(
         SearchSuggesterRepresentation $suggester,
-        array $resourceTypes,
+        array $resourceClassesByNames,
         array $fields,
         array $excludedFields,
         string $modeIndex
@@ -514,18 +540,18 @@ SQL;
             ->where($expr->neq('value', null));
 
         /* // Cannot be added, because criteria does not match not-in memory.
-        if ($resourceTypes) {
+        if ($resourceClassesByNames) {
             // in() with string is messy.
             // https://www.doctrine-project.org/projects/doctrine-orm/en/2.6/reference/inheritance-mapping.html#query-the-type
-            if (count($resourceTypes) === 1) {
+            if (count($resourceClassesByNames) === 1) {
                 $criteria
-                    ->andWhere($expr->memberOf('resource', $resourceTypes));
-            } elseif (count($resourceTypes) === 2) {
-                $resourceTypes = array_values($resourceTypes);
+                    ->andWhere($expr->memberOf('resource', key($resourceClassesByNames)));
+            } elseif (count($resourceClassesByNames) === 2) {
+                $resourceNames = array_keys($resourceClassesByNames);
                 $criteria
                     ->andWhere($expr->orX(
-                        $expr->memberOf('resource', $resourceTypes[0]),
-                        $expr->memberOf('resource', $resourceTypes[1])
+                        $expr->memberOf('resource', $resourceNames[0]),
+                        $expr->memberOf('resource', $resourceNames[1])
                     ));
             }
         }
@@ -643,7 +669,9 @@ SQL;
                 ++$totalProcessed;
 
                 $resource = $value->getResource();
-                if (!isset($resourceTypes[$resource->getResourceName()])) {
+                if ($resourceClassesByNames
+                    && !isset($resourceClassesByNames[$resource->getResourceName()])
+                ) {
                     continue;
                 }
 

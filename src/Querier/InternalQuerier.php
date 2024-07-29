@@ -177,39 +177,46 @@ SQL;
 
     protected function querySuggestionsDirect(): Response
     {
-        // Only items and itemSets are managed currently.
-        $resourceTypesToSqlClasses = [
-            // 'items' => \Omeka\Entity\Item::class,
-            // 'item_sets' => \Omeka\Entity\ItemSet::class,
-            'items' => 'Omeka\\\\Entity\\\\Item',
-            'item_sets' => 'Omeka\\\\Entity\\\\ItemSet',
-        ];
-        $sqlIsPublic = $this->query->getIsPublic()
-            ? 'AND `resource`.`is_public` = 1 AND `value`.`is_public` = 1'
-            : '';
-
-        // The bind is not working in a array, so use a direct string.
-        $sqlClasses = array_intersect_key($resourceTypesToSqlClasses, array_flip($this->resourceTypes));
-        $inClasses = '"' . implode('", "', $sqlClasses) . '"';
-
         // TODO Manage site id and item set id and any other filter query.
         // TODO Use the full text search table.
+
+        $mapResourcesToClasses = [
+            'items' => \Omeka\Entity\Item::class,
+            'item_sets' => \Omeka\Entity\ItemSet::class,
+            'media' => \Omeka\Entity\Media::class,
+            'value_annotations' => \Omeka\Entity\ValueAnnotation::class,
+            'annotations' => \Annotate\Entity\Annotation::class,
+        ];
 
         /** @var \Doctrine\DBAL\Connection $connection */
         $connection = $this->services->get('Omeka\Connection');
         $q = $this->query->getQuery();
         $bind = [
-            // 'resource_types' => $sqlClasses,
             'limit' => $this->query->getLimit(),
             'value_length' => mb_strlen($q),
             'length' => (int) ($this->query->getSuggestOptions()['length'] ?: 50),
         ];
         $types = [
-            // 'resource_types' => $connection::PARAM_STR_ARRAY,
             'limit' => \PDO::PARAM_INT,
             'value_length' => \PDO::PARAM_INT,
             'length' => \PDO::PARAM_INT,
         ];
+
+        // When searching in resources too, don't add the condition.
+        $resourceClasses = in_array('resources', $this->resourceTypes)
+            ? []
+            : array_intersect_key($mapResourcesToClasses, array_flip($this->resourceTypes));
+        if ($resourceClasses) {
+            $sqlResourceTypes = 'AND `resource`.`resource_type` IN (:resource_types)';
+            $bind['resource_types'] = array_values($resourceClasses);
+            $types['resource_types'] = $connection::PARAM_STR_ARRAY;
+        } else {
+            $sqlResourceTypes = '';
+        }
+
+        $sqlIsPublic = $this->query->getIsPublic()
+            ? 'AND `resource`.`is_public` = 1 AND `value`.`is_public` = 1'
+            : '';
 
         $fields = $this->query->getSuggestFields();
         if ($fields) {
@@ -230,7 +237,7 @@ SQL;
         if ($excludedFields) {
             $ids = $this->easyMeta->propertyIds($excludedFields);
             if ($ids) {
-                $sqlFields .= ' AND `value`.`property_id` NOT IN (:excluded_property_ids)';
+                $sqlFields .= 'AND `value`.`property_id` NOT IN (:excluded_property_ids)';
                 $bind['excluded_property_ids'] = array_values($ids);
                 $types['excluded_property_ids'] = $connection::PARAM_INT_ARRAY;
             }
@@ -261,12 +268,14 @@ SELECT DISTINCT
     SUBSTRING(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), 1, :length) AS "value",
     COUNT(SUBSTRING(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), 1, :length)) AS "data"
 FROM `value` AS `value`
-INNER JOIN `resource` ON `resource`.`id` = `value`.`resource_id`
+INNER JOIN
+    `resource` ON `resource`.`id` = `value`.`resource_id`
+    $sqlResourceTypes
 $sqlSite
-WHERE `resource`.`resource_type` IN ($inClasses)
+WHERE
+    `value`.`value` LIKE :value_like
     $sqlIsPublic
     $sqlFields
-    AND `value`.`value` LIKE :value_like
 GROUP BY
     SUBSTRING(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), 1, :length)
 ORDER BY data DESC
@@ -290,10 +299,12 @@ SELECT DISTINCT
         " "), " ", 1
     ), 1, :length)) as "data"
 FROM `value` AS `value`
-INNER JOIN `resource` ON `resource`.`id` = `value`.`resource_id`
+INNER JOIN
+    `resource` ON `resource`.`id` = `value`.`resource_id`
+    $sqlResourceTypes
 $sqlSite
-WHERE `resource`.`resource_type` IN ("Omeka\\Entity\\Item", "Omeka\\Entity\\ItemSet")
-    AND `value`.`value` LIKE :value_like
+WHERE
+    `value`.`value` LIKE :value_like
 GROUP BY SUBSTRING(SUBSTRING_INDEX(
         CONCAT(
             TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")),
@@ -323,12 +334,14 @@ SELECT DISTINCT
         )
     ) AS "data"
 FROM `value` AS `value`
-INNER JOIN `resource` ON `resource`.`id` = `value`.`resource_id`
+INNER JOIN
+    `resource` ON `resource`.`id` = `value`.`resource_id`
+    $sqlResourceTypes
 $sqlSite
-WHERE `resource`.`resource_type` IN ($inClasses)
+WHERE
+    `value`.`value` LIKE :value_like
     $sqlIsPublic
     $sqlFields
-    AND `value`.`value` LIKE :value_like
 GROUP BY
     SUBSTRING(
         SUBSTRING(

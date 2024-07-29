@@ -32,15 +32,9 @@ namespace AdvancedSearch\Form\Admin;
 
 use Laminas\Form\Element;
 use Laminas\Form\Form;
-use Laminas\I18n\Translator\TranslatorAwareInterface;
-use Laminas\I18n\Translator\TranslatorAwareTrait;
 
-class SearchEngineConfigureForm extends Form implements TranslatorAwareInterface
+class SearchEngineConfigureForm extends Form
 {
-    use TranslatorAwareTrait;
-
-    protected $apiManager;
-
     public function init(): void
     {
         $this
@@ -59,34 +53,40 @@ class SearchEngineConfigureForm extends Form implements TranslatorAwareInterface
                 'name' => 'resources',
                 'type' => Element\MultiCheckbox::class,
                 'options' => [
-                    'label' => 'Resources indexed', // @translate
+                    'label' => 'Resources indexed and searchable', // @translate
+                    'label_attributes' => ['style' => 'display: block'],
                     'value_options' => $this->getResourcesOptions(),
                 ],
                 'attributes' => [
                     'id' => 'resources',
-                    'value' => ['items'],
+                    'value' => [
+                        'resources',
+                        'items',
+                        'item_sets',
+                        'media',
+                    ],
                 ],
-            ]);
+            ])
+        ;
     }
 
     /**
-     * Get the list of resource types.
+     * Get the list of the resource types to search.
      *
-     * @todo There may be other resources types to index for search: media, external resources types. See git history of this file.
-     *
-     * @return array
+     * @todo Get list from engine? See git commit 28b1787.
      */
     protected function getResourcesOptions(): array
     {
         return [
+            'resources' => 'Resources (mixed)', // @translate
             'items' => 'Items',
             'item_sets' => 'Item sets',
+            'media' => 'Media',
+            // Value annotations are managed with resources.
+            // 'value_annotations' => 'Value annotations',
+            'annotations' => 'Annotations',
+            // Not managed for now.
+            // 'site_pages' => 'Site pages',
         ];
-    }
-
-    public function setApiManager($apiManager): self
-    {
-        $this->apiManager = $apiManager;
-        return $this;
     }
 }

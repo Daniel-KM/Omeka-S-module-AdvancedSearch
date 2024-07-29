@@ -1285,37 +1285,47 @@ class MainSearchForm extends Form
 
     protected function listResourceIdTitles(): array
     {
-        if (!$this->searchConfig) {
-            return $this->api->search('items', [], ['returnScalar' => 'title'])->getContent();
-        }
-        $engine = $this->searchConfig->engine();
-        $engineTypes = $engine->setting('resources');
-        if (!$engineTypes) {
-            return $this->api->search('items', [], ['returnScalar' => 'title'])->getContent();
+        // Option "returnScalar" is not available for resources in Omeka S v4.1.
+        $resourceTypesDefault = [
+            'items',
+            'item_sets',
+            'media',
+            'annotations',
+        ];
+        if ($this->searchConfig) {
+            $engine = $this->searchConfig->engine();
+            $resourceTypes = $engine->setting('resources');
         }
         $result = [];
-        foreach ($engineTypes as $resourceName) {
-            // Don't use array_merge.
+        foreach ($resourceTypes ?: $resourceTypesDefault as $resourceName) {
+            // Don't use array_merge because keys are numeric.
             $result = array_replace($result, $this->api->search($resourceName, [], ['returnScalar' => 'title'])->getContent());
         }
         return $result;
     }
 
+    /**
+     * This resource list is mainly used for internal purpose.
+     */
     protected function listResourceNames(): array
     {
         $types = [
+            'resources' => 'Resources',
             'items' => 'Items',
             'item_sets' => 'Item sets',
             'media' => 'Media',
+            // Value annotations are not resources.
+            // 'value_annotations' => 'Value annotations',
+            'annotations' => 'Annotations',
         ];
         if (!$this->searchConfig) {
-            return ['items'];
+            return ['resources'];
         }
         $engine = $this->searchConfig->engine();
         $engineTypes = $engine->setting('resources');
         return $engineTypes
             ? array_intersect_key($types, array_flip($engineTypes))
-            : ['items'];
+            : ['resources'];
     }
 
     protected function listResourceTemplates(bool $grouped = false): array

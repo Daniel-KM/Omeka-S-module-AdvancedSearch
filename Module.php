@@ -320,6 +320,38 @@ class Module extends AbstractModule
             -100
         );
 
+        // Annotations.
+        $sharedEventManager->attach(
+            \Annotate\Api\Adapter\AnnotationAdapter::class,
+            'api.create.post',
+            [$this, 'updateSearchEngine'],
+            -100
+        );
+        $sharedEventManager->attach(
+            \Annotate\Api\Adapter\AnnotationAdapter::class,
+            'api.update.post',
+            [$this, 'updateSearchEngine'],
+            -100
+        );
+        $sharedEventManager->attach(
+            \Annotate\Api\Adapter\AnnotationAdapter::class,
+            'api.delete.post',
+            [$this, 'updateSearchEngine'],
+            -100
+        );
+        $sharedEventManager->attach(
+            \Annotate\Api\Adapter\AnnotationAdapter::class,
+            'api.batch_update.pre',
+            [$this, 'preBatchUpdateSearchEngine'],
+            -100
+        );
+        $sharedEventManager->attach(
+            \Annotate\Api\Adapter\AnnotationAdapter::class,
+            'api.batch_update.post',
+            [$this, 'postBatchUpdateSearchEngine'],
+            -100
+        );
+
         // Listeners for sites.
 
         $sharedEventManager->attach(

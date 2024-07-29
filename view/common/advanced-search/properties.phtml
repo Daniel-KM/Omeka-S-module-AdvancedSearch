@@ -25,7 +25,7 @@ $isSiteRequest = $status->isSiteRequest();
 $applyTemplates = $isSiteRequest ? $siteSetting('search_apply_templates') : false;
 $usedTerms = !$isSiteRequest;
 
-$resourceTypesToNames = ['item' => 'items', 'item-set' => 'item_sets', 'media' => 'media'];
+$resourceTypesToNames = ['item' => 'items', 'item-set' => 'item_sets', 'media' => 'media', 'annotation' => 'annotations'];
 $resourceName = $resourceTypesToNames[$this->resourceType ?? null] ?? 'items';
 
 $selectMainDataType = new \Laminas\Form\Element\Select;

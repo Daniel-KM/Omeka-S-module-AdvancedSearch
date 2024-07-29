@@ -103,12 +103,18 @@ class SearchingFilters extends AbstractHelper
      */
     public function filterSearchingFilters(SearchConfigRepresentation $searchConfig, array $query, array $filters): array
     {
-        // Warning: unlike plugin helper, view helper api() cannot use options.
+        /**
+         * @var \Omeka\View\Helper\Api $api
+         * @var \Common\Stdlib\EasyMeta $easyMeta
+         *
+         * Warning: unlike plugin helper, view helper api() cannot use options.
+         */
         $view = $this->getView();
         $plugins = $view->getHelperPluginManager();
         $url = $plugins->get('url');
         $api = $plugins->get('api');
         $translate = $plugins->get('translate');
+        $easyMeta = $plugins->get('easyMeta')();
 
         $this->baseUrl = $url(null, [], true);
         $this->query = $query;
@@ -167,15 +173,12 @@ class SearchingFilters extends AbstractHelper
                     $filters[$filterLabel][$this->urlQuery($key)] = $value;
                     break;
 
-                // Resource type is "items", "item_sets", etc.
+                // Resource type is the api name ("items", "item_sets", etc.).
                 case 'resource_type':
-                    $resourceTypes = [
-                        'items' => $translate('Items'),
-                        'item_sets' => $translate('Item sets'),
-                    ];
                     $filterLabel = $translate('Resource type'); // @translate
                     foreach ($flatArray($value) as $subKey => $subValue) {
-                        $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $resourceTypes[$subValue] ?? $subValue;
+                        $subValueLabel = $easyMeta->resourceLabelPlural($subValue);
+                        $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $subValueLabel ? ucfirst($translate($subValueLabel)) : $subValue;
                     }
                     break;
 
@@ -375,8 +378,6 @@ class SearchingFilters extends AbstractHelper
                     break;
 
                 case 'thesaurus':
-                    /** @var \Common\Stdlib\EasyMeta $easyMeta */
-                    $easyMeta = $plugins->get('easyMeta')();
                     $is = $translate('is'); // @translate
                     foreach ($query['thesaurus'] as $term => $itemIds) {
                         if (!$itemIds) {

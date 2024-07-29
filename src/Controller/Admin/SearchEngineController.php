@@ -87,7 +87,11 @@ class SearchEngineController extends AbstractActionController
     {
         $id = $this->params('id');
 
-        /** @var \AdvancedSearch\Entity\SearchEngine $searchEngine */
+        /**
+         * @var \AdvancedSearch\Entity\SearchEngine $searchEngine
+         * @var \AdvancedSearch\Adapter\AdapterInterface $adapter
+         * @var \AdvancedSearch\Form\Admin\SearchEngineConfigureForm $form
+         */
         $searchEngine = $this->entityManager->find(\AdvancedSearch\Entity\SearchEngine::class, $id);
         $searchEngineAdapterName = $searchEngine->getAdapter();
         if (!$this->searchAdapterManager->has($searchEngineAdapterName)) {
@@ -98,12 +102,12 @@ class SearchEngineController extends AbstractActionController
             return $this->redirect()->toRoute('admin/search-manager', ['action' => 'browse'], true);
         }
 
-        /** @var \AdvancedSearch\Adapter\AdapterInterface $adapter */
+        // Passing option requires a factory to avoids the error in laminas.
         $adapter = $this->searchAdapterManager->get($searchEngineAdapterName);
-
         $form = $this->getForm(SearchEngineConfigureForm::class, [
             'search_engine_id' => $id,
         ]);
+
         $adapterFieldset = $adapter->getConfigFieldset();
         if ($adapterFieldset) {
             $adapterFieldset

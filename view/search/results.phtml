@@ -9,8 +9,8 @@
  * @var string $resourceName
  */
 
-$resources = $response->getResources($resourceName);
 // A check is done: when page is not first, the resources may be empty even with results.
+$resources = $response->getResources($resourceName);
 if (!$resources) return;
 
 $plugins = $this->getHelperPluginManager();
@@ -26,9 +26,9 @@ $setting = $plugins->get(isset($site) ? 'siteSetting' : 'setting');
 $siteSlug = isset($site) ? $site->slug() : null;
 
 $filterLocale = (bool) $setting('filter_locale_values');
-$siteLang = $plugins->get('lang')();
-$lang = $filterLocale ? $siteLang : null;
-$langValue = $filterLocale ? [$siteLang, ''] : null;
+$lang = $plugins->get('lang')();
+$langValue = $filterLocale ? [$lang, ''] : null;
+
 $untitled = $translate('[Untitled]');
 
 $headingTerm = $setting('browse_heading_property_term');
@@ -36,7 +36,8 @@ $bodyTerm = $setting('browse_body_property_term');
 
 $gridListMode = $searchConfig ? $searchConfig->subSetting('display', 'grid_list_mode', 'auto') : 'auto';
 
-$defaultThumbnail = '<img loading="lazy" src="' . $assetUrl('thumbnails/default.png', 'Omeka', true) . '" title="' . $translate('No media') . '"/>';
+// Normally automatically managed.
+$defaultThumbnail = sprintf('<img loading="lazy" src="%1$s" title="%2$s"/>', $assetUrl('thumbnails/default.png', 'Omeka', true), $translate('No media'));
 ?>
 
 <?php if ($title): ?>
@@ -58,8 +59,10 @@ $defaultThumbnail = '<img loading="lazy" src="' . $assetUrl('thumbnails/default.
         <div class="resource-thumbnail">
             <?= $hyperlink->raw($resourceThumbnail, $resourceUrl, ['class' => 'resource-link']) ?>
         </div>
-        <div class="resource-metadata">
-            <h4><?= $resource->linkRaw($heading) ?></h4>
+        <div class="resource-metadata resource-metadata-heading">
+            <?= $resource->linkRaw($heading, null, ['class' => 'resource-link']) ?>
+        </div>
+        <div class="resource-metadata resource-metadata-body">
             <div class="description">
                 <?= $body ?>
             </div>

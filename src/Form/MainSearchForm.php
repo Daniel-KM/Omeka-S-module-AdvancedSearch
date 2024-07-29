@@ -162,7 +162,7 @@ class MainSearchForm extends Form
         // TODO Check the required options for variant "quick" to skip available fields early.
         $availableFields = in_array($this->variant, ['simple', 'csrf']) ? [] : $this->getAvailableFields();
 
-        $this->elementAttributes = empty($this->formSettings['filters']['attribute_form'])
+        $this->elementAttributes = empty($this->formSettings['form']['attribute_form'])
             ? []
             : ['form' => 'form-search'];
 
@@ -369,8 +369,8 @@ class MainSearchForm extends Form
                         'unchecked_value' => 'record',
                         'checked_value' => 'all',
                     ])
+                    ->setAttributes($this->elementAttributes)
                     ->setAttribute('id', 'rft')
-                    ->setAttribute('form', 'form-search')
                 ;
                 return $this->add($element);
             case 'record_checkbox':
@@ -381,8 +381,8 @@ class MainSearchForm extends Form
                         'unchecked_value' => 'all',
                         'checked_value' => 'record',
                     ])
+                    ->setAttributes($this->elementAttributes)
                     ->setAttribute('id', 'rft')
-                    ->setAttribute('form', 'form-search')
                 ;
                 return $this->add($element);
             case 'fulltext_radio':
@@ -394,8 +394,8 @@ class MainSearchForm extends Form
                         'all' => 'Full text', // @ŧranslate
                         'record' => 'Record only', // @ŧranslate
                     ])
+                    ->setAttributes($this->elementAttributes)
                     ->setAttribute('id', 'rft')
-                    ->setAttribute('form', 'form-search')
                     ->setValue('all')
                 ;
                 return $this->add($element);
@@ -408,8 +408,8 @@ class MainSearchForm extends Form
                         'record' => 'Record only', // @ŧranslate
                         'all' => 'Full text', // @ŧranslate
                     ])
+                    ->setAttributes($this->elementAttributes)
                     ->setAttribute('id', 'rft')
-                    ->setAttribute('form', 'form-search')
                     ->setValue('record')
                 ;
                 return $this->add($element);
@@ -426,7 +426,7 @@ class MainSearchForm extends Form
         $element = new Element($filter['field']);
         $element
             ->setLabel($filter['label'])
-            ->setAttribute('form', 'form-search')
+            ->setAttributes($this->elementAttributes)
             ->setAttribute('data-field-type', $filter['type'])
         ;
         return $element;
@@ -459,8 +459,6 @@ class MainSearchForm extends Form
         $element = new Element\Collection('filter');
         $element
             ->setLabel((string) $filter['label'])
-            ->setAttribute('form', 'form-search')
-            ->setAttribute('data-field-type', 'filter')
             ->setOptions([
                 'label' => $filter['label'],
                 // TODO The max number is required to fill the current query?
@@ -472,6 +470,8 @@ class MainSearchForm extends Form
             ])
             ->setAttributes([
                 'id' => 'search-filters',
+                'class' => 'search-filters-advanced',
+                'data-field-type' => 'filter',
                 // TODO Remove this attribute data and use only search config.
                 'data-count-default' => $defaultNumber,
                 'data-count-max' => $maxNumber,
@@ -486,7 +486,7 @@ class MainSearchForm extends Form
         $element = new Element\Checkbox($filter['field']);
         $element
             ->setLabel($filter['label'])
-            ->setAttribute('form', 'form-search')
+            ->setAttributes($this->elementAttributes)
             ->setAttribute('data-field-type', 'checkbox')
         ;
         if (!empty($filter['options']) && count($filter['options']) === 2) {
@@ -503,7 +503,7 @@ class MainSearchForm extends Form
         $fieldset = new Fieldset($filter['field']);
         $fieldset
             ->setLabel($filter['label'])
-            ->setAttribute('form', 'form-search')
+            ->setAttributes($this->elementAttributes)
             ->setAttribute('data-field-type', 'daterange')
             ->add([
                 'name' => 'from',
@@ -536,7 +536,7 @@ class MainSearchForm extends Form
         $element = new Element\Hidden($filter['field']);
         $element
             ->setValue($value)
-            ->setAttribute('form', 'form-search')
+            ->setAttributes($this->elementAttributes)
         ;
         return $element;
     }
@@ -548,7 +548,7 @@ class MainSearchForm extends Form
         $element
             ->setLabel($filter['label'])
             ->setValueOptions($valueOptions)
-            ->setAttribute('form', 'form-search')
+            ->setAttributes($this->elementAttributes)
             ->setAttribute('data-field-type', 'multicheckbox')
         ;
         return $element;
@@ -574,7 +574,7 @@ class MainSearchForm extends Form
         $element = new AdvancedSearchElement\MultiText($filter['field']);
         $element
             ->setLabel($filter['label'])
-            ->setAttribute('form', 'form-search')
+            ->setAttributes($this->elementAttributes)
             ->setAttribute('data-field-type', 'multitext')
         ;
         return $element;
@@ -585,7 +585,7 @@ class MainSearchForm extends Form
         $element = new Element\Number($filter['field']);
         $element
             ->setLabel($filter['label'])
-            ->setAttribute('form', 'form-search')
+            ->setAttributes($this->elementAttributes)
             ->setAttribute('data-field-type', 'number')
         ;
         return $element;
@@ -598,7 +598,7 @@ class MainSearchForm extends Form
         $element
             ->setLabel($filter['label'])
             ->setValueOptions($valueOptions)
-            ->setAttribute('form', 'form-search')
+            ->setAttributes($this->elementAttributes)
             ->setAttribute('data-field-type', 'radio')
         ;
         return $element;
@@ -610,7 +610,7 @@ class MainSearchForm extends Form
         $valueOptions = ['' => ''] + $valueOptions;
 
         $attributes = $filter['attributes'] ?? [];
-        $attributes['form'] = 'form-search';
+        $attributes += $this->elementAttributes;
         $attributes['class'] ??= 'chosen-select';
         $attributes['placeholder'] ??= '';
         $attributes['data-placeholder'] ??= ' ';
@@ -638,7 +638,7 @@ class MainSearchForm extends Form
         $element = new Element\Text($filter['field']);
         $element
             ->setLabel($filter['label'])
-            ->setAttribute('form', 'form-search')
+            ->setAttributes($this->elementAttributes)
             ->setAttribute('data-field-type', 'text')
         ;
         return $element;

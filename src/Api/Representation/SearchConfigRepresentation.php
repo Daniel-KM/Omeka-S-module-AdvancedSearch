@@ -64,7 +64,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         $options = [
             'force_canonical' => $canonical,
         ];
-        return $url('admin/search/config-id', $params, $options);
+        return $url('admin/search-manager/config-id', $params, $options);
     }
 
     /**
@@ -79,7 +79,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         if ($query) {
             $options['query'] = $query;
         }
-        return $url('search-admin-page-' . $this->id(), [], $options);
+        return $url('search-admin-page-' . $this->slug(), [], $options);
     }
 
     public function siteUrl($siteSlug = null, $canonical = false, array $query = [])

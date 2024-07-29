@@ -52,10 +52,10 @@ $this->headScript()
 <?= $this->pageTitle($translate('Search manager')) ?>
 
 <div id="page-actions">
-    <a class="button" href="<?= $url('admin/search/engine', ['action' => 'add']) ?>"><?= $translate('Add new search engine') ?></a>
+    <a class="button" href="<?= $url('admin/search-manager/engine', ['action' => 'add']) ?>"><?= $translate('Add new search engine') ?></a>
     <?php if (!empty($engines)): ?>
-        <a class="button" href="<?= $url('admin/search/config', ['action' => 'add']) ?>"><?= $translate('Add new page') ?></a>
-        <a class="button" href="<?= $url('admin/search/suggester', ['action' => 'add']) ?>"><?= $translate('Add new suggester') ?></a>
+        <a class="button" href="<?= $url('admin/search-manager/config', ['action' => 'add']) ?>"><?= $translate('Add new page') ?></a>
+        <a class="button" href="<?= $url('admin/search-manager/suggester', ['action' => 'add']) ?>"><?= $translate('Add new suggester') ?></a>
     <?php endif; ?>
 </div>
 

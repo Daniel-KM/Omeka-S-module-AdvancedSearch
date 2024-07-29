@@ -95,7 +95,7 @@ class SearchEngineController extends AbstractActionController
                 'The search adapter "{name}" is not available.', // @translate
                 ['name' => $searchEngineAdapterName]
             ));
-            return $this->redirect()->toRoute('admin/search', ['action' => 'browse'], true);
+            return $this->redirect()->toRoute('admin/search-manager', ['action' => 'browse'], true);
         }
 
         /** @var \AdvancedSearch\Adapter\AdapterInterface $adapter */
@@ -140,7 +140,7 @@ class SearchEngineController extends AbstractActionController
                 ['name' => $searchEngine->getName()]
             ));
             $this->messenger()->addWarning('Don’t forget to run the indexation of the search engine.'); // @translate
-            return $this->redirect()->toRoute('admin/search', ['action' => 'browse'], true);
+            return $this->redirect()->toRoute('admin/search-manager', ['action' => 'browse'], true);
         }
 
         return $view;
@@ -195,18 +195,16 @@ class SearchEngineController extends AbstractActionController
                 'link_job' => sprintf('<a href="%1$s">', $urlPlugin->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId()])),
                 'job_id' => $job->getId(),
                 'link_end' => '</a>',
-                'link_log' => sprintf(
-                    '<a href="%1$s">',
-                    class_exists('Log\Module', false)
-                        ? $urlPlugin->fromRoute('admin/default', ['controller' => 'log'], ['query' => ['job_id' => $job->getId()]])
-                        : $urlPlugin->fromRoute('admin/id', ['controller' => 'job', 'action' => 'log', 'id' => $job->getId()])
+                'link_log' => sprintf('<a href="%1$s">', class_exists('Log\Module', false)
+                    ? $urlPlugin->fromRoute('admin/default', ['controller' => 'log'], ['query' => ['job_id' => $job->getId()]])
+                    : $urlPlugin->fromRoute('admin/id', ['controller' => 'job', 'action' => 'log', 'id' => $job->getId()])
                 ),
             ]
         );
         $message->setEscapeHtml(false);
         $this->messenger()->addSuccess($message);
 
-        return $this->redirect()->toRoute('admin/search', ['action' => 'browse'], true);
+        return $this->redirect()->toRoute('admin/search-manager', ['action' => 'browse'], true);
     }
 
     public function deleteConfirmAction()
@@ -245,6 +243,6 @@ class SearchEngineController extends AbstractActionController
                 ));
             }
         }
-        return $this->redirect()->toRoute('admin/search');
+        return $this->redirect()->toRoute('admin/search-manager');
     }
 }

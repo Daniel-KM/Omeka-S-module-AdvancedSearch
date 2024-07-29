@@ -159,8 +159,7 @@ return [
             // TODO Include site routes here, not during bootstrap.
             'admin' => [
                 'child_routes' => [
-                    // To simplify migration, the route is "search".
-                    'search' => [
+                    'search-manager' => [
                         'type' => \Laminas\Router\Http\Literal::class,
                         'options' => [
                             'route' => '/search-manager',
@@ -276,37 +275,37 @@ return [
         'AdminModule' => [
             'advanced-search' => [
                 'label' => 'Search manager', // @translate
-                'route' => 'admin/search',
+                'route' => 'admin/search-manager',
                 'resource' => Controller\Admin\IndexController::class,
                 'privilege' => 'browse',
                 'class' => 'o-icon-search',
                 'pages' => [
                     [
-                        'route' => 'admin/search/engine',
+                        'route' => 'admin/search-manager/engine',
                         'visible' => false,
                         'pages' => [
                             [
-                                'route' => 'admin/search/engine-id',
+                                'route' => 'admin/search-manager/engine-id',
                                 'visible' => false,
                             ],
                         ],
                     ],
                     [
-                        'route' => 'admin/search/config',
+                        'route' => 'admin/search-manager/config',
                         'visible' => false,
                         'pages' => [
                             [
-                                'route' => 'admin/search/config-id',
+                                'route' => 'admin/search-manager/config-id',
                                 'visible' => false,
                             ],
                         ],
                     ],
                     [
-                        'route' => 'admin/search/suggester',
+                        'route' => 'admin/search-manager/suggester',
                         'visible' => false,
                         'pages' => [
                             [
-                                'route' => 'admin/search/suggester-id',
+                                'route' => 'admin/search-manager/suggester-id',
                                 'visible' => false,
                             ],
                         ],
@@ -317,7 +316,7 @@ return [
         'AdvancedSearch\Config' => [
             [
                 'label' => 'Manage', // @translate
-                'route' => 'admin/search/config-id',
+                'route' => 'admin/search-manager/config-id',
                 'resource' => Controller\Admin\SearchConfigController::class,
                 'action' => 'edit',
                 'privilege' => 'edit',
@@ -325,7 +324,7 @@ return [
             ],
             [
                 'label' => 'Configure', // @translate
-                'route' => 'admin/search/config-id',
+                'route' => 'admin/search-manager/config-id',
                 'resource' => Controller\Admin\SearchConfigController::class,
                 'action' => 'configure',
                 'privilege' => 'edit',

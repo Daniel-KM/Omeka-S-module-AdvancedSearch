@@ -39,7 +39,7 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
             'force_canonical' => $canonical,
         ];
 
-        return $url('admin/search/suggester-id', $params, $options);
+        return $url('admin/search-manager/suggester-id', $params, $options);
     }
 
     public function siteUrl($siteSlug = null, $canonical = false)

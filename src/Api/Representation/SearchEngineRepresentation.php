@@ -64,7 +64,7 @@ class SearchEngineRepresentation extends AbstractEntityRepresentation
             'force_canonical' => $canonical,
         ];
 
-        return $url('admin/search/engine-id', $params, $options);
+        return $url('admin/search-manager/engine-id', $params, $options);
     }
 
     public function name(): string

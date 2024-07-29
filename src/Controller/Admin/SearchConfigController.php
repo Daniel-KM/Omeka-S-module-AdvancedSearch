@@ -147,7 +147,7 @@ class SearchConfigController extends AbstractActionController
             $formData['manage_config_availability']
         );
 
-        return $this->redirect()->toRoute('admin/search');
+        return $this->redirect()->toRoute('admin/search-manager');
     }
 
     /**
@@ -224,7 +224,7 @@ class SearchConfigController extends AbstractActionController
             ['name' => $searchConfig->getName()]
         ));
 
-        return $this->redirect()->toRoute('admin/search');
+        return $this->redirect()->toRoute('admin/search-manager');
     }
 
     public function deleteConfirmAction()
@@ -261,7 +261,7 @@ class SearchConfigController extends AbstractActionController
                 ));
             }
         }
-        return $this->redirect()->toRoute('admin/search');
+        return $this->redirect()->toRoute('admin/search-manager');
     }
 
     protected function checkPostAndValidForm($form): bool

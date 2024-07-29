@@ -244,12 +244,14 @@ return [
         ],
 
         'facet' => [
-            'label' => 'Facets', // @translate
+            'label' => 'Facets',
+            'label_no_facets' => $translate('No facets'),
+            'label_active_facets' => $translate('Active facets'),
             'mode' => 'button',
             'display_active' => true,
             'display_submit' => 'above',
-            'display_reset' => 'above',
             'label_submit' => $translate('Apply facets'),
+            'display_reset' => 'above',
             'label_reset' => $translate('Reset facets'),
             'facets' => [
                 'item_set_id' => [

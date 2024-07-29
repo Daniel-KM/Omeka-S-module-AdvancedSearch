@@ -46,12 +46,14 @@ if (!empty($itemSet)) {
 
 <div class="search-facets-content">
 
-    <?php if ($facetsLabel = $searchConfig->subSetting('facet', 'label', $translate('Facets'))): ?>
-    <h3><?= $escape($facetsLabel) ?></h3>
+    <?php if ($label = $searchConfig->subSetting('facet', 'label', $translate('Facets'))): ?>
+    <h3><?= $escape($label) ?></h3>
     <?php endif; ?>
 
     <?php if ($displayActive && count($activeFacets)): ?>
-    <h4><?= $translate('Active facets') ?></h4>
+    <?php if ($label = $searchConfig->subSetting('facet', 'label_active_facets', $translate('Active facets'))): ?>
+    <h4><?= $escape($label) ?></h4>
+    <?php endif; ?>
     <?= $facetActives(null, $activeFacets, $searchConfig->setting('facet')) ?>
     <?php endif; ?>
 
@@ -75,7 +77,9 @@ if (!empty($itemSet)) {
         <?php endif; ?>
 
         <?php if (empty($facets) && empty($activeFacets)): ?>
-        <p><?= $translate('No facets.') ?></p>
+        <?php if ($label = $searchConfig->subSetting('facet', 'label_no_facets', $translate('No facets'))): ?>
+        <p><?= $escape($label) ?></p>
+        <?php endif; ?>
         <?php else: ?>
         <ul class="search-facets-list">
             <?php foreach ($facets as $name => $facetValues): ?>

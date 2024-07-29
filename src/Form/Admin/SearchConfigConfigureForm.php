@@ -773,7 +773,6 @@ new = does not end with
                 ],
             ])
             ->get('facet')
-            // field (term) = label (order means weight).
             ->add([
                 'name' => 'label',
                 'type' => Element\Text::class,
@@ -783,6 +782,28 @@ new = does not end with
                 'attributes' => [
                     'id' => 'label',
                     'value' => 'Facets',
+                ],
+            ])
+            ->add([
+                'name' => 'label_no_facets',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Label "No facets"', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'label',
+                    'value' => 'No facets', // @translate
+                ],
+            ])
+            ->add([
+                'name' => 'label_active_facets',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Label "Active facets"', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'label',
+                    'value' => 'Active facets', // @translate
                 ],
             ])
             ->add([

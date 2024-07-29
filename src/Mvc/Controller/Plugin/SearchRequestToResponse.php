@@ -177,6 +177,23 @@ class SearchRequestToResponse extends AbstractPlugin
 
         if ($site) {
             $query->setSiteId($site->id());
+            // $siteSettings = $services->get('Omeka\Settings\Site');
+            $searchConfigId = (int) $siteSettings->get('advancedsearch_main_config');
+        } else {
+            // $settings = $services->get('Omeka\Settings');
+            $searchConfigId = (int) $settings->get('advancedsearch_main_config');
+        }
+
+        if ($searchConfigId) {
+            $api = $services->get('Omeka\ApiManager');
+            try {
+                /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig*/
+                $searchConfig = $api->read('search_configs', ['id' => $searchConfigId])->getContent();
+                $aliases = $searchConfig->subSetting('index', 'aliases', []);
+                $query->setAliases($aliases);
+            } catch (\Exception $e) {
+                // No aliases.
+            }
         }
 
         $query->setByResourceType(!empty($searchConfigSettings['display']['by_resource_type']));

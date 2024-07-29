@@ -1195,11 +1195,11 @@ class MainSearchForm extends Form
 
         // Convert multi-fields into a list of property terms.
         // Normalize search query keys as omeka keys for items and item sets.
-        $multifields = $searchConfig->subSetting('index', 'multifields', []);
+        $aliases = $searchConfig->subSetting('index', 'aliases', []);
         $fields = [];
         $fields[$field] = $metadataFieldsToNames[$field]
             ?? $this->easyMeta->propertyTerm($field)
-            ?? $multifields[$field]['fields']
+            ?? $aliases[$field]['fields']
             ?? $field;
 
         // Simplified from References::listDataForProperty().

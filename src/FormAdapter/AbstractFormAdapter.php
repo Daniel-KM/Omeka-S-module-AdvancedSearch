@@ -207,7 +207,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
         $query = new Query;
 
         $query
-            ->setMultiFields($formSettings['multifields'] ?? []);
+            ->setAliases($formSettings['aliases'] ?? []);
 
         // Solr doesn't allow unavailable args anymore (invalid or unknown).
         // Furthermore, fields are case sensitive.

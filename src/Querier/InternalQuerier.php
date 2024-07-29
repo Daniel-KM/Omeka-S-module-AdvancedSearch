@@ -975,9 +975,9 @@ SQL;
      */
     protected function fieldToIndex(string $field)
     {
-        $multifields = $this->query->getMultiFields();
+        $aliases = $this->query->getAliases();
         return $this->easyMeta->propertyTerm($field)
-            ?? $multifields[$field]['fields']
+            ?? $aliases[$field]['fields']
             ?? $this->underscoredNameToTerm($field)
             ?? null;
     }

@@ -151,8 +151,9 @@ class IndexSearch extends AbstractJob
         foreach ($resourceTypes as $resourceType) {
             if (!$fullClearIndex && empty($resourceIds) && $startResourceId <= 0) {
                 $query = new Query();
-                // Here, no need to init the multifields because there is no
-                // site or admin and aliases are managed earlier or later.
+                // Here, no need to init the aliases and aggregated fields
+                // because there is no site or admin and aliases are managed
+                // earlier or later.
                 $query
                     // By default the query process public resources only.
                     ->setIsPublic(false)

@@ -252,58 +252,52 @@ class SearchConfigConfigureForm extends Form
             ;
         }
 
-        // Solr supports multifields natively: all indexes can be created from multiple fields!
-        // TODO Add field names to solr indexes (don't use index names natively).
-        // TODO In fact, add aliases to Solr. There may be indexes for facet, sort, etc. but the aliases should be simple. So a native property too may be an alias to multiple indexes in Solr.
+        $this
+            ->add([
+                'name' => 'index',
+                'type' => Fieldset::class,
+                'options' => [
+                    'label' => 'Indexes', // @translate
+                ],
+            ])
+            ->get('index')
 
-        if ($isInternalEngine) {
-            $this
-                ->add([
-                    'name' => 'index',
-                    'type' => Fieldset::class,
-                    'options' => [
-                        'label' => 'Indexes', // @translate
+            ->add([
+                'name' => 'aliases',
+                'type' => CommonElement\DataTextarea::class,
+                'options' => [
+                    'label' => 'Aliases and aggregated fields', // @translate
+                    'info' => 'List of fields that refers to one or multiple indexes (properties with internal search engine, native indexes with Solr), formatted "name = label", then the list of properties and an empty line. The name must not be a property term or a reserved keyword.', // @translate
+                    'documentation' => 'https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch/-/blob/master/data/configs/search_engine.internal.php',
+                    'as_key_value' => true,
+                    'key_value_separator' => '=',
+                    'data_options' => [
+                        'name' => null,
+                        'label' => null,
+                        'fields' => ',',
                     ],
-                ])
-                ->get('index')
-
-                ->add([
-                    'name' => 'multifields',
-                    'type' => CommonElement\DataTextarea::class,
-                    'options' => [
-                        'label' => 'Aliases and aggregated fields for filters and facets', // @translate
-                        'info' => 'List of fields that refers to multiple indexes (properties with internal search engine, native indexes with Solr), formatted "name = label", then the list of properties and an empty line. The name must not be a property term or a reserved keyword.', // @translate
-                        'documentation' => 'https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch/-/blob/master/data/configs/search_engine.internal.php',
-                        'as_key_value' => true,
-                        'key_value_separator' => '=',
-                        'data_options' => [
-                            'name' => null,
-                            'label' => null,
-                            'fields' => ',',
-                        ],
-                        'data_text_mode' => 'last_is_list',
-                    ],
-                    'attributes' => [
-                        'id' => 'index_multifields',
-                        'placeholder' => <<<'STRING'
-                            author = Author
-                            dcterms:creator
-                            dcterms:contributor
-                            
-                            title = Title
-                            dcterms:title
-                            dcterms:alternative
-                            
-                            date = Date
-                            dcterms:date
-                            dcterms:created
-                            dcterms:issued
-                            STRING,
-                        'rows' => 30,
-                    ],
-                ])
-            ;
-        }
+                    'data_text_mode' => 'last_is_list',
+                ],
+                'attributes' => [
+                    'id' => 'index_aliases',
+                    'placeholder' => <<<'STRING'
+                        author = Author
+                        dcterms:creator
+                        dcterms:contributor
+                        
+                        title = Title
+                        dcterms:title
+                        dcterms:alternative
+                        
+                        date = Date
+                        dcterms:date
+                        dcterms:created
+                        dcterms:issued
+                        STRING,
+                    'rows' => 30,
+                ],
+            ])
+        ;
 
         // Settings for the form querier (advanced form and filters).
 

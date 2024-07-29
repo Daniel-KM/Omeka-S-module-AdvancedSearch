@@ -89,7 +89,7 @@ class ApiFormAdapter implements FormAdapterInterface
     {
         $query = new Query();
         $query
-            ->setMultiFields($formSettings['multifields'] ?? []);
+            ->setAliases($formSettings['aliases'] ?? []);
 
         if (isset($request['search'])) {
             $query->setQuery($request['search']);

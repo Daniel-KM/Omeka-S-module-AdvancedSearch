@@ -54,7 +54,7 @@ class Query implements JsonSerializable
     /**
      * @var array
      */
-    protected $multiFields = [];
+    protected $aliases = [];
 
     /**
      * @var bool
@@ -199,21 +199,29 @@ class Query implements JsonSerializable
     }
 
     /**
-     * Allow to manage multiple indexes with one alias name (aggregated fields).
+     * Allow to manage one or multiple indexes with one alias name.
      *
-     * @param array $multifields Associative array where the key is the
-     * multi-field name and the value is an array containing three keys for
-     * name, label, and fields. The fields are a list of native indexes.
+     * Aliases allows to manage aggregated fields.
+     *
+     *  With internal engine, the fields are a list of properties.
+     *  With Solr, aliases allow to avoid to use native index names directly.
+     *  Solr doesn't need aggregated fields: all indexes can be built with
+     *  multiple fields. Nevertheless, Solr may need multiple indexes (facet,
+     *  sort, etc.) for the same metadata.
+     *
+     * @param array $aliases Associative array where the key is the alias name
+     * and the value is an array containing three keys for name, label, and
+     * fields. The fields are a list of native indexes.
      */
-    public function setMultiFields(array $multifields): self
+    public function setAliases(array $aliases): self
     {
-        $this->multiFields = $multifields;
+        $this->aliases = $aliases;
         return $this;
     }
 
-    public function getMultiFields(): array
+    public function getAliases(): array
     {
-        return $this->multiFields;
+        return $this->aliases;
     }
 
     public function setIsPublic($isPublic): self
@@ -559,6 +567,7 @@ class Query implements JsonSerializable
             'query' => $this->getQuery(),
             'resource_types' => $this->getResourceTypes(),
             'by_resource_type' => $this->getByResourceType(),
+            'aliases' => $this->getAliases(),
             'is_public' => $this->getIsPublic(),
             'filters' => $this->getFilters(),
             'filters_range' => $this->getFiltersRange(),

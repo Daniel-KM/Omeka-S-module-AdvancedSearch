@@ -26,11 +26,11 @@ class InternalAdapter extends AbstractAdapter
         $fields = $this->getDefaultFields();
 
         // Display specific fields first, but keep standard fields.
-        $multiFields = $this->searchConfig
-            ? $this->searchConfig->subSetting('index', 'multifields', [])
+        $aliases = $this->searchConfig
+            ? $this->searchConfig->subSetting('index', 'aliases', [])
             : [];
         // Don't bypass default fields with the specific ones.
-        $fields = array_merge($fields, $multiFields);
+        $fields = array_merge($fields, $aliases);
 
         /** @var \Common\Stdlib\EasyMeta $easyMeta */
         $easyMeta = $this->getServiceLocator()->get('Common\EasyMeta');
@@ -121,21 +121,21 @@ class InternalAdapter extends AbstractAdapter
         asort($propertyLabelsByTerms);
 
         // Don't bypass default fields with the specific ones, so remove them.
-        $multiFields = $this->searchConfig
-            ? $this->searchConfig->subSetting('index', 'multifields', [])
+        $aliases = $this->searchConfig
+            ? $this->searchConfig->subSetting('index', 'aliases', [])
             : [];
-        $multiFields = array_diff_key($multiFields, $defaultFields, $propertyLabelsByTerms);
+        $aliases = array_diff_key($aliases, $defaultFields, $propertyLabelsByTerms);
 
         $fields = [];
         $fields['metadata'] = [
             'label' => 'Metadata', // @translate
             'options' => array_column($defaultFields, 'label', 'name'),
         ];
-        $fields['multifields'] = [
-            'label' => 'Aggregated fields', // @translate
+        $fields['aliases'] = [
+            'label' => 'Aliases and aggregated fields', // @translate
             'options' => array_replace(
-                array_column($multiFields, 'name', 'name'),
-                array_filter(array_column($multiFields, 'label', 'name'))
+                array_column($aliases, 'name', 'name'),
+                array_filter(array_column($aliases, 'label', 'name'))
             ),
         ];
 

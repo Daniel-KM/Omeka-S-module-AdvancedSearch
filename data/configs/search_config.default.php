@@ -48,7 +48,7 @@ return [
         ],
 
         'index' => [
-            'multifields' => [
+            'aliases' => [
                 'title' => [
                     'name' => 'title',
                     'label' => 'Title',

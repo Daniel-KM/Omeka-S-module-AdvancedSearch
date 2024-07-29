@@ -129,10 +129,10 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
             try {
                 /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig*/
                 $searchConfig = $api->read('search_configs', ['id' => $searchConfigId])->getContent();
-                $multifields = $searchConfig->subSetting('index', 'multifields', []);
-                $query->setMultiFields($multifields);
+                $aliases = $searchConfig->subSetting('index', 'aliases', []);
+                $query->setAliases($aliases);
             } catch (\Exception $e) {
-                // No multifields.
+                // No aliases.
             }
         }
 

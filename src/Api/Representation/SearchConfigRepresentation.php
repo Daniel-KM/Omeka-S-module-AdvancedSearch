@@ -427,8 +427,8 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
             $query->setSiteId($site->id());
         }
 
-        $multifields = $this->subSetting('index', 'multifields', []);
-        $query->setMultiFields($multifields);
+        $aliases = $this->subSetting('index', 'aliases', []);
+        $query->setAliases($aliases);
 
         $fields = [];
         if ($field) {
@@ -444,11 +444,11 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
                 'access' => 'access',
                 'item_sets_tree' => 'o:item_set',
             ];
-            // Convert multi-fields into a list of property terms.
+            // Convert aliases into a list of property terms.
             // Normalize search query keys as omeka keys for items and item sets.
             $cleanField = $metadataFieldsToNames[$field]
                 ?? $easyMeta->propertyTerm($field)
-                ?? $multifields[$field]['fields']
+                ?? $aliases[$field]['fields']
                 ?? $field;
             $fields = (array) $cleanField;
         }

@@ -195,6 +195,7 @@ return [
             'grid_list_mode' => 'auto',
             'thumbnail_mode' => 'default',
             'thumbnail_type' => 'medium',
+            'allow_html' => false,
             'facets' => 'before',
         ],
 

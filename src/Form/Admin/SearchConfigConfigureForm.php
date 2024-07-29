@@ -639,6 +639,16 @@ new = does not end with
                 ],
             ])
             ->add([
+                'name' => 'allow_html',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Allow html in result values', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'allow_html',
+                ],
+            ])
+            ->add([
                 'name' => 'facets',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [

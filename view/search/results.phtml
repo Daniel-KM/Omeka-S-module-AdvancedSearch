@@ -13,6 +13,7 @@ $resources = $response->getResources($resourceName);
 if (!$resources) return;
 
 $plugins = $this->getHelperPluginManager();
+$isHtml = $plugins->get('isHtml');
 $escape = $plugins->get('escapeHtml');
 $assetUrl = $plugins->get('assetUrl');
 $translate = $plugins->get('translate');
@@ -35,6 +36,9 @@ $bodyTerm = $setting('browse_body_property_term');
 
 $gridListMode = $searchConfig->subSetting('display', 'grid_list_mode', 'auto');
 
+// A list has not html-code in a consistant user interface.
+$allowHtml = (bool) $searchConfig->subSetting('display', 'allow_html');
+
 $thumbnailMode = $searchConfig->subSetting('display', 'thumbnail_mode', 'default');
 $noThumbnail = $thumbnailMode === 'none';
 $allThumbnail = $thumbnailMode === 'all';
@@ -48,13 +52,17 @@ $thumbnailType = $searchConfig->subSetting('display', 'thumbnail_type', 'medium'
 <ul class="resource-list search-results-list<?= $gridListMode === 'list_only' ? ' list' : ($gridListMode === 'grid_only' ? ' grid' : '') ?>">
     <?php /** @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource */
     foreach ($resources as $resource):
-        // Can be simplified in the public theme.
-        $resourceUrl = isset($site) ? $resource->siteUrl($siteSlug) : $resource->adminUrl($siteSlug);
-        $heading = $headingTerm ? $resource->value($headingTerm, ['lang' => $langValue]) : null;
-        $heading = $heading ? $heading->asHtml() : $escape($resource->displayTitle($untitled, $langValue));
-        $body = $bodyTerm ? $resource->value($bodyTerm, ['lang' => $langValue]) : null;
-        $body = $body ? $body->asHtml() : $escape($resource->displayDescription(null, $langValue));
+        $resourceUrl = isset($site) ? $resource->siteUrl($siteSlug) : $resource->adminUrl();
         $resourceType = $resource->getControllerName();
+        $heading = $headingTerm ? $resource->value($headingTerm, ['default' => $untitled, 'lang' => $langValue]) : $resource->displayTitle(null, $langValue);
+        $body = $bodyTerm ? $resource->value($bodyTerm, ['lang' => $langValue]) : $resource->displayDescription(null, $langValue);
+        if ($allowHtml) {
+            $heading = is_object($heading) ? $heading->asHtml() : ($isHtml($heading) ? $heading : $escape($heading));
+            $body = is_object($body) ? $body->asHtml() : ($isHtml($body) ? $body : $escape($body));
+        } else {
+            $heading = $escape(is_object($heading) ? strip_tags((string) $heading) : ($isHtml($heading) ? strip_tags($heading) : $heading));
+            $body = $escape(is_object($body) ? strip_tags((string) $body) : ($isHtml($body) ? strip_tags($body) : $body));
+        }
         ?>
     <li class="resource <?= $resourceType ?>">
         <?php if (!$noThumbnail): ?>

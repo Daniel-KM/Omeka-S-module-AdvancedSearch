@@ -1105,7 +1105,7 @@ class Module extends AbstractModule
         if ($status->isAdminRequest()) {
             $basePath = $plugins->get('basePath');
             $assetUrl = $plugins->get('assetUrl');
-            $searchUrl = $basePath('admin/' . $searchConfig->path());
+            $searchUrl = $basePath('admin/' . $searchConfig->slug());
             $autoSuggestUrl = $searchConfig->subSetting('autosuggest', 'url');
             if (!$autoSuggestUrl) {
                 $suggester = $searchConfig->subSetting('autosuggest', 'suggester');
@@ -1304,14 +1304,14 @@ SQL;
         if (!$searchConfigId) {
             $sql = <<<SQL
 INSERT INTO `search_config`
-(`engine_id`, `name`, `path`, `form_adapter`, `settings`, `created`)
+(`engine_id`, `name`, `slug`, `form_adapter`, `settings`, `created`)
 VALUES
 ($searchEngineId, ?, ?, ?, ?, NOW());
 SQL;
             $searchConfigConfig = require __DIR__ . '/data/configs/search_config.default.php';
             $connection->executeStatement($sql, [
                 $searchConfigConfig['o:name'],
-                $searchConfigConfig['o:path'],
+                $searchConfigConfig['o:slug'],
                 $searchConfigConfig['o:form'],
                 json_encode($searchConfigConfig['o:settings']),
             ]);

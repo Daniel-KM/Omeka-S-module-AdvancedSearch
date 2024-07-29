@@ -15,7 +15,7 @@ class SettingsFieldsetFactory implements FactoryInterface
         $valueOptions = [];
         $apiOptions = [];
         foreach ($searchConfigs as $searchConfig) {
-            $labelSearchConfig = sprintf('%s (/%s)', $searchConfig->name(), $searchConfig->path());
+            $labelSearchConfig = sprintf('%s (/%s)', $searchConfig->name(), $searchConfig->slug());
             $valueOptions[$searchConfig->id()] = $labelSearchConfig;
             if ($searchConfig->formAdapter() instanceof \AdvancedSearch\FormAdapter\ApiFormAdapter) {
                 $apiOptions[$searchConfig->id()] = $labelSearchConfig;

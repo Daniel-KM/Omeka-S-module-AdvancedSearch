@@ -12,35 +12,35 @@ class GetSearchConfig extends AbstractHelper
      *
      * The search config should be available in the current site or in admin.
      */
-    public function __invoke($searchConfigIdOrPath = null): ?SearchConfigRepresentation
+    public function __invoke($searchConfigIdOrSlug = null): ?SearchConfigRepresentation
     {
         $plugins = $this->getView()->getHelperPluginManager();
         $isSiteRequest = $plugins->get('status')->isSiteRequest();
         $setting = $plugins->get($isSiteRequest ? 'siteSetting' : 'setting');
 
-        if (empty($searchConfigIdOrPath)) {
-            $searchConfigIdOrPath = $setting('advancedsearch_main_config');
-            if (!$searchConfigIdOrPath) {
+        if (empty($searchConfigIdOrSlug)) {
+            $searchConfigIdOrSlug = $setting('advancedsearch_main_config');
+            if (!$searchConfigIdOrSlug) {
                 return null;
             }
         }
 
-        $isNumeric = is_numeric($searchConfigIdOrPath);
+        $isNumeric = is_numeric($searchConfigIdOrSlug);
 
-        // Quick check: no check on path here.
+        // Quick check: no check on slug here.
         $available = $setting('advancedsearch_configs', []);
-        if ($isNumeric && !in_array($searchConfigIdOrPath, $available)) {
+        if ($isNumeric && !in_array($searchConfigIdOrSlug, $available)) {
             return null;
         }
 
         $api = $plugins->get('api');
         try {
-            $searchConfig = $api->read('search_configs', [$isNumeric ? 'id' : 'path' => $searchConfigIdOrPath])->getContent();
+            $searchConfig = $api->read('search_configs', [$isNumeric ? 'id' : 'slug' => $searchConfigIdOrSlug])->getContent();
         } catch (\Omeka\Mvc\Exception\NotFoundException $e) {
             return null;
         }
 
-        $searchConfigIdOrPath = $searchConfig->id();
+        $searchConfigIdOrSlug = $searchConfig->id();
         return $isNumeric || in_array($searchConfig->id(), $available)
             ? $searchConfig
             : null;

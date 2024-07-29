@@ -20,7 +20,7 @@ class SearchingFormFieldsetFactory implements FactoryInterface
         $searchConfigs = $api->search('search_configs', ['id' => $available])->getContent();
 
         foreach ($searchConfigs as $searchConfig) {
-            $configs[$searchConfig->id()] = sprintf('%s (/%s)', $searchConfig->name(), $searchConfig->path());
+            $configs[$searchConfig->id()] = sprintf('%s (/%s)', $searchConfig->name(), $searchConfig->slug());
         }
 
         // Set the main search config first and as default.

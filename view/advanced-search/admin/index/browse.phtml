@@ -124,7 +124,7 @@ $this->headScript()
         <thead>
             <tr>
                 <th><?= $translate('Name') ?></th>
-                <th><?= $translate('Path') ?></th>
+                <th><?= $translate('Slug') ?></th>
                 <th><?= $translate('Search engine') ?></th>
                 <th><?= $translate('Form') ?></th>
             </tr>
@@ -158,7 +158,7 @@ $this->headScript()
                             </li>
                         </ul>
                     </td>
-                    <td><?= $searchConfig->path() ?></td>
+                    <td><?= $searchConfig->slug() ?></td>
                     <td><?= $searchConfig->engine()->name() ?></td>
                     <td>
                         <?php

@@ -66,14 +66,14 @@ class SearchConfigForm extends Form
             ])
 
             ->add([
-                'name' => 'o:path',
+                'name' => 'o:slug',
                 'type' => Element\Text::class,
                 'options' => [
-                    'label' => 'Path', // @translate
-                    'info' => 'The path to the search form. The site path will be automatically prepended.',
+                    'label' => 'Slug', // @translate
+                    'info' => 'The slug to the search form. The site slug will be automatically prepended.',
                 ],
                 'attributes' => [
-                    'id' => 'path',
+                    'id' => 'slug',
                     'required' => true,
                 ],
             ])

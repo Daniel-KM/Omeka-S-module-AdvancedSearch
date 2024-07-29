@@ -30,7 +30,7 @@ abstract class SearchControllerTestCase extends OmekaControllerTestCase
         $searchEngine = $response->getContent();
         $response = $this->api()->create('search_configs', [
             'o:name' => 'TestPage',
-            'o:path' => 'test/search',
+            'o:slug' => 'test/search',
             'o:engine' => $searchEngine->id(),
             'o:form' => 'basic',
             'o:settings' => [

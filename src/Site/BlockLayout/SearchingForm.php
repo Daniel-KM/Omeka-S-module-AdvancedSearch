@@ -85,20 +85,18 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
         $searchConfigId = empty($searchConfig) || $searchConfig === 'default' ? null : (int) $searchConfig;
         $searchConfig = $view->getSearchConfig($searchConfigId);
         if (!$searchConfig) {
-            $message = new \Omeka\Stdlib\Message(
+            $view->logger()->err(
                 'No search config specified for this block or not available for this site.' // @translate
             );
-            $view->logger()->err($message);
             return '';
         }
 
         $form = $searchConfig->form();
         if (!$form) {
-            $message = new \Omeka\Stdlib\Message(
-                'The search config "%s" has no form associated.', // @translate
-                $searchConfig->path()
+            $view->logger()->warn(
+                'The search config "{search_slug}" has no form associated.', // @translate
+                ['search_slug' => $searchConfig->slug()]
             );
-            $view->logger()->warn($message);
             return '';
         }
 

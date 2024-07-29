@@ -13,7 +13,7 @@ return [
     '@type' => 'o:SearchConfig',
     'o:id' => null,
     'o:name' => $translate('Default'),
-    'o:path' => 'find',
+    'o:slug' => 'find',
     'o:engine' => ['o:id' => 1],
     'o:form' => 'main',
     'o:settings' => [

@@ -270,30 +270,30 @@ class SearchConfigController extends AbstractActionController
             return false;
         }
 
-        // Check if the name of the path is single in the database.
+        // Check if the name of the slug is single in the database.
         $params = $this->params()->fromPost();
         $id = (int) $this->params('id');
-        $path = $params['o:path'];
+        $slug = $params['o:slug'];
 
-        $paths = $this->api()
-            ->search('search_configs', [], ['returnScalar' => 'path'])
+        $slugs = $this->api()
+            ->search('search_configs', [], ['returnScalar' => 'slug'])
             ->getContent();
-        if (in_array($path, $paths)) {
+        if (in_array($slug, $slugs)) {
             if (!$id) {
-                $this->messenger()->addError('The path should be unique.'); // @translate
+                $this->messenger()->addError('The slug should be unique.'); // @translate
                 return false;
             }
             $searchConfigId = (int) $this->api()
-                ->searchOne('search_configs', ['path' => $path], ['returnScalar' => 'id'])
+                ->searchOne('search_configs', ['slug' => $slug], ['returnScalar' => 'id'])
                 ->getContent();
             if ($id !== $searchConfigId) {
-                $this->messenger()->addError('The path should be unique.'); // @translate
+                $this->messenger()->addError('The slug should be unique.'); // @translate
                 return false;
             }
         }
 
-        if (strpos($path, 'https:') === 0 || strpos($path, 'http:') === 0) {
-            $this->messenger()->addError('The path should be relative to the root of the site, like "search".'); // @translate
+        if (strpos($slug, 'https:') === 0 || strpos($slug, 'http:') === 0) {
+            $this->messenger()->addError('The slug should be relative to the root of the site, like "search".'); // @translate
             return false;
         }
 

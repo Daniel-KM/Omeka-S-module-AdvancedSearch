@@ -44,7 +44,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         $modified = $this->resource->getModified();
         return [
             'o:name' => $this->resource->getName(),
-            'o:path' => $this->resource->getPath(),
+            'o:slug' => $this->resource->getSlug(),
             'o:engine' => $this->engine()->getReference(),
             // TODO Don't use "o:form" for the form adapter.
             'o:form' => $this->resource->getFormAdapter(),
@@ -107,9 +107,9 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         return $this->resource->getName();
     }
 
-    public function path(): ?string
+    public function slug(): ?string
     {
-        return $this->resource->getPath();
+        return $this->resource->getSlug();
     }
 
     public function engine(): ?\AdvancedSearch\Api\Representation\SearchEngineRepresentation

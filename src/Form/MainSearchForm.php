@@ -192,7 +192,7 @@ class MainSearchForm extends Form
                 // TODO Use url helper?
                 $autoSuggestUrl = $this->basePath
                     . ($this->site ? '/s/' . $this->site->slug() : '/admin')
-                    . '/' . ($this->searchConfig ? $this->searchConfig->path() : 'search')
+                    . '/' . ($this->searchConfig ? $this->searchConfig->slug() : 'search')
                     . '/suggest';
             }
         }

@@ -14,7 +14,7 @@ class SiteSettingsFieldsetFactory implements FactoryInterface
         $searchConfigs = $services->get('Omeka\ApiManager')->search('search_configs')->getContent();
         $valueOptions = [];
         foreach ($searchConfigs as $searchConfig) {
-            $labelSearchConfig = sprintf('%s (/%s)', $searchConfig->name(), $searchConfig->path());
+            $labelSearchConfig = sprintf('%s (/%s)', $searchConfig->name(), $searchConfig->slug());
             $valueOptions[$searchConfig->id()] = $labelSearchConfig;
         }
         $siteSettings = $services->get('Omeka\Settings\Site');

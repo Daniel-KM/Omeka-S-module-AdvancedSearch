@@ -67,7 +67,7 @@ class SearchConfig extends AbstractEntity
      *     length=190
      * )
      */
-    protected $path;
+    protected $slug;
 
     /**
      * @var SearchEngine
@@ -142,15 +142,15 @@ class SearchConfig extends AbstractEntity
         return $this->name;
     }
 
-    public function setPath(string $path): self
+    public function setSlug(string $slug): self
     {
-        $this->path = $path;
+        $this->slug = $slug;
         return $this;
     }
 
-    public function getPath(): string
+    public function getSlug(): string
     {
-        return $this->path;
+        return $this->slug;
     }
 
     public function setEngine(SearchEngine $engine): self

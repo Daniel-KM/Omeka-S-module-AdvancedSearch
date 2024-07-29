@@ -373,6 +373,7 @@ return [
     ],
     'advancedsearch' => [
         'settings' => [
+            'advancedsearch_property_improved' => false,
             'advancedsearch_fulltextsearch_alto' => false,
             'advancedsearch_main_config' => 1,
             'advancedsearch_configs' => [1],
@@ -383,10 +384,12 @@ return [
             'advancedsearch_all_configs' => [1 => 'find'],
         ],
         'site_settings' => [
+            'advancedsearch_property_improved' => false,
             'advancedsearch_search_fields' => [
                 'common/advanced-search/sort',
                 'common/advanced-search/fulltext',
                 // 'common/advanced-search/properties',
+                // 'common/advanced-search/properties-improved',
                 'common/advanced-search/filters',
                 'common/advanced-search/resource-class',
                 // 'common/advanced-search/resource-template',
@@ -420,6 +423,7 @@ return [
             'common/advanced-search/sort' => ['label' => 'Sort'], // @translate
             'common/advanced-search/fulltext' => ['label' => 'Full text'], // @translate
             'common/advanced-search/properties' => ['label' => 'Properties'], // @translate
+            'common/advanced-search/properties-improved' => ['label' => 'Properties (improved)'], // @translate
             'common/advanced-search/filters' => ['label' => 'Filters'], // @translate
             'common/advanced-search/resource-class' => ['label' => 'Classes'], // @translate
             'common/advanced-search/resource-template' => ['label' => 'Templates', 'default' => false], // @translate

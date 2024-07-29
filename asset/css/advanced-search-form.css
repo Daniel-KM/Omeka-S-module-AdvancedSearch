@@ -52,12 +52,16 @@
         display: none;
     }
 
-    #advanced-search #property-queries .inputs > .value,
+    #advanced-search #property-queries.property-queries-improved .inputs > .value,
     #advanced-search #filter-queries .inputs > .value {
         display: flex;
         flex-direction: column;
         gap: .25rem 0;
     }
+    #advanced-search #property-queries:not(.property-queries-improved) .inputs > .value * {
+        margin: 0 0.10rem .25rem 0;
+    }
+
     #advanced-search .inputs > .value .value-fields {
         display: flex;
         flex-wrap: wrap;

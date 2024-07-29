@@ -714,6 +714,9 @@ class Module extends AbstractModule
                 ->prependStylesheet($assetUrl('vendor/chosen-js/chosen.min.css', 'Omeka'));
             $headScript
                 ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.js', 'Omeka'), 'text/javascript', ['defer' => 'defer']);
+            $isPropertyImproved = (bool) $plugins->get('siteSetting')('advancedsearch_property_improved');
+        } else {
+            $isPropertyImproved = (bool) $plugins->get('setting')('advancedsearch_property_improved');
         }
 
         $headLink
@@ -721,10 +724,10 @@ class Module extends AbstractModule
         $headScript
             ->appendFile($assetUrl('js/advanced-search-form.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
 
-        $this->handlePartialsAdvancedSearch($event);
+        $this->handlePartialsAdvancedSearch($event, $isPropertyImproved);
     }
 
-    public function handlePartialsAdvancedSearch(Event $event): void
+    protected function handlePartialsAdvancedSearch(Event $event, bool $isPropertyImproved = false): void
     {
         // Adapted from application/view/common/advanced-search.phtml.
 
@@ -760,17 +763,24 @@ class Module extends AbstractModule
             $partials[] = 'common/advanced-search/media-type';
         }
 
-        $partials = array_unique($partials);
-
-        // insert "filter" after "properties".
+        // Insert "filter" after "properties" and manage improved properties.
         $p = $partials;
         $partials = [];
         foreach ($p as $partial) {
+            if ($partial === 'common/advanced-search/properties' && $isPropertyImproved) {
+                $partial = 'common/advanced-search/properties-improved';
+            } elseif ($partial === 'common/advanced-search/properties-improved' && !$isPropertyImproved) {
+                $partial = 'common/advanced-search/properties';
+            }
             $partials[] = $partial;
-            if ($partial === 'common/advanced-search/properties') {
+            if ($partial === 'common/advanced-search/properties'
+                || $partial === 'common/advanced-search/properties-improved'
+            ) {
                 $partials[] = 'common/advanced-search/filters';
             }
         }
+
+        $partials = array_unique($partials);
 
         $event->setParam('query', $query);
         $event->setParam('partials', $partials);

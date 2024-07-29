@@ -68,6 +68,7 @@ return [
             'searchingFilters' => View\Helper\SearchingFilters::class,
             'searchingForm' => View\Helper\SearchingForm::class,
             'searchingUrl' => View\Helper\SearchingUrl::class,
+            'searchingValue' => View\Helper\SearchingValue::class,
             'searchPaginationPerPageSelector' => View\Helper\SearchPaginationPerPageSelector::class,
             'searchSortSelector' => View\Helper\SearchSortSelector::class,
         ],

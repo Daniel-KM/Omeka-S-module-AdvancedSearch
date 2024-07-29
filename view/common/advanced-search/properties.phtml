@@ -146,6 +146,10 @@ if ($isSiteRequest) {
                         <?= $queryOption('nnear', $property, 'type', $translate('is not similar to')) ?>
                         <?= $queryOption('ma', $property, 'type', $translate('matches')) ?>
                         <?= $queryOption('nma', $property, 'type', $translate('does not match')) ?>
+                        <?= $queryOption('lt', $property, 'type', $translate('lower than')) ?>
+                        <?= $queryOption('lte', $property, 'type', $translate('lower than or equal')) ?>
+                        <?= $queryOption('gte', $property, 'type', $translate('greater than or equal')) ?>
+                        <?= $queryOption('gt', $property, 'type', $translate('greater than')) ?>
                     </optgroup>
                     <optgroup label="<?= $translate('Resource') ?>">
                         <?= $queryOption('res', $property, 'type', $translate('is resource with ID')) ?>

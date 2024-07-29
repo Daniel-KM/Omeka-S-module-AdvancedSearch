@@ -81,12 +81,6 @@ class Module extends AbstractModule
             );
             throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
         }
-
-        if ($this->isModuleActive('Search')) {
-            throw new \Omeka\Module\Exception\ModuleCannotInstallException(
-                $translate('This module is not compatible with mocule "Search". Disable or uninstall it first. To upgrade from it, update it to version 3.5.23.3 or greater and downgrade this module to version 3.4.14.') // @translate
-            );
-        }
     }
 
     protected function postInstall(): void
@@ -109,10 +103,10 @@ class Module extends AbstractModule
             \Omeka\Module\Manager::STATE_NEEDS_UPGRADE,
         ])) {
             $version = $module->getIni('version');
-            if (version_compare($version, '3.5.45', '<')) {
+            if (version_compare($version, '3.5.47', '<')) {
                 $message = new PsrMessage(
                     'The module {module} should be upgraded to version {version} or later.', // @translate
-                    ['module' => 'SearchSolr', 'version' => '3.5.45']
+                    ['module' => 'SearchSolr', 'version' => '3.5.47']
                 );
                 $messenger->addWarning($message);
             } elseif ($module->getState() !== \Omeka\Module\Manager::STATE_ACTIVE) {

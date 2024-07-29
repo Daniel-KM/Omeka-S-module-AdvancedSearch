@@ -875,17 +875,15 @@ To avoid this check, add temporarily the key "advancedsearch_skip_exception" wit
 To process **some** of them automatically, you should backup themes and files, then add temporarily the key "advancedsearch_upgrade_3.4.28" with value "true" in the file config/local.config.php.
 The list of issues is available in logs too.' // @translate
             );
-            $message->setTranslator($translator);
             $messages[] = $message;
         }
         foreach ($results as $key => $result) {
             $message = new PsrMessage($stringsAndMessages[$key]['message'], ['json' => json_encode($result, 448)]);
-            $message->setTranslator($translator);
             $logger->err($message->getMessage(), $message->getContext());
             $messages[] = $message;
         }
         if (empty($config['advancedsearch_skip_exception'])) {
-            throw new \Omeka\Module\Exception\ModuleCannotInstallException(implode("\n\n", array_map('strval', $messages)));
+            throw new \Omeka\Module\Exception\ModuleCannotInstallException(implode("\n\n", array_map(fn($message) => (string) $message->setTranslator($translator), $messages)));
         }
         $messenger->addErrors($messages);
         $message = new PsrMessage(

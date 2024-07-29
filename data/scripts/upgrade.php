@@ -737,9 +737,94 @@ SQL;
 }
 
 if (version_compare($oldVersion, '3.4.28', '<')) {
+    // TODO Move this in module Common in a new class "UpgradeTheme".
+    // The previous version used shell commands, but they may be forbidden by some servers.
     $logger = $services->get('Omeka\Logger');
     $doUpgrade = !empty($config['advancedsearch_upgrade_3.4.28']);
     $stringsAndMessages = [
+        'facetOptions' => [
+            'strings' => [
+                'themes/*/view/search/*' => [
+                    'facetActives(',
+                ],
+            ],
+            'message' => 'The template for facets was simplified. See view/search/facets-list.phtml. Matching templates: {json}', // @translate
+            'commands' => [
+                // TODO Missing replacements: facetsOptions.
+                'str_replace' => [
+                    'from' => [
+                        <<<'PHP'
+                        $facetActives(null, $activeFacets, $options)
+                        PHP,
+                        <<<'PHP'
+                        $facetElements = $isFacetModeButton ? $plugins->get('facetCheckboxes') : $plugins->get('facetLinks');
+                        PHP,
+                        '// Facet checkbox can be used in any case anyway, the js checks it.' . "\n",
+                        <<<'PHP'
+                        $facetSelect = $plugins->get('facetSelect');
+                        PHP . "\n",
+                        <<<'PHP'
+                        $facetSelectRange = $plugins->get('facetSelectRange');
+                        PHP . "\n",
+                        <<<'PHP'
+                        $facetElementsTree = $isFacetModeButton ? $plugins->get('facetCheckboxesTree') : $plugins->get('facetLinksTree');
+                        PHP . "\n",
+                        <<<'PHP'
+                        <?php $facetType = empty($options['facets'][$name]['type']) ? 'Checkbox' : $options['facets'][$name]['type']; ?>
+                        PHP . "\n",
+                        <<<'PHP'
+                        <?php foreach ($facets as $name => $facetValues): ?>
+                        PHP . "\n",
+                        <<<'PHP'
+                                        <?php if ($facetType === 'Select'): ?>
+                                        <?= $facetSelect($name, $facetValues, $options) ?>
+                                        <?php elseif ($facetType === 'SelectRange'): ?>
+                                        <?= $facetSelectRange($name, $facetValues, $options) ?>
+                                        <?php elseif ($facetType === 'Tree' || $facetType === 'Thesaurus'): ?>
+                                        <?= $facetElementsTree($name, $facetValues, $options) ?>
+                                        <?php else: ?>
+                                        <?= $facetElements($name, $facetValues, $options) ?>
+                                        <?php endif; ?>
+                        PHP,
+                        <<<'PHP'
+                                    <?php if ($facetType === 'Select'): ?>
+                                    <?= $facetSelect($name, $facetValues, $options) ?>
+                                    <?php elseif ($facetType === 'SelectRange'): ?>
+                                    <?= $facetSelectRange($name, $facetValues, $options) ?>
+                                    <?php elseif ($facetType === 'Tree'): ?>
+                                    <?= $facetElementsTree($name, $facetValues, $options) ?>
+                                    <?php else: ?>
+                                    <?= $facetElements($name, $facetValues, $options) ?>
+                                    <?php endif; ?>
+                        PHP,
+                    ],
+                    'to' => [
+                        <<<'PHP'
+                        $facetActives(null, $activeFacets, $searchConfig->setting('facet'))
+                        PHP,
+                        <<<'PHP'
+                        $facetElements = $plugins->get('facetElements');
+                        PHP,
+                        '',
+                        '',
+                        '',
+                        '',
+                        '',
+                        <<<'PHP'
+                        <?php foreach ($facets as $name => $facetValues): ?>
+                                        <?php $facetOptions = $searchFacets[$name]; ?>
+                        PHP . "\n",
+                        <<<'PHP'
+                                        <?= $facetElements($name, $facetValues, $facetOptions) ?>
+                        PHP,
+                        <<<'PHP'
+                                    <?= $facetElements($name, $facetValues, $facetOptions) ?>
+                        PHP,
+                    ],
+                    'message' => 'Command "{name}" #{index}/{total} for {key}: file #{count}/{count_total} {file} partially updated.', // @translate
+                ],
+            ],
+        ],
         'facet_filters' => [
             'strings' => [
                 'themes/*/view/search/*' => [
@@ -755,6 +840,26 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
                 ],
             ],
             'message' => 'The view helper "facetLabel()" was removed. Update the theme and get the label directly from the each facet config: replace `$facetLabel($name)` by `$facetOptions[\'label\'] ?: $name)`. Matching templates: {json}', // @translate
+            'commands' => [
+                // TODO Missing replacements: to get facetsOptions.
+                'str_replace' => [
+                    'from' => [
+                        <<<'PHP'
+                        $facetLabel = $plugins->get('facetLabel');
+                        PHP . "\n",
+                        <<<'PHP'
+                        $facetLabel($name)
+                        PHP,
+                    ],
+                    'to' => [
+                        '',
+                        <<<'PHP'
+                        $facetOptions['label'] ?? $name)
+                        PHP,
+                    ],
+                    'message' => 'Command "{name}" #{index}/{total} for {key}: file #{count}/{count_total} {file} partially updated.', // @translate
+                ],
+            ],
         ],
         'searchForm' => [
             'strings' => [
@@ -774,13 +879,15 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
                 ],
             ],
             'message' => 'The template "search/facets" was renamed "search/facets-list". Update it in your theme. Matching templates: {json}', // @translate
-            'script' => [
-                'rename' => <<<'SH'
-                    find 'OMEKA_PATH/themes/' -type f -not -path '*/\.git/*' -not -path '*/vendor/*' -not -path '*/node_modules/*' -wholename '*/view/search/facets.phtml' -exec rename -v 's~facets.phtml~facets-list.phtml~' '{}' \;
-                    SH,
-                'replace' => <<<'SH'
-                    find 'OMEKA_PATH/themes/' -type f -not -path '*/\.git/*' -not -path '*/vendor/*' -not -path '*/node_modules/*' -wholename '*/view/search/*.phtml' -exec sed -i "s~search/facets'~search/facets-list'~g" '{}' \;
-                    SH,
+            'commands' => [
+                'str_replace' => [
+                    'from' => "search/facets'",
+                    'to' => "search/facets-list'",
+                ],
+                'rename' => [
+                    'from' => 'search/facets.phtml',
+                    'to' => 'search/facets-list.phtml',
+                ],
             ],
         ],
         'resource-list' => [
@@ -790,13 +897,15 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
                 ],
             ],
             'message' => 'The template "search/resource-list" was renamed "search/results". Update your theme. Matching templates: {json}', // @translate
-            'script' => [
-                'rename' => <<<'SH'
-                    find 'OMEKA_PATH/themes/' -type f -not -path '*/\.git/*' -not -path '*/vendor/*' -not -path '*/node_modules/*' -wholename '*/view/search/resource-list.phtml' -exec rename -v 's~resource-list.phtml~results.phtml~' '{}' \;
-                    SH,
-                'replace' => <<<'SH'
-                    find 'OMEKA_PATH/themes/' -type f -not -path '*/\.git/*' -not -path '*/vendor/*' -not -path '*/node_modules/*' -wholename '*/view/search/*.phtml' -exec sed -i "s~search/resource-list'~search/results'~g" '{}' \;
-                    SH,
+            'commands' => [
+                'str_replace' => [
+                    'from' => "search/resource-list'",
+                    'to' => "search/results'",
+                ],
+                'rename' => [
+                    'from' => 'search/resource-list.phtml',
+                    'to' => 'search/results.phtml',
+                ],
             ],
         ],
         'results-header-footer' => [
@@ -815,10 +924,11 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
                 ],
             ],
             'message' => 'The key "per_pages" was renamed "per_page". Update your theme. Matching templates: {json}', // @translate
-            'script' => [
-                'replace' => <<<'SH'
-                    find 'OMEKA_PATH/themes/' -type f -not -path '*/\.git/*' -not -path '*/vendor/*' -not -path '*/node_modules/*' -wholename '*/view/search/*.phtml' -exec sed -i "s~'per_pages'~'per_page'~g" '{}' \;
-                    SH,
+            'commands' => [
+                'str_replace' => [
+                    'from' => "'per_pages'",
+                    'to' => "'per_page'",
+                ],
             ],
         ],
     ];
@@ -828,42 +938,78 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
         $result = $manageModuleAndResources->checkStringsInFiles($strings, $path);
         if (!$result) {
             continue;
-        } elseif (!$doUpgrade) {
+        } elseif (!$doUpgrade || empty($stringsAndMessage['commands'])) {
             $results[$key][trim(basename($path), '*')] = $result;
             continue;
         }
-        if (!empty($stringsAndMessage['script'])) {
-            /** @var \Omeka\Stdlib\Cli $cli */
-            $cli = $services->get('Omeka\Cli');
-            $total = count($stringsAndMessage['script']);
-            $i = 0;
-            foreach ($stringsAndMessage['script'] as $commandName => $command) {
-                $command = str_replace('OMEKA_PATH', OMEKA_PATH, $command);
-                $output = $cli->execute($command);
-                // Errors are already logged only with proc_open(), not exec().
-                if ($output === false) {
-                    $message = new PsrMessage(
-                        'Command "{name}" #{index}/{total} cannot be executed for {key}.', // @translate
-                        ['name' => $commandName, 'index' => ++$i, 'total' => $total, 'key' => $key]
-                    );
-                    $messenger->addError($message);
-                    $logger->err($message->getMessage(), $message->getContext());
-                } elseif ($output) {
-                    $message = new PsrMessage(
-                        'Command "{name}" #{index}/{total} executed for {key}. Output: {output}', // @translate
-                        ['name' => $commandName, 'index' => ++$i, 'total' => $total, 'key' => $key, 'output' => $output]
-                    );
-                    $messenger->addNotice($message);
-                    $logger->notice($message->getMessage(), $message->getContext());
-                } else {
-                    $message = new PsrMessage(
-                        'Command "{name}" #{index}/{total} executed for {key}.', // @translate
-                        ['name' => $commandName, 'index' => ++$i, 'total' => $total, 'key' => $key]
-                    );
-                    $messenger->addNotice($message);
-                    $logger->notice($message->getMessage(), $message->getContext());
+        $total = count($stringsAndMessage['commands']);
+        $i = 0;
+        foreach ($stringsAndMessage['commands'] as $commandName => $commandArgs) switch ($commandName) {
+            default:
+                ++$i;
+                // For debug only.
+                throw new \Exception('Command undefined');
+            case 'rename':
+                ++$i;
+                $j = 0;
+                foreach ($result as $filename) {
+                    $from = OMEKA_PATH . '/' . $filename;
+                    $newFilename = str_replace($commandArgs['from'], $commandArgs['to'], $filename);
+                    $to = OMEKA_PATH . '/' . $newFilename;
+                    if ($from !== $to) {
+                        $written = rename($from, $to);
+                        if (!$written) {
+                            $message = new PsrMessage(
+                                'Command "{name}" #{index}/{total} for {key}: file #{count}/{count_total} {file} failed to be renamed {file_new}.', // @translate
+                                ['name' => $commandName, 'index' => $i, 'total' => $total, 'key' => $key, 'count' => ++$j, 'count_total' => count($result), 'file' => $filename, 'file_new' => $newFilename]
+                            );
+                            $messenger->addError($message);
+                            $logger->err($message->getMessage(), $message->getContext());
+                        } else {
+                            $message = new PsrMessage(
+                                'Command "{name}" #{index}/{total} for {key}: file #{count}/{count_total} {file} successfully renamed {file_new}.', // @translate
+                                ['name' => $commandName, 'index' => $i, 'total' => $total, 'key' => $key, 'count' => ++$j, 'count_total' => count($result), 'file' => $filename, 'file_new' => $newFilename]
+                            );
+                            $messenger->addSuccess($message);
+                            $logger->notice($message->getMessage(), $message->getContext());
+                        }
+                    }
                 }
-            }
+                break;
+            case 'str_replace':
+                ++$i;
+                $j = 0;
+                foreach ($result as $filename) {
+                    $filepath = OMEKA_PATH . '/' . $filename;
+                    $content = file_get_contents($filepath);
+                    if ($content) {
+                        $content = str_replace($commandArgs['from'], $commandArgs['to'], $content);
+                        $written = file_put_contents($filepath, $content);
+                        if ($written === false) {
+                            $message = new PsrMessage(
+                                'Command "{name}" #{index}/{total} for {key}: file #{count}/{count_total}  {file} unwriteable.', // @translate
+                                ['name' => $commandName, 'index' => $i, 'total' => $total, 'key' => $key, 'count' => ++$j, 'count_total' => count($result), 'file' => $filename]
+                            );
+                            $messenger->addError($message);
+                            $logger->err($message->getMessage(), $message->getContext());
+                        } else {
+                            $message = new PsrMessage(
+                                $commandArgs['message'] ?? 'Command "{name}" #{index}/{total} for {key}: file #{count}/{count_total}  {file} updated.', // @translate
+                                ['name' => $commandName, 'index' => $i, 'total' => $total, 'key' => $key, 'count' => ++$j, 'count_total' => count($result), 'file' => $filename]
+                            );
+                            $messenger->addSuccess($message);
+                            $logger->notice($message->getMessage(), $message->getContext());
+                        }
+                    } else {
+                        $message = new PsrMessage(
+                            'Command "{name}" #{index}/{total} for {key}: file #{count}/{count_total} {file} unreadable.', // @translate
+                            ['name' => $commandName, 'index' => $i, 'total' => $total, 'key' => $key, 'count' => ++$j, 'count_total' => count($result), 'file' => $filename]
+                        );
+                        $messenger->addError($message);
+                        $logger->err($message->getMessage(), $message->getContext());
+                    }
+                }
+                break;
         }
     }
     if ($results) {

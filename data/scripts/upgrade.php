@@ -1139,3 +1139,148 @@ SQL;
     );
     $messenger->addWarning($message);
 }
+
+if (version_compare($oldVersion, '3.4.29', '<')) {
+    // Updated search page.
+
+    $message = new PsrMessage(
+        'The html/css class names were simplified in the search page, in particular for facets. You should check your theme if you customized it.' // @translate
+    );
+    $messenger->addWarning($message);
+
+    $logger = $services->get('Omeka\Logger');
+    $stringsAndMessages = [
+        'search-facet' => [
+            'strings' => [
+                'themes/*/view/search/*' => [
+                    'search-facet',
+                ],
+            ],
+            'message' => 'The template for facets was simplified. See view/search/facets-list.phtml. Matching templates: {json}', // @translate
+        ],
+    ];
+    $manageModuleAndResources = $this->getManageModuleAndResources();
+    $results = [];
+    foreach ($stringsAndMessages as $key => $stringsAndMessage) foreach ($stringsAndMessage['strings'] as $path => $strings) {
+        $result = $manageModuleAndResources->checkStringsInFiles($strings, $path);
+        if (!$result) {
+            continue;
+        }
+        $results[$key][] = $result;
+    }
+    if ($results) {
+        foreach ($results as $key => $result) {
+            $message = new PsrMessage($stringsAndMessages[$key]['message'], ['json' => json_encode($result, 448)]);
+            $logger->err($message->getMessage(), $message->getContext());
+            $messenger->addWarning($message);
+        }
+    }
+
+    // Convert each facet as array to configure each of them separately.
+    // Move mapping config to mapper.
+    $qb = $connection->createQueryBuilder();
+    $qb
+        ->select('search_config.id', 'search_config.settings')
+        ->from('search_config', 'search_config')
+        ->where('search_config.settings IS NOT NULL')
+        ->orderBy('search_config.id', 'asc');
+    $searchConfigs = $connection->executeQuery($qb)->fetchAllKeyValue();
+    foreach ($searchConfigs as $id => $searchConfigSettings) {
+        $searchConfigSettings = json_decode($searchConfigSettings, true);
+        $facetConfig = $searchConfigSettings['facet'] ?? [];
+        $facetMode = ($facetConfig['mode'] ?? null) === 'link' ? 'link' : 'button';
+        // Invert option to filter available or all facets when option is set.
+        if (isset($facetConfig['list']) || empty($facetConfig['display_list'])) {
+            $facetList = $facetConfig['list'] === 'all' ? 'all' : 'available';
+        } else {
+            $facetList = $facetConfig['display_list'] === 'available' ? 'all' : 'available';
+        }
+        $facetConfigNew = [
+            'label' => $facetConfig['label'] ?? $translate('Facets'),
+            'label_no_facets' => $facetConfig['label_no_facets'] ?? $translate('No facets'),
+            'mode' => $facetMode,
+            'list' => $facetList,
+            'display_active' => !empty($facetConfig['display_active']),
+            'label_active_facets' => $facetConfig['label_active_facets'] ?? $translate('Active facets'),
+            'display_submit' => $facetConfig['display_submit'] ?? 'above',
+            'label_submit' => $facetConfig['label_submit'] ?? $translate('Apply facets'),
+            'display_reset' => $facetConfig['display_reset'] ?? 'above',
+            'label_reset' => $facetConfig['label_reset'] ?? $translate('Reset facets'),
+            'facets' => [],
+        ];
+        $languages = $searchConfigSettings['facet']['languages'] ?? [];
+        $order = $searchConfigSettings['facet']['order'] ?? '';
+        $limit = (int) ($searchConfigSettings['facet']['limit'] ?? 25);
+        $displayCount = !empty($searchConfigSettings['facet']['display_count']);
+        foreach ($searchConfigSettings['facet']['facets'] ?? [] as $facet) {
+            $field = $facet['field'] ?? $facet['name'] ?? null;
+            if (!$field) {
+                continue;
+            }
+            // Options are no more used.
+            $optionsOptions = empty($facet['options'])
+                ? []
+                : (is_scalar($facet['options']) ? ['options' => $facet['options']] : $facet['options']);
+            $newFacet = [
+                'field' => $field,
+                'languages' => $facet['languages'] ?? $languages,
+                'label' => $facet['label'] ?? $field,
+                'type' => empty($facet['type']) ? 'Checkbox' : $facet['type'],
+                'order' => $facet['order'] ?? $order,
+                'limit' => $facet['limit'] ?? $limit,
+                'display_count' => $facet['display_count'] ?? $displayCount,
+                // Store the facet mode in each facet to simplify theme.
+                'mode' => $facetMode,
+            ];
+            // Until this version, only two options were managed: thesaurus and
+            // main types, exclusively.
+            if (strcasecmp($newFacet['type'], 'thesaurus') === 0) {
+                if (empty($optionsOptions)) {
+                    $newFacet['thesaurus'] = 0;
+                } elseif (count($optionsOptions) === 1) {
+                    $newFacet['thesaurus'] = (int) reset($optionsOptions);
+                } else {
+                    $newFacet['thesaurus'] = empty($optionsOptions['id']) && empty($optionsOptions['thesaurus'])
+                        ? (int) reset($optionsOptions)
+                        : (int) ($optionsOptions['thesaurus'] ?? $optionsOptions['id'] ?? 0);
+                }
+            } elseif ($optionsOptions) {
+                $newFacet['main_types'] = $optionsOptions;
+            }
+            $facetConfigNew['facets'][$field] = $newFacet;
+        }
+        $searchConfigSettings['facet'] = $facetConfigNew;
+        $connection->executeStatement(
+            'UPDATE `search_config` SET `settings` = :settings WHERE `id` = :id',
+            [
+                'settings' => json_encode($searchConfigSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+                'id' => $id,
+            ],
+            [
+                'settings' => \Doctrine\DBAL\ParameterType::STRING,
+                'id' => \Doctrine\DBAL\ParameterType::INTEGER,
+            ],
+        );
+    }
+
+    $message = new PsrMessage(
+        'It is now possible to have a specific config for each facet (index, type, size, display, etc.).' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    // Check for internal querier.
+    $qb = $connection->createQueryBuilder();
+    $qb
+        ->select('search_config.id')
+        ->from('search_config', 'search_config')
+        ->innerJoin('search_config', 'search_engine', 'search_engine', 'search_engine.id = search_config.engine_id')
+        ->where($qb->expr()->eq('search_engine.adapter', ':adapter'))
+        ->orderBy('search_engine.id', 'asc');
+    $searchConfigs = $connection->executeQuery($qb, ['adapter' => 'internal'])->fetchFirstColumn();
+    if ($searchConfigs) {
+        $message = new PsrMessage(
+            'The option to display available or all facets was inverted and the same for the internal engine.' // @translate
+        );
+        $messenger->addWarning($message);
+    }
+}

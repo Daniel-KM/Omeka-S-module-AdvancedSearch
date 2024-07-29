@@ -875,6 +875,63 @@ class SearchResources extends AbstractPlugin
     }
 
     /**
+     * Omeka S v4.1 allows to search resources, but to search full text requires
+     * a specific adapter, so override it to manage it, allowing filtering the
+     * specified resource types in option "resource_type" with api names.
+     *
+     * Another way is to remove the event and to pass the good one.
+     */
+    public function searchResourcesFullText(QueryBuilder $qb, array $query): void
+    {
+        if (empty($query['fulltext_search'])) {
+            return;
+        }
+
+        // Doctrine does not allow to modify a join, so get them all, remove
+        // them all, and update the one for full text.
+        $dqlJoins = $qb->getDQLPart('join');
+        if (empty($dqlJoins['omeka_root'])) {
+            return;
+        }
+
+        $qb->resetDQLPart('join');
+        /** @var \Doctrine\ORM\Query\Expr\Join $join */
+        foreach ($dqlJoins as $alias => $joins) foreach ($joins as $join) {
+            if ($alias === 'omeka_root'
+                && $join->getAlias() === 'omeka_fulltext_search'
+                && $join->getJoin() === \Omeka\Entity\FulltextSearch::class
+            ) {
+                // The condition is always the same, because it is managed in
+                // one place (@see \Omeka\Module::searchFulltext()).
+                // The parameter is something like "omeka_0".
+                $condition = $join->getCondition();
+                $parameterName = substr($condition, strrpos($condition, ':') + 1);
+                $hasResourceType = !empty($query['resource_type']);
+                $join = new \Doctrine\ORM\Query\Expr\Join(
+                    $join->getJoinType(),
+                    \Omeka\Entity\FulltextSearch::class,
+                    'omeka_fulltext_search',
+                    $join->getConditionType(),
+                    $hasResourceType
+                        ? "omeka_fulltext_search.id = omeka_root.id AND omeka_fulltext_search.resource IN (:$parameterName)"
+                        : 'omeka_fulltext_search.id = omeka_root.id',
+                    $join->getIndexBy()
+                );
+                if ($hasResourceType) {
+                    $resourceTypes = is_array($query['resource_type']) ? $query['resource_type'] : [$query['resource_type']];
+                    $qb
+                        ->setParameter($parameterName, $resourceTypes, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
+                } else {
+                    // The parameter is kept for simplicity.
+                    $qb
+                        ->andWhere($qb->expr()->eq(":$parameterName", ":$parameterName"));
+                }
+            }
+            $qb->add('join', [$alias => $join], true);
+        }
+    }
+
+    /**
      * Override the core adapter to search resource without template, etc.
      *
      * @see \Omeka\Api\Adapter\AbstractResourceEntityAdapter::buildQuery()

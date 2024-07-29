@@ -167,6 +167,15 @@ class Module extends AbstractModule
             );
         }
 
+        // Manage exception for full text search with resource adapter.
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\ResourceAdapter::class,
+            'api.search.query',
+            [$this, 'overrideQueryResourceFullText'],
+            // Process after Omeka\Module.
+            -10
+        );
+
         $sharedEventManager->attach(
             \Omeka\Form\Element\PropertySelect::class,
             'form.vocab_member_select.query',
@@ -646,6 +655,34 @@ class Module extends AbstractModule
             ->setAdapter($adapter)
             // Process the query for overridden keys.
             ->buildInitialQuery($qb, $request->getContent());
+    }
+
+    /**
+     * Override fulltext for type "resources". The adapter must be set first.
+     *
+     * This method is set separately because it should be passed after
+     * \Omeka\Module.
+     *
+     * @see \Omeka\Module::searchFullText()
+     */
+    public function overrideQueryResourceFullText(Event $event): void
+    {
+        /** @var \Omeka\Api\Request $request */
+        $request = $event->getParam('request');
+
+        // Don't override for api index search.
+        if ($request->getOption('is_index_search')) {
+            return;
+        }
+
+        $qb = $event->getParam('queryBuilder');
+        $adapter = $event->getTarget();
+
+        /** @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResources::searchResourcesFullText() */
+        $this->getServiceLocator()->get('ControllerPluginManager')
+            ->get('searchResources')
+            ->setAdapter($adapter)
+            ->searchResourcesFullText($qb, $request->getContent());
     }
 
     public function onFormVocabMemberSelectQuery(Event $event): void

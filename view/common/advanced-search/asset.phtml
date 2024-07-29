@@ -1,0 +1,23 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var array $query
+ */
+
+$plugins = $this->getHelperPluginManager();
+$translate = $plugins->get('translate');
+$hyperlink = $plugins->get('hyperlink');
+?>
+
+<div class="field">
+    <div class="field-meta">
+        <label for="owner_id"><?= $translate('Has a specific asset as thumbnail') ?></label>
+        <?= $hyperlink('', '#', ['class' => 'expand', 'title' => $translate('Expand')]) ?>
+        <div class="collapsible">
+            <div class="field-description"><?= $translate('Searches for resources with a specific asset as thumbnail.') ?></div>
+        </div>
+    </div>
+    <div class="inputs">
+        <input name="asset_id" value="<?= $query['asset_id'] ?? '' ?>" type="number" min="0"/>
+    </div>
+</div>

@@ -438,6 +438,7 @@ return [
             'common/advanced-search/has-original' => ['label' => 'Has original file', 'default' => false], // @translate
             'common/advanced-search/has-thumbnails' => ['label' => 'Has thumbnails', 'default' => false], // @translate
             'common/advanced-search/has-asset' => ['label' => 'Has asset as thumbnail', 'default' => false], // @translate
+            'common/advanced-search/asset' => ['label' => 'Has a specific asset', 'default' => false], // @translate
             'common/advanced-search/media-type' => ['label' => 'Media types'], // @translate
             'common/advanced-search/visibility' => ['label' => 'Visibility', 'default' => false], // @translate
             // From module data type geometry.

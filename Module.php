@@ -754,6 +754,9 @@ class Module extends AbstractModule
         $query['has_asset'] ??= '';
         $partials[] = 'common/advanced-search/has-asset';
 
+        $query['asset_id'] ??= '';
+        $partials[] = 'common/advanced-search/asset';
+
         if ($resourceType === 'item' || $resourceType === 'media') {
             $query['has_original'] ??= '';
             $partials[] = 'common/advanced-search/has-original';

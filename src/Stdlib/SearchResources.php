@@ -478,6 +478,7 @@ class SearchResources
                 'resource_class_id',
                 'resource_template_id',
                 'item_set_id',
+                'asset_id',
             ])) {
                 $values = is_array($value) ? $value : [$value];
                 $values = array_map('intval', array_filter($values, 'is_numeric'));
@@ -1247,6 +1248,36 @@ class SearchResources
             } else {
                 $qb
                     ->andWhere($expr->isNull('omeka_root.thumbnail'));
+            }
+        }
+
+        if (isset($query['asset_id'])
+            && $query['asset_id'] !== ''
+            && $query['asset_id'] !== []
+        ) {
+            $assetIds = is_array($query['asset_id'])
+                ? array_values(array_unique($query['asset_id']))
+                : [$query['asset_id']];
+            if (array_values($assetIds) === [0]) {
+                $qb
+                    ->andWhere(
+                        $expr->isNull('omeka_root.thumbnail')
+                    );
+            } elseif (in_array(0, $assetIds, true)) {
+                $qb
+                    ->andWhere($expr->orX(
+                        $expr->isNull('omeka_root.thumbnail'),
+                        $expr->in(
+                            'omeka_root.thumbnail',
+                            $this->adapter->createNamedParameter($qb, $assetIds)
+                        )
+                    ));
+            } else {
+                $qb
+                    ->andWhere($expr->in(
+                        'omeka_root.thumbnail',
+                        $this->adapter->createNamedParameter($qb, $assetIds)
+                    ));
             }
         }
 

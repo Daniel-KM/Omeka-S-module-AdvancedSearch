@@ -91,6 +91,7 @@ $(document).ready(function() {
             'has_original',
             'has_thumbnails',
             'has_asset',
+            'asset_id',
             // Data Type Geometry.
             'geo[box]',
             'geo[zone]',

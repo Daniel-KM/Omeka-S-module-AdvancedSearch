@@ -549,6 +549,24 @@ class SearchFilters extends AbstractHelper
                         : $translate('no'); // @translate
                     break;
 
+                case 'asset_id':
+                    if (!is_array($value)) {
+                        $value = [$value];
+                    }
+                    $filterLabel = $translate('Thumbnail'); // @translate
+                    foreach ($value as $subKey => $subValue) {
+                        if (!is_numeric($subValue)) {
+                            continue;
+                        }
+                        if ($subValue) {
+                            $filterValue = sprintf($translate('#%d'), $subValue); // @translate
+                        } else {
+                            $filterValue = $translate('[none]'); // @translate
+                        }
+                        $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $filterValue;
+                    }
+                    break;
+
                 case 'media_types':
                     $filterLabel = $translate('Media types'); // @translate
                     foreach ($flatArray($value) as $subKey => $subValue) {

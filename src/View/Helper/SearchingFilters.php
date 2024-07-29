@@ -355,6 +355,20 @@ class SearchingFilters extends AbstractHelper
                     }
                     break;
 
+                case 'item_sets_tree':
+                    $filterLabel = $translate('Item sets tree'); // @translate
+                    $isId = is_array($value) && key($value) === 'id';
+                    foreach (array_filter($flatArray($value), 'is_numeric') as $subKey => $subValue) {
+                        try {
+                            $filterValue = $api->read('item_sets', $subValue)->getContent()->displayTitle();
+                        } catch (NotFoundException $e) {
+                            $filterValue = $translate('Unknown item set');
+                        }
+                        $urlQuery = $isId ? $this->urlQueryId($key, $subKey) : $this->urlQuery($key, $subKey);
+                        $filters[$filterLabel][$urlQuery] = $filterValue;
+                    }
+                    break;
+
                 case 'thesaurus':
                     $is = $translate('is'); // @translate
                     foreach ($query['thesaurus'] as $term => $itemIds) {

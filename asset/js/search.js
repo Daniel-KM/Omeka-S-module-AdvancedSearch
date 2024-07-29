@@ -188,6 +188,37 @@ $(document).ready(function() {
 
     /* Facets. */
 
+    const SearchFacets = (function() {
+        var self = {};
+
+        self.facetExpandOrCollapse = function (button) {
+            button = $(button);
+            if (button.hasClass('expand')) {
+                button.attr('aria-label', button.attr('data-label-expand') ? button.attr('data-label-expand') : Omeka.jsTranslate('Expand'));
+                button.closest('.facet').find('.facet-elements').attr('hidden', 'hidden');
+            } else {
+                button.attr('aria-label', button.attr('data-label-expand') ? button.attr('data-label-collapse') : Omeka.jsTranslate('Collapse'));
+                button.closest('.facet').find('.facet-elements').removeAttr('hidden');
+            }
+            return self;
+        }
+
+        self.facetSeeMoreOrLess = function (button) {
+            button = $(button);
+            if (button.hasClass('expand')) {
+                button.text(button.attr('data-label-see-more') ? button.attr('data-label-see-more') : Omeka.jsTranslate('See more'));
+                const defaultCount = Number(button.attr('data-default-count')) + 1;
+                button.closest('.facet').find('.facet-items .facet-item:nth-child(n+' + defaultCount + ')').attr('hidden', 'hidden');
+            } else {
+                button.text(button.attr('data-label-see-less') ? button.attr('data-label-see-less') : Omeka.jsTranslate('See less'));
+                button.closest('.facet').find('.facet-items .facet-item').removeAttr('hidden');
+            }
+            return self;
+        }
+
+        return self;
+    })();
+
     $('.facets-active a').on('click', function(e) {
         // Reload with the link when there is no button to apply facets.
         if (!$('.facets-apply').length) {
@@ -298,29 +329,6 @@ $(document).ready(function() {
             .find('textarea, :text, select').val('');
     });
 
-    function facetExpandOrCollapse(button) {
-        button = $(button);
-        if (button.hasClass('expand')) {
-            button.attr('aria-label', button.attr('data-label-expand') ? button.attr('data-label-expand') : Omeka.jsTranslate('Expand'));
-            button.closest('.facet').find('.facet-elements').attr('hidden', 'hidden');
-        } else {
-            button.attr('aria-label', button.attr('data-label-expand') ? button.attr('data-label-collapse') : Omeka.jsTranslate('Collapse'));
-            button.closest('.facet').find('.facet-elements').removeAttr('hidden');
-        }
-    }
-
-    function facetSeeMoreOrLess(button) {
-        button = $(button);
-        if (button.hasClass('expand')) {
-            button.text(button.attr('data-label-see-more') ? button.attr('data-label-see-more') : Omeka.jsTranslate('See more'));
-            const defaultCount = Number(button.attr('data-default-count')) + 1;
-            button.closest('.facet').find('.facet-items .facet-item:nth-child(n+' + defaultCount + ')').attr('hidden', 'hidden');
-        } else {
-            button.text(button.attr('data-label-see-less') ? button.attr('data-label-see-less') : Omeka.jsTranslate('See less'));
-            button.closest('.facet').find('.facet-items .facet-item').removeAttr('hidden');
-        }
-    }
-
     $('.facets').on('click', '.facet-button, .facet-see-more-or-less', function() {
         const button = $(this);
         if (button.hasClass('expand')) {
@@ -329,13 +337,15 @@ $(document).ready(function() {
             $(this).removeClass('collapse').addClass('expand');
         }
         if (button.hasClass('facet-see-more-or-less')) {
-            facetSeeMoreOrLess(button);
+            SearchFacets.facetSeeMoreOrLess(button);
         } else {
-            facetExpandOrCollapse(button);
+            SearchFacets.facetExpandOrCollapse(button);
         }
     });
 
-    $('.facet-see-more-or-less').each((index, button) => facetSeeMoreOrLess(button));
+    /* Init facets */
+
+    $('.facet-see-more-or-less').each((index, button) => SearchFacets.facetSeeMoreOrLess(button));
 
     /**
      * Search range double / sliders

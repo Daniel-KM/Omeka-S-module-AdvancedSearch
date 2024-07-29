@@ -4,7 +4,6 @@ namespace AdvancedSearch\View\Helper;
 
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use AdvancedSearch\Query;
-use AdvancedSearch\Stdlib\SearchResources;
 use Laminas\View\Helper\AbstractHelper;
 use Omeka\Api\Exception\NotFoundException;
 

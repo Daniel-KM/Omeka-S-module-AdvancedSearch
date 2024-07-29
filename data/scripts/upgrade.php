@@ -1030,7 +1030,7 @@ The list of issues is available in logs too.' // @translate
             $messages[] = $message;
         }
         if (empty($config['advancedsearch_skip_exception'])) {
-            throw new \Omeka\Module\Exception\ModuleCannotInstallException(implode("\n\n", array_map(fn($message) => (string) $message->setTranslator($translator), $messages)));
+            throw new \Omeka\Module\Exception\ModuleCannotInstallException(implode("\n\n", array_map(fn ($message) => (string) $message->setTranslator($translator), $messages)));
         }
         $messenger->addErrors($messages);
         $message = new PsrMessage(

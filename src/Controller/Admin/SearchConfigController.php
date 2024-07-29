@@ -717,7 +717,7 @@ class SearchConfigController extends AbstractActionController
         }
 
         $collections = [
-            'form'=> 'filters',
+            'form' => 'filters',
             'display' => 'sort_list',
             'facet' => 'facets',
         ];

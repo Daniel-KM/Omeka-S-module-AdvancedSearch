@@ -187,7 +187,7 @@ class InternalAdapter extends AbstractAdapter
         // There is no default score sort, except for full text search.
         // According to mysql, the default for relevance is "desc".
         $sortFields = [
-            'relevance desc' =>$translator->translate('Relevance'), // @translate
+            'relevance desc' => $translator->translate('Relevance'), // @translate
             'relevance asc' => $translator->translate('Relevance (inversed)'), // @translate
         ];
 

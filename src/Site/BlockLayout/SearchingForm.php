@@ -3,7 +3,6 @@
 namespace AdvancedSearch\Site\BlockLayout;
 
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
-use AdvancedSearch\Response;
 use Laminas\View\Renderer\PhpRenderer;
 use Omeka\Api\Representation\SitePageBlockRepresentation;
 use Omeka\Api\Representation\SitePageRepresentation;

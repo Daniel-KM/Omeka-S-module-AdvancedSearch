@@ -24,7 +24,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 'type' => Element\Select::class,
                 'options' => [
                     'label' => 'Field', // @translate
-                    'info' =>'The field is an index available in the search engine. The internal search engine supports property terms and aggregated fields (date, author, etc).', // @translate
+                    'info' => 'The field is an index available in the search engine. The internal search engine supports property terms and aggregated fields (date, author, etc).', // @translate
                     'value_options' => $availableFields,
                     'empty_option' => '',
                 ],

@@ -270,7 +270,7 @@ class ApiSearch extends AbstractPlugin
 
         /** @see \AdvancedSearch\Form\Admin\ApiFormConfigFieldset */
 
-         // Begin building the search query.
+        // Begin building the search query.
         $resourceType = $request->getResource();
         $searchConfigSettings = $this->searchConfig->settings();
         $searchFormSettings = $searchConfigSettings['form'] ?? [

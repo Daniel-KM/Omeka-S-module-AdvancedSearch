@@ -85,7 +85,7 @@ class RangeDouble extends Element implements InputProviderInterface
     public function getInputSpecification(): array
     {
         return [
-            'name'     => $this->getName(),
+            'name' => $this->getName(),
             'required' => !empty($this->attributes['required']),
         ];
     }

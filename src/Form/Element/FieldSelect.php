@@ -104,9 +104,7 @@ class FieldSelect extends Select implements EventManagerAwareInterface
             }
         }
         // Sort options alphabetically.
-        usort($valueOptions, function ($a, $b) {
-            return strcasecmp($a['label'], $b['label']);
-        });
+        usort($valueOptions, fn ($a, $b) => strcasecmp($a['label'], $b['label']));
         return $valueOptions;
     }
 

@@ -2534,7 +2534,7 @@ class SearchResources
      *
      * The argument uses "has_original", with value "1" or "0".
      */
-    protected function searchHasOriginal(QueryBuilder $qb,array $query): self
+    protected function searchHasOriginal(QueryBuilder $qb, array $query): self
     {
         return $this->searchMediaSpecific($qb, $query, 'has_original');
     }

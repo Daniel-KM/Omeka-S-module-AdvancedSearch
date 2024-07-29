@@ -46,7 +46,7 @@ class FacetActives extends AbstractFacet
                 if (!is_numeric($firstKey)) {
                     $newValues = $currentValues;
                     unset($newValues[$facetKey]);
-                    $newValues = array_filter($newValues, fn($v) => $v !== null && $v !== '');
+                    $newValues = array_filter($newValues, fn ($v) => $v !== null && $v !== '');
                 } else {
                     $newValues = array_diff($currentValues, [$facetValueValue]);
                 }

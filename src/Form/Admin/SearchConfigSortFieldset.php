@@ -16,7 +16,7 @@ class SearchConfigSortFieldset extends Fieldset implements InputFilterProviderIn
         $searchConfig = $this->getOption('search_config');
         $translate = $searchConfig
             ? $searchConfig->getServiceLocator()->get('ViewHelperManager')->get('translate')
-            : fn($v) => $v;
+            : fn ($v) => $v;
 
         $directionLabels = [
             'asc' => $translate('ascendant'), // @ŧranslate
@@ -26,14 +26,14 @@ class SearchConfigSortFieldset extends Fieldset implements InputFilterProviderIn
         // These fields may be overridden by the available fields.
         $availableFields = $this->getAvailableSortFields();
 
-        $sortFromField = function($label, $name) use($translate, $directionLabels): string {
+        $sortFromField = function ($label, $name) use ($translate, $directionLabels): string {
             $labelDirectionPos = mb_strrpos($label, ' ');
             $labelNoDirection = $labelDirectionPos ? trim(mb_substr($label, 0, $labelDirectionPos)) : $label;
             $labelDirection = $labelDirectionPos ? trim(mb_substr($label, $labelDirectionPos), ' ()') : ($name === 'relevance desc' ? '' : $directionLabels['asc']);
             return sprintf('%1$s %2$s (%3$s)', $translate($labelNoDirection), $labelDirection, $name);
         };
 
-        $labelFromField = function($label) use($translate, $directionLabels): string {
+        $labelFromField = function ($label) use ($translate, $directionLabels): string {
             $labelDirectionPos = mb_strrpos($label, ' ');
             $labelNoDirection = $labelDirectionPos ? trim(mb_substr($label, 0, $labelDirectionPos)) : $label;
             $labelDirection = $labelDirectionPos ? trim(mb_substr($label, $labelDirectionPos), ' ()') : $directionLabels['asc'];
@@ -78,7 +78,7 @@ class SearchConfigSortFieldset extends Fieldset implements InputFilterProviderIn
                 'type' => Element\Select::class,
                 'options' => [
                     'label' => 'Sort field', // @translate
-                    'info' =>'The field is an index available in the search engine. The internal search engine supports property terms and aggregated fields (date, author, etc).', // @translate
+                    'info' => 'The field is an index available in the search engine. The internal search engine supports property terms and aggregated fields (date, author, etc).', // @translate
                     'value_options' => $sortFields,
                     'empty_option' => '',
                 ],

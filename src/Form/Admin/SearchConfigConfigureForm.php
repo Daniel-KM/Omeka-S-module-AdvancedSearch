@@ -303,9 +303,9 @@ advanced = Filters = Advanced',
                     'info' => 'List of filters that will be displayed in the search form. Format is "term = Label". The field should exist in all resources fields. Only properties are managed for internal search engine.', // @translate
                     'as_key_value' => true,
                     'key_value_separator' => '=',
-                    'data_keys' => [
-                        'value',
-                        'label',
+                    'data_options' => [
+                        'value' => null,
+                        'label' => null,
                     ],
                 ],
                 'attributes' => [
@@ -697,9 +697,9 @@ nlres = is not linked with resource with ID
                     'info' => 'List of sort fields that will be displayed in the search page. Format is "term dir = Label".', // @translate
                     'as_key_value' => true,
                     'key_value_separator' => '=',
-                    'data_keys' => [
-                        'name',
-                        'label',
+                    'data_options' => [
+                        'name' => null,
+                        'label' => null,
                     ],
                 ],
                 'attributes' => [

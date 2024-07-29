@@ -31,16 +31,12 @@ class InternalConfigFieldset extends Fieldset
                     'documentation' => 'https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch/-/blob/master/data/configs/search_engine.internal.php',
                     'as_key_value' => true,
                     'key_value_separator' => '=',
-                    'data_keys' => [
-                        'name',
-                        'label',
-                        'fields',
-                    ],
-                    'data_array_keys' => [
+                    'data_options' => [
+                        'name' => null,
+                        'label' => null,
                         'fields' => ',',
                     ],
                     'data_text_mode' => 'last_is_list',
-
                 ],
                 'attributes' => [
                     'id' => 'multifields',

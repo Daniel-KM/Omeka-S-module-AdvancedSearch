@@ -1240,7 +1240,7 @@ SQL;
             $connection->executeStatement($sql, [
                 $searchEngineConfig['o:name'],
                 $searchEngineConfig['o:adapter'],
-                json_encode($searchEngineConfig['o:settings'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+                json_encode($searchEngineConfig['o:settings']),
             ]);
             $searchEngineId = $connection->fetchOne($sqlSearchEngineId);
             $message = new PsrMessage(
@@ -1275,7 +1275,7 @@ VALUES
 SQL;
             $suggesterSettings = require __DIR__ . '/data/configs/search_suggester.internal.php';
             $connection->executeStatement($sql, [
-                json_encode($suggesterSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+                json_encode($suggesterSettings),
             ]);
             $suggesterId = (int) $connection->fetchOne($sqlSuggesterId);
             $message = new PsrMessage(
@@ -1311,17 +1311,18 @@ SQL;
                 $searchConfigConfig['o:name'],
                 $searchConfigConfig['o:path'],
                 $searchConfigConfig['o:form'],
-                json_encode($searchConfigConfig['o:settings'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+                json_encode($searchConfigConfig['o:settings']),
             ]);
 
             $searchConfigId = $connection->fetchOne($sqlSearchConfigId);
             $message = new PsrMessage(
-                'The default search config can be {link_url}edited{link_end} and configured in the {link_url_2}main settings{link_end} for admin search and in each site settings for public search.', // @translate
+                'The default search config can be {link_1}edited{link_end}, {link_2}configured{link_end} and defined in the {link_3}main settings{link_end} for admin search and in each site settings for public search.', // @translate
                 [
-                    // Don't use the url helper, the route is not available during install.
-                    'link_url' => sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager/config/' . $searchConfigId . '/edit'),
+                    // Don't use the module routes: they are not available during install.
                     'link_end' => '</a>',
-                    'link_url_2' => sprintf('<a href="%s">', $urlHelper('admin') . '/setting#advancedsearch_main_config'),
+                    'link_1' => sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager/config/' . $searchConfigId . '/edit'),
+                    'link_2' => sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager/config/' . $searchConfigId . '/configure'),
+                    'link_3' => sprintf('<a href="%s">', $urlHelper('admin') . '/setting#advancedsearch_main_config'),
                 ]
             );
             $message->setEscapeHtml(false);

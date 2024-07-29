@@ -22,7 +22,7 @@ return [
             'default_query' => '',
             // Generally sort, but allows to force page, facets, etc.
             'default_query_post' => '',
-            'hidden_query_filters' => '',
+            'hidden_query_filters' => [],
             'fulltext_search' => '',
             'validate_form' => false,
         ],
@@ -31,6 +31,7 @@ return [
             'suggester' => 1,
             'url' => '',
             'url_param_name' => '',
+            'limit' => null,
         ],
 
         'form' => [
@@ -71,7 +72,7 @@ return [
                 [
                     'field' => 'advanced',
                     'label' => $translate('Filters'),
-                    'type' => $translate('Advanced'),
+                    'type' => 'Advanced',
                     'fields' => [
                         'title' => [
                             'value' => 'title',

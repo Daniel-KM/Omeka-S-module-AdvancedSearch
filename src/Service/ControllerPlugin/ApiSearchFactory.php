@@ -40,7 +40,7 @@ class ApiSearchFactory implements FactoryInterface
             $api,
             $services->get('Omeka\Acl'),
             $services->get('Omeka\ApiAdapterManager'),
-            $services->get('Search\FormAdapterManager')->get('api'),
+            $services->get('AdvancedSearch\FormAdapterManager')->get('api'),
             $services->get('EasyMeta'),
             $services->get('Omeka\EntityManager'),
             $services->get('Omeka\Logger'),

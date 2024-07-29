@@ -43,7 +43,6 @@ use Common\Stdlib\PsrMessage;
 use Common\TraitModule;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
-use Laminas\ModuleManager\ModuleManager;
 use Laminas\Mvc\MvcEvent;
 use Omeka\Entity\Resource;
 use Omeka\Module\AbstractModule;
@@ -62,27 +61,6 @@ class Module extends AbstractModule
      * @var bool
      */
     protected $isBatchUpdate;
-
-    public function init(ModuleManager $moduleManager): void
-    {
-        /** @var \Laminas\ModuleManager\Listener\ServiceListenerInterface $serviceListerner */
-        $serviceListener = $moduleManager->getEvent()->getParam('ServiceManager')
-            ->get('ServiceListener');
-
-        // Keep old name for compatibility with other modules.
-        $serviceListener->addServiceManager(
-            'Search\AdapterManager',
-            'search_adapters',
-            Feature\AdapterProviderInterface::class,
-            'getSearchAdapterConfig'
-        );
-        $serviceListener->addServiceManager(
-            'Search\FormAdapterManager',
-            'search_form_adapters',
-            Feature\FormAdapterProviderInterface::class,
-            'getSearchFormAdapterConfig'
-        );
-    }
 
     public function onBootstrap(MvcEvent $event): void
     {

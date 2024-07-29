@@ -23,8 +23,8 @@ return [
             Mvc\MvcListeners::class => Mvc\MvcListeners::class,
         ],
         'factories' => [
-            'Search\AdapterManager' => Service\AdapterManagerFactory::class,
-            'Search\FormAdapterManager' => Service\FormAdapterManagerFactory::class,
+            'AdvancedSearch\AdapterManager' => Service\Adapter\ManagerFactory::class,
+            'AdvancedSearch\FormAdapterManager' => Service\FormAdapter\ManagerFactory::class,
         ],
         'delegators' => [
             'Omeka\ApiManager' => [
@@ -349,12 +349,12 @@ return [
         'Try to map automatically the metadata and the properties that are not mapped yet with the fields of the index', // @translate
         '[Edit below]', // @translate
     ],
-    'search_adapters' => [
+    'advanced_search_adapters' => [
         'factories' => [
             'internal' => Service\Adapter\InternalAdapterFactory::class,
         ],
     ],
-    'search_form_adapters' => [
+    'advanced_search_form_adapters' => [
         'invokables' => [
             'main' => FormAdapter\MainFormAdapter::class,
         ],

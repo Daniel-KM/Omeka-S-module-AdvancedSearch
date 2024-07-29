@@ -319,7 +319,7 @@ return [
         ],
         'AdvancedSearch\Config' => [
             [
-                'label' => 'Manage', // @translate
+                'label' => 'Settings', // @translate
                 'route' => 'admin/search-manager/config-id',
                 'resource' => Controller\Admin\SearchConfigController::class,
                 'action' => 'edit',

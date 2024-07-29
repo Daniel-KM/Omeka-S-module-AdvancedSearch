@@ -74,13 +74,13 @@ class SearchConfigConfigureForm extends Form
 
         $this
             ->add([
-                'name' => 'search',
+                'name' => 'request',
                 'type' => Fieldset::class,
                 'options' => [
-                    'label' => 'Search settings', // @translate
+                    'label' => 'Request', // @translate
                 ],
             ])
-            ->get('search')
+            ->get('request')
             ->add([
                 'name' => 'default_results',
                 'type' => Element\Radio::class,
@@ -167,7 +167,7 @@ class SearchConfigConfigureForm extends Form
                 'name' => 'autosuggest',
                 'type' => Fieldset::class,
                 'options' => [
-                    'label' => 'Auto-suggestions', // @translate
+                    'label' => 'Auto-suggestion', // @translate
                 ],
             ])
             ->get('autosuggest')
@@ -458,7 +458,8 @@ class SearchConfigConfigureForm extends Form
                 'name' => 'display',
                 'type' => Fieldset::class,
                 'options' => [
-                    'label' => 'Results display (when supported by theme)', // @translate
+                    'label' => 'Display', // @translate
+'info' => 'sfqsdf',
                 ],
             ])
             ->get('display')
@@ -744,11 +745,12 @@ class SearchConfigConfigureForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'per_page',
-                    'placeholder' => '10 = Results by 10
-25 = Results by 25
-50 = Results by 50
-100 = Results by 100
-',
+                    'placeholder' => <<<'STRING'
+                        10 = Results by 10
+                        25 = Results by 25
+                        50 = Results by 50
+                        100 = Results by 100
+                        STRING,
                     'rows' => 6,
                 ],
             ])
@@ -758,14 +760,14 @@ class SearchConfigConfigureForm extends Form
 
         $this
             ->add([
-                'name' => 'sort',
+                'name' => 'sorting',
                 'type' => Fieldset::class,
                 'options' => [
                     // Avoid a bad translation.
                     'label' => 'Sorting', // @translate
                 ],
             ])
-            ->get('sort')
+            ->get('sorting')
             // field (term + asc/desc) = label (+ asc/desc) (order means weight).
             ->add([
                 'name' => 'label',

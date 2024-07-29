@@ -19,7 +19,7 @@ return [
     'o:engine' => ['o:id' => 1],
     'o:form' => 'main',
     'o:settings' => [
-        'search' => [
+        'request' => [
             'default_results' => 'default',
             'default_query' => '',
             // Generally sort, but allows to force page, facets, etc.
@@ -29,6 +29,7 @@ return [
             'validate_form' => false,
         ],
 
+        // To be moved: this is only for the first form filter q.
         'autosuggest' => [
             'suggester' => 1,
             'url' => '',
@@ -223,7 +224,7 @@ return [
             ],
         ],
 
-        'sort' => [
+        'sorting' => [
             'label' => $translate('Sort'),
             'fields' => [
                 'relevance desc' => [

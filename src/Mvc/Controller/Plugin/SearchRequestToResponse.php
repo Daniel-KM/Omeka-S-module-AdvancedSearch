@@ -128,7 +128,7 @@ class SearchRequestToResponse extends AbstractPlugin
             $settings = $plugins->get('settings')();
             $perPage = (int) $settings->get('pagination_per_page', Paginator::PER_PAGE);
         }
-        $searchFormSettings['search']['per_page'] = $perPage ?: Paginator::PER_PAGE;
+        $searchFormSettings['request']['per_page'] = $perPage ?: Paginator::PER_PAGE;
 
         // Facets are needed to check active facets with range, where the
         // default value should be skipped.
@@ -138,7 +138,7 @@ class SearchRequestToResponse extends AbstractPlugin
         $query = $formAdapter->toQuery($request, $searchFormSettings);
 
         // Append hidden query if any (filter, date range filter, filter query).
-        $hiddenFilters = $searchConfigSettings['search']['hidden_query_filters'] ?? [];
+        $hiddenFilters = $searchConfigSettings['request']['hidden_query_filters'] ?? [];
         if ($hiddenFilters) {
             // TODO Convert a generic hidden query filters into a specific one?
             // $hiddenFilters = $formAdapter->toQuery($hiddenFilters, $searchFormSettings);
@@ -346,7 +346,7 @@ class SearchRequestToResponse extends AbstractPlugin
      */
     protected function getSortOptions(): array
     {
-        $sortFieldsSettings = $this->searchConfig->subSetting('sort', 'fields', []);
+        $sortFieldsSettings = $this->searchConfig->subSetting('sorting', 'fields', []);
         if (empty($sortFieldsSettings)) {
             return [];
         }

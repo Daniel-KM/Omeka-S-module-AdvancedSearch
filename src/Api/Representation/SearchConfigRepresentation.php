@@ -166,17 +166,47 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
 
     public function setting(string $name, $default = null)
     {
+        $name = $this->settingCheckName($name);
         return $this->resource->getSettings()[$name] ?? $default;
     }
 
     public function subSetting(string $mainName, string $name, $default = null)
     {
+        $mainName = $this->settingCheckName($mainName);
         return $this->resource->getSettings()[$mainName][$name] ?? $default;
     }
 
     public function subSubSetting(string $mainName, string $name, string $subName, $default = null)
     {
+        $mainName = $this->settingCheckName($mainName);
         return $this->resource->getSettings()[$mainName][$name][$subName] ?? $default;
+    }
+
+    /**
+     * Log issues for deprecated themes.
+     */
+    protected function settingCheckName(string $mainName): ?string
+    {
+        if ($mainName === 'search') {
+            $services = $this->getServiceLocator();
+            $logger = $services->get('Omeka\Logger');
+            $message = new PsrMessage(
+                'The search config setting "{old}" was renamed "{new}". You should update your theme.', // @translate
+                ['old' => 'search', 'new' => 'request']
+            );
+            $logger->err($message->getMessage(), $message->getContext());
+            return 'request';
+        } elseif ($mainName === 'sort') {
+            $services = $this->getServiceLocator();
+            $logger = $services->get('Omeka\Logger');
+            $message = new PsrMessage(
+                'The search config setting "{old}" was renamed "{new}". You should update your theme.', // @translate
+                ['old' => 'sort', 'new' => 'sorting']
+            );
+            $logger->err($message->getMessage(), $message->getContext());
+            return 'sorting';
+        }
+        return $mainName;
     }
 
     public function created(): \DateTime

@@ -28,7 +28,7 @@
  */
 
 /**
- * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var Laminas\View\Renderer\PhpRenderer|Laminas\Form\View\HelperTrait $this
  * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
  * @var \AdvancedSearch\Form\Admin\SearchConfigConfigureForm $form
  */
@@ -50,6 +50,11 @@ if (empty($adapter)) {
 }
 
 $form->prepare();
+
+$navTab = [];
+foreach ($form->getFieldsets() as $fieldset) {
+    $navTab[$fieldset->getName()] = $translate($fieldset->getLabel());
+}
 ?>
 
 <?= $this->pageTitle(sprintf($translate('Search page "%1$s" (%2$s)'), $searchConfig->name(), $searchConfig->slug())) ?>
@@ -62,4 +67,19 @@ $form->prepare();
     <?= $this->navigation('Laminas\Navigation\AdvancedSearch\Config')->menu() ?>
 </nav>
 
-<?= $this->form($form) ?>
+<?= $this->form()->openTag($form) ?>
+
+<nav class="section-nav sub-section-nav ">
+    <?= $this->sectionNav($navTab, null, $searchConfig) ?>
+</nav>
+
+<?php $next = -1; ?>
+<?php foreach ($form->getFieldsets() as $name => $fieldset): ?>
+<?= $this->formCollection($fieldset->setAttributes(['id' => $name, 'class' => 'section' . (++$next ? '' : ' active') , 'aria-labelledby' => $name . '-label'])) ?>
+<?php endforeach; ?>
+
+<?php foreach ($form->getElements() as $element): ?>
+<?= $this->formElement($element) ?>
+<?php endforeach; ?>
+
+<?= $this->form()->closeTag() ?>

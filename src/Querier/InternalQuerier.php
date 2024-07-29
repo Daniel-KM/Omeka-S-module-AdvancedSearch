@@ -936,6 +936,7 @@ SQL;
                 'filters' => [
                     'languages' => $facetData['languages'] ?? [],
                     'main_types' => $facetData['main_types'] ?? [],
+                    'data_types' => $facetData['data_types'] ?? [],
                 ],
             ];
             // Manage an exception for facet ranges: skip limit and order.

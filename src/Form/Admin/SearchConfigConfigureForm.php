@@ -880,7 +880,7 @@ new = does not end with
                 'type' => CommonElement\IniTextarea::class,
                 'options' => [
                     'label' => 'List of facets', // @translate
-                    'info' => 'List of facets that will be displayed in the search page, formatted as ini. The section is a unique name. Keys are: field, languages, main_types, label, type, order, limit, display_list, display_count, options.', // @translate
+                    'info' => 'List of facets that will be displayed in the search page, formatted as ini. The section is a unique name. Keys are: field, languages, data_types, main_types, label, type, order, limit, display_list, display_count, options.', // @translate
                     // TODO Convert documentation into help. See application/view/common/form-row.phtml
                     'documentation' => nl2br(<<<'MARKDOWN'
                         #"></a>
@@ -890,6 +890,7 @@ new = does not end with
                         - "Tree" can be used for item sets when module ItemSetsTree is enabled and data indexed recursively.
                         - Order may be "default", "alphabetic asc", "alphabetic desc", "total asc", "total desc".
                         - "languages" allows to filter values by language. It is a single or list of language codes. To get the values without language too, use "null".
+                        - "data_types" allows to filter values by some specific data types, for example a custom vocab.
                         - "main_types" allows to filter values by main data type ("literal", "uri" or "resource").
                         <a style="display: none" href="#
                         MARKDOWN), // @translate

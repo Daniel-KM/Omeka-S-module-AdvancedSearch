@@ -360,7 +360,7 @@ var Omeka = {
                     const match = inputName.match(/property\[(\d+)\]\[text\]/);
                     if (match) {
                         const propertyType = form.find(`[name="property[${match[1]}][type]"]`);
-                        if (['eq', 'neq', 'in', 'nin', 'res', 'nres', 'resq', 'nresq', 'list', 'nlist', 'sw', 'nsw', 'ew', 'new', 'near', 'nnear', 'lres', 'nlres', 'lkq', 'nlkq', 'dtp', 'ndtp', 'tp', 'ntp', 'gt', 'gte', 'lte', 'lt']
+                        if (['eq', 'neq', 'in', 'nin', 'sw', 'nsw', 'ew', 'new', 'near', 'nnear', 'lt', 'lte', 'gte', 'gt', 'list', 'nlist', 'res', 'nres', 'resq', 'nresq', 'lres', 'nlres', 'lkq', 'nlkq', 'dtp', 'ndtp', 'tp', 'ntp']
                             .includes(propertyType.val())
                         ) {
                             form.find(`[name="property[${match[1]}][joiner]"]`).prop('name', '');

@@ -84,8 +84,11 @@ var Search = (function() {
             return {
                 query: searchString,
                 suggestions: $.map(answer[searchString].suggestions, function(dataItem) {
-                    return { value: dataItem.term, data: dataItem.weight };
-                })
+                    return {
+                        value: dataItem.term,
+                        data: dataItem.weight,
+                    };
+                }),
             };
         }
         // Managed by module or try the format of jQuery-Autocomplete.
@@ -121,6 +124,8 @@ var Search = (function() {
 })();
 
 $(document).ready(function() {
+
+    const hasAutocomplete = typeof $.fn.autocomplete === 'function';
 
     /**
      * When the simple and the advanced form are the same form.
@@ -271,6 +276,7 @@ $(document).ready(function() {
 
     /**
      * Open advanced search when it is used according to the query.
+     *
      * @todo Check if we are on the advanced search page first.
      * @todo Use focus on load, but don't open autosuggestion on focus.
      */
@@ -278,20 +284,33 @@ $(document).ready(function() {
         $('.advanced-search-form-toggle a').click();
     }
 
+    /**
+     * Init display of results list or grid.
+     */
     var view_type = localStorage.getItem('search_view_type');
     if (!view_type) {
         view_type = 'list';
     }
     $('.search-view-type-' + view_type).click();
 
-    if (typeof $.fn.autocomplete === 'function') {
-        let searchElement = $('.form-search .autosuggest[name=q]');
-        let autosuggestOptions = Search.autosuggestOptions(searchElement);
-        if (autosuggestOptions) searchElement.autocomplete(autosuggestOptions);
-    }
-
+    /**
+     * Init chosen select.
+     */
     if (hasChosenSelect) {
         $('.chosen-select').chosen(Search.chosenOptions);
+    }
+
+    /**
+     * Init autocompletion/autosuggestion of all specified input fields.
+     */
+    if (hasAutocomplete) {
+        let searchElement = $('.form-search .autosuggest[name=q]');
+        if (searchElement) {
+            let autosuggestOptions = Search.autosuggestOptions(searchElement);
+            if (autosuggestOptions) {
+                searchElement.autocomplete(autosuggestOptions);
+            }
+        }
     }
 
 });

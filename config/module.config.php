@@ -62,6 +62,7 @@ return [
             'facetSelect' => View\Helper\FacetSelect::class,
             'facetSelectRange' => View\Helper\FacetSelectRange::class,
             'formMultiText' => Form\View\Helper\FormMultiText::class,
+            'formRangeDouble' => Form\View\Helper\FormRangeDouble::class,
             'getSearchConfig' => View\Helper\GetSearchConfig::class,
             'hiddenInputsFromFilteredQuery' => View\Helper\HiddenInputsFromFilteredQuery::class,
             'searchConfigCurrent' => View\Helper\SearchConfigCurrent::class,

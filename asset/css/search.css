@@ -371,6 +371,7 @@
     }
 
     /* Search range */
+    /* The color of the slider is managed via js with linear-gradient. */
 
     .range-double {
         display: flex;

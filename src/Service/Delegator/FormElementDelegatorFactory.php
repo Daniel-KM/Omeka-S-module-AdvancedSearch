@@ -13,6 +13,7 @@ class FormElementDelegatorFactory implements DelegatorFactoryInterface
         $formElement = $callback();
         return $formElement
             ->addClass(\AdvancedSearch\Form\Element\MultiText::class, 'formMultiText')
+            ->addClass(\AdvancedSearch\Form\Element\RangeDouble::class, 'formRangeDouble')
         ;
     }
 }

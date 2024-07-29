@@ -1,0 +1,57 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \AdvancedSearch\Form\Element\RangeDouble $element
+ *
+ * @uses \Laminas\Form\View\Helper\FormInput
+ *
+ * @todo Use formRange() and formNumber()?
+ * Attributes "min", "max" and "step" may be set as attributes of main element.
+ */
+
+$plugins = $this->getHelperPluginManager();
+$escape = $plugins->get('escapeHtml');
+$formInput = $plugins->get('formInput');
+$escapeAttr = $plugins->get('escapeHtmlAttr');
+
+$this->headScript()->appendFile(
+    $this->assetUrl('js/recaptcha.js', 'Omeka')
+);
+
+$name = $element->getName();
+$value = $element->getValue();
+$attributes = $element->getAttributes();
+$keyFrom = $element->getKeyFrom();
+$keyTo = $element->getKeyTo();
+$useInputRange = $element->getUseInputRange();
+$useInputNumber = $element->getUseInputNumber();
+?>
+
+<div class="range-double<?= isset($attributes['class']) ? $escapeAttr($attributes['class']) : '' ?>">
+    <?php if ($useInputRange):
+        $attributesFrom = ['name' => sprintf('%s[%s]', $name, $keyFrom), 'type' => 'range', 'value' => $value[$keyFrom] ?? $attributes['min'] ?? '', 'class' => 'range-slider-from'] + $attributes;
+        $attributesTo = ['name' => sprintf('%s[%s]', $name, $keyTo), 'type' => 'range', 'value' => $value[$keyTo] ?? $attributes['max'] ?? '', 'class' => 'range-slider-to'] + $attributes;
+        ?>
+    <div class="range-sliders">
+        <input <?= $formInput->createAttributesString($attributesFrom) ?>/>
+        <input <?= $formInput->createAttributesString($attributesTo) ?>/>
+    </div>
+    <?php endif; ?>
+    <?php if ($useInputNumber):
+        $labelFrom = $element->getLabelFrom();
+        $labelTo = $element->getLabelTo();
+        $attributesFrom = ['name' => sprintf('%s[%s]', $name, $keyFrom), 'type' => 'number', 'value' => $value[$keyFrom] ?? $attributes['min'] ?? '', 'class' => 'range-numeric-from'] + $attributes;
+        $attributesTo = ['name' => sprintf('%s[%s]', $name, $keyTo), 'type' => 'number', 'value' => $value[$keyTo] ?? $attributes['max'] ?? '', 'class' => 'range-numeric-to'] + $attributes;
+        ?>
+    <div class="range-numerics">
+        <div class="range-numeric">
+            <?= $labelFrom ? sprintf('<span class="range-numeric-label range-numeric-from-label">%s</span>', $escape($labelFrom)) : '' ?>
+            <input <?= $formInput->createAttributesString($attributesFrom) ?>/>
+        </div>
+        <div class="range-numeric">
+            <?= $labelFrom ? sprintf('<span class="range-numeric-label range-numeric-to-label">%s</span>', $escape($labelTo)) : '' ?>
+            <input <?= $formInput->createAttributesString($attributesTo) ?>/>
+        </div>
+    </div>
+    <?php endif; ?>
+</div>

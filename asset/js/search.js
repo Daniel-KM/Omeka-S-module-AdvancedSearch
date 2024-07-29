@@ -418,18 +418,21 @@ var Search = (function() {
         return self;
     }
 
+    /**
+    * Search range double / sliders.
+    *
+    * "min" and "max" values are required to compute color.
+    *
+    * @todo Get slider colors from the css.
+    * @see https://medium.com/@predragdavidovic10/native-dual-range-slider-html-css-javascript-91e778134816
+    */
     self.rangeSliderDouble = (function() {
         var self = {};
 
-        // TODO Get slider colors from the css.
+        self.minDefault = 0;
+        self.maxDefault = 100;
         self.colorRangeDefault = '#a7a7a7';
         self.colorSliderDefault = '#e9e9ed';
-
-        /**
-        * Search range double / sliders.
-        *
-        * @see https://medium.com/@predragdavidovic10/native-dual-range-slider-html-css-javascript-91e778134816
-        */
 
         self.getRangeDoubleElements = function(element) {
             const rangeDouble = element.closest('.range-double');
@@ -478,9 +481,13 @@ var Search = (function() {
         }
 
         self.fillSlider = function(from, to, controlSlider, colorSlider, colorRange) {
-            const rangeDistance = to.max - to.min;
-            const fromPosition = from.value - to.min;
-            const toPosition = to.value - to.min;
+            const minValue = to.min === '' ? self.minDefault : to.min;
+            const maxValue = to.max === '' ? self.maxDefault : to.max;
+            const fromValue = from.value === '' ? minValue : from.value;
+            const toValue = to.value === '' ? maxValue : to.value;
+            const rangeDistance = maxValue - minValue;
+            const fromPosition = fromValue - minValue;
+            const toPosition = toValue - minValue;
             colorSlider = colorSlider ? colorSlider : self.colorSliderDefault;
             colorRange = colorRange ? colorRange : self.colorRangeDefault;
             controlSlider.style.background = `linear-gradient(

@@ -34,11 +34,12 @@ class AbstractFacetTree extends AbstractFacet
 
     protected function prepareFacetData(string $facetField, array $facetValues, array $options): array
     {
+        $facetType = $options['type'] ?? null;
         $isItemSetsTree = $this->itemSetsTree
             && substr($facetField, 0, 14) === 'item_sets_tree';
             // && in_array($facetField, ['item_set', 'item_set_id']);
         $isThesaurus = $this->thesaurus
-            && $options['facets'][$facetField]['type'] === 'Thesaurus';
+            && $facetType === 'Thesaurus';
         if ($isItemSetsTree) {
             $this->tree = $this->itemSetsTreeQuick();
             $result = parent::prepareFacetData($facetField, $facetValues, $options);
@@ -278,11 +279,12 @@ SQL;
      */
     protected function thesaurusQuick(string $facetField, array $options): ?array
     {
-        $facetOptions = $options['facets'][$facetField]['options'];
-        $thesaurusId = empty($facetOptions['id']) && empty($facetOptions['thesaurus'])
-            ? (int) reset($facetOptions)
-            : (int) ($facetOptions['thesaurus'] ?? $facetOptions['id'] ?? 0);
+        $thesaurusId = (int) ($options['options']['thesaurus'] ?? 0);
         if (!$thesaurusId) {
+            $this->logger->__invoke()->err(
+                'For facet "{field}", the thesaurus is not defined. Set it as option thesaurus = id.', // @translate
+                ['field' => $facetField]
+            );
             return null;
         }
         $this->thesaurus->__invoke($thesaurusId);

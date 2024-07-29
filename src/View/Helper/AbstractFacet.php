@@ -17,6 +17,11 @@ class AbstractFacet extends AbstractHelper
     protected $easyMeta;
 
     /**
+     * @var \Omeka\View\Helper\Logger
+     */
+    protected $logger;
+
+    /**
      * @var \Laminas\View\Helper\Partial
      */
     protected $partialHelper;
@@ -76,6 +81,7 @@ class AbstractFacet extends AbstractHelper
         $view = $this->getView();
         $plugins = $view->getHelperPluginManager();
         $this->api = $plugins->get('api');
+        $this->logger = $plugins->get('logger');
         $this->translate = $plugins->get('translate');
         $this->urlHelper = $plugins->get('url');
         $this->easyMeta = $plugins->get('easyMeta')();

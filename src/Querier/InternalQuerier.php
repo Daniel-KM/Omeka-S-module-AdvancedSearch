@@ -862,14 +862,9 @@ SQL;
         /** @var \Reference\Mvc\Controller\Plugin\References $references */
         $references = $this->services->get('ControllerPluginManager')->get('references');
 
-        // @deprecated Will be removed in a future version.
-        $facetLimit = $this->query->getFacetLimit();
-        $facetOrder = $this->query->getFacetOrder();
-        $facetLanguages = $this->query->getFacetLanguages();
-        // $facetFields = $this->query->getFacetFields();
         $facets = $this->query->getFacets();
 
-        $metadataFieldsToNames = [
+        $metadataFieldsToReferenceFields = [
             'resource_name' => 'resource_type',
             'resource_type' => 'resource_type',
             'is_public' => 'is_public',
@@ -879,39 +874,17 @@ SQL;
             'resource_template_id' => 'o:resource_template',
             'item_set_id' => 'o:item_set',
             'access' => 'access',
-            'item_sets_tree' => 'item_sets_tree',
+            'item_sets_tree' => 'o:item_set',
         ];
-
-        // Convert multi-fields into a list of property terms.
-        // Normalize search query keys as omeka keys for items and item sets.
-        $multifields = $this->engine->settingAdapter('multifields', []);
-        $fields = [];
-        foreach ($facets as $facetField => $facetData) {
-            $fields[$facetField] = $metadataFieldsToNames[$facetField]
-                ?? $this->easyMeta->propertyTerm($facetField)
-                ?? $multifields[$facetField]['fields']
-                ?? $facetField;
-        }
-
-        // Manage an exception for module ItemSetsTree: search item sets.
-        $hasItemSetsTree = isset($fields['item_sets_tree']);
-        if ($hasItemSetsTree) {
-            $fields['item_sets_tree'] = 'o:item_set';
-        }
-
-        // Facet counts don't make a distinction by resource type, so they
-        // should be merged here. This is needed as long as there is no single
-        // query for resource (items and item sets together).
-        $facetCountsByField = array_fill_keys(array_keys($facets), []);
-
-        $facetData = $this->query->getOption('facet_display_list', 'available') === 'all'
-            ? $this->argsWithoutActiveFacets
-            : $this->args;
 
         $facetOrders = [
             'alphabetic asc' => [
                 'sort_by' => 'alphabetic',
                 'sort_order' => 'ASC',
+            ],
+            'alphabetic desc' => [
+                'sort_by' => 'alphabetic',
+                'sort_order' => 'DESC',
             ],
             'total asc' => [
                 'sort_by' => 'total',
@@ -926,84 +899,87 @@ SQL;
                 'sort_order' => 'ASC',
             ],
         ];
-        if (!isset($facetOrders[$facetOrder])) {
-            $facetOrder = 'default';
+
+        // Convert multi-fields into a list of property terms.
+        $multifields = $this->engine->settingAdapter('multifields', []);
+
+        // Normalize search query keys as omeka keys for items and item sets.
+        // TODO Manages individual options for range, main data types, data types.
+
+        $referenceMetadata = [];
+        $referenceOptions = [
+            'resource_name' => null,
+            'output' => 'associative',
+            'meta_options' => [],
+        ];
+        foreach ($facets as $facetName => $facetData) {
+            if (empty($facetData['field'])) {
+                $this->logger->err(
+                    'The field for the facet "{name}" is not set.', // @translate
+                    ['name' => $facetName]
+                );
+                continue;
+            }
+            // Check for specific fields of the search engine.
+            $facetField = $facetData['field'];
+            $facetField = $metadataFieldsToReferenceFields[$facetField]
+                ?? $this->easyMeta->propertyTerm($facetField)
+                ?? $multifields[$facetField]['fields']
+                ?? $facetField;
+            $referenceMetadata[$facetName] = $facetField;
+            // Check for specific options for the current facet.
+            $order = $facetOrders[$facetData['order'] ?? 'default'] ?? $facetOrders['default'];
+            $facetOptions = [
+                'sort_by' => $order['sort_by'],
+                'sort_order' => $order['sort_order'],
+                'per_page' => $facetData['limit'] ?? 0,
+                'filters' => [
+                    'languages' => $facetData['languages'] ?? [],
+                    'main_types' => $facetData['main_types'] ?? [],
+                ],
+            ];
+            // Manage an exception for facet ranges: skip limit and order.
+            // TODO Add an individual sort_by for numeric facet ranges. Currently "alphabetic" is used, that works fine only for years.
+            // TODO Make InternalQuerier and References manage facet ranges (for now via a manual process here and above and in FacetSelectRange).
+            $isFacetRange = ($facetData['type'] ?? null) === 'SelectRange';
+            if ($isFacetRange) {
+                $facetOptions['sort_by'] = 'alphabetic';
+                $facetOptions['sort_order'] = 'asc';
+                $facetOptions['per_page'] = 0;
+                $facetOptions['is_facet_range'] = true;
+            }
+            $referenceOptions['meta_options'][$facetName] = $facetOptions;
         }
 
+        // Facet counts don't make a distinction by resource type, so they
+        // should be merged here. This is needed as long as there is no single
+        // query for resource (items and item sets together).
+        $facetCountsByField = array_fill_keys(array_keys($facets), []);
+
+        // Like Solr, get all facet values, so all existing values.
+        /** @see https://solr.apache.org/guide/solr/latest/query-guide/faceting.html */
+        $referenceQuery = $this->query->getOption('facet_display_list', 'available') === 'all'
+            ? $this->argsWithoutActiveFacets
+            : $this->args;
+
         foreach ($this->resourceTypes as $resourceType) {
-            // Default options.
-            $options = [
-                'resource_name' => $resourceType,
-                // Options sql.
-                'per_page' => $facetLimit,
-                'page' => 1,
-                'sort_by' => $facetOrders[$facetOrder]['sort_by'],
-                'sort_order' => $facetOrders[$facetOrder]['sort_order'],
-                'filters' => [
-                    'languages' => $facetLanguages,
-                    // 'main_types' => [],
-                    'datatypes' => [],
-                ],
-                'values' => [],
-                // Output options.
-                'first' => false,
-                'initial' => false,
-                'distinct' => false,
-                'type' => false,
-                'lang' => false,
-                'include_without_meta' => false,
-                'output' => 'associative',
-            ];
-
-            // TODO Make References manages individual options for each field (limit, order, languages, range, main data types, data types).
+            $referenceOptions['resource_name'] = $resourceType;
             $values = $references
-                ->setMetadata($fields)
-                ->setQuery($facetData)
-                ->setOptions($options)
+                ->setMetadata($referenceMetadata)
+                ->setQuery($referenceQuery)
+                ->setOptions($referenceOptions)
                 ->list();
-
-            // For facet ranges, the limit and order should be removed.
-            // TODO Add an individual sort_by for numeric facet ranges (currently "alphabetic", that works fine only for years).
-            $optionsFacetRange = $options;
-            $optionsFacetRange['per_page'] = 0;
-            $optionsFacetRange['sort_by'] = 'alphabetic';
-            $optionsFacetRange['sort_order'] = 'asc';
-
-            // TODO Make InternalQuerier and References manage facet ranges (for now via a manual process here and above and in FacetSelectRange).
-            foreach (array_keys($fields) as $facetField) {
-                $isFacetRange = $facets[$facetField]['type'] === 'SelectRange';
-                // Like Solr, get all facet values, so all existing values.
-                /** @see https://solr.apache.org/guide/solr/latest/query-guide/faceting.html */
-                // TODO Remove these double queries for facet range when individual options will be managed.
-                if ($isFacetRange) {
-                    $localValues = $references
-                        ->setMetadata([$facetField => $fields[$facetField]])
-                        ->setQuery($facetData)
-                        ->setOptions($optionsFacetRange)
-                        ->list();
-                } elseif (!empty($facets[$facetField]['options']) && $facets[$facetField]['options'] !== ['value', 'uri', 'resource']) {
-                    $localOptions = $options;
-                    $localOptions['filters']['main_types'] = $facets[$facetField]['options'];
-                    $localValues = $references
-                        ->setMetadata([$facetField => $fields[$facetField]])
-                        ->setQuery($facetData)
-                        ->setOptions($localOptions)
-                        ->list();
+            foreach (array_keys($referenceMetadata) as $facetName) foreach ($values[$facetName]['o:references'] ?? [] as $value => $count) {
+                if (empty($facetCountsByField[$facetName][$value])) {
+                    $facetCountsByField[$facetName][$value] = [
+                        'value' => $value,
+                        'count' => $count,
+                    ];
                 } else {
-                    $localValues = $values;
-                }
-                foreach ($localValues[$facetField]['o:references'] ?? [] as $value => $count) {
-                    if (empty($facetCountsByField[$facetField][$value])) {
-                        $facetCountsByField[$facetField][$value] = [
-                            'value' => $value,
-                            'count' => $count,
-                        ];
-                    } else {
-                        $facetCountsByField[$facetField][$value] = [
-                            'value' => $value,
-                            'count' => $count + $facetCountsByField[$facetField][$value]['count'],
-                        ];
-                    }
+                    $facetCountsByField[$facetName][$value] = [
+                        'value' => $value,
+                        'count' => $count + $facetCountsByField[$facetName][$value]['count'],
+                    ];
                 }
             }
         }

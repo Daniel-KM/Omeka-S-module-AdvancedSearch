@@ -100,24 +100,6 @@ class Query implements \JsonSerializable
     protected $facets = [];
 
     /**
-     * @var int
-     * @deprecated Use individual facet array. Will be removed in a future version.
-     */
-    protected $facetLimit = 0;
-
-    /**
-     * @var string
-     * @deprecated Use individual facet array. Will be removed in a future version.
-     */
-    protected $facetOrder = '';
-
-    /**
-     * @var array
-     * @deprecated Use individual facet array. Will be removed in a future version.
-     */
-    protected $facetLanguages = [];
-
-    /**
      * @var array
      */
     protected $activeFacets = [];
@@ -397,98 +379,6 @@ class Query implements \JsonSerializable
         return $this->facets[$facetName] ?? null;
     }
 
-    /**
-     * @deprecated Use facet fields array. Will be removed in a future version.
-     */
-    public function addFacetFields(array $facetFields): self
-    {
-        $this->facets = [];
-        foreach ($facetFields as $facetField) {
-            $facet = [
-                'field' => $facetField,
-                'limit' => $this->facetLimit,
-                'order' => $this->facetOrder,
-                'languages' => $this->facetLanguages,
-            ];
-            $this->facets[$facetField] = $facet;
-        }
-        return $this;
-    }
-
-    /**
-     * @deprecated Use facet fields array. Will be removed in a future version.
-     */
-    public function addFacetField(string $facetField): self
-    {
-        $facet = [
-            'field' => $facetField,
-            'limit' => $this->facetLimit,
-            'order' => $this->facetOrder,
-            'languages' => $this->facetLanguages,
-        ];
-        $this->facets[$facetField] = $facet;
-        return $this;
-    }
-
-    /**
-     * @deprecated Use facet fields array. Will be removed in a future version.
-     */
-    public function getFacetFields(): array
-    {
-        return array_column($this->facets, 'field');
-    }
-
-    /**
-     * @deprecated Use facet fields array. Will be removed in a future version.
-     */
-    public function setFacetLimit(?int $facetLimit): self
-    {
-        $this->facetLimit = (int) $facetLimit;
-        return $this;
-    }
-
-    /**
-     * @deprecated Use facet fields array. Will be removed in a future version.
-     */
-    public function getFacetLimit(): int
-    {
-        return $this->facetLimit;
-    }
-
-    /**
-     * @deprecated Use facet fields array. Will be removed in a future version.
-     */
-    public function setFacetOrder(?string $facetOrder): self
-    {
-        $this->facetOrder = (string) $facetOrder;
-        return $this;
-    }
-
-    /**
-     * @deprecated Use facet fields array. Will be removed in a future version.
-     */
-    public function getFacetOrder(): string
-    {
-        return $this->facetOrder;
-    }
-
-    /**
-     * @deprecated Use facet fields array. Will be removed in a future version.
-     */
-    public function setFacetLanguages(array $facetLanguages): self
-    {
-        $this->facetLanguages = $facetLanguages;
-        return $this;
-    }
-
-    /**
-     * @deprecated Use facet fields array. Will be removed in a future version.
-     */
-    public function getFacetLanguages(): array
-    {
-        return $this->facetLanguages;
-    }
-
     public function setActiveFacets(array $activeFacets): self
     {
         $this->activeFacets = $activeFacets;
@@ -635,20 +525,11 @@ class Query implements \JsonSerializable
             'offset' => $this->getOffset(),
             'limit' => $this->getLimit(),
             'facets' => $this->getFacets(),
-            // Deprecated "facet_fields", "facet_limit", "facet_languages".
-            'facet_fields' => $this->getFacetFields(),
-            'facet_limit' => $this->getFacetLimit(),
-            'facet_languages' => $this->getFacetLanguages(),
             'active_facets' => $this->getActiveFacets(),
             'suggest_options' => $this->getSuggestOptions(),
             'suggest_fields' => $this->getSuggestFields(),
             'excluded_fields' => $this->getExcludedFields(),
             'site_id' => $this->getSiteId(),
-            'deprecated' => [
-                'facet_fields',
-                'facet_limit',
-                'facet_languages',
-            ],
         ];
     }
 }

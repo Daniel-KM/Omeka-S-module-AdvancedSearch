@@ -209,10 +209,7 @@ return [
             'thumbnail_type' => 'medium',
             'allow_html' => false,
             'facets' => 'before',
-        ],
-
-        'pagination' => [
-            'per_page' => [
+            'per_page_list' => [
                 // For translation only.
                 10 => $translate('Results by %d'), // @translate
                 10 => $translate('Results by 10'), // @translate

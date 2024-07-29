@@ -29,7 +29,7 @@ $displayParts = [
 $displayParts = $searchConfig ? $searchConfig->setting('display', $displayParts) : $displayParts;
 $displayParts = array_filter($displayParts, fn ($v) => in_array($v, [$resultPart, 'both']));
 
-$paginationPerPages = isset($displayParts['per_page']) ? $searchConfig->subSetting('pagination', 'per_page') : [];
+$paginationPerPages = isset($displayParts['per_page']) ? $searchConfig->subSetting('display', 'per_page_list') : [];
 $sortFields = isset($displayParts['sort']) ? $searchConfig->subSetting('sorting', 'fields') : [];
 $gridListMode = $searchConfig->subSetting('display', 'grid_list_mode', 'auto');
 $multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['list_only', 'grid_only']);

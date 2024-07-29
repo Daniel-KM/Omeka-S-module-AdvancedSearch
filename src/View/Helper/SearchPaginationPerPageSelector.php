@@ -14,7 +14,7 @@ class SearchPaginationPerPageSelector extends AbstractHelper
     protected $partial = 'search/pagination-per-page-selector';
 
     /**
-     * Option $asUrls allows to include the select in the main form or not.
+     * Option $asUrl allows to include the select in the main form or not.
      * When set, a js reloads the page directly.
      * Anyway, the js can rebuild the url from the values.
      * @todo To avoid a js, a css select (replace select by ul/li + a) can be created in theme.

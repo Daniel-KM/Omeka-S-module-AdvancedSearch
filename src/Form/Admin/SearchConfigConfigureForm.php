@@ -726,32 +726,19 @@ class SearchConfigConfigureForm extends Form
                     'value' => 'before',
                 ],
             ])
-        ;
 
-        // Settings for the results (pagination).
+            // TODO Add the style of pagination (prev/next or list of pages).
 
-        // TODO Add the style of pagination (prev/next or list of pages).
-
-        $this
             ->add([
-                'name' => 'pagination',
-                'type' => Fieldset::class,
-                'options' => [
-                    'label' => 'Pagination', // @translate
-                ],
-            ])
-            ->get('pagination')
-            ->add([
-                'name' => 'per_page',
+                'name' => 'per_page_list',
                 'type' => OmekaElement\ArrayTextarea::class,
                 'options' => [
-                    'label' => 'Results per page', // @translate
-                    'info' => 'If any, the search page will display a select to paginate results.', // @translate
+                    'label' => 'Labels for results per page', // @translate
                     'as_key_value' => true,
                     'key_value_separator' => '=',
                 ],
                 'attributes' => [
-                    'id' => 'per_page',
+                    'id' => 'per_page_list',
                     'placeholder' => <<<'STRING'
                         10 = Results by 10
                         25 = Results by 25

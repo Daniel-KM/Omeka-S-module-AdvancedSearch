@@ -45,6 +45,11 @@ class SearchConfigConfigureForm extends Form
      */
     protected $suggesters = [];
 
+    /**
+     * @var array
+     */
+    protected $thumbnailTypes = [];
+
     public function init(): void
     {
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
@@ -622,6 +627,18 @@ new = does not end with
                 ],
             ])
             ->add([
+                'name' => 'thumbnail_type',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Thumbnail type', // @translate
+                    'value_options' => array_combine($this->thumbnailTypes, $this->thumbnailTypes),
+                ],
+                'attributes' => [
+                    'id' => 'thumbnail_type',
+                    'value' => 'medium',
+                ],
+            ])
+            ->add([
                 'name' => 'facets',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [
@@ -1098,15 +1115,21 @@ new = does not end with
         return $options;
     }
 
+    public function setFormElementManager($formElementManager): self
+    {
+        $this->formElementManager = $formElementManager;
+        return $this;
+    }
+
     public function setSuggesters(array $suggesters): self
     {
         $this->suggesters = $suggesters;
         return $this;
     }
 
-    public function setFormElementManager($formElementManager): self
+    public function setThumbnailTypes(array $thumbnailTypes): self
     {
-        $this->formElementManager = $formElementManager;
+        $this->thumbnailTypes = $thumbnailTypes;
         return $this;
     }
 }

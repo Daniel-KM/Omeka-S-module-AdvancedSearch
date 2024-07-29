@@ -41,6 +41,8 @@ $allThumbnail = $thumbnailMode === 'all';
 $defaultThumbnail = $allThumbnail
     ? sprintf('<img loading="lazy" src="%1$s" title="%2$s"/>', $assetUrl('thumbnails/default.png', 'Omeka', true), $translate('No media'))
     : '';
+
+$thumbnailType = $searchConfig->subSetting('display', 'thumbnail_type', 'medium');
 ?>
 
 <ul class="resource-list search-results-list<?= $gridListMode === 'list_only' ? ' list' : ($gridListMode === 'grid_only' ? ' grid' : '') ?>">
@@ -56,7 +58,7 @@ $defaultThumbnail = $allThumbnail
         ?>
     <li class="resource <?= $resourceType ?>">
         <?php if (!$noThumbnail): ?>
-        <?php $resourceThumbnail = $thumbnail($resource, 'medium'); ?>
+        <?php $resourceThumbnail = $thumbnail($resource, $thumbnailType); ?>
         <div class="resource-thumbnail<?= $resourceThumbnail ? '' : ($allThumbnail ? ' default-thumbnail' : '') ?>">
             <?php if ($resourceThumbnail || $allThumbnail): ?>
             <?= $hyperlink->raw($resourceThumbnail ?: $defaultThumbnail, $resourceUrl, ['class' => 'resource-link']) ?>

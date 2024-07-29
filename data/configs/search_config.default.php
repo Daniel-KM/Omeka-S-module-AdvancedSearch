@@ -194,6 +194,7 @@ return [
             'grid_list' => 'header',
             'grid_list_mode' => 'auto',
             'thumbnail_mode' => 'default',
+            'thumbnail_type' => 'medium',
             'facets' => 'before',
         ],
 

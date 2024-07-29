@@ -323,15 +323,9 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                 case 'filter':
                     // The request filters are the advanced ones in the form settings.
                     // The default query type is "in" (contains).
-                    $joiner = null;
-                    $operator = null;
-                    foreach ($formSettings['filters'] as $filter) {
-                        if (($filter['type'] ?? '') === 'Advanced') {
-                            $joiner = (bool) $filter['field_joiner'];
-                            $operator = (bool) $filter['field_operator'];
-                            break;
-                        }
-                    }
+                    // TODO Clarify the default field joiner an operator between standard fields.
+                    $joiner = !empty($formSettings['advanced']['field_joiner']);
+                    $operator = !empty($formSettings['advanced']['field_operator']);
 
                     // TODO The filter field can be multiple (as array).
 

@@ -432,48 +432,11 @@ class SearchConfigController extends AbstractActionController
      * Adapt the settings for the form to be edited.
      *
      * @todo Adapt the settings via the form itself.
+     *
      * @see data/search_configs/default.php
      */
     protected function prepareDataForForm(array $settings): array
     {
-        // Ok search.
-        // Ok autosuggest.
-        // Ok sort.
-        // Ok facet.
-
-        // Fix form.
-        $settings['form']['filters'] ??= [];
-        if (empty($settings['form']['filters'])) {
-            return $settings;
-        }
-        $keyAdvancedFilter = false;
-        foreach ($settings['form']['filters'] as $keyFilter => $filter) {
-            if (empty($filter['type'])) {
-                continue;
-            }
-            if ($filter['type'] === 'Advanced') {
-                $keyAdvancedFilter = $keyFilter;
-                break;
-            }
-        }
-        if ($keyAdvancedFilter === false) {
-            return $settings;
-        }
-
-        $advanced = $settings['form']['filters'][$keyAdvancedFilter];
-        $settings['form']['advanced'] = $advanced['fields'] ?? [];
-        $settings['form']['default_number'] = (int) ($advanced['default_number'] ?? 1);
-        $settings['form']['max_number'] = (int) ($advanced['max_number'] ?? 10);
-        $settings['form']['field_joiner'] = (bool) ($advanced['field_joiner'] ?? false);
-        $settings['form']['field_joiner_not'] = (bool) ($advanced['field_joiner_not'] ?? false);
-        $settings['form']['field_operator'] = (bool) ($advanced['field_operator'] ?? false);
-        $settings['form']['field_operators'] = $advanced['field_operators'] ?? [];
-        $settings['form']['filters'][$keyAdvancedFilter] = [
-            'field' => 'advanced',
-            'label' => 'Filters',
-            'type' => 'Advanced',
-        ];
-
         // Remove the mode of each facet to simplify config.
         // Simplify some values too (integer and boolean).
         $settings['facet']['mode'] = ($settings['facet']['mode'] ?? null) === 'link' ? 'link' : 'button';
@@ -537,78 +500,76 @@ class SearchConfigController extends AbstractActionController
             'thesaurus' => 'Thesaurus',
         ];
 
-        // The field "advanced" is only for display, so save it with filters.
-        // TODO No more include advanced fields in filters, but still cleaning.
-        $params['form']['filters'] ??= [];
-        $advanced = $params['form']['advanced'] ?? [];
-        $keyAdvanced = false;
-        foreach ($params['form']['filters'] as $keyFilter => $filter) {
+        $filters = [];
+        $i = 0;
+        foreach ($params['form']['filters'] ?? [] as $name => $filter) {
             if (empty($filter['field'])) {
-                unset($params['form']['filters'][$keyFilter]);
                 continue;
             }
-            $filterType = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '', $filter['type'] ?? 'Noop'));
-            if (substr($filterType, 0, 5) === 'omeka') {
-                $subFilterType = trim(substr($filterType, 5), '/ ');
-                $params['form']['filters'][$keyFilter]['type'] = trim('Omeka/' . ($inputTypes[$subFilterType] ?? ucfirst($subFilterType)), '/');
-            } else {
-                $params['form']['filters'][$keyFilter]['type'] = $inputTypes[$filterType] ?? ucfirst($filterType);
-            }
-            if ($filter['type'] === 'Advanced') {
-                if ($keyAdvanced !== false) {
-                    unset($params['form']['filters'][$keyAdvanced]);
-                }
-                $keyAdvanced = $keyFilter;
-            }
-        }
-        $params['form']['filters'] = array_values($params['form']['filters']);
 
-        if ($keyAdvanced === false) {
-            if (!$advanced) {
-                unset(
-                    $params['form']['advanced'],
-                    $params['form']['default_number'],
-                    $params['form']['max_number'],
-                    $params['form']['field_joiner'],
-                    $params['form']['field_joiner_not'],
-                    $params['form']['field_operator'],
-                    $params['form']['field_operators']
-                );
-                return $params;
+            $field = $filter['field'];
+
+            $type = mb_strtolower($filter['type'] ?? '');
+            $type = $inputTypes[$type] ?? ucfirst($type);
+
+            // Key is always "advanced" for advanced filters, so no duplicate.
+            if ($type === 'Advanced') {
+                $name = 'advanced';
+                $filter = [
+                    'field' => 'advanced',
+                    'label' => $filter['label'] ?? '',
+                    'type' => 'Advanced',
+                ] + $filter;
+            } elseif ($type === '') {
+                unset($filter['type']);
             }
-            $params['form']['filters'][] = [
-                'field' => 'advanced',
-                'label' => $this->translate('Filters'), // @translate
-                'type' => 'Advanced',
-            ];
-            $keyAdvanced = key(array_slice($params['form']['filters'], -1, 1, true));
+
+            $name = is_numeric($name) ? $field : $name;
+            $name = $this->slugify($name);
+            if ($name !== 'advanced' && isset($filters[$name])) {
+                $name .= '_' . ++$i;
+            }
+
+            $filters[$name] = $filter;
         }
 
-        $params['form']['filters'][$keyAdvanced]['fields'] = $advanced;
-        $params['form']['filters'][$keyAdvanced]['default_number'] = $params['form']['default_number'] ?? 1;
-        $params['form']['filters'][$keyAdvanced]['max_number'] = $params['form']['max_number'] ?? 10;
-        $params['form']['filters'][$keyAdvanced]['field_joiner'] = $params['form']['field_joiner'] ?? false;
-        $params['form']['filters'][$keyAdvanced]['field_joiner_not'] = $params['form']['field_joiner_not'] ?? false;
-        $params['form']['filters'][$keyAdvanced]['field_operator'] = $params['form']['field_operator'] ?? false;
-        $params['form']['filters'][$keyAdvanced]['field_operators'] = $params['form']['field_operators'] ?? [];
-        unset(
-            $params['form']['advanced'],
-            $params['form']['default_number'],
-            $params['form']['max_number'],
-            $params['form']['field_joiner'],
-            $params['form']['field_joiner_not'],
-            $params['form']['field_operator'],
-            $params['form']['field_operators']
-        );
+        $advanced = $params['form']['advanced'] ?? [];
+        if ($advanced) {
+            // Normalize some keys.
+            $advanced['default_number'] = isset($advanced['default_number']) ? (int) $advanced['default_number'] : 1;
+            $advanced['max_number'] = isset($advanced['max_number']) ? (int) $advanced['max_number'] : 10;
+            $advanced['field_joiner'] = isset($advanced['field_joiner']) ? !empty($advanced['field_joiner']) : true;
+            $advanced['field_joiner_not'] = isset($advanced['field_joiner_not']) ? !empty($advanced['field_joiner_not']) : true;
+            $advanced['field_operator'] = isset($advanced['field_operator']) ? !empty($advanced['field_operator']) : true;
+            $advanced['field_operators'] = isset($advanced['field_operators']) ? (array) $advanced['field_operators'] : [];
+            // Move advanced fields as last key for end user.
+            $advancedFields = $advanced['fields'] ?? [];
+            unset($advanced['fields']);
+            $advanced['fields'] = $advancedFields;
+        }
 
-        // Add the mode to each facets to simplify theme.
+        $params['form']['filters'] = $filters;
+        $params['form']['advanced'] = $advanced;
+
+        // Add the mode to each facet to simplify theme.
         // Simplify some values too (integer and boolean).
         // TODO Explode array options ("|" and "," are supported) early or keep user input?
         // Furthermore, add a warning for languages of facets because it may be
         // a hard to understand issue.
         $facetMode = ($params['facet']['mode'] ?? null) === 'link' ? 'link' : 'button';
         $warnLanguage = false;
-        foreach ($params['facet']['facets'] ?? [] as $key => $facet) {
+        $facets = [];
+        $i = 0;
+        foreach ($params['facet']['facets'] ?? [] as $name => $facet) {
+            if (empty($facet['field'])) {
+                continue;
+            }
+            $field = $facet['field'];
+            $name = is_numeric($name) ? $field : $name;
+            $name = $this->slugify($name);
+            if (isset($facets[$name])) {
+                $name .= '_' . ++$i;
+            }
             $facet['mode'] = $facetMode;
             if (isset($facet['limit'])) {
                 $facet['limit'] = (int) $facet['limit'];
@@ -622,8 +583,10 @@ class SearchConfigController extends AbstractActionController
                     $warnLanguage = true;
                 }
             }
-            $params['facet']['facets'][$key] = $facet;
+            $facets[$name] = $facet;
         }
+        $params['facet']['facets'] = $facets;
+
         if ($warnLanguage) {
             $this->messenger()->addWarning(
                 'Note that you didn’t set an empty language for some facets, so all values without language will be skipped in the facet.' // @translate
@@ -650,5 +613,32 @@ class SearchConfigController extends AbstractActionController
             }
         }
         return $params;
+    }
+
+    /**
+     * Transform the given string into a valid URL slug.
+     *
+     * Unlike site slug slugify, replace with "_" and don't start with a number.
+     *
+     * @see \Omeka\Api\Adapter\SiteSlugTrait::slugify()
+     * @see \AdvancedSearch\Controller\Admin\SearchConfigController::slugify()
+     * @see \BlockPlus\Module::slugify()
+     */
+    protected function slugify($input): string
+    {
+        if (extension_loaded('intl')) {
+            $transliterator = \Transliterator::createFromRules(':: NFD; :: [:Nonspacing Mark:] Remove; :: NFC;');
+            $slug = $transliterator->transliterate((string) $input);
+        } elseif (extension_loaded('iconv')) {
+            $slug = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', (string) $input);
+        } else {
+            $slug = (string) $input;
+        }
+        $slug = mb_strtolower((string) $slug, 'UTF-8');
+        $slug = preg_replace('/[^a-z0-9_]+/u', '_', $slug);
+        $slug = preg_replace('/^\d+$/', '_', $slug);
+        $slug = preg_replace('/_{2,}/', '_', $slug);
+        $slug = preg_replace('/_*$/', '', $slug);
+        return $slug;
     }
 }

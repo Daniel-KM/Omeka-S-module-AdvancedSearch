@@ -234,47 +234,6 @@ class SearchConfigConfigureForm extends Form
             ->get('form')
 
             ->add([
-                'name' => 'filters',
-                'type' => CommonElement\DataTextarea::class,
-                'options' => [
-                    'label' => 'Filters', // @translate
-                    'info' => 'List of filters that will be displayed in the search form. Format is "field = Label = Type = Options". The field should exist in all resources fields.', // @translate
-                    'as_key_value' => false,
-                    'key_value_separator' => '=',
-                    'data_options' => [
-                        'field' => null,
-                        'label' => null,
-                        'type' => null,
-                        'options' => [
-                            'separator' => '|',
-                            'associative' => '=',
-                        ],
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'filters',
-                    // field (term) = label = type = options
-                    'placeholder' => 'item_set_id = Collection = Omeka/Select
-resource_class_id = Class = Omeka/SelectFlat
-dcterms:title = Title = Text
-dcterms:date = Date = DateRange
-dcterms:subject = Subject = MultiCheckbox = alpha | beta | gamma
-dcterms:spatial = Place = Thesaurus = 151
-advanced = Filters = Advanced',
-                    'rows' => 12,
-                ],
-            ])
-            ->add([
-                'name' => 'attribute_form',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'label' => 'Add attribute "form" to input elements', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'attribute_form',
-                ],
-            ])
-            ->add([
                 'name' => 'button_reset',
                 'type' => Element\Checkbox::class,
                 'options' => [
@@ -295,6 +254,37 @@ advanced = Filters = Advanced',
                 ],
             ])
             ->add([
+                'name' => 'attribute_form',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Add attribute "form" to input elements', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'attribute_form',
+                ],
+            ])
+            ->add([
+                'name' => 'filters',
+                'type' => CommonElement\IniTextarea::class,
+                'options' => [
+                    'label' => 'Filters', // @translate
+                    'info' => 'List of filters that will be displayed in the search form, formatted as ini. The section is a unique name. Keys are: field, label, type and specific keys.', // @translate
+                    // TODO Convert documentation into help. See application/view/common/form-row.phtml
+                    'documentation' => nl2br(<<<'MARKDOWN'
+                        #"></a><div class="field-description">
+                        - The input types are: Text (default), Checkbox, Number, Radio, Select, SelectFlat, DateRange, Hidden, MultiCheckbox, MultiSelect, MultiSelectFlat, Thesaurus, and Advanced (list of advanced filters),
+                        - For the type Advanced, use the specific options below.
+                        </div><a style="display: none" href="#
+                        MARKDOWN), // @translate
+                    'ini_typed_mode' => true,
+                ],
+                'attributes' => [
+                    'id' => 'form_filters',
+                    'rows' => 12,
+                    'placeholder' => '',
+                ],
+            ])
+            ->add([
                 'name' => 'available_filters',
                 'type' => OmekaElement\ArrayTextarea::class,
                 'options' => [
@@ -310,26 +300,15 @@ advanced = Filters = Advanced',
                     'rows' => 12,
                 ],
             ])
+            // Advanced is a sub-fieldset of form.
             ->add([
                 'name' => 'advanced',
-                'type' => CommonElement\DataTextarea::class,
+                'type' => Fieldset::class,
                 'options' => [
-                    'label' => 'Advanced filters', // @translate
-                    'info' => 'List of filters that will be displayed in the search form. Format is "term = Label". The field should exist in all resources fields. Only properties are managed for internal search engine.', // @translate
-                    'as_key_value' => true,
-                    'key_value_separator' => '=',
-                    'data_options' => [
-                        'value' => null,
-                        'label' => null,
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'filters',
-                    // field (term) = label (order means weight).
-                    'placeholder' => 'dcterms:title = Title',
-                    'rows' => 12,
+                    'label' => 'Advanced  filters', // @translate
                 ],
             ])
+            ->get('advanced')
             ->add([
                 'name' => 'default_number',
                 'type' => Element\Number::class,
@@ -404,16 +383,33 @@ advanced = Filters = Advanced',
                 ],
                 'attributes' => [
                     'id' => 'field_operators',
+                    'rows' => 12,
                     // This placeholder does not contain all query types.
-                    'placeholder' => 'eq = is exactly
-neq = is not exactly
-in = contains
-nin = does not contain
-sw = starts with
-nsw = does not start with
-ew = ends with
-new = does not end with
-',
+                    'placeholder' => <<<'STRING'
+                        eq = is exactly
+                        in = contains
+                        sw = starts with
+                        ew = ends with
+                        STRING, // @translate
+                ],
+            ])
+            ->add([
+                'name' => 'fields',
+                'type' => CommonElement\DataTextarea::class,
+                'options' => [
+                    'label' => 'Fields', // @translate
+                    'info' => 'List of filters that will be displayed in the search form. Format is "term = Label". The field should exist in all resources fields. Only properties are managed for internal search engine.', // @translate
+                    'as_key_value' => true,
+                    'key_value_separator' => '=',
+                    'data_options' => [
+                        'value' => null,
+                        'label' => null,
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'fields',
+                    // field (term) = label (order means weight).
+                    'placeholder' => 'dcterms:title = Title',
                     'rows' => 12,
                 ],
             ])

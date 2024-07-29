@@ -305,14 +305,7 @@ class SearchingFilters extends AbstractHelper
                         $vrTitles = array_column($qb->getQuery()->getScalarResult(), 'title', 'id');
                     }
 
-                    // To get the name of the advanced fields, a loop should be done for now.
-                    $searchFormAdvancedLabels = [];
-                    foreach ($searchFormSettings['filters'] as $searchFormFilter) {
-                        if ($searchFormFilter['type'] === 'Advanced') {
-                            $searchFormAdvancedLabels = array_column($searchFormFilter['fields'] ?? [], 'label', 'value');
-                            break;
-                        }
-                    }
+                    $searchFormAdvancedLabels = array_column($searchFormSettings['advanced']['fields'] ?? [], 'label', 'value');
                     $fieldFiltersLabels = array_replace($fieldLabels, array_filter($searchFormAdvancedLabels));
 
                     $index = 0;

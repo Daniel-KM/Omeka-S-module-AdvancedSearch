@@ -738,6 +738,7 @@ SQL;
 
 if (version_compare($oldVersion, '3.4.28', '<')) {
     $logger = $services->get('Omeka\Logger');
+    $doUpgrade = !empty($config['advancedsearch_upgrade_3.4.28']);
     $stringsAndMessages = [
         'facet_filters' => [
             'strings' => [
@@ -773,6 +774,14 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
                 ],
             ],
             'message' => 'The template "search/facets" was renamed "search/facets-list". Update it in your theme. Matching templates: {json}', // @translate
+            'script' => [
+                'rename' => <<<'SH'
+                    find 'OMEKA_PATH/themes/' -type f -not -path '*/\.git/*' -not -path '*/vendor/*' -not -path '*/node_modules/*' -wholename '*/view/search/facets.phtml' -exec rename -v 's~facets.phtml~facets-list.phtml~' '{}' \;
+                    SH,
+                'replace' => <<<'SH'
+                    find 'OMEKA_PATH/themes/' -type f -not -path '*/\.git/*' -not -path '*/vendor/*' -not -path '*/node_modules/*' -wholename '*/view/search/*.phtml' -exec sed -i "s~search/facets'~search/facets-list'~g" '{}' \;
+                    SH,
+            ],
         ],
         'resource-list' => [
             'strings' => [
@@ -781,13 +790,19 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
                 ],
             ],
             'message' => 'The template "search/resource-list" was renamed "search/results". Update your theme. Matching templates: {json}', // @translate
+            'script' => [
+                'rename' => <<<'SH'
+                    find 'OMEKA_PATH/themes/' -type f -not -path '*/\.git/*' -not -path '*/vendor/*' -not -path '*/node_modules/*' -wholename '*/view/search/resource-list.phtml' -exec rename -v 's~resource-list.phtml~results.phtml~' '{}' \;
+                    SH,
+                'replace' => <<<'SH'
+                    find 'OMEKA_PATH/themes/' -type f -not -path '*/\.git/*' -not -path '*/vendor/*' -not -path '*/node_modules/*' -wholename '*/view/search/*.phtml' -exec sed -i "s~search/resource-list'~search/results'~g" '{}' \;
+                    SH,
+            ],
         ],
         'results-header-footer' => [
             'strings' => [
                 'themes/*/view/search/*' => [
                     "search/results-header'",
-                ],
-                'themes/*/view/search/*' => [
                     "search/results-footer'",
                 ],
             ],
@@ -800,14 +815,55 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
                 ],
             ],
             'message' => 'The key "per_pages" was renamed "per_page". Update your theme. Matching templates: {json}', // @translate
+            'script' => [
+                'replace' => <<<'SH'
+                    find 'OMEKA_PATH/themes/' -type f -not -path '*/\.git/*' -not -path '*/vendor/*' -not -path '*/node_modules/*' -wholename '*/view/search/*.phtml' -exec sed -i "s~'per_pages'~'per_page'~g" '{}' \;
+                    SH,
+            ],
         ],
     ];
     $manageModuleAndResources = $this->getManageModuleAndResources();
     $results = [];
     foreach ($stringsAndMessages as $key => $stringsAndMessage) foreach ($stringsAndMessage['strings'] as $path => $strings) {
         $result = $manageModuleAndResources->checkStringsInFiles($strings, $path);
-        if ($result) {
+        if (!$result) {
+            continue;
+        } elseif (!$doUpgrade) {
             $results[$key][trim(basename($path), '*')] = $result;
+            continue;
+        }
+        if (!empty($stringsAndMessage['script'])) {
+            /** @var \Omeka\Stdlib\Cli $cli */
+            $cli = $services->get('Omeka\Cli');
+            $total = count($stringsAndMessage['script']);
+            $i = 0;
+            foreach ($stringsAndMessage['script'] as $commandName => $command) {
+                $command = str_replace('OMEKA_PATH', OMEKA_PATH, $command);
+                $output = $cli->execute($command);
+                // Errors are already logged only with proc_open(), not exec().
+                if ($output === false) {
+                    $message = new PsrMessage(
+                        'Command "{name}" #{index}/{total} cannot be executed for {key}.', // @translate
+                        ['name' => $commandName, 'index' => ++$i, 'total' => $total, 'key' => $key]
+                    );
+                    $messenger->addError($message);
+                    $logger->err($message->getMessage(), $message->getContext());
+                } elseif ($output) {
+                    $message = new PsrMessage(
+                        'Command "{name}" #{index}/{total} executed for {key}. Output: {output}', // @translate
+                        ['name' => $commandName, 'index' => ++$i, 'total' => $total, 'key' => $key, 'output' => $output]
+                    );
+                    $messenger->addNotice($message);
+                    $logger->notice($message->getMessage(), $message->getContext());
+                } else {
+                    $message = new PsrMessage(
+                        'Command "{name}" #{index}/{total} executed for {key}.', // @translate
+                        ['name' => $commandName, 'index' => ++$i, 'total' => $total, 'key' => $key]
+                    );
+                    $messenger->addNotice($message);
+                    $logger->notice($message->getMessage(), $message->getContext());
+                }
+            }
         }
     }
     if ($results) {
@@ -816,6 +872,7 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
             $message = new PsrMessage(
                 'The module may break the theme to manage new features, in particular for facets.
 To avoid this check, add temporarily the key "advancedsearch_skip_exception" with value "true" in the file config/local.config.php.
+To process **some** of them automatically, you should backup themes and files, then add temporarily the key "advancedsearch_upgrade_3.4.28" with value "true" in the file config/local.config.php.
 The list of issues is available in logs too.' // @translate
             );
             $message->setTranslator($translator);
@@ -832,9 +889,17 @@ The list of issues is available in logs too.' // @translate
         }
         $messenger->addErrors($messages);
         $message = new PsrMessage(
-            'The key "advancedsearch_skip_exception" can be removed from the file config/local.config.php.' // @translate
+            'The key "{key}" can be removed from the file config/local.config.php.', // @translate
+            ['key' => 'advancedsearch_skip_exception']
         );
         $messenger->addNotice($message);
+        if (array_key_exists('advancedsearch_upgrade_3.4.28', $config)) {
+            $message = new PsrMessage(
+                'The key "{key}" can be removed from the file config/local.config.php.', // @translate
+                ['key' => 'advancedsearch_upgrade_3.4.28']
+            );
+            $messenger->addNotice($message);
+        }
     }
 
     $stringsAndMessages = [

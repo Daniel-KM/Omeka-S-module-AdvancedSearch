@@ -2,6 +2,8 @@
 
 namespace AdvancedSearch\Service\ControllerPlugin;
 
+use AdvancedSearch\Adapter\InternalAdapter;
+use AdvancedSearch\Adapter\NoopAdapter;
 use AdvancedSearch\Mvc\Controller\Plugin\ApiSearch;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
@@ -27,7 +29,10 @@ class ApiSearchFactory implements FactoryInterface
 
         $searchEngine = $searchConfig->engine();
         $searchAdapter = $searchEngine ? $searchEngine->adapter() : null;
-        if (!$searchAdapter) {
+        if (!$searchAdapter
+            || $searchAdapter instanceof InternalAdapter
+            || $searchAdapter instanceof NoopAdapter
+        ) {
             return new ApiSearch($api);
         }
 

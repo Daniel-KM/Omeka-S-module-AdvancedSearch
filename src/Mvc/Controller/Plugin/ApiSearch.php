@@ -110,6 +110,7 @@ class ApiSearch extends AbstractPlugin
      * Execute a search API request via the querier if available, else the api.
      *
      * Allows to get a standard Omeka Response from the external engine.
+     * The internal and noop engines are skipped and use the default api.
      *
      * The arguments are the same than \Omeka\Mvc\Controller\Plugin\Api::search().
      * - Some features of the Omeka api are not available.

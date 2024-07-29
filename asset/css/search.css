@@ -1,4 +1,5 @@
 @media screen {
+    /* Search form */
     .form-search {
         margin-bottom: 24px;
     }
@@ -17,6 +18,14 @@
         min-height: 36px;
         margin: 0;
     }
+    .form-search label.search-submit {
+        display: none;
+    }
+    .form-search button.search-submit {
+        float: right;
+    }
+
+    /* Search form filters */
 
     #search-filters {
         margin: 36px 0;
@@ -56,12 +65,7 @@
         margin-right: 0;
     }
 
-    .form-search label.search-submit {
-        display: none;
-    }
-    .form-search button.search-submit {
-        float: right;
-    }
+    /* Search results */
 
     .search-results-wrapper {
         display: flex;
@@ -69,6 +73,8 @@
     .search-results {
         flex-grow: 1;
     }
+
+    /* Search results header and footer */
 
     .search-results-header,
     .search-results-footer {
@@ -90,6 +96,62 @@
     .search-view-type.active {
         font-weight: bold;
     }
+
+    /* Search results (list and grid) */
+
+    .search-results .resource-list {
+        display: flex;
+    }
+    .search-results-count.no-total-results .row-count {
+        display: none;
+    }
+    .search-results .resource-list.list {
+        flex-direction: column;
+    }
+    .search-results .resource-list.grid {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: row;
+        justify-content: start;
+        align-items: stretch;
+        align-content: start;
+        padding-left: 0;
+        margin: 0;
+    }
+    .search-results .resource-list.grid > * {
+        flex: 0 0 auto;
+        margin: 6px;
+    }
+    .search-results .resource-list.grid .resource {
+        width: auto;
+        display: initial;
+        padding-top: 29px;
+        padding-right: 29px;
+    }
+    .search-results ul.resource-list.grid .resource:first-child {
+        border-top: none;
+    }
+    .search-results .resource-list.grid .resource-thumbnail {
+        display: flex;
+        justify-content: center;
+        padding: 29px 0;
+    }
+    .search-results .resource-list.grid .resource-thumbnail img {
+        height: auto;
+        max-height: 200px;
+        width: 100%;
+        max-width: 200px;
+        margin: 0;
+        padding: 0;
+    }
+    .search-results .resource-list.grid .resource-metadata {
+        max-width: 224px;
+    }
+    .search-results .resource-list.grid .description {
+        display: none;
+    }
+
+    /* Search facets */
 
     .search-facets {
         flex-basis: 25%;
@@ -199,57 +261,7 @@
         content: "\f14a";
     }
 
-    .search-results .resource-list {
-        display: flex;
-    }
-    .search-results-count.no-total-results .row-count {
-        display: none;
-    }
-    .search-results .resource-list.list {
-        flex-direction: column;
-    }
-    .search-results .resource-list.grid {
-        display: flex;
-        flex-wrap: wrap;
-        flex-direction: row;
-        justify-content: start;
-        align-items: stretch;
-        align-content: start;
-        padding-left: 0;
-        margin: 0;
-    }
-    .search-results .resource-list.grid > * {
-        flex: 0 0 auto;
-        margin: 6px;
-    }
-    .search-results .resource-list.grid .resource {
-        width: auto;
-        display: initial;
-        padding-top: 29px;
-        padding-right: 29px;
-    }
-    .search-results ul.resource-list.grid .resource:first-child {
-        border-top: none;
-    }
-    .search-results .resource-list.grid .resource-thumbnail {
-        display: flex;
-        justify-content: center;
-        padding: 29px 0;
-    }
-    .search-results .resource-list.grid .resource-thumbnail img {
-        height: auto;
-        max-height: 200px;
-        width: 100%;
-        max-width: 200px;
-        margin: 0;
-        padding: 0;
-    }
-    .search-results .resource-list.grid .resource-metadata {
-        max-width: 224px;
-    }
-    .search-results .resource-list.grid .description {
-        display: none;
-    }
+    /* Autocomplete */ 
 
     .autocomplete-suggestions {
         border: 1px solid #999999;
@@ -279,6 +291,7 @@
     }
 
     /* Breadcrumbs */
+
     nav.breadcrumbs > ul,
     nav.breadcrumbs > ol {
         list-style: none;

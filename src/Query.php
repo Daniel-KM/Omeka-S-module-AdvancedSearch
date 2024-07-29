@@ -42,7 +42,7 @@ class Query implements \JsonSerializable
     /**
      * @var string[]
      */
-    protected $resources = [];
+    protected $resourceTypes = [];
 
     /**
      * @var bool
@@ -150,29 +150,29 @@ class Query implements \JsonSerializable
     }
 
     /**
-     * @param string[] $resources The types are generally "items" and "item_sets".
+     * @param string[] $resourceTypes The types are generally "items" and "item_sets".
      */
-    public function setResources(array $resources): self
+    public function setResourceTypes(array $resourceTypes): self
     {
-        $this->resources = $resources;
+        $this->resourceTypes = $resourceTypes;
         return $this;
     }
 
     /**
-     * @param string $resources Generally "items" or "item_sets".
+     * @param string $resourceType Generally "items" or "item_sets".
      */
-    public function addResource(string $resource): self
+    public function addResourceType(string $resourceType): self
     {
-        $this->resources[] = $resource;
+        $this->resourceTypes[] = $resourceType;
         return $this;
     }
 
     /**
      * @return string[]
      */
-    public function getResources(): array
+    public function getResourceTypes(): array
     {
-        return $this->resources;
+        return $this->resourceTypes;
     }
 
     public function setIsPublic($isPublic): self
@@ -516,7 +516,7 @@ class Query implements \JsonSerializable
     {
         return [
             'query' => $this->getQuery(),
-            'resources' => $this->getResources(),
+            'resource_types' => $this->getResourceTypes(),
             'is_public' => $this->getIsPublic(),
             'filters' => $this->getFilters(),
             'filters_range' => $this->getFiltersRange(),

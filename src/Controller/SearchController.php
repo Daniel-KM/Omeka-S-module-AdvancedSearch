@@ -555,7 +555,7 @@ class SearchController extends AbstractActionController
         $currentSiteSlug = $currentSite->slug();
 
         $controller = $this->params()->fromRoute('resource-type', 'item');
-        $mainResourceName = $controllersToApi[$controller] ?? 'items';
+        $mainResourceType = $controllersToApi[$controller] ?? 'items';
 
         // TODO Factorize to get results directly.
 
@@ -614,7 +614,7 @@ class SearchController extends AbstractActionController
             return;
         }
 
-        $resources = $response->getResources($mainResourceName);
+        $resources = $response->getResources($mainResourceType);
         foreach ($resources as $resource) {
             // Manage the case where the main resource is "resource".
             $resourceName = $resource->resourceName();

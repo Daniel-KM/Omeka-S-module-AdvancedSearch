@@ -39,16 +39,16 @@ abstract class AbstractIndexer implements IndexerInterface
     use LoggerAwareTrait;
 
     /**
-     * @var ServiceLocatorInterface
+     * @var \Laminas\ServiceManager\ServiceLocatorInterface
      */
     protected $services;
 
     /**
-     * @var SearchEngineRepresentation
+     * @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation
      */
     protected $engine;
 
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): IndexerInterface
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): self
     {
         $this->services = $serviceLocator;
         return $this;
@@ -59,7 +59,7 @@ abstract class AbstractIndexer implements IndexerInterface
         return $this->services;
     }
 
-    public function setSearchEngine(SearchEngineRepresentation $engine): IndexerInterface
+    public function setSearchEngine(SearchEngineRepresentation $engine): self
     {
         $this->engine = $engine;
         return $this;

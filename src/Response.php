@@ -195,6 +195,14 @@ class Response implements \JsonSerializable
     }
 
     /**
+     * Get the list of resource types from results.
+     */
+    public function getResourceTypes(): array
+    {
+        return array_keys($this->resourceTotalResults);
+    }
+
+    /**
      * Store all results for all resources.
      *
      * @param array $results Results by resource type ("items", "item_sets"…).
@@ -480,6 +488,7 @@ class Response implements \JsonSerializable
             'current_page' => $this->getCurrentPage(),
             'per_page' => $this->getPerPage(),
             'total_results' => $this->getTotalResults(),
+            'resource_types' => $this->getResourceTypes(),
             'resource_total_results' => $this->getResourceTotalResults(),
             'results' => $this->getResults(),
             'facet_counts' => $this->getFacetCounts(),

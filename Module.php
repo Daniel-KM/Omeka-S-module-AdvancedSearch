@@ -1052,14 +1052,14 @@ class Module extends AbstractModule
      * Delete the index for the resource in search engine.
      *
      * @param SearchEngineRepresentation $searchEngine
-     * @param string $resourceName
+     * @param string $resourceType
      * @param int $id
      */
-    protected function deleteIndexResource(SearchEngineRepresentation $searchEngine, $resourceName, $id): void
+    protected function deleteIndexResource(SearchEngineRepresentation $searchEngine, $resourceType, $id): void
     {
         $indexer = $searchEngine->indexer();
         try {
-            $indexer->deleteResource($resourceName, $id);
+            $indexer->deleteResource($resourceType, $id);
         } catch (\Exception $e) {
             $services = $this->getServiceLocator();
             $logger = $services->get('Omeka\Logger');

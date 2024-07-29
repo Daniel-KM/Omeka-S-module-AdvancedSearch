@@ -154,7 +154,7 @@ class IndexSearch extends AbstractJob
                 $query
                     // By default the query process public resources only.
                     ->setIsPublic(false)
-                    ->setResources([$resourceType]);
+                    ->setResourceTypes([$resourceType]);
                 $indexer->clearIndex($query);
             }
 

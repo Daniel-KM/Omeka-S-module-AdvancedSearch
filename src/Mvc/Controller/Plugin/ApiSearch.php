@@ -138,7 +138,7 @@ class ApiSearch extends AbstractPlugin
         }
 
         // Check it the resource is managed by this index.
-        if (!in_array($resource, $this->searchEngine->setting('resources', []))) {
+        if (!in_array($resource, $this->searchEngine->setting('resource_types', []))) {
             // Unset the "index" option to avoid a loop.
             unset($data['index']);
             unset($options['index']);
@@ -269,7 +269,7 @@ class ApiSearch extends AbstractPlugin
         // There is no form validation/filter.
 
         // Begin building the search query.
-        $resource = $request->getResource();
+        $resourceType = $request->getResource();
         $searchConfigSettings = $this->searchConfig->settings();
         $searchFormSettings = $searchConfigSettings['form'] ?? [
             'options' => [],
@@ -277,7 +277,7 @@ class ApiSearch extends AbstractPlugin
             'properties' => [],
             'sort_fields' => [],
         ];
-        $searchFormSettings['resource'] = $resource;
+        $searchFormSettings['resource'] = $resourceType;
         // Fix to be removed.
         $searchEngine = $this->searchConfig->engine();
         $searchAdapter = $searchEngine ? $searchEngine->adapter() : null;
@@ -293,7 +293,7 @@ class ApiSearch extends AbstractPlugin
             && $searchAdapter instanceof \SearchSolr\Adapter\SolariumAdapter;
 
         $searchQuery = $this->apiFormAdapter->toQuery($query, $searchFormSettings);
-        $searchQuery->setResources([$resource]);
+        $searchQuery->setResourceTypes([$resourceType]);
 
         // Note: the event search.query is not triggered.
 
@@ -329,19 +329,11 @@ class ApiSearch extends AbstractPlugin
 
         // TODO Manage returnScalar.
 
-        $totalResults = array_map(fn ($resource) => $searchResponse->getResourceTotalResults($resource), $this->searchEngine->setting('resources', []));
+        $totalResults = array_map(fn ($resource) => $searchResponse->getResourceTotalResults($resource), $this->searchEngine->setting('resource_types', []));
 
         // Get entities from the search response.
-        $ids = $this->extractIdsFromResponse($searchResponse, $resource);
-        $mapClasses = [
-            'resources' => \Omeka\Entity\Resource::class,
-            'items' => \Omeka\Entity\Item::class,
-            'item_sets' => \Omeka\Entity\ItemSet::class,
-            'media' => \Omeka\Entity\ItemSet::class,
-            'value_annotations' => \Omeka\Entity\ValueAnnotation::class,
-            'annotations' => \Annotate\Entity\Annotation::class,
-        ];
-        $entityClass = $mapClasses[$resource];
+        $ids = $this->extractIdsFromResponse($searchResponse, $resourceType);
+        $entityClass = $this->easyMeta->entityClass($resourceType);
         $repository = $this->entityManager->getRepository($entityClass);
         $entities = $repository->findBy([
             'id' => $ids,
@@ -458,11 +450,11 @@ class ApiSearch extends AbstractPlugin
      * Extract ids from a search response.
      *
      * @param SearchResponse $searchResponse
-     * @param string $resource
+     * @param string $resourceType
      * @return int[]
      */
-    protected function extractIdsFromResponse(SearchResponse $searchResponse, $resource)
+    protected function extractIdsFromResponse(SearchResponse $searchResponse, $resourceType)
     {
-        return array_map(fn ($v) => $v['id'], $searchResponse->getResults($resource));
+        return array_map(fn ($v) => $v['id'], $searchResponse->getResults($resourceType));
     }
 }

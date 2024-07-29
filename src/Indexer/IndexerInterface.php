@@ -36,49 +36,44 @@ use Laminas\Log\LoggerAwareInterface;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use Omeka\Entity\Resource;
 
-/**
- * The signature uses "IndexerInterface" instead of "self" for compatibility with php < 7.4.
- */
 interface IndexerInterface extends LoggerAwareInterface
 {
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): IndexerInterface;
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): self;
 
-    public function setSearchEngine(SearchEngineRepresentation $engine): IndexerInterface;
+    public function setSearchEngine(SearchEngineRepresentation $engine): self;
 
     /**
      * Inidicate if the resource can be indexed.
      *
-     * @param string $resourceName The resource type ("items", "item_sets"…).
-     * @return bool
+     * @param string $resourceType May be "resources", "items", "item_sets"…
+     * Note that resources inclues items, media, etc.
      */
-    public function canIndex(string $resourceName): bool;
+    public function canIndex(string $resourceType): bool;
 
     /**
      * Reset the index.
      *
      * @param Query $query Allows to limit clearing to some resources.
-     * @return self
      */
-    public function clearIndex(?Query $query = null): IndexerInterface;
+    public function clearIndex(?Query $query = null): self;
 
     /**
      * Index a resource.
      */
-    public function indexResource(Resource $resource): IndexerInterface;
+    public function indexResource(Resource $resource): self;
 
     /**
      * Index multiple resources.
      *
      * @param Resource[] $resources
      */
-    public function indexResources(array $resources): IndexerInterface;
+    public function indexResources(array $resources): self;
 
     /**
      * Unindex a deleted resource.
      *
-     * @param string $resourceName The resource type ("items", "item_sets"…).
+     * @param string $resourceType May be "resources", "items", "item_sets"…
      * @param int $id
-     * @return self
      */
-    public function deleteResource(string $resourceName, $id): IndexerInterface;
+    public function deleteResource(string $resourceType, $id): self;
 }

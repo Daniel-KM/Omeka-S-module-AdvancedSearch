@@ -13,8 +13,8 @@ class TestQuerier extends AbstractQuerier
         $response = new Response;
 
         $response->setTotalResults(0);
-        foreach ($query->getResources() as $resource) {
-            $response->setResourceTotalResults($resource, 0);
+        foreach ($query->getResourceTypes() as $resourceType) {
+            $response->setResourceTotalResults($resourceType, 0);
         }
 
         return $response;

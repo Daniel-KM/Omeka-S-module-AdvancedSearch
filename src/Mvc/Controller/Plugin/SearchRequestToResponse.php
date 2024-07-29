@@ -180,14 +180,14 @@ class SearchRequestToResponse extends AbstractPlugin
         }
 
         // Check resources.
-        $resourceTypes = $query->getResources();
+        $resourceTypes = $query->getResourceTypes();
         // TODO Check why resources may not be filled.
-        $engineSettings['resources'] ??= ['resources'];
+        $engineSettings['resource_types'] ??= ['resources'];
         if ($resourceTypes) {
-            $resourceTypes = array_intersect($resourceTypes, $engineSettings['resources']) ?: $engineSettings['resources'];
-            $query->setResources($resourceTypes);
+            $resourceTypes = array_intersect($resourceTypes, $engineSettings['resource_types']) ?: $engineSettings['resource_types'];
+            $query->setResourceTypes($resourceTypes);
         } else {
-            $query->setResources($engineSettings['resources']);
+            $query->setResourceTypes($engineSettings['resource_types']);
         }
 
         // Check sort.

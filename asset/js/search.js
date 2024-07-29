@@ -108,6 +108,11 @@ var Search = (function() {
                     console.log(errorThrown)
                 }
             },
+            onSelect: function (suggestion) {
+                if (!$(this).data('autosuggest-fill-input')) {
+                    $(this).closest('form').submit();
+                }
+            },
         };
     };
 

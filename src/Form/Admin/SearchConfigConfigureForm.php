@@ -209,6 +209,16 @@ class SearchConfigConfigureForm extends Form
                     'id' => 'autosuggest_url_param_name',
                 ],
             ])
+            ->add([
+                'name' => 'fill_input',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Stay on form when selecting a suggestion (no auto-submit)', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'fill_input',
+                ],
+            ])
         ;
 
         // Settings for the form querier (advanced form and filters).

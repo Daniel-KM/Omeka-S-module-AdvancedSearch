@@ -200,6 +200,10 @@ class MainSearchForm extends Form
             $elementQ = $this->get('q')
                 ->setAttribute('class', 'autosuggest')
                 ->setAttribute('data-autosuggest-url', $autoSuggestUrl);
+            if (!empty($this->formSettings['autosuggest']['fill_input'])) {
+                $elementQ
+                    ->setAttribute('data-autosuggest-fill-input', '1');
+            }
             if (empty($suggester) && !empty($this->formSettings['autosuggest']['url_param_name'])) {
                 $elementQ
                     ->setAttribute('data-autosuggest-param-name', $this->formSettings['autosuggest']['url_param_name']);

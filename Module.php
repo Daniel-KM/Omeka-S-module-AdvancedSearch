@@ -1081,6 +1081,8 @@ class Module extends AbstractModule
             $basePath = $plugins->get('basePath');
             $assetUrl = $plugins->get('assetUrl');
             $searchUrl = $basePath('admin/' . $searchConfig->slug());
+            $script = sprintf('var searchUrl = %s;', json_encode($searchUrl, 320));
+
             $autoSuggestUrl = $searchConfig->subSetting('autosuggest', 'url');
             if (!$autoSuggestUrl) {
                 $suggester = $searchConfig->subSetting('autosuggest', 'suggester');
@@ -1088,12 +1090,22 @@ class Module extends AbstractModule
                     $autoSuggestUrl = $searchUrl . '/suggest';
                 }
             }
+            if ($autoSuggestUrl) {
+                $script .= sprintf("\nvar searchAutosuggestUrl = %s;", json_encode($autoSuggestUrl, 320));
+                /*
+                // Always autosubmit in admin.
+                // TODO Add a setting for autosubmit in admin quick form?
+                $autoSuggestFillInput = $searchConfig->subSetting('autosuggest', 'fill_input');
+                if ($autoSuggestFillInput) {
+                    $script .= "\nvar searchAutosuggestFillInput = true;";
+                }
+                */
+            }
+
             $plugins->get('headLink')
                 ->appendStylesheet($assetUrl('css/advanced-search-admin.css', 'AdvancedSearch'));
             $plugins->get('headScript')
-                ->appendScript(sprintf('var searchUrl = %s;', json_encode($searchUrl, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE))
-                   . ($autoSuggestUrl ? sprintf("\nvar searchAutosuggestUrl=%s;", json_encode($autoSuggestUrl, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)) : '')
-                )
+                ->appendScript($script)
                 ->appendFile($assetUrl('js/advanced-search-admin.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
         }
 

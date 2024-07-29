@@ -7,7 +7,7 @@ $(document).ready(function() {
 
     var searchHtml = `
 <form id="search-form-quick" method="GET" action="${typeof searchUrl !== 'undefined' ? searchUrl : ''}">
-    <input id="search-q" name="q" placeholder="${Omeka.jsTranslate('Find resources…')}" value="" type="text" ${typeof searchAutosuggestUrl !== 'undefined' ? ' class="autosuggest" data-autosuggest-url="' + searchAutosuggestUrl + '"' : ''}/>
+    <input id="search-q" name="q" placeholder="${Omeka.jsTranslate('Find resources…')}" value="" type="text" ${typeof searchAutosuggestUrl !== 'undefined' ? ' class="autosuggest" data-autosuggest-url="' + searchAutosuggestUrl + '"' + (typeof searchAutosuggestFillInput !== 'undefined' && searchAutosuggestFillInput ? ' data-autosuggest-fill-input="1"' : '') : ''}/>
     <button type="submit">${Omeka.jsTranslate('Find')}</button>
 </form>`;
     $('#search').after(searchHtml);

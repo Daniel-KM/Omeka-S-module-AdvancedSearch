@@ -10,7 +10,7 @@
 
 $translate = $this->plugin('translate');
 
-$resourceNames = $resource->setting('resources', []);
+$resourceTypes = $resource->setting('resources', []);
 
 $this->form->setAttribute('action', $resource->url('index'));
 $this->form->setButtonLabel($translate('Confirm reindex'));
@@ -20,7 +20,7 @@ $this->form->setButtonLabel($translate('Confirm reindex'));
 <div id="index" class="sidebar">
     <?= $this->hyperlink('', '#', ['class' => 'sidebar-close o-icon-close', 'title' => $translate('Close')]) ?>
 <?php endif; ?>
-<?php if (count($resourceNames)): ?>
+<?php if (count($resourceTypes)): ?>
     <div id="sidebar-confirm">
         <h3><?= sprintf($translate('Reindex "%s"'), $resource->name()) ?></h3>
         <p><?= $translate('Are you sure you would like to reindex this index?') ?></p>
@@ -36,8 +36,8 @@ $this->form->setButtonLabel($translate('Confirm reindex'));
         </p>
         <p>
         <?= $translate('You may want to limit the reindexing to a resource type.') ?>
-        <?php foreach ($resourceNames as $resourceName): ?>
-        <input name="resource_names[]" value="<?= $resourceName ?>" type="checkbox" checked="checked" form="confirmform" /><?= $resourceName ?>
+        <?php foreach ($resourceTypes as $resourceType): ?>
+        <input name="resource_types[]" value="<?= $resourceType ?>" type="checkbox" checked="checked" form="confirmform" /><?= $translate($resourceType) ?>
         <?php endforeach; ?>
         </p>
         <p>

@@ -5,11 +5,11 @@
  * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
  * @var \AdvancedSearch\Query $query
  * @var \AdvancedSearch\Response $response
- * @var ?string $resourceName
+ * @var ?string $resourceType The resource type may be "resources" or a specific one.
  */
 
 // A check is done: when page is not first, the resources may be empty even with results.
-$resources = $response->getResources($resourceName);
+$resources = $response->getResources($resourceType);
 if (!$resources) return;
 
 $plugins = $this->getHelperPluginManager();

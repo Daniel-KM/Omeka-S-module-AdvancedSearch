@@ -8,24 +8,24 @@ use Omeka\Entity\Resource;
 
 class TestIndexer extends AbstractIndexer
 {
-    public function canIndex($resourceName)
+    public function canIndex(string $resourceType): bool
     {
         return true;
     }
 
-    public function clearIndex(Query $query = null): void
+    public function clearIndex(?Query $query = null): self
     {
     }
 
-    public function indexResource(Resource $resource): void
+    public function indexResource(Resource $resource): self
     {
     }
 
-    public function indexResources(array $resources): void
+    public function indexResources(array $resources): self
     {
     }
 
-    public function deleteResource($resourceName, $id): void
+    public function deleteResource(string $resourceType, $id): self
     {
     }
 }

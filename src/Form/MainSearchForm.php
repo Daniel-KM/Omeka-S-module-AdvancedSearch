@@ -1067,9 +1067,8 @@ class MainSearchForm extends Form
         $nativeField = $availableFields[$field]['from'] ?? null;
 
         switch ($nativeField) {
-            case 'resource_name':
             case 'resource_type':
-                return $this->listResourceNames();
+                return $this->listResourceTypes();
 
             case 'id':
             case 'o:id':
@@ -1297,9 +1296,9 @@ class MainSearchForm extends Form
             $resourceTypes = $engine->setting('resources');
         }
         $result = [];
-        foreach ($resourceTypes ?: $resourceTypesDefault as $resourceName) {
+        foreach ($resourceTypes ?: $resourceTypesDefault as $resourceType) {
             // Don't use array_merge because keys are numeric.
-            $result = array_replace($result, $this->api->search($resourceName, [], ['returnScalar' => 'title'])->getContent());
+            $result = array_replace($result, $this->api->search($resourceType, [], ['returnScalar' => 'title'])->getContent());
         }
         return $result;
     }
@@ -1307,7 +1306,7 @@ class MainSearchForm extends Form
     /**
      * This resource list is mainly used for internal purpose.
      */
-    protected function listResourceNames(): array
+    protected function listResourceTypes(): array
     {
         $types = [
             'resources' => 'Resources',

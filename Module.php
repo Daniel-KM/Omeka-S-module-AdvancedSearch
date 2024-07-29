@@ -953,7 +953,7 @@ class Module extends AbstractModule
                 $jobArgs = [];
                 $jobArgs['search_engine_id'] = $searchEngine->id();
                 $jobArgs['resource_ids'] = $ids;
-                $jobArgs['resource_names'] = [$resourceType];
+                $jobArgs['resource_types'] = [$resourceType];
                 // Most of the time, there is only one solr index.
                 // TODO Improve indexing of multiple search engines after batch process.
                 $jobArgs['force'] = !$first;

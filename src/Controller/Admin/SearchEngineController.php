@@ -179,13 +179,13 @@ class SearchEngineController extends AbstractActionController
         $searchEngine = $this->api()->read('search_engines', $searchEngineId)->getContent();
 
         $startResourceId = (int) $this->params()->fromPost('start_resource_id');
-        $resourceNames = $this->params()->fromPost('resource_names') ?: [];
+        $resourceTypes = $this->params()->fromPost('resource_types') ?: [];
         $force = (bool) $this->params()->fromPost('force');
 
         $jobArgs = [];
         $jobArgs['search_engine_id'] = $searchEngine->id();
         $jobArgs['start_resource_id'] = $startResourceId;
-        $jobArgs['resource_names'] = $resourceNames;
+        $jobArgs['resource_types'] = $resourceTypes;
         $jobArgs['force'] = $force;
         // Synchronous dispatcher for quick testing purpose.
         // $job = $this->jobDispatcher()->dispatch(\AdvancedSearch\Job\IndexSearch::class, $jobArgs, $searchEngine->getServiceLocator()->get('Omeka\Job\DispatchStrategy\Synchronous'));

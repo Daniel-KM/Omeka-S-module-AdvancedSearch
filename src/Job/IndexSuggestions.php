@@ -76,7 +76,7 @@ class IndexSuggestions extends AbstractJob
             return;
         }
 
-        $resourceNames = $engine->setting('resources', []);
+        $resourceTypes = $engine->setting('resources', []);
         $mapResources = [
             'resources' => \Omeka\Entity\Resource::class,
             'items' => \Omeka\Entity\Item::class,
@@ -85,7 +85,7 @@ class IndexSuggestions extends AbstractJob
             'value_annotations' => \Omeka\Entity\ValueAnnotation::class,
             'annotations' => \Annotate\Entity\Annotation::class,
         ];
-        $resourceClasses = array_intersect_key($mapResources, array_flip($resourceNames));
+        $resourceClasses = array_intersect_key($mapResources, array_flip($resourceTypes));
         if (!$resourceClasses) {
             $this->logger->notice(
                 'Suggester #{search_suggester_id} ("{name}"): there is no resource type to index or the indexation is not needed.', // @translate
@@ -147,7 +147,7 @@ class IndexSuggestions extends AbstractJob
 
         // TODO Index value annotations with resources (for now, they can't be selected individually in the config).
 
-        $resourceNames = $suggester->engine()->setting('resources', []);
+        $resourceTypes = $suggester->engine()->setting('resources', []);
         $mapResourcesToClasses = [
             'items' => \Omeka\Entity\Item::class,
             'item_sets' => \Omeka\Entity\ItemSet::class,
@@ -155,9 +155,9 @@ class IndexSuggestions extends AbstractJob
             'value_annotations' => \Omeka\Entity\ValueAnnotation::class,
             'annotations' => \Annotate\Entity\Annotation::class,
         ];
-        $resourceClasses = in_array('resources', $resourceNames)
+        $resourceClasses = in_array('resources', $resourceTypes)
             ? []
-            : array_intersect_key($mapResourcesToClasses, array_flip($resourceNames));
+            : array_intersect_key($mapResourcesToClasses, array_flip($resourceTypes));
 
         // FIXME Fields are not only properties, but titles, classes and templates.
         $fields = $suggester->setting('fields') ?: [];
@@ -547,11 +547,11 @@ SQL;
                 $criteria
                     ->andWhere($expr->memberOf('resource', key($resourceClassesByNames)));
             } elseif (count($resourceClassesByNames) === 2) {
-                $resourceNames = array_keys($resourceClassesByNames);
+                $resourceTypes = array_keys($resourceClassesByNames);
                 $criteria
                     ->andWhere($expr->orX(
-                        $expr->memberOf('resource', $resourceNames[0]),
-                        $expr->memberOf('resource', $resourceNames[1])
+                        $expr->memberOf('resource', $resourceTypes[0]),
+                        $expr->memberOf('resource', $resourceTypes[1])
                     ));
             }
         }

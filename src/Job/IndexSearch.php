@@ -93,13 +93,13 @@ class IndexSearch extends AbstractJob
             $startResourceId = 1;
         }
 
-        $resourceNames = $searchEngine->setting('resources', []);
-        $selectedResourceNames = $this->getArg('resource_names', []);
-        if ($selectedResourceNames) {
-            $resourceNames = array_intersect($resourceNames, $selectedResourceNames);
+        $resourceTypes = $searchEngine->setting('resources', []);
+        $selectedResourceTypes = $this->getArg('resource_types', []);
+        if ($selectedResourceTypes) {
+            $resourceTypes = array_intersect($resourceTypes, $selectedResourceTypes);
         }
-        $resourceNames = array_filter($resourceNames, fn ($resourceName) => $indexer->canIndex($resourceName));
-        if (empty($resourceNames)) {
+        $resourceTypes = array_filter($resourceTypes, fn ($resourceType) => $indexer->canIndex($resourceType));
+        if (empty($resourceTypes)) {
             $this->logger->notice(
                 'Search index #{search_engine_id} ("{name}"): there is no resource type to index or the indexation is not needed.', // @translate
                 ['search_engine_id' => $searchEngine->id(), 'name' => $searchEngine->name()]
@@ -131,11 +131,11 @@ class IndexSearch extends AbstractJob
             ['search_engine_id' => $searchEngine->id(), 'name' => $searchEngine->name()]
         );
 
-        $rNames = $resourceNames;
-        sort($rNames);
+        $rTypes = $resourceTypes;
+        sort($rTypes);
         $fullClearIndex = empty($resourceIds)
             && $startResourceId <= 0
-            && array_values($rNames) === ['item_sets', 'items'];
+            && array_values($rTypes) === ['item_sets', 'items'];
 
         if ($fullClearIndex) {
             $indexer->clearIndex();
@@ -148,19 +148,19 @@ class IndexSearch extends AbstractJob
 
         $resources = [];
         $totals = [];
-        foreach ($resourceNames as $resourceName) {
+        foreach ($resourceTypes as $resourceType) {
             if (!$fullClearIndex && empty($resourceIds) && $startResourceId <= 0) {
                 $query = new Query();
                 $query
                     // By default the query process public resources only.
                     ->setIsPublic(false)
-                    ->setResources([$resourceName]);
+                    ->setResources([$resourceType]);
                 $indexer->clearIndex($query);
             }
 
-            $totals[$resourceName] = 0;
+            $totals[$resourceType] = 0;
             $searchConfig = 1;
-            $entityClass = $apiAdapters->get($resourceName)->getEntityClass();
+            $entityClass = $apiAdapters->get($resourceType)->getEntityClass();
             $dql = "SELECT resource FROM $entityClass resource";
             $parameter = null;
             if (count($resourceIds)) {
@@ -182,19 +182,19 @@ class IndexSearch extends AbstractJob
                         );
                     } else {
                         $totalResults = [];
-                        foreach ($resourceNames as $resourceName) {
+                        foreach ($resourceTypes as $resourceType) {
                             $totalResults[] = (new PsrMessage(
-                                '{resource_name}: {count} indexed', // @translate
-                                ['resource_name' => $resourceName, 'count' => $totals[$resourceName]]
+                                '{resource_type}: {count} indexed', // @translate
+                                ['resource_type' => $resourceType, 'count' => $totals[$resourceType]]
                             ))->setTranslator($translator);
                         }
                         $resource = array_pop($resources);
                         $this->logger->warn(
-                            'Search index #{search_engine_id} ("{name}"): the indexing was stopped. Last indexed resource: {resource_name} #{resource_id}; {results}. Execution time: {duration} seconds.', // @translate
+                            'Search index #{search_engine_id} ("{name}"): the indexing was stopped. Last indexed resource: {resource_type} #{resource_id}; {results}. Execution time: {duration} seconds.', // @translate
                             [
                                 'search_engine_id' => $searchEngine->id(),
                                 'name' => $searchEngine->name(),
-                                'resource_name' => $resource->getResourceName(),
+                                'resource_type' => $resource->getResourceType(),
                                 'resource_id' => $resource->getId(),
                                 'results' => implode('; ', $totalResults),
                                 'duration' => (int) (microtime(true) - $timeStart),
@@ -220,16 +220,16 @@ class IndexSearch extends AbstractJob
                 $indexer->indexResources($resources);
 
                 ++$searchConfig;
-                $totals[$resourceName] += count($resources);
+                $totals[$resourceType] += count($resources);
                 $entityManager->clear();
             } while (count($resources) === $batchSize);
         }
 
         $totalResults = [];
-        foreach ($resourceNames as $resourceName) {
+        foreach ($resourceTypes as $resourceType) {
             $totalResults[] = (new PsrMessage(
-                '{resource_name}: {count} indexed', // @translate
-                ['resource_name' => $resourceName, 'count' => $totals[$resourceName]]
+                '{resource_type}: {count} indexed', // @translate
+                ['resource_type' => $resourceType, 'count' => $totals[$resourceType]]
             ))->setTranslator($translator);
         }
 

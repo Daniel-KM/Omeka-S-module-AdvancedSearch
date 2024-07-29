@@ -607,12 +607,10 @@ SQL;
             // and "resource-type" by omeka main search engine in admin, with
             // the controller name, but it is a fake argument that redirect to
             // the controller.
-            case 'resource_name':
+            // Anyway, "resource_name" is no more used.
             case 'resource_type':
                 $values = $flatArray($values);
-                $this->args['resource_name'] = empty($this->args['resource_name'])
-                    ? $values
-                    : array_merge(is_array($this->args['resource_name']) ? $this->args['resource_name'] : [$this->args['resource_name']], $values);
+                $this->args['resource_type'] = $values;
                 continue 2;
 
             // "is_public" is automatically managed by this internal adapter
@@ -961,6 +959,7 @@ SQL;
         // Normalize search query keys as omeka keys for items and item sets.
         // TODO Manages individual options for range, main data types, data types.
 
+        // The module Reference use the key "resource_name" for now.
         $referenceMetadata = [];
         $referenceOptions = [
             'resource_name' => null,

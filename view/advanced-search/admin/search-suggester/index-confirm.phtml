@@ -20,7 +20,7 @@ $this->form->setButtonLabel($translate('Confirm reindex'));
 <div id="index" class="sidebar">
     <?= $this->hyperlink('', '#', ['class' => 'sidebar-close o-icon-close', 'title' => $translate('Close')]) ?>
 <?php endif; ?>
-<?php if (count($resourceNames)): ?>
+<?php if (count($resourceTypes)): ?>
     <div id="sidebar-confirm">
         <h3><?= sprintf($translate('Reindex "%s"'), $resource->name()) ?></h3>
         <p><?= $translate('Are you sure you would like to reindex this suggester?') ?></p>

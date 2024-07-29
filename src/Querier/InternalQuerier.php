@@ -677,7 +677,13 @@ SQL;
                     : array_merge(is_array($this->args['item_sets_tree']) ? $this->args['item_sets_tree'] : [$this->args['item_sets_tree']], $values);
                 continue 2;
 
-            default:
+            case $inListForFacets:
+                $fieldName = $field;
+                $fieldData = $this->query->getFacet($fieldName);
+                if (!$fieldData) {
+                    break;
+                }
+                $field = $fieldData['field'] ?? $fieldName;
                 $field = $this->easyMeta->propertyTerm($field)
                     ?? $multifields[$field]['fields']
                     ?? $this->underscoredNameToTerm($field)
@@ -686,34 +692,41 @@ SQL;
                     break;
                 }
                 // "In list" is used for facets.
-                if ($inListForFacets) {
-                    $firstKey = key($values);
-                    // Check for a facet range.
-                    if (count($values) <= 2 && ($firstKey === 'from' || $firstKey === 'to')) {
-                        if (isset($values['from']) && $values['from'] !== '') {
-                            $this->args['property'][] = [
-                                'joiner' => 'and',
-                                'property' => $field,
-                                'type' => 'gte',
-                                'text' => $values['from'],
-                            ];
-                        }
-                        if (isset($values['to']) && $values['to'] !== '') {
-                            $this->args['property'][] = [
-                                'joiner' => 'and',
-                                'property' => $field,
-                                'type' => 'lte',
-                                'text' => $values['to'],
-                            ];
-                        }
-                    } else {
+                $firstKey = key($values);
+                // Check for a facet range.
+                if (count($values) <= 2 && ($firstKey === 'from' || $firstKey === 'to')) {
+                    if (isset($values['from']) && $values['from'] !== '') {
                         $this->args['property'][] = [
                             'joiner' => 'and',
                             'property' => $field,
-                            'type' => 'list',
-                            'text' => $flatArray($values),
+                            'type' => 'gte',
+                            'text' => $values['from'],
                         ];
                     }
+                    if (isset($values['to']) && $values['to'] !== '') {
+                        $this->args['property'][] = [
+                            'joiner' => 'and',
+                            'property' => $field,
+                            'type' => 'lte',
+                            'text' => $values['to'],
+                        ];
+                    }
+                } else {
+                    $this->args['property'][] = [
+                        'joiner' => 'and',
+                        'property' => $field,
+                        'type' => 'list',
+                        'text' => $flatArray($values),
+                    ];
+                }
+                break;
+
+            default:
+                $field = $this->easyMeta->propertyTerm($field)
+                    ?? $multifields[$field]['fields']
+                    ?? $this->underscoredNameToTerm($field)
+                    ?? null;
+                if (!$field) {
                     break;
                 }
                 foreach ($values as $value) {
@@ -729,15 +742,15 @@ SQL;
                         $this->args['property'][] = [
                             'joiner' => 'and',
                             'property' => $field,
-                            'type' => 'list',
-                            'text' => $value,
+                            'type' => 'lte',
+                            'text' => $values['to'],
                         ];
                     } else {
                         $this->args['property'][] = [
                             'joiner' => 'and',
                             'property' => $field,
-                            'type' => 'eq',
-                            'text' => $value,
+                            'type' => 'list',
+                            'text' => $flatArray($values),
                         ];
                     }
                 }

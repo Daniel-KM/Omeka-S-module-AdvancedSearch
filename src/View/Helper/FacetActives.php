@@ -19,28 +19,39 @@ class FacetActives extends AbstractFacet
     {
         $isFacetModeDirect = ($options['mode'] ?? '') === 'link';
 
-        foreach ($activeFacets as $facetField => &$facetValues) {
-            $facetFieldLabel = $options['facets'][$facetField]['label'] ?? $facetField;
+        foreach ($activeFacets as $facetName => &$facetValues) {
+            $facetFieldLabel = $options['facets'][$facetName]['label'] ?? $facetName;
             foreach ($facetValues as $facetKey => &$facetValue) {
-                $facetValueLabel = (string) $this->facetValueLabel($facetField, $facetValue);
+                $facetValueLabel = (string) $this->facetValueLabel($facetName, $facetValue);
                 if (!strlen($facetValueLabel)) {
-                    unset($activeFacets[$facetField][$facetKey]);
+                    unset($activeFacets[$facetName][$facetKey]);
                     continue;
                 }
 
                 $facetValueValue = (string) $facetValue;
                 $query = $this->queryBase;
 
-                if (!isset($query['facet'][$facetField])
-                    || array_search($facetValueValue, $query['facet'][$facetField]) === false
+                if (!isset($query['facet'][$facetName])
+                    || array_search($facetValueValue, $query['facet'][$facetName]) === false
                 ) {
                     continue;
                 }
 
-                $values = $query['facet'][$facetField];
+                $currentValues = $query['facet'][$facetName];
+
                 // TODO Remove this filter to keep all active facet values?
-                $values = array_filter($values, fn ($v) => $v !== $facetValueValue);
-                $query['facet'][$facetField] = $values;
+                // Manage special filters with string keys, like Select range
+                // with from/to. In that case, remove the specific key.
+                $firstKey = key($currentValues);
+                if (!is_numeric($firstKey)) {
+                    $newValues = $currentValues;
+                    unset($newValues[$facetKey]);
+                    $newValues = array_filter($newValues, fn($v) => $v !== null && $v !== '');
+                } else {
+                    $newValues = array_diff($currentValues, [$facetValueValue]);
+                }
+
+                $query['facet'][$facetName] = $newValues;
 
                 $url = $isFacetModeDirect
                     ? $this->urlHelper->__invoke($this->route, $this->params, ['query' => $query])
@@ -55,7 +66,9 @@ class FacetActives extends AbstractFacet
                     'fieldLabel' => $facetFieldLabel,
                 ];
             }
+            unset($facetValue);
         }
+        unset($facetValues);
 
         return $activeFacets;
     }

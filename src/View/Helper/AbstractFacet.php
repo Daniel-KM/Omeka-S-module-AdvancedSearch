@@ -187,11 +187,13 @@ class AbstractFacet extends AbstractHelper
     /**
      * The facets may be indexed by the search engine.
      *
+     * @param string|int|float|null $value
+     *
      * @todo Remove search of facet labels: use values from the response (possible only for solr for now).
      */
-    protected function facetValueLabel(string $facetField, string $value): ?string
+    protected function facetValueLabel(string $facetField, $value): ?string
     {
-        if (!strlen($value)) {
+        if (is_null($value) || !strlen((string) $value)) {
             return null;
         }
 

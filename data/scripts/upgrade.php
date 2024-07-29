@@ -25,6 +25,8 @@ $connection = $services->get('Omeka\Connection');
 $messenger = $plugins->get('messenger');
 $entityManager = $services->get('Omeka\EntityManager');
 
+$config = $services->get('Config');
+
 if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.61')) {
     $message = new \Omeka\Stdlib\Message(
         $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
@@ -735,6 +737,7 @@ SQL;
 }
 
 if (version_compare($oldVersion, '3.4.28', '<')) {
+    $logger = $services->get('Omeka\Logger');
     $stringsAndMessages = [
         'facet_filters' => [
             'strings' => [
@@ -809,11 +812,74 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
     }
     if ($results) {
         $messages = [];
-        foreach ($results as $key => $result) {
-            $message = new PsrMessage($stringsAndMessages[$key]['message'], ['json' => json_encode($result, 448)]);
+        if (empty($config['advancedsearch_skip_exception'])) {
+            $message = new PsrMessage(
+                'The module may break the theme to manage new features, in particular for facets.
+To avoid this check, add temporarily the key "advancedsearch_skip_exception" with value "true" in the file config/local.config.php.
+The list of issues is available in logs too.' // @translate
+            );
             $message->setTranslator($translator);
             $messages[] = $message;
         }
-        throw new \Omeka\Module\Exception\ModuleCannotInstallException(implode("\n\n", array_map('strval', $messages)));
+        foreach ($results as $key => $result) {
+            $message = new PsrMessage($stringsAndMessages[$key]['message'], ['json' => json_encode($result, 448)]);
+            $message->setTranslator($translator);
+            $logger->err($message->getMessage(), $message->getContext());
+            $messages[] = $message;
+        }
+        if (empty($config['advancedsearch_skip_exception'])) {
+            throw new \Omeka\Module\Exception\ModuleCannotInstallException(implode("\n\n", array_map('strval', $messages)));
+        }
+        $messenger->addErrors($messages);
+        $message = new PsrMessage(
+            'The key "advancedsearch_skip_exception" can be removed from the file config/local.config.php.' // @translate
+        );
+        $messenger->addNotice($message);
+    }
+
+    $stringsAndMessages = [
+        'searchingForm' => [
+            'strings' => [
+                'themes/*/common/search-form*' => [
+                    'searchingForm(',
+                ],
+                'themes/*/view/common/block-layout/search*' => [
+                    'searchingForm(',
+                ],
+                'themes/*/view/common/block-layout/searching-form*' => [
+                    'searchingForm(',
+                ],
+                'themes/*/view/search/index/search*' => [
+                    'searchingForm(',
+                ],
+            ],
+            'message' => 'The view helper `searchingForm()` is deprecated. Replace it with `$searchConfig->renderForm([])`. Matching templates: {json}', // @translate
+        ],
+        'title' => [
+            'strings' => [
+                'themes/*/view/search/results.phtml' => [
+                    '* @var string $title',
+                ],
+                'themes/*/view/search/resource-list.phtml' => [
+                    '* @var string $title',
+                ],
+            ],
+            'message' => 'The title of the result part is no more appended in template "search/resource-list" or "search/results", but in main search template. Update your theme. Matching templates: {json}', // @translate
+        ],
+    ];
+    $manageModuleAndResources = $this->getManageModuleAndResources();
+    $results = [];
+    foreach ($stringsAndMessages as $key => $stringsAndMessage) foreach ($stringsAndMessage['strings'] as $path => $strings) {
+        $result = $manageModuleAndResources->checkStringsInFiles($strings, $path);
+        if ($result) {
+            $results[$key][trim(basename($path), '*')] = $result;
+        }
+    }
+    if ($results) {
+        foreach ($results as $key => $result) {
+            $message = new PsrMessage($stringsAndMessages[$key]['message'], ['json' => json_encode($result, 448)]);
+            $logger->warn($message->getMessage(), $message->getContext());
+            $messenger->addWarning($message);
+        }
     }
 }

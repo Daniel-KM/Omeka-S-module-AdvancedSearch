@@ -1282,10 +1282,42 @@ if (version_compare($oldVersion, '3.4.29', '<')) {
     }
 }
 
-if (version_compare($oldVersion, '3.4.30', '<')) {
+if (version_compare($oldVersion, '3.4.31', '<')) {
     // Check for upgraded features.
     $logger = $services->get('Omeka\Logger');
     $stringsAndMessages = [
+        'settings-search' => [
+            'strings' => [
+                'themes/*/view/search/*' => [
+                    "etting('search',",
+                ],
+            ],
+            'message' => 'The search config setting "search" was renamed "request". Check your theme. Matching templates: {json}', // @translate
+        ],
+        'settings-autosuggest' => [
+            'strings' => [
+                'themes/*/view/search/*' => [
+                    "etting('autosuggest',",
+                ],
+            ],
+            'message' => 'The search config setting "autosuggest" was renamed "q" and sub-settings too. Check your theme. Matching templates: {json}', // @translate
+        ],
+        'settings-per-page-list' => [
+            'strings' => [
+                'themes/*/view/search/*' => [
+                    "etting('pagination', 'per_page')",
+                ],
+            ],
+            'message' => 'The search config setting "pagination/per_page" was renamed "display/per_page_list". Check your theme. Matching templates: {json}', // @translate
+        ],
+        'settings-sort' => [
+            'strings' => [
+                'themes/*/view/search/*' => [
+                    "etting('sort',",
+                ],
+            ],
+            'message' => 'The search config setting "sort/fields" was renamed "display/sort_list" and label "sort/label" was renamed "display/label_sort". Check your theme. Matching templates: {json}', // @translate
+        ],
         'resource-name' => [
             'strings' => [
                 'themes/*/view/search/*' => [
@@ -1328,6 +1360,26 @@ if (version_compare($oldVersion, '3.4.30', '<')) {
         }
     }
 
+    // Add a unique name as key to filters.
+    $qb = $connection->createQueryBuilder();
+    $qb
+        ->select('id', 'settings')
+        ->from('search_engine', 'search_engine')
+        // Only upgrade internal options.
+        ->where('adapter = "internal"')
+        ->orderBy('id', 'asc');
+    $searchEngineSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    foreach ($searchEngineSettings as $key => $searchEngineSetting) {
+        $searchEngineSettings[$key] = json_decode($searchEngineSetting, true) ?: [];
+    }
+
+    $qb = $connection->createQueryBuilder();
+    $qb
+        ->select('id', 'engine_id')
+        ->from('search_config', 'search_config')
+        ->orderBy('id', 'asc');
+    $searchConfigsEngines = $connection->executeQuery($qb)->fetchAllKeyValue();
+
     $qb = $connection->createQueryBuilder();
     $qb
         ->select('id', 'settings')
@@ -1335,7 +1387,40 @@ if (version_compare($oldVersion, '3.4.30', '<')) {
         ->orderBy('id', 'asc');
     $searchConfigsSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
     foreach ($searchConfigsSettings as $id => $searchConfigSettings) {
+        $searchEngineId = $searchConfigsEngines[$id] ?? null;
+        // Renamed the main option for request.
         $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
+        $searchConfigSettings = ['request' => $searchConfigSettings['search'] ?? []] + $searchConfigSettings;
+        unset($searchConfigSettings['search']);
+        // Renamed the option "autosuggest" as "q".
+        $autoSuggest = $searchConfigSettings['autosuggest'] ?? null;
+        if ($autoSuggest) {
+            // suggest limit is an old setting.
+            $searchConfigSettings['q'] = $autoSuggest;
+            $searchConfigSettings['q']['suggester'] = $autoSuggest['suggester'] ?? null;
+            $searchConfigSettings['q']['suggest_url'] = $autoSuggest['url'] ?? null;
+            $searchConfigSettings['q']['suggest_url_param_name'] = $autoSuggest['url_param_name'] ?? null;
+            $searchConfigSettings['q']['suggest_limit'] = $autoSuggest['limit'] ?? null;
+            $searchConfigSettings['q']['suggest_fill_input'] = $autoSuggest['fill_input'] ?? null;
+            unset($searchConfigSettings['autosuggest'], $searchConfigSettings['q']['url'], $searchConfigSettings['q']['url_param_name'], $searchConfigSettings['q']['limit'], $searchConfigSettings['q']['fill_input']);
+        }
+        // Move a request settings to "q".
+        $searchConfigSettings['q']['fulltext_search'] = $searchConfigSettings['request']['fulltext_search'] ?? null;
+        unset($searchConfigSettings['request']['fulltext_search']);
+        if (!empty($searchEngineSettings[$searchEngineId])) {
+            // Append internal adapter settings to "q".
+            $searchConfigSettings['q']['default_search_partial_word'] = !empty($searchEngineSettings[$searchEngineId]['adapter']['default_search_partial_word']);
+            // Append internal adapter multi-fields to "index/aliases".
+            $searchConfigSettings['index']['aliases'] = $searchEngineSettings[$searchEngineId]['adapter']['multifields'] ?? [];
+        }
+        // Renamed the option "sort".
+        $searchConfigSettings['display']['label_sort'] = $searchConfigSettings['sort']['label'] ?? $searchConfigSettings['display']['label_sort'] ?? null;
+        $searchConfigSettings['display']['sort_list'] = $searchConfigSettings['sort']['fields'] ?? $searchConfigSettings['display']['sort_list'] ?? [];
+        unset($searchConfigSettings['sort']);
+        // Add sort by relevance for internal engine.
+        if (!empty($searchEngineSettings[$searchEngineId])) {
+            $searchConfigSettings['display']['sort_list']['relevance desc'] ??= ['name' => 'relevance desc', 'label' => $translate('Relevance')];
+        }
         // Set old options.
         $searchConfigSettings['display']['by_resource_type'] = true;
         $filters = [];
@@ -1499,6 +1584,14 @@ if (version_compare($oldVersion, '3.4.30', '<')) {
     $sql = 'UPDATE `search_suggester` SET `name` = ? WHERE `name` = ?;';
     $connection->executeStatement($sql, [$translate('Main index'), 'Internal suggester (sql)']);
 
+    $siteSettings = $services->get('Omeka\Settings\Site');
+    $siteIds = $api->search('sites', [], ['returnScalar' => 'id'])->getContent();
+    foreach ($siteIds as $siteId) {
+        $siteSettings->setTargetId($siteId);
+        $siteSettings->set('advancedsearch_property_improved', true);
+    }
+    $settings->set('advancedsearch_property_improved', true);
+
     $message = new PsrMessage(
         'The form simple filters is now simpler to manage.' // @translate
     );
@@ -1533,4 +1626,19 @@ if (version_compare($oldVersion, '3.4.30', '<')) {
         'it is now possible to display all resources (item sets, items, etc.) together in results or to separate them, like in previous versions.' // @translate
     );
     $messenger->addSuccess($message);
+
+    $message = new PsrMessage(
+        'A new element was added to the standard advanced search for a thumbnail attached to a resource.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new PsrMessage(
+        'A new element was added to the standard advanced search to filter properties. It allows to avoid to override the default element to search properties. An option is added in main settings and site settings to set them.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new PsrMessage(
+        'You should check all your search engines: form, filters, results, sort, facets. It may be simpler to remove all your specific search files and to update only the css.' // @translate
+    );
+    $messenger->addWarning($message);
 }

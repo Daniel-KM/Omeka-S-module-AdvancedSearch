@@ -30,12 +30,23 @@
 
 namespace AdvancedSearch\Adapter;
 
+use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 
 interface AdapterInterface
 {
     public function setServiceLocator(ServiceLocatorInterface $serviceLocator): self;
+
+    /**
+     * Set the search config for this adapter.
+     */
+    public function setSearchConfig(SearchConfigRepresentation $searchConfig): self;
+
+    /**
+     * Get the search config of this adapter.
+     */
+    public function getSearchConfig(): ?SearchConfigRepresentation;
 
     /**
      * Set the search engine for this adapter.

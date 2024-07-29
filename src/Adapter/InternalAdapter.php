@@ -26,7 +26,9 @@ class InternalAdapter extends AbstractAdapter
         $fields = $this->getDefaultFields();
 
         // Display specific fields first, but keep standard fields.
-        $multiFields = $this->searchEngine ? $this->searchEngine->settingAdapter('multifields', []) : [];
+        $multiFields = $this->searchConfig
+            ? $this->searchConfig->subSetting('index', 'multifields', [])
+            : [];
         // Don't bypass default fields with the specific ones.
         $fields = array_merge($fields, $multiFields);
 
@@ -119,8 +121,8 @@ class InternalAdapter extends AbstractAdapter
         asort($propertyLabelsByTerms);
 
         // Don't bypass default fields with the specific ones, so remove them.
-        $multiFields = $this->searchEngine
-            ? $this->searchEngine->settingAdapter('multifields', [])
+        $multiFields = $this->searchConfig
+            ? $this->searchConfig->subSetting('index', 'multifields', [])
             : [];
         $multiFields = array_diff_key($multiFields, $defaultFields, $propertyLabelsByTerms);
 

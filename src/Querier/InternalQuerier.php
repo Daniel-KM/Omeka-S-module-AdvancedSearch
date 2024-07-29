@@ -659,8 +659,6 @@ SQL;
 
     protected function filterQueryValues(array $filters, bool $inListForFacets = false): void
     {
-        $multifields = $this->engine->settingAdapter('multifields', []);
-
         $flatArray = function ($values): array {
             if (!is_array($values)) {
                 return [$values];
@@ -769,10 +767,7 @@ SQL;
                     break;
                 }
                 $field = $fieldData['field'] ?? $fieldName;
-                $field = $this->easyMeta->propertyTerm($field)
-                    ?? $multifields[$field]['fields']
-                    ?? $this->underscoredNameToTerm($field)
-                    ?? null;
+                $field = $this->fieldToIndex($field);
                 if (!$field) {
                     break;
                 }
@@ -807,10 +802,7 @@ SQL;
                 break;
 
             default:
-                $field = $this->easyMeta->propertyTerm($field)
-                    ?? $multifields[$field]['fields']
-                    ?? $this->underscoredNameToTerm($field)
-                    ?? null;
+                $field = $this->fieldToIndex($field);
                 if (!$field) {
                     break;
                 }
@@ -845,15 +837,11 @@ SQL;
 
     protected function filterQueryRanges(array $dateRangeFilters): void
     {
-        $multifields = $this->engine->settingAdapter('multifields', []);
         foreach ($dateRangeFilters as $field => $filterValues) {
             if ($field === 'created' || $field === 'modified') {
                 $argName = 'datetime';
             } else {
-                $field = $this->easyMeta->propertyTerm($field)
-                    ?? $multifields[$field]['fields']
-                    ?? $this->underscoredNameToTerm($field)
-                    ?? null;
+                $field = $this->fieldToIndex($field);
                 if (!$field) {
                     continue;
                 }
@@ -889,12 +877,8 @@ SQL;
      */
     protected function filterQueryFilters(array $filters): void
     {
-        $multifields = $this->engine->settingAdapter('multifields', []);
         foreach ($filters as $field => $values) {
-            $field = $this->easyMeta->propertyTerm($field)
-                ?? $multifields[$field]['fields']
-                ?? $this->underscoredNameToTerm($field)
-                ?? null;
+            $field = $this->fieldToIndex($field);
             if (!$field) {
                 continue;
             }
@@ -980,6 +964,22 @@ SQL;
         return isset($this->args['facet'])
             && is_array($this->args['facet'])
             && array_intersect_key($specificKeys, $this->args['facet']);
+    }
+
+    /**
+     * Convert a field argument into one or more indexes.
+     *
+     * The indexes are the properties in internal sql.
+     *
+     * @return array|string|null
+     */
+    protected function fieldToIndex(string $field)
+    {
+        $multifields = $this->query->getMultiFields();
+        return $this->easyMeta->propertyTerm($field)
+            ?? $multifields[$field]['fields']
+            ?? $this->underscoredNameToTerm($field)
+            ?? null;
     }
 
     /**
@@ -1095,9 +1095,6 @@ SQL;
             ],
         ];
 
-        // Convert multi-fields into a list of property terms.
-        $multifields = $this->engine->settingAdapter('multifields', []);
-
         // Normalize search query keys as omeka keys for items and item sets.
         // TODO Manages individual options for range, main data types, data types.
 
@@ -1119,8 +1116,7 @@ SQL;
             // Check for specific fields of the search engine.
             $facetField = $facetData['field'];
             $facetField = $metadataFieldsToReferenceFields[$facetField]
-                ?? $this->easyMeta->propertyTerm($facetField)
-                ?? $multifields[$facetField]['fields']
+                ?? $this->fieldToIndex($facetField)
                 ?? $facetField;
             $referenceMetadata[$facetName] = $facetField;
             // Check for specific options for the current facet.

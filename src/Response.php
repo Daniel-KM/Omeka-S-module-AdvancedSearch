@@ -30,12 +30,13 @@
 
 namespace AdvancedSearch;
 
+use JsonSerializable;
 use Omeka\Api\Manager as ApiManager;
 
 /**
  * @todo Manage resources as a whole with a global order.
  */
-class Response implements \JsonSerializable
+class Response implements JsonSerializable
 {
     /**
      * @var \Omeka\Api\Manager

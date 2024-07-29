@@ -29,10 +29,12 @@
  */
 namespace AdvancedSearch;
 
+use JsonSerializable;
+
 /**
  * @todo Replace by the solarium query, that manages everything and can be used by mysql too!
  */
-class Query implements \JsonSerializable
+class Query implements JsonSerializable
 {
     /**
      * @var string
@@ -48,6 +50,11 @@ class Query implements \JsonSerializable
      * @var bool
      */
     protected $byResourceType = false;
+
+    /**
+     * @var array
+     */
+    protected $multiFields = [];
 
     /**
      * @var bool
@@ -189,6 +196,24 @@ class Query implements \JsonSerializable
     public function getByResourceType(): bool
     {
         return $this->byResourceType;
+    }
+
+    /**
+     * Allow to manage multiple indexes with one alias name (aggregated fields).
+     *
+     * @param array $multifields Associative array where the key is the
+     * multi-field name and the value is an array containing three keys for
+     * name, label, and fields. The fields are a list of native indexes.
+     */
+    public function setMultiFields(array $multifields): self
+    {
+        $this->multiFields = $multifields;
+        return $this;
+    }
+
+    public function getMultiFields(): array
+    {
+        return $this->multiFields;
     }
 
     public function setIsPublic($isPublic): self

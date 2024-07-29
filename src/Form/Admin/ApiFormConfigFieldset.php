@@ -19,6 +19,8 @@ class ApiFormConfigFieldset extends Fieldset
     {
         // Mapping between omeka api and search engine.
 
+        /** @see \AdvancedSearch\FormAdapter\ApiFormAdapter */
+
         $this
             ->setName('form')
             ->setLabel('Specific settings'); // @translate
@@ -354,14 +356,14 @@ class ApiFormConfigFieldset extends Fieldset
 
     protected function getAvailableFields(): array
     {
-        $options = [];
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $this->getOption('search_config');
-        $searchEngine = $searchConfig->engine();
-        $searchAdapter = $searchEngine->adapter();
+        $searchAdapter = $searchConfig ? $searchConfig->searchAdapter() : null;
         if (empty($searchAdapter)) {
             return [];
         }
-        $fields = $searchAdapter->setSearchEngine($searchEngine)->getAvailableFields();
+        $fields = $searchAdapter->getAvailableFields();
+        $options = [];
         foreach ($fields as $name => $field) {
             $options[$name] = $field['label'] ?? $name;
         }
@@ -370,14 +372,14 @@ class ApiFormConfigFieldset extends Fieldset
 
     protected function getAvailableSortFields(): array
     {
-        $options = [];
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $this->getOption('search_config');
-        $searchEngine = $searchConfig->engine();
-        $searchAdapter = $searchEngine->adapter();
+        $searchAdapter = $searchConfig ? $searchConfig->searchAdapter() : null;
         if (empty($searchAdapter)) {
             return [];
         }
-        $fields = $searchAdapter->setSearchEngine($searchEngine)->getAvailableSortFields();
+        $fields = $searchAdapter->getAvailableSortFields();
+        $options = [];
         foreach ($fields as $name => $field) {
             $options[$name] = $field['label'] ?? $name;
         }

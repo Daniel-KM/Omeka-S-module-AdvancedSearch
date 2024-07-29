@@ -263,17 +263,9 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
     {
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $this->getOption('search_config');
-        if (!$searchConfig) {
-            return [];
-        }
-
-        $searchEngine = $searchConfig->engine();
-        $searchAdapter = $searchEngine ? $searchEngine->adapter() : null;
-        if (empty($searchAdapter)) {
-            return [];
-        }
-
-        $searchAdapter->setSearchEngine($searchEngine);
-        return $searchAdapter->getAvailableFacetFieldsForSelect();
+        $searchAdapter = $searchConfig ? $searchConfig->searchAdapter() : null;
+        return $searchAdapter
+            ? $searchAdapter->getAvailableFacetFieldsForSelect()
+            : [];
     }
 }

@@ -217,14 +217,10 @@ class SearchSuggesterForm extends Form
     protected function getAvailableFields(): array
     {
         /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation $searchEngine */
-        $searchEngine = $this->getOption('engine');
-        if (!$searchEngine) {
-            return [];
-        }
-
-        $searchAdapter = $searchEngine->adapter();
-        return empty($searchAdapter)
-            ? []
-            : $searchAdapter->setSearchEngine($searchEngine)->getAvailableFieldsForSelect();
+        $searchEngine = $this->getOption('search_engine');
+        $searchAdapter = $searchEngine ? $searchEngine->adapter() : null;
+        return $searchAdapter
+            ? $searchAdapter->getAvailableFieldsForSelect()
+            : [];
     }
 }

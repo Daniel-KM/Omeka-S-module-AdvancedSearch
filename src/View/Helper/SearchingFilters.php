@@ -87,11 +87,10 @@ class SearchingFilters extends AbstractHelper
         $this->baseUrl = $url(null, [], true);
         $this->query = $query;
 
-        $searchEngine = $searchConfig->engine();
-        $searchAdapter = $searchEngine->adapter();
-        $availableFields = empty($searchAdapter)
-            ? []
-            : $searchAdapter->setSearchEngine($searchEngine)->getAvailableFields();
+        $searchAdapter = $searchConfig->searchAdapter();
+        $availableFields = $searchAdapter
+            ? $searchAdapter->getAvailableFields()
+            : [];
         $searchFormSettings = $searchConfig->setting('form') ?: [];
 
         // Manage all fields, included those not in the form in order to support

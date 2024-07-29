@@ -126,12 +126,12 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
 
     public function searchAdapter(): ?\AdvancedSearch\Adapter\AdapterInterface
     {
-        $engine = $this->engine();
-        if ($engine) {
-            $adapter = $engine->adapter();
-            return $adapter
-                ? $adapter->setSearchEngine($engine)
-                : null;
+        $searchEngine = $this->engine();
+        if ($searchEngine) {
+            $adapter = $searchEngine->adapter();
+            if ($adapter) {
+                return $adapter->setSearchConfig($this);
+            }
         }
         return null;
     }
@@ -404,32 +404,9 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
                 ->setMessage($message->setTranslator($translator));
         }
 
-        $fields = [];
-        if ($field) {
-            $metadataFieldsToNames = [
-                'resource_name' => 'resource_type',
-                'resource_type' => 'resource_type',
-                'is_public' => 'is_public',
-                'owner_id' => 'o:owner',
-                'site_id' => 'o:site',
-                'resource_class_id' => 'o:resource_class',
-                'resource_template_id' => 'o:resource_template',
-                'item_set_id' => 'o:item_set',
-                'access' => 'access',
-                'item_sets_tree' => 'o:item_set',
-            ];
-            // Convert multi-fields into a list of property terms.
-            // Normalize search query keys as omeka keys for items and item sets.
-            $multifields = $this->subSetting('index', 'multifields', []);
-            $cleanField = $metadataFieldsToNames[$field]
-                ?? $easyMeta->propertyTerm($field)
-                ?? $multifields[$field]['fields']
-                ?? $field;
-            $fields = (array) $cleanField;
-        }
-
         // Prepare dynamic query.
         $query = new Query();
+
         $query->setQuery($q);
 
         $user = $services->get('Omeka\AuthenticationService')->getIdentity();
@@ -448,6 +425,32 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
 
         if ($site) {
             $query->setSiteId($site->id());
+        }
+
+        $multifields = $this->subSetting('index', 'multifields', []);
+        $query->setMultiFields($multifields);
+
+        $fields = [];
+        if ($field) {
+            $metadataFieldsToNames = [
+                'resource_name' => 'resource_type',
+                'resource_type' => 'resource_type',
+                'is_public' => 'is_public',
+                'owner_id' => 'o:owner',
+                'site_id' => 'o:site',
+                'resource_class_id' => 'o:resource_class',
+                'resource_template_id' => 'o:resource_template',
+                'item_set_id' => 'o:item_set',
+                'access' => 'access',
+                'item_sets_tree' => 'o:item_set',
+            ];
+            // Convert multi-fields into a list of property terms.
+            // Normalize search query keys as omeka keys for items and item sets.
+            $cleanField = $metadataFieldsToNames[$field]
+                ?? $easyMeta->propertyTerm($field)
+                ?? $multifields[$field]['fields']
+                ?? $field;
+            $fields = (array) $cleanField;
         }
 
         $engineSettings = $engine->settings();

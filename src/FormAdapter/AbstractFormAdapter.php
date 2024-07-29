@@ -128,9 +128,11 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
         $helpers = $services->get('ViewHelperManager');
 
         $vars = [
-            'site' => $options['site'] ?? $helpers->get('currentSite')(),
             'searchConfig' => $this->searchConfig,
+            'site' => $options['site'] ?? $helpers->get('currentSite')(),
+            // The form is set via searchConfig.
             'form' => null,
+            // Set a default empty query and response to simplify view.
             'query' => new Query,
             'response' => new Response,
         ];
@@ -203,6 +205,9 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
     {
         // TODO Prepare the full query here for simplification.
         $query = new Query;
+
+        $query
+            ->setMultiFields($formSettings['multifields'] ?? []);
 
         // Solr doesn't allow unavailable args anymore (invalid or unknown).
         // Furthermore, fields are case sensitive.

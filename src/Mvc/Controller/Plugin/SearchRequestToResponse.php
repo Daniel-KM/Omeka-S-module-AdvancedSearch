@@ -84,9 +84,9 @@ class SearchRequestToResponse extends AbstractPlugin
         $searchFormSettings = $searchConfigSettings['form'] ?? [];
 
         $this->searchEngine = $searchConfig->engine();
-        $searchAdapter = $this->searchEngine ? $this->searchEngine->adapter() : null;
+        $searchAdapter = $searchConfig->searchAdapter();
         if ($searchAdapter) {
-            $availableFields = $searchAdapter->setSearchEngine($this->searchEngine)->getAvailableFields();
+            $availableFields = $searchAdapter->getAvailableFields();
             // Include the specific fields to simplify querying with main form.
             $searchFormSettings['available_fields'] = $availableFields;
             $specialFieldsToInputFields = [
@@ -350,11 +350,11 @@ class SearchRequestToResponse extends AbstractPlugin
         if (empty($sortFieldsSettings)) {
             return [];
         }
-        $engineAdapter = $this->searchEngine->adapter();
-        if (empty($engineAdapter)) {
+        $searchAdapter = $this->searchConfig->searchAdapter();
+        if (empty($searchAdapter)) {
             return [];
         }
-        $availableSortFields = $engineAdapter->setSearchEngine($this->searchEngine)->getAvailableSortFields();
+        $availableSortFields = $searchAdapter->getAvailableSortFields();
         return array_intersect_key($sortFieldsSettings, $availableSortFields);
     }
 }

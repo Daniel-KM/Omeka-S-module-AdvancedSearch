@@ -70,7 +70,7 @@ class SearchSuggesterController extends AbstractActionController
 
         $form = $this->getForm(SearchSuggesterForm::class, [
             'add' => false,
-            'engine' => $searchEngine,
+            'search_engine' => $searchEngine,
             'is_internal' => $isInternal,
         ]);
         $form->setData($data);

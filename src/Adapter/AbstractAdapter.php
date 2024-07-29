@@ -30,6 +30,7 @@
 
 namespace AdvancedSearch\Adapter;
 
+use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 
@@ -39,6 +40,11 @@ abstract class AbstractAdapter implements AdapterInterface
      * @var \Laminas\ServiceManager\ServiceLocatorInterface
      */
     protected $services;
+
+    /**
+     * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation
+     */
+    protected $searchConfig;
 
     /**
      * @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation
@@ -69,6 +75,17 @@ abstract class AbstractAdapter implements AdapterInterface
     {
         $this->services = $serviceLocator;
         return $this;
+    }
+
+    public function setSearchConfig(SearchConfigRepresentation $searchConfig): self
+    {
+        $this->searchConfig = $searchConfig;
+        return $this;
+    }
+
+    public function getSearchConfig(): ?SearchConfigRepresentation
+    {
+        return $this->searchConfig;
     }
 
     public function setSearchEngine(SearchEngineRepresentation $searchEngine): self

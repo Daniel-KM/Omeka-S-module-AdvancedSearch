@@ -88,6 +88,8 @@ class ApiFormAdapter implements FormAdapterInterface
     public function toQuery(array $request, array $formSettings): \AdvancedSearch\Query
     {
         $query = new Query();
+        $query
+            ->setMultiFields($formSettings['multifields'] ?? []);
 
         if (isset($request['search'])) {
             $query->setQuery($request['search']);

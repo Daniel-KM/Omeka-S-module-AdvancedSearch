@@ -171,21 +171,17 @@ class Advanced extends Fieldset
     protected function getFilterFields(): array
     {
         $fields = $this->getOption('fields');
-        if (empty($fields)) {
+        if (!$fields) {
             return [];
         }
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $this->getOption('search_config');
-        if (!$searchConfig) {
+        $searchAdapter = $searchConfig ? $searchConfig->searchAdapter() : null;
+        if (!$searchAdapter) {
             return [];
         }
-        $searchEngine = $searchConfig->engine();
-        $searchAdapter = $searchEngine->adapter();
-        if (empty($searchAdapter)) {
-            return [];
-        }
-        $availableFields = $searchAdapter->getAvailableFields($searchEngine);
-        if (empty($availableFields)) {
+        $availableFields = $searchAdapter->getAvailableFields();
+        if (!$availableFields) {
             return [];
         }
         return array_intersect_key($fields, $availableFields);

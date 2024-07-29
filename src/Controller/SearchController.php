@@ -79,6 +79,7 @@ class SearchController extends AbstractActionController
             'searchConfig' => $searchConfig,
             'site' => $site,
             // Set a default empty query and response to simplify view.
+            // They will be filled in searchRequestToResponse.
             'query' => new Query,
             'response' => new Response,
         ]);
@@ -151,6 +152,7 @@ class SearchController extends AbstractActionController
 
         /** @see \AdvancedSearch\Mvc\Controller\Plugin\SearchRequestToResponse */
         $result = $this->searchRequestToResponse($request, $searchConfig, $site);
+
         if ($result['status'] === 'fail') {
             // Currently only "no query".
             if ($isJsonQuery) {

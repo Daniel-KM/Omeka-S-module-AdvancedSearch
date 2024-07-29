@@ -268,7 +268,9 @@ class ApiSearch extends AbstractPlugin
 
         // There is no form validation/filter.
 
-        // Begin building the search query.
+        /** @see \AdvancedSearch\Form\Admin\ApiFormConfigFieldset */
+
+         // Begin building the search query.
         $resourceType = $request->getResource();
         $searchConfigSettings = $this->searchConfig->settings();
         $searchFormSettings = $searchConfigSettings['form'] ?? [
@@ -279,10 +281,9 @@ class ApiSearch extends AbstractPlugin
         ];
         $searchFormSettings['resource'] = $resourceType;
         // Fix to be removed.
-        $searchEngine = $this->searchConfig->engine();
-        $searchAdapter = $searchEngine ? $searchEngine->adapter() : null;
+        $searchAdapter = $this->searchConfig->searchAdapter();
         if ($searchAdapter) {
-            $availableFields = $searchAdapter->setSearchEngine($searchEngine)->getAvailableFields();
+            $availableFields = $searchAdapter->getAvailableFields();
             $searchFormSettings['available_fields'] = array_combine(array_keys($availableFields), array_keys($availableFields));
         } else {
             $searchFormSettings['available_fields'] = [];

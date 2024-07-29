@@ -97,6 +97,7 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
     public function suggest(string $q, ?SiteRepresentation $site = null): Response
     {
         $query = new Query();
+
         $query->setQuery($q);
 
         $services = $this->getServiceLocator();
@@ -116,6 +117,23 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
 
         if ($site) {
             $query->setSiteId($site->id());
+            $siteSettings = $services->get('Omeka\Settings\Site');
+            $searchConfigId = (int) $siteSettings->get('advancedsearch_main_config');
+        } else {
+            $settings = $services->get('Omeka\Settings');
+            $searchConfigId = (int) $settings->get('advancedsearch_main_config');
+        }
+
+        if ($searchConfigId) {
+            $api = $services->get('Omeka\ApiManager');
+            try {
+                /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig*/
+                $searchConfig = $api->read('search_configs', ['id' => $searchConfigId])->getContent();
+                $multifields = $searchConfig->subSetting('index', 'multifields', []);
+                $query->setMultiFields($multifields);
+            } catch (\Exception $e) {
+                // No multifields.
+            }
         }
 
         $engine = $this->engine();

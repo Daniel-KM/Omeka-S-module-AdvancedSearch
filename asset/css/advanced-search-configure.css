@@ -43,4 +43,7 @@
     .ui-dialog .ui-dialog-titlebar-close {
         min-height: inherit;
     }
+    .field-description.no-link + a {
+        display: none;
+    }
 }

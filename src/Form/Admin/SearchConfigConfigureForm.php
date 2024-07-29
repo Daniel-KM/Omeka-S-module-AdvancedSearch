@@ -294,23 +294,24 @@ class SearchConfigConfigureForm extends Form
                 'type' => CommonElement\IniTextarea::class,
                 'options' => [
                     'label' => 'Filters', // @translate
-                    'info' => 'List of filters that will be displayed in the search form, formatted as ini. The section is a unique name. Keys are: field, label, type and specific keys.', // @translate
+                    'info' => 'List of filters that will be displayed in the search form, formatted as ini. The section is a unique name. Main keys are: field, label and type.', // @translate
                     // TODO Convert documentation into help. See application/view/common/form-row.phtml
                     'documentation' => nl2br(<<<'MARKDOWN'
-                        #"></a><div class="field-description">
-                        - The input types are: Text (default), Advanced (list of advanced filters), Checkbox, Number, Radio, Select, SelectFlat, SelectGroup, DateRange, Hidden, MultiCheckbox, MultiSelect, MultiSelectFlat, MultiSelectGroup, MultiText, and, for modules, Access, Thesaurus, and Tree.
-                        - "Advanced": use the specific options below.
-                        - "Checkbox": the keys "unchecked_value" and "checked_value" allows to define a specific value to be returned.
-                        - "DateRange": allow to display two html input "number" for start and end year.
-                        - "Hidden": the value can be passed with key "value". If the value is not a scalar, it is serialized as json.
-                        - "Number": the keys "min", "max" and "step" can be set.
-                        - "MultiSelectFlat" and "SelectFlat" may be used to be sure that values are flatten.
-                        - "MultiSelectGroup" and "SelectGroup" may be used for some specific fields that group options by default (resource classes, resource templates), in which case the options labels are removed.
-                        - "Tree" can be used for item sets when module ItemSetsTree is enabled and data indexed recursively.
-                        - For the types MultiCheckbox, Radio, Select, and derivatives, the values can be passed with key "value_options", else the ones of the field will be used.
-                        - The key "options" can be passed to set options. All available options of Omeka and Laminas can be passed.
-                        - The key "attributes" can be passed to set attributes of the html input. It may be used for class.
-                        </div><a style="display: none" href="#
+                        #"></a><div class="field-description no-link">
+                        - The field is the name of the metadata (resource_template_id, etc), of the index (date, author, etc), or the property term.
+                        - The key "options" can be passed to set options. All available options managed by Omeka or Laminas can be passed. For example, `options.checked_value = "yes"` or `options.value_options.first = "First"`.
+                        - The key "attributes" can be passed to set attributes of the html input. It may be used for class, min, max, step, placeholder, data, etc., for example `attributes.class = "specific-class"`.
+                        - The types are html input types: Text (default), Advanced (list of advanced filters), Checkbox, Hidden, Number, Radio, Range, RangeDouble, Select, SelectFlat, SelectGroup, MultiCheckbox, MultiSelect, MultiSelectFlat, MultiSelectGroup, MultiText, and, for modules, Access, Thesaurus, and Tree (item sets tree).
+                        - Checkbox: the keys "unchecked_value" and "checked_value" allow to define a specific value to be returned.
+                        - Hidden: the value can be passed with key "value". If the value is not a scalar, it is serialized as json.
+                        - Number: the keys "min", "max" and "step" can be set as attributes, else they will be extracted from data. Of course, data should be numbers.
+                        - Range and RangeDouble allows to display a slider with one or two values. Min and max are extracted from data if not set as attributes.
+                        - For Number, Range and RangeDouble, "first_digits" can be set as option to extract the years from dates, but it is recommended to use an index with the year in that case to avoid strange results when casting and sorting non-normalized data.
+                        - MultiSelectFlat and SelectFlat may be used to be sure that values are flatten.
+                        - MultiSelectGroup and SelectGroup may be used for some specific fields that group options by default (resource classes, resource templates), in which case the options labels are removed.
+                        - Tree can be used for item sets when module ItemSetsTree is enabled and data indexed recursively.
+                        - For the types MultiCheckbox, Radio, Select, and derivatives, the values can be passed with the option "value_options", else the ones of the field will be used.
+                        </div><a href="#
                         MARKDOWN), // @translate
                     'ini_typed_mode' => true,
                 ],

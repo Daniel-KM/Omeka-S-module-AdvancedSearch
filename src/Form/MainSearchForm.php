@@ -274,9 +274,6 @@ class MainSearchForm extends Form
                 case 'Checkbox':
                     $element = $this->searchCheckbox($filter);
                     break;
-                case 'Daterange':
-                    $element = $this->searchDateRange($filter);
-                    break;
                 case 'Csrf':
                 case 'Hidden':
                     $element = $this->searchHidden($filter);
@@ -302,12 +299,20 @@ class MainSearchForm extends Form
                     $element = $this->searchMultiSelectFlat($filter, $values);
                     break;
                 case 'Number':
-                    $values = $this->listValues($filter);
+                    $values = $this->listValuesAttributesMinMax($filter);
                     $element = $this->searchNumber($filter, $values);
                     break;
                 case 'Radio':
                     $values = $this->listValues($filter);
                     $element = $this->searchRadio($filter, $values);
+                    break;
+                case 'Range':
+                    $values = $this->listValuesAttributesMinMax($filter);
+                    $element = $this->searchRange($filter, $values);
+                    break;
+                case 'Rangedouble':
+                    $values = $this->listValuesAttributesMinMax($filter);
+                    $element = $this->searchRangeDouble($filter, $values);
                     break;
                 case 'Select':
                     $values = $this->listValues($filter);
@@ -512,11 +517,11 @@ class MainSearchForm extends Form
                 'allow_add' => true,
                 'allow_remove' => true,
                 'target_element' => $advanced,
-                'required' => false,
             ] + $filter['options'])
             ->setAttributes([
                 'id' => 'search-filters',
                 'class' => 'search-filters-advanced',
+                'required' => false,
                 // TODO Remove this attribute data and use only search config?
                 'data-count-default' => $defaultNumber,
                 'data-count-max' => $maxNumber,
@@ -532,44 +537,15 @@ class MainSearchForm extends Form
         $element
             ->setLabel($filter['label'])
         ;
-        if (array_key_exists('unchecked_value', $filter)) {
+        if (array_key_exists('unchecked_value', $filter['options'])) {
             $element
-                ->setOption('unchecked_value', $filter['unchecked_value']);
+                ->setOption('unchecked_value', $filter['options']['unchecked_value']);
         }
-        if (array_key_exists('checked_value', $filter)) {
+        if (array_key_exists('checked_value', $filter['options'])) {
             $element
-                ->setOption('checked_value', $filter['checked_value']);
+                ->setOption('checked_value', $filter['options']['checked_value']);
         }
         return $this->appendOptionsAndAttributes($element, $filter);
-    }
-
-    protected function searchDateRange(array $filter): ?ElementInterface
-    {
-        $fieldset = new Fieldset($filter['field']);
-        $fieldset
-            ->setLabel($filter['label'])
-            ->add([
-                'name' => 'from',
-                'type' => Element\Number::class,
-                'options' => [
-                    'label' => 'From', // @translate
-                ] + $filter['options'],
-                'attributes' => [
-                    'placeholder' => 'YYYY', // @translate
-                ] + $filter['attributes'],
-            ])
-            ->add([
-                'name' => 'to',
-                'type' => Element\Number::class,
-                'options' => [
-                    'label' => 'To', // @translate
-                ] + $filter['options'],
-                'attributes' => [
-                    'placeholder' => 'YYYY', // @translate
-                ] + $filter['attributes'],
-            ])
-        ;
-        return $fieldset;
     }
 
     protected function searchHidden(array $filter): ?ElementInterface
@@ -634,24 +610,14 @@ class MainSearchForm extends Form
         return $this->appendOptionsAndAttributes($element, $filter);
     }
 
-    protected function searchNumber(array $filter): ?ElementInterface
+    protected function searchNumber(array $filter, array $valueOptions): ?ElementInterface
     {
+        $filter['attributes']['min'] = $valueOptions['min'];
+        $filter['attributes']['max'] = $valueOptions['max'];
         $element = new Element\Number($filter['field']);
         $element
             ->setLabel($filter['label'])
         ;
-        if (array_key_exists('min', $filter)) {
-            $element
-                ->setAttribute('min', $filter['min']);
-        }
-        if (array_key_exists('max', $filter)) {
-            $element
-                ->setAttribute('max', $filter['max']);
-        }
-        if (array_key_exists('step', $filter)) {
-            $element
-                ->setAttribute('step', $filter['step']);
-        }
         return $this->appendOptionsAndAttributes($element, $filter);
     }
 
@@ -663,6 +629,37 @@ class MainSearchForm extends Form
             ->setValueOptions($valueOptions)
         ;
         return $this->appendOptionsAndAttributes($element, $filter);
+    }
+
+    protected function searchRange(array $filter, array $valueOptions): ?ElementInterface
+    {
+        $filter['attributes']['min'] = $valueOptions['min'];
+        $filter['attributes']['max'] = $valueOptions['max'];
+        $element = new Element\Range($filter['field']);
+        $element
+            ->setLabel($filter['label'])
+        ;
+        return $this->appendOptionsAndAttributes($element, $filter);
+    }
+
+    protected function searchRangeDouble(array $filter, array $valueOptions): ?ElementInterface
+    {
+        $filter['attributes']['min'] = $valueOptions['min'];
+        $filter['attributes']['max'] = $valueOptions['max'];
+        $element = new AdvancedSearchElement\RangeDouble($filter['field']);
+        $element
+            ->setLabel($filter['label'])
+            ->setOptions([
+                'options' => [
+                    'label_from' => $this->translator->translate('From'), // @translate
+                    'label_to' => $this->translator->translate('To'), // @translate
+                ] + $filter['options'],
+            ])
+            ->setAttributes([
+                'placeholder' => 'YYYY', // @translate
+            ] + $filter['attributes'])
+        ;
+        return $element;
     }
 
     protected function searchSelect(array $filter, array $valueOptions): ?ElementInterface
@@ -1029,11 +1026,11 @@ class MainSearchForm extends Form
             return [];
         }
 
-        $options = $filter['value_options'] ?? null;
-        if (is_array($options)) {
+        $valueOptions = $filter['options']['value_options'] ?? null;
+        if (is_array($valueOptions)) {
             // Avoid issue with duplicates.
-            $options = array_filter(array_keys(array_flip($options)), 'strlen');
-            return array_combine($options, $options);
+            $valueOptions = array_filter(array_keys(array_flip($valueOptions)), 'strlen');
+            return array_combine($valueOptions, $valueOptions);
         }
 
         $availableFields = in_array($this->variant, ['simple', 'csrf']) ? [] : $this->getAvailableFields();
@@ -1104,6 +1101,37 @@ class MainSearchForm extends Form
             default:
                 return $this->listValuesForField($field);
         }
+    }
+
+    protected function listValuesAttributesMinMax(array $filter): array
+    {
+        $min = $filter['attributes']['min'] ?? null;
+        $max = $filter['attributes']['max'] ?? null;
+        if (is_numeric($min) && is_numeric($max)) {
+            return [
+                'min' => $min,
+                'max' => $max,
+            ];
+        }
+        $values = $this->listValues($filter);
+        // Negative numbers are accepted in all cases (int parsing).
+        $firstDigits = isset($filter['options']['first_digits'])
+            && in_array($filter['options']['first_digits'], [1, true, '1', 'true'], true);
+        $values = $firstDigits
+            // There is no year "0", so extract first digits except 0.
+            ? array_filter(array_map('intval', $values))
+            // Keep all numeric values.
+            : array_map('intval', array_filter($values, 'is_numeric'));
+        if (!count($values)) {
+            return [
+                'min' => is_numeric($min) ? $min : null,
+                'max' => is_numeric($max) ? $max : null,
+            ];
+        }
+        return [
+            'min' => is_numeric($min) ? $min : min($values),
+            'max' => is_numeric($max) ? $max : max($values),
+        ];
     }
 
     /**
@@ -1354,43 +1382,43 @@ class MainSearchForm extends Form
         return $adapter ? $adapter->getAvailableFields() : [];
     }
 
-    public function setBasePath(string $basePath): Form
+    public function setBasePath(string $basePath): self
     {
         $this->basePath = $basePath;
         return $this;
     }
 
-    public function setSite(?SiteRepresentation $site): Form
+    public function setSite(?SiteRepresentation $site): self
     {
         $this->site = $site;
         return $this;
     }
 
-    public function setApi(ApiManager $api): Form
+    public function setApi(ApiManager $api): self
     {
         $this->api = $api;
         return $this;
     }
 
-    public function setEasyMeta(EasyMeta $easyMeta): Form
+    public function setEasyMeta(EasyMeta $easyMeta): self
     {
         $this->easyMeta = $easyMeta;
         return $this;
     }
 
-    public function setEntityManager(EntityManager $entityManager): Form
+    public function setEntityManager(EntityManager $entityManager): self
     {
         $this->entityManager = $entityManager;
         return $this;
     }
 
-    public function setEscapeHtml(EscapeHtml $escapeHtml): Form
+    public function setEscapeHtml(EscapeHtml $escapeHtml): self
     {
         $this->escapeHtml = $escapeHtml;
         return $this;
     }
 
-    public function setFormElementManager(FormElementManager $formElementManager): Form
+    public function setFormElementManager(FormElementManager $formElementManager): self
     {
         $this->formElementManager = $formElementManager;
         return $this;
@@ -1399,25 +1427,25 @@ class MainSearchForm extends Form
     /**
      * @param \ItemSetsTree\ViewHelper\ItemSetsTree $itemSetsTree
      */
-    public function setItemSetsTree($itemSetsTree): Form
+    public function setItemSetsTree($itemSetsTree): self
     {
         $this->itemSetsTree = $itemSetsTree;
         return $this;
     }
 
-    public function setSettings(Settings $settings): Form
+    public function setSettings(Settings $settings): self
     {
         $this->settings = $settings;
         return $this;
     }
 
-    public function setSiteSettings(?SiteSettings $siteSettings = null): Form
+    public function setSiteSettings(?SiteSettings $siteSettings = null): self
     {
         $this->siteSettings = $siteSettings;
         return $this;
     }
 
-    public function setTranslator(Translator $translator): Form
+    public function setTranslator(Translator $translator): self
     {
         $this->translator = $translator;
         return $this;

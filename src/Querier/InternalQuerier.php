@@ -742,15 +742,15 @@ SQL;
                         $this->args['property'][] = [
                             'joiner' => 'and',
                             'property' => $field,
-                            'type' => 'lte',
-                            'text' => $values['to'],
+                            'type' => 'list',
+                            'text' => $value,
                         ];
                     } else {
                         $this->args['property'][] = [
                             'joiner' => 'and',
                             'property' => $field,
-                            'type' => 'list',
-                            'text' => $flatArray($values),
+                            'type' => 'eq',
+                            'text' => $value,
                         ];
                     }
                 }

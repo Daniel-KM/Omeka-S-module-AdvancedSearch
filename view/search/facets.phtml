@@ -10,9 +10,6 @@
  * @var ?\Omeka\Api\Representation\ItemSetRepresentation $itemSet
  */
 
-// Same template than facets.phtml, except the main aside replaced by a div.
-// TODO Factorize / rebuild the block for facets.
-
 if (!isset($response) || empty($searchConfig->subSetting('facet', 'facets'))) return;
 
 $plugins = $this->getHelperPluginManager();

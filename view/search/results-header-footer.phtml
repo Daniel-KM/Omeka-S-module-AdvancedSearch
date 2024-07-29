@@ -24,7 +24,6 @@ $displayParts = [
     'paginator' => 'header',
     'per_pages' => 'header',
     'sort' => 'header',
-    'facets_filters' => 'none',
     'grid_list' => 'header',
     'grid_list_mode' => 'auto',
 ];
@@ -95,12 +94,6 @@ $multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['lis
 
 <?php if (count($sortFields)): ?>
 <?= $this->searchSortSelector($query, $sortFields, ['as_url' => true, 'label' => $searchConfig->subSetting('sort', 'label')]) ?>
-<?php endif; ?>
-
-<?php // Facets as filters. ?>
-
-<?php if (isset($displayParts['facets_filters'])): ?>
-<?= $this->partial('search/facets-filters') ?>
 <?php endif; ?>
 
 <?php // Grid/list. ?>

@@ -91,7 +91,7 @@
         font-weight: bold;
     }
 
-    aside.search-facets {
+    .search-facets {
         flex-basis: 25%;
         order: -1;
         padding: 0 0.5em;

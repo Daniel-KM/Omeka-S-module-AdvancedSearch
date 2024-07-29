@@ -400,23 +400,27 @@ class SearchResources extends AbstractPlugin
     public function buildInitialQuery(QueryBuilder $qb, array $query): void
     {
         // Process advanced search plus keys.
-        $this->searchSites($qb, $query);
-        $this->searchResources($qb, $query);
-        $this->searchResourceClassTerm($qb, $query);
-        $this->searchDateTime($qb, $query);
-        $this->buildPropertyQuery($qb, $query);
+        $this
+            ->searchSites($qb, $query)
+            ->searchResources($qb, $query)
+            ->searchResourceClassTerm($qb, $query)
+            ->searchDateTime($qb, $query)
+            ->buildPropertyQuery($qb, $query);
         if ($this->adapter instanceof ItemAdapter) {
-            $this->searchHasMedia($qb, $query);
-            $this->searchHasMediaOriginal($qb, $query);
-            $this->searchHasMediaThumbnails($qb, $query);
-            $this->searchByMediaType($qb, $query);
+            $this
+                ->searchHasMedia($qb, $query)
+                ->searchHasMediaOriginal($qb, $query)
+                ->searchHasMediaThumbnails($qb, $query)
+                ->searchByMediaType($qb, $query);
         } elseif ($this->adapter instanceof MediaAdapter) {
-            $this->searchMediaByItemSet($qb, $query);
-            $this->searchHasOriginal($qb, $query);
-            $this->searchHasThumbnails($qb, $query);
-            $this->searchByMediaType($qb, $query);
+            $this
+                ->searchMediaByItemSet($qb, $query)
+                ->searchHasOriginal($qb, $query)
+                ->searchHasThumbnails($qb, $query)
+                ->searchByMediaType($qb, $query);
         } elseif ($this->adapter instanceof ResourceAdapter) {
-            $this->searchResourcesByType($qb, $query);
+            $this
+                ->searchResourcesByType($qb, $query);
         }
     }
 
@@ -739,16 +743,16 @@ class SearchResources extends AbstractPlugin
     /**
      * Allow to search a resource in multiple sites (with "or").
      */
-    protected function searchSites(QueryBuilder $qb, array $query): void
+    protected function searchSites(QueryBuilder $qb, array $query): self
     {
         if (empty($query['site_id']) || !is_array($query['site_id'])) {
-            return;
+            return $this;
         }
 
         // The site "0" is kept: no site, as in core adapter.
         $sites = array_values(array_unique(array_map('intval', array_filter($query['site_id'], 'is_numeric'))));
         if (!$sites) {
-            return;
+            return $this;
         }
 
         $expr = $qb->expr();
@@ -816,16 +820,18 @@ class SearchResources extends AbstractPlugin
                 $this->adapter->createNamedParameter($qb, $sites))
             );
         }
+
+        return $this;
     }
 
     /**
      * Omeka S v4.1 allows to search resources, but it is not possible to filter
      * by resource type yet.
      */
-    protected function searchResourcesByType(QueryBuilder $qb, array $query): void
+    protected function searchResourcesByType(QueryBuilder $qb, array $query): self
     {
         if (empty($query['resource_type'])) {
-            return;
+            return $this;
         }
 
         $expr = $qb->expr();
@@ -856,6 +862,8 @@ class SearchResources extends AbstractPlugin
                     ->andWhere($expr->orX(...$or));
             }
         }
+
+        return $this;
     }
 
     /**
@@ -865,17 +873,17 @@ class SearchResources extends AbstractPlugin
      *
      * Another way is to remove the event and to pass the good one.
      */
-    public function searchResourcesFullText(QueryBuilder $qb, array $query): void
+    public function searchResourcesFullText(QueryBuilder $qb, array $query): self
     {
         if (empty($query['fulltext_search'])) {
-            return;
+            return $this;
         }
 
         // Doctrine does not allow to modify a join, so get them all, remove
         // them all, and update the one for full text.
         $dqlJoins = $qb->getDQLPart('join');
         if (empty($dqlJoins['omeka_root'])) {
-            return;
+            return $this;
         }
 
         $qb->resetDQLPart('join');
@@ -913,6 +921,8 @@ class SearchResources extends AbstractPlugin
             }
             $qb->add('join', [$alias => $join], true);
         }
+
+        return $this;
     }
 
     /**
@@ -920,7 +930,7 @@ class SearchResources extends AbstractPlugin
      *
      * @see \Omeka\Api\Adapter\AbstractResourceEntityAdapter::buildQuery()
      */
-    protected function searchResources(QueryBuilder $qb, array $query): void
+    protected function searchResources(QueryBuilder $qb, array $query): self
     {
         /**
          * Overridden keys of the query are already cleaned.
@@ -1104,15 +1114,17 @@ class SearchResources extends AbstractPlugin
             $qb
                 ->addOrderBy($matchOrder, $sortOrder);
         }
+
+        return $this;
     }
 
     /**
      * Allow to search a resource by a class term.
      */
-    protected function searchResourceClassTerm(QueryBuilder $qb, array $query): void
+    protected function searchResourceClassTerm(QueryBuilder $qb, array $query): self
     {
         if (empty($query['resource_class_term'])) {
-            return;
+            return $this;
         }
 
         // When there are only fake classes, no result should be returned, so 0
@@ -1130,6 +1142,8 @@ class SearchResources extends AbstractPlugin
             'omeka_root.resourceClass',
             $this->adapter->createNamedParameter($qb, $classIds)
         ));
+
+        return $this;
     }
 
     /**
@@ -1253,14 +1267,11 @@ class SearchResources extends AbstractPlugin
      * For consistency, "nlex" is the reverse of "lex" even when a resource is
      * linked with a public and a private resource.
      * A private linked resource is not linked for an anonymous.
-     *
-     * @param QueryBuilder $qb
-     * @param array $query
      */
-    protected function buildPropertyQuery(QueryBuilder $qb, array $query): void
+    protected function buildPropertyQuery(QueryBuilder $qb, array $query): self
     {
         if (empty($query['property']) || !is_array($query['property'])) {
-            return;
+            return $this;
         }
 
         $valuesJoin = 'omeka_root.values';
@@ -1904,6 +1915,8 @@ class SearchResources extends AbstractPlugin
         if ($where) {
             $qb->andWhere($where);
         }
+
+        return $this;
     }
 
     /**
@@ -1931,12 +1944,10 @@ class SearchResources extends AbstractPlugin
      * @param QueryBuilder $qb
      * @param array $query The query should be cleaned first.
      */
-    protected function searchDateTime(
-        QueryBuilder $qb,
-        array $query
-    ): void {
+    protected function searchDateTime(QueryBuilder $qb, array $query): self
+    {
         if (empty($query['datetime'])) {
-            return;
+            return $this;
         }
 
         $where = '';
@@ -2052,27 +2063,24 @@ class SearchResources extends AbstractPlugin
         if ($where) {
             $qb->andWhere($where);
         }
+
+        return $this;
     }
 
     /**
      * Build query to check if an item has media or not.
      *
      * The argument uses "has_media", with value "1" or "0".
-     *
-     * @param QueryBuilder $qb
-     * @param array $query
      */
-    protected function searchHasMedia(
-        QueryBuilder $qb,
-        array $query
-    ): void {
+    protected function searchHasMedia(QueryBuilder $qb, array $query): self
+    {
         if (!isset($query['has_media'])) {
-            return;
+            return $this;
         }
 
         $value = (string) $query['has_media'];
         if ($value === '') {
-            return;
+            return $this;
         }
 
         $expr = $qb->expr();
@@ -2099,57 +2107,43 @@ class SearchResources extends AbstractPlugin
                 )
                 ->andWhere($expr->isNull($mediaAlias . '.id'));
         }
+        return $this;
     }
 
     /**
      * Build query to check if an item has an original file or not.
      *
      * The argument uses "has_original", with value "1" or "0".
-     *
-     * @param QueryBuilder $qb
-     * @param array $query
      */
-    protected function searchHasMediaOriginal(
-        QueryBuilder $qb,
-        array $query
-    ): void {
-        $this->searchHasMediaSpecific($qb, $query, 'has_original');
+    protected function searchHasMediaOriginal(QueryBuilder $qb,array $query): self
+    {
+        return $this->searchHasMediaSpecific($qb, $query, 'has_original');
     }
 
     /**
      * Build query to check if an item has thumbnails or not.
      *
      * The argument uses "has_thumbnails", with value "1" or "0".
-     *
-     * @param QueryBuilder $qb
-     * @param array $query
      */
-    protected function searchHasMediaThumbnails(
-        QueryBuilder $qb,
-        array $query
-    ): void {
-        $this->searchHasMediaSpecific($qb, $query, 'has_thumbnails');
+    protected function searchHasMediaThumbnails(QueryBuilder $qb, array $query): self
+    {
+        return $this->searchHasMediaSpecific($qb, $query, 'has_thumbnails');
     }
 
     /**
      * Build query to check if an item has an original file or thumbnails or not.
      *
-     * @param QueryBuilder $qb
-     * @param array $query
      * @param string $field "has_original" or "has_thumbnails".
      */
-    protected function searchHasMediaSpecific(
-        QueryBuilder $qb,
-        array $query,
-        $field
-    ): void {
+    protected function searchHasMediaSpecific(QueryBuilder $qb, array $query, $field): self
+    {
         if (!isset($query[$field])) {
-            return;
+            return $this;
         }
 
         $value = (string) $query[$field];
         if ($value === '') {
-            return;
+            return $this;
         }
 
         $expr = $qb->expr();
@@ -2185,20 +2179,17 @@ class SearchResources extends AbstractPlugin
                     $expr->eq($mediaAlias . '.' . $fields[$field], 0)
                 ));
         }
+
+        return $this;
     }
 
     /**
      * Build query to check by media types.
-     *
-     * @param QueryBuilder $qb
-     * @param array $query
      */
-    protected function searchByMediaType(
-        QueryBuilder $qb,
-        array $query
-    ): void {
+    protected function searchByMediaType(QueryBuilder $qb, array $query): self
+    {
         if (!isset($query['media_types'])) {
-            return;
+            return $this;
         }
 
         $values = is_array($query['media_types'])
@@ -2206,7 +2197,7 @@ class SearchResources extends AbstractPlugin
             : [$query['media_types']];
         $values = array_filter(array_map('trim', $values));
         if (empty($values)) {
-            return;
+            return $this;
         }
         $values = array_values($values);
 
@@ -2218,7 +2209,7 @@ class SearchResources extends AbstractPlugin
                     'omeka_root.mediaType',
                     $this->adapter->createNamedParameter($qb, $values)
                 ));
-            return;
+            return $this;
         }
 
         $mediaAlias = $this->adapter->createAlias();
@@ -2235,57 +2226,44 @@ class SearchResources extends AbstractPlugin
                 )
             )
         );
+
+        return $this;
     }
 
     /**
      * Build query to check if a media has an original file or not.
      *
      * The argument uses "has_original", with value "1" or "0".
-     *
-     * @param QueryBuilder $qb
-     * @param array $query
      */
-    protected function searchHasOriginal(
-        QueryBuilder $qb,
-        array $query
-    ): void {
-        $this->searchMediaSpecific($qb, $query, 'has_original');
+    protected function searchHasOriginal(QueryBuilder $qb,array $query): self
+    {
+        return $this->searchMediaSpecific($qb, $query, 'has_original');
     }
 
     /**
      * Build query to check if a media has thumbnails or not.
      *
      * The argument uses "has_thumbnails", with value "1" or "0".
-     *
-     * @param QueryBuilder $qb
-     * @param array $query
      */
-    protected function searchHasThumbnails(
-        QueryBuilder $qb,
-        array $query
-    ): void {
-        $this->searchMediaSpecific($qb, $query, 'has_thumbnails');
+    protected function searchHasThumbnails(QueryBuilder $qb, array $query): self
+    {
+        return $this->searchMediaSpecific($qb, $query, 'has_thumbnails');
     }
 
     /**
      * Build query to check if a media has an original file or thumbnails or not.
      *
-     * @param QueryBuilder $qb
-     * @param array $query
      * @param string $field "has_original" or "has_thumbnails".
      */
-    protected function searchMediaSpecific(
-        QueryBuilder $qb,
-        array $query,
-        $field
-    ): void {
+    protected function searchMediaSpecific(QueryBuilder $qb, array $query, $field): self
+    {
         if (!isset($query[$field])) {
-            return;
+            return $this;
         }
 
         $value = (string) $query[$field];
         if ($value === '') {
-            return;
+            return $this;
         }
 
         $fields = [
@@ -2294,20 +2272,17 @@ class SearchResources extends AbstractPlugin
         ];
         $qb
             ->andWhere($qb->expr()->eq('omeka_root.' . $fields[$field], (int) (bool) $value));
+
+        return $this;
     }
 
     /**
      * Build query to search media by item set.
-     *
-     * @param QueryBuilder $qb
-     * @param array $query
      */
-    protected function searchMediaByItemSet(
-        QueryBuilder $qb,
-        array $query
-    ): void {
+    protected function searchMediaByItemSet(QueryBuilder $qb, array $query): self
+    {
         if (!isset($query['item_set_id'])) {
-            return;
+            return $this;
         }
 
         // Overridden keys of the query are already cleaned.
@@ -2354,6 +2329,8 @@ class SearchResources extends AbstractPlugin
                     $expr->in("$itemSetAlias.id", $this->adapter->createNamedParameter($qb, $itemSetIds))
                 );
         }
+
+        return $this;
     }
 
     /**

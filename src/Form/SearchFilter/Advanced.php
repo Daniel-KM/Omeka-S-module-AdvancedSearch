@@ -122,7 +122,47 @@ class Advanced extends Fieldset
             ->add([
                 'name' => 'value',
                 'type' => Element\Text::class,
-            ]);
+            ])
+
+            ->add([
+                'name' => 'minus',
+                'type' => Element\Button::class,
+                'options' => [
+                    'label' => ' ',
+                    'label_options' => [
+                        'disable_html_escape' => true,
+                    ],
+                    'label_attributes' => [
+                        'class' => 'search-filter-action-label',
+                    ],
+                ],
+                'attributes' => [
+                    // Don't use o-icon-delete.
+                    'class' => 'search-filter-action search-filter-minus fa fa-minus remove-value button',
+                    'aria-label' => 'Remove this filter', // @translate
+                ],
+            ])
+            /* // TODO Allow to insert a filter between two filters? Useless because order has no special meaning for now.
+            ->add([
+                'name' => 'plus',
+                'type' => Element\Button::class,
+                'options' => [
+                    'label' => ' ',
+                    'label_options' => [
+                        'disable_html_escape' => true,
+                    ],
+                    'label_attributes' => [
+                        'class' => 'search-filter-action-label',
+                    ],
+                ],
+                'attributes' => [
+                    // Don't use o-icon-add.
+                    'class' => 'search-filter-action search-filter-plus fa fa-plus add-value button',
+                    'aria-label' => 'Add a filter', // @translate
+                ],
+            ])
+            */
+        ;
     }
 
     /**

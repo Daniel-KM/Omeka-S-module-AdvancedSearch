@@ -39,6 +39,8 @@ use Laminas\Form\ElementInterface;
 use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
 use Laminas\Form\FormElementManager;
+use Laminas\Mvc\I18n\Translator;
+use Laminas\View\Helper\EscapeHtml;
 use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Form\Element as OmekaElement;
 use Omeka\Settings\Settings;
@@ -55,6 +57,11 @@ class MainSearchForm extends Form
      * @var \Doctrine\ORM\EntityManager
      */
     protected $entityManager;
+
+    /**
+     * @var \Laminas\View\Helper\EscapeHtml
+     */
+    protected $escapeHtml;
 
     /**
      * @var \Laminas\Form\FormElementManager
@@ -75,6 +82,11 @@ class MainSearchForm extends Form
      * @var \Omeka\View\Helper\Setting
      */
     protected $siteSetting;
+
+    /**
+     * @var \Laminas\Mvc\I18n\Translator
+     */
+    protected $translator;
 
     /**
      * @var string
@@ -457,14 +469,38 @@ class MainSearchForm extends Form
         }
 
         $element = new Element\Collection('filter');
+
+        // To use the label is the simplest to pass the button Plus inside the
+        // fieldset of the collection. To add a second element to the form adds
+        // it outside of the fieldset.
+        // It is placed inside the legend, so a fake legend is appended to keep
+        // view clean without css. A flex box order is added to move the button
+        // after the advanced filters.
+        if ($maxNumber === 1) {
+            $element->setLabel($filter['label']);
+        } else {
+            $label = sprintf(<<<'HTML'
+                %1$s</legend>
+                <button type="button" name="plus" class="search-filter-action search-filter-plus fa fa-plus add-value button" aria-label="%2$s" value=""></button>
+                <legend hidden="hidden">
+                HTML,
+                $this->escapeHtml->__invoke($filter['label']),
+                $this->translator->translate('Add a filter') // @translate
+            );
+            $element
+                ->setLabel($label)
+                ->setLabelOption('disable_html_escape', true);
+        }
+
         $element
-            ->setLabel((string) $filter['label'])
             ->setOptions([
-                'label' => $filter['label'],
-                // TODO The max number is required to fill the current query?
-                'count' => max($defaultNumber, $maxNumber),
+                // When there are more filters in the query used to fill form
+                // than the default number, new filters will be added
+                // automatically (allow_add).
+                'count' => $defaultNumber,
                 'should_create_template' => true,
                 'allow_add' => true,
+                'allow_remove' => true,
                 'target_element' => $advanced,
                 'required' => false,
             ])
@@ -472,7 +508,7 @@ class MainSearchForm extends Form
                 'id' => 'search-filters',
                 'class' => 'search-filters-advanced',
                 'data-field-type' => 'filter',
-                // TODO Remove this attribute data and use only search config.
+                // TODO Remove this attribute data and use only search config?
                 'data-count-default' => $defaultNumber,
                 'data-count-max' => $maxNumber,
             ] + $this->elementAttributes)
@@ -1299,21 +1335,42 @@ class MainSearchForm extends Form
         return $this;
     }
 
+    public function setSite(?SiteRepresentation $site): Form
+    {
+        $this->site = $site;
+        return $this;
+    }
+
     public function setEasyMeta(EasyMeta $easyMeta): Form
     {
         $this->easyMeta = $easyMeta;
         return $this;
     }
 
-    public function setItemSetsTree($itemSetsTree): Form
+    public function setEntityManager(EntityManager $entityManager): Form
     {
-        $this->itemSetsTree = $itemSetsTree;
+        $this->entityManager = $entityManager;
         return $this;
     }
 
-    public function setSite(?SiteRepresentation $site): Form
+    public function setEscapeHtml(EscapeHtml $escapeHtml): Form
     {
-        $this->site = $site;
+        $this->escapeHtml = $escapeHtml;
+        return $this;
+    }
+
+    public function setFormElementManager(FormElementManager $formElementManager): Form
+    {
+        $this->formElementManager = $formElementManager;
+        return $this;
+    }
+
+    /**
+     * @param \ItemSetsTree\ViewHelper\ItemSetsTree $itemSetsTree
+     */
+    public function setItemSetsTree($itemSetsTree): Form
+    {
+        $this->itemSetsTree = $itemSetsTree;
         return $this;
     }
 
@@ -1329,15 +1386,9 @@ class MainSearchForm extends Form
         return $this;
     }
 
-    public function setFormElementManager(FormElementManager $formElementManager): Form
+    public function setTranslator(Translator $translator): Form
     {
-        $this->formElementManager = $formElementManager;
-        return $this;
-    }
-
-    public function setEntityManager(EntityManager $entityManager): Form
-    {
-        $this->entityManager = $entityManager;
+        $this->translator = $translator;
         return $this;
     }
 }

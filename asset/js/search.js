@@ -30,8 +30,111 @@
 
 const hasChosenSelect = typeof $.fn.chosen === 'function';
 
+const $searchFiltersAdvanced = $('#search-filters');
+
+/**
+ * Manage search form, search filters, search results, search facets.
+ */
+
 var Search = (function() {
+
     var self = {};
+
+    /**
+     * Data about search filter types.
+     *
+     * @see \AdvancedSearch\Mvc\Controller\Plugin\SearchResources
+     */
+    self.filterTypes = {
+        withValue: [
+            'eq',
+            'neq',
+            'in',
+            'nin',
+            'ma',
+            'nma',
+            'res',
+            'nres',
+            'resq',
+            'nresq',
+            'list',
+            'nlist',
+            'sw',
+            'nsw',
+            'ew',
+            'new',
+            'near',
+            'nnear',
+            'lres',
+            'nlres',
+            'lkq',
+            'nlkq',
+            'dtp',
+            'ndtp',
+            'tp',
+            'ntp',
+            'lt',
+            'lte',
+            'gte',
+            'gt',
+        ],
+        withoutValue: [
+            'ex',
+            'nex',
+            'exs',
+            'nexs',
+            'exm',
+            'nexm',
+            'resq',
+            'nresq',
+            'lex',
+            'nlex',
+            'lkq',
+            'nlkq',
+            'dtp',
+            'ndtp',
+            'tp',
+            'ntp',
+            'tpl',
+            'ntpl',
+            'tpr',
+            'ntpr',
+            'tpu',
+            'ntpu',
+            'dup',
+            'ndup',
+            'dupl',
+            'ndupl',
+            'dupt',
+            'ndupt',
+            'duptl',
+            'nduptl',
+            'dupv',
+            'ndupv',
+            'dupvl',
+            'ndupvl',
+            'dupvt',
+            'ndupvt',
+            'dupvtl',
+            'ndupvtl',
+            'dupr',
+            'ndupr',
+            'duprl',
+            'nduprl',
+            'duprt',
+            'nduprt',
+            'duprtl',
+            'nduprtl',
+            'dupu',
+            'ndupu',
+            'dupul',
+            'ndupul',
+            'duput',
+            'nduput',
+            'duputl',
+            'nduputl',
+        ],
+    };
 
     /**
      * Chosen default options.
@@ -115,6 +218,95 @@ var Search = (function() {
             },
         };
     };
+
+    /**
+     * Advanced filters.
+     */
+
+    self.filtersAdvanced = (function() {
+        var self = {};
+
+        // At least one default.
+        self.countDefault = $searchFiltersAdvanced.data('count-default') ? $searchFiltersAdvanced.data('count-default') : 0;
+
+        self.countMax = $searchFiltersAdvanced.data('count-max') ? $searchFiltersAdvanced.data('count-max') : 0;
+
+        self.countAll = function() {
+            return $searchFiltersAdvanced.find('> fieldset.filter').length;
+        }
+
+        self.countFilled = function() {
+            var countFilled = 0;
+            $searchFiltersAdvanced.find('> fieldset.filter').each(function(index, filterFieldset) {
+                // The fields may be select or radio or checkboxes.
+                const field = $(filterFieldset).find('[name^="filter["][name$="][field]"]');
+                const type = $(filterFieldset).find('[name^="filter["][name$="][type]"]');
+                const value = $(filterFieldset).find('[name^="filter["][name$="][value]"]');
+                // const matchField = field.prop('name').match(/filter\[(\d+)\]\[field\]/);
+                // const matchType = type.prop('name').match(/filter\[(\d+)\]\[type\]/);
+                // const matchValue = value.prop('name').match(/filter\[(\d+)\]\[value\]/);
+                if (field.length
+                    && type.length
+                    && (Search.filterTypes.withoutValue.includes(type.val()) ? true : (value.length && value.val()))
+                ) {
+                    ++countFilled;
+                }
+            });
+            return countFilled;
+        };
+
+        self.init = function() {
+            // Warning: nth-child() counts all childs, even not fieldsets, so use nth-of-type().
+            // Remove unmanaged fieldset.
+            if (self.countMax) {
+                $searchFiltersAdvanced.find('> fieldset.filter:nth-of-type(n+' + (self.countMax + 1) + ')').remove();
+            }
+            // Display or remove fieldsets.
+            const countFilled = self.countFilled();
+            const countNeeded = Math.max(self.countDefault, countFilled);
+            $searchFiltersAdvanced.find('> fieldset.filter:nth-of-type(-n+' + (countNeeded + 1) + ')').removeAttr('hidden');
+            $searchFiltersAdvanced.find('> fieldset.filter:nth-of-type(n+' + (countNeeded + 1) + ')').remove();
+            // Create missing fieldsets.
+            self.appendFilter(self.countDefault - self.countAll());
+            self.updatePlus();
+            return self;
+        };
+
+        self.appendFilter = function(countAppend = 1) {
+            countAppend = self.countMax ? Math.min(countAppend, self.countMax - self.countAll()) : countAppend;
+            if (countAppend <= 0) {
+                return self;
+            }
+            const fieldsetTemplate = $searchFiltersAdvanced.find('span[data-template]').attr('data-template');
+            let maxIndex = 0;
+            $searchFiltersAdvanced.find('> fieldset.filter').each(function(no, item) {
+                const fieldsetName = $(item).attr('name');
+                const fieldsetIndex = fieldsetName.replace(/\D+/g, '');
+                maxIndex = Math.max(maxIndex, fieldsetIndex);
+            });
+            for (var i = 0; i < countAppend; i++) {
+                $searchFiltersAdvanced.append(fieldsetTemplate.split('__index__').join(++maxIndex));
+            }
+            return self;
+        }
+
+        self.removeFilter = function(filter) {
+            $(filter).remove();
+            return self;
+        }
+
+        self.updatePlus = function() {
+            const buttonPlus = $searchFiltersAdvanced.find('.search-filter-plus');
+            if (self.countMax && self.countAll() >= self.countMax) {
+                buttonPlus.hide();
+            } else {
+                buttonPlus.show();
+            }
+            return self;
+        }
+
+        return self;
+    })();
 
     /* Results */
 
@@ -327,13 +519,8 @@ $(document).ready(function() {
 
     const hasAutocomplete = typeof $.fn.autocomplete === 'function';
 
-    $('#search-reset, #facets-reset').on('click', function () {
-        const form = $(this).closest('form')[0];
-        Search.smartClearForm(form);
-    });
-
     /**
-     * When the simple and the advanced form are the same form.
+     * Fix when the simple and the advanced form are the same form.
      */
     $('.advanced-search-form-toggle a').on('click', function(e) {
         e.preventDefault();
@@ -345,6 +532,35 @@ $(document).ready(function() {
         }
         // TODO Don't open autosuggestion when toggle.
         // $('#search-form [name=q]').focus();
+    });
+
+    /**
+     * Events.
+     */
+
+    $('#search-reset, #facets-reset').on('click', function () {
+        const form = $(this).closest('form')[0];
+        Search.smartClearForm(form);
+    });
+
+    /**
+     * Init advanced search filters.
+     */
+
+    Search.filtersAdvanced.init();
+
+    $searchFiltersAdvanced.on('click', '.search-filter-minus', function (ev) {
+        const filter = $(ev.target).closest('fieldset.filter');
+        Search.filtersAdvanced
+            .removeFilter(filter)
+            .updatePlus();
+    });
+
+    $searchFiltersAdvanced.on('click', '.search-filter-plus', function (ev) {
+        // const index = fieldset.index('fieldset.filter');
+        Search.filtersAdvanced
+            .appendFilter()
+            .updatePlus();
     });
 
     /**

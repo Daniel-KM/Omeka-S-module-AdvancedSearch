@@ -45,13 +45,15 @@ class MainSearchFormFactory implements FactoryInterface
             : null;
         return (new MainSearchForm(null, $options))
             ->setBasePath($helpers->get('basePath')())
-            ->setEasyMeta($services->get('Common\EasyMeta'))
-            ->setItemSetsTree($services->has('ItemSetsTree') ? $services->get('ItemSetsTree') : null)
             ->setSite($currentSite)
+            ->setEasyMeta($services->get('Common\EasyMeta'))
+            ->setEntityManager($services->get('Omeka\EntityManager'))
+            ->setEscapeHtml($helpers->get('escapeHtml'))
+            ->setFormElementManager($services->get('FormElementManager'))
+            ->setItemSetsTree($services->has('ItemSetsTree') ? $services->get('ItemSetsTree') : null)
             ->setSettings($services->get('Omeka\Settings'))
             ->setSiteSetting($siteSetting)
-            ->setFormElementManager($services->get('FormElementManager'))
-            ->setEntityManager($services->get('Omeka\EntityManager'))
+            ->setTranslator($services->get('MvcTranslator'))
         ;
     }
 }

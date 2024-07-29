@@ -47,6 +47,11 @@ class Query implements \JsonSerializable
     /**
      * @var bool
      */
+    protected $byResourceType = false;
+
+    /**
+     * @var bool
+     */
     protected $isPublic = true;
 
     /**
@@ -173,6 +178,17 @@ class Query implements \JsonSerializable
     public function getResourceTypes(): array
     {
         return $this->resourceTypes;
+    }
+
+    public function setByResourceType(bool $byResourceType): self
+    {
+        $this->byResourceType = $byResourceType;
+        return $this;
+    }
+
+    public function getByResourceType(): bool
+    {
+        return $this->byResourceType;
     }
 
     public function setIsPublic($isPublic): self
@@ -517,6 +533,7 @@ class Query implements \JsonSerializable
         return [
             'query' => $this->getQuery(),
             'resource_types' => $this->getResourceTypes(),
+            'by_resource_type' => $this->getByResourceType(),
             'is_public' => $this->getIsPublic(),
             'filters' => $this->getFilters(),
             'filters_range' => $this->getFiltersRange(),

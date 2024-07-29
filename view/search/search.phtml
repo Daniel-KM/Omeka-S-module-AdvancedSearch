@@ -46,7 +46,7 @@ $escape = $plugins->get('escapeHtml');
 $assetUrl = $plugins->get('assetUrl');
 $translate = $plugins->get('translate');
 $hyperlink = $plugins->get('hyperlink');
-$translatePlural = $plugins->get('translatePlural');
+$easyMeta = $plugins->get('easyMeta');
 
 $breadcrumbs = $plugins->has('breadcrumbs') ? $plugins->get('breadcrumbs') : null;
 
@@ -72,8 +72,6 @@ $variables = $vars->getArrayCopy();
 $isPartial = $skipFormAction = !empty($skipFormAction);
 
 $documentCount = $response->getTotalResults();
-$itemSetsCount = $response->getResourceTotalResults('item_sets');
-$itemsCount = $response->getResourceTotalResults('items');
 $displayParts = $searchConfig->setting('display', []);
 $displayPartsHeader = array_filter($displayParts, fn ($v) => in_array($v, ['header', 'both']));
 $displayPartsFooter = array_filter($displayParts, fn ($v) => in_array($v, ['footer', 'both']));
@@ -165,15 +163,10 @@ $this->headScript()
         <?php if ($documentCount): ?>
 
         <div class="search-results-part search-results-list">
-            <?php if ($itemSetsCount): // Title is kept temporarily for compatibility with old themes. ?>
-            <h3><?= $escape($title = sprintf($translatePlural('%d item set', '%d item sets', $itemSetsCount), $itemSetsCount)) ?></h3>
-            <?= $partial('search/results', $variables + ['resourceName' => 'item_sets', 'title' => $title]) ?>
-            <?php endif; ?>
-
-            <?php if ($itemsCount): ?>
-            <h3><?= $escape($title = sprintf($translatePlural('%d item', '%d items', $itemsCount), $itemsCount)) ?></h3>
-            <?= $partial('search/results', $variables + ['resourceName' => 'items', 'title' => $title]) ?>
-            <?php endif; ?>
+            <?php foreach (array_filter($response->getResourceTotalResults()) as $resourceType => $count): ?>
+            <h3><?= $escape(sprintf($translate('%1$d %2$s'), $count, $easyMeta->resourceLabelCount($resourceType, $count))) ?></h3>
+            <?= $partial('search/results', $variables + ['resourceType' => $resourceType]) ?>
+            <?php endforeach; ?>
         </div>
 
         <?php else: ?>

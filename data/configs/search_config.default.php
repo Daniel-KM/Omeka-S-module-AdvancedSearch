@@ -192,6 +192,7 @@ return [
         ],
 
         'display' => [
+            'by_resource_type' => false,
             'template' => null,
             'breadcrumbs' => false,
             'search_filters' => 'header',

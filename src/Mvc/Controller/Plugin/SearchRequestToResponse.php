@@ -179,6 +179,8 @@ class SearchRequestToResponse extends AbstractPlugin
             $query->setSiteId($site->id());
         }
 
+        $query->setByResourceType(!empty($searchConfigSettings['display']['by_resource_type']));
+
         // Check resources.
         $resourceTypes = $query->getResourceTypes();
         // TODO Check why resources may not be filled.

@@ -463,6 +463,16 @@ class SearchConfigConfigureForm extends Form
             ])
             ->get('display')
             ->add([
+                'name' => 'by_resource_type',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Separate resources by type (item set, items, etc.)', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'by_resource_type',
+                ],
+            ])
+            ->add([
                 'name' => 'template',
                 'type' => Element\Text::class,
                 'options' => [

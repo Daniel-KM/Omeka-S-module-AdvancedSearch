@@ -68,6 +68,11 @@ class Response implements \JsonSerializable
     protected $totalResults = \Omeka\Stdlib\Paginator::TOTAL_COUNT;
 
     /**
+     * @var bool
+     */
+    protected $byResourceType = false;
+
+    /**
      * @var array
      */
     protected $resourceTotalResults = [];
@@ -171,6 +176,17 @@ class Response implements \JsonSerializable
     public function getTotalResults(): int
     {
         return $this->totalResults;
+    }
+
+    public function setByResourceType(bool $byResourceType): self
+    {
+        $this->byResourceType = $byResourceType;
+        return $this;
+    }
+
+    public function getByResourceType(): bool
+    {
+        return $this->byResourceType;
     }
 
     /**
@@ -489,6 +505,7 @@ class Response implements \JsonSerializable
             'per_page' => $this->getPerPage(),
             'total_results' => $this->getTotalResults(),
             'resource_types' => $this->getResourceTypes(),
+            'by_resource_type' => $this->getByResourceType(),
             'resource_total_results' => $this->getResourceTotalResults(),
             'results' => $this->getResults(),
             'facet_counts' => $this->getFacetCounts(),

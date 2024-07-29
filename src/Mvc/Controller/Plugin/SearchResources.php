@@ -13,6 +13,7 @@ use Omeka\Api\Adapter\AbstractResourceEntityAdapter;
 use Omeka\Api\Adapter\ItemAdapter;
 use Omeka\Api\Adapter\ItemSetAdapter;
 use Omeka\Api\Adapter\MediaAdapter;
+use Omeka\Api\Adapter\ResourceAdapter;
 use Omeka\Api\Exception\NotFoundException;
 use Omeka\Api\Request;
 
@@ -428,6 +429,8 @@ class SearchResources extends AbstractPlugin
             $this->searchHasOriginal($qb, $query);
             $this->searchHasThumbnails($qb, $query);
             $this->searchByMediaType($qb, $query);
+        } elseif ($this->adapter instanceof ResourceAdapter) {
+            $this->searchResourcesByType($qb, $query);
         }
     }
 
@@ -826,6 +829,48 @@ class SearchResources extends AbstractPlugin
                 "$this->siteItemSetsAlias.site",
                 $this->adapter->createNamedParameter($qb, $sites))
             );
+        }
+    }
+
+    /**
+     * Omeka S v4.1 allows to search resources, but it is not possible to filter
+     * by resource type yet.
+     */
+    protected function searchResourcesByType(QueryBuilder $qb, array $query): void
+    {
+        if (empty($query['resource_type'])) {
+            return;
+        }
+
+        $expr = $qb->expr();
+
+        $resourceTypes = is_array($query['resource_type'])
+            ? $query['resource_type']
+            : [$query['resource_type']];
+
+        // With discriminator map, the resource type can't be filtered directly,
+        // but all derivated tables are left-joined.
+        // So resource.resourceType or resource.resource_type cannot be used,
+        // so use isInstanceOf, that does the same.
+
+        /** @var \Common\Stdlib\EasyMeta $easyMeta */
+        $easyMeta = $this->adapter->getServiceLocator()->get('Common\EasyMeta');
+        $entityClasses = array_unique($easyMeta->entityResourceClasses($resourceTypes));
+        if (!$entityClasses) {
+            $qb
+                ->andWhere($qb->expr()->eq(0, 1));
+        } elseif (!in_array(\Omeka\Entity\Resource::class, $entityClasses)) {
+            if (count($entityClasses) === 1) {
+                $qb
+                    ->andWhere($expr->isInstanceOf('omeka_root', reset($entityClasses)));
+            } else {
+                $or = [];
+                foreach ($entityClasses as $entityClass) {
+                    $or[] = $expr->isInstanceOf('omeka_root', $entityClass);
+                }
+                $qb
+                    ->andWhere($expr->orX(...$or));
+            }
         }
     }
 

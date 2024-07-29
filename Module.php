@@ -134,6 +134,7 @@ class Module extends AbstractModule
             \Omeka\Api\Adapter\ItemAdapter::class,
             \Omeka\Api\Adapter\ItemSetAdapter::class,
             \Omeka\Api\Adapter\MediaAdapter::class,
+            \Omeka\Api\Adapter\ResourceAdapter::class,
             // Annotation is not supported any more for now, but all features
             // are included directly inside the module.
             // \Annotate\Api\Adapter\AnnotationAdapter::class,

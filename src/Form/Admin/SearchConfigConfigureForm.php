@@ -34,16 +34,31 @@ use Common\Form\Element as CommonElement;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
+use Laminas\Mvc\I18n\Translator;
+use Laminas\View\Helper\EscapeHtml;
 use Omeka\Form\Element as OmekaElement;
 
 class SearchConfigConfigureForm extends Form
 {
+    /**
+     * @var \Laminas\View\Helper\EscapeHtml
+     */
+    protected $escapeHtml;
+
+    /**
+     * @var \Laminas\Form\FormElementManager
+     */
     protected $formElementManager;
 
     /**
      * @var array
      */
     protected $suggesters = [];
+
+    /**
+     * @var \Laminas\Mvc\I18n\Translator
+     */
+    protected $translator;
 
     /**
      * @var array
@@ -61,11 +76,8 @@ class SearchConfigConfigureForm extends Form
 
         // This is the settings for the search config, not the search form one.
 
-        // TODO Simplify the form with js, storing the whole form one time.
+        // TODO Simplify the form with js, storing the whole form one time via ini or json or just add a button import/export.
         // TODO See UserProfile and https://docs.laminas.dev/laminas-form/v3/form-creation/creation-via-factory/
-
-        // These fields may be overridden by the available fields.
-        $availableFields = $this->getAvailableFields();
 
         $this
             ->setAttribute('id', 'form-search-config-configure');
@@ -167,7 +179,7 @@ class SearchConfigConfigureForm extends Form
                 'name' => 'autosuggest',
                 'type' => Fieldset::class,
                 'options' => [
-                    'label' => 'Auto-suggestion', // @translate
+                    'label' => 'Search field', // @translate
                 ],
             ])
             ->get('autosuggest')
@@ -223,12 +235,17 @@ class SearchConfigConfigureForm extends Form
 
         // Settings for the form querier (advanced form and filters).
 
+        /** @var \AdvancedSearch\Form\Admin\SearchConfigFilterFieldset $filterFieldset */
+        $filterFieldset = $this->formElementManager->get(SearchConfigFilterFieldset::class, [
+            'search_config' => $this->getOption('search_config'),
+        ]);
+
         $this
             ->add([
                 'name' => 'form',
                 'type' => Fieldset::class,
                 'options' => [
-                    'label' => 'Form', // @translate
+                    'label' => 'Filters', // @translate
                 ],
             ])
             ->get('form')
@@ -291,53 +308,44 @@ class SearchConfigConfigureForm extends Form
             ])
             ->add([
                 'name' => 'filters',
-                'type' => CommonElement\IniTextarea::class,
+                'type' => Element\Collection::class,
                 'options' => [
-                    'label' => 'Filters', // @translate
+                    'label' => 'Filters', // @ŧranslate
                     'info' => 'List of filters that will be displayed in the search form, formatted as ini. The section is a unique name. Main keys are: field, label and type.', // @translate
-                    // TODO Convert documentation into help. See application/view/common/form-row.phtml
-                    'documentation' => nl2br(<<<'MARKDOWN'
-                        #"></a><div class="field-description no-link">
-                        - The field is the name of the metadata (resource_template_id, etc), of the index (date, author, etc), or the property term.
-                        - The key "options" can be passed to set options. All available options managed by Omeka or Laminas can be passed. For example, `options.checked_value = "yes"` or `options.value_options.first = "First"`.
-                        - The key "attributes" can be passed to set attributes of the html input. It may be used for class, min, max, step, placeholder, data, etc., for example `attributes.class = "specific-class"`.
-                        - The types are html input types: Text (default), Advanced (list of advanced filters), Checkbox, Hidden, Number, Radio, Range, RangeDouble, Select, SelectFlat, SelectGroup, MultiCheckbox, MultiSelect, MultiSelectFlat, MultiSelectGroup, MultiText, and, for modules, Access, Thesaurus, and Tree (item sets tree).
-                        - Text: the default html input field may be improved with an autosuggester. Enable it with option "autosuggest" and value "true". An external url can be set via attribute "'data-autosuggest-url'."
-                        - Checkbox: the keys "unchecked_value" and "checked_value" allow to define a specific value to be returned.
-                        - Hidden: the value can be passed with key "value". If the value is not a scalar, it is serialized as json.
-                        - Number: the keys "min", "max" and "step" can be set as attributes, else they will be extracted from data. Of course, data should be numbers.
-                        - Range and RangeDouble allows to display a slider with one or two values. Min and max are extracted from data if not set as attributes.
-                        - For Number, Range and RangeDouble, "first_digits" can be set as option to extract the years from dates, but it is recommended to use an index with the year in that case to avoid strange results when casting and sorting non-normalized data.
-                        - MultiSelectFlat and SelectFlat may be used to be sure that values are flatten.
-                        - MultiSelectGroup and SelectGroup may be used for some specific fields that group options by default (resource classes, resource templates), in which case the options labels are removed.
-                        - Tree can be used for item sets when module ItemSetsTree is enabled and data indexed recursively.
-                        - For the types MultiCheckbox, Radio, Select, and derivatives, the values can be passed with the option "value_options", else the ones of the field will be used.
-                        </div><a href="#
-                        MARKDOWN), // @translate
-                    'ini_typed_mode' => true,
+                    'count' => 0,
+                    'allow_add' => true,
+                    'allow_remove' => true,
+                    'should_create_template' => true,
+                    'template_placeholder' => '__index__',
+                    'create_new_objects' => true,
+                    'target_element' => $filterFieldset,
                 ],
                 'attributes' => [
                     'id' => 'form_filters',
-                    'rows' => 12,
-                    'placeholder' => '',
+                    'required' => false,
+                    'class' => 'form-fieldset-collection',
+                    'data-label-index' => $this->translator->translate('Filter {index}'), // @ŧranslate
                 ],
             ])
             ->add([
-                'name' => 'available_filters',
-                'type' => OmekaElement\ArrayTextarea::class,
+                'name' => 'plus',
+                'type' => Element\Button::class,
                 'options' => [
-                    'label' => 'Available filters', // @translate
-                    'info' => 'List of all available filters, among which some can be copied above.', // @translate
-                    'as_key_value' => true,
-                    'key_value_separator' => '=',
+                    'label' => ' ',
+                    'label_options' => [
+                        'disable_html_escape' => true,
+                    ],
+                    'label_attributes' => [
+                        'class' => 'search-fieldset-action-label',
+                    ],
                 ],
                 'attributes' => [
-                    'id' => 'available_filters',
-                    'value' => $availableFields,
-                    'placeholder' => 'dcterms:title = Title',
-                    'rows' => 12,
+                    // Don't use o-icon-add.
+                    'class' => 'search-fieldset-action search-fieldset-plus fa fa-plus add-value button',
+                    'aria-label' => 'Add a filter', // @translate
                 ],
             ])
+
             // Advanced is a sub-fieldset of form.
             ->add([
                 'name' => 'advanced',
@@ -459,7 +467,6 @@ class SearchConfigConfigureForm extends Form
                 'type' => Fieldset::class,
                 'options' => [
                     'label' => 'Display', // @translate
-'info' => 'sfqsdf',
                 ],
             ])
             ->get('display')
@@ -1083,24 +1090,6 @@ class SearchConfigConfigureForm extends Form
         return $this;
     }
 
-    protected function getAvailableFields(): array
-    {
-        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
-        $searchConfig = $this->getOption('search_config');
-        $searchEngine = $searchConfig->engine();
-        $searchAdapter = $searchEngine->adapter();
-        if (empty($searchAdapter)) {
-            return [];
-        }
-
-        $options = [];
-        $fields = $searchAdapter->setSearchEngine($searchEngine)->getAvailableFields();
-        foreach ($fields as $name => $field) {
-            $options[$name] = $field['label'] ?? $name;
-        }
-        return $options;
-    }
-
     protected function getAvailableSortFields(): array
     {
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
@@ -1137,6 +1126,12 @@ class SearchConfigConfigureForm extends Form
         return $options;
     }
 
+    public function setEscapeHtml(EscapeHtml $escapeHtml): self
+    {
+        $this->escapeHtml = $escapeHtml;
+        return $this;
+    }
+
     public function setFormElementManager($formElementManager): self
     {
         $this->formElementManager = $formElementManager;
@@ -1152,6 +1147,12 @@ class SearchConfigConfigureForm extends Form
     public function setThumbnailTypes(array $thumbnailTypes): self
     {
         $this->thumbnailTypes = $thumbnailTypes;
+        return $this;
+    }
+
+    public function setTranslator(Translator $translator): self
+    {
+        $this->translator = $translator;
         return $this;
     }
 }

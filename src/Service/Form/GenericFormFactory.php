@@ -2,15 +2,16 @@
 
 namespace AdvancedSearch\Service\Form;
 
-use AdvancedSearch\Form\Admin\SearchEngineConfigureForm;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
-class SearchEngineConfigureFormFactory implements FactoryInterface
+/**
+ * The factory allows to pass options without issue when getForm() is used.
+ */
+class GenericFormFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        // The factory is required to pass options when getForm() is used.
-        return new SearchEngineConfigureForm(null, $options ?? []);
+        return new $requestedName(null, $options ?? []);
     }
 }

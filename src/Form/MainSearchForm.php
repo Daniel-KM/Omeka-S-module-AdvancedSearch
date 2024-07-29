@@ -262,6 +262,7 @@ class MainSearchForm extends Form
                 $filter = $this->appendAutosuggestAttributes($filter);
             }
 
+            /** @see \AdvancedSearch\Form\Admin\SearchConfigFilterFieldset */
             switch ($type) {
                 default:
                     // Check for deprecated types.

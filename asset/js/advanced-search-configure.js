@@ -2,6 +2,145 @@
 
 $(document).ready(function() {
 
+    const hasChosenSelect = typeof $.fn.chosen === 'function';
+
+    /**
+     * Search configure form.
+     */
+
+    const $formConfig = $('#form-search-config-configure');
+
+    var SearchConfig = (function() {
+
+        var self = {};
+
+        /**
+        * Chosen default options.
+        * @see https://harvesthq.github.io/chosen/
+        */
+        self.chosenOptions = {
+            allow_single_deselect: true,
+            disable_search_threshold: 10,
+            width: '100%',
+            include_group_label_in_selected: true,
+        };
+
+        self.init = function() {
+            self.fieldsetUpdateButtons();
+            self.fieldsetUpdateLabels();
+
+            // Move the button plus inside the previous fieldset.
+            $formConfig.find('.search-fieldset-plus').each(function(no, button) {
+                $(button).appendTo($(button).prev('fieldset'));
+            });
+
+            $formConfig.on('click', '.search-fieldset-minus', self.fieldsetRemove);
+            $formConfig.on('click', '.search-fieldset-plus', self.fieldsetAppend);
+            $formConfig.on('click', '.search-fieldset-up', self.fieldsetMoveUp);
+            $formConfig.on('click', '.search-fieldset-down', self.fieldsetMoveDown);
+            return self;
+        };
+
+        self.fieldsetRemove = function(ev) {
+            $(ev.currentTarget).closest('fieldset').remove();
+            self.fieldsetUpdateButtons();
+            self.fieldsetUpdateLabels();
+            return self;
+        };
+
+        self.fieldsetAppend = function(ev) {
+            const $fieldset = $(ev.currentTarget).closest('fieldset');
+            const template = $fieldset.find('> span[data-template]').attr('data-template');
+            if (template) {
+                var maxIndex = 0;
+                $fieldset.find('> fieldset').each(function(no, item) {
+                    const fieldsetName = $(item).attr('name');
+                    const fieldsetIndex = fieldsetName.replace(/\D+/g, '');
+                    maxIndex = Math.max(maxIndex, fieldsetIndex);
+                });
+                $fieldset.append(template.split('__index__').join(++maxIndex));
+                // Move button plus last in the fieldset.
+                $(ev.currentTarget).appendTo($fieldset)
+                self.fieldsetUpdateButtons();
+                self.fieldsetUpdateLabels();
+                if (hasChosenSelect) {
+                    $fieldset.find('.chosen-select').chosen(self.chosenOptions);
+                }
+            }
+            return self;
+        };
+
+        self.fieldsetMoveUp = function(ev) {
+            const current = $(ev.currentTarget).closest('fieldset');
+            const previous = current.prev('fieldset');
+            current.insertBefore(previous);
+            self.fieldsetUpdateButtons();
+            self.fieldsetUpdateLabels();
+            return self;
+        };
+
+        self.fieldsetMoveDown = function(ev) {
+            const current = $(ev.currentTarget).closest('fieldset');
+            const next = current.next('fieldset');
+            current.insertAfter(next);
+            self.fieldsetUpdateButtons();
+            self.fieldsetUpdateLabels();
+            return self;
+        };
+
+        self.fieldsetUpdateButtons = function() {
+            // Remove the field wrapping new buttons.
+            $('.search-fieldset-action').each(function(no, button) {
+                const field = button.closest('.field');
+                if (field) {
+                    $(button).insertBefore(field);
+                    field.remove();
+                }
+            });
+            // Enable or disable up/down buttons in each fieldset.
+            var buttons = $formConfig.find('.search-fieldset-up');
+            $formConfig.find('.search-fieldset-up').each(function(index, button) {
+                button = $(button);
+                const fieldset = button.closest('fieldset');
+                if (index <= 0) {
+                    button.attr('disabled', 'disabled');
+                } else {
+                    button.removeAttr('disabled');
+                }
+            });
+            buttons = $formConfig.find('.search-fieldset-down');
+            $formConfig.find('.search-fieldset-down').each(function(index, button) {
+                button = $(button);
+                const fieldset = button.closest('fieldset');
+                if (index >= (buttons.length - 1)) {
+                    button.attr('disabled', 'disabled');
+                } else {
+                    button.removeAttr('disabled');
+                }
+            });
+            return self;
+        };
+
+        self.fieldsetUpdateLabels = function() {
+            $('.form-fieldset-collection[data-label-index] > fieldset').each(function(index, fieldset) {
+                fieldset = $(fieldset);
+                const labelIndex = fieldset.parent().data('label-index');
+                var legend = fieldset.find('> legend');
+                if (!legend.length) {
+                    fieldset.prepend('<legend></legend>')
+                    legend = fieldset.find('> legend');
+                }
+                legend.text(labelIndex.replace('{index}', index + 1));
+            });
+            return self;
+        };
+
+        return self;
+
+    })();
+
+    SearchConfig.init();
+
     /**
      * External search engine for api.
      */

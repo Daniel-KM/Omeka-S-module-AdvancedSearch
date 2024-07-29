@@ -53,43 +53,55 @@ return [
                     'field' => 'item_set_id',
                     // A end user doesn't knwo "item set", but "collection".
                     'label' => $translate('Collection'), // @ŧranslate
-                    'type' => 'Omeka/MultiSelect',
+                    'type' => 'MultiSelect',
                 ],
                 'resource_class_id' => [
                     'field' => 'resource_class_id',
                     'label' => $translate('Class'),
-                    'type' => 'Omeka/MultiSelectFlat',
+                    'type' => 'MultiSelectFlat',
                 ],
                 'resource_template_id' => [
                     'field' => 'resource_template_id',
                     'label' => $translate('Template'),
-                    'type' => 'Omeka/Radio',
+                    'type' => 'Radio',
                 ],
                 'title' => [
                     'field' => 'title',
                     'label' => $translate('Title'),
                     'type' => null,
+                    'options' => [
+                        'autosuggest' => true,
+                    ],
                 ],
                 'author' => [
                     'field' => 'author',
                     'label' => $translate('Author'),
-                    'type' => null,
+                    'type' => 'Select',
                 ],
                 'dcterms_subject' => [
                     'field' => 'dcterms:subject',
                     'label' => $translate('Subject'),
                     'type' => null,
+                    'options' => [
+                        'autosuggest' => true,
+                    ],
                 ],
-                // Advanced should be set in "filters" to enable it.
+                'date' => [
+                    'field' => 'date',
+                    'label' => $translate('Date range'),
+                    'type' => 'RangeDouble',
+                    'options' => [
+                        'first_digits' => true,
+                    ],
+                    'attributes' => [
+                        'min' => 1454,
+                        'max' => 2025,
+                    ],
+                ],
                 'advanced' => [
                     'field' => 'advanced',
                     'label' => $translate('Filters'),
                     'type' => 'Advanced',
-                ],
-                'dcterms_date' => [
-                    'field' => 'dcterms:date',
-                    'label' => $translate('Date range'),
-                    'type' => 'DateRange',
                 ],
                 // Other available filters.
                 /*
@@ -98,31 +110,16 @@ return [
                     'label' => $translate('Number'),
                     'type' => 'Number',
                 ],
-                'dcterms_valid' => [
-                    'field' => 'dcterms:valid',
-                    'label' => $translate('Number'),
-                    'type' => 'NumberRange',
-                ],
-                'dcterms_provenance' => [
-                    'field' => 'dcterms:provenance',
-                    'type' => 'Hidden',
-                    'options' => [
-                        'the provenance',
-                    ],
-                ],
                 'dcterms_audience' => [
                     'field' => 'dcterms:audience',
                     'type' => 'Checkbox',
-                    'options' => ['no', 'yes'],
+                    'options' => [
+                        'unchecked_value' => 'no',
+                        'checked_value' => 'yes',
+                    ],
                 ],
-                */
                 // Not managed currently.
                 /*
-                'date' => [
-                    'field' => 'date',
-                    'label' => $translate('Date'),
-                    'type' => 'Date',
-                ],
                 'date_range' => [
                     'field' => 'date_range',
                     'label' => $translate('Date range'),
@@ -145,6 +142,8 @@ return [
                 */
             ],
 
+            // The specific settings for filter Advanced are separated to avoid
+            // a complex form.
             'advanced' => [
                 'default_number' => 1,
                 'max_number' => 10,

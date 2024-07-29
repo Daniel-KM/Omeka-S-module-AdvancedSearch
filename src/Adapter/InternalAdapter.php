@@ -91,53 +91,70 @@ class InternalAdapter extends AbstractAdapter
 
     public function getAvailableFieldsForSelect(): array
     {
-        static $availableFields;
+        static $fields;
 
-        if (isset($availableFields)) {
-            return $availableFields;
+        if (isset($fields)) {
+            return $fields;
         }
 
-        $fields = [];
+        // Special fields of Omeka.
+        $defaultFields = $this->getDefaultFields();
 
-        // Display specific fields first.
-        $multifields = $this->searchEngine
+        /**
+         * @var \Omeka\Api\Representation\VocabularyRepresentation $vocabulary
+         */
+        $services = $this->getServiceLocator();
+        $api = $services->get('Omeka\ApiManager');
+        $easyMeta = $services->get('Common\EasyMeta');
+        $viewHelperManager = $services->get('ViewHelperManager');
+        $translate = $viewHelperManager->get('translate');
+
+        $vocabularies = $api->search('vocabularies', ['sort_by' => 'label'])->getContent();
+        $propertyLabelsByTerms = $easyMeta->propertyLabels();
+        foreach ($propertyLabelsByTerms as &$label) {
+            $label = $translate($label);
+        }
+        unset($label);
+        asort($propertyLabelsByTerms);
+
+        // Don't bypass default fields with the specific ones, so remove them.
+        $multiFields = $this->searchEngine
             ? $this->searchEngine->settingAdapter('multifields', [])
             : [];
-        if ($multifields) {
-            $fields['multifieds'] = [
-                'label' => 'Multi-fields', // @translate
-                'options' => array_replace(
-                    array_column($multifields, 'name', 'name'),
-                    array_filter(array_column($multifields, 'label', 'name'))
-                ),
-            ];
-        }
+        $multiFields = array_diff_key($multiFields, $defaultFields, $propertyLabelsByTerms);
 
-        // Display generic fields second, so they cannot be bypassed.
-        $defaultFields = $this->getDefaultFields();
-        $fields['generic'] = [
-            'label' => 'Generic', // @translate
+        $fields = [];
+        $fields['metadata'] = [
+            'label' => 'Metadata',
             'options' => array_column($defaultFields, 'label', 'name'),
         ];
-
-        /** @var \Common\Stdlib\EasyMeta $easyMeta */
-        $easyMeta = $this->getServiceLocator()->get('Common\EasyMeta');
-        $vocabularies = $easyMeta->vocabularyLabels();
-        $propertyLabelsByTerms = $easyMeta->propertyLabels();
+        $fields['multifields'] = [
+            'label' => 'Aggregated fields',
+            'options' => array_replace(
+                array_column($multiFields, 'name', 'name'),
+                array_filter(array_column($multiFields, 'label', 'name'))
+            ),
+        ];
 
         // Set Dublin Core terms and types first vocabularies.
         // There is no property in dctype.
-        $fields['dcterms'] = [];
-        foreach ($propertyLabelsByTerms as $term => $label) {
-            $prefix = strtok($term, ':');
-            if (empty($fields[$prefix]['label'])) {
-                $fields[$prefix] = [
-                    'label' => $vocabularies[$prefix],
-                    'options' => [],
-                ];
+        $properties = ['dcterms' => []];
+        foreach ($vocabularies as $vocabulary) {
+            $prefix = $vocabulary->prefix();
+            $properties[$prefix] = [
+                'label' => $vocabulary->label(),
+                'options' => [],
+            ];
+            foreach ($propertyLabelsByTerms as $term => $label) {
+                if (strtok($term, ':') === $prefix) {
+                    $properties[$prefix]['options'][$term] = $label;
+                }
             }
-            $fields[$prefix]['options'][$term] = $label;
         }
+
+        $fields += $properties;
+
+        $fields = array_filter($fields);
 
         return $fields;
     }

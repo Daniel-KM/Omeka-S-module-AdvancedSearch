@@ -33,10 +33,12 @@ namespace AdvancedSearch\Controller\Admin;
 use AdvancedSearch\Adapter\Manager as SearchAdapterManager;
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use AdvancedSearch\Form\Admin\SearchConfigConfigureForm;
+use AdvancedSearch\Form\Admin\SearchConfigFilterFieldset;
 use AdvancedSearch\Form\Admin\SearchConfigForm;
 use AdvancedSearch\FormAdapter\Manager as SearchFormAdapterManager;
 use Common\Stdlib\PsrMessage;
 use Doctrine\ORM\EntityManager;
+use Laminas\Form\FormElementManager;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Omeka\Form\ConfirmForm;
@@ -60,10 +62,12 @@ class SearchConfigController extends AbstractActionController
 
     public function __construct(
         EntityManager $entityManager,
+        FormElementManager $formElementManager,
         SearchAdapterManager $searchAdapterManager,
         SearchFormAdapterManager $searchFormAdapterManager
     ) {
         $this->entityManager = $entityManager;
+        $this->formElementManager = $formElementManager;
         $this->searchAdapterManager = $searchAdapterManager;
         $this->searchFormAdapterManager = $searchFormAdapterManager;
     }
@@ -176,6 +180,7 @@ class SearchConfigController extends AbstractActionController
         }
 
         $form = $this->getConfigureForm($searchConfig);
+        $form->setFormElementManager($this->formElementManager);
         if (empty($form)) {
             $message = new PsrMessage(
                 'This engine adapter "{label}" has no config form.', // @translate
@@ -197,7 +202,7 @@ class SearchConfigController extends AbstractActionController
         }
 
         $params = $this->getRequest()->getPost()->toArray();
-        $params = $this->removeAvailableFields($params);
+        $params = $this->removeUselessFields($params);
 
         // TODO Check simple fields with normal way.
         $form->setData($params);
@@ -437,6 +442,21 @@ class SearchConfigController extends AbstractActionController
      */
     protected function prepareDataForForm(array $settings): array
     {
+        $filterTypes = $this->getFormFilterTypes();
+
+        foreach ($settings['form']['filters'] ?? [] as $key => $fieldset) {
+            // The name of filters are used as key and should be unique.
+            $settings['form']['filters'][$key]['name'] = $key;
+            // Set specific types options.
+            $type = $fieldset['type'] ?? '';
+            if ($type && !isset($filterTypes[$type])) {
+                $settings['form']['filters'][$key]['type'] = 'Specific';
+                $settings['form']['filters'][$key]['options'] = ['type' => $type]
+                    + ($settings['form']['filters'][$key]['options'] ?? []);
+            }
+        }
+        $settings['form']['filters'] = array_values($settings['form']['filters'] ?? []);
+
         // Remove the mode of each facet to simplify config.
         // Simplify some values too (integer and boolean).
         $settings['facet']['mode'] = ($settings['facet']['mode'] ?? null) === 'link' ? 'link' : 'button';
@@ -466,7 +486,7 @@ class SearchConfigController extends AbstractActionController
     {
         unset($params['csrf']);
 
-        $params = $this->removeAvailableFields($params);
+        $params = $this->removeUselessFields($params);
 
         if (isset($params['search']['default_query'])) {
             $params['search']['default_query'] = trim($params['search']['default_query'] ?? '', "? \t\n\r\0\x0B");
@@ -476,34 +496,24 @@ class SearchConfigController extends AbstractActionController
             $params['search']['default_query_post'] = trim($params['search']['default_query_post'] ?? '', "? \t\n\r\0\x0B");
         }
 
+        // Set name as key and move all specific types to options.
+        $filters = [];
+        foreach ($params['form']['filters'] ?? [] as $filter) {
+            $name = trim($filter['name'] ?? '');
+            if ($name) {
+                unset($filter['name']);
+                $type = $filter['type'] ?? '';
+                if ($type === 'Specific') {
+                    $filter['type'] = $filter['options']['type'] ?? '';
+                    unset($filter['options']['type']);
+                }
+                $filters[$name] = $filter;
+            }
+        }
+        $params['form']['filters'] = $filters;
+
         // Normalize filters.
-        $inputTypes = [
-            'advanced' => 'Advanced',
-            'checkbox' => 'Checkbox',
-            'csrf' => 'Csrf',
-            // 'date' => 'Date',
-            'hidden' => 'Hidden',
-            'multicheckbox' => 'MultiCheckbox',
-            'multiselect' => 'MultiSelect',
-            'multiselectflat' => 'MultiSelectFlat',
-            'multiselectgroup' => 'MultiSelectGroup',
-            'multitext' => 'MultiText',
-            'noop' => 'Noop',
-            'number' => 'Number',
-            // 'numberrange' => 'NumberRange',
-            // 'place' => 'Place',
-            'radio' => 'Radio',
-            'range' => 'Range',
-            'rangedouble' => 'RangeDouble',
-            'select' => 'Select',
-            'selectflat' => 'SelectFlat',
-            'selectfgroup' => 'SelectGroup',
-            'text' => 'Text',
-            'access' => 'Access',
-            'thesaurus' => 'Thesaurus',
-            'itemsetstree' => 'Tree',
-            'tree' => 'Tree',
-        ];
+        $filterTypes = $this->getFormFilterTypes();
 
         $filters = [];
         $i = 0;
@@ -514,8 +524,8 @@ class SearchConfigController extends AbstractActionController
 
             $field = $filter['field'];
 
-            $type = mb_strtolower($filter['type'] ?? '');
-            $type = $inputTypes[$type] ?? ucfirst($type);
+            $type = $filter['type'] ?? '';
+            $type = $filterTypes[$type] ?? ucfirst($type);
 
             // Key is always "advanced" for advanced filters, so no duplicate.
             if ($type === 'Advanced') {
@@ -602,20 +612,42 @@ class SearchConfigController extends AbstractActionController
     }
 
     /**
+     * Get the list of filter types.
+     */
+    protected function getFormFilterTypes(): array
+    {
+        // Some types are specific and set as option.
+        $fieldset = $this->getForm(SearchConfigFilterFieldset::class);
+        $types = $fieldset->get('type')->getOption('value_options');
+        $types += $types['modules']['options'];
+        unset($types['modules']);
+        return $types;
+    }
+
+    /**
      * Remove all params starting with "available_".
      */
-    protected function removeAvailableFields(array $params): array
+    protected function removeUselessFields(array $params): array
     {
+        $removeNames = ['minus', 'plus', 'up', 'down'];
         foreach ($params as $name => $values) {
-            if (substr($name, 0, 10) === 'available_') {
+            if (in_array($name, $removeNames)
+                || substr($name, 0, 10) === 'available_'
+            ) {
                 unset($params[$name]);
             } elseif (is_array($values)) {
                 foreach (array_keys($values) as $subName) {
-                    if (substr($subName, 0, 10) === 'available_') {
+                    if (in_array($subName, $removeNames)
+                        || substr($subName, 0, 10) === 'available_'
+                    ) {
                         unset($params[$name][$subName]);
                     }
                 }
             }
+        }
+        foreach ($params['form']['filters'] ?? [] as $key => $filter) {
+            unset($filter['minus'], $filter['plus'], $filter['up'], $filter['down']);
+            $params['form']['filters'][$key] = $filter;
         }
         return $params;
     }

@@ -10,6 +10,8 @@ use Omeka\Api\Exception\NotFoundException;
 
 /**
  * View helper for rendering search filters for the advanced search response.
+ *
+ * @deprecated Use $searchConfig->renderSearchFilters() instead.
  */
 class SearchingFilters extends AbstractHelper
 {
@@ -39,6 +41,8 @@ class SearchingFilters extends AbstractHelper
      * @uses \Omeka\View\Helper\SearchFilters
      * @return self|string Return self when no config or no query is set, else
      * process search filters and return string via helper SearchFilters.
+     *
+     * @deprecated Use $searchConfig->renderSearchFilters() instead.
      */
     public function __invoke(?SearchConfigRepresentation $searchConfig = null, ?Query $query = null, array $options = [])
     {
@@ -47,51 +51,15 @@ class SearchingFilters extends AbstractHelper
         }
 
         $view = $this->getView();
-        $template = $options['template'] ?? null;
+        $view->logger()->warn('The use of the view helper searchingFilters() is deprecated. Use $searchConfig->renderSearchFilters() instead.'); // @translate
 
-        // TODO Use the managed query to get a clean query.
-        $params = $view->params();
-        $request = $params->fromQuery();
-
-        // Don't display the current item set argument on item set page.
-        $currentItemSet = (int) $view->params()->fromRoute('item-set-id');
-        if ($currentItemSet) {
-            foreach ($request as $key => $value) {
-                // TODO Use the form adapter to get the real arg for the item set.
-                if ($value && $key === 'item_set_id' || $key === 'item_set') {
-                    if (is_array($value)) {
-                        // Check if this is not a sub array (item_set[id][]).
-                        $first = reset($value);
-                        if (is_array($first)) {
-                            $value = $first;
-                        }
-                        $pos = array_search($currentItemSet, $value);
-                        if ($pos !== false) {
-                            if (count($request[$key]) <= 1) {
-                                unset($request[$key]);
-                            } else {
-                                unset($request[$key][$pos]);
-                            }
-                        }
-                    } elseif ((int) $value === $currentItemSet) {
-                        unset($request[$key]);
-                    }
-                    break;
-                }
-            }
-        }
-
-        $request['__searchConfig'] = $searchConfig;
-        $request['__searchQuery'] = $query;
-
-        // The search filters trigger event "'view.search.filters", that calls
-        // the method filterSearchingFilter(). This process allows to use the
-        // standard filters.
-        return $view->searchFilters($template, $request);
+        return $searchConfig->renderSearchFilters($query, $options);
     }
 
     /**
      * Manage specific arguments of the module searching form.
+     *
+     * For internal use only.
      *
      * @todo Should use the form adapter (but only main form is really used).
      * @see \AdvancedSearch\FormAdapter\AbstractFormAdapter
@@ -162,7 +130,16 @@ class SearchingFilters extends AbstractHelper
             return array_replace($values, $titles);
         };
 
-        foreach ($this->query as $key => $value) {
+        $skip = [
+            'page' => null,
+            'offset' => null,
+            'submit' => null,
+            '__searchConfig' => null,
+            '__searchQuery' => null,
+            '__searchCleanQuery' => null,
+        ];
+
+        foreach (array_diff_key($this->query, $skip) as $key => $value) {
             if ($value === null || $value === '' || $value === []) {
                 continue;
             }
@@ -183,6 +160,7 @@ class SearchingFilters extends AbstractHelper
                     break;
 
                 // Resource id.
+                // Override standard search filters.
                 case 'id':
                     $filterLabel = $translate('ID'); // @translate
                     foreach (array_filter(array_map('intval', $flatArray($value))) as $subKey => $subValue) {
@@ -399,6 +377,29 @@ class SearchingFilters extends AbstractHelper
                     }
                     break;
 
+                // Bypass filters processed by searchFilters.
+                // Standard.
+                case 'fulltext_search':
+                case 'resource_class_id':
+                case 'property':
+                case 'search':
+                case 'resource_template_id':
+                case 'item_set_id':
+                case 'not_item_set_id':
+                case 'owner_id':
+                case 'site_id':
+                case 'is_public':
+                case 'has_media':
+                // case 'id':
+                case 'in_sites':
+                case 'datetime':
+                case 'resource_class_term':
+                // Added to this module.
+                case 'has_original':
+                case 'has_thumbnails':
+                case 'media_types':
+                    break;
+
                 default:
                     // Append only fields that are not yet processed somewhere
                     // else, included searchFilters helper.
@@ -425,6 +426,8 @@ class SearchingFilters extends AbstractHelper
                     break;
             }
         }
+
+        // TODO Reorder filters according to query for better ui.
 
         return $filters;
     }

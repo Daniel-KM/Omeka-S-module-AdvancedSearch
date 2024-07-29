@@ -29,11 +29,28 @@ class SearchFilters extends AbstractHelper
     protected $baseUrl;
 
     /**
-     * The cleaned query.
+     * The cleaned query without specific keys.
      *
      * @var array
      */
     protected $query;
+
+    /**
+     * The cleaned query.
+     *
+     * @var array
+     */
+    protected $searchCleanQuery;
+
+    /**
+     * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation
+     */
+    protected $searchConfig;
+
+    /**
+     * @var \AdvancedSearch\Query
+     */
+    protected $searchQuery;
 
     /**
      * Render filters from search query, with urls if needed (if set in theme).
@@ -57,12 +74,17 @@ class SearchFilters extends AbstractHelper
 
         $this->baseUrl = $url(null, [], true);
         $this->query = $cleanQuery($query);
+        $this->searchCleanQuery = $this->query;
+        $this->searchConfig = $this->query['__searchConfig'] ?? null;
+        $this->searchQuery = $this->query['__searchQuery'] ?? null;
+
         unset(
             $this->query['page'],
             $this->query['offset'],
             $this->query['submit'],
             $this->query['__searchConfig'],
-            $this->query['__searchQuery']
+            $this->query['__searchQuery'],
+            $this->query['__searchCleanQuery']
         );
 
         // This function fixes some forms that add an array level.
@@ -406,6 +428,13 @@ class SearchFilters extends AbstractHelper
             }
         }
 
+        if ($this->searchConfig) {
+            $query['__searchConfig'] = $this->searchConfig;
+            $query['__searchQuery'] = $this->searchQuery;
+            $query['__searchCleanQuery'] = $this->searchCleanQuery;
+        }
+
+        // Run event for modules, included AdvancedSearch.
         $result = $view->trigger(
             'view.search.filters',
             ['filters' => $filters, 'query' => $query, 'baseUrl' => $this->baseUrl],

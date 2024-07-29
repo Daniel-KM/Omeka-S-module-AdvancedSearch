@@ -799,13 +799,15 @@ class Module extends AbstractModule
     /**
      * Filter search filters.
      *
-     * The search filter helper is overridden, so manage only the searching
-     * filters here.
+     * The search filter helper is overridden in order to manage improved
+     * filters (url) and new filters. Furthermore, the event manage the specific
+     * arguments of the advanced search.
+     * This process allows to manage filtering for standard browse, filtering by
+     * other modules and filtering for advanced search.
      *
      * @see \Omeka\View\Helper\SearchFilters
      * @see \AdvancedSearch\View\Helper\SearchFilters
-     *
-     * @param Event $event
+     * @see \AdvancedSearch\View\Helper\SearchingFilters
      */
     public function filterSearchFilters(Event $event): void
     {
@@ -814,31 +816,16 @@ class Module extends AbstractModule
             return;
         }
 
+        $searchConfig = $query['__searchConfig'] ?? null;
+
+        if (!$searchConfig) {
+            return;
+        }
+
         $filters = $event->getParam('filters');
 
-        // $this->baseUrl = (string) $event->getParam('baseUrl');
-
-        /** @var \AdvancedSearch\Mvc\Controller\Plugin\SearchResources $searchResources */
-        $searchResources = $this->getServiceLocator()->get('ControllerPluginManager')
-            ->get('searchResources');
-
-        $cleanedQuery = $searchResources->cleanQuery($query);
-        $searchConfig = $cleanedQuery['__searchConfig'] ?? null;
-        // TODO Use the search Query directly or the query in the params? Currently, Query is not used.
-        // $searchQuery = $cleanedQuery['__searchQuery'] ?? null;
-        unset(
-            $cleanedQuery['page'],
-            $cleanedQuery['offset'],
-            $cleanedQuery['submit'],
-            $cleanedQuery['__searchConfig'],
-            $cleanedQuery['__searchQuery']
-        );
-
-        // TODO Clarify main search filters and searching filters.
-        if ($searchConfig) {
-            $view = $event->getTarget();
-            $filters = $view->searchingFilters()->filterSearchingFilters($searchConfig, $cleanedQuery, $filters);
-        }
+        $view = $event->getTarget();
+        $filters = $view->searchingFilters()->filterSearchingFilters($searchConfig, $query['__searchCleanQuery'] ?? $query, $filters);
 
         $event->setParam('filters', $filters);
     }

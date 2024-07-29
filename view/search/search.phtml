@@ -179,7 +179,7 @@ $this->headScript()
             <?php else: ?>
             <?php if (in_array($searchConfig->subSetting('display', 'search_filters', 'header'), ['header', 'both'])): ?>
             <div class="search-results-part search-results-header">
-                <?= $this->searchingFilters($searchConfig, $query, ['template' => 'common/search-filters-links']) ?>
+                <?= $searchConfig->renderSearchFilters($query, ['template' => 'common/search-filters-links']) ?>
             </div>
             <?php endif; ?>
             <?= $translate('The query returned no results') ?>

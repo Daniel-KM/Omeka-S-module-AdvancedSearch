@@ -125,11 +125,6 @@ class Query implements \JsonSerializable
     /**
      * @var array
      */
-    protected $excludedFields = [];
-
-    /**
-     * @var array
-     */
     protected $suggestOptions = [
         'suggester' => 0,
         'direct' => false,
@@ -142,6 +137,11 @@ class Query implements \JsonSerializable
      * @var array
      */
     protected $suggestFields = [];
+
+    /**
+     * @var array
+     */
+    protected $excludedFields = [];
 
     /**
      * @var int

@@ -35,14 +35,6 @@ class SearchSortSelector extends AbstractHelper
             return '';
         }
 
-        /* @deprecated Since 3.5.23.3. Kept for old themes. */
-        if (!is_array(reset($valueOptions))) {
-            foreach ($valueOptions as $name => &$sortOption) {
-                $sortOption = ['name' => $name, 'label' => $sortOption];
-            }
-            unset($sortOption);
-        }
-
         if (is_array($params)) {
             $params += [
                 'label' => $label,
@@ -75,8 +67,6 @@ class SearchSortSelector extends AbstractHelper
             'query' => $query,
             'select' => $select,
             'params' => $params,
-            // Kept for old themes.
-            'asUrl' => $params['as_url'],
         ]);
     }
 

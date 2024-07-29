@@ -9,8 +9,11 @@ class FacetActives extends AbstractFacet
     /**
      * Get complete data about active facets.
      *
-     * The options are the search page settings for facets, so contains all names
-     * , label and types of all facets.
+     * @param array $options Unlike AbstractFacet, options are the full config
+     * settings for facets, so contains the common options of facets and all
+     * specific settings, label and types of all facets.
+     *
+     * @todo Separate FacetActives from AbstractFacet?
      */
     protected function prepareActiveFacetData(array $activeFacets, array $options): array
     {
@@ -32,7 +35,9 @@ class FacetActives extends AbstractFacet
                 $facetValueValue = (string) $facetValue;
                 $query = $this->queryBase;
 
-                if (!isset($query['facet'][$facetField]) || array_search($facetValueValue, $query['facet'][$facetField]) === false) {
+                if (!isset($query['facet'][$facetField])
+                    || array_search($facetValueValue, $query['facet'][$facetField]) === false
+                ) {
                     continue;
                 }
 
@@ -41,7 +46,9 @@ class FacetActives extends AbstractFacet
                 $values = array_filter($values, fn ($v) => $v !== $facetValueValue);
                 $query['facet'][$facetField] = $values;
 
-                $url = $isFacetModeDirect ? $this->urlHelper->__invoke($this->route, $this->params, ['query' => $query]) : '';
+                $url = $isFacetModeDirect
+                    ? $this->urlHelper->__invoke($this->route, $this->params, ['query' => $query])
+                    : '';
 
                 $facetValue = [
                     'value' => $facetValue,

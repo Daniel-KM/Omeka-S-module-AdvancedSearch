@@ -155,6 +155,41 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
             ->setSearchConfig($this);
     }
 
+    public function settings(): array
+    {
+        return $this->resource->getSettings();
+    }
+
+    public function setting(string $name, $default = null)
+    {
+        return $this->resource->getSettings()[$name] ?? $default;
+    }
+
+    public function subSetting(string $mainName, string $name, $default = null)
+    {
+        return $this->resource->getSettings()[$mainName][$name] ?? $default;
+    }
+
+    public function subSubSetting(string $mainName, string $name, string $subName, $default = null)
+    {
+        return $this->resource->getSettings()[$mainName][$name][$subName] ?? $default;
+    }
+
+    public function created(): \DateTime
+    {
+        return $this->resource->getCreated();
+    }
+
+    public function modified(): ?\DateTime
+    {
+        return $this->resource->getModified();
+    }
+
+    public function getEntity(): \AdvancedSearch\Entity\SearchConfig
+    {
+        return $this->resource;
+    }
+
     /**
      * Get the form from the adapter.
      *
@@ -195,40 +230,5 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         return $formAdapter
             ? $formAdapter->renderForm($options)
             : '';
-    }
-
-    public function settings(): array
-    {
-        return $this->resource->getSettings();
-    }
-
-    public function setting(string $name, $default = null)
-    {
-        return $this->resource->getSettings()[$name] ?? $default;
-    }
-
-    public function subSetting(string $mainName, string $name, $default = null)
-    {
-        return $this->resource->getSettings()[$mainName][$name] ?? $default;
-    }
-
-    public function subSubSetting(string $mainName, string $name, string $subName, $default = null)
-    {
-        return $this->resource->getSettings()[$mainName][$name][$subName] ?? $default;
-    }
-
-    public function created(): \DateTime
-    {
-        return $this->resource->getCreated();
-    }
-
-    public function modified(): ?\DateTime
-    {
-        return $this->resource->getModified();
-    }
-
-    public function getEntity(): \AdvancedSearch\Entity\SearchConfig
-    {
-        return $this->resource;
     }
 }

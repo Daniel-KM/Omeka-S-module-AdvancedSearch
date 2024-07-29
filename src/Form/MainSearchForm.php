@@ -189,8 +189,11 @@ class MainSearchForm extends Form
         if (!$autoSuggestUrl) {
             $suggester = $this->formSettings['autosuggest']['suggester'] ?? null;
             if ($suggester) {
-                // TODO Use url helper.
-                $autoSuggestUrl = $this->basePath . ($this->site ? '/s/' . $this->site->slug() : '/admin') . '/' . ($this->searchConfig ? $this->searchConfig->path() : 'search') . '/suggest';
+                // TODO Use url helper?
+                $autoSuggestUrl = $this->basePath
+                    . ($this->site ? '/s/' . $this->site->slug() : '/admin')
+                    . '/' . ($this->searchConfig ? $this->searchConfig->path() : 'search')
+                    . '/suggest';
             }
         }
         if ($autoSuggestUrl) {

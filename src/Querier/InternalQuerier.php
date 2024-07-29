@@ -178,7 +178,7 @@ SQL;
     protected function querySuggestionsDirect(): Response
     {
         // Only items and itemSets are managed currently.
-        $resourceTypesToClasses = [
+        $resourceTypesToSqlClasses = [
             // 'items' => \Omeka\Entity\Item::class,
             // 'item_sets' => \Omeka\Entity\ItemSet::class,
             'items' => 'Omeka\\\\Entity\\\\Item',
@@ -189,8 +189,8 @@ SQL;
             : '';
 
         // The bind is not working in a array, so use a direct string.
-        $classes = array_intersect_key($resourceTypesToClasses, array_flip($this->resourceTypes));
-        $inClasses = '"' . implode('", "', $classes) . '"';
+        $sqlClasses = array_intersect_key($resourceTypesToSqlClasses, array_flip($this->resourceTypes));
+        $inClasses = '"' . implode('", "', $sqlClasses) . '"';
 
         // TODO Manage site id and item set id and any other filter query.
         // TODO Use the full text search table.
@@ -199,10 +199,10 @@ SQL;
         $connection = $this->services->get('Omeka\Connection');
         $q = $this->query->getQuery();
         $bind = [
-            // 'resource_types' => $classes,
+            // 'resource_types' => $sqlClasses,
             'limit' => $this->query->getLimit(),
             'value_length' => mb_strlen($q),
-            'length' => $this->query->getSuggestOptions()['length'] ?? 50,
+            'length' => (int) ($this->query->getSuggestOptions()['length'] ?: 50),
         ];
         $types = [
             // 'resource_types' => $connection::PARAM_STR_ARRAY,
@@ -213,14 +213,14 @@ SQL;
 
         $fields = $this->query->getSuggestFields();
         if ($fields) {
-            $ids = $this->getPropertyIds($fields);
+            $ids = $this->easyMeta->propertyIds($fields);
             if (!$ids) {
                 // Searching inside non-existing properties outputs no result.
                 return $this->response
                    ->setIsSuccess(true);
             }
             $sqlFields = 'AND `value`.`property_id` IN (:property_ids)';
-            $bind['property_ids'] = $ids;
+            $bind['property_ids'] = array_values($ids);
             $types['property_ids'] = $connection::PARAM_INT_ARRAY;
         } else {
             $sqlFields = '';
@@ -228,10 +228,10 @@ SQL;
 
         $excludedFields = $this->query->getExcludedFields();
         if ($excludedFields) {
-            $ids = $this->getPropertyIds($excludedFields);
+            $ids = $this->easyMeta->propertyIds($excludedFields);
             if ($ids) {
                 $sqlFields .= ' AND `value`.`property_id` NOT IN (:excluded_property_ids)';
-                $bind['excluded_property_ids'] = $ids;
+                $bind['excluded_property_ids'] = array_values($ids);
                 $types['excluded_property_ids'] = $connection::PARAM_INT_ARRAY;
             }
         }
@@ -245,6 +245,13 @@ SQL;
         }
 
         // TODO Check the index mode for the direct search of suggestions.
+
+        // Use keys "value" and "data" to get a well formatted output for
+        // suggestions.
+        // The query cuts the value to the first space. The end of line is
+        // removed to avoid some strange results.
+        // The group by uses the same than the select, because suggester
+        // requires "value".
 
         $mode = $this->query->getSuggestOptions()['mode_search'] ?: 'start';
         if ($mode === 'contain') {
@@ -269,12 +276,6 @@ SQL;
             $bind['value_like'] = '%' . str_replace(['%', '_'], ['\%', '\_'], $q) . '%';
             $types['value_like'] = \PDO::PARAM_STR;
         } elseif ($mode === 'start') {
-            // Use keys "value" and "data" to get a well formatted output for
-            // suggestions.
-            // The query cuts the value to the first space. The end of line is
-            // removed to avoid some strange results.
-            // The group by uses the same than the select, because suggester
-            // requires "value".
             /*
             $sql = <<<SQL
 SELECT DISTINCT
@@ -353,7 +354,12 @@ SQL;
             $this->logger->err($e->getMessage());
             return $this->response
                 ->setMessage('An internal issue in database occurred.'); // @translate
+        } catch (\Exception $e) {
+            $this->logger->err($e->getMessage());
+            return $this->response
+                ->setMessage('An internal issue occurred.'); // @translate
         }
+
         return $this->response
             ->setSuggestions($results)
             ->setIsSuccess(true);
@@ -427,7 +433,7 @@ SQL;
                 );
                 $this->query->setExcludedFields([]);
                 $messenger->addWarning($message);
-                $this->logger->warn($message);
+                $this->logger->warn($message->getMessage(), $message->getContext());
                 return $this->getPreparedQuery();
             }
 
@@ -436,7 +442,7 @@ SQL;
                 ['query' => $req, 'count' => count($this->args['property']), 'total' => self::REQUEST_MAX_ARGS]
             );
             $messenger->addWarning($message);
-            $this->logger->warn($message);
+            $this->logger->warn($message->getMessage(), $message->getContext());
             $this->args['property'] = array_slice($this->args['property'], 0, self::REQUEST_MAX_ARGS);
         }
 
@@ -583,158 +589,159 @@ SQL;
         };
 
         // Empty values are already filtered by the form adapter.
-        foreach ($filters as $field => $values) {
-            switch ($field) {
-                // "resource_type" is used externally and "resource_name" internally.
-                case 'resource_name':
-                case 'resource_type':
-                    $values = $flatArray($values);
-                    $this->args['resource_name'] = empty($this->args['resource_name'])
-                        ? $values
-                        : array_merge(is_array($this->args['resource_name']) ? $this->args['resource_name'] : [$this->args['resource_name']], $values);
-                    continue 2;
+        foreach ($filters as $field => $values) switch ($field) {
+            // "resource_type" is used externally and "resource_name" internally
+            // and "resource-type" by omeka main search engine in admin, with
+            // the controller name, but it is a fake argument that redirect to
+            // the controller.
+            case 'resource_name':
+            case 'resource_type':
+                $values = $flatArray($values);
+                $this->args['resource_name'] = empty($this->args['resource_name'])
+                    ? $values
+                    : array_merge(is_array($this->args['resource_name']) ? $this->args['resource_name'] : [$this->args['resource_name']], $values);
+                continue 2;
 
-                // "is_public" is automatically managed by this internal adapter
-                // TODO Improve is_public to search public/private only.
-                case 'is_public':
-                    continue 2;
+            // "is_public" is automatically managed by this internal adapter
+            // TODO Improve is_public to search public/private only.
+            case 'is_public':
+                continue 2;
 
-                case 'id':
-                    $values = array_filter(array_map('intval', $flatArray($values)));
-                    $this->args['id'] = empty($this->args['id'])
-                        ? $values
-                        : array_merge(is_array($this->args['id']) ? $this->args['id'] : [$this->args['id']], $values);
-                    continue 2;
+            case 'id':
+                $values = array_filter(array_map('intval', $flatArray($values)));
+                $this->args['id'] = empty($this->args['id'])
+                    ? $values
+                    : array_merge(is_array($this->args['id']) ? $this->args['id'] : [$this->args['id']], $values);
+                continue 2;
 
-                case 'owner_id':
-                    $values = $flatArray($values);
-                    $values = is_numeric(reset($values))
-                        ? array_filter(array_map('intval', $values))
-                        : $this->listUserIds($values);
-                    $this->args['owner_id'] = empty($this->args['owner_id'])
-                        ? $values
-                        : array_merge(is_array($this->args['owner_id']) ? $this->args['owner_id'] : [$this->args['owner_id']], $values);
-                    continue 2;
+            case 'owner_id':
+                $values = $flatArray($values);
+                $values = is_numeric(reset($values))
+                    ? array_filter(array_map('intval', $values))
+                    : $this->listUserIds($values);
+                $this->args['owner_id'] = empty($this->args['owner_id'])
+                    ? $values
+                    : array_merge(is_array($this->args['owner_id']) ? $this->args['owner_id'] : [$this->args['owner_id']], $values);
+                continue 2;
 
-                case 'site_id':
-                    $values = $flatArray($values);
-                    $values = is_numeric(reset($values))
-                        ? array_filter(array_map('intval', $values))
-                        : $this->listSiteIds($values);
-                    $this->args['site_id'] = empty($this->args['site_id'])
-                        ? $values
-                        : array_merge(is_array($this->args['site_id']) ? $this->args['site_id'] : [$this->args['site_id']], $values);
-                    continue 2;
+            case 'site_id':
+                $values = $flatArray($values);
+                $values = is_numeric(reset($values))
+                    ? array_filter(array_map('intval', $values))
+                    : $this->listSiteIds($values);
+                $this->args['site_id'] = empty($this->args['site_id'])
+                    ? $values
+                    : array_merge(is_array($this->args['site_id']) ? $this->args['site_id'] : [$this->args['site_id']], $values);
+                continue 2;
 
-                case 'resource_class_id':
-                    $values = $flatArray($values);
-                    $values = is_numeric(reset($values))
-                        ? array_filter(array_map('intval', $values))
-                        : array_values($this->getResourceClassIds($values));
-                    $this->args['resource_class_id'] = empty($this->args['resource_class_id'])
-                        ? $values
-                        : array_merge(is_array($this->args['resource_class_id']) ? $this->args['resource_class_id'] : [$this->args['resource_class_id']], $values);
-                    continue 2;
+            case 'resource_class_id':
+                $values = $flatArray($values);
+                $values = is_numeric(reset($values))
+                    ? array_filter(array_map('intval', $values))
+                    : array_values($this->easyMeta->resourceClassIds($values));
+                $this->args['resource_class_id'] = empty($this->args['resource_class_id'])
+                    ? $values
+                    : array_merge(is_array($this->args['resource_class_id']) ? $this->args['resource_class_id'] : [$this->args['resource_class_id']], $values);
+                continue 2;
 
-                case 'resource_template_id':
-                    $values = $flatArray($values);
-                    $values = is_numeric(reset($values))
-                        ? array_filter(array_map('intval', $values))
-                        : array_values($this->getResourceTemplateIds($values));
-                    $this->args['resource_template_id'] = empty($this->args['resource_template_id'])
-                        ? $values
-                        : array_merge(is_array($this->args['resource_template_id']) ? $this->args['resource_template_id'] : [$this->args['resource_template_id']], $values);
-                    continue 2;
+            case 'resource_template_id':
+                $values = $flatArray($values);
+                $values = is_numeric(reset($values))
+                    ? array_filter(array_map('intval', $values))
+                    : array_values($this->easyMeta->resourceTemplateIds($values));
+                $this->args['resource_template_id'] = empty($this->args['resource_template_id'])
+                    ? $values
+                    : array_merge(is_array($this->args['resource_template_id']) ? $this->args['resource_template_id'] : [$this->args['resource_template_id']], $values);
+                continue 2;
 
-                case 'item_set_id':
-                    $values = array_filter(array_map('intval', $flatArray($values)));
-                    $this->args['item_set_id'] = empty($this->args['item_set_id'])
-                        ? $values
-                        : array_merge(is_array($this->args['item_set_id']) ? $this->args['item_set_id'] : [$this->args['item_set_id']], $values);
-                    continue 2;
+            case 'item_set_id':
+                $values = array_filter(array_map('intval', $flatArray($values)));
+                $this->args['item_set_id'] = empty($this->args['item_set_id'])
+                    ? $values
+                    : array_merge(is_array($this->args['item_set_id']) ? $this->args['item_set_id'] : [$this->args['item_set_id']], $values);
+                continue 2;
 
-                // Module Access: access level (free, reserved, protected, forbidden).
-                case 'access':
-                    $values = array_filter($flatArray($values));
-                    $this->args['access'] = empty($this->args['access'])
-                        ? $values
-                        : array_merge(is_array($this->args['access']) ? $this->args['access'] : [$this->args['access']], $values);
-                    continue 2;
+            // Module Access: access level (free, reserved, protected, forbidden).
+            case 'access':
+                $values = array_filter($flatArray($values));
+                $this->args['access'] = empty($this->args['access'])
+                    ? $values
+                    : array_merge(is_array($this->args['access']) ? $this->args['access'] : [$this->args['access']], $values);
+                continue 2;
 
-                // Module Item Sets Tree.
-                case 'item_sets_tree':
-                    $values = array_filter(array_map('intval', $flatArray($values)));
-                    $this->args['item_sets_tree'] = empty($this->args['item_sets_tree'])
-                        ? $values
-                        : array_merge(is_array($this->args['item_sets_tree']) ? $this->args['item_sets_tree'] : [$this->args['item_sets_tree']], $values);
-                    continue 2;
+            // Module Item Sets Tree.
+            case 'item_sets_tree':
+                $values = array_filter(array_map('intval', $flatArray($values)));
+                $this->args['item_sets_tree'] = empty($this->args['item_sets_tree'])
+                    ? $values
+                    : array_merge(is_array($this->args['item_sets_tree']) ? $this->args['item_sets_tree'] : [$this->args['item_sets_tree']], $values);
+                continue 2;
 
-                default:
-                    $field = $this->getPropertyTerm($field)
-                        ?? $multifields[$field]['fields']
-                        ?? $this->underscoredNameToTerm($field)
-                        ?? null;
-                    if (!$field) {
-                        break;
-                    }
-                    // "In list" is used for facets.
-                    if ($inListForFacets) {
-                        $firstKey = key($values);
-                        // Check for a facet range.
-                        if (count($values) <= 2 && ($firstKey === 'from' || $firstKey === 'to')) {
-                            if (isset($values['from']) && $values['from'] !== '') {
-                                $this->args['property'][] = [
-                                    'joiner' => 'and',
-                                    'property' => $field,
-                                    'type' => 'gte',
-                                    'text' => $values['from'],
-                                ];
-                            }
-                            if (isset($values['to']) && $values['to'] !== '') {
-                                $this->args['property'][] = [
-                                    'joiner' => 'and',
-                                    'property' => $field,
-                                    'type' => 'lte',
-                                    'text' => $values['to'],
-                                ];
-                            }
-                        } else {
+            default:
+                $field = $this->easyMeta->propertyTerm($field)
+                    ?? $multifields[$field]['fields']
+                    ?? $this->underscoredNameToTerm($field)
+                    ?? null;
+                if (!$field) {
+                    break;
+                }
+                // "In list" is used for facets.
+                if ($inListForFacets) {
+                    $firstKey = key($values);
+                    // Check for a facet range.
+                    if (count($values) <= 2 && ($firstKey === 'from' || $firstKey === 'to')) {
+                        if (isset($values['from']) && $values['from'] !== '') {
                             $this->args['property'][] = [
                                 'joiner' => 'and',
                                 'property' => $field,
-                                'type' => 'list',
-                                'text' => $flatArray($values),
+                                'type' => 'gte',
+                                'text' => $values['from'],
                             ];
                         }
-                        break;
-                    }
-                    foreach ($values as $value) {
-                        if (is_array($value)) {
-                            // Skip date range queries (for hidden queries).
-                            if (isset($value['from']) || isset($value['to'])) {
-                                continue;
-                            }
-                            // Skip queries filters (for hidden queries).
-                            if (isset($value['joiner']) || isset($value['type']) || isset($value['text']) || isset($value['join']) || isset($value['value'])) {
-                                continue;
-                            }
+                        if (isset($values['to']) && $values['to'] !== '') {
                             $this->args['property'][] = [
                                 'joiner' => 'and',
                                 'property' => $field,
-                                'type' => 'list',
-                                'text' => $value,
-                            ];
-                        } else {
-                            $this->args['property'][] = [
-                                'joiner' => 'and',
-                                'property' => $field,
-                                'type' => 'eq',
-                                'text' => $value,
+                                'type' => 'lte',
+                                'text' => $values['to'],
                             ];
                         }
+                    } else {
+                        $this->args['property'][] = [
+                            'joiner' => 'and',
+                            'property' => $field,
+                            'type' => 'list',
+                            'text' => $flatArray($values),
+                        ];
                     }
                     break;
-            }
+                }
+                foreach ($values as $value) {
+                    if (is_array($value)) {
+                        // Skip date range queries (for hidden queries).
+                        if (isset($value['from']) || isset($value['to'])) {
+                            continue;
+                        }
+                        // Skip queries filters (for hidden queries).
+                        if (isset($value['joiner']) || isset($value['type']) || isset($value['text']) || isset($value['join']) || isset($value['value'])) {
+                            continue;
+                        }
+                        $this->args['property'][] = [
+                            'joiner' => 'and',
+                            'property' => $field,
+                            'type' => 'list',
+                            'text' => $value,
+                        ];
+                    } else {
+                        $this->args['property'][] = [
+                            'joiner' => 'and',
+                            'property' => $field,
+                            'type' => 'eq',
+                            'text' => $value,
+                        ];
+                    }
+                }
+                break;
         }
     }
 
@@ -745,7 +752,7 @@ SQL;
             if ($field === 'created' || $field === 'modified') {
                 $argName = 'datetime';
             } else {
-                $field = $this->getPropertyTerm($field)
+                $field = $this->easyMeta->propertyTerm($field)
                     ?? $multifields[$field]['fields']
                     ?? $this->underscoredNameToTerm($field)
                     ?? null;
@@ -786,7 +793,7 @@ SQL;
     {
         $multifields = $this->engine->settingAdapter('multifields', []);
         foreach ($filters as $field => $values) {
-            $field = $this->getPropertyTerm($field)
+            $field = $this->easyMeta->propertyTerm($field)
                 ?? $multifields[$field]['fields']
                 ?? $this->underscoredNameToTerm($field)
                 ?? null;
@@ -881,7 +888,7 @@ SQL;
         $fields = [];
         foreach ($facets as $facetField => $facetData) {
             $fields[$facetField] = $metadataFieldsToNames[$facetField]
-                ?? $this->getPropertyTerm($facetField)
+                ?? $this->easyMeta->propertyTerm($facetField)
                 ?? $multifields[$facetField]['fields']
                 ?? $facetField;
         }
@@ -1083,31 +1090,6 @@ SQL;
     }
 
     /**
-     * Get the list of vocabulary prefixes by vocabulary ids.
-     */
-    protected function getVocabularyPrefixes(): array
-    {
-        static $vocabularies;
-
-        if (is_null($vocabularies)) {
-            /** @var \Doctrine\DBAL\Connection $connection */
-            $connection = $this->services->get('Omeka\Connection');
-            $qb = $connection->createQueryBuilder();
-            $qb
-                ->select(
-                    'vocabulary.id AS id',
-                    'vocabulary.prefix AS prefix'
-                )
-                ->from('vocabulary', 'vocabulary')
-                ->orderBy('vocabulary.id)', 'ASC')
-            ;
-            $vocabularies = $connection->executeQuery($qb)->fetchAllKeyValue();
-        }
-
-        return $vocabularies;
-    }
-
-    /**
      * Get all property terms as terms with "_".
      *
      * This allows to convert some Solr keys like "dcterms_subject_ss" into a
@@ -1120,69 +1102,13 @@ SQL;
         static $properties;
 
         if (is_null($properties)) {
-            /** @var \Doctrine\DBAL\Connection $connection */
-            $connection = $this->services->get('Omeka\Connection');
-            // For big databases, manage used properties separately.
-            $subQb = $connection->createQueryBuilder();
-            $subQb
-                ->select('DISTINCT property_id')
-                ->from('value', 'value')
-            ;
-            $qb = $connection->createQueryBuilder();
-            $qb
-                ->select(
-                    'CONCAT(vocabulary.prefix, "_", property.local_name) AS "key"',
-                    'CONCAT(vocabulary.prefix, ":", property.local_name) AS "term"'
-                )
-                ->from('property', 'property')
-                ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
-                // Overflow on big databases, so use subquery.
-                // ->innerJoin('property', 'value', 'value', 'property.id = value.property_id')
-                ->where('property.id IN (' . $subQb . ')')
-            ;
-            $properties = $connection->executeQuery($qb)->fetchAllKeyValue();
+            $usedPropertyByTerms = $this->easyMeta->propertyIdsUsed();
+            $properties = [];
+            foreach (array_keys($usedPropertyByTerms) as $term) {
+                $properties[str_replace(':', '_', $term)] = $term;
+            }
         }
 
         return $properties;
-    }
-
-    /**
-     * Get property ids by JSON-LD terms or by numeric ids.
-     *
-     * @return array Associative array of property ids by terms or ids.
-     */
-    protected function getPropertyIds($termsOrIds = null): array
-    {
-        return $this->services->get('EasyMeta')->propertyIds($termsOrIds);
-    }
-
-    /**
-     * Get a property term by JSON-LD term or by numeric id.
-     *
-     * @return string|null The property term or null.
-     */
-    protected function getPropertyTerm($termOrId): ?string
-    {
-        return $this->services->get('EasyMeta')->propertyTerm($termOrId);
-    }
-
-    /**
-     * Convert a list of terms into a list of resource class ids.
-     *
-     * @return array Associative array of resource class ids by terms or ids.
-     */
-    protected function getResourceClassIds($termsOrIds = null): array
-    {
-        return $this->services->get('EasyMeta')->resourceClassIds($termsOrIds);
-    }
-
-    /**
-     * Convert a list of labels into a list of resource template ids.
-     *
-     * @return array Associative array of resource template ids by labels or ids.
-     */
-    protected function getResourceTemplateIds($labelsOrIds = null): array
-    {
-        return $this->services->get('EasyMeta')->resourceTemplateIds($labelsOrIds);
     }
 }

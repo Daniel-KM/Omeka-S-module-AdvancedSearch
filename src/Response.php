@@ -235,7 +235,7 @@ class Response implements \JsonSerializable
      *
      * @param string|null $resourceType The resource type ("items", "item_sets"…).
      */
-    public function getResults(string $resourceType = null): array
+    public function getResults(?string $resourceType = null): array
     {
         return is_null($resourceType)
             ? $this->results
@@ -270,7 +270,7 @@ class Response implements \JsonSerializable
     }
 
     /**
-     * Get resources ids for a resource type or all resource types.
+     * Get resources ids for a resource type or all types, without pagination.
      *
      * @param string|null $resourceType The resource type ("items", "item_sets"…).
      * @param bool $byResourceType Merge ids or not.
@@ -278,7 +278,7 @@ class Response implements \JsonSerializable
      * @internal Currently experimental.
      * @todo Return ids directly with array_column() in the response or include it by default.
      */
-    public function getResourceIds(string $resourceType = null, bool $byResourceType = false): array
+    public function getResourceIds(?string $resourceType = null, bool $byResourceType = false): array
     {
         if (!count($this->allResourceIdsByResourceType)) {
             foreach (array_keys($this->results) as $resourceType) {
@@ -308,7 +308,7 @@ class Response implements \JsonSerializable
      * When resources types are set and unique, the key is the id (that is the
      * case with item and item set, not pages).
      */
-    public function getResources(string $resourceType = null): array
+    public function getResources(?string $resourceType = null): array
     {
         if (!$this->api) {
             return [];

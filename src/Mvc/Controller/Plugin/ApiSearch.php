@@ -8,6 +8,7 @@ use AdvancedSearch\FormAdapter\ApiFormAdapter;
 use AdvancedSearch\Querier\Exception\QuerierException;
 use AdvancedSearch\Query;
 use AdvancedSearch\Response as SearchResponse;
+use Common\Stdlib\EasyMeta;
 use Doctrine\ORM\EntityManager;
 use Laminas\I18n\Translator\TranslatorInterface;
 use Laminas\Log\LoggerInterface;
@@ -15,123 +16,112 @@ use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 use Laminas\ServiceManager\Exception\ServiceNotFoundException;
 use Omeka\Api\Adapter\Manager as AdapterManager;
 use Omeka\Api\Exception;
-use Omeka\Api\Manager;
+use Omeka\Api\Manager as ApiManager;
 use Omeka\Api\Request;
 use Omeka\Api\ResourceInterface;
 use Omeka\Api\Response;
 use Omeka\Permissions\Acl;
 use Omeka\Stdlib\Paginator;
 
-/**
- * Do an api search via the default search engine.
- *
- * Does the same than the Omeka api controller plugin for method search().
- * Allows to get a standard Omeka Response from the external engine.
- * @see \Omeka\Mvc\Controller\Plugin\Api
- *
- * Notes:
- * - Currently, many parameters are unavailable. Some methods miss in Query.
- * - The event "api.search.query" is not triggered.
- * - returnScalar is not managed.
- * - Ideally, the external search engine should answer like the api?
- *
- * @todo Convert in a standard api restful controller or in a standard page with the api form adapter.
- */
 class ApiSearch extends AbstractPlugin
 {
     /**
-     * @var Manager
-     */
-    protected $api;
-
-    /**
-     * @var SearchConfigRepresentation
-     */
-    protected $searchConfig;
-
-    /**
-     * @var SearchEngineRepresentation
-     */
-    protected $engine;
-
-    /**
-     * @var AdapterManager
-     */
-    protected $adapterManager;
-
-    /**
-     * @var ApiFormAdapter
-     */
-    protected $apiFormAdapter;
-
-    /**
-     * @var Acl
+     * @var \Omeka\Permissions\Acl
      */
     protected $acl;
 
     /**
-     * @var LoggerInterface
+     * @var \Omeka\Api\Adapter\Manager
      */
-    protected $logger;
+    protected $adapterManager;
 
     /**
-     * @var TranslatorInterface
+     * @var \Omeka\Api\Manager
      */
-    protected $translator;
+    protected $api;
 
     /**
-     * @var EntityManager
+     * @var \AdvancedSearch\FormAdapter\ApiFormAdapter
+     */
+    protected $apiFormAdapter;
+
+    /**
+     * @var \Common\Stdlib\EasyMeta
+     */
+    protected $easyMeta;
+
+    /**
+     * @var \Doctrine\ORM\EntityManager
      */
     protected $entityManager;
 
     /**
-     * @var Paginator
+     * @var \Laminas\Log\LoggerInterface
+     */
+    protected $logger;
+
+    /**
+     * @var \Omeka\Stdlib\Paginator
      */
     protected $paginator;
 
     /**
-     * @param Manager $api
-     * @param SearchConfigRepresentation $searchConfig
-     * @param SearchEngineRepresentation $engine
-     * @param AdapterManager $adapterManager
-     * @param ApiFormAdapter $apiFormAdapter
-     * @param Acl $acl
-     * @param LoggerInterface $logger
-     * @param TranslatorInterface $translator
-     * @param EntityManager $entityManager
-     * @param Paginator $paginator
+     * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation
      */
+    protected $searchConfig;
+
+    /**
+     * @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation
+     */
+    protected $searchEngine;
+
+    /**
+     * @var \Laminas\I18n\Translator\TranslatorInterface
+     */
+    protected $translator;
+
     public function __construct(
-        Manager $api,
-        SearchConfigRepresentation $searchConfig = null,
-        SearchEngineRepresentation $engine = null,
-        AdapterManager $adapterManager = null,
-        ApiFormAdapter $apiFormAdapter = null,
+        ApiManager $api,
         Acl $acl = null,
-        LoggerInterface $logger = null,
-        TranslatorInterface $translator = null,
+        ApiFormAdapter $apiFormAdapter = null,
+        EasyMeta $easyMeta = null,
+        AdapterManager $adapterManager = null,
         EntityManager $entityManager = null,
-        Paginator $paginator = null
+        LoggerInterface $logger = null,
+        Paginator $paginator = null,
+        SearchConfigRepresentation $searchConfig = null,
+        SearchEngineRepresentation $searchEngine = null,
+        TranslatorInterface $translator = null
     ) {
         $this->api = $api;
-        $this->searchConfig = $searchConfig;
-        $this->engine = $engine;
+        $this->acl = $acl;
         $this->adapterManager = $adapterManager;
         $this->apiFormAdapter = $apiFormAdapter;
-        $this->acl = $acl;
-        $this->logger = $logger;
-        $this->translator = $translator;
+        $this->easyMeta = $easyMeta;
         $this->entityManager = $entityManager;
+        $this->logger = $logger;
         $this->paginator = $paginator;
+        $this->searchConfig = $searchConfig;
+        $this->searchEngine = $searchEngine;
+        $this->translator = $translator;
     }
 
     /**
-     * Execute a search API request via a querier if available, else the api.
+     * Execute a search API request via the querier if available, else the api.
+     *
+     * Allows to get a standard Omeka Response from the external engine.
      *
      * The arguments are the same than \Omeka\Mvc\Controller\Plugin\Api::search().
-     * Some features of the Omeka api may not be available.
+     * - Some features of the Omeka api are not available.
+     * - Currently, many parameters are unavailable. Some methods miss in Query.
+     * - The event "api.search.query" is not triggered.
+     * - returnScalar is not managed.
+     * - Ideally, the external search engine should answer like the api?
      *
      * @see \Omeka\Api\Manager::search()
+     * @see \Omeka\Mvc\Controller\Plugin\Api
+     *
+     * @todo Convert in a standard api restful controller or in a standard page with the api form adapter.
      *
      * @param string $resource
      * @param array $data
@@ -139,7 +129,7 @@ class ApiSearch extends AbstractPlugin
      */
     public function __invoke($resource, array $data = [], array $options = [])
     {
-        if (!$this->engine) {
+        if (!$this->searchEngine) {
             // Unset the "index" option to avoid a loop.
             unset($data['index']);
             unset($options['index']);
@@ -147,7 +137,7 @@ class ApiSearch extends AbstractPlugin
         }
 
         // Check it the resource is managed by this index.
-        if (!in_array($resource, $this->engine->setting('resources', []))) {
+        if (!in_array($resource, $this->searchEngine->setting('resources', []))) {
             // Unset the "index" option to avoid a loop.
             unset($data['index']);
             unset($options['index']);
@@ -327,7 +317,7 @@ class ApiSearch extends AbstractPlugin
 
         // Send the query to the search engine.
         /** @var \AdvancedSearch\Querier\QuerierInterface $querier */
-        $querier = $this->engine
+        $querier = $this->searchEngine
             ->querier()
             ->setQuery($searchQuery);
         try {
@@ -338,7 +328,7 @@ class ApiSearch extends AbstractPlugin
 
         // TODO Manage returnScalar.
 
-        $totalResults = array_map(fn ($resource) => $searchResponse->getResourceTotalResults($resource), $this->engine->setting('resources', []));
+        $totalResults = array_map(fn ($resource) => $searchResponse->getResourceTotalResults($resource), $this->searchEngine->setting('resources', []));
 
         // Get entities from the search response.
         $ids = $this->extractIdsFromResponse($searchResponse, $resource);
@@ -395,7 +385,7 @@ class ApiSearch extends AbstractPlugin
             $sortOrder = null;
         }
 
-        $property = $this->normalizeProperty($sortBy);
+        $property = $this->easyMeta->propertyTerm($sortBy);
         if ($property) {
             $sort = $sortOrder ? $property . ' ' . $sortOrder : $property;
         } elseif (in_array($sortBy, ['resource_class_label', 'owner_name'])) {
@@ -457,41 +447,6 @@ class ApiSearch extends AbstractPlugin
         } elseif ($offset) {
             $searchQuery->setLimitPage($offset, 1);
         }
-    }
-
-    /**
-     * Get the term from a property string or integer.
-     *
-     * @todo Factorize with \AdvancedSearch\FormAdapter\ApiFormAdapter::normalizeProperty().
-     *
-     * @param string|int $termOrId
-     * @return string
-     */
-    protected function normalizeProperty($termOrId): string
-    {
-        static $properties;
-
-        if (!$termOrId) {
-            return '';
-        }
-
-        if (is_null($properties)) {
-            $sql = <<<'SQL'
-SELECT
-    CONCAT(vocabulary.prefix, ":", property.local_name),
-    property.id
-FROM property
-JOIN vocabulary ON vocabulary.id = property.vocabulary_id
-SQL;
-            $properties = array_map('intval', $this->entityManager->getConnection()->executeQuery($sql)->fetchAllKeyValue());
-        }
-
-        if (is_numeric($termOrId)) {
-            return array_search((int) $termOrId, $properties) ?: '';
-        }
-
-        $termOrId = (string) $termOrId;
-        return isset($properties[$termOrId]) ? $termOrId : '';
     }
 
     /**

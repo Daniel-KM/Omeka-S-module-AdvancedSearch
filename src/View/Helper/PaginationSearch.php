@@ -2,10 +2,7 @@
 
 namespace AdvancedSearch\View\Helper;
 
-use Omeka\Api\Representation\ItemSetRepresentation;
-use Omeka\Stdlib\Paginator;
 use Omeka\View\Helper\Pagination;
-use Laminas\View\Helper\AbstractHelper;
 
 /**
  * View helper for rendering pagination via advanced search, managing item set.

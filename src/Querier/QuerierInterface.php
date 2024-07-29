@@ -36,16 +36,13 @@ use AdvancedSearch\Response;
 use Laminas\Log\LoggerAwareInterface;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 
-/**
- * The signature uses "QuerierInterface" instead of "self" for compatibility with php < 7.4.
- */
 interface QuerierInterface extends LoggerAwareInterface
 {
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): QuerierInterface;
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): self;
 
-    public function setSearchEngine(SearchEngineRepresentation $engine): QuerierInterface;
+    public function setSearchEngine(SearchEngineRepresentation $engine): self;
 
-    public function setQuery(Query $query): QuerierInterface;
+    public function setQuery(Query $query): self;
 
     /**
      * Process a search query.

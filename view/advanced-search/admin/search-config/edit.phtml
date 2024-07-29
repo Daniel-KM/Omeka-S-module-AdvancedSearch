@@ -38,12 +38,17 @@ $form->prepare();
 
 <?= $this->pageTitle($translate('Manage search page')) ?>
 
+<?= $this->form()->openTag($form) ?>
+
 <div id="page-actions">
-    <button form="form-search-config-edit" type="submit"><?= $translate('Save') ?></button>
+    <button type="submit"><?= $translate('Save') ?></button>
 </div>
 
 <nav class="section-nav">
     <?= $this->navigation('Laminas\Navigation\AdvancedSearch\Config')->menu() ?>
 </nav>
 
-<?= $this->form($form) ?>
+<?= $this->formCollection($form, false) ?>
+<?php $this->trigger('view.edit.form.after'); ?>
+<?= $this->form()->closeTag() ?>
+<?php $this->trigger('view.edit.after'); ?>

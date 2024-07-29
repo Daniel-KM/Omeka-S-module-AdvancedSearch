@@ -57,12 +57,16 @@ class AbstractFacet extends AbstractHelper
     protected $queryBase = [];
 
     /**
-     * Create one facet as link, checkbox, select or button.
+     * Create one facet (list of facet values) as link, checkbox, select, etc.
      *
      * @param string|array $facetField Field name or null for active facets.
      * @param array $facetValues Each facet value has two keys: value and count.
-     * May have more for specific facets, like facet range.
+     * May have more data for specific facets, like facet range.
      * For active facets, keys are names and values are list of values.
+     * @param array $options Search config settings for the current facet, that
+     * should contain the main mode and, for some types of facets, the type and
+     * the label or the label of all facets (active facets).
+     * @param bool $asData Return an array instead of the partial.
      * @return string|array
      */
     public function __invoke(?string $facetField, array $facetValues, array $options = [], bool $asData = false)

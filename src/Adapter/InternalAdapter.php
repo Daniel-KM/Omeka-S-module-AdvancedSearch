@@ -29,28 +29,14 @@ class InternalAdapter extends AbstractAdapter
         // Don't bypass default fields with the specific ones.
         $fields = array_merge($fields, $multiFields);
 
-        // A direct query avoids memory overload when vocabularies are numerous.
-        /** @var \Doctrine\DBAL\Connection $connection */
-        $connection = $this->getServiceLocator()->get('Omeka\Connection');
-
-        $qb = $connection->createQueryBuilder();
-        $qb
-            ->select(
-                'CONCAT(vocabulary.prefix, ":", property.local_name) AS "name"',
-                'property.label AS "label"'
-            )
-            ->from('property', 'property')
-            ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
-            ->addOrderBy('vocabulary.id', 'ASC')
-            ->addOrderBy('property.local_name', 'ASC');
-
-        $result = $connection->executeQuery($qb)->fetchAllKeyValue();
-        foreach ($result as $name => &$field) {
-            $field = ['name' => $name, 'label' => $field];
+        /** @var \Common\Stdlib\EasyMeta $easyMeta */
+        $easyMeta = $this->getServiceLocator()->get('EasyMeta');
+        $propertyLabelsByTerms = $easyMeta->propertyLabels();
+        foreach ($propertyLabelsByTerms as $term => $label) {
+            $propertyLabelsByTerms[$term] = ['name' => $term, 'label' => $label];
         }
-        unset($field);
 
-        return $availableFields = array_merge($fields, $result);
+        return $availableFields = array_merge($fields, $propertyLabelsByTerms);
     }
 
     public function getAvailableSortFields(): array
@@ -124,39 +110,23 @@ class InternalAdapter extends AbstractAdapter
             'options' => array_column($defaultFields, 'label', 'name'),
         ];
 
-        // A direct query avoids memory overload when vocabularies are numerous.
-        /** @var \Doctrine\DBAL\Connection $connection */
-        $connection = $this->getServiceLocator()->get('Omeka\Connection');
+        /** @var \Common\Stdlib\EasyMeta $easyMeta */
+        $easyMeta = $this->getServiceLocator()->get('EasyMeta');
+        $vocabularies = $easyMeta->vocabularyLabels();
+        $propertyLabelsByTerms = $easyMeta->propertyLabels();
 
-        $qb = $connection->createQueryBuilder();
-        $qb
-            ->select(
-                'DISTINCT CONCAT(vocabulary.prefix, ":", property.local_name) AS "name"',
-                'property.label AS "label"',
-                'vocabulary.prefix AS "prefix"',
-                'vocabulary.label AS "vocabulary"',
-                // Only the previous selects are needed, but some databases
-                // require "order by" or "group by" value to be in the select,
-                // in particular to fix the "only_full_group_by" issue.
-                'property.local_name'
-            )
-            ->from('property', 'property')
-            ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
-            ->addOrderBy('vocabulary.label', 'ASC')
-            ->addOrderBy('property.local_name', 'ASC');
-
-        $results = $connection->executeQuery($qb)->fetchAllAssociative();
-
-        // Set Dublin Core terms and types first (but there is no property in dctype).
+        // Set Dublin Core terms and types first vocabularies.
+        // There is no property in dctype.
         $fields['dcterms'] = [];
-        foreach ($results as $data) {
-            if (empty($fields[$data['prefix']]['label'])) {
-                $fields[$data['prefix']] = [
-                    'label' => $data['vocabulary'],
+        foreach ($propertyLabelsByTerms as $term => $label) {
+            $prefix = strtok($term, ':');
+            if (empty($fields[$prefix]['label'])) {
+                $fields[$prefix] = [
+                    'label' => $vocabularies[$prefix],
                     'options' => [],
                 ];
             }
-            $fields[$data['prefix']]['options'][$data['name']] = $data['label'];
+            $fields[$prefix]['options'][$term] = $label;
         }
 
         return $fields;

@@ -40,6 +40,9 @@ use Laminas\View\Model\ViewModel;
 
 class SearchController extends AbstractActionController
 {
+    /**
+     * @throws \Omeka\Api\Exception\NotFoundException for item set.
+     */
     public function searchAction()
     {
         $searchConfigId = (int) $this->params('id');
@@ -146,6 +149,7 @@ class SearchController extends AbstractActionController
             $request = $parsedQuery + $request + $parsedQueryPost;
         }
 
+        /** @see \AdvancedSearch\Mvc\Controller\Plugin\SearchRequestToResponse */
         $result = $this->searchRequestToResponse($request, $searchConfig, $site);
         if ($result['status'] === 'fail') {
             // Currently only "no query".

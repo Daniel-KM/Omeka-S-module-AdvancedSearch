@@ -59,34 +59,45 @@ class SearchResources extends AbstractPlugin
      */
     const PROPERTY_QUERY = [
         'reciprocal' => [
+            // Value.
             'eq' => 'neq',
             'neq' => 'eq',
             'in' => 'nin',
             'nin' => 'in',
-            'ex' => 'nex',
-            'nex' => 'ex',
-            'exs' => 'nexs',
-            'nexs' => 'exs',
-            'exm' => 'nexm',
-            'nexm' => 'exm',
-            'list' => 'nlist',
-            'nlist' => 'list',
             'sw' => 'nsw',
             'nsw' => 'sw',
             'ew' => 'new',
             'new' => 'ew',
             'near' => 'nnear',
             'nnear' => 'near',
+            // Comparison.
+            'lt' => 'gte',
+            'lte' => 'gt',
+            'gte' => 'lt',
+            'gt' => 'lte',
+            // Internal.
+            'list' => 'nlist',
+            'nlist' => 'list',
+            // Resource.
             'res' => 'nres',
             'nres' => 'res',
             'resq' => 'nresq',
             'nresq' => 'resq',
+            // Linked resource.
             'lex' => 'nlex',
             'nlex' => 'lex',
             'lres' => 'nlres',
             'nlres' => 'lres',
             'lkq' => 'nlkq',
             'nlkq' => 'lkq',
+            // Count.
+            'ex' => 'nex',
+            'nex' => 'ex',
+            'exs' => 'nexs',
+            'nexs' => 'exs',
+            'exm' => 'nexm',
+            'nexm' => 'exm',
+            // Data type.
             'tp' => 'ntp',
             'ntp' => 'tp',
             'tpl' => 'ntpl',
@@ -97,6 +108,7 @@ class SearchResources extends AbstractPlugin
             'ntpu' => 'tpu',
             'dtp' => 'ndtp',
             'ndtp' => 'dtp',
+            // Curation (duplicates).
             'dup' => 'ndup',
             'ndup' => 'dup',
             'dupl' => 'ndupl',
@@ -129,31 +141,33 @@ class SearchResources extends AbstractPlugin
             'nduput' => 'duput',
             'duputl' => 'nduputl',
             'nduputl' => 'duputl',
-            'gt' => 'lte',
-            'gte' => 'lt',
-            'lte' => 'gt',
-            'lt' => 'gte',
         ],
         'negative' => [
+            // Value.
             'neq',
             'nin',
-            'nex',
-            'nexs',
-            'nexm',
-            'nlist',
             'nsw',
             'new',
             'nnear',
+            'nlist',
+            // Resource.
             'nres',
             'nresq',
+            // Linked resource.
             'nlex',
             'nlres',
             'nlkq',
+            // Count.
+            'nex',
+            'nexs',
+            'nexm',
+            // Data type.
             'ntp',
             'ntpl',
             'ntpr',
             'ntpu',
             'ndtp',
+            // Curation (duplicates).
             'ndup',
             'ndupl',
             'ndupt',
@@ -1025,46 +1039,61 @@ class SearchResources extends AbstractPlugin
      * - property[{index}][text]: search text or array of texts or values
      * - property[{index}][type]: search type
      * - property[{index}][datatype]: filter on data type(s)
+     *
+     * Value
      *   - eq: is exactly (core)
      *   - neq: is not exactly (core)
      *   - in: contains (core)
      *   - nin: does not contain (core)
-     *   - ex: has any value (core)
-     *   - nex: has no value (core)
-     *   - exs: has a single value
-     *   - nexs: has not a single value
-     *   - exm: has multiple values
-     *   - nexm: has not multiple values
-     *   - list: is in list
-     *   - nlist: is not in list
      *   - sw: starts with
      *   - nsw: does not start with
      *   - ew: ends with
      *   - new: does not end with
      *   - near: is similar to
      *   - nnear: is not similar to
-     *   - res: has resource (core)
-     *   - nres: has no resource (core)
-     *   - resq: has resource matching query
-     *   - nresq: has no resource matching query
+     *   Reserved for future implementation (already in Solr)
+     *   - ma: matches a simple regex
+     *   - nma: does not match a simple regex
+     *   Comparisons (alphabetical)
+     *   - lt: lower than
+     *   - lte: lower than or equal
+     *   - gte: greater than or equal
+     *   - gt: greater than
+     *   Internal, deprecated (any type can have multiple values)
+     *   - list: is in list
+     *   - nlist: is not in list
+     * Resource
+     *   - res: is resource with ID (core)
+     *   - nres: is not resource with ID (core)
+     *   - resq: is resource matching query
+     *   - nresq: is not resource matching query
+     * Linked resource
      *   - lex: is a linked resource
      *   - nlex: is not a linked resource
-     *   - lres: is linked with resource #id
-     *   - nlres: is not linked with resource #id
-     *   - lkq: is linked with resources matching query
-     *   - nlkq: is not linked with resources matching query
-     *   - tp: has main type (literal-like, resource-like, uri-like)
-     *   - ntp: has not main type (literal-like, resource-like, uri-like)
+     *   - lres: is linked with resource with ID (expert)
+     *   - nlres: is not linked with resource with ID (expert)
+     *   - lkq: is linked with resources matching query (expert)
+     *   - nlkq: is not linked with resources matching query (expert)
+     * Count
+     *   - ex: has any value (core)
+     *   - nex: has no values (core)
+     *   - exs: has a single value
+     *   - nexs: has not a single value
+     *   - exm: has multiple values
+     *   - nexm: has not multiple values
+     * Data type
+     *   - dtp: has data type
+     *   - ndtp: has not data type
+     *   - tp: has main type
+     *   - ntp: has not main type
      *   - tpl: has type literal-like
      *   - ntpl: has not type literal-like
      *   - tpr: has type resource-like
      *   - ntpr: has not type resource-like
      *   - tpu: has type uri-like
      *   - ntpu: has not type uri-like
-     *   - dtp: has data type
-     *   - ndtp: has not data type
-     *   Curation:
-     *   Curation duplicate all (values as generic):
+     * Curation (duplicates)
+     *   Curation duplicate all (values as generic)
      *   - dup: has duplicate values
      *   - ndup: has not duplicate values
      *   - dupt: has duplicate values and type
@@ -1073,7 +1102,7 @@ class SearchResources extends AbstractPlugin
      *   - ndupl: has not duplicate values and language
      *   - duptl: has duplicate values, type and language
      *   - nduptl: has not duplicate values, type and language
-     *   Curation duplicate values (values as strict):
+     *   Curation duplicate values (values as strict)
      *   - dupv: has duplicate simple values
      *   - ndupv: has not duplicate simple values
      *   - dupvt: has duplicate simple values and type
@@ -1082,7 +1111,7 @@ class SearchResources extends AbstractPlugin
      *   - ndupvl: has not duplicate simple values and language
      *   - dupvtl: has duplicate simple values, type and language
      *   - ndupvtl: has not duplicate simple values, type and language
-     *   Curation duplicate linked resources:
+     *   Curation duplicate linked resources
      *   - dupr: has duplicate linked resources
      *   - ndupr: has not duplicate linked resources
      *   - duprt: has duplicate linked resources and type
@@ -1091,7 +1120,7 @@ class SearchResources extends AbstractPlugin
      *   - nduprl: has not duplicate linked resources and language
      *   - duprtl: has duplicate linked resources, type and language
      *   - nduprtl: has not duplicate linked resources, type and language
-     *   Curation duplicate uris:
+     *   Curation duplicate uris
      *   - dupu: has duplicate uris
      *   - ndupu: has not duplicate uris
      *   - duput: has duplicate uris and type
@@ -1100,22 +1129,12 @@ class SearchResources extends AbstractPlugin
      *   - ndupul: has not duplicate uris and language
      *   - duputl: has duplicate uris, type and language
      *   - nduputl: has not duplicate uris, type and language
-     *   Comparisons
-     *   Warning: Comparisons are mysql comparisons, so alphabetic ones.
-     *   TODO Add specific types to compare date and time (probably useless: use module NumericDataTypes).
-     *   - gt: greater than
-     *   - gte: greater than or equal
-     *   - lte: lower than or equal
-     *   - lt: lower than
      *
+     * @todo Add specific types to compare date and time (probably useless: alphabetical is enough with formatted date, or use module NumericDataTypes).
      * @todo The multiple types of duplicates are related to the database structure, only first should be needed.
      * @todo Duplicates with or (dupo: duplicate literal value or duplicate linked resource or duplicate uri)
      * @todo Duplicates with value annotations.
      * @todo La recherche des doublons nécessite que les valeurs soient propres (espaces et nuls).
-     *
-     * Reserved for future implementation (already in Solr):
-     *   - ma: matches a simple regex
-     *   - nma: does not match a simple regex
      *
      * Note for "nlex":
      * For consistency, "nlex" is the reverse of "lex" even when a resource is
@@ -1363,6 +1382,32 @@ class SearchResources extends AbstractPlugin
                     );
                     break;
 
+                // TODO Manage uri and resources with lt, lte, gte, gt (it has a meaning at least for resource ids, but separate).
+                case 'lt':
+                    $predicateExpr = $expr->lt(
+                        "$valuesAlias.value",
+                        $this->adapter->createNamedParameter($qb, $value)
+                    );
+                    break;
+                case 'lte':
+                    $predicateExpr = $expr->lte(
+                        "$valuesAlias.value",
+                        $this->adapter->createNamedParameter($qb, $value)
+                    );
+                    break;
+                case 'gte':
+                    $predicateExpr = $expr->gte(
+                        "$valuesAlias.value",
+                        $this->adapter->createNamedParameter($qb, $value)
+                    );
+                    break;
+                case 'gt':
+                    $predicateExpr = $expr->gt(
+                        "$valuesAlias.value",
+                        $this->adapter->createNamedParameter($qb, $value)
+                    );
+                    break;
+
                 case 'res':
                     if (count($value) <= 1) {
                         $param = $this->adapter->createNamedParameter($qb, (int) reset($value));
@@ -1591,32 +1636,6 @@ class SearchResources extends AbstractPlugin
                     $predicateExpr = $expr->in("$valuesAlias.resource", $subquery->getDQL());
                     break;
 
-                // TODO Manage uri and resources with gt, gte, lte, lt (it has a meaning at least for resource ids, but separate).
-                case 'gt':
-                    $predicateExpr = $expr->gt(
-                        "$valuesAlias.value",
-                        $this->adapter->createNamedParameter($qb, $value)
-                    );
-                    break;
-                case 'gte':
-                    $predicateExpr = $expr->gte(
-                        "$valuesAlias.value",
-                        $this->adapter->createNamedParameter($qb, $value)
-                    );
-                    break;
-                case 'lte':
-                    $predicateExpr = $expr->lte(
-                        "$valuesAlias.value",
-                        $this->adapter->createNamedParameter($qb, $value)
-                    );
-                    break;
-                case 'lt':
-                    $predicateExpr = $expr->lt(
-                        "$valuesAlias.value",
-                        $this->adapter->createNamedParameter($qb, $value)
-                    );
-                    break;
-
                 default:
                     // Normally not possible because types are already checked.
                     continue 2;
@@ -1740,12 +1759,12 @@ class SearchResources extends AbstractPlugin
      * - datetime[{index}][joiner]: "and" OR "or" joiner with previous query
      * - datetime[{index}][field]: the field "created" or "modified"
      * - datetime[{index}][type]: search type
-     *   - gt: greater than (after)
-     *   - gte: greater than or equal
+     *   - lt: lower than (before)
+     *   - lte: lower than or equal
      *   - eq: is exactly
      *   - neq: is not exactly
-     *   - lte: lower than or equal
-     *   - lt: lower than (before)
+     *   - gte: greater than or equal
+     *   - gt: greater than (after)
      *   - ex: has any value
      *   - nex: has no value
      * - datetime[{index}][value]: search date time (sql format: "2017-11-07 17:21:17",
@@ -2330,27 +2349,16 @@ class SearchResources extends AbstractPlugin
 
     /**
      * Get the last day of a given year/month.
-     *
-     * @param int $year
-     * @param int $month
-     * @return int
      */
-    protected function getLastDay($year, $month)
+    protected function getLastDay($year, $month): int
     {
-        switch ($month) {
-            case 2:
-                // February (accounting for leap year)
-                $leapYear = date('L', mktime(0, 0, 0, 1, 1, $year));
-                return $leapYear ? 29 : 28;
-            case 4:
-            case 6:
-            case 9:
-            case 11:
-                // April, June, September, November
-                return 30;
-            default:
-                // January, March, May, July, August, October, December
-                return 31;
+        $month = (int) $month;
+        if (in_array($month, [4, 6, 9, 11], true)) {
+            return 30;
+        } elseif ($month === 2) {
+            return date('L', mktime(0, 0, 0, 1, 1, $year)) ? 29 : 28;
+        } else {
+            return 31;
         }
     }
 

@@ -41,33 +41,39 @@ abstract class AbstractQuerier implements QuerierInterface
     use LoggerAwareTrait;
 
     /**
-     * @var ServiceLocatorInterface
+     * @var \Common\Stdlib\EasyMeta
+     */
+    protected $easyMeta;
+
+    /**
+     * @var \Laminas\ServiceManager\ServiceLocatorInterface
      */
     protected $services;
 
     /**
-     * @var SearchEngineRepresentation $engine
+     * @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation $engine
      */
     protected $engine;
 
     /**
-     * @var Query
+     * @var \AdvancedSearch\Query
      */
     protected $query;
 
-    public function setServiceLocator(ServiceLocatorInterface $services): QuerierInterface
+    public function setServiceLocator(ServiceLocatorInterface $services): self
     {
         $this->services = $services;
+        $this->easyMeta = $services->get('EasyMeta');
         return $this;
     }
 
-    public function setSearchEngine(SearchEngineRepresentation $engine): QuerierInterface
+    public function setSearchEngine(SearchEngineRepresentation $engine): self
     {
         $this->engine = $engine;
         return $this;
     }
 
-    public function setQuery(Query $query): QuerierInterface
+    public function setQuery(Query $query): self
     {
         $this->query = $query;
         return $this;

@@ -101,7 +101,6 @@ return [
     'form_elements' => [
         'invokables' => [
             Form\Admin\InternalConfigFieldset::class => Form\Admin\InternalConfigFieldset::class,
-            Form\Element\DataTextarea::class => Form\Element\DataTextarea::class,
             Form\Element\MultiText::class => Form\Element\MultiText::class,
             Form\Element\TextExact::class => Form\Element\TextExact::class,
         ],

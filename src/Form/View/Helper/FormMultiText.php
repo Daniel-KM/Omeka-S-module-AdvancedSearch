@@ -2,7 +2,7 @@
 
 namespace AdvancedSearch\Form\View\Helper;
 
-use AdvancedSearch\Form\Element\MultiText as MultiTextElement;
+use AdvancedSearch\Form\Element as AdvancedSearchElement;
 use Laminas\Form\ElementInterface;
 use Laminas\Form\Exception;
 use Laminas\Form\View\helper\FormText;
@@ -17,17 +17,17 @@ class FormMultiText extends FormText
      */
     public function render(ElementInterface $element): string
     {
-        if (!($element instanceof MultiTextElement)) {
+        if (!$element instanceof AdvancedSearchElement\MultiText) {
             throw new Exception\InvalidArgumentException(sprintf(
-                '%s requires that the element is of type AdvancedSearch\Form\Element\MultiTextElement',
-                __METHOD__
+                'Method %1$s requires that the element is of type %2$s', // @translate
+                __METHOD__, \AdvancedSearch\Form\Element\MultiText::class
             ));
         }
 
         $name = $element->getName();
         if ($name === null || $name === '') {
             throw new Exception\DomainException(sprintf(
-                '%s requires that the element has an assigned name; none discovered',
+                '%s requires that the element has an assigned name; none discovered', // @ŧranslate
                 __METHOD__
             ));
         }

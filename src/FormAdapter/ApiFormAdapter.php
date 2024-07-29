@@ -3,11 +3,13 @@
 namespace AdvancedSearch\FormAdapter;
 
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
+use AdvancedSearch\Mvc\Controller\Plugin\SearchResources;
 use AdvancedSearch\Query;
+use Common\Stdlib\EasyMeta;
 use Doctrine\DBAL\Connection;
 
 /**
- * Simulate an api search.
+ * Simulate an api search for an external search engine.
  *
  * Only main search and properties are managed currently, with the joiner "and".
  *
@@ -15,29 +17,34 @@ use Doctrine\DBAL\Connection;
  */
 class ApiFormAdapter implements FormAdapterInterface
 {
-    /**
-     * @var Connection
-     */
-    protected $connection;
-
     protected $configFormClass = \AdvancedSearch\Form\Admin\ApiFormConfigFieldset::class;
 
     protected $label = 'Api'; // @translate
+
+    /**
+     * @var \Doctrine\DBAL\Connection
+     */
+    protected $connection;
+
+    /**
+     * @var \Common\Stdlib\EasyMeta
+     */
+    protected $easyMeta;
 
     /**
      * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation
      */
     protected $searchConfig;
 
-    /**
-     * @param Connection $connection
-     */
-    public function __construct(Connection $connection)
-    {
+    public function __construct(
+        Connection $connection,
+        EasyMeta $easyMeta
+    ) {
         $this->connection = $connection;
+        $this->easyMeta = $easyMeta;
     }
 
-    public function setSearchConfig(?SearchConfigRepresentation $searchConfig): FormAdapterInterface
+    public function setSearchConfig(?SearchConfigRepresentation $searchConfig): self
     {
         $this->searchConfig = $searchConfig;
         return $this;
@@ -210,7 +217,7 @@ class ApiFormAdapter implements FormAdapterInterface
             }
 
             // Narrow to specific property, if one is selected, else use search.
-            $property = $this->normalizeProperty($property);
+            $property = $this->easyMeta->propertyTerm($property);
             // TODO Manage empty properties (main search and "any property").
             if (!$property) {
                 continue;
@@ -261,44 +268,11 @@ class ApiFormAdapter implements FormAdapterInterface
                 case 'lres':
                     $query->addFilterQuery($propertyField, $value, $queryType);
                     break;
+
                 default:
                     continue 2;
             }
         }
-    }
-
-    /**
-     * Get the term from a property string or integer.
-     *
-     * @todo Factorize with \AdvancedSearch\Mvc\Controller\Plugin\ApiSearch::normalizeProperty().
-     *
-     * @param string|int $termOrId
-     */
-    protected function normalizeProperty($termOrId): string
-    {
-        static $properties;
-
-        if (!$termOrId) {
-            return '';
-        }
-
-        if (is_null($properties)) {
-            $sql = <<<'SQL'
-SELECT
-    CONCAT(vocabulary.prefix, ":", property.local_name),
-    property.id
-FROM property
-JOIN vocabulary ON vocabulary.id = property.vocabulary_id
-SQL;
-            $properties = array_map('intval', $this->connection->executeQuery($sql)->fetchAllKeyValue());
-        }
-
-        if (is_numeric($termOrId)) {
-            return array_search((int) $termOrId, $properties) ?: '';
-        }
-
-        $termOrId = (string) $termOrId;
-        return isset($properties[$termOrId]) ? $termOrId : '';
     }
 
     /**

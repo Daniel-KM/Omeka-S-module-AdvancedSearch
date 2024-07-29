@@ -303,12 +303,12 @@ class SearchFilters extends AbstractHelper
 
                 case 'datetime':
                     $queryTypesDatetime = [
-                    'gt' => $translate('after'), // @translate
-                        'gte' => $translate('after or on'), // @translate
+                        'lt' => $translate('before'), // @translate
+                        'lte' => $translate('before or on'), // @translate
                         'eq' => $translate('on'), // @translate
                         'neq' => $translate('not on'), // @translate
-                        'lte' => $translate('before or on'), // @translate
-                        'lt' => $translate('before'), // @translate
+                        'gte' => $translate('after or on'), // @translate
+                        'gt' => $translate('after'), // @translate
                         'ex' => $translate('has any date / time'), // @translate
                         'nex' => $translate('has no date / time'), // @translate
                     ];

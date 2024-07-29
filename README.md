@@ -65,6 +65,7 @@ only via api, not in the advanced search form for now):
     - `sw`/`nsw`: starts or does not start with
     - `ew`/`new`: ends or does not end with
     - `near`/`nnear`: is or is not similar to (algorithm [Soundex], based on British English phonetic)
+    - `ma`/`nma`: matches or does not match
     - `list`/`nlist`: is or is not in list (api only)
 - Resources:
     - `res`/`nres`: has resource or has no resource (default Omeka)

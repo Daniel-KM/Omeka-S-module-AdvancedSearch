@@ -918,7 +918,7 @@ new = does not end with
                 'type' => CommonElement\IniTextarea::class,
                 'options' => [
                     'label' => 'Facets', // @translate
-                    'info' => 'List of facets that will be displayed in the search page, formatted as ini. The section is a unique name. Keys are: field, label, type, order, limit, more, languages, data_types, main_types, values, display_count, and specific options, like thesaurus, min and max.', // @translate
+                    'info' => 'List of facets that will be displayed in the search page, formatted as ini. The section is a unique name. Keys are: field, label, type, order, limit, state, more, languages, data_types, main_types, values, display_count, and specific options, like thesaurus, min and max.', // @translate
                     // TODO Convert documentation into help. See application/view/common/form-row.phtml
                     'documentation' => nl2br(<<<'MARKDOWN'
                         #"></a><div class="field-description">
@@ -926,11 +926,12 @@ new = does not end with
                         - For "RangeDouble" and "SelectRange", the minimum and maximum should be set as "min" and "max", and "step" too.
                         - With type "Thesaurus", the option "thesaurus" should be set with the id. It requires the module Thesaurus.
                         - "Tree" can be used for item sets when module ItemSetsTree is enabled and data indexed recursively.
-                        - Order may be "alphabetic" (asc, default), "alphabetic desc", "total" (desc), "total asc", "values" (asc), "values desc".
                         - "languages" allows to filter values by language. It is a single or list of language codes. To get the values without language too, use "null" or append "|" to the string.
                         - "data_types" allows to filter values by some specific data types, for example a custom vocab.
                         - "main_types" allows to filter values by main data type ("literal", "uri" or "resource").
                         - "values" allows to filter values by a list of values.
+                        - "order" may be "alphabetic" (asc, default), "alphabetic desc", "total" (desc), "total asc", "values" (asc), "values desc".
+                        - "state" defines the state of a facet and may be "static" (default, that is open), "expand" or "collapse".
                         </div><a style="display: none" href="#
                         MARKDOWN), // @translate
                     'ini_typed_mode' => true,

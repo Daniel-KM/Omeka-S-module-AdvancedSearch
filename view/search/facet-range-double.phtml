@@ -27,7 +27,7 @@ $minMaxStep = ($min === '' ? '' : ' min="' . $escapeAttr($min) . '"')
     . ($step === '' ? '' : ' step="' . $escapeAttr($step) . '"');
 ?>
 
-<div class="facet-range-double range-double">
+<div class="facet-items facet-range-double range-double">
     <div class="range-sliders">
         <input class="range-slider-from" type="range" name="facet[<?= $name ?>][from]" value="<?= $escapeAttr($from ?? $min) ?>"<?= $minMaxStep ?><?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($fromUrl ?? '') . '"' : '' ?>/>
         <input class="range-slider-to" type="range" name="facet[<?= $name ?>][to]" value="<?= $escapeAttr($to ?? $max) ?>"<?= $minMaxStep ?><?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($toUrl ?? '') . '"' : '' ?>/>

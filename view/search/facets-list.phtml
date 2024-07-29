@@ -85,12 +85,19 @@ if (!empty($itemSet)) {
         <ul class="facets-list">
             <?php foreach ($facets as $name => $facetValues): ?>
             <?php $facetOptions = $searchFacets[$name]; ?>
+            <?php $hasState = in_array($facetOptions['state'] ?? '', ['expand', 'collapse']); ?>
             <li class="facet">
+                <?php if ($hasState): ?>
+                <button type="button" class="facet-button <?= $facetOptions['state'] === 'collapse' ? 'expand' : 'collapse' ?>" aria-label="<?= $translate($facetOptions['state'] === 'collapse' ? 'Expand' : 'Collapse') ?>"><?= $escape($translate($facetOptions['label'] ?? $name)) ?></button>
+                <?php else: ?>
                 <h4><?= $escape($translate($facetOptions['label'] ?? $name)) ?></h4>
-                <?= $facetElements($name, $facetValues, $facetOptions) ?>
-                <?php if (($facetOptions['more'] ?? '') !== '' && in_array($facetOptions['type'] ?? '', ['', 'Checkbox']) && count($facetValues) > (int) $facetOptions['more']): ?>
-                <div class="facet-see-more">
-                    <button type="button" class="facet-see-more-or-less expand" data-default-count="<?= (int) $facetOptions['more'] ?>" data-more-count="<?= count($facetValues) - (int) $facetOptions['more'] ?>" data-label-see-more="<?= $escapeAttr($translate('See more')) ?>" data-label-see-less="<?= $escapeAttr($translate('See less')) ?>"><?= $escape($translate('See more')) ?></button>
+                <?php endif; ?>
+                <div class="facet-elements<?= $hasState ? ' collapsible' : '' ?>"<?= $hasState && $facetOptions['state'] === 'collapse' ? ' hidden="hidden"' : '' ?>>
+                    <?= $facetElements($name, $facetValues, $facetOptions) ?>
+                    <?php if (($facetOptions['more'] ?? '') !== '' && in_array($facetOptions['type'] ?? '', ['', 'Checkbox']) && count($facetValues) > (int) $facetOptions['more']): ?>
+                    <div class="facet-see-more">
+                        <button type="button" class="facet-see-more-or-less expand" data-default-count="<?= (int) $facetOptions['more'] ?>" data-more-count="<?= count($facetValues) - (int) $facetOptions['more'] ?>" data-label-see-more="<?= $escapeAttr($translate('See more')) ?>" data-label-see-less="<?= $escapeAttr($translate('See less')) ?>"><?= $escape($translate('See more')) ?></button>
+                    </div>
                 </div>
                 <?php endif; ?>
             </li>

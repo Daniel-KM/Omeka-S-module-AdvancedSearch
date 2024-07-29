@@ -264,6 +264,17 @@ $(document).ready(function() {
         }
     });
 
+    function facetExpandOrCollapse(button) {
+        button = $(button);
+        if (button.hasClass('expand')) {
+            button.attr('aria-label', button.attr('data-label-expand') ? button.attr('data-label-expand') : Omeka.jsTranslate('Expand'));
+            button.closest('.facet').find('.facet-elements').attr('hidden', 'hidden');
+        } else {
+            button.attr('aria-label', button.attr('data-label-expand') ? button.attr('data-label-collapse') : Omeka.jsTranslate('Collapse'));
+            button.closest('.facet').find('.facet-elements').removeAttr('hidden');
+        }
+    }
+
     function facetSeeMoreOrLess(button) {
         button = $(button);
         if (button.hasClass('expand')) {
@@ -276,14 +287,18 @@ $(document).ready(function() {
         }
     }
 
-    $('.facets').on('click', '.facet-see-more-or-less', function() {
+    $('.facets').on('click', '.facet-button, .facet-see-more-or-less', function() {
         const button = $(this);
         if (button.hasClass('expand')) {
             $(this).removeClass('expand').addClass('collapse');
         } else {
             $(this).removeClass('collapse').addClass('expand');
         }
-        facetSeeMoreOrLess(button);
+        if (button.hasClass('facet-see-more-or-less')) {
+            facetSeeMoreOrLess(button);
+        } else {
+            facetExpandOrCollapse(button);
+        }
     });
 
     $('.facet-see-more-or-less').each((index, button) => facetSeeMoreOrLess(button));

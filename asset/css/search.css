@@ -226,6 +226,27 @@
     .facet h4 {
         margin-bottom: 0.5em;
     }
+    .facets .facet-button {
+        display: block;
+        background: initial;
+        border: none;
+        border-bottom: 1px inset transparent;
+        box-shadow: initial;
+        text-align: initial;
+        cursor: pointer;
+        width: 100%;
+        padding: 0;
+        margin: 0 0 0.5em 0;
+        font-weight: bold;
+    }
+    .facets .facet-button:hover {
+        box-shadow: initial;
+        border-bottom: 1px inset;
+        border-radius: 0;
+    }
+    .facets .facet-button::after {
+        float: right;
+    }
 
     .facet-items {
         padding-left: 0;

@@ -30,7 +30,7 @@ class InternalAdapter extends AbstractAdapter
         $fields = array_merge($fields, $multiFields);
 
         /** @var \Common\Stdlib\EasyMeta $easyMeta */
-        $easyMeta = $this->getServiceLocator()->get('EasyMeta');
+        $easyMeta = $this->getServiceLocator()->get('Common\EasyMeta');
         $propertyLabelsByTerms = $easyMeta->propertyLabels();
         foreach ($propertyLabelsByTerms as $term => $label) {
             $propertyLabelsByTerms[$term] = ['name' => $term, 'label' => $label];
@@ -121,7 +121,7 @@ class InternalAdapter extends AbstractAdapter
         ];
 
         /** @var \Common\Stdlib\EasyMeta $easyMeta */
-        $easyMeta = $this->getServiceLocator()->get('EasyMeta');
+        $easyMeta = $this->getServiceLocator()->get('Common\EasyMeta');
         $vocabularies = $easyMeta->vocabularyLabels();
         $propertyLabelsByTerms = $easyMeta->propertyLabels();
 

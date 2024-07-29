@@ -12,7 +12,7 @@ class ApiFormAdapterFactory implements FactoryInterface
     {
         return new ApiFormAdapter(
             $services->get('Omeka\Connection'),
-            $services->get('EasyMeta')
+            $services->get('Common\EasyMeta')
         );
     }
 }

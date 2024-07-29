@@ -63,7 +63,7 @@ abstract class AbstractQuerier implements QuerierInterface
     public function setServiceLocator(ServiceLocatorInterface $services): self
     {
         $this->services = $services;
-        $this->easyMeta = $services->get('EasyMeta');
+        $this->easyMeta = $services->get('Common\EasyMeta');
         return $this;
     }
 

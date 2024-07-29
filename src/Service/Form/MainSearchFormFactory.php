@@ -45,7 +45,7 @@ class MainSearchFormFactory implements FactoryInterface
             : null;
         return (new MainSearchForm(null, $options))
             ->setBasePath($helpers->get('basePath')())
-            ->setEasyMeta($services->get('EasyMeta'))
+            ->setEasyMeta($services->get('Common\EasyMeta'))
             ->setItemSetsTree($services->has('ItemSetsTree') ? $services->get('ItemSetsTree') : null)
             ->setSite($currentSite)
             ->setSettings($services->get('Omeka\Settings'))

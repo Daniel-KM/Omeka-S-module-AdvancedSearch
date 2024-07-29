@@ -461,6 +461,13 @@ class SearchConfigConfigureForm extends Form
             ])
         ;
 
+        // Settings for the results.
+
+        /** @var \AdvancedSearch\Form\Admin\SearchConfigSortFieldset $sortFieldset */
+        $sortFieldset = $this->formElementManager->get(SearchConfigSortFieldset::class, [
+            'search_config' => $this->getOption('search_config'),
+        ]);
+
         $this
             ->add([
                 'name' => 'display',
@@ -748,65 +755,57 @@ class SearchConfigConfigureForm extends Form
                     'rows' => 6,
                 ],
             ])
-        ;
 
-        // Settings for the results (sorting).
-
-        $this
-            ->add([
-                'name' => 'sorting',
-                'type' => Fieldset::class,
-                'options' => [
-                    // Avoid a bad translation.
-                    'label' => 'Sorting', // @translate
-                ],
-            ])
-            ->get('sorting')
             // field (term + asc/desc) = label (+ asc/desc) (order means weight).
             ->add([
-                'name' => 'label',
+                'name' => 'label_sort',
                 'type' => Element\Text::class,
                 'options' => [
                     'label' => 'Sort label', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'sorting_label',
+                    'id' => 'label_sort',
                     'value' => 'Sort',
                 ],
             ])
+
             ->add([
-                'name' => 'fields',
-                'type' => CommonElement\DataTextarea::class,
+                'type' => Element\Collection::class,
+                'name' => 'sort_list',
                 'options' => [
-                    'label' => 'Sort fields', // @translate
-                    'info' => 'List of sort fields that will be displayed in the search page. Format is "term dir = Label".', // @translate
-                    'as_key_value' => true,
-                    'key_value_separator' => '=',
-                    'data_options' => [
-                        'name' => null,
-                        'label' => null,
-                    ],
+                    'label' => 'Sort selector', // @ŧranslate
+                    'info' => 'List of sort field that will be displayed in the results.', // @translate
+                    'count' => 0,
+                    'allow_add' => true,
+                    'allow_remove' => true,
+                    'should_create_template' => true,
+                    'template_placeholder' => '__index__',
+                    'create_new_objects' => true,
+                    'target_element' => $sortFieldset,
                 ],
                 'attributes' => [
-                    'id' => 'sorting_fields',
-                    'placeholder' => 'dcterms:subject asc = Subject (asc)',
-                    'rows' => 12,
+                    'id' => 'sort_list',
+                    'required' => false,
+                    'class' => 'form-fieldset-collection',
+                    'data-label-index' => $this->translator->translate('Sort {index}'), // @ŧranslate
                 ],
             ])
             ->add([
-                'name' => 'available_sort_fields',
-                'type' => OmekaElement\ArrayTextarea::class,
+                'name' => 'plus',
+                'type' => Element\Button::class,
                 'options' => [
-                    'label' => 'Available sort fields', // @translate
-                    'info' => 'List of all available sort fields, among which some can be copied above.', // @translate
-                    'as_key_value' => true,
-                    'key_value_separator' => '=',
+                    'label' => ' ',
+                    'label_options' => [
+                        'disable_html_escape' => true,
+                    ],
+                    'label_attributes' => [
+                        'class' => 'search-fieldset-action-label',
+                    ],
                 ],
                 'attributes' => [
-                    'id' => 'sorting_available_sort_fields',
-                    'value' => $this->getAvailableSortFields(),
-                    'placeholder' => 'dcterms:subject asc = Subject (asc)',
-                    'rows' => 12,
+                    // Don't use o-icon-add.
+                    'class' => 'search-fieldset-action search-fieldset-plus fa fa-plus add-value button',
+                    'aria-label' => 'Add a sort option', // @translate
                 ],
             ])
         ;
@@ -1075,24 +1074,6 @@ class SearchConfigConfigureForm extends Form
         $this->add($fieldset);
 
         return $this;
-    }
-
-    protected function getAvailableSortFields(): array
-    {
-        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
-        $searchConfig = $this->getOption('search_config');
-        $searchEngine = $searchConfig->engine();
-        $searchAdapter = $searchEngine->adapter();
-        if (empty($searchAdapter)) {
-            return [];
-        }
-
-        $options = [];
-        $fields = $searchAdapter->setSearchEngine($searchEngine)->getAvailableSortFields();
-        foreach ($fields as $name => $field) {
-            $options[$name] = $field['label'] ?? $name;
-        }
-        return $options;
     }
 
     protected function getAvailableFacetFields(): array

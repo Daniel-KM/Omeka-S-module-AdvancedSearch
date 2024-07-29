@@ -127,6 +127,16 @@ abstract class AbstractAdapter implements AdapterInterface
         );
     }
 
+    public function getAvailableSortFieldsForSelect(): array
+    {
+        $fields = $this->getAvailableSortFields();
+        // Manage the case when there is no label.
+        return array_replace(
+            array_column($fields, 'name', 'name'),
+            array_filter(array_column($fields, 'label', 'name'))
+        );
+    }
+
     protected function getServiceLocator(): ServiceLocatorInterface
     {
         return $this->services;

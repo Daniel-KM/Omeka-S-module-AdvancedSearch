@@ -159,6 +159,50 @@ class InternalAdapter extends AbstractAdapter
         return $fields;
     }
 
+    public function getAvailableSortFieldsForSelect(): array
+    {
+        static $sortFields;
+
+        if (isset($sortFields)) {
+            return $sortFields;
+        }
+
+        $availableFields = $this->getAvailableFieldsForSelect();
+
+        $translator = $this->getServiceLocator()->get('MvcTranslator');
+
+        $directionLabels = [
+            'asc' => $translator->translate('ascendant'), // @ŧranslate
+            'desc' => $translator->translate('descendant'), // @translate
+        ];
+
+        // There is no default score sort, except for full text search.
+        // According to mysql, the default for relevance is "desc".
+        $sortFields = [
+            'relevance desc' =>$translator->translate('Relevance'), // @translate
+            'relevance asc' => $translator->translate('Relevance (inversed)'), // @translate
+        ];
+
+        foreach ($availableFields as $name => $availableField) {
+            if (!is_array($availableField)) {
+                $sortFields[$name] = $availableField;
+                continue;
+            }
+            // Manage grouped fields.
+            $sortFields[$name] = $availableField;
+            $options = [];
+            foreach ($availableField['options'] ?? [] as $optionName => $optionLabel) {
+                foreach ($directionLabels as $direction => $labelDirection) {
+                    $sortName = $optionName . ' ' . $direction;
+                    $options[$sortName] = strlen((string) $optionLabel) ? $optionLabel . ' ' . $labelDirection : $sortName;
+                }
+            }
+            $sortFields[$name]['options'] = $options;
+        }
+
+        return $sortFields;
+    }
+
     protected function getDefaultFields(): array
     {
         // Field names are directly managed by the form adapter and the querier.

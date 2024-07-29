@@ -571,6 +571,15 @@ class SearchConfigController extends AbstractActionController
         // TODO Explode array options ("|" and "," are supported) early or keep user input?
         // Furthermore, add a warning for languages of facets because it may be
         // a hard to understand issue.
+
+        $sortList = [];
+        foreach ($params['display']['sort_list'] ?? [] as $sort) {
+            if (!empty($sort['name'])) {
+                $sortList[$sort['name']] = $sort;
+            }
+        }
+        $params['display']['sort_list'] = $sortList;
+
         $facetMode = ($params['facet']['mode'] ?? null) === 'link' ? 'link' : 'button';
         $warnLanguage = false;
         $facets = [];
@@ -645,9 +654,15 @@ class SearchConfigController extends AbstractActionController
                 }
             }
         }
-        foreach ($params['form']['filters'] ?? [] as $key => $filter) {
-            unset($filter['minus'], $filter['plus'], $filter['up'], $filter['down']);
-            $params['form']['filters'][$key] = $filter;
+        $collections = [
+            'form'=> 'filters',
+            'display' => 'sort_list',
+        ];
+        foreach ($collections as $mainName => $name) {
+            foreach ($params[$mainName][$name] ?? [] as $key => $data) {
+                unset($data['minus'], $data['plus'], $data['up'], $data['down']);
+                $params[$mainName][$name][$key] = $data;
+            }
         }
         return $params;
     }

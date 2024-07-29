@@ -106,4 +106,16 @@ interface AdapterInterface
      * or grouped according to Laminas select.
      */
     public function getAvailableFieldsForSelect(): array;
+
+    /**
+     * Get available sort fields usable in a laminas form element "select".
+     *
+     * Options may be grouped.
+     *
+     * @see https://docs.laminas.dev/laminas-form/v3/element/select/#basic-usage
+     *
+     * @return array Associative array with field name as key and label as value,
+     * or grouped according to Laminas select.
+     */
+    public function getAvailableSortFieldsForSelect(): array;
 }

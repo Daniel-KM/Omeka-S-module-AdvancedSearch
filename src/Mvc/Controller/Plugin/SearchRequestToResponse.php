@@ -346,7 +346,7 @@ class SearchRequestToResponse extends AbstractPlugin
      */
     protected function getSortOptions(): array
     {
-        $sortFieldsSettings = $this->searchConfig->subSetting('sorting', 'fields', []);
+        $sortFieldsSettings = $this->searchConfig->subSetting('display', 'sort_list', []);
         if (empty($sortFieldsSettings)) {
             return [];
         }

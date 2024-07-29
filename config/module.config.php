@@ -111,6 +111,7 @@ return [
             Form\Admin\ApiFormConfigFieldset::class => Service\Form\ApiFormConfigFieldsetFactory::class,
             Form\Admin\SearchConfigConfigureForm::class => Service\Form\SearchConfigConfigureFormFactory::class,
             Form\Admin\SearchConfigFilterFieldset::class => Service\Form\GenericFormFactory::class,
+            Form\Admin\SearchConfigSortFieldset::class => Service\Form\GenericFormFactory::class,
             Form\Admin\SearchConfigForm::class => Service\Form\SearchConfigFormFactory::class,
             Form\Admin\SearchEngineConfigureForm::class => Service\Form\GenericFormFactory::class,
             Form\Admin\SearchEngineForm::class => Service\Form\SearchEngineFormFactory::class,

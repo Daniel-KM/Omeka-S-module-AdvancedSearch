@@ -30,7 +30,7 @@ $displayParts = $searchConfig ? $searchConfig->setting('display', $displayParts)
 $displayParts = array_filter($displayParts, fn ($v) => in_array($v, [$resultPart, 'both']));
 
 $paginationPerPages = isset($displayParts['per_page']) ? $searchConfig->subSetting('display', 'per_page_list') : [];
-$sortFields = isset($displayParts['sort']) ? $searchConfig->subSetting('sorting', 'fields') : [];
+$sortFields = isset($displayParts['sort']) ? $searchConfig->subSetting('display', 'sort_list') : [];
 $gridListMode = $searchConfig->subSetting('display', 'grid_list_mode', 'auto');
 $multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['list_only', 'grid_only']);
 ?>
@@ -88,7 +88,7 @@ $multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['lis
 <?php // Sort. ?>
 
 <?php if (count($sortFields)): ?>
-<?= $this->searchSortSelector($query, $sortFields, ['as_url' => true, 'label' => $searchConfig->subSetting('sorting', 'label')]) ?>
+<?= $this->searchSortSelector($query, $sortFields, ['as_url' => true, 'label' => $searchConfig->subSetting('display', 'label_sort')]) ?>
 <?php endif; ?>
 
 <?php // Grid/list. ?>

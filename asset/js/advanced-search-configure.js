@@ -38,6 +38,15 @@ $(document).ready(function() {
             $formConfig.on('click', '.search-fieldset-plus', self.fieldsetAppend);
             $formConfig.on('click', '.search-fieldset-up', self.fieldsetMoveUp);
             $formConfig.on('click', '.search-fieldset-down', self.fieldsetMoveDown);
+
+            $formConfig.on('change', '#form-search-config-sort select', function() {
+                const select = $(this);
+                const fieldset = select.closest('fieldset');
+                const optionSelected = $('option:selected', select);
+                const label = optionSelected.data('label-default');
+                fieldset.find('input[type=text]').val(label);
+            });
+
             return self;
         };
 
@@ -59,8 +68,10 @@ $(document).ready(function() {
                     maxIndex = Math.max(maxIndex, fieldsetIndex);
                 });
                 $fieldset.append(template.split('__index__').join(++maxIndex));
-                // Move button plus last in the fieldset.
+                // Move the button plus and the hidden span at last to simplify
+                // up/down with new fieldset, without interspersed elements.
                 $(ev.currentTarget).appendTo($fieldset)
+                $fieldset.find('span[data-template]').appendTo($fieldset)
                 self.fieldsetUpdateButtons();
                 self.fieldsetUpdateLabels();
                 if (hasChosenSelect) {
@@ -99,20 +110,21 @@ $(document).ready(function() {
             });
             // Enable or disable up/down buttons in each fieldset.
             var buttons = $formConfig.find('.search-fieldset-up');
-            $formConfig.find('.search-fieldset-up').each(function(index, button) {
+            $formConfig.find('.search-fieldset-up').each(function(no, button) {
                 button = $(button);
-                const fieldset = button.closest('fieldset');
-                if (index <= 0) {
+                const index = self.fieldsetIndex(button.closest('fieldset'));
+                if (index <= 1) {
                     button.attr('disabled', 'disabled');
                 } else {
                     button.removeAttr('disabled');
                 }
             });
             buttons = $formConfig.find('.search-fieldset-down');
-            $formConfig.find('.search-fieldset-down').each(function(index, button) {
+            $formConfig.find('.search-fieldset-down').each(function(no, button) {
                 button = $(button);
+                const index = self.fieldsetIndex(button.closest('fieldset'));
                 const fieldset = button.closest('fieldset');
-                if (index >= (buttons.length - 1)) {
+                if (index >= self.fieldsetCount(fieldset)) {
                     button.attr('disabled', 'disabled');
                 } else {
                     button.removeAttr('disabled');
@@ -122,18 +134,31 @@ $(document).ready(function() {
         };
 
         self.fieldsetUpdateLabels = function() {
-            $('.form-fieldset-collection[data-label-index] > fieldset').each(function(index, fieldset) {
+            $('.form-fieldset-collection[data-label-index] > fieldset').each(function(no, fieldset) {
                 fieldset = $(fieldset);
-                const labelIndex = fieldset.parent().data('label-index');
+                const mainFieldset = fieldset.parent();
+                const labelIndex = mainFieldset.data('label-index');
                 var legend = fieldset.find('> legend');
                 if (!legend.length) {
                     fieldset.prepend('<legend></legend>')
                     legend = fieldset.find('> legend');
                 }
-                legend.text(labelIndex.replace('{index}', index + 1));
+                legend.text(labelIndex.replace('{index}', self.fieldsetIndex(fieldset)));
             });
             return self;
         };
+
+        self.fieldsetCount = function(fieldset) {
+            fieldset = $(fieldset);
+            const mainFieldset = fieldset.parent();
+            return mainFieldset.find('> fieldset').length;
+        }
+
+        self.fieldsetIndex = function(fieldset) {
+            fieldset = $(fieldset);
+            const mainFieldset = fieldset.parent();
+            return mainFieldset.find('> fieldset').index(fieldset) + 1;
+        }
 
         return self;
 

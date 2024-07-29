@@ -341,10 +341,11 @@ class ApiFormConfigFieldset extends Fieldset
     public function skipDefaultElementsOrFieldsets(): array
     {
         return [
-            'search',
+            'request',
             'autosuggest',
             // The form is overwrittable.
             // 'form',
+            'display',
             'sort',
             'facet',
         ];

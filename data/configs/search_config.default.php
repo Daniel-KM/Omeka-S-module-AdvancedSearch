@@ -218,11 +218,8 @@ return [
                 50 => $translate('Results by 50'), // @translate
                 100 => $translate('Results by 100'), // @translate
             ],
-        ],
-
-        'sorting' => [
-            'label' => $translate('Sort'),
-            'fields' => [
+            'label_sort' => $translate('Sort'),
+            'sort_list' => [
                 'relevance desc' => [
                     'name' => 'relevance desc',
                     'label' => $translate('Relevance'), // @translate

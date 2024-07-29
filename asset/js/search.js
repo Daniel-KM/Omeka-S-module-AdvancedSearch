@@ -1,6 +1,6 @@
 'use strict';
 
-/*
+/**
  * Copyright BibLibre, 2016
  * Copyright Daniel Berthereau, 2017-2024
  *
@@ -275,7 +275,9 @@ $(document).ready(function() {
         // $('#search-form [name=q]').focus();
     });
 
-    /* Results tools (sort, pagination, per-page) */
+    /**
+     * Results tools (sort, pagination, per-page).
+     */
 
     $('.search-view-type-list').on('click', function(e) {
         e.preventDefault();
@@ -298,40 +300,7 @@ $(document).ready(function() {
         };
     });
 
-    /* Per-page selector links (depending if server or client build) */
-    /* @deprecated Kept for old themes: use ".as-url" instead */
-    $('.search-results-per-page:not(.as-url) select').on('change', function(e) {
-        // Per-page fields don't look like a url.
-        e.preventDefault();
-        var perPage = $(this).val();
-        if (perPage.substring(0, 6) === 'https:' || perPage.substring(0, 5) === 'http:') {
-            window.location = perPage;
-        } else if (perPage.substring(0, 1) === '/') {
-            window.location = window.location.origin + perPage;
-        } else {
-            var searchParams = new URLSearchParams(window.location.search);
-            searchParams.set('page', 1);
-            searchParams.set('per_page', $(this).val());
-            window.location.search = searchParams.toString();
-        }
-    });
-
-    /* Sort selector links (depending if server or client build) */
-    /* @deprecated Kept for old themes: use ".as-url" instead. */
-    $('.search-sort:not(.as-url) select').on('change', function(e) {
-        // Sort fields don't look like a url.
-        e.preventDefault();
-        var sort = $(this).val();
-        if (sort.substring(0, 6) === 'https:' || sort.substring(0, 5) === 'http:') {
-            window.location = sort;
-        } else if (sort.substring(0, 1) === '/') {
-            window.location = window.location.origin + sort;
-        } else {
-            var searchParams = new URLSearchParams(window.location.search);
-            searchParams.set('sort', $(this).val());
-            window.location.search = searchParams.toString();
-        }
-    });
+    /* Facets. */
 
     $('.facets-active a').on('click', function(e) {
         // Reload with the link when there is no button to apply facets.
@@ -409,7 +378,9 @@ $(document).ready(function() {
         }
     });
 
-    // Reset facets, except hidden elements. Active facets are kept.
+    /**
+     * Reset facets, except hidden elements. Active facets are kept.
+     */
     $('#facets-reset').on('click', function () {
         $(this).closest('form')
             // Manage range and numeric separately to manage all the cases.
@@ -463,7 +434,7 @@ $(document).ready(function() {
 
     const rangeDoubles = document.querySelectorAll('.range-double');
 
-    /* Init ranges only when present. */
+    // Init ranges only when present.
     if (rangeDoubles.length) {
         rangeDoubles.forEach((rangeDouble) => {
             const rangeSliderFrom = rangeDouble.querySelector('.range-slider-from');

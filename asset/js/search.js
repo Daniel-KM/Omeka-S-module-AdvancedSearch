@@ -164,6 +164,68 @@ var Search = (function() {
 
     /* Forms tools. */
 
+    /**
+     * Clear the form with hidden and min/max management.
+     *
+     * The html button "reset" resets to default values, not empty values.
+     * Furthermore, the min/max of ranges and numbers should be managed.
+     * For select and radio, set the default or the first value.
+     * Keep hidden values.
+     */
+    self.smartClearForm = function(form) {
+        // TODO Function reset() does not work on search form, only on facets form.
+        typeof form.reset === 'function' ? form.reset() : $(form).trigger('reset');
+        const elements = form.elements;
+        var element, type;
+        for (var i = 0; i < elements.length; i++) {
+            element = elements[i];
+            type = element.type.toLowerCase();
+            switch(type) {
+                case 'hidden':
+                case 'button':
+                case 'reset':
+                case 'submit':
+                    // Keep hidden fields.
+                    break;
+                case 'checkbox':
+                case 'radio':
+                    element.checked = false;
+                    break;
+                case 'select-one':
+                case 'select-multiple':
+                    $(element).find('option').removeAttr('selected').end().trigger('chosen:updated');
+                    break;
+                case 'number':
+                    if ((element.name.endsWith('[to]')) || element.className.endsWith('-to')) {
+                        element.defaultValue = element.value = element.max;
+                        Search.rangeSliderDouble.controlNumericTo(element);
+                    } else {
+                        element.defaultValue = element.value = element.min;
+                        if (element.name.endsWith('[from]') || element.className.endsWith('-from')) {
+                            Search.rangeSliderDouble.controlNumericFrom(element);
+                        }
+                    }
+                    break;
+                case 'range':
+                    if (element.name.endsWith('[to]') || element.className.endsWith('-to')) {
+                        element.defaultValue = element.value = element.max;
+                        Search.rangeSliderDouble.controlSliderTo(element);
+                    } else {
+                        element.defaultValue = element.value = element.min;
+                        if (element.name.endsWith('[from]') || element.className.endsWith('-from')) {
+                            Search.rangeSliderDouble.controlSliderFrom(element);
+                        }
+                    }
+                    break;
+                default:
+                    // Text area, text, password, etc.
+                    element.defaultValue = element.value = '';
+                    break;
+            }
+        }
+        return self;
+    }
+
     self.rangeSliderDouble = (function() {
         var self = {};
 
@@ -264,6 +326,11 @@ var Search = (function() {
 $(document).ready(function() {
 
     const hasAutocomplete = typeof $.fn.autocomplete === 'function';
+
+    $('#search-reset, #facets-reset').on('click', function () {
+        const form = $(this).closest('form')[0];
+        Search.smartClearForm(form);
+    });
 
     /**
      * When the simple and the advanced form are the same form.
@@ -381,42 +448,6 @@ $(document).ready(function() {
             });
             window.location = url.toString();
         }
-    });
-
-    /**
-     * Reset facets, except hidden elements. Active facets are kept.
-     */
-    $('#facets-reset').on('click', function () {
-        $(this).closest('form')
-            // Manage range and numeric separately to manage all the cases.
-            .find('input[type=range]').each(function(index, element) {
-                if ((element.max && element.name.includes('[to]'))
-                    || (element.className && element.className.includes('-to'))
-                 ) {
-                    element.value = element.max;
-                    element.defaultValue = element.value;
-                    Search.rangeSliderDouble.controlSliderTo(element);
-                } else {
-                    element.value = typeof element.min === 'undefined' ? '0' : element.min;
-                    element.defaultValue = element.value;
-                    Search.rangeSliderDouble.controlSliderFrom(element);
-                }
-            }).end()
-            .find('input[type=number]').each(function(index, element) {
-                if ((element.max && element.name.includes('[to]'))
-                    || (element.className && element.className.includes('-to'))
-                 ) {
-                    element.value = element.max;
-                    element.defaultValue = element.value;
-                    Search.rangeSliderDouble.controlNumericTo(element);
-                } else {
-                    element.value = typeof element.min === 'undefined' ? '0' : element.min;
-                    element.defaultValue = element.value;
-                    Search.rangeSliderDouble.controlNumericFrom(element);
-                }
-            }).end()
-            .find(':radio, :checkbox').removeAttr('checked').end()
-            .find('textarea, :text, select').val('');
     });
 
     $('.facets').on('click', '.facet-button, .facet-see-more-or-less', function() {

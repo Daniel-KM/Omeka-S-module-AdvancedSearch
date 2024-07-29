@@ -151,8 +151,8 @@ return [
                 'field_joiner_not' => true,
                 'field_operator' => true,
                 'field_operators' => [
-                    'eq' => $translate('is exactly'), // @translate
                     'in' => $translate('contains'), // @translate
+                    'eq' => $translate('is exactly'), // @translate
                     'sw' => $translate('starts with'), // @translate
                     'ew' => $translate('ends with'), // @translate
                     'ex' => $translate('has any value'), // @translate

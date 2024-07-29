@@ -326,7 +326,7 @@ class MainSearchForm extends Form
                         ],
                     ],
                     'attributes' => [
-                        'id' => 'reset',
+                        'id' => 'search-reset',
                         'type' => 'reset',
                         'class' => 'search-reset',
                     ] + $this->elementAttributes,
@@ -345,7 +345,7 @@ class MainSearchForm extends Form
                         ],
                     ],
                     'attributes' => [
-                        'id' => 'submit',
+                        'id' => 'search-submit',
                         'type' => 'submit',
                         'class' => 'search-submit',
                     ] + $this->elementAttributes,

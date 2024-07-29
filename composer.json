@@ -32,14 +32,13 @@
                 "type": "omeka-addon-asset",
                 "dist": {
                     "type": "file",
-                    "url": "https://github.com/devbridge/jQuery-Autocomplete/raw/master/dist/jquery.autocomplete.min.js",
+                    "url": "https://github.com/Daniel-KM/Omeka-S-module-AdvancedSearch/releases/download/3.4.30/jquery.autocomplete.min.js",
                     "reference": ""
                 }
             }
         }
     ],
     "require": {
-        "cweagans/composer-patches": "^1.7",
         "devbridge/jquery-autocomplete": "^1.4.11",
         "laminas/laminas-feed": "^2.18",
         "oomphinc/composer-installers-extender": "^2.0"
@@ -64,18 +63,12 @@
                 "type:omeka-addon-asset"
             ]
         },
-        "installer-name" : "AdvancedSearch",
-        "patches": {
-            "devbridge/jquery-autocomplete": {
-                "Fix slow clicker (see https://github.com/devbridge/jQuery-Autocomplete/pull/811)": "patches/jquery-autocomplete-omeka.patch"
-            }
-        }
+        "installer-name" : "AdvancedSearch"
     },
     "config": {
         "platform": {"php": "7.4"},
         "allow-plugins": {
             "composer/installers": true,
-            "cweagans/composer-patches": true,
             "oomphinc/composer-installers-extender": true
         }
     }

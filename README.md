@@ -284,16 +284,73 @@ and type.
 
 #### Facets
 
-See options in the config form.
-The format to fill each facet is "field = Label" and optionnally the type after
-another "=", "Checkbox", "Select" or "SelectRange".
+The format to fill facets is "ini", so set a section name between "[]", then
+each param of the facet. For example:
 
-The list of facets can be displayed as checkboxes (default: `Checkbox`), a select
-with multiple values `Select` or a double select for ranges `SelectRange`.
+```ini
+[subjects]
+field = "dcterms:subject"
+label = Subjects
+sort_by = "total"
+display_list = "available"
+display_count = true
 
-Warning: With internal sql engine, `SelectRange` orders values alphabetically,
-so it is used for string, years or standard dates, but not for number or
-variable dates. With Solr, `SelectRange` works only with date and numbers.
+[template]
+field = "resource_template_id"
+type = Select
+label = Resource types
+sort_by= "values"
+values = "Text|Image|Audio|Vidéo"
+display_count = true
+
+[date]
+field = "dcterms:date"
+type = Range
+label = Year
+min = 1789
+max = 1804
+```
+
+The section is a unique name.
+
+Keys are: `field`, `label`, `type`, `order`, `limit`, `state`, `more`, `languages`, `data_types`,
+`main_types`, `values`, `display_count`, and specific options, like `thesaurus`.
+
+Multi-valued keys can be set as ini (key ending with [] or .xxx) or as a string
+with multiple values separated with a "|".
+
+Only the key "field" is required.
+
+- Input types may be Checkbox (default), RangeDouble, Select, SelectRange, Thesaurus, Tree.
+  - "RangeDouble" and "SelectRange" are used to specify an interval of numbers
+    or dates. The options "min" and "max" should be set to limit it, for example
+    `min = 1789` and `max = 1804`. For Range, the option "step" can be set too.
+    With Solr, it works only with date and numbers.
+  - "Thesaurus" requires the module Thesaurus and a specific option `thesaurus`,
+    with the id.
+  - "Tree" can be used for item sets when module ItemSetsTree is enabled and
+    data indexed recursively.
+- "languages", "data_types" and "main_types" are filters to limit results from
+  the query. They are a list of values. They can be set as an array (recommended),
+  with the format `languages[] = fr` or as a string separated with `|`, like
+  `languages[] = fr|en|`. The use of a comma to separate values is deprecated
+  and will be removed in a future version.
+  - "languages" allows to filter values by language. To get the values without
+    language too, use "null" (recommended) or an empty string.
+  - "data_types" allows to filter values by some specific data types, for
+    example a custom vocab or a value suggest.
+  - "main_types" allows to filter values by main data type ("literal", "uri" or
+    "resource").
+  - "values" allows to filter values by a list of values. The same key is used
+    for the order "values" too.
+- "order" may be "alphabetic" (asc), "alphabetic desc", "total" (desc),
+  "total asc", "values" (asc), "values desc". When the order is by values, the
+  list of values should be set in key "values".
+- "limit" is the maximum number of facets. When "more" (integer) is set too, it
+  is the maximum number displayed by default, with a button to expand to all
+  facets. Of course, "more" cannot be greater than "limit".
+- "state" defines the state of a facet and may be "static" (default), "opened"
+  or "closed".
 
 
 Internal engine (mysql)
@@ -509,7 +566,7 @@ The Psl search form and the Solr modules were initially built by [BibLibre] and
 were used by the [digital library of PSL], a French university. Next improvements
 were done for various projects. The auto-completion was built for the future
 digital library of [Campus Condorcet]. The aggregated fields feature was built
-for the future digital library [Corpus du Louvre].
+for the digital library [Corpus du Louvre].
 
 
 [Advanced Search]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch

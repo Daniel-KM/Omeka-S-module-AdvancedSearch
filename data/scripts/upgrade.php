@@ -527,12 +527,12 @@ if (version_compare($oldVersion, '3.4.24', '<')) {
     foreach ($strings as $path => $strings) {
         $result = $manageModuleAndResources->checkStringsInFiles($strings, $path);
         if ($result) {
-            $results[trim(basename($path), '*')] = $result;
+            $results[] = $result;
         }
     }
     if ($results) {
         $message = new PsrMessage(
-            'The variables "$heading", "$html" and "$cssClass" were removed from block Searching Form. Fix them in the following files before upgrading: {json}', // @translate
+            'The variables "$heading", "$html" and "$cssClass" were removed from block Searching Form. Remove them in the following files before upgrade and automatic conversion: {json}', // @translate
             ['json' => json_encode($results, 448)]
         );
         throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message->setTranslator($translator));
@@ -605,7 +605,11 @@ if (version_compare($oldVersion, '3.4.24', '<')) {
             $layoutData = $block->getLayoutData() ?? [];
             $existingTemplateName = $layoutData['template_name'] ?? null;
             $templateName = pathinfo($template, PATHINFO_FILENAME);
-            if ($templateName && $templateName !== 'searching-form' && (!$existingTemplateName || $existingTemplateName === 'searching-form')) {
+            $templateCheck = 'searching-form';
+            if ($templateName
+                && $templateName !== $templateCheck
+                && (!$existingTemplateName || $existingTemplateName === $templateCheck)
+            ) {
                 $layoutData['template_name'] = $templateName;
                 $pagesUpdated2[$siteSlug][$pageSlug] = $pageSlug;
             }
@@ -939,7 +943,7 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
         if (!$result) {
             continue;
         } elseif (!$doUpgrade || empty($stringsAndMessage['commands'])) {
-            $results[$key][trim(basename($path), '*')] = $result;
+            $results[$key][] = $result;
             continue;
         }
         $total = count($stringsAndMessage['commands']);
@@ -1081,7 +1085,7 @@ The list of issues is available in logs too.' // @translate
     foreach ($stringsAndMessages as $key => $stringsAndMessage) foreach ($stringsAndMessage['strings'] as $path => $strings) {
         $result = $manageModuleAndResources->checkStringsInFiles($strings, $path);
         if ($result) {
-            $results[$key][trim(basename($path), '*')] = $result;
+            $results[$key][] = $result;
         }
     }
     if ($results) {
@@ -1091,4 +1095,47 @@ The list of issues is available in logs too.' // @translate
             $messenger->addWarning($message);
         }
     }
+
+    // The process can be repeated in case of issue.
+
+    // Update name of the navigation link.
+    $sql = <<<SQL
+UPDATE `site`
+SET
+    `navigation` = REPLACE(`navigation`, '"type":"searchPage"', '"type":"searchingPage"')
+;
+SQL;
+    $connection->executeStatement($sql);
+
+    // Normalize name of a column.
+    $sql = <<<SQL
+ALTER TABLE `search_config`
+CHANGE `path` `slug` varchar(190) NOT NULL AFTER `name`
+;
+SQL;
+    try {
+        $connection->executeStatement($sql);
+    } catch (\Exception $e) {
+        // Already done.
+    }
+
+    $message = new PsrMessage(
+        'New options were added in search config: the choice of the theme template (search/search) and an option to display the breadcrumbs.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new PsrMessage(
+        'New options were added to define the thumbnail.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new PsrMessage(
+        'It is now possible to sort by relevance with the internal querier.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new PsrMessage(
+        'The default template for the list of results was updated to use css flex. Check your theme.' // @translate
+    );
+    $messenger->addWarning($message);
 }

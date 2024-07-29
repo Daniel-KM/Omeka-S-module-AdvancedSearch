@@ -477,7 +477,7 @@ class SearchConfigController extends AbstractActionController
         // Remove the mode of each facet to simplify config.
         // Simplify some values too (integer and boolean).
         $settings['facet']['mode'] = ($settings['facet']['mode'] ?? null) === 'link' ? 'link' : 'button';
-        foreach ($settings['facet']['facets'] ?? [] as &$facet) {
+        foreach ($settings['facet']['facets'] ?? [] as $key => $facet) {
             unset($facet['mode']);
             if (isset($facet['limit'])) {
                 $facet['limit'] = (int) $facet['limit'];
@@ -485,8 +485,8 @@ class SearchConfigController extends AbstractActionController
             if (isset($facet['display_count'])) {
                 $facet['display_count'] = (bool) $facet['display_count'];
             }
+            $settings['facet']['facets'][$key] = $facet;
         }
-        unset ($facet);
 
         return $settings;
     }
@@ -608,7 +608,7 @@ class SearchConfigController extends AbstractActionController
         // a hard to understand issue.
         $facetMode = ($params['facet']['mode'] ?? null) === 'link' ? 'link' : 'button';
         $warnLanguage = false;
-        foreach ($params['facet']['facets'] ?? [] as &$facet) {
+        foreach ($params['facet']['facets'] ?? [] as $key => $facet) {
             $facet['mode'] = $facetMode;
             if (isset($facet['limit'])) {
                 $facet['limit'] = (int) $facet['limit'];
@@ -622,8 +622,8 @@ class SearchConfigController extends AbstractActionController
                     $warnLanguage = true;
                 }
             }
+            $params['facet']['facets'][$key] = $facet;
         }
-        unset ($facet);
         if ($warnLanguage) {
             $this->messenger()->addWarning(
                 'Note that you didn’t set an empty language for some facets, so all values without language will be skipped in the facet.' // @translate

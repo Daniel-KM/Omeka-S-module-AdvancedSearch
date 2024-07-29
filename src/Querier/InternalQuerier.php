@@ -70,6 +70,10 @@ class InternalQuerier extends AbstractQuerier
         $offset = empty($dataQuery['offset']) ? 0 : (int) $dataQuery['offset'];
         unset($dataQuery['limit'], $dataQuery['offset']);
 
+        // Some query arguments and facets are not manageable via resource type
+        // "resources".
+        $isSpecificQuery = $this->isSpecificQuery(true);
+
         // Return scalar doesn't allow to get the total of results.
         // So skip offset and limit, then apply them in order to avoid the
         // double query.
@@ -77,7 +81,7 @@ class InternalQuerier extends AbstractQuerier
         // TODO Check if this internal api paginator is quicker in all cases (small/long results) than previous double query.
 
         // Resources types are filtered from the query or from the indexes.
-        if ($this->byResourceType) {
+        if ($this->byResourceType || $isSpecificQuery) {
             foreach ($this->resourceTypes as $resourceType) {
                 try {
                     $apiResponse = $api->search($resourceType, $dataQuery, ['returnScalar' => 'id']);
@@ -106,7 +110,8 @@ class InternalQuerier extends AbstractQuerier
             try {
                 // It is not possible to return the resource type for now with
                 // doctrine, but it is useless.
-                $apiResponse = $api->search('resources', $dataQuery, ['returnScalar' => 'id']);
+                $mainResourceType = count($this->resourceTypes) === 1 ? reset($this->resourceTypes) : 'resources';
+                $apiResponse = $api->search($mainResourceType, $dataQuery, ['returnScalar' => 'id']);
                 $totalResults = $apiResponse->getTotalResults();
                 $result = $apiResponse->getContent();
                 // TODO Currently experimental. To replace by a query + arg "querier=internal".
@@ -133,6 +138,28 @@ class InternalQuerier extends AbstractQuerier
 
         if ($hasReferences) {
             $this->fillFacetResponse();
+        }
+
+        // Remove specific results when settings are not by resource type.
+        // TODO The order may be different when "resources" is not used.
+        // This is the same in SolariumQuerier.
+        if ($isSpecificQuery && !$this->byResourceType && count($this->resourceTypes) > 1) {
+            $allResourceIdsByType = $this->response->getAllResourceIds(null, true);
+            if (isset($allResourceIdsByType['resources'])) {
+                $this->response->setAllResourceIdsByResourceType(['resources' => $allResourceIdsByType['resources']]);
+            } else {
+                $this->response->setAllResourceIdsByResourceType(['resources' => array_merge(...array_values($allResourceIdsByType))]);
+            }
+            $resultsByType = $this->response->getResults();
+            if (isset($resultsByType['resources'])) {
+                $this->response->setResults(['resources' => $resultsByType['resources']]);
+            } else {
+                $this->response->setResults(['resources' => array_replace(...$resultsByType)]);
+            }
+            $totalResultsByType = $this->response->getResourceTotalResults();
+            $total = isset($totalResultsByType['resources']) ? $totalResultsByType['resources'] : array_sum($totalResultsByType);
+            $this->response->setResourceTotalResults(['resources' => $total]);
+            $this->response->setTotalResults($total);
         }
 
         return $this->response
@@ -888,6 +915,74 @@ SQL;
     }
 
     /**
+     * @param bool $useArgsWithFacets Use this args with or without facets.
+     *
+     * @todo The check of specific query should use the real keys, not the query field names.
+     */
+    protected function isSpecificQuery(bool $useArgsWithFacets = false): bool
+    {
+        $singleResourceType = count($this->resourceTypes) === 1;
+        if ($singleResourceType && reset($this->resourceTypes) !== 'resources') {
+            return false;
+        }
+
+        $specificKeys = [
+            'item_set_id' => null,
+            'not_item_set_id' => null,
+            // Site id is managed by all resources, but differently.
+            'site_id' => null,
+            'in_sites' => null,
+            'has_media' => null,
+            'item_id' => null,
+            'media_type' => null,
+            'ingester' => null,
+            'renderer' => null,
+            'is_open' => null,
+            // More.
+            'item_set/o:id' => null,
+            'site/o:id' => null,
+            // Modules.
+            'item_sets_tree' => null,
+            // Old keys.
+            'itemset' => null,
+            'itemSet' => null,
+            'item_set' => null,
+            'site' => null,
+            // Multi.
+            'item_set_id[]' => null,
+            'not_item_set_id[]' => null,
+            // Site id is managed by all resources, but differently.
+            'site_id[]' => null,
+            'in_sites[]' => null,
+            'item_id[]' => null,
+            'media_type[]' => null,
+            'ingester[]' => null,
+            'renderer[]' => null,
+            // Modules.
+            'item_sets_tree[]' => null,
+            'item_sets_tree[id]' => null,
+            // Old keys.
+            'itemset[]' => null,
+            'itemSet[]' => null,
+            'item_set[]' => null,
+            'itemset[id]' => null,
+            'itemSet[id]' => null,
+            'item_set[id]' => null,
+            'site[]' => null,
+        ];
+
+        if (!$useArgsWithFacets) {
+            return (bool) array_intersect_key($specificKeys, $this->argsWithoutActiveFacets);
+        }
+        if (array_intersect_key($specificKeys, $this->args)) {
+            return true;
+        }
+        return isset($this->args['facet'])
+            && is_array($this->args['facet'])
+            && array_intersect_key($specificKeys, $this->args['facet']);
+    }
+
+    /**
      * Convert a name with an underscore into a standard term.
      *
      * Manage dcterms_subject_ss, ss_dcterms_subject, etc. from specific search
@@ -1065,6 +1160,69 @@ SQL;
 
         $isAllFacets = $this->query->getOption('facet_list') === 'all';
 
+        // The query already contains the arg "resource_type", so it is now
+        // possible to do a unique request to references, since there is only
+        // one list of facets for all resources.
+        // Nevertheless, this is not possible when the facets contain specific
+        // fields, in particular item sets or item sets tree, that are available
+        // only for items.
+
+        // TODO Remove processing specific queries.
+        $isSpecificQuery = $this->isSpecificQuery(!$isAllFacets);
+
+        if (!$isSpecificQuery) {
+            $mainResourceType = count($this->resourceTypes) === 1 ? reset($this->resourceTypes) : 'resources';
+            // Like Solr, get only available useful values or all existing values.
+            /** @see https://solr.apache.org/guide/solr/latest/query-guide/faceting.html */
+            if ($isAllFacets) {
+                // Do the query one time for all facets, for each resource types.
+                // Itis not possible when there are facets for item set or site
+                // because they are removed from the query.
+                // TODO Check if item sets and sites are still an exception for references.
+                /** @see \Reference\Mvc\Controller\Plugin\References::searchQuery() */
+                if ((in_array('o:item_set', $referenceMetadata) && (isset($this->argsWithoutActiveFacets['item_set_id']) || isset($this->argsWithoutActiveFacets['item_set']) || isset($this->argsWithoutActiveFacets['itemset'])))
+                    || (in_array('o:site', $referenceMetadata) && (isset($this->argsWithoutActiveFacets['site_id']) || isset($this->argsWithoutActiveFacets['site'])))
+                ) {
+                    $referenceQuery = $this->argsWithoutActiveFacets;
+                } else {
+                    /** @var \Omeka\Api\Manager $api */
+                    $api = $this->services->get('Omeka\ApiManager');
+                    $ids = $api->search($mainResourceType, $this->argsWithoutActiveFacets, ['returnScalar' => 'id'])->getContent();
+                    if (!$ids) {
+                        return;
+                    }
+                    $referenceQuery = ['id' => array_values($ids)];
+                }
+            } else {
+                // For performance, use the full list of resource ids when possible,
+                // instead of the original query.
+                // $referenceQuery = $this->args;
+                $ids = $this->response->getAllResourceIds();
+                if (!$ids) {
+                    return;
+                }
+                $referenceQuery = ['id' => array_values($ids)];
+            }
+
+            $referenceOptions['resource_name'] = $mainResourceType;
+            $values = $references
+                ->setMetadata($referenceMetadata)
+                ->setQuery($referenceQuery)
+                ->setOptions($referenceOptions)
+                ->list();
+            foreach (array_keys($referenceMetadata) as $facetName) foreach ($values[$facetName]['o:references'] ?? [] as $value => $count) {
+                $facetCountsByField[$facetName][$value] = [
+                    'value' => $value,
+                    'count' => $count,
+                ];
+            }
+            $this->response->setFacetCounts(array_map('array_values', $facetCountsByField));
+            return;
+        }
+
+        // Manage exceptions in some query arguments or facets, because the
+        // adapter for resources does not manage all arguments.
+
         // The query already contains the arg "resource_type".
         foreach ($this->byResourceType ? $this->resourceTypes : ['resources'] as $resourceType) {
             // Like Solr, get only available useful values or all existing values.
@@ -1092,7 +1250,7 @@ SQL;
                 // For performance, use the full list of resource ids when possible,
                 // instead of the original query.
                 // $referenceQuery = $this->args;
-                $ids = $this->response->getResourceIds($resourceType, $resourceType);
+                $ids = $this->response->getAllResourceIds($resourceType, $resourceType);
                 if (!$ids) {
                     continue;
                 }

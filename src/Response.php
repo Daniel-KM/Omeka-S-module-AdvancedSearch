@@ -302,9 +302,11 @@ class Response implements \JsonSerializable
      * @internal Currently experimental.
      * @todo Return ids directly with array_column() in the response or include it by default.
      */
-    public function getResourceIds(?string $resourceType = null, bool $byResourceType = false): array
+    public function getAllResourceIds(?string $resourceType = null, bool $byResourceType = false): array
     {
+        // When the data are not filled early, use results.
         if (!count($this->allResourceIdsByResourceType)) {
+            // TODO Add a logger when the resource ids by resource type are not filled early.
             foreach (array_keys($this->results) as $resourceType) {
                 $this->allResourceIdsByResourceType[$resourceType] = array_column($this->getResults($resourceType), 'id');
             }

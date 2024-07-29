@@ -27,11 +27,7 @@ return [
     'o:adapter' => 'internal',
     'o:settings' => [
         'resource_types' => [
-            'resources',
             'items',
-            'item_sets',
-            'media',
-            'annotations',
         ],
         'adapter' => [
             'default_search_partial_word' => false,

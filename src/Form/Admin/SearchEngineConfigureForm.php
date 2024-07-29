@@ -60,10 +60,7 @@ class SearchEngineConfigureForm extends Form
                 'attributes' => [
                     'id' => 'resource_types',
                     'value' => [
-                        'resources',
                         'items',
-                        'item_sets',
-                        'media',
                     ],
                 ],
             ])

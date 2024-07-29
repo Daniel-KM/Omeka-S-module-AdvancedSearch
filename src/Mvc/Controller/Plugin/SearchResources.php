@@ -415,12 +415,18 @@ class SearchResources extends AbstractPlugin
      * The advanced search form returns all keys, so clear useless ones and
      * avoid to check them in many places.
      *
+     * Warning: an empty string for the keys "sort_by_default" and "sort_order_default"
+     * have a meaning and are used internally, so they must not be removed.
+     *
      * @todo Improve cleaning query.
      */
     public function cleanQuery(array $query): array
     {
         foreach ($query as $key => $value) {
-            if ($value === '' || $value === null || $value === []
+            if ($key === 'sort_by_default' || $key === 'sort_order_default') {
+                // Keep these keys.
+                continue;
+            } elseif ($value === '' || $value === null || $value === []
                 || !$key || $key === 'submit' || $key === 'numeric-toggle-time-checkbox'
             ) {
                 unset($query[$key]);

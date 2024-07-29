@@ -866,7 +866,12 @@ SQL;
 
     /**
      * @todo Factorize with \AdvancedSearch\Form\MainSearchForm::listValues()
-     * @see \AdvancedSearch\Form\MainSearchForm::listValues()
+     *
+     * Adapted:
+     * @see \AdvancedSearch\Api\Representation\SearchConfigRepresentation::suggest()
+     * @see \AdvancedSearch\Api\Representation\SearchSuggesterRepresentation::suggest()
+     * @see \AdvancedSearch\Form\MainSearchForm::listValuesForField()
+     * @see \Reference\Mvc\Controller\Plugin\References
      */
     protected function fillFacetResponse(): void
     {

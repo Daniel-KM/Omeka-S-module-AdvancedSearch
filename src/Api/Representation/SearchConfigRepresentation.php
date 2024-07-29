@@ -30,7 +30,12 @@
 
 namespace AdvancedSearch\Api\Representation;
 
+use AdvancedSearch\Querier\Exception\QuerierException;
+use AdvancedSearch\Query;
+use AdvancedSearch\Response;
+use Common\Stdlib\PsrMessage;
 use Omeka\Api\Representation\AbstractEntityRepresentation;
+use Omeka\Api\Representation\SiteRepresentation;
 
 class SearchConfigRepresentation extends AbstractEntityRepresentation
 {
@@ -229,5 +234,150 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         return $formAdapter
             ? $formAdapter->renderForm($options)
             : '';
+    }
+
+    /**
+     * @todo Remove site (but manage direct query).
+     * @todo Manage direct query here? Remove it?
+     *
+     * Adapted:
+     * @see \AdvancedSearch\Api\Representation\SearchConfigRepresentation::suggest()
+     * @see \AdvancedSearch\Api\Representation\SearchSuggesterRepresentation::suggest()
+     * @see \AdvancedSearch\Form\MainSearchForm::listValuesForField()
+     * @see \Reference\Mvc\Controller\Plugin\References
+     */
+    public function suggest(string $q, ?string $field, ?SiteRepresentation $site): Response
+    {
+        $services = $this->getServiceLocator();
+        $api = $services->get('Omeka\ApiManager');
+        $logger = $services->get('Omeka\Logger');
+        $translator = $services->get('MvcTranslator');
+        $easyMeta = $services->get('Common\EasyMeta');
+
+        $response = new Response();
+        $response->setApi($api);
+
+        if ($field === null) {
+            // Check if the main index exists when no field is set.
+            // The suggester may be the url, but in that case it's pure js and the
+            // query doesn't come here (for now).
+            $suggesterId = $this->subSetting('autosuggest', 'suggester');
+            if (!$suggesterId) {
+                $message = new PsrMessage(
+                    'The search page "{search_page}" has no suggester.', // @translate
+                    ['search_page' => $this->slug()]
+                );
+                $logger->err($message->getMessage(), $message->getContext());
+                return $response
+                    ->setMessage($message->setTranslator($translator));
+            }
+
+            try {
+                /** @var \AdvancedSearch\Api\Representation\SearchSuggesterRepresentation $suggester */
+                $suggester = $api->read('search_suggesters', $suggesterId)->getContent();
+            } catch (\Omeka\Api\Exception\NotFoundException $e) {
+                $message = new PsrMessage(
+                    'The search page "{search_page}" has no more suggester.', // @translate
+                    ['search_page' => $this->slug()]
+                );
+                $logger->err($message->getMessage(), $message->getContext());
+                return $response
+                    ->setMessage($message->setTranslator($translator));
+            }
+
+            return $suggester->suggest($q, $site);
+        }
+
+        // When a field is set, there is no suggester for now, so use a direct
+        // query.
+
+        $engine = $this->engine();
+        if (!$engine) {
+            $message = new PsrMessage(
+                'The search page "{search_page}" has no search engine.', // @translate
+                ['search_page' => $this->slug()]
+            );
+            $logger->err($message->getMessage(), $message->getContext());
+            return $response
+                ->setMessage($message->setTranslator($translator));
+        }
+
+        $fields = [];
+        if ($field) {
+            $metadataFieldsToNames = [
+                'resource_name' => 'resource_type',
+                'resource_type' => 'resource_type',
+                'is_public' => 'is_public',
+                'owner_id' => 'o:owner',
+                'site_id' => 'o:site',
+                'resource_class_id' => 'o:resource_class',
+                'resource_template_id' => 'o:resource_template',
+                'item_set_id' => 'o:item_set',
+                'access' => 'access',
+                'item_sets_tree' => 'o:item_set',
+            ];
+            // Convert multi-fields into a list of property terms.
+            // Normalize search query keys as omeka keys for items and item sets.
+            $multifields = $engine->settingAdapter('multifields', []);
+            $cleanField = $metadataFieldsToNames[$field]
+                ?? $easyMeta->propertyTerm($field)
+                ?? $multifields[$field]['fields']
+                ?? $field;
+            $fields = (array) $cleanField;
+        }
+
+        // Prepare dynamic query.
+        $query = new Query();
+        $query->setQuery($q);
+
+        $user = $services->get('Omeka\AuthenticationService')->getIdentity();
+        // TODO Manage roles from modules and visibility from modules (access resources).
+        $omekaRoles = [
+            \Omeka\Permissions\Acl::ROLE_GLOBAL_ADMIN,
+            \Omeka\Permissions\Acl::ROLE_SITE_ADMIN,
+            \Omeka\Permissions\Acl::ROLE_EDITOR,
+            \Omeka\Permissions\Acl::ROLE_REVIEWER,
+            \Omeka\Permissions\Acl::ROLE_AUTHOR,
+            \Omeka\Permissions\Acl::ROLE_RESEARCHER,
+        ];
+        if ($user && in_array($user->getRole(), $omekaRoles)) {
+            $query->setIsPublic(false);
+        }
+
+        if ($site) {
+            $query->setSiteId($site->id());
+        }
+
+        $engineSettings = $engine->settings();
+
+        $query
+            ->setResources($engineSettings['resources'])
+            ->setLimitPage(1, \Omeka\Stdlib\Paginator::PER_PAGE)
+            ->setSuggestOptions([
+                'suggester' => null,
+                'direct' => true,
+                'mode_index' => 'start',
+                'mode_search' => 'start',
+                'length' => 50,
+            ])
+            ->setSuggestFields($fields)
+            // ->setExcludedFields([])
+        ;
+
+        /** @var \AdvancedSearch\Querier\QuerierInterface $querier */
+        $querier = $engine
+            ->querier()
+            ->setQuery($query);
+        try {
+            return $querier->querySuggestions();
+        } catch (QuerierException $e) {
+            $message = new PsrMessage(
+                "Query error: {message}\nQuery:{query}", // @translate
+                ['message' => $e->getMessage(), 'query' => $query->jsonSerialize()]
+            );
+            $this->logger()->err($message->getMessage(), $message->getContext());
+            return $response
+                ->setMessage($message);
+        }
     }
 }

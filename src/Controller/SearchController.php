@@ -213,11 +213,14 @@ class SearchController extends AbstractActionController
         if (!$this->getRequest()->isXmlHttpRequest()) {
             return new JsonModel([
                 'status' => 'error',
-                'message' => 'This action requires an ajax request.', // @translate
+                'message' => $this->translate('This action requires an ajax request.'), // @translate
             ]);
         }
 
-        $q = (string) $this->params()->fromQuery('q');
+        $params = $this->params();
+
+        // Some search engines may use trailing spaces, so keep them.
+        $q = (string) $params->fromQuery('q');
         if (!strlen($q)) {
             return new JsonModel([
                 'status' => 'success',
@@ -228,7 +231,7 @@ class SearchController extends AbstractActionController
             ]);
         }
 
-        $searchConfigId = (int) $this->params('id');
+        $searchConfigId = (int) $params->fromRoute('id');
 
         $isSiteRequest = $this->status()->isSiteRequest();
         if ($isSiteRequest) {
@@ -238,7 +241,7 @@ class SearchController extends AbstractActionController
             if (!in_array($searchConfigId, $siteSearchConfigs)) {
                 return new JsonModel([
                     'status' => 'error',
-                    'message' => 'Not a search page for this site.', // @translate
+                    'message' => $this->translate('Not a search page for this site.'), // @translate
                 ]);
             }
             // TODO Manage item set redirection.
@@ -247,34 +250,24 @@ class SearchController extends AbstractActionController
         }
 
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
-        $searchConfig = $this->api()->read('search_configs', $searchConfigId)->getContent();
-
-        // The suggester may be the url, but in that case it's pure js and the
-        // query doesn't come here (for now).
-        $suggesterId = $searchConfig->subSetting('autosuggest', 'suggester');
-        if (!$suggesterId) {
-            return new JsonModel([
-                'status' => 'error',
-                'message' => 'The search page has no suggester.', // @translate
-            ]);
-        }
-
         try {
-            /** @var \AdvancedSearch\Api\Representation\SearchSuggesterRepresentation $suggester */
-            $suggester = $this->api()->read('search_suggesters', $suggesterId)->getContent();
+            $searchConfig = $this->api()->read('search_configs', $searchConfigId)->getContent();
         } catch (\Omeka\Api\Exception\NotFoundException $e) {
             return new JsonModel([
                 'status' => 'error',
-                'message' => 'The search page has no more suggester.', // @translate
+                'message' => $this->translate('The seach engine is not available.'), // @translate
             ]);
         }
 
-        $response = $suggester->suggest($q, $site);
+        $field = $params->fromQuery('field');
+
+        $response = $searchConfig->suggest($q, $field, $site);
+
         if (!$response) {
             $this->getResponse()->setStatusCode(\Laminas\Http\Response::STATUS_CODE_500);
             return new JsonModel([
                 'status' => 'error',
-                'message' => 'An error occurred.', // @translate
+                'message' => $this->translate('An error occurred.'), // @translate
             ]);
         }
 

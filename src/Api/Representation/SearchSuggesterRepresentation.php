@@ -87,13 +87,20 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
     /**
      * @todo Remove site (but manage direct query).
      * @todo Manage direct query here? Remove it?
+     *
+     * Adapted:
+     * @see \AdvancedSearch\Api\Representation\SearchConfigRepresentation::suggest()
+     * @see \AdvancedSearch\Api\Representation\SearchSuggesterRepresentation::suggest()
+     * @see \AdvancedSearch\Form\MainSearchForm::listValuesForField()
+     * @see \Reference\Mvc\Controller\Plugin\References
      */
     public function suggest(string $q, ?SiteRepresentation $site = null): Response
     {
         $query = new Query();
         $query->setQuery($q);
 
-        $user = $this->getServiceLocator()->get('Omeka\AuthenticationService')->getIdentity();
+        $services = $this->getServiceLocator();
+        $user = $services->get('Omeka\AuthenticationService')->getIdentity();
         // TODO Manage roles from modules and visibility from modules (access resources).
         $omekaRoles = [
             \Omeka\Permissions\Acl::ROLE_GLOBAL_ADMIN,
@@ -126,7 +133,8 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
                 'length' => $suggesterSettings['length'] ?? 50,
             ])
             ->setSuggestFields($suggesterSettings['fields'] ?? [])
-            ->setExcludedFields($suggesterSettings['excluded_fields'] ?? []);
+            ->setExcludedFields($suggesterSettings['excluded_fields'] ?? [])
+        ;
 
         /** @var \AdvancedSearch\Querier\QuerierInterface $querier */
         $querier = $engine
@@ -136,12 +144,13 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
             return $querier->querySuggestions();
         } catch (QuerierException $e) {
             $message = new PsrMessage(
-                "Query error: {message}\nQuery:{json_query}", // @translate
-                ['message' => $e->getMessage(), 'json_query' => json_encode($query->jsonSerialize(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)]
+                "Query error: {message}\nQuery:{query}", // @translate
+                ['message' => $e->getMessage(), 'query' => $query->jsonSerialize()]
             );
             $this->logger()->err($message->getMessage(), $message->getContext());
+            $translator = $services->get('MvcTranslator');
             return (new Response)
-                ->setMessage($message);
+                ->setMessage($message->setTranslator($translator));
         }
     }
 }

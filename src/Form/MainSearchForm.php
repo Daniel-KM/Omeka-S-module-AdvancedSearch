@@ -1145,7 +1145,12 @@ class MainSearchForm extends Form
      * managed languages, but a lot slower for big databases.
      *
      * @todo Factorize with \AdvancedSearch\Querier\InternalQuerier::fillFacetResponse()
-     * @see \AdvancedSearch\Querier\InternalQuerier::fillFacetResponse()
+     *
+     * Adapted:
+     * @see \AdvancedSearch\Api\Representation\SearchConfigRepresentation::suggest()
+     * @see \AdvancedSearch\Api\Representation\SearchSuggesterRepresentation::suggest()
+     * @see \AdvancedSearch\Form\MainSearchForm::listValuesForField()
+     * @see \Reference\Mvc\Controller\Plugin\References
      */
     protected function listValuesForField(string $field): array
     {
@@ -1162,6 +1167,8 @@ class MainSearchForm extends Form
             'resource_class_id' => 'o:resource_class',
             'resource_template_id' => 'o:resource_template',
             'item_set_id' => 'o:item_set',
+            'access' => 'access',
+            'item_sets_tree' => 'o:item_set',
         ];
 
         // Convert multi-fields into a list of property terms.

@@ -36,7 +36,7 @@ interface FormAdapterInterface
 {
     public function getLabel(): string;
 
-    public function setSearchConfig(?SearchConfigRepresentation $searchConfig): \AdvancedSearch\FormAdapter\FormAdapterInterface;
+    public function setSearchConfig(?SearchConfigRepresentation $searchConfig): self;
 
     public function getConfigFormClass(): ?string;
 

@@ -66,7 +66,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
      */
     protected $searchConfig;
 
-    public function setSearchConfig(?SearchConfigRepresentation $searchConfig): FormAdapterInterface
+    public function setSearchConfig(?SearchConfigRepresentation $searchConfig): self
     {
         $this->searchConfig = $searchConfig;
         return $this;

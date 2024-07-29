@@ -65,13 +65,13 @@ abstract class AbstractAdapter implements AdapterInterface
      */
     protected $querierClass = null;
 
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): AdapterInterface
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): self
     {
         $this->services = $serviceLocator;
         return $this;
     }
 
-    public function setSearchEngine(SearchEngineRepresentation $searchEngine): AdapterInterface
+    public function setSearchEngine(SearchEngineRepresentation $searchEngine): self
     {
         $this->searchEngine = $searchEngine;
         return $this;

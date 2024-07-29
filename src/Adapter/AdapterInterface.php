@@ -35,12 +35,12 @@ use Laminas\ServiceManager\ServiceLocatorInterface;
 
 interface AdapterInterface
 {
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): AdapterInterface;
+    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): self;
 
     /**
      * Set the search engine for this adapter.
      */
-    public function setSearchEngine(SearchEngineRepresentation $searchEngine): AdapterInterface;
+    public function setSearchEngine(SearchEngineRepresentation $searchEngine): self;
 
     /**
      * Get the search engine of this adapter.

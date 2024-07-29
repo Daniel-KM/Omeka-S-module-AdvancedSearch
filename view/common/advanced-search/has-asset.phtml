@@ -1,0 +1,28 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var array $query
+ */
+
+$translate = $this->plugin('translate');
+?>
+
+<?php
+$element = new \Laminas\Form\Element\Radio('has_asset');
+$element
+    ->setLabel('Use an asset as thumbnail') // @translate
+    ->setLabelAttributes(['class' => 'type-radio'])
+    ->setValueOptions([
+        '1' => 'Has asset', // @translate
+        '0' => 'Has no asset', // @translate
+        // Should be last because of "0".
+        '' => 'Any', // @translate
+    ])
+    ->setValue($query['has_asset'] ?? '')
+    ->setAttributes([
+        'id' => 'has_asset',
+        'class' => 'query-has-asset',
+        'value' => $query['has_asset'] ?? '',
+        'aria-label' => $translate('Search by use of an asset as thumbnail'), // @translate
+    ]);
+echo $this->formRow($element);

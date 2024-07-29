@@ -542,6 +542,13 @@ class SearchFilters extends AbstractHelper
                         : $translate('no'); // @translate
                     break;
 
+                case 'has_asset':
+                    $filterLabel = $translate('Has asset as thumbnail'); // @translate
+                    $filters[$filterLabel][$this->urlQuery($key)] = $value
+                        ? $translate('yes') // @translate
+                        : $translate('no'); // @translate
+                    break;
+
                 case 'media_types':
                     $filterLabel = $translate('Media types'); // @translate
                     foreach ($flatArray($value) as $subKey => $subValue) {

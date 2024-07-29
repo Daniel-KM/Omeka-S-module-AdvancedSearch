@@ -287,6 +287,7 @@ class SearchingFilters extends AbstractHelper
                 case 'filter':
                 case 'has_original':
                 case 'has_thumbnails':
+                case 'has_asset':
                 case 'media_types':
                 case 'resource_class_term':
                     break;

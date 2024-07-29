@@ -1240,6 +1240,16 @@ class SearchResources
                 ->addOrderBy($matchOrder, $sortOrder);
         }
 
+        if (isset($query['has_asset']) && (string) $query['has_asset'] !== '') {
+            if ($query['has_asset']) {
+                $qb
+                    ->andWhere($expr->isNotNull('omeka_root.thumbnail'));
+            } else {
+                $qb
+                    ->andWhere($expr->isNull('omeka_root.thumbnail'));
+            }
+        }
+
         return $this;
     }
 

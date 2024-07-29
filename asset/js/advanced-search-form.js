@@ -90,6 +90,7 @@ $(document).ready(function() {
             // Advanced Search.
             'has_original',
             'has_thumbnails',
+            'has_asset',
             // Data Type Geometry.
             'geo[box]',
             'geo[zone]',

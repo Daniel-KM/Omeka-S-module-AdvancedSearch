@@ -17,8 +17,8 @@ $displayCount = !empty($options['display_count']);
 $isTree = is_array($tree);
 ?>
 
-<ul class="search-facet-items">
-    <?php foreach ($facetValues as $k => $facetValue):
+<ul class="facet-items">
+    <?php foreach ($facetValues as $facetValue):
         $escapedValue = $escapeAttr($facetValue['value']);
         $escapedId = $name . '[]' . $escapedValue;
         $label = $displayCount
@@ -27,7 +27,7 @@ $isTree = is_array($tree);
         $treeVal = $isTree ? $tree[$facetValue['value']] ?? null : null;
         $treeValAttrs = $treeVal ? sprintf(' data-value="%s" data-parent="%s" data-level="%s"', $treeVal['id'], $treeVal['parent'], $treeVal['level']) : '';
     ?>
-    <li class="search-facet-item <?= $facetValue['active'] ? 'active' : 'inactive' ?>"<?= $treeValAttrs ?>>
+    <li class="facet-item <?= $facetValue['active'] ? 'active' : 'inactive' ?>"<?= $treeValAttrs ?>>
         <input type="checkbox" name="<?= "facet[$name][]" ?>" id="<?= $escapedId ?>" value="<?= $escapedValue ?>"<?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($facetValue['url']) . '"' : '' ?><?= $facetValue['active'] ? ' checked="checked"' : '' ?>/>
         <label for="<?= $escapedId ?>"><?= $label ?></label>
     </li>

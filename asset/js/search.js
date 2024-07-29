@@ -188,23 +188,23 @@ $(document).ready(function() {
 
     /* Facets. */
 
-    $('.search-facets-active a').on('click', function(e) {
+    $('.facets-active a').on('click', function(e) {
         // Reload with the link when there is no button to apply facets.
-        if (!$('.apply-facets').length) {
+        if (!$('.facets-apply').length) {
             return true;
         }
         e.preventDefault();
         $(this).closest('li').hide();
         var facetName = $(this).data('facetName');
         var facetValue = $(this).data('facetValue');
-        $('.search-facet-item input:checked').each(function() {
+        $('.facet-item input:checked').each(function() {
             if ($(this).prop('name') === facetName
                 && $(this).prop('value') === String(facetValue)
             ) {
                 $(this).prop('checked', false);
             }
         });
-        $('select.search-facet-items option:selected').each(function() {
+        $('select.facet-items option:selected').each(function() {
             if ($(this).closest('select').prop('name') === facetName
                 && $(this).prop('value') === String(facetValue)
             ) {
@@ -226,14 +226,14 @@ $(document).ready(function() {
         }
     });
 
-    $('.search-facets').on('change', 'input[type=checkbox]', function() {
-        if (!$('.apply-facets').length && $(this).data('url')) {
+    $('.facets').on('change', 'input[type=checkbox]', function() {
+        if (!$('.facets-apply').length && $(this).data('url')) {
             window.location = $(this).data('url');
         }
     });
 
-    $('.search-facets').on('change', 'select', function() {
-        if (!$('#apply-facets').length) {
+    $('.facets').on('change', 'select', function() {
+        if (!$('#facets-apply').length) {
             // Replace the current select args by new ones.
             // Names in facets may have no index in array ("[]") when it is a multiple one.
             // But the select may be a single select too, in which case the url is already in data.

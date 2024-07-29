@@ -15,22 +15,22 @@ $translate = $plugins->get('translate');
 $escapeAttr = $plugins->get('escapeHtmlAttr');
 
 $texts = [
-    'from' => $translate('%1$s: from %2$s'), // @translate
-    'to' => $translate('%1$s: to %2$s'), // @translate
-    'default' => $translate('%1$s: %2$s'), // @translate
+    'from' => $translate('from %1$s'), // @translate
+    'to' => $translate('to %1$s'), // @translate
+    'default' => '%1$s',
 ];
 ?>
 
-<ul class="search-facets-active">
-    <?php
-    foreach ($activeFacets as $name => $facetValues) foreach ($facetValues as $facetKey => $facetValue):
-        $text = $texts[$facetKey] ?? $texts['default'];
-        ?>
-    <li><?= sprintf('<a class="facet-active" href="%1$s" data-facet-name="facet[%2$s][%3$s]" data-facet-value="%4$s">%5$s</a>',
-        $escapeAttr($facetValue['url']),
-        $escapeAttr($name),
-        is_numeric($facetKey) ? '' : $escapeAttr($facetKey),
-        $escapeAttr($facetValue['value']),
-        $escape(sprintf($text, $translate($facetValue['fieldLabel']), $facetValue['label']))) ?></li>
+<ul class="facets-active">
+    <?php foreach ($activeFacets as $name => $facetValues) foreach ($facetValues as $facetKey => $facetValue): ?>
+    <li class="facet-active">
+        <span class="facet-active-label"><?= $escape($translate($facetValue['fieldLabel'])) ?></span>
+        <?= sprintf('<a class="facet-active-value" href="%1$s" data-facet-name="facet[%2$s][%3$s]" data-facet-value="%4$s">%5$s</a>',
+            $escapeAttr($facetValue['url']),
+            $escapeAttr($name),
+            is_numeric($facetKey) ? '' : $escapeAttr($facetKey),
+            $escapeAttr($facetValue['value']),
+            $escape(sprintf($texts[$facetKey] ?? $texts['default'], $facetValue['label']))) ?>
+    </li>
     <?php endforeach; ?>
 </ul>

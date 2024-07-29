@@ -44,7 +44,7 @@ if (!empty($itemSet)) {
 }
 ?>
 
-<div class="search-facets-content">
+<div class="facets">
 
     <?php if ($label = $searchConfig->subSetting('facet', 'label', $translate('Facets'))): ?>
     <h3><?= $escape($label) ?></h3>
@@ -66,12 +66,12 @@ if (!empty($itemSet)) {
         <?php $displayButtonReset = $displayReset === 'above' || $displayReset === 'both'; ?>
         <?php $displayButtonSubmit = $displayFacetButton && ($displaySubmit === 'above' || $displaySubmit === 'both'); ?>
         <?php if ($displayButtonReset || $displayButtonSubmit): ?>
-        <div class="apply-facets apply-facets-top">
+        <div class="facets-apply facets-apply-top">
             <?php if ($displayButtonSubmit): ?>
-            <button id="apply-facets" type="submit"><?= $labelSubmit ?></button>
+            <button id="facets-apply" type="submit"><?= $labelSubmit ?></button>
             <?php endif; ?>
             <?php if ($displayButtonReset): ?>
-            <button id="reset-facets" type="reset"><?= $labelReset ?></button>
+            <button id="facets-reset" type="reset"><?= $labelReset ?></button>
             <?php endif; ?>
         </div>
         <?php endif; ?>
@@ -81,10 +81,10 @@ if (!empty($itemSet)) {
         <p><?= $escape($label) ?></p>
         <?php endif; ?>
         <?php else: ?>
-        <ul class="search-facets-list">
+        <ul class="facets-list">
             <?php foreach ($facets as $name => $facetValues): ?>
             <?php $facetOptions = $searchFacets[$name]; ?>
-            <li class="search-facet">
+            <li class="facet">
                 <h4><?= $escape($translate($facetOptions['label'] ?? $name)) ?></h4>
                 <?= $facetElements($name, $facetValues, $facetOptions) ?>
             </li>
@@ -95,12 +95,12 @@ if (!empty($itemSet)) {
         <?php $displayButtonReset = $displayReset === 'below' || $displayReset === 'both'; ?>
         <?php $displayButtonSubmit = $displayFacetButton && ($displaySubmit === 'below' || $displaySubmit === 'both'); ?>
         <?php if ($displayButtonReset || $displayButtonSubmit): ?>
-        <div class="apply-facets apply-facets-bottom">
+        <div class="facets-facets facets-apply-bottom">
             <?php if ($displayButtonSubmit): ?>
-            <button id="apply-facets" type="submit"><?= $labelSubmit ?></button>
+            <button id="facets-apply" type="submit"><?= $labelSubmit ?></button>
             <?php endif; ?>
             <?php if ($displayButtonReset): ?>
-            <button id="reset-facets" type="reset"><?= $labelReset ?></button>
+            <button id="facets-reset" type="reset"><?= $labelReset ?></button>
             <?php endif; ?>
         </div>
         <?php endif; ?>

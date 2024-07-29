@@ -16,12 +16,12 @@ $displayCount = !empty($options['display_count']);
 $isTree = is_array($tree);
 ?>
 
-<ul class="search-facet-items">
+<ul class="facet-items">
     <?php foreach ($facetValues as $facetValue):
         $treeVal = $isTree ? $tree[$facetValue['value']] ?? null : null;
         $treeValAttrs = $treeVal ? sprintf(' data-value="%s" data-parent="%s" data-level="%s"', $treeVal['id'], $treeVal['parent'], $treeVal['level']) : '';
     ?>
-    <li class="search-facet-item <?= $facetValue['active'] ? 'active' : 'inactive' ?>"<?= $treeValAttrs ?>>
+    <li class="facet-item <?= $facetValue['active'] ? 'active' : 'inactive' ?>"<?= $treeValAttrs ?>>
         <a href="<?= $escapeAttr($facetValue['url']) ?>">
             <span>
                 <?= $escape($facetValue['label']) ?>

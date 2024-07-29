@@ -44,11 +44,8 @@ $multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['lis
 <?php // Active Facets. ?>
 
 <?php if (isset($displayParts['active_facets']) && $activeFacets = $response->getActiveFacets()): ?>
-    <?php
-    $facetActives = $plugins->get('facetActives');
-    $options = $searchConfig->setting('facet', []);
-    ?>
-<?= $facetActives(null, $activeFacets, $options) ?>
+<?php $facetActives = $plugins->get('facetActives'); ?>
+<?= $facetActives(null, $activeFacets, $searchConfig->setting('facet', [])) ?>
 <?php endif; ?>
 
 <?php // Total results. ?>

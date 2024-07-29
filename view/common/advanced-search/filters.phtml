@@ -123,19 +123,20 @@ if ($isSiteRequest) {
                 </select>
                 <?= $fieldSelect([
                     'name' => $stem . '[field]',
+                    'options' => [
+                        'term_as_value' => true,
+                        'empty_option' => '',
+                        'apply_templates' => $applyTemplates,
+                        'query' => $optionsQuery,
+                        // Used terms in site are already managed by vocabulary scope, but only for items.
+                        'used_terms' => $usedTerms,
+                    ],
                     'attributes' => [
                         'class' => 'query-filter query-property chosen-select',
                         'value' => $fieldList,
                         'aria-label' => $translate('Metadata'), // @translate
                         'multiple' => true,
                         'data-placeholder' => '[any metadata]', // @translate
-                    ],
-                    'options' => [
-                        'empty_option' => '',
-                        'apply_templates' => $applyTemplates,
-                        'query' => $optionsQuery,
-                        // Used terms in site are already managed by vocabulary scope, but only for items.
-                        'used_terms' => $usedTerms,
                     ],
                 ]) ?>
                 <select class="query-type chosen-select" name="<?= $escape($stem . '[type]') ?>" aria-label="<?= $translate('Query type') ?>">

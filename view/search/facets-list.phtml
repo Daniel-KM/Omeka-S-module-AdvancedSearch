@@ -10,7 +10,10 @@
  * @var ?\Omeka\Api\Representation\ItemSetRepresentation $itemSet
  */
 
-if (!isset($response) || empty($searchConfig->subSetting('facet', 'facets'))) return;
+if (!isset($response)) return;
+
+$searchFacets = $searchConfig->subSetting('facet', 'facets');
+if (!count($searchFacets)) return;
 
 $plugins = $this->getHelperPluginManager();
 $escape = $plugins->get('escapeHtml');
@@ -32,11 +35,7 @@ $labelSubmit = $displaySubmit ? $searchConfig->subSetting('facet', 'label_submit
 $labelReset = $displayReset ? $searchConfig->subSetting('facet', 'label_reset', $translate('Reset facets')) : null;
 
 $facetActives = $plugins->get('facetActives');
-// Facet checkbox can be used in any case anyway, the js checks it.
-$facetElements = $isFacetModeButton ? $plugins->get('facetCheckboxes') : $plugins->get('facetLinks');
-$facetSelect = $plugins->get('facetSelect');
-$facetSelectRange = $plugins->get('facetSelectRange');
-$facetElementsTree = $isFacetModeButton ? $plugins->get('facetCheckboxesTree') : $plugins->get('facetLinksTree');
+$facetElements = $plugins->get('facetElements');
 
 // Don't display facets for item sets when browsing an item set.
 if (!empty($itemSet)) {
@@ -82,18 +81,10 @@ $options = $searchConfig->setting('facet', []);
         <?php else: ?>
         <ul class="search-facets-list">
             <?php foreach ($facets as $name => $facetValues): ?>
-            <?php $facetType = empty($options['facets'][$name]['type']) ? 'Checkbox' : $options['facets'][$name]['type']; ?>
+            <?php $facetOptions = $searchFacets[$name] + $options; ?>
             <li class="search-facet">
-                <h4><?= $escape($translate($options['facets'][$name]['label'] ?? $name)) ?></h4>
-                <?php if ($facetType === 'Select'): ?>
-                <?= $facetSelect($name, $facetValues, $options) ?>
-                <?php elseif ($facetType === 'SelectRange'): ?>
-                <?= $facetSelectRange($name, $facetValues, $options) ?>
-                <?php elseif ($facetType === 'Tree' || $facetType === 'Thesaurus'): ?>
-                <?= $facetElementsTree($name, $facetValues, $options) ?>
-                <?php else: ?>
-                <?= $facetElements($name, $facetValues, $options) ?>
-                <?php endif; ?>
+                <h4><?= $escape($translate($facetOptions['label'] ?? $name)) ?></h4>
+                <?= $facetElements($name, $facetValues, $facetOptions) ?>
             </li>
             <?php endforeach; ?>
         </ul>

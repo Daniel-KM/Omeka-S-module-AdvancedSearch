@@ -55,6 +55,7 @@ return [
             'facetActives' => View\Helper\FacetActives::class,
             'facetCheckboxes' => View\Helper\FacetCheckboxes::class,
             'facetCheckboxesTree' => View\Helper\FacetCheckboxesTree::class,
+            'facetElements' => View\Helper\FacetElements::class,
             'facetLinks' => View\Helper\FacetLinks::class,
             'facetLinksTree' => View\Helper\FacetLinksTree::class,
             'facetSelect' => View\Helper\FacetSelect::class,

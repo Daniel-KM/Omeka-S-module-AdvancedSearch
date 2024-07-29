@@ -70,6 +70,8 @@ class SearchResources extends AbstractPlugin
             'new' => 'ew',
             'near' => 'nnear',
             'nnear' => 'near',
+            'ma' => 'nma',
+            'nma' => 'ma',
             // Comparison.
             'lt' => 'gte',
             'lte' => 'gt',
@@ -149,6 +151,7 @@ class SearchResources extends AbstractPlugin
             'nsw',
             'new',
             'nnear',
+            'nma',
             'nlist',
             // Resource.
             'nres',
@@ -1051,7 +1054,6 @@ class SearchResources extends AbstractPlugin
      *   - new: does not end with
      *   - near: is similar to
      *   - nnear: is not similar to
-     *   Reserved for future implementation (already in Solr)
      *   - ma: matches a simple regex
      *   - nma: does not match a simple regex
      *   Comparisons (alphabetical)
@@ -1379,6 +1381,23 @@ class SearchResources extends AbstractPlugin
                         // A soundex on a uri has no meaning.
                         $expr->eq("SOUNDEX($valuesAlias.uri)", "SOUNDEX($param)")
                         */
+                    );
+                    break;
+
+                case 'ma':
+                    // The doctrine dql requires "true" and will be converted to
+                    // a standard mysql query.
+                    $param = $this->adapter->createNamedParameter($qb, $value);
+                    $subqueryAlias = $this->adapter->createAlias();
+                    $subquery = $entityManager
+                        ->createQueryBuilder()
+                        ->select("$subqueryAlias.id")
+                        ->from('Omeka\Entity\Resource', $subqueryAlias)
+                        ->where("REGEXP($subqueryAlias.title, $param) = TRUE");
+                    $predicateExpr = $expr->orX(
+                        $expr->in("$valuesAlias.valueResource", $subquery->getDQL()),
+                        "REGEXP($valuesAlias.value, $param) = TRUE",
+                        "REGEXP($valuesAlias.uri, $param) = TRUE"
                     );
                     break;
 

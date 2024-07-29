@@ -22,6 +22,8 @@ trait SearchFiltersTrait
                 'new' => $translate('does not end with'), // @translate
                 'near' => $translate('is similar to'), // @translate
                 'nnear' => $translate('is not similar to'), // @translate
+                'ma' => $translate('matches'), // @translate
+                'nma' => $translate('does not match'), // @translate
                 // Comparison (alphabetical).
                 'lt' => $translate('lower than'), // @translate
                 'lte' => $translate('lower than or equal'), // @translate

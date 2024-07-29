@@ -118,7 +118,7 @@ $(document).ready(function() {
             'seconds',
             'integer',
         ];
-        const propertyQueryTypeWithText = ['eq', 'neq', 'in', 'nin', 'sw', 'nsw', 'ew', 'new', 'near', 'nnear', 'lt', 'lte', 'gte', 'gt', 'list', 'nlist', 'res', 'nres', 'resq', 'nresq', 'lres', 'nlres', 'lkq', 'nlkq', 'dtp', 'ndtp', 'tp', 'ntp'];
+        const propertyQueryTypeWithText = ['eq', 'neq', 'in', 'nin', 'sw', 'nsw', 'ew', 'new', 'near', 'nnear', 'ma', 'nma', 'lt', 'lte', 'gte', 'gt', 'list', 'nlist', 'res', 'nres', 'resq', 'nresq', 'lres', 'nlres', 'lkq', 'nlkq', 'dtp', 'ndtp', 'tp', 'ntp'];
         form.find(":input[name]:not([name='']):not(:disabled)").each(function(index) {
             const input = $(this);
             const inputName = input.attr('name');

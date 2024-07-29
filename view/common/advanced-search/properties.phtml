@@ -144,6 +144,8 @@ if ($isSiteRequest) {
                         <?= $queryOption('new', $property, 'type', $translate('does not end with')) ?>
                         <?= $queryOption('near', $property, 'type', $translate('is similar to')) ?>
                         <?= $queryOption('nnear', $property, 'type', $translate('is not similar to')) ?>
+                        <?= $queryOption('ma', $property, 'type', $translate('matches')) ?>
+                        <?= $queryOption('nma', $property, 'type', $translate('does not match')) ?>
                     </optgroup>
                     <optgroup label="<?= $translate('Resource') ?>">
                         <?= $queryOption('res', $property, 'type', $translate('is resource with ID')) ?>

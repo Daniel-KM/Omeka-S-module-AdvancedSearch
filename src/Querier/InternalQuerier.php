@@ -894,6 +894,14 @@ SQL;
                 'sort_by' => 'total',
                 'sort_order' => 'DESC',
             ],
+            'values asc' => [
+                'sort_by' => 'values',
+                'sort_order' => 'ASC',
+            ],
+            'values desc' => [
+                'sort_by' => 'values',
+                'sort_order' => 'DESC',
+            ],
             'default' => [
                 'sort_by' => 'alphabetic',
                 'sort_order' => 'ASC',

@@ -264,6 +264,40 @@ $(document).ready(function() {
         }
     });
 
+    // Reset facets, except hidden elements. Active facets are kept.
+    $('#facets-reset').on('click', function () {
+        $(this).closest('form')
+            // Manage range and numeric separately to manage all the cases.
+            .find('input[type=range]').each(function(index, element) {
+                if ((element.max && element.name.includes('[to]'))
+                    || (element.className && element.className.includes('-to'))
+                 ) {
+                    element.value = element.max;
+                    element.defaultValue = element.value;
+                    controlSliderTo(element);
+                } else {
+                    element.value = typeof element.min === 'undefined' ? '0' : element.min;
+                    element.defaultValue = element.value;
+                    controlSliderFrom(element);
+                }
+            }).end()
+            .find('input[type=number]').each(function(index, element) {
+                if ((element.max && element.name.includes('[to]'))
+                    || (element.className && element.className.includes('-to'))
+                 ) {
+                    element.value = element.max;
+                    element.defaultValue = element.value;
+                    controlNumericTo(element);
+                } else {
+                    element.value = typeof element.min === 'undefined' ? '0' : element.min;
+                    element.defaultValue = element.value;
+                    controlNumericFrom(element);
+                }
+            }).end()
+            .find(':radio, :checkbox').removeAttr('checked').end()
+            .find('textarea, :text, select').val('');
+    });
+
     function facetExpandOrCollapse(button) {
         button = $(button);
         if (button.hasClass('expand')) {

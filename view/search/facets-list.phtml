@@ -27,8 +27,8 @@ $activeFacets = $response->getActiveFacets();
 $facets = array_filter($facets);
 
 $isFacetModeButton = $searchConfig->subSetting('facet', 'mode') !== 'link';
-$displayFacetButton = $isFacetModeButton && !empty($facets);
 $displayActive = (bool) $searchConfig->subSetting('facet', 'display_active', true);
+$displayFacetButton = $isFacetModeButton && ($displayActive || !empty($facets));
 $displaySubmit = $displayFacetButton ? $searchConfig->subSetting('facet', 'display_submit', 'above') : 'none';
 $labelSubmit = $displaySubmit ? $searchConfig->subSetting('facet', 'label_submit', $translate('Apply facets')) : null;
 $displayReset = $searchConfig->subSetting('facet', 'display_reset', 'above');
@@ -67,12 +67,12 @@ if (!empty($itemSet)) {
         <?php $displayButtonReset = $displayReset === 'above' || $displayReset === 'both'; ?>
         <?php $displayButtonSubmit = $displayFacetButton && ($displaySubmit === 'above' || $displaySubmit === 'both'); ?>
         <?php if ($displayButtonReset || $displayButtonSubmit): ?>
-        <div class="facets-apply facets-apply-top">
+        <div class="facets-actions facets-actions-top">
             <?php if ($displayButtonSubmit): ?>
-            <button id="facets-apply" type="submit"><?= $labelSubmit ?></button>
+            <button id="facets-apply" class="facets-apply" type="submit"><?= $escape($labelSubmit) ?></button>
             <?php endif; ?>
             <?php if ($displayButtonReset): ?>
-            <button id="facets-reset" type="reset"><?= $labelReset ?></button>
+            <button id="facets-reset" class="facets-reset" type="reset"><?= $escape($labelReset) ?></button>
             <?php endif; ?>
         </div>
         <?php endif; ?>
@@ -108,12 +108,12 @@ if (!empty($itemSet)) {
         <?php $displayButtonReset = $displayReset === 'below' || $displayReset === 'both'; ?>
         <?php $displayButtonSubmit = $displayFacetButton && ($displaySubmit === 'below' || $displaySubmit === 'both'); ?>
         <?php if ($displayButtonReset || $displayButtonSubmit): ?>
-        <div class="facets-facets facets-apply-bottom">
+        <div class="facets-actions facets-actions-bottom">
             <?php if ($displayButtonSubmit): ?>
-            <button id="facets-apply" type="submit"><?= $labelSubmit ?></button>
+            <button id="facets-apply" class="facets-apply" type="submit"><?= $escape($labelSubmit) ?></button>
             <?php endif; ?>
             <?php if ($displayButtonReset): ?>
-            <button id="facets-reset" type="reset"><?= $labelReset ?></button>
+            <button id="facets-reset" class="facets-reset" type="reset"><?= $escape($labelReset) ?></button>
             <?php endif; ?>
         </div>
         <?php endif; ?>

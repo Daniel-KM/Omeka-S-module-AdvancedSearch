@@ -234,6 +234,29 @@ class SearchConfigConfigureForm extends Form
             ->get('form')
 
             ->add([
+                'name' => 'button_submit',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Add a button "submit"', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'button_submit',
+                ],
+            ])
+            ->add([
+                'name' => 'label_submit',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Label for submit', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'label_submit',
+                    'required' => false,
+                    'value' => 'Search', // @translate
+                    'placeholder' => 'Search', // @translate
+                ],
+            ])
+            ->add([
                 'name' => 'button_reset',
                 'type' => Element\Checkbox::class,
                 'options' => [
@@ -244,13 +267,16 @@ class SearchConfigConfigureForm extends Form
                 ],
             ])
             ->add([
-                'name' => 'button_submit',
-                'type' => Element\Checkbox::class,
+                'name' => 'label_reset',
+                'type' => Element\Text::class,
                 'options' => [
-                    'label' => 'Add a button "submit"', // @translate
+                    'label' => 'Label for reset', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'button_submit',
+                    'id' => 'label_reset',
+                    'required' => false,
+                    'value' => 'Reset fields', // @translate
+                    'placeholder' => 'Reset fields', // @translate
                 ],
             ])
             ->add([

@@ -37,18 +37,21 @@ return [
             'fill_input' => false,
         ],
 
+        // All filters except "advanced" are managed the same via querier:
+        // a form is a query configurator.
         'form' => [
-            // All filters except "advanced" are managed the same via querier:
-            // a form is a query configurator.
-            'button_reset' => true,
             'button_submit' => true,
+            'label_submit' => $translate('Search'),
+            'button_reset' => false,
+            'label_reset' => $translate('Reset fields'),
             'attribute_form' => false,
 
             'filters' => [
                 // Ordered list of specific filters.
                 'item_set_id' => [
                     'field' => 'item_set_id',
-                    'label' => $translate('Collection'),
+                    // A end user doesn't knwo "item set", but "collection".
+                    'label' => $translate('Collection'), // @ŧranslate
                     'type' => 'Omeka/MultiSelect',
                 ],
                 'resource_class_id' => [

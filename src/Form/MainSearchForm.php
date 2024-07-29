@@ -320,7 +320,7 @@ class MainSearchForm extends Form
                     'name' => 'reset',
                     'type' => Element\Button::class,
                     'options' => [
-                        'label' => 'Reset fields', // @translate
+                        'label' => $this->formSettings['form']['label_reset'] ?: 'Reset fields', // @translate
                         'label_attributes' => [
                             'class' => 'search-reset',
                         ],
@@ -339,7 +339,7 @@ class MainSearchForm extends Form
                     'name' => 'submit',
                     'type' => Element\Button::class,
                     'options' => [
-                        'label' => 'Search', // @translate
+                        'label' => $this->formSettings['form']['label_submit'] ?: 'Search', // @translate
                         'label_attributes' => [
                             'class' => 'search-submit',
                         ],

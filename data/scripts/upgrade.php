@@ -733,3 +733,87 @@ SET
 SQL;
     $connection->executeStatement($sql);
 }
+
+if (version_compare($oldVersion, '3.4.28', '<')) {
+    $stringsAndMessages = [
+        'facet_filters' => [
+            'strings' => [
+                'themes/*/view/search/*' => [
+                    'facet_filters',
+                ],
+            ],
+            'message' => 'The option "facet_filters" was removed. Update the theme to use facets instead. Matching templates: {json}', // @translate
+        ],
+        'facetLabel' => [
+            'strings' => [
+                'themes/*/view/search/*' => [
+                    'facetLabel(',
+                ],
+            ],
+            'message' => 'The view helper "facetLabel()" was removed. Update the theme and get the label directly from the each facet config: replace `$facetLabel($name)` by `$facetOptions[\'label\'] ?: $name)`. Matching templates: {json}', // @translate
+        ],
+        'searchForm' => [
+            'strings' => [
+                'themes/*/view/common/block-layout/searching-form*' => [
+                    'searchForm(',
+                ],
+                'themes/*/view/search/*' => [
+                    'searchForm(',
+                ],
+            ],
+            'message' => 'The view helper `searchForm()` was removed. You should replace it with `$searchConfig->renderForm([])`. Matching templates: {json}', // @translate
+        ],
+        'facets' => [
+            'strings' => [
+                'themes/*/view/search/*' => [
+                    "search/facets'",
+                ],
+            ],
+            'message' => 'The template "search/facets" was renamed "search/facets-list". Update it in your theme. Matching templates: {json}', // @translate
+        ],
+        'resource-list' => [
+            'strings' => [
+                'themes/*/view/search/*' => [
+                    "search/resource-list'",
+                ],
+            ],
+            'message' => 'The template "search/resource-list" was renamed "search/results". Update your theme. Matching templates: {json}', // @translate
+        ],
+        'results-header-footer' => [
+            'strings' => [
+                'themes/*/view/search/*' => [
+                    "search/results-header'",
+                ],
+                'themes/*/view/search/*' => [
+                    "search/results-footer'",
+                ],
+            ],
+            'message' => 'The templates "search/results-header" and "search/results-footer" were replaced by "search/results-header-footer". Remove them in your theme. Matching templates: {json}', // @translate
+        ],
+        'per_pages' => [
+            'strings' => [
+                'themes/*/view/search/*' => [
+                    "'per_pages'",
+                ],
+            ],
+            'message' => 'The key "per_pages" was renamed "per_page". Update your theme. Matching templates: {json}', // @translate
+        ],
+    ];
+    $manageModuleAndResources = $this->getManageModuleAndResources();
+    $results = [];
+    foreach ($stringsAndMessages as $key => $stringsAndMessage) foreach ($stringsAndMessage['strings'] as $path => $strings) {
+        $result = $manageModuleAndResources->checkStringsInFiles($strings, $path);
+        if ($result) {
+            $results[$key][trim(basename($path), '*')] = $result;
+        }
+    }
+    if ($results) {
+        $messages = [];
+        foreach ($results as $key => $result) {
+            $message = new PsrMessage($stringsAndMessages[$key]['message'], ['json' => json_encode($result, 448)]);
+            $message->setTranslator($translator);
+            $messages[] = $message;
+        }
+        throw new \Omeka\Module\Exception\ModuleCannotInstallException(implode("\n\n", array_map('strval', $messages)));
+    }
+}

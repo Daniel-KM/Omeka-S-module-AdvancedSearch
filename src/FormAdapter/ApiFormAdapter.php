@@ -243,29 +243,7 @@ class ApiFormAdapter implements FormAdapterInterface
                     }
                     $value = $list;
                     // no break;
-                case 'neq':
-                case 'nin':
-                case 'in':
-                case 'nsw':
-                case 'sw':
-                case 'new':
-                case 'ew':
-                case 'nma':
-                case 'ma':
-                case 'nnear':
-                case 'near':
-                case 'nres':
-                case 'res':
-                case 'nex':
-                case 'ex':
-                case 'nexs':
-                case 'exs':
-                case 'nexm':
-                case 'exm':
-                case 'nlex':
-                case 'lex':
-                case 'nlres':
-                case 'lres':
+                case isset(SearchResources::PROPERTY_QUERY['reciprocal'][$queryType]):
                     $query->addFilterQuery($propertyField, $value, $queryType);
                     break;
 

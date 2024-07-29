@@ -29,11 +29,15 @@
 
 namespace AdvancedSearch\Form\SearchFilter;
 
+use AdvancedSearch\Mvc\Controller\Plugin\SearchResources;
+use AdvancedSearch\View\Helper\SearchFiltersTrait;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 
 class Advanced extends Fieldset
 {
+    use SearchFiltersTrait;
+
     public function init(): void
     {
         $filterFields = $this->getFilterFields();
@@ -92,57 +96,9 @@ class Advanced extends Fieldset
 
         $operator = (bool) $this->getOption('field_operator');
         if ($operator) {
-            $operators = $this->getOption('field_operators') ?: [
-                'eq' => 'is exactly', // @translate
-                'neq' => 'is not exactly', // @translate
-                'in' => 'contains', // @translate
-                'nin' => 'does not contain', // @translate
-                'sw' => 'starts with', // @translate
-                'nsw' => 'does not start with', // @translate
-                'ew' => 'ends with', // @translate
-                'new' => 'does not end with', // @translate
-                'near' => 'is similar to', // @translate
-                'nnear' => 'is not similar to', // @translate
-                'ex' => 'has any value', // @translate
-                'nex' => 'has no values', // @translate
-                'exs' => 'has a single value', // @translate
-                'nexs' => 'has not a single value', // @translate
-                'exm' => 'has multiple values', // @translate
-                'nexm' => 'has not multiple values', // @translate
-                'res' => 'is resource with ID', // @translate
-                'nres' => 'is not resource with ID', // @translate
-                'resq' => 'is resource matching query', // @translate
-                'nresq' => 'is not resource matching query', // @translate
-                'lex' => 'is a linked resource', // @translate
-                'nlex' => 'is not a linked resource', // @translate
-                'lres' => 'is linked with resource with ID', // @translate
-                'nlres' => 'is not linked with resource with ID', // @translate
-                'lkq' => 'is linked with resources matching query', // @translate
-                'nlkq' => 'is not linked with resources matching query', // @translate
-                /*
-                'list',
-                'nlist',
-                'res',
-                'nres',
-                'tp'…,
-                 */
-            ];
+            $operators = $this->getOption('field_operators') ?: $this->getQueryTypesLabels();
             if ($joiner && $joinerNot) {
-                unset(
-                    $operators['neq'],
-                    $operators['nin'],
-                    $operators['nsw'],
-                    $operators['new'],
-                    $operators['nnear'],
-                    $operators['nex'],
-                    $operators['nexs'],
-                    $operators['nexm'],
-                    $operators['nres'],
-                    $operators['nresq'],
-                    $operators['nlex'],
-                    $operators['nlres'],
-                    $operators['nlkq']
-                );
+                $operators = array_diff_key($operators, array_flip(SearchResources::PROPERTY_QUERY['negative']));
             }
             $this
                 ->add([

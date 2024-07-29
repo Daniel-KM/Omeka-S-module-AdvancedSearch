@@ -383,7 +383,7 @@ advanced = Filters = Advanced',
                 'type' => OmekaElement\ArrayTextarea::class,
                 'options' => [
                     'label' => 'List of operators', // @translate
-                    'info' => 'The default list is: eq, neq, in, nin, sw, nsw, ew, new, ex, nex, res, nres. Negative operators are removed when the joiner "not" is used. The default operators are used when empty. Other advanced operators can be used.', // @translate
+                    'info' => 'The default list is the full list available in advanced standard search form. Negative operators are removed when the joiner "not" is used.', // @translate
                     'as_key_value' => true,
                     'key_value_separator' => '=',
                 ],
@@ -398,14 +398,6 @@ sw = starts with
 nsw = does not start with
 ew = ends with
 new = does not end with
-ex = has any value
-nex = has no values
-res = is resource with ID
-nres = is not resource with ID
-lex = is a linked resource
-nlex = is not a linked resource
-lres = is linked with resource with ID
-nlres = is not linked with resource with ID
 ',
                     'rows' => 12,
                 ],

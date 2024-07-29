@@ -39,6 +39,11 @@ class InternalAdapter extends AbstractAdapter
         return $availableFields = array_merge($fields, $propertyLabelsByTerms);
     }
 
+    public function getAvailableFacetFields(): array
+    {
+        return $this->getAvailableFields();
+    }
+
     public function getAvailableSortFields(): array
     {
         static $sortFields;
@@ -82,11 +87,6 @@ class InternalAdapter extends AbstractAdapter
         }
 
         return $sortFields;
-    }
-
-    public function getAvailableFacetFields(): array
-    {
-        return $this->getAvailableFields();
     }
 
     public function getAvailableFieldsForSelect(): array
@@ -157,6 +157,11 @@ class InternalAdapter extends AbstractAdapter
         $fields = array_filter($fields);
 
         return $fields;
+    }
+
+    public function getAvailableFacetFieldsForSelect(): array
+    {
+        return $this->getAvailableFieldsForSelect();
     }
 
     public function getAvailableSortFieldsForSelect(): array

@@ -457,16 +457,38 @@ class SearchConfigController extends AbstractActionController
         }
         $settings['form']['filters'] = array_values($settings['form']['filters'] ?? []);
 
-        // Remove the mode of each facet to simplify config.
-        // Simplify some values too (integer and boolean).
+        $facetInputs = [
+            'field',
+            'label',
+            'type',
+            'order',
+            'limit',
+            'state',
+            'more',
+            'display_count',
+        ];
         $settings['facet']['mode'] = ($settings['facet']['mode'] ?? null) === 'link' ? 'link' : 'button';
         foreach ($settings['facet']['facets'] ?? [] as $key => $facet) {
+            // Remove the mode of each facet to simplify config.
             unset($facet['mode']);
-            if (isset($facet['limit'])) {
-                $facet['limit'] = (int) $facet['limit'];
-            }
+            // Simplify some values too (integer and boolean).
             if (isset($facet['display_count'])) {
                 $facet['display_count'] = (bool) $facet['display_count'];
+            }
+            foreach (['limit', 'more', 'min', 'max'] as $k) {
+                if (isset($facet[$k])) {
+                    if ($facet[$k] === '') {
+                        unset($facet[$k]);
+                    } else {
+                        $facet[$k] = (int) $facet[$k];
+                    }
+                }
+            }
+            // Move specific settings to options.
+            foreach ($facet as $k => $v) {
+                if (!in_array($k, $facetInputs)) {
+                    $facet['options'][$k] = $v;
+                }
             }
             $settings['facet']['facets'][$key] = $facet;
         }
@@ -539,6 +561,12 @@ class SearchConfigController extends AbstractActionController
                 unset($filter['type']);
             }
 
+            foreach ($filter as $k => $v) {
+                if ($v === null || $v === '' || $v === []) {
+                    unset($filter[$k]);
+                }
+            }
+
             $name = is_numeric($name) ? $field : $name;
             $name = $this->slugify($name);
             if ($name !== 'advanced' && isset($filters[$name])) {
@@ -566,12 +594,6 @@ class SearchConfigController extends AbstractActionController
         $params['form']['filters'] = $filters;
         $params['form']['advanced'] = $advanced;
 
-        // Add the mode to each facet to simplify theme.
-        // Simplify some values too (integer and boolean).
-        // TODO Explode array options ("|" and "," are supported) early or keep user input?
-        // Furthermore, add a warning for languages of facets because it may be
-        // a hard to understand issue.
-
         $sortList = [];
         foreach ($params['display']['sort_list'] ?? [] as $sort) {
             if (!empty($sort['name'])) {
@@ -586,6 +608,7 @@ class SearchConfigController extends AbstractActionController
         $i = 0;
         foreach ($params['facet']['facets'] ?? [] as $name => $facet) {
             if (empty($facet['field'])) {
+                unset($params['facet']['facets'][$name]);
                 continue;
             }
             $field = $facet['field'];
@@ -594,19 +617,45 @@ class SearchConfigController extends AbstractActionController
             if (isset($facets[$name])) {
                 $name .= '_' . ++$i;
             }
+            // Add the mode to each facet to simplify theme.
             $facet['mode'] = $facetMode;
-            if (isset($facet['limit'])) {
-                $facet['limit'] = (int) $facet['limit'];
+            // Move specific settings to the root of the array.
+            foreach ($facet['options'] as $k => $v) {
+                $facet[$k] = $v;
             }
+            unset($facet['options']);
+            // Simplify some values (empty string, integer and boolean).
             if (isset($facet['display_count'])) {
                 $facet['display_count'] = (bool) $facet['display_count'];
             }
+            foreach (['limit', 'more', 'min', 'max'] as $k) {
+                if (isset($facet[$k])) {
+                    if ($facet[$k] === '') {
+                        unset($facet[$k]);
+                    } else {
+                        $facet[$k] = (int) $facet[$k];
+                    }
+                }
+            }
+            foreach ($facet as $k => $v) {
+                if ($v === null || $v === '' || $v === []) {
+                    unset($facet[$k]);
+                }
+            }
+            // Add a warning for languages of facets because it may be a hard to
+            // understand issue.
             if (!empty($facet['languages'])) {
                 $facet['languages'] = array_values(array_unique(array_map('trim', $facet['languages'])));
                 if (!empty($facet['languages']) && !in_array('', $facet['languages'])) {
                     $warnLanguage = true;
                 }
             }
+            foreach ($facet as $k => $v) {
+                if ($v === null || $v === '' || $v === []) {
+                    unset($facet[$k]);
+                }
+            }
+            // TODO Explode array options ("|" and "," are supported) early or keep user input?
             $facets[$name] = $facet;
         }
         $params['facet']['facets'] = $facets;
@@ -654,9 +703,11 @@ class SearchConfigController extends AbstractActionController
                 }
             }
         }
+
         $collections = [
             'form'=> 'filters',
             'display' => 'sort_list',
+            'facet' => 'facets',
         ];
         foreach ($collections as $mainName => $name) {
             foreach ($params[$mainName][$name] ?? [] as $key => $data) {
@@ -664,6 +715,7 @@ class SearchConfigController extends AbstractActionController
                 $params[$mainName][$name][$key] = $data;
             }
         }
+
         return $params;
     }
 

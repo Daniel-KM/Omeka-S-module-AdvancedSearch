@@ -80,20 +80,20 @@ interface AdapterInterface
     public function getAvailableFields(): array;
 
     /**
-     * Get the available sort fields.
-     *
-     * @return array Associative array with sort name as key and an array with
-     * sort name and sort label as value.
-     */
-    public function getAvailableSortFields(): array;
-
-    /**
      * Get the available facet fields.
      *
      * @return array Associative array with facet name as key and an array with
      * facet name and facet label as value.
      */
     public function getAvailableFacetFields(): array;
+
+    /**
+     * Get the available sort fields.
+     *
+     * @return array Associative array with sort name as key and an array with
+     * sort name and sort label as value.
+     */
+    public function getAvailableSortFields(): array;
 
     /**
      * Get available fields usable in a laminas form element "select".
@@ -106,6 +106,18 @@ interface AdapterInterface
      * or grouped according to Laminas select.
      */
     public function getAvailableFieldsForSelect(): array;
+
+    /**
+     * Get available facet fields usable in a laminas form element "select".
+     *
+     * Options may be grouped.
+     *
+     * @see https://docs.laminas.dev/laminas-form/v3/element/select/#basic-usage
+     *
+     * @return array Associative array with field name as key and label as value,
+     * or grouped according to Laminas select.
+     */
+    public function getAvailableFacetFieldsForSelect(): array;
 
     /**
      * Get available sort fields usable in a laminas form element "select".

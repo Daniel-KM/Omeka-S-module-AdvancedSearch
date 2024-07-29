@@ -35,16 +35,10 @@ use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
 use Laminas\Mvc\I18n\Translator;
-use Laminas\View\Helper\EscapeHtml;
 use Omeka\Form\Element as OmekaElement;
 
 class SearchConfigConfigureForm extends Form
 {
-    /**
-     * @var \Laminas\View\Helper\EscapeHtml
-     */
-    protected $escapeHtml;
-
     /**
      * @var \Laminas\Form\FormElementManager
      */
@@ -813,6 +807,11 @@ class SearchConfigConfigureForm extends Form
         // Settings for the results (facets).
         // TODO Add the count or not.
 
+        /** @var \AdvancedSearch\Form\Admin\SearchConfigFacetFieldset $facetFieldset */
+        $facetFieldset = $this->formElementManager->get(SearchConfigFacetFieldset::class, [
+            'search_config' => $this->getOption('search_config'),
+        ]);
+
         $this
             ->add([
                 'name' => 'facet',
@@ -964,46 +963,41 @@ class SearchConfigConfigureForm extends Form
             ])
             ->add([
                 'name' => 'facets',
-                'type' => CommonElement\IniTextarea::class,
+                'type' => Element\Collection::class,
                 'options' => [
-                    'label' => 'Facets', // @translate
+                    'label' => 'Facets', // @ŧranslate
                     'info' => 'List of facets that will be displayed in the search page, formatted as ini. The section is a unique name. Keys are: field, label, type, order, limit, state, more, languages, data_types, main_types, values, display_count, and specific options, like thesaurus, min and max.', // @translate
-                    // TODO Convert documentation into help. See application/view/common/form-row.phtml
-                    'documentation' => nl2br(<<<'MARKDOWN'
-                        #"></a><div class="field-description">
-                        - Input types may be Checkbox (default), RangeDouble, Select, SelectRange, Thesaurus, Tree.
-                        - For "RangeDouble" and "SelectRange", the minimum and maximum should be set as "min" and "max", and "step" too.
-                        - With type "Thesaurus", the option "thesaurus" should be set with the id. It requires the module Thesaurus.
-                        - "Tree" can be used for item sets when module ItemSetsTree is enabled and data indexed recursively.
-                        - "languages" allows to filter values by language. It is a single or list of language codes. To get the values without language too, use "null" or append "|" to the string.
-                        - "data_types" allows to filter values by some specific data types, for example a custom vocab.
-                        - "main_types" allows to filter values by main data type ("literal", "uri" or "resource").
-                        - "values" allows to filter values by a list of values.
-                        - "order" may be "alphabetic" (asc, default), "alphabetic desc", "total" (desc), "total asc", "values" (asc), "values desc".
-                        - "state" defines the state of a facet and may be "static" (default, that is open), "expand" or "collapse".
-                        </div><a style="display: none" href="#
-                        MARKDOWN), // @translate
-                    'ini_typed_mode' => true,
+                    'count' => 0,
+                    'allow_add' => true,
+                    'allow_remove' => true,
+                    'should_create_template' => true,
+                    'template_placeholder' => '__index__',
+                    'create_new_objects' => true,
+                    'target_element' => $facetFieldset,
                 ],
                 'attributes' => [
                     'id' => 'facet_facets',
-                    'rows' => 12,
-                    'placeholder' => '',
+                    'required' => false,
+                    'class' => 'form-fieldset-collection',
+                    'data-label-index' => $this->translator->translate('Facet {index}'), // @ŧranslate
                 ],
             ])
             ->add([
-                'name' => 'available_facets',
-                'type' => OmekaElement\ArrayTextarea::class,
+                'name' => 'plus',
+                'type' => Element\Button::class,
                 'options' => [
-                    'label' => 'Available facets', // @translate
-                    'info' => 'List of all available facets, among which some can be copied above.', // @translate
-                    'as_key_value' => true,
-                    'key_value_separator' => '=',
+                    'label' => ' ',
+                    'label_options' => [
+                        'disable_html_escape' => true,
+                    ],
+                    'label_attributes' => [
+                        'class' => 'search-fieldset-action-label',
+                    ],
                 ],
                 'attributes' => [
-                    'id' => 'facet_available_facets',
-                    'value' => $this->getAvailableFacetFields(),
-                    'rows' => 12,
+                    // Don't use o-icon-add.
+                    'class' => 'search-fieldset-action search-fieldset-plus fa fa-plus add-value button',
+                    'aria-label' => 'Add a facet', // @translate
                 ],
             ])
         ;
@@ -1073,30 +1067,6 @@ class SearchConfigConfigureForm extends Form
 
         $this->add($fieldset);
 
-        return $this;
-    }
-
-    protected function getAvailableFacetFields(): array
-    {
-        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
-        $searchConfig = $this->getOption('search_config');
-        $searchEngine = $searchConfig->engine();
-        $searchAdapter = $searchEngine->adapter();
-        if (empty($searchAdapter)) {
-            return [];
-        }
-
-        $options = [];
-        $fields = $searchAdapter->setSearchEngine($searchEngine)->getAvailableFacetFields();
-        foreach ($fields as $name => $field) {
-            $options[$name] = $field['label'] ?? $name;
-        }
-        return $options;
-    }
-
-    public function setEscapeHtml(EscapeHtml $escapeHtml): self
-    {
-        $this->escapeHtml = $escapeHtml;
         return $this;
     }
 

@@ -1188,9 +1188,9 @@ if (version_compare($oldVersion, '3.4.29', '<')) {
         $facetMode = ($facetConfig['mode'] ?? null) === 'link' ? 'link' : 'button';
         // Invert option to filter available or all facets when option is set.
         if (isset($facetConfig['list']) || empty($facetConfig['display_list'])) {
-            $facetList = $facetConfig['list'] === 'all' ? 'all' : 'available';
+            $facetList = ($facetConfig['list'] ?? '') === 'all' ? 'all' : 'available';
         } else {
-            $facetList = $facetConfig['display_list'] === 'available' ? 'all' : 'available';
+            $facetList = ($facetConfig['display_list'] ?? '') === 'available' ? 'all' : 'available';
         }
         $facetConfigNew = [
             'label' => $facetConfig['label'] ?? $translate('Facets'),

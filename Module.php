@@ -428,6 +428,7 @@ class Module extends AbstractModule
         $siteSlug = $status->getRouteParam('site-slug');
         if (!$siteSlug) {
             $helpers = $services->get('ViewHelperManager');
+            // This check is used when module Common is upgraded.
             if ($helpers->has('defaultSite')) {
                 $defaultSite = $helpers->get('defaultSite');
                 $siteSlug = $defaultSite('slug');
@@ -435,9 +436,10 @@ class Module extends AbstractModule
                 $defaultSite = (int) $settings->get('default_site');
                 if ($defaultSite) {
                     try {
-                        $site = $api->read('sites', ['id' => $defaultSite])->getContent();
+                        $site = $helpers->get('api')->read('sites', ['id' => $defaultSite])->getContent();
                         $siteSlug = $site->slug();
                     } catch (\Exception $e) {
+                        // No default site slug.
                     }
                 }
             }

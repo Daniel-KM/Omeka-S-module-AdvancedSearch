@@ -34,7 +34,7 @@ use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Site\Navigation\Link\LinkInterface;
 use Omeka\Stdlib\ErrorStore;
 
-class SearchPage implements LinkInterface
+class SearchingPage implements LinkInterface
 {
     public function getName()
     {
@@ -61,7 +61,7 @@ class SearchPage implements LinkInterface
 
     public function getFormTemplate()
     {
-        return 'common/navigation-link-form/search-page';
+        return 'common/navigation-link-form/searching-page';
     }
 
     public function toZend(array $data, SiteRepresentation $site)

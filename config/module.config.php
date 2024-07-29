@@ -129,7 +129,7 @@ return [
     ],
     'navigation_links' => [
         'invokables' => [
-            'search-page' => Site\Navigation\Link\SearchPage::class,
+            'searchingPage' => Site\Navigation\Link\SearchingPage::class,
         ],
     ],
     'controllers' => [

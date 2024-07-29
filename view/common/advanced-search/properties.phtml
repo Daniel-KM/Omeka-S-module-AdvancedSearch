@@ -150,6 +150,10 @@ if ($isSiteRequest) {
                         <?= $queryOption('lte', $property, 'type', $translate('lower than or equal')) ?>
                         <?= $queryOption('gte', $property, 'type', $translate('greater than or equal')) ?>
                         <?= $queryOption('gt', $property, 'type', $translate('greater than')) ?>
+                        <?= $queryOption('<', $property, 'type', '<') ?>
+                        <?= $queryOption('≤', $property, 'type', '≤') ?>
+                        <?= $queryOption('≥', $property, 'type', '≥') ?>
+                        <?= $queryOption('>', $property, 'type', '>') ?>
                     </optgroup>
                     <optgroup label="<?= $translate('Resource') ?>">
                         <?= $queryOption('res', $property, 'type', $translate('is resource with ID')) ?>

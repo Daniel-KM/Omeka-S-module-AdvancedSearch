@@ -5,6 +5,7 @@ namespace AdvancedSearch\Mvc\Controller\Plugin;
 use DateTime;
 use DateTimeZone;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
@@ -77,6 +78,10 @@ class SearchResources extends AbstractPlugin
             'lte' => 'gt',
             'gte' => 'lt',
             'gt' => 'lte',
+            '<' => '<',
+            '≤' => '≤',
+            '≥' => '≥',
+            '>' => '>',
             // Internal.
             'list' => 'nlist',
             'nlist' => 'list',
@@ -1076,6 +1081,11 @@ class SearchResources extends AbstractPlugin
      *   - lte: lower than or equal
      *   - gte: greater than or equal
      *   - gt: greater than
+     *   Comparisons (numerical, with casting to float/integer):
+     *   - <: lower than
+     *   - ≤: lower than or equal
+     *   - ≥: greater than or equal
+     *   - >: greater than
      *   Internal, deprecated (any type can have multiple values)
      *   - list: is in list
      *   - nlist: is not in list
@@ -1237,6 +1247,14 @@ class SearchResources extends AbstractPlugin
                         continue;
                     }
                     $value = (int) $value;
+                } elseif (in_array($queryType, ['<', '≤', '≥', '>'])) {
+                    // The types "integer" and "string" are automatically
+                    // infered from the php type.
+                    // Warning: "float" is managed like string in mysql via pdo.
+                    if (is_numeric($value)) {
+                        $int = (int) $value;
+                        $value = $int == $value ? $int : $value;
+                    }
                 }
             }
 
@@ -1440,6 +1458,28 @@ class SearchResources extends AbstractPlugin
                         "$valuesAlias.value",
                         $this->adapter->createNamedParameter($qb, $value)
                     );
+                    break;
+
+                case '<':
+                    // Use adapter method in order to increment internal index.
+                    $param = $this->adapter->createNamedParameter($qb, $value);
+                    $qb->setParameter(substr($param, 1), $value, is_int($value) ? ParameterType::INTEGER : ParameterType::STRING);
+                    $predicateExpr = $expr->lt("$valuesAlias.value", $param);
+                    break;
+                case '≤':
+                    $param = $this->adapter->createNamedParameter($qb, $value);
+                    $qb->setParameter(substr($param, 1), $value, is_int($value) ? ParameterType::INTEGER : ParameterType::STRING);
+                    $predicateExpr = $expr->lte("$valuesAlias.value", $param);
+                    break;
+                case '≥':
+                    $param = $this->adapter->createNamedParameter($qb, $value);
+                    $qb->setParameter(substr($param, 1), $value, is_int($value) ? ParameterType::INTEGER : ParameterType::STRING);
+                    $predicateExpr = $expr->gte("$valuesAlias.value", $param);
+                    break;
+                case '>':
+                    $param = $this->adapter->createNamedParameter($qb, $value);
+                    $qb->setParameter(substr($param, 1), $value, is_int($value) ? ParameterType::INTEGER : ParameterType::STRING);
+                    $predicateExpr = $expr->gt("$valuesAlias.value", $param);
                     break;
 
                 case 'res':

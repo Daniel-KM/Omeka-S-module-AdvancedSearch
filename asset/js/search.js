@@ -77,6 +77,10 @@ var Search = (function() {
             'lte',
             'gte',
             'gt',
+            '<',
+            '≤',
+            '≥',
+            '>',
         ],
         withoutValue: [
             'ex',

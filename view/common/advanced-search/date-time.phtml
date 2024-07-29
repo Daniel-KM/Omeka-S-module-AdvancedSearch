@@ -68,12 +68,12 @@ $queryInputText = function (array $search, $engine) use ($translate, $escape) {
             echo $this->formSelect($select);
             ?>
             <select class="query-type chosen-select" name="<?= $escape($stem . '[type]') ?>" aria-label="<?= $translate('Query type') // @translate ?>">
-                <?= $querySelectOption('lt', $datetime, 'type', $translate('before')) // @translate ?>
-                <?= $querySelectOption('lte', $datetime, 'type', $translate('before or on')) // @translate ?>
+                <?= $querySelectOption('<', $datetime, 'type', $translate('before')) // @translate ?>
+                <?= $querySelectOption('≤', $datetime, 'type', $translate('before or on')) // @translate ?>
                 <?= $querySelectOption('eq', $datetime, 'type', $translate('on')) // @translate ?>
                 <?= $querySelectOption('neq', $datetime, 'type', $translate('not on')) // @translate ?>
-                <?= $querySelectOption('gte', $datetime, 'type', $translate('after or on')) // @translate ?>
-                <?= $querySelectOption('gt', $datetime, 'type', $translate('after')) // @translate ?>
+                <?= $querySelectOption('≥', $datetime, 'type', $translate('after or on')) // @translate ?>
+                <?= $querySelectOption('>', $datetime, 'type', $translate('after')) // @translate ?>
                 <?= $querySelectOption('ex', $datetime, 'type', $translate('has any date / time')) // @translate ?>
                 <?= $querySelectOption('nex', $datetime, 'type', $translate('has no date / time')) // @translate ?>
             </select>

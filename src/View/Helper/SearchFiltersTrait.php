@@ -29,6 +29,11 @@ trait SearchFiltersTrait
                 'lte' => $translate('lower than or equal'), // @translate
                 'gte' => $translate('greater than or equal'), // @translate
                 'gt' => $translate('greater than'), // @translate
+                // Comparison (numerical).
+                '<' => '<',
+                '≤' => '≤',
+                '≥' => '≥',
+                '>' => '>',
                 // Internal.
                 'list' => $translate('is in list'), // @translate
                 'nlist' => $translate('is not in list'), // @translate

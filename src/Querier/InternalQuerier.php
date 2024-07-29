@@ -699,7 +699,7 @@ SQL;
                         $this->args['property'][] = [
                             'joiner' => 'and',
                             'property' => $field,
-                            'type' => 'gte',
+                            'type' => '≥',
                             'text' => $values['from'],
                         ];
                     }
@@ -707,7 +707,7 @@ SQL;
                         $this->args['property'][] = [
                             'joiner' => 'and',
                             'property' => $field,
-                            'type' => 'lte',
+                            'type' => '≤',
                             'text' => $values['to'],
                         ];
                     }
@@ -783,7 +783,7 @@ SQL;
                     $this->args[$argName][] = [
                         'joiner' => 'and',
                         'property' => $field,
-                        'type' => 'gte',
+                        'type' => '≥',
                         'text' => $filterValue['from'],
                     ];
                 }
@@ -791,7 +791,7 @@ SQL;
                     $this->args[$argName][] = [
                         'joiner' => 'and',
                         'property' => $field,
-                        'type' => 'lte',
+                        'type' => '≤',
                         'text' => $filterValue['to'],
                     ];
                 }

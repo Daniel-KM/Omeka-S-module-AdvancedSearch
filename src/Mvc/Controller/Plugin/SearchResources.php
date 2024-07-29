@@ -2,6 +2,7 @@
 
 namespace AdvancedSearch\Mvc\Controller\Plugin;
 
+use Common\Stdlib\EasyMeta;
 use DateTime;
 use DateTimeZone;
 use Doctrine\DBAL\Connection;
@@ -19,39 +20,6 @@ use Omeka\Api\Request;
 
 class SearchResources extends AbstractPlugin
 {
-    /**
-     * @var \Doctrine\DBAL\Connection
-     */
-    protected $connection;
-
-    /**
-     * The adapter used to build the query.
-     *
-     * @var \Omeka\Api\Adapter\AbstractResourceEntityAdapter
-     */
-    protected $adapter;
-
-    /**
-     * List of used property ids by term.
-     *
-     * @var array
-     */
-    protected $usedPropertiesByTerm;
-
-    /**
-     * List of resource class ids by term and id.
-     *
-     * @var array
-     */
-    protected $resourceClassesByTermsAndIds;
-
-    /**
-     * List of used resource class ids by term.
-     *
-     * @var array
-     */
-    protected $usedResourceClassesByTerm;
-
     /**
      * Tables of all query types and their behaviors.
      *
@@ -276,9 +244,27 @@ class SearchResources extends AbstractPlugin
         ],
     ];
 
-    public function __construct(Connection $connection)
+    /**
+     * The adapter used to build the query.
+     *
+     * @var \Omeka\Api\Adapter\AbstractResourceEntityAdapter
+     */
+    protected $adapter;
+
+    /**
+     * @var \Doctrine\DBAL\Connection
+     */
+    protected $connection;
+
+    /**
+     * @var \Common\Stdlib\EasyMeta
+     */
+    protected $easyMeta;
+
+    public function __construct(Connection $connection, EasyMeta $easyMeta)
     {
         $this->connection = $connection;
+        $this->easyMeta = $easyMeta;
     }
 
     public function __invoke(): self
@@ -853,9 +839,7 @@ class SearchResources extends AbstractPlugin
         // So resource.resourceType or resource.resource_type cannot be used,
         // so use isInstanceOf, that does the same.
 
-        /** @var \Common\Stdlib\EasyMeta $easyMeta */
-        $easyMeta = $this->adapter->getServiceLocator()->get('Common\EasyMeta');
-        $entityClasses = array_unique($easyMeta->entityResourceClasses($resourceTypes));
+        $entityClasses = array_unique($this->easyMeta->entityResourceClasses($resourceTypes));
         if (!$entityClasses) {
             $qb
                 ->andWhere($qb->expr()->eq(0, 1));
@@ -1134,12 +1118,12 @@ class SearchResources extends AbstractPlugin
         // When there are only fake classes, no result should be returned, so 0
         // should be used.
         if (is_array($query['resource_class_term'])) {
-            $classIds = $this->getResourceClassIds($query['resource_class_term']);
+            $classIds = $this->easyMeta->resourceClassIds($query['resource_class_term']);
             if (empty($classIds)) {
                 $classIds = [0];
             }
         } else {
-            $classIds = [(int) $this->getResourceClassId($query['resource_class_term'])];
+            $classIds = [(int) $this->easyMeta->resourceClassId($query['resource_class_term'])];
         }
 
         $qb->andWhere($qb->expr()->in(
@@ -1296,9 +1280,6 @@ class SearchResources extends AbstractPlugin
         $expr = $qb->expr();
         $entityManager = $this->adapter->getEntityManager();
 
-        // Initialize properties and used properties one time.
-        $this->getPropertyIds();
-
         foreach ($query['property'] as $queryRow) {
             if (!is_array($queryRow)
                 || empty($queryRow['type'])
@@ -1387,7 +1368,7 @@ class SearchResources extends AbstractPlugin
             if (is_array($propertyIds) && in_array('', $propertyIds, true)) {
                 $propertyIds = [];
             } elseif ($propertyIds) {
-                $propertyIds = array_values(array_unique($this->getPropertyIds($propertyIds)));
+                $propertyIds = array_values(array_unique($this->easyMeta->propertyIds($propertyIds)));
                 $fakePropertyIds = empty($propertyIds);
             }
 
@@ -1850,12 +1831,12 @@ class SearchResources extends AbstractPlugin
                 // TODO What if a property is ""?
                 $excludePropertyIds = $propertyIds || empty($queryRow['except'])
                     ? false
-                    : array_values(array_unique($this->getPropertyIds($queryRow['except'])));
+                    : array_values(array_unique($this->easyMeta->propertyIds($queryRow['except'])));
                 // Use standard query if nothing to exclude, else limit search.
                 if ($excludePropertyIds) {
                     // The aim is to search anywhere except ocr content.
                     // Use not positive + in() or notIn()? A full list is simpler.
-                    $otherIds = array_diff($this->usedPropertiesByTerm, $excludePropertyIds);
+                    $otherIds = array_diff($this->easyMeta->propertyIdsUsed(), $excludePropertyIds);
                     // Avoid issue when everything is excluded.
                     $otherIds[] = 0;
                     if (in_array($queryType, self::PROPERTY_QUERY['value_subject'])) {
@@ -2535,109 +2516,6 @@ class SearchResources extends AbstractPlugin
             return date('L', mktime(0, 0, 0, 1, 1, $year)) ? 29 : 28;
         } else {
             return 31;
-        }
-    }
-
-    /**
-     * Get one or more property ids by JSON-LD terms or by numeric ids.
-     *
-     * @fixme Factorize with \Common\Stdlib\EasyMeta::propertyIds() (differences: return used properties).
-     *
-     * @param array|int|string|null $termsOrIds One or multiple ids or terms.
-     * @return int[] The property ids matching terms or ids, or all properties
-     * by terms.
-     */
-    protected function getPropertyIds($termsOrIds = null): array
-    {
-        static $propertiesByTerms;
-        static $propertiesByTermsAndIds;
-
-        if (is_null($propertiesByTermsAndIds)) {
-            $qb = $this->connection->createQueryBuilder();
-            $qb
-                ->select(
-                    'DISTINCT CONCAT(vocabulary.prefix, ":", property.local_name) AS term',
-                    'property.id AS id',
-                    // Required with only_full_group_by.
-                    'vocabulary.id'
-                )
-                ->from('property', 'property')
-                ->innerJoin('property', 'vocabulary', 'vocabulary', 'property.vocabulary_id = vocabulary.id')
-                ->orderBy('vocabulary.id', 'asc')
-                ->addOrderBy('property.id', 'asc')
-            ;
-            $propertiesByTerms = array_map('intval', $this->connection->executeQuery($qb)->fetchAllKeyValue());
-            $propertiesByTermsAndIds = array_replace($propertiesByTerms, array_combine($propertiesByTerms, $propertiesByTerms));
-
-            $qb->innerJoin('property', 'value', 'value', 'property.id = value.property_id');
-            $this->usedPropertiesByTerm = array_map('intval', $this->connection->executeQuery($qb)->fetchAllKeyValue());
-        }
-
-        if (is_null($termsOrIds)) {
-            return $propertiesByTerms;
-        }
-
-        if (is_scalar($termsOrIds)) {
-            return isset($propertiesByTermsAndIds[$termsOrIds])
-                ? [$termsOrIds => $propertiesByTermsAndIds[$termsOrIds]]
-                : [];
-        }
-
-        // TODO Keep original order.
-        return array_intersect_key($propertiesByTermsAndIds, array_fill_keys($termsOrIds, null));
-    }
-
-    /**
-     * Get resource class ids by JSON-LD terms or by numeric ids.
-     *
-     * @return int[]
-     */
-    protected function getResourceClassIds(array $termsOrIds): array
-    {
-        if (is_null($this->resourceClassesByTermsAndIds)) {
-            $this->prepareResourceClasses();
-        }
-        return array_values(array_intersect_key($this->resourceClassesByTermsAndIds, array_flip($termsOrIds)));
-    }
-
-    /**
-     * Get resource class id by JSON-LD term or by numeric id.
-     */
-    protected function getResourceClassId($termOrId): ?int
-    {
-        if (is_null($this->resourceClassesByTermsAndIds)) {
-            $this->prepareResourceClasses();
-        }
-        return $this->resourceClassesByTermsAndIds[$termOrId] ?? null;
-    }
-
-    /**
-     * Prepare the list of resource classes and used resource classes by term.
-     *
-     * @fixme Factorize with \Common\Stdlib\EasyMeta::resourceClassIds() (differences: return used classes).
-     */
-    protected function prepareResourceClasses(): self
-    {
-        if (is_null($this->resourceClassesByTermsAndIds)) {
-            $qb = $this->connection->createQueryBuilder();
-            $qb
-                ->select(
-                    'CONCAT(vocabulary.prefix, ":", resource_class.local_name) AS term',
-                    'resource_class.id AS id',
-                    // Required with only_full_group_by.
-                    'vocabulary.id'
-                )
-                ->from('resource_class', 'resource_class')
-                ->innerJoin('resource_class', 'vocabulary', 'vocabulary', 'resource_class.vocabulary_id = vocabulary.id')
-                ->orderBy('vocabulary.id', 'asc')
-                ->addOrderBy('resource_class.id', 'asc')
-            ;
-            $resourceClasses = array_map('intval', $this->connection->executeQuery($qb)->fetchAllKeyValue());
-            $this->resourceClassesByTermsAndIds = array_replace($resourceClasses, array_combine($resourceClasses, $resourceClasses));
-
-            $qb->innerJoin('resource_class', 'resource', 'resource', 'resource_class.id = resource.resource_class_id');
-            $this->usedResourceClassesByTerm = array_map('intval', $this->connection->executeQuery($qb)->fetchAllKeyValue());
-            return $this;
         }
     }
 }

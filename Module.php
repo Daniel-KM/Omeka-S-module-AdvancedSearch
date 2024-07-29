@@ -1312,12 +1312,13 @@ SQL;
         $suggesterId = (int) $connection->fetchOne($sqlSuggesterId);
 
         if (!$suggesterId) {
+            $mainIndex = $translate('Main index'); // @translate
             // Create the internal suggester.
             $sql = <<<SQL
 INSERT INTO `search_suggester`
 (`engine_id`, `name`, `settings`, `created`)
 VALUES
-($searchEngineId, 'Internal suggester (sql)', ?, NOW());
+($searchEngineId, "$mainIndex", ?, NOW());
 SQL;
             $suggesterSettings = require __DIR__ . '/data/configs/search_suggester.internal.php';
             $connection->executeStatement($sql, [

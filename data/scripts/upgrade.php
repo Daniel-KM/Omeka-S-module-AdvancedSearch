@@ -540,7 +540,6 @@ if (version_compare($oldVersion, '3.4.24', '<')) {
 
     $logger = $services->get('Omeka\Logger');
     $pageRepository = $entityManager->getRepository(\Omeka\Entity\SitePage::class);
-    $blocksRepository = $entityManager->getRepository(\Omeka\Entity\SitePageBlock::class);
 
     $viewHelpers = $services->get('ViewHelperManager');
     $escape = $viewHelpers->get('escapeHtml');
@@ -549,7 +548,6 @@ if (version_compare($oldVersion, '3.4.24', '<')) {
     $pagesUpdated = [];
     $pagesUpdated2 = [];
     foreach ($pageRepository->findAll() as $page) {
-        $pageId = $page->getId();
         $pageSlug = $page->getSlug();
         $siteSlug = $page->getSite()->getSlug();
         $position = 0;
@@ -559,7 +557,6 @@ if (version_compare($oldVersion, '3.4.24', '<')) {
             if ($layout !== 'searchingForm') {
                 continue;
             }
-            $blockId = $block->getId();
             $data = $block->getData() ?: [];
 
             $heading = $data['heading'] ?? '';
@@ -1217,7 +1214,7 @@ if (version_compare($oldVersion, '3.4.29', '<')) {
             if (!$field) {
                 continue;
             }
-            // Options are no more used.
+            // Options are no more used for facets.
             $optionsOptions = empty($facet['options'])
                 ? []
                 : (is_scalar($facet['options']) ? ['options' => $facet['options']] : $facet['options']);
@@ -1232,8 +1229,8 @@ if (version_compare($oldVersion, '3.4.29', '<')) {
                 // Store the facet mode in each facet to simplify theme.
                 'mode' => $facetMode,
             ];
-            // Until this version, only two options were managed: thesaurus and
-            // main types, exclusively.
+            // Until this version, only two options were managed for facets:
+            // thesaurus and main types, exclusively.
             if (strcasecmp($newFacet['type'], 'thesaurus') === 0) {
                 if (empty($optionsOptions)) {
                     $newFacet['thesaurus'] = 0;
@@ -1283,4 +1280,257 @@ if (version_compare($oldVersion, '3.4.29', '<')) {
         );
         $messenger->addWarning($message);
     }
+}
+
+if (version_compare($oldVersion, '3.4.30', '<')) {
+    // Check for upgraded features.
+    $logger = $services->get('Omeka\Logger');
+    $stringsAndMessages = [
+        'resource-name' => [
+            'strings' => [
+                'themes/*/view/search/*' => [
+                    '$resourceName',
+                ],
+            ],
+            'message' => 'The variable "$resourceName" was renamed "$resourceType". Check your theme. Matching templates: {json}', // @translate
+        ],
+        'search-sort-urls' => [
+            'strings' => [
+                'themes/*/view/search/*' => [
+                    'search-sort-urls',
+                ],
+            ],
+            'message' => 'The template for sort-selector was simplified. See view/search/sort-selector.phtml. Check your theme. Matching templates: {json}', // @translate
+        ],
+        'searching-filters' => [
+            'strings' => [
+                'themes/*/view/search/*' => [
+                    'searchingFilters(',
+                ],
+            ],
+            'message' => 'The use of the view helper searchingFilters() is deprecated. Use $searchConfig->renderSearchFilters() instead. Check your theme. Matching templates: {json}', // @translate
+        ],
+    ];
+    $manageModuleAndResources = $this->getManageModuleAndResources();
+    $results = [];
+    foreach ($stringsAndMessages as $key => $stringsAndMessage) foreach ($stringsAndMessage['strings'] as $path => $strings) {
+        $result = $manageModuleAndResources->checkStringsInFiles($strings, $path);
+        if (!$result) {
+            continue;
+        }
+        $results[$key][] = $result;
+    }
+    if ($results) {
+        foreach ($results as $key => $result) {
+            $message = new PsrMessage($stringsAndMessages[$key]['message'], ['json' => json_encode($result, 448)]);
+            $logger->err($message->getMessage(), $message->getContext());
+            $messenger->addWarning($message);
+        }
+    }
+
+    $qb = $connection->createQueryBuilder();
+    $qb
+        ->select('id', 'settings')
+        ->from('search_config', 'search_config')
+        ->orderBy('id', 'asc');
+    $searchConfigsSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    foreach ($searchConfigsSettings as $id => $searchConfigSettings) {
+        $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
+        // Set old options.
+        $searchConfigSettings['display']['by_resource_type'] = true;
+        $filters = [];
+        foreach ($searchConfigSettings['form']['filters'] ?? [] as $key => $filter) {
+            $field = $filter['field'];
+            if (!$field) {
+                // Normally not possible.
+                continue;
+            }
+
+            $field = $filter['field'];
+            $type = $filter['type'] ?? '';
+
+            // Normally, there is only one advanced.
+            if ($field === 'advanced' || $key === 'advanced' || mb_strtolower($type) === 'advanced') {
+                // Key is always "advanced" for advanced filters, so no duplicate.
+                $name = 'advanced';
+                $type = 'Advanced';
+                // Normalize some keys.
+                $filter['default_number'] = isset($filter['default_number']) ? (int) $filter['default_number'] : 1;
+                $filter['max_number'] = isset($filter['max_number']) ? (int) $filter['max_number'] : 10;
+                $filter['field_joiner'] = isset($filter['field_joiner']) ? !empty($filter['field_joiner']) : true;
+                $filter['field_joiner_not'] = isset($filter['field_joiner_not']) ? !empty($filter['field_joiner_not']) : true;
+                $filter['field_operator'] = isset($filter['field_operator']) ? !empty($filter['field_operator']) : true;
+                $filter['field_operators'] = isset($filter['field_operators']) ? (array) $filter['field_operators'] : [];
+                // Move advanced fields as last key for end user.
+                $filterFields = $filter['fields'] ?? [];
+                unset($filter['fields']);
+                $filter['fields'] = $filterFields;
+            } else {
+                // Normally, there is no name.
+                // The key is numeric, except when the upgrade is done twice,
+                $name = $filter['name'] ?? (is_numeric($key) ? $field : $key);
+                $name = mb_strtolower(str_replace(['-', ':'], '_', $name));
+                if (isset($filters[$name])) {
+                    $name .= '_' . $key;
+                }
+                // Simplify Omeka types: they are now deducted from the field.
+                if (mb_strtolower(mb_substr($type, 0, 5)) === 'omeka') {
+                    $type = trim(substr($type, 5), '/');
+                    // Force type for specific fields.
+                    $cleanField = preg_replace('/[^a-z]+/u', '', strtolower($field));
+                    if (substr($cleanField, 0, 12) === 'resourcename' || substr($cleanField, 0, 12) === 'resourcetype') {
+                        $type = 'Select';
+                    } elseif ((substr($cleanField, 0, 2) === 'id' || substr($cleanField, 0, 3) === 'oid')
+                        && (substr($cleanField, 0, 10) !== 'identifier')
+                    ) {
+                        $type = 'Select';
+                    } elseif (substr($cleanField, 0, 8) === 'ispublic' || substr($cleanField, 0, 9) === 'oispublic') {
+                        $type = 'Checkbox';
+                    } elseif (substr($cleanField, 0, 5) === 'owner' || substr($cleanField, 0, 6) === 'oowner') {
+                        $type = 'Select';
+                    } elseif (substr($cleanField, 0, 4) === 'site' || substr($cleanField, 0, 5) === 'osite') {
+                        $type = 'Select';
+                    } elseif (substr($cleanField, 0, 13) === 'resourceclass' || substr($cleanField, 0, 14) === 'oresourceclass') {
+                        $type = 'Select';
+                    } elseif (substr($cleanField, 0, 16) === 'resourcetemplate' || substr($cleanField, 0, 17) === 'oresourcetemplate') {
+                        $type = 'Select';
+                    } elseif (substr($cleanField, 0, 7) === 'itemset' || substr($cleanField, 0, 8) === 'oitemset') {
+                        $type = 'Select';
+                    } elseif (substr($cleanField, 0, 6) === 'access' || substr($cleanField, 0, 7) === 'oaccess') {
+                        $type = 'Select';
+                    } elseif (substr($cleanField, 0, 12) === 'itemsetstree' || substr($cleanField, 0, 13) === 'oitemsetstree') {
+                        $type = 'Tree';
+                    } elseif (substr($cleanField, 0, 9) === 'thesaurus' || substr($cleanField, 0, 10) === 'othesaurus') {
+                        $type = 'Thesaurus';
+                    } else {
+                        $message = new PsrMessage(
+                            'The search type "{type}" is no more managed and should be migrated manually in search config #{search_config_id}.', // @translate
+                            ['type' => $filter['type'], 'search_config_id' => $id]
+                        );
+                        $messenger->addWarning($message);
+                    }
+                }
+                // Renamed DateRange.
+                if ($type === 'DateRange') {
+                    $type = 'RangeDouble';
+                    $filter['options']['first_digits'] = true;
+                } elseif ($type === 'ItemSetsTree') {
+                    $type = 'Tree';
+                }
+                // Manage specific options for filters.
+                // Use the old process of MainSearchForm to get values options.
+                if (array_key_exists('options', $filter)) {
+                    if (strcasecmp($type, 'thesaurus') === 0) {
+                        if (empty($filter['options']['id']) && empty($filter['options']['thesaurus'])) {
+                            $filter['thesaurus'] = (int) reset($filter['options']);
+                        } else {
+                            $filter['thesaurus'] = (int) ($filter['options']['thesaurus'] ?? $filter['options']['id'] ?? 0);
+                        }
+                    } elseif (strcasecmp($type, 'checkbox') === 0 && count($filter['options']) === 2) {
+                        $filter['unchecked_value'] = reset($filter['options']);
+                        $filter['checked_value'] = end($filter['options']);
+                    } elseif (strcasecmp($type, 'hidden') === 0) {
+                        $filter['value'] = is_scalar($filter['options']) ? (string) $filter['options'] : reset($filter['options']);
+                    } else {
+                        if (is_string($filter['options'])) {
+                            // TODO Explode may use another string than "|".
+                            $filter['options'] = ['value_options' => array_filter(array_map('trim', explode('|', $filter['options'])), 'strlen')];
+                        } elseif (!is_array($filter['options'])) {
+                            $filter['options'] = ['value_options' => [(string) $filter['options'] => (string) $filter['options']]];
+                        } else {
+                            $filter['options']['value_options'] = (array) $filter['options'];
+                        }
+                        // Avoid issue with duplicates.
+                        $filter['options']['value_options'] = array_filter(array_keys(array_flip($filter['options']['value_options'])), 'strlen');
+                    }
+                }
+            }
+            unset($filter['options']);
+
+            if (empty($type)) {
+                unset($filter['type']);
+            } else {
+                $filter['type'] = $type;
+            }
+            unset($filter['name']);
+            $filters[$name] = $filter;
+        }
+
+        // Manage advanced filters separately, except label, field and type.
+        $advanced = $filters['advanced'] ?? [];
+        if ($advanced) {
+            $filters['advanced'] = [
+                'field' => 'advanced',
+                'label' => $advanced['label'] ?? '',
+                'type' => 'Advanced',
+            ];
+            unset($advanced['field'], $advanced['label'], $advanced['type']);
+        }
+
+        $searchConfigSettings['form']['filters'] = $filters;
+        $searchConfigSettings['form']['advanced'] = $advanced;
+
+        foreach ($searchConfigSettings as $k => $v) {
+            if ($v === null || $v === '' || $v === []) {
+                unset($searchConfigSettings[$k]);
+            } elseif (is_array($v)) {
+                foreach ($v as $kk => $vv) {
+                    if ($vv === null || $vv === '' || $vv === []) {
+                        unset($searchConfigSettings[$k][$kk]);
+                    }
+                }
+            }
+        }
+
+        $sql = 'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?;';
+        $connection->executeStatement($sql, [json_encode($searchConfigSettings, 320), $id]);
+    }
+
+    // Engine.
+    $sql = <<<SQL
+    UPDATE `search_engine`
+    SET
+        `settings` = REPLACE(`settings`, '"resources":[', '"resource_types":[')
+    ;
+    SQL;
+    $connection->executeStatement($sql);
+
+    // Suggest.
+    $sql = 'UPDATE `search_suggester` SET `name` = ? WHERE `name` = ?;';
+    $connection->executeStatement($sql, [$translate('Main index'), 'Internal suggester (sql)']);
+
+    $message = new PsrMessage(
+        'The form simple filters is now simpler to manage.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new PsrMessage(
+        'Each simple filter can have a specific input type instead of a html input text. When a specific type is set, it is automatically filled with values from the field.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new PsrMessage(
+        'Filters are now standard Omeka or Laminas html elements, so any options and attributes can be passed from the config.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new PsrMessage(
+        'The advanced filters was restructured and new options were added to manage most common needs.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new PsrMessage(
+        'The autosuggester is now auto-submitting the selected suggestion. An option was added to keep old behavior (fill the input and stay on form).' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new PsrMessage(
+        'The autosuggester can be enabled for any filter in advanced search form.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new PsrMessage(
+        'it is now possible to display all resources (item sets, items, etc.) together in results or to separate them, like in previous versions.' // @translate
+    );
+    $messenger->addSuccess($message);
 }

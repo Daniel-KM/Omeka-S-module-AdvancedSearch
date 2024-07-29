@@ -271,10 +271,8 @@ class SearchRequestToResponse extends AbstractPlugin
         return [
             'status' => 'success',
             'data' => [
-                'site' => $site,
                 'query' => $query,
                 'response' => $response,
-                'sortOptions' => $sortOptions,
             ],
         ];
     }

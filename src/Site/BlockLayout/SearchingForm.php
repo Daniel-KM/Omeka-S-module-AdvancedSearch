@@ -120,30 +120,28 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
         $vars = [
             'block' => $block,
             'site' => $site,
-            'link' => $link,
             'searchConfig' => $searchConfig,
-            'query' => null,
+            'request' => null,
+            'link' => $link,
             // Returns results on the same page.
             'skipFormAction' => $displayResults,
             'displayResults' => $displayResults,
-            'response' => new Response,
         ];
 
         if ($displayResults) {
             $query = $data['query'] ?? [];
             $filterQuery = $data['query_filter'] ?? [];
-
             $query += $filterQuery;
 
             $request = $view->params()->fromQuery();
-            $request = array_filter($query, fn ($v) => $v !== '' && $v !== [] && $v !== null);
+            $request = array_filter($request, fn ($v) => $v !== '' && $v !== [] && $v !== null);
             if ($request) {
                 $request += $filterQuery;
                 $request = $this->validateSearchRequest($searchConfig, $form, $request) ?: $query;
             } else {
                 $request = $query;
-                $vars['query'] = $request;
             }
+            $vars['request'] = $request;
 
             $plugins = $block->getServiceLocator()->get('ControllerPluginManager');
             $searchRequestToResponse = $plugins->get('searchRequestToResponse');

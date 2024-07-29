@@ -32,6 +32,7 @@ namespace AdvancedSearch\FormAdapter;
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use AdvancedSearch\Mvc\Controller\Plugin\SearchResources;
 use AdvancedSearch\Query;
+use AdvancedSearch\Response;
 
 abstract class AbstractFormAdapter implements FormAdapterInterface
 {
@@ -114,6 +115,26 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
 
     public function renderForm(array $options = []): string
     {
+        /**
+         * @var \Laminas\Mvc\Controller\PluginManager $plugins
+         * @var \Laminas\View\HelperPluginManager $helpers
+         * @var \Omeka\Mvc\Status $status
+         * @var \AdvancedSearch\Mvc\Controller\Plugin\SearchRequestToResponse $searchRequestToResponse
+         *
+         * @see \AdvancedSearch\Controller\SearchController::searchAction()
+         */
+        $services = $this->searchConfig->getServiceLocator();
+        $plugins = $services->get('ControllerPluginManager');
+        $helpers = $services->get('ViewHelperManager');
+
+        $vars = [
+            'site' => $options['site'] ?? $helpers->get('currentSite')(),
+            'searchConfig' => $this->searchConfig,
+            'form' => null,
+            'query' => new Query,
+            'response' => new Response,
+        ];
+
         $options += [
             'template' => null,
             'skip_form_action' => false,
@@ -126,13 +147,6 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
             return '';
         }
 
-        /** @var \Laminas\View\HelperPluginManager $plugins  */
-        $plugins = $this->searchConfig->getServiceLocator()->get('ViewHelperManager');
-        /** @var \Laminas\View\Helper\Partial $partial */
-        $partial = $plugins->get('partial');
-        // In rare cases, view may be missing.
-        $view = $partial->getView();
-
         if (!$options['template']) {
             $options['template'] = $this->getFormPartial();
             if (!$options['template']) {
@@ -140,6 +154,11 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
             }
         }
 
+        /** @var \Laminas\View\Helper\Partial $partial */
+        $partial = $helpers->get('partial');
+
+        // In rare cases, view may be missing.
+        $view = $partial->getView();
         if ($view && !$view->resolver($options['template'])) {
             return '';
         }
@@ -147,25 +166,37 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
         if (!$options['skip_partial_headers']) {
             $partialHeaders = $this->getFormPartialHeaders();
             if ($partialHeaders) {
-                // No output.
-                $partial($partialHeaders, [
-                    'searchConfig' => $this->searchConfig,
-                ] + $options);
+                // No output for this partial.
+                $partial($partialHeaders, ['searchConfig' => $this->searchConfig] + $options);
             }
         }
 
         if (empty($options['skip_form_action'])) {
-            $isAdmin = $plugins->get('status')->isAdminRequest();
+            $status = $services->get('Omeka\Status');
+            $isAdmin = $status->isAdminRequest();
             $formActionUrl = $isAdmin
                 ? $this->searchConfig->adminSearchUrl()
                 : $this->searchConfig->siteUrl();
             $form->setAttribute('action', $formActionUrl);
         }
 
-        return $partial($options['template'], [
-            'searchConfig' => $this->searchConfig,
-            'form' => $form,
-        ] + $options);
+        if (!empty($options['request'])) {
+            $form->setData($options['request']);
+            $searchRequestToResponse = $plugins->get('searchRequestToResponse');
+            $result = $searchRequestToResponse($options['request'], $this->searchConfig, $vars['site']);
+            if ($result['status'] === 'fail') {
+                return '';
+            } elseif ($result['status'] === 'error') {
+                $this->messenger()->addError($result['message']);
+                return '';
+            }
+            // Data contain query and response.
+            $vars = $result['data'] + $vars;
+        }
+
+        $vars['form'] = $form;
+
+        return $partial($options['template'], $vars + $options);
     }
 
     public function toQuery(array $request, array $formSettings): Query

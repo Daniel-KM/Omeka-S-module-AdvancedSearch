@@ -4,11 +4,10 @@
  * @var \Omeka\Api\Representation\SitePageBlockRepresentation $block
  * @var \Omeka\Api\Representation\SiteRepresentation $site
  * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
- * @var \AdvancedSearch\Query|null $query
+ * @var array|null $request The user request completed with the hidden one.
  * @var array $link
  * @var bool $skipFormAction Allow to display results on same form.
  * @var bool $displayResults Display results in the same block.
- * @var \AdvancedSearch\Response $response
  */
 
 $plugins = $this->getHelperPluginManager();
@@ -18,8 +17,10 @@ $hyperlink = $plugins->get('hyperlink');
 
 <div class="block block-search">
     <?= $searchConfig->renderForm([
+        'site' => $site,
         'template' => $displayResults ? 'search/search' :  null,
         'skip_form_action' => $skipFormAction,
+        'request' => $request,
     ]) ?>
     <?php if ($link): ?>
     <div class="block-search-link">

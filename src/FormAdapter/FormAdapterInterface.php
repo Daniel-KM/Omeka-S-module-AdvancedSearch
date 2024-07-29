@@ -77,6 +77,7 @@ interface FormAdapterInterface
      *   - template (string): Use a specific template instead of the default one.
      *     This is the template of the form, not the main template of the search
      *     config.
+     *   - request (array): The request to fill the form.
      *   - skip_form_action (bool): Don't set form action, so use the current page.
      *   - skip_partial_headers (bool): Skip partial headers.
      *   - skip_values: Does not init form element values (quicker results).

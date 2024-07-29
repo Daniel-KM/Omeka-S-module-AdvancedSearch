@@ -70,6 +70,7 @@ class SearchController extends AbstractActionController
         $searchConfig = $this->api()->read('search_configs', $searchConfigId)->getContent();
 
         // TODO Factorize with rss output below.
+        /** @see \AdvancedSearch\FormAdapter\AbstractFormAdapter::renderForm() */
         $view = new ViewModel([
             // The form is set via searchConfig.
             'searchConfig' => $searchConfig,
@@ -192,9 +193,15 @@ class SearchController extends AbstractActionController
             return new JsonModel($result);
         }
 
+        $vars = [
+            'searchConfig' => $searchConfig,
+            'site' => $site,
+            'query' => $result['data']['query'],
+            'response' => $result['data']['response'],
+        ];
+
         return $view
-            ->setVariables($result['data'], true)
-            ->setVariable('searchConfig', $searchConfig);
+            ->setVariables($vars, true);
     }
 
     public function suggestAction()

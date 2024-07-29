@@ -1,7 +1,7 @@
 <?php
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
- * @var \Omeka\Api\Representation\SiteRepresentation $site
+ * @var \Omeka\Api\Representation\SiteRepresentation|null $site
  * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
  * @var \AdvancedSearch\Query $query
  * @var \AdvancedSearch\Response $response
@@ -46,7 +46,7 @@ $defaultThumbnail = '<img loading="lazy" src="' . $assetUrl('thumbnails/default.
     <?php /** @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource */
     foreach ($resources as $resource):
         // Can be simplified in the public theme.
-        $resourceUrl = $site ? $resource->siteUrl($siteSlug) : $resource->adminUrl($siteSlug);
+        $resourceUrl = isset($site) ? $resource->siteUrl($siteSlug) : $resource->adminUrl($siteSlug);
         $heading = $headingTerm ? $resource->value($headingTerm, ['lang' => $langValue]) : null;
         $heading = $heading ? $heading->asHtml() : $escape($resource->displayTitle($untitled, $langValue));
         $body = $bodyTerm ? $resource->value($bodyTerm, ['lang' => $langValue]) : null;

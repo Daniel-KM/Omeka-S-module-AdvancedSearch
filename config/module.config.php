@@ -398,11 +398,11 @@ return [
         ],
         'block_settings' => [
             'searchingForm' => [
-                'link' => '',
                 'search_config' => null,
-                'display_results' => false,
+                'display_results' => true,
                 'query' => [],
                 'query_filter' => [],
+                'link' => '',
             ],
         ],
         // This is the default list of all possible fields, allowing other modules

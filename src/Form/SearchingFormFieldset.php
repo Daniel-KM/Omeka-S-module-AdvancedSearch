@@ -16,17 +16,6 @@ class SearchingFormFieldset extends Fieldset
     {
         $this
             ->add([
-                'name' => 'o:block[__blockIndex__][o:data][link]',
-                'type' => Element\Text::class,
-                'options' => [
-                    'label' => 'Link to display', // @translate
-                    'info' => 'Formatted as "/url/full/path Label of the link".', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'search-form-link',
-                ],
-            ])
-            ->add([
                 'name' => 'o:block[__blockIndex__][o:data][search_config]',
                 'type' => Element\Select::class,
                 'options' => [
@@ -59,7 +48,7 @@ class SearchingFormFieldset extends Fieldset
                 'type' => Element\Text::class,
                 'options' => [
                     'label' => 'Query', // @translate
-                    'info' => 'Display resources using this search query. Important: use the query of the engine you use, not the browse preview one.', // @translate
+                    'info' => 'Display resources using this search query. Important: use the format of the query of the engine (standard api request or solr).', // @translate
                 ],
                 'attributes' => [
                     'id' => 'searching-form-query',
@@ -74,6 +63,17 @@ class SearchingFormFieldset extends Fieldset
                 ],
                 'attributes' => [
                     'id' => 'searching-form-query-filter',
+                ],
+            ])
+            ->add([
+                'name' => 'o:block[__blockIndex__][o:data][link]',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Link to display', // @translate
+                    'info' => 'Formatted as "/url/full/path Label of the link".', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'search-form-link',
                 ],
             ])
         ;

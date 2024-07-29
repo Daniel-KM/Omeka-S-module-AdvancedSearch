@@ -72,20 +72,11 @@ $variables = $vars->getArrayCopy();
 $isPartial = $skipFormAction = !empty($skipFormAction);
 
 $documentCount = $response->getTotalResults();
-if ($documentCount) {
-    $itemSetsCount = $response->getResourceTotalResults('item_sets');
-    $itemsCount = $response->getResourceTotalResults('items');
-    $displayParts = $searchConfig->setting('display', []);
-    $displayPartsHeader = array_filter($displayParts, fn ($v) => in_array($v, ['header', 'both']));
-    $displayPartsFooter = array_filter($displayParts, fn ($v) => in_array($v, ['footer', 'both']));
-} else {
-    $itemSetsCount = 0;
-    $itemsCount = 0;
-    $displayParts = [];
-    $displayPartsHeader = [];
-    $displayPartsFooter = [];
-}
-
+$itemSetsCount = $response->getResourceTotalResults('item_sets');
+$itemsCount = $response->getResourceTotalResults('items');
+$displayParts = $searchConfig->setting('display', []);
+$displayPartsHeader = array_filter($displayParts, fn ($v) => in_array($v, ['header', 'both']));
+$displayPartsFooter = array_filter($displayParts, fn ($v) => in_array($v, ['footer', 'both']));
 $displayFacets = $displayParts ? $displayParts['facets'] ?? 'before' : 'none';
 
 if ($itemSet && $site) {
@@ -165,13 +156,13 @@ $this->headScript()
 
     <div class="search-results">
 
-        <?php if ($documentCount): ?>
-
         <?php if ($displayPartsHeader): ?>
         <div class="search-results-part search-results-header">
             <?= $partial('search/results-header-footer', $variables + ['resultPart' => 'header']) ?>
         </div>
         <?php endif; ?>
+
+        <?php if ($documentCount): ?>
 
         <div class="search-results-part search-results-list">
             <?php if ($itemSetsCount): // Title is kept temporarily for compatibility with old themes. ?>
@@ -184,12 +175,6 @@ $this->headScript()
             <?= $partial('search/results', $variables + ['resourceName' => 'items', 'title' => $title]) ?>
             <?php endif; ?>
         </div>
-
-        <?php if ($displayPartsFooter): ?>
-        <div class="search-results-part search-results-footer">
-            <?= $partial('search/results-header-footer', $variables + ['resultPart' => 'footer']) ?>
-        </div>
-        <?php endif; ?>
 
         <?php else: ?>
 
@@ -208,6 +193,12 @@ $this->headScript()
             <?php endif; ?>
         </div>
 
+        <?php endif; ?>
+
+        <?php if ($displayPartsFooter): ?>
+        <div class="search-results-part search-results-footer">
+            <?= $partial('search/results-header-footer', $variables + ['resultPart' => 'footer']) ?>
+        </div>
         <?php endif; ?>
 
     </div>

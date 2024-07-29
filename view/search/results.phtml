@@ -49,19 +49,21 @@ $defaultThumbnail = sprintf('<img loading="lazy" src="%1$s" title="%2$s"/>', $as
         $body = $bodyTerm ? $resource->value($bodyTerm, ['lang' => $langValue]) : null;
         $body = $body ? $body->asHtml() : $escape($resource->displayDescription(null, $langValue));
         $resourceType = $resource->getControllerName();
-        $resourceThumbnail = $thumbnail($resource, 'medium') ?: $defaultThumbnail;
-    ?>
+        $resourceThumbnail = $thumbnail($resource, 'medium');
+        ?>
     <li class="resource <?= $resourceType ?>">
-        <div class="resource-thumbnail">
-            <?= $hyperlink->raw($resourceThumbnail, $resourceUrl, ['class' => 'resource-link']) ?>
+        <div class="resource-thumbnail<?= $resourceThumbnail ? '' : ' no-thumbnail' ?>">
+            <?= $hyperlink->raw($resourceThumbnail ?: $defaultThumbnail, $resourceUrl, ['class' => 'resource-link']) ?>
         </div>
-        <div class="resource-metadata resource-metadata-heading">
-            <?= $resource->linkRaw($heading, null, ['class' => 'resource-link']) ?>
+        <div class="resource-heading">
+            <?= $hyperlink($heading, $resourceUrl, ['class' => 'resource-link']) ?>
         </div>
-        <div class="resource-metadata resource-metadata-body">
+        <div class="resource-body resource-metadata">
+            <?php if (strlen($body)): ?>
             <div class="description">
                 <?= $body ?>
             </div>
+            <?php endif; ?>
         </div>
     </li>
     <?php endforeach; ?>

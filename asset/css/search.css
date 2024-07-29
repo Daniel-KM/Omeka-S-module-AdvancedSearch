@@ -105,9 +105,28 @@
     .search-results-count.no-total-results .row-count {
         display: none;
     }
+    .search-results .resource-list .resource-heading {
+        font-weight: bold;
+    }
+    /* Search results (list) */
     .search-results .resource-list.list {
         flex-direction: column;
     }
+    .search-results .resource-list.list .resource {
+        display: flex;
+        flex-flow: row wrap;
+    }
+    .search-results .resource-list.list .resource-thumbnail {
+        flex-basis: 42px;
+    }
+    .search-results .resource-list.list .resource-heading {
+        flex-basis: calc(100% - 42px);
+    }
+    .search-results .resource-list.list .resource-metadata,
+    .search-results .resource-list.list .resource-body {
+        flex-basis: 100%;
+    }
+    /* Search results (grid) */
     .search-results .resource-list.grid {
         display: flex;
         flex-wrap: wrap;
@@ -115,26 +134,23 @@
         justify-content: start;
         align-items: stretch;
         align-content: start;
-        padding-left: 0;
-        margin: 0;
-    }
-    .search-results .resource-list.grid > * {
-        flex: 0 0 auto;
-        margin: 6px;
+        gap: 18px 18px;
+        padding: initial;
+        margin: initial;
     }
     .search-results .resource-list.grid .resource {
-        width: auto;
-        display: initial;
-        padding-top: 29px;
-        padding-right: 29px;
-    }
-    .search-results ul.resource-list.grid .resource:first-child {
-        border-top: none;
+        display: flex;
+        flex-flow: column wrap;
+        flex: 1 1 200px;
+        row-gap: 6px;
+        align-items: flex-start;
+        width: 0;
+        margin: 0;
+        padding: 0 0 12px;
     }
     .search-results .resource-list.grid .resource-thumbnail {
         display: flex;
         justify-content: center;
-        padding: 29px 0;
     }
     .search-results .resource-list.grid .resource-thumbnail img {
         height: auto;
@@ -144,10 +160,12 @@
         margin: 0;
         padding: 0;
     }
-    .search-results .resource-list.grid .resource-metadata {
-        max-width: 224px;
+    .search-results .resource-list.grid .resource-heading {
+        justify-content: center;
     }
-    .search-results .resource-list.grid .description {
+    /* .resource-metadata is kept for now, but deprecated and replaced by resource-body. */
+    .search-results .resource-list.grid .resource-metadata,
+    .search-results .resource-list.grid .resource-body {
         display: none;
     }
 

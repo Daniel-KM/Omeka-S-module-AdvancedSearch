@@ -193,6 +193,7 @@ return [
             'sort' => 'header',
             'grid_list' => 'header',
             'grid_list_mode' => 'auto',
+            'thumbnail_mode' => 'default',
             'facets' => 'before',
         ],
 

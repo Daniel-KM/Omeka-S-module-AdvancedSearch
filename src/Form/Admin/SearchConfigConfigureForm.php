@@ -606,6 +606,22 @@ new = does not end with
                 ],
             ])
             ->add([
+                'name' => 'thumbnail_mode',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Resource thumbnail', // @translate
+                    'value_options' => [
+                        'default' => 'Default resource thumbnail', // @translate
+                        'none' => 'Never', // @translate
+                        'all' => 'Always', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'thumbnail_mode',
+                    'value' => 'default',
+                ],
+            ])
+            ->add([
                 'name' => 'facets',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [

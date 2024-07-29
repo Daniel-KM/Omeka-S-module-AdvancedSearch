@@ -33,10 +33,14 @@ $untitled = $translate('[Untitled]');
 $headingTerm = $setting('browse_heading_property_term');
 $bodyTerm = $setting('browse_body_property_term');
 
-$gridListMode = $searchConfig ? $searchConfig->subSetting('display', 'grid_list_mode', 'auto') : 'auto';
+$gridListMode = $searchConfig->subSetting('display', 'grid_list_mode', 'auto');
 
-// Normally automatically managed.
-$defaultThumbnail = sprintf('<img loading="lazy" src="%1$s" title="%2$s"/>', $assetUrl('thumbnails/default.png', 'Omeka', true), $translate('No media'));
+$thumbnailMode = $searchConfig->subSetting('display', 'thumbnail_mode', 'default');
+$noThumbnail = $thumbnailMode === 'none';
+$allThumbnail = $thumbnailMode === 'all';
+$defaultThumbnail = $allThumbnail
+    ? sprintf('<img loading="lazy" src="%1$s" title="%2$s"/>', $assetUrl('thumbnails/default.png', 'Omeka', true), $translate('No media'))
+    : '';
 ?>
 
 <ul class="resource-list search-results-list<?= $gridListMode === 'list_only' ? ' list' : ($gridListMode === 'grid_only' ? ' grid' : '') ?>">
@@ -49,12 +53,16 @@ $defaultThumbnail = sprintf('<img loading="lazy" src="%1$s" title="%2$s"/>', $as
         $body = $bodyTerm ? $resource->value($bodyTerm, ['lang' => $langValue]) : null;
         $body = $body ? $body->asHtml() : $escape($resource->displayDescription(null, $langValue));
         $resourceType = $resource->getControllerName();
-        $resourceThumbnail = $thumbnail($resource, 'medium');
         ?>
     <li class="resource <?= $resourceType ?>">
-        <div class="resource-thumbnail<?= $resourceThumbnail ? '' : ' no-thumbnail' ?>">
+        <?php if (!$noThumbnail): ?>
+        <?php $resourceThumbnail = $thumbnail($resource, 'medium'); ?>
+        <div class="resource-thumbnail<?= $resourceThumbnail ? '' : ($allThumbnail ? ' default-thumbnail' : '') ?>">
+            <?php if ($resourceThumbnail || $allThumbnail): ?>
             <?= $hyperlink->raw($resourceThumbnail ?: $defaultThumbnail, $resourceUrl, ['class' => 'resource-link']) ?>
+            <?php endif; ?>
         </div>
+        <?php endif; ?>
         <div class="resource-heading">
             <?= $hyperlink($heading, $resourceUrl, ['class' => 'resource-link']) ?>
         </div>

@@ -1146,7 +1146,7 @@ class Module extends AbstractModule
         // A try/catch is required to bypass issues during upgrade.
         try {
             /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
-            $searchConfig = $plugins->get('api')->read('search_configs', ['id' => $searchConfig])->getContent();
+            $searchConfig = $plugins->get('api')->read('search_configs', [is_numeric($searchConfig) ? 'id' : 'slug' => $searchConfig])->getContent();
         } catch (\Exception $e) {
             return;
         }
@@ -1239,7 +1239,7 @@ class Module extends AbstractModule
         $searchConfig = null;
         if ($searchConfigId) {
             try {
-                $searchConfig = $api->read('search_configs', ['id' => $searchConfigId])->getContent();
+                $searchConfig = $api->read('search_configs', [is_numeric($searchConfigId) ? 'id' : 'slug'  => $searchConfigId])->getContent();
             } catch (\Exception $e) {
             }
         }

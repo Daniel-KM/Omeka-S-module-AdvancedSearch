@@ -474,6 +474,20 @@ class SearchConfigController extends AbstractActionController
             'type' => 'Advanced',
         ];
 
+        // Remove the mode of each facet to simplify config.
+        // Simplify some values too (integer and boolean).
+        $settings['facet']['mode'] = ($settings['facet']['mode'] ?? null) === 'link' ? 'link' : 'button';
+        foreach ($settings['facet']['facets'] ?? [] as &$facet) {
+            unset($facet['mode']);
+            if (isset($facet['limit'])) {
+                $facet['limit'] = (int) $facet['limit'];
+            }
+            if (isset($facet['display_count'])) {
+                $facet['display_count'] = (bool) $facet['display_count'];
+            }
+        }
+        unset ($facet);
+
         return $settings;
     }
 
@@ -587,10 +601,21 @@ class SearchConfigController extends AbstractActionController
             $params['form']['field_operators']
         );
 
-        // Add a warning for languages of facets because it may be a hard to
-        // understand issue.
+        // Add the mode to each facets to simplify theme.
+        // Simplify some values too (integer and boolean).
+        // TODO Explode array options ("|" and "," are supported) early or keep user input?
+        // Furthermore, add a warning for languages of facets because it may be
+        // a hard to understand issue.
+        $facetMode = ($params['facet']['mode'] ?? null) === 'link' ? 'link' : 'button';
         $warnLanguage = false;
         foreach ($params['facet']['facets'] ?? [] as &$facet) {
+            $facet['mode'] = $facetMode;
+            if (isset($facet['limit'])) {
+                $facet['limit'] = (int) $facet['limit'];
+            }
+            if (isset($facet['display_count'])) {
+                $facet['display_count'] = (bool) $facet['display_count'];
+            }
             if (!empty($facet['languages'])) {
                 $facet['languages'] = array_values(array_unique(array_map('trim', $facet['languages'])));
                 if (!empty($facet['languages']) && !in_array('', $facet['languages'])) {

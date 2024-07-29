@@ -895,6 +895,7 @@ new = does not end with
                         - "values" allows to filter values by a list of values.
                         <a style="display: none" href="#
                         MARKDOWN), // @translate
+                    'ini_typed_mode' => true,
                 ],
                 'attributes' => [
                     'id' => 'facet_facets',

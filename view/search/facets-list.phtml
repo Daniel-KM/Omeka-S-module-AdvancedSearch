@@ -42,9 +42,6 @@ if (!empty($itemSet)) {
     unset($facets['item_set_id']);
     unset($activeFacets['item_set_id']);
 }
-
-// The only common option is the facet mode (button or direct link).
-$options = ['mode' => $isFacetModeButton ? 'button' : 'link'];
 ?>
 
 <div class="search-facets-content">
@@ -55,7 +52,7 @@ $options = ['mode' => $isFacetModeButton ? 'button' : 'link'];
 
     <?php if ($displayActive && count($activeFacets)): ?>
     <h4><?= $translate('Active facets') ?></h4>
-    <?= $facetActives(null, $activeFacets, $options) ?>
+    <?= $facetActives(null, $activeFacets, $searchConfig->setting('facet')) ?>
     <?php endif; ?>
 
     <form id="form-facets">
@@ -82,7 +79,7 @@ $options = ['mode' => $isFacetModeButton ? 'button' : 'link'];
         <?php else: ?>
         <ul class="search-facets-list">
             <?php foreach ($facets as $name => $facetValues): ?>
-            <?php $facetOptions = $searchFacets[$name] + $options; ?>
+            <?php $facetOptions = $searchFacets[$name]; ?>
             <li class="search-facet">
                 <h4><?= $escape($translate($facetOptions['label'] ?? $name)) ?></h4>
                 <?= $facetElements($name, $facetValues, $facetOptions) ?>

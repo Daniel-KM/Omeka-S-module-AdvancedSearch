@@ -261,6 +261,7 @@ return [
                     'limit' => 25,
                     'display_list' => 'available',
                     'display_count' => false,
+                    'mode' => 'button',
                 ],
                 'resource_class_id' => [
                     'field' => 'resource_class_id',
@@ -271,6 +272,7 @@ return [
                     'limit' => 25,
                     'display_list' => 'available',
                     'display_count' => false,
+                    'mode' => 'button',
                 ],
                 'dcterms:subject' => [
                     'field' => 'dcterms:subject',
@@ -282,6 +284,7 @@ return [
                     'langs' => [],
                     'display_list' => 'available',
                     'display_count' => false,
+                    'mode' => 'button',
                 ],
                 'dcterms:type' => [
                     'field' => 'dcterms:type',
@@ -292,6 +295,7 @@ return [
                     'limit' => 25,
                     'display_list' => 'available',
                     'display_count' => false,
+                    'mode' => 'button',
                 ],
                 'author' => [
                     'field' => 'author',
@@ -302,6 +306,7 @@ return [
                     'limit' => 25,
                     'display_list' => 'available',
                     'display_count' => false,
+                    'mode' => 'button',
                 ],
                 'date' => [
                     'field' => 'date',
@@ -312,6 +317,7 @@ return [
                     'limit' => 25,
                     'display_list' => 'available',
                     'display_count' => false,
+                    'mode' => 'button',
                 ],
                 'dcterms:language' => [
                     'field' => 'dcterms:language',
@@ -322,6 +328,7 @@ return [
                     'limit' => 25,
                     'display_list' => 'available',
                     'display_count' => false,
+                    'mode' => 'button',
                 ],
             ],
         ],

@@ -62,17 +62,17 @@ class Query implements \JsonSerializable
     /**
      * @var array
      */
-    protected $dateRangeFilters = [];
+    protected $filtersRange = [];
 
     /**
      * @var array
      */
-    protected $filterQueries = [];
+    protected $filtersQuery = [];
 
     /**
      * @var array
      */
-    protected $hiddenQueryFilters = [];
+    protected $filtersQueryHidden = [];
 
     /**
      * @var string|null
@@ -221,18 +221,18 @@ class Query implements \JsonSerializable
     /**
      * @todo Support multi-fields (name).
      */
-    public function addDateRangeFilter(string $name, string $from, string $to): self
+    public function addFilterRange(string $name, string $from, string $to): self
     {
-        $this->dateRangeFilters[$name][] = [
+        $this->filtersRange[$name][] = [
             'from' => trim($from),
             'to' => trim($to),
         ];
         return $this;
     }
 
-    public function getDateRangeFilters(): array
+    public function getFiltersRange(): array
     {
-        return $this->dateRangeFilters;
+        return $this->filtersRange;
     }
 
     /**
@@ -243,7 +243,7 @@ class Query implements \JsonSerializable
      */
     public function addFilterQuery(string $name, $value, ?string $type = 'in', ?string $join = 'and'): self
     {
-        $this->filterQueries[$name][] = [
+        $this->filtersQuery[$name][] = [
             'value' => trim((string) $value),
             'type' => trim((string) $type),
             'join' => trim((string) $join),
@@ -251,20 +251,20 @@ class Query implements \JsonSerializable
         return $this;
     }
 
-    public function getFilterQueries(): array
+    public function getFiltersQuery(): array
     {
-        return $this->filterQueries;
+        return $this->filtersQuery;
     }
 
-    public function setHiddenQueryFilters(array $hiddenQueryFilters): self
+    public function setFiltersQueryHidden(array $filtersQueryHidden): self
     {
-        $this->hiddenQueryFilters = $hiddenQueryFilters;
+        $this->filtersQueryHidden = $filtersQueryHidden;
         return $this;
     }
 
-    public function getHiddenQueryFilters(): array
+    public function getFiltersQueryHidden(): array
     {
-        return $this->hiddenQueryFilters;
+        return $this->filtersQueryHidden;
     }
 
     /**
@@ -329,7 +329,7 @@ class Query implements \JsonSerializable
      * details of the facet:
      * - field: the index to use
      * - label
-     * - type: Checkbox, Select, SelectRange, Thesaurus, Tree, etc.
+     * - type: Checkbox, Select, RangeDouble, Thesaurus, Tree, etc.
      * - order
      * - limit
      * - languages
@@ -491,8 +491,8 @@ class Query implements \JsonSerializable
     {
         return $this->getQuery() === ''
             && $this->getFilters() === []
-            && $this->getDateRangeFilters() === []
-            && $this->getFilterQueries() === []
+            && $this->getFiltersRange() === []
+            && $this->getFiltersQuery() === []
             && $this->getActiveFacets() === []
         ;
     }
@@ -507,8 +507,8 @@ class Query implements \JsonSerializable
     {
         return $this->getQuery() !== ''
             || $this->getFilters() !== []
-            || $this->getDateRangeFilters() !== []
-            || $this->getFilterQueries() !== []
+            || $this->getFiltersRange() !== []
+            || $this->getFiltersQuery() !== []
         ;
     }
 
@@ -519,9 +519,9 @@ class Query implements \JsonSerializable
             'resources' => $this->getResources(),
             'is_public' => $this->getIsPublic(),
             'filters' => $this->getFilters(),
-            'date_range_filters' => $this->getDateRangeFilters(),
-            'filter_queries' => $this->getFilterQueries(),
-            'hidden_query_filters' => $this->getHiddenQueryFilters(),
+            'filters_range' => $this->getFiltersRange(),
+            'filters_query' => $this->getFiltersQuery(),
+            'filters_query_hidden' => $this->getFiltersQueryHidden(),
             'sort' => $this->getSort(),
             'page' => $this->getPage(),
             'offset' => $this->getOffset(),

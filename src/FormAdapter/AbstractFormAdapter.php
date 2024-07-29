@@ -535,7 +535,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                             $dateFrom = (string) ($value['from'] ?? '');
                             $dateTo = (string) ($value['to'] ?? '');
                             if (strlen($dateFrom) || strlen($dateTo)) {
-                                $query->addDateRangeFilter($name, $dateFrom, $dateTo);
+                                $query->addFilterRange($name, $dateFrom, $dateTo);
                             }
                             continue 3;
                     }

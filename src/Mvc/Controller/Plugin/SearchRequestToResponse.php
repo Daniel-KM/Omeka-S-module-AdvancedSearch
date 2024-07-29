@@ -142,7 +142,7 @@ class SearchRequestToResponse extends AbstractPlugin
         if ($hiddenFilters) {
             // TODO Convert a generic hidden query filters into a specific one?
             // $hiddenFilters = $formAdapter->toQuery($hiddenFilters, $searchFormSettings);
-            $query->setHiddenQueryFilters($hiddenFilters);
+            $query->setFiltersQueryHidden($hiddenFilters);
         }
 
         // Add global parameters.

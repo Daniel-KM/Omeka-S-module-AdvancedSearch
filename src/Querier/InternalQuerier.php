@@ -547,12 +547,12 @@ SQL;
 
     protected function appendHiddenFilters(): void
     {
-        $hiddenFilters = $this->query->getHiddenQueryFilters();
+        $hiddenFilters = $this->query->getFiltersQueryHidden();
         if (!$hiddenFilters) {
             return;
         }
         $this->filterQueryValues($hiddenFilters);
-        $this->filterQueryDateRange($hiddenFilters);
+        $this->filterQueryRanges($hiddenFilters);
         $this->filterQueryFilters($hiddenFilters);
     }
 
@@ -569,8 +569,8 @@ SQL;
     {
         // Don't use excluded fields for filters.
         $this->filterQueryValues($this->query->getFilters());
-        $this->filterQueryDateRange($this->query->getDateRangeFilters());
-        $this->filterQueryFilters($this->query->getFilterQueries());
+        $this->filterQueryRanges($this->query->getFiltersRange());
+        $this->filterQueryFilters($this->query->getFiltersQuery());
         $this->argsWithoutActiveFacets = $this->args;
         $this->filterQueryValues($this->query->getActiveFacets(), true);
     }
@@ -758,7 +758,7 @@ SQL;
         }
     }
 
-    protected function filterQueryDateRange(array $dateRangeFilters): void
+    protected function filterQueryRanges(array $dateRangeFilters): void
     {
         $multifields = $this->engine->settingAdapter('multifields', []);
         foreach ($dateRangeFilters as $field => $filterValues) {

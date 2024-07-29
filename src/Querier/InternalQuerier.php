@@ -65,7 +65,7 @@ class InternalQuerier extends AbstractQuerier
             try {
                 // Return scalar doesn't allow to get the total of results.
                 // So skip offset and limit, then apply them in order to avoid
-                // the double query.
+                // the double query. This result is used for the facets too.
                 // TODO Check if this internal api paginator is quicker in all cases (small/long results) than previous double query.
                 $apiResponse = $api->search($resourceType, $dataQuery, ['returnScalar' => 'id']);
                 $totalResults = $apiResponse->getTotalResults();
@@ -977,18 +977,51 @@ SQL;
             $referenceOptions['meta_options'][$facetName] = $facetOptions;
         }
 
+        if (!$referenceMetadata) {
+            return;
+        }
+
         // Facet counts don't make a distinction by resource type, so they
         // should be merged here. This is needed as long as there is no single
         // query for resource (items and item sets together).
         $facetCountsByField = array_fill_keys(array_keys($facets), []);
 
-        // Like Solr, get only available useful values or all existing values.
-        /** @see https://solr.apache.org/guide/solr/latest/query-guide/faceting.html */
-        $referenceQuery = $this->query->getOption('facet_list') === 'all'
-            ? $this->argsWithoutActiveFacets
-            : $this->args;
+        $isAllFacets = $this->query->getOption('facet_list') === 'all';
 
         foreach ($this->resourceTypes as $resourceType) {
+            // Like Solr, get only available useful values or all existing values.
+            /** @see https://solr.apache.org/guide/solr/latest/query-guide/faceting.html */
+            if ($isAllFacets) {
+                // Do the query one time for all facets, for each resource types.
+                // Itis not possible when there are facets for item set or site
+                // because they are removed from the query.
+                // TODO Check if item sets and sites are still an exception for references.
+                /** @see \Reference\Mvc\Controller\Plugin\References::searchQuery() */
+                if (!$resourceType
+                    || $resourceType === 'resources'
+                    || (in_array('o:item_set', $referenceMetadata) && (isset($this->argsWithoutActiveFacets['item_set_id']) || isset($this->argsWithoutActiveFacets['item_set']) || isset($this->argsWithoutActiveFacets['itemset'])))
+                    || (in_array('o:site', $referenceMetadata) && (isset($this->argsWithoutActiveFacets['site_id']) || isset($this->argsWithoutActiveFacets['site'])))
+                ) {
+                    $referenceQuery = $this->argsWithoutActiveFacets;
+                } else {
+                    /** @var \Omeka\Api\Manager $api */
+                    $api = $this->services->get('Omeka\ApiManager');
+                    $ids = $api->search($resourceType, $this->argsWithoutActiveFacets, ['returnScalar' => 'id'])->getContent();
+                    if (!$ids) {
+                        continue;
+                    }
+                    $referenceQuery = ['id' => array_values($ids)];
+                }
+            } else {
+                // For performance, use the full list of resource ids when possible,
+                // instead of the original query.
+                // $referenceQuery = $this->args;
+                $ids = $this->response->getResourceIds($resourceType === 'resources' ? null : $resourceType);
+                if (!$ids) {
+                    continue;
+                }
+                $referenceQuery = ['id' => array_values($ids)];
+            }
             $referenceOptions['resource_name'] = $resourceType;
             $values = $references
                 ->setMetadata($referenceMetadata)

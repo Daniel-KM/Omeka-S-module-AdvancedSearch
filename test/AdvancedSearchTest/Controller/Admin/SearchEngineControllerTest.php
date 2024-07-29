@@ -42,7 +42,7 @@ class SearchEngineControllerTest extends \AdvancedSearchTest\Controller\SearchCo
         $this->dispatch($this->searchEngine->adminUrl('edit'));
         $this->assertResponseStatusCode(200);
 
-        $this->assertQuery('input[name="resources[]"]');
+        $this->assertQuery('input[name="resource_types[]"]');
     }
 
     public function testConfigurePostAction(): void
@@ -53,7 +53,7 @@ class SearchEngineControllerTest extends \AdvancedSearchTest\Controller\SearchCo
         ]);
 
         $this->dispatch($this->searchEngine->adminUrl('edit'), 'POST', [
-            'resources' => ['items', 'item_sets'],
+            'resource_types' => ['items', 'item_sets'],
             'csrf' => $form->get('csrf')->getValue(),
         ]);
         $this->assertRedirectTo('/admin/search-manager');

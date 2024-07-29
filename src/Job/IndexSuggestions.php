@@ -76,7 +76,7 @@ class IndexSuggestions extends AbstractJob
             return;
         }
 
-        $resourceTypes = $engine->setting('resources', []);
+        $resourceTypes = $engine->setting('resource_types', []);
         $mapResources = [
             'resources' => \Omeka\Entity\Resource::class,
             'items' => \Omeka\Entity\Item::class,
@@ -147,7 +147,7 @@ class IndexSuggestions extends AbstractJob
 
         // TODO Index value annotations with resources (for now, they can't be selected individually in the config).
 
-        $resourceTypes = $suggester->engine()->setting('resources', []);
+        $resourceTypes = $suggester->engine()->setting('resource_types', []);
         $mapResourcesToClasses = [
             'items' => \Omeka\Entity\Item::class,
             'item_sets' => \Omeka\Entity\ItemSet::class,

@@ -280,7 +280,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                     if (!is_array($value)) {
                         $value = [$value];
                     }
-                    $query->setResources($value);
+                    $query->setResourceTypes($value);
                     break;
 
                 case 'id':

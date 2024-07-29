@@ -21,7 +21,7 @@ abstract class SearchControllerTestCase extends OmekaControllerTestCase
             'o:name' => 'TestIndex',
             'o:adapter' => 'test',
             'o:settings' => [
-                'resources' => [
+                'resource_types' => [
                     'items',
                     'item_sets',
                 ],

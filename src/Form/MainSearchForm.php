@@ -1293,7 +1293,7 @@ class MainSearchForm extends Form
         ];
         if ($this->searchConfig) {
             $engine = $this->searchConfig->engine();
-            $resourceTypes = $engine->setting('resources');
+            $resourceTypes = $engine->setting('resource_types');
         }
         $result = [];
         foreach ($resourceTypes ?: $resourceTypesDefault as $resourceType) {
@@ -1321,7 +1321,7 @@ class MainSearchForm extends Form
             return ['resources'];
         }
         $engine = $this->searchConfig->engine();
-        $engineTypes = $engine->setting('resources');
+        $engineTypes = $engine->setting('resource_types');
         return $engineTypes
             ? array_intersect_key($types, array_flip($engineTypes))
             : ['resources'];

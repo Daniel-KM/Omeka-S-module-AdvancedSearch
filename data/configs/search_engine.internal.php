@@ -26,7 +26,7 @@ return [
     'o:name' => 'Internal (sql)',
     'o:adapter' => 'internal',
     'o:settings' => [
-        'resources' => [
+        'resource_types' => [
             'resources',
             'items',
             'item_sets',

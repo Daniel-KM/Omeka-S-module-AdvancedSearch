@@ -903,7 +903,7 @@ class Module extends AbstractModule
         foreach ($searchEngines as $searchEngine) {
             $indexer = $searchEngine->indexer();
             if ($indexer->canIndex($resourceType)
-                && in_array($resourceType, $searchEngine->setting('resources', []))
+                && in_array($resourceType, $searchEngine->setting('resource_types', []))
             ) {
                 try {
                     $indexer->indexResources($resources);
@@ -948,7 +948,7 @@ class Module extends AbstractModule
         foreach ($searchEngines as $searchEngine) {
             $indexer = $searchEngine->indexer();
             if ($indexer->canIndex($resourceType)
-                && in_array($resourceType, $searchEngine->setting('resources', []))
+                && in_array($resourceType, $searchEngine->setting('resource_types', []))
             ) {
                 $jobArgs = [];
                 $jobArgs['search_engine_id'] = $searchEngine->id();
@@ -1005,7 +1005,7 @@ class Module extends AbstractModule
         $searchEngines = $api->search('search_engines')->getContent();
         foreach ($searchEngines as $searchEngine) {
             if ($searchEngine->indexer()->canIndex($requestResource)
-                && in_array($requestResource, $searchEngine->setting('resources', []))
+                && in_array($requestResource, $searchEngine->setting('resource_types', []))
             ) {
                 if ($request->getOperation() === 'delete') {
                     $id = $request->getId();
@@ -1041,7 +1041,7 @@ class Module extends AbstractModule
         $searchEngines = $api->search('search_engines')->getContent();
         foreach ($searchEngines as $searchEngine) {
             if ($searchEngine->indexer()->canIndex('items')
-                && in_array('items', $searchEngine->setting('resources', []))
+                && in_array('items', $searchEngine->setting('resource_types', []))
             ) {
                 $this->updateIndexResource($searchEngine, $item);
             }

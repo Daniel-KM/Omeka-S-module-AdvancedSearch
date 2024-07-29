@@ -403,8 +403,8 @@ SQL;
 
         // TODO Normalize search url arguments. Here, the ones from default form, adapted from Solr, are taken.
 
-        $indexerResourceTypes = $this->engine->setting('resources', []);
-        $this->resourceTypes = $this->query->getResources() ?: $indexerResourceTypes;
+        $indexerResourceTypes = $this->engine->setting('resource_types', []);
+        $this->resourceTypes = $this->query->getResourceTypes() ?: $indexerResourceTypes;
         $this->resourceTypes = array_intersect($this->resourceTypes, $indexerResourceTypes);
         if (empty($this->resourceTypes)) {
             $this->args = null;

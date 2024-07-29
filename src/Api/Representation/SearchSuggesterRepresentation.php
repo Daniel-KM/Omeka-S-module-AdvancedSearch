@@ -123,7 +123,7 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
         $suggesterSettings = $this->settings();
 
         $query
-            ->setResources($engineSettings['resources'])
+            ->setResourceTypes($engineSettings['resource_types'])
             ->setLimitPage(1, empty($suggesterSettings['limit']) ? \Omeka\Stdlib\Paginator::PER_PAGE : (int) $suggesterSettings['limit'])
             ->setSuggestOptions([
                 'suggester' => $this->resource->getId(),

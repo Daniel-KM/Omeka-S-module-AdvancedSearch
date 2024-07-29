@@ -270,7 +270,7 @@ class SearchRequestToResponse extends AbstractPlugin
             $response->setFacetCounts($facetCounts);
         }
 
-        $totalResults = array_map(fn ($resource) => $response->getResourceTotalResults($resource), $engineSettings['resources']);
+        $totalResults = array_map(fn ($resource) => $response->getResourceTotalResults($resource), $engineSettings['resource_types']);
         $plugins->get('paginator')(max($totalResults), $query->getPage() ?: 1, $query->getPerPage());
 
         return [

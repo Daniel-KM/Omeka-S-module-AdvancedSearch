@@ -50,15 +50,15 @@ class SearchEngineConfigureForm extends Form
                 ],
             ])
             ->add([
-                'name' => 'resources',
+                'name' => 'resource_types',
                 'type' => Element\MultiCheckbox::class,
                 'options' => [
                     'label' => 'Resources indexed and searchable', // @translate
                     'label_attributes' => ['style' => 'display: block'],
-                    'value_options' => $this->getResourcesOptions(),
+                    'value_options' => $this->getResourcesTypes(),
                 ],
                 'attributes' => [
-                    'id' => 'resources',
+                    'id' => 'resource_types',
                     'value' => [
                         'resources',
                         'items',
@@ -75,7 +75,7 @@ class SearchEngineConfigureForm extends Form
      *
      * @todo Get list from engine? See git commit 28b1787.
      */
-    protected function getResourcesOptions(): array
+    protected function getResourcesTypes(): array
     {
         return [
             'resources' => 'Resources (mixed)', // @translate

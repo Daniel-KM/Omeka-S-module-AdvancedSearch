@@ -351,7 +351,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         $engineSettings = $engine->settings();
 
         $query
-            ->setResources($engineSettings['resources'])
+            ->setResourceTypes($engineSettings['resource_types'])
             ->setLimitPage(1, \Omeka\Stdlib\Paginator::PER_PAGE)
             ->setSuggestOptions([
                 'suggester' => null,

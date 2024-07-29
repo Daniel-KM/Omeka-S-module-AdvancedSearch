@@ -10,7 +10,7 @@
 
 $translate = $this->plugin('translate');
 
-$resourceTypes = $resource->setting('resources', []);
+$resourceTypes = $resource->setting('resource_types', []);
 
 $this->form->setAttribute('action', $resource->url('index'));
 $this->form->setButtonLabel($translate('Confirm reindex'));

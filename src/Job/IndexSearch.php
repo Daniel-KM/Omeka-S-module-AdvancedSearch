@@ -93,7 +93,7 @@ class IndexSearch extends AbstractJob
             $startResourceId = 1;
         }
 
-        $resourceTypes = $searchEngine->setting('resources', []);
+        $resourceTypes = $searchEngine->setting('resource_types', []);
         $selectedResourceTypes = $this->getArg('resource_types', []);
         if ($selectedResourceTypes) {
             $resourceTypes = array_intersect($resourceTypes, $selectedResourceTypes);

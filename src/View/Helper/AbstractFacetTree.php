@@ -326,7 +326,7 @@ SQL;
 
         // Prepend ancestors to each facet.
         $result = [];
-        $isFacetModeDirect = ($options['mode'] ?? '') === 'link';
+        $isFacetModeDirect = in_array($options['mode'] ?? null, ['link', 'js']);
         foreach (array_intersect_key($treeValues, $facetValuesByLabels) as $facetLabel => $treeId) {
             $treeElement = $this->tree[$treeId];
             if ($treeElement['top']) {

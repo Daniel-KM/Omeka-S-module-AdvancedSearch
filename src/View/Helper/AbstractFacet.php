@@ -131,7 +131,7 @@ class AbstractFacet extends AbstractHelper
      */
     protected function prepareFacetData(string $facetField, array $facetValues, array $options): array
     {
-        $isFacetModeDirect = ($options['mode'] ?? '') === 'link';
+        $isFacetModeDirect = in_array($options['mode'] ?? null, ['link', 'js']);
 
         foreach ($facetValues as /* $facetIndex => */ &$facetValue) {
             $facetValueValue = (string) $facetValue['value'];

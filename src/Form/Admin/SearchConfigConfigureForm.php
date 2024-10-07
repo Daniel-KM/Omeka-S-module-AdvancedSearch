@@ -975,7 +975,8 @@ class SearchConfigConfigureForm extends Form
                     'label' => 'Facet mode', // @translate
                     'value_options' => [
                         'button' => 'Send request with a button', // @translate
-                        'link' => 'Send request directly', // @translate
+                        'js' => 'Send request directly (use checkbox and js)', // @translate
+                        'link' => 'Send request directly (use a link looking like a checkbox)', // @translate
                     ],
                 ],
                 'attributes' => [

@@ -11,7 +11,7 @@ $translate = $plugins->get('translate');
 $escape = $plugins->get('escapeHtml');
 $escapeAttr = $plugins->get('escapeHtmlAttr');
 
-$isFacetModeDirect = ($options['mode'] ?? '') === 'link';
+$isFacetModeDirect = in_array($options['mode'] ?? null, ['link', 'js']);
 $displayCount = !empty($options['display_count']);
 ?>
 

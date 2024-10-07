@@ -17,7 +17,7 @@ class FacetActives extends AbstractFacet
      */
     protected function prepareActiveFacetData(array $activeFacets, array $options): array
     {
-        $isFacetModeDirect = ($options['mode'] ?? '') === 'link';
+        $isFacetModeDirect = in_array($options['mode'] ?? null, ['link', 'js']);
 
         foreach ($activeFacets as $facetName => &$facetValues) {
             $facetFieldLabel = $options['facets'][$facetName]['label'] ?? $facetName;

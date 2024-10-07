@@ -29,11 +29,10 @@
  */
 
 const hasChosenSelect = typeof $.fn.chosen === 'function';
-
 const hasOmekaTranslate = typeof Omeka !== 'undefined' && typeof Omeka.jsTranslate === 'function';
 
 const $searchFiltersAdvanced = $('#search-filters');
-const $searchFacetsAdvanced = $('#search-facets');
+const $searchFacets = $('#search-facets');
 
 /**
  * Manage search form, search filters, search results, search facets.
@@ -338,6 +337,11 @@ var Search = (function() {
     self.facets = (function() {
         var self = {};
 
+        /**
+         * Modes may be "click a button to apply facets" or "reload the page directly".
+         */
+        self.useApplyFacets = $searchFacets.find('.apply-facets').length > 0;
+
         self.expandOrCollapse = function(button) {
             button = $(button);
             if (button.hasClass('expand')) {
@@ -347,7 +351,7 @@ var Search = (function() {
                 button.attr('aria-label', button.attr('data-label-collapse') ? button.attr('data-label-collapse') : (hasOmekaTranslate ? Omeka.jsTranslate('Collapse') : 'Collapse'));
                 button.closest('.facet').find('.facet-elements').removeAttr('hidden');
             }
-            $searchFacetsAdvanced.trigger('o:advanced-search.facet.expand-or-collapse');
+            $searchFacets.trigger('o:advanced-search.facet.expand-or-collapse');
             return self;
         };
 
@@ -361,7 +365,98 @@ var Search = (function() {
                 button.text(button.attr('data-label-see-less') ? button.attr('data-label-see-less') : (hasOmekaTranslate ? Omeka.jsTranslate('See less') : 'See less'));
                 button.closest('.facet').find('.facet-items .facet-item').removeAttr('hidden');
             }
-            $searchFacetsAdvanced.trigger('o:advanced-search.facet.see-more-or-less');
+            $searchFacets.trigger('o:advanced-search.facet.see-more-or-less');
+            return self;
+        };
+
+        self.directLinkCheckbox = function (facetItem) {
+            if (!self.useApplyFacets) {
+                facetItem = facetItem ? $(facetItem) : $(this);
+                if (facetItem.data('url')) {
+                    window.location = facetItem.data('url');
+                }
+            }
+            return self;
+        };
+
+        self.directLinkSelect = function (facet) {
+            if (self.useApplyFacets) {
+                return self;
+            }
+            // Replace the current select args by new ones.
+            // Names in facets may have no index in array ("[]") when it is a
+            // multiple one. But the select may be a single select too, in which
+            // case the url is already in data.
+            facet = facet ? $(facet) : $(this);
+            let url;
+            let selectValues = facet.val();
+            if (typeof selectValues !== 'object') {
+                let option =  facet.find('option:selected');
+                if (option.length && option[0].value !== '') {
+                    url = option.data('url');
+                    if (url && url.length) {
+                        window.location = url;
+                    }
+                } else {
+                    url = new URL(window.location.href);
+                    url.searchParams.delete(facet.prop('name'));
+                    window.location = url.toString();
+                }
+            } else {
+                // Prepare the url with the selected values.
+                url = new URL(window.location.href);
+                let selectName = facet.prop('name');
+                url.searchParams.delete(selectName);
+                selectValues.forEach((element, index) => {
+                    url.searchParams.set(selectName.substring(0, selectName.length - 2) + '[' + index + ']', element);
+                });
+                window.location = url.toString();
+            }
+            return self;
+        };
+
+        /**
+         * Active facets are always a link, but the link may be skipped when
+         * the mode is to use the apply button.
+         */
+        self.removeActiveFacet = function (activeFacet) {
+            // Reload with the link when there is no button to apply facets.
+            if (!Search.facets.useApplyFacets) {
+                return true;
+            }
+            e.preventDefault();
+            activeFacet = activeFacet ? $(activeFacet) : $(this);
+            activeFacet.closest('li').hide();
+            var facetName = activeFacet.data('facetName');
+            var facetValue = activeFacet.data('facetValue');
+            $searchFacets.find('.facet-item input:checked').each(function() {
+                if ($(this).prop('name') === facetName
+                    && $(this).prop('value') === String(facetValue)
+                ) {
+                    $(this).prop('checked', false);
+                }
+            });
+            $searchFacets.find('select.facet-items option:selected').each(function() {
+                if ($(this).closest('select').prop('name') === facetName
+                    && $(this).prop('value') === String(facetValue)
+                ) {
+                    $(this).prop('selected', false);
+                    if (hasChosenSelect) {
+                        $(this).closest('select').trigger('chosen:updated');
+                    }
+                }
+            });
+            // Manage the special case where the active facet is a range.
+            var facetRange = $searchFacets.find(`input[type=range][name="${facetName}"]`);
+            if (facetRange.length) {
+                if (facetName.includes('[to]')) {
+                    facetRange.val(facetRange.attr('max'));
+                    Search.rangeSliderDouble.controlSliderTo(facetRange[0]);
+                } else {
+                    facetRange.val(facetRange.attr('min'));
+                    Search.rangeSliderDouble.controlSliderFrom(facetRange[0]);
+                }
+            }
             return self;
         };
 
@@ -611,99 +706,30 @@ $(document).ready(function() {
 
     /* Facets. */
 
-    $('.facets-active a').on('click', function(e) {
-        // Reload with the link when there is no button to apply facets.
-        if (!$('.facets-apply').length) {
-            return true;
+    if ($searchFacets.length) {
+        if (Search.facets.useApplyFacets) {
+            $searchFacets.on('click', '.facets-active a', (event) => Search.facets.removeActiveFacet(event.target));
+        } else {
+            $searchFacets.on('change', 'input[type=checkbox][data-url]', (event) => Search.facets.directLinkCheckbox(event.target));
+            $searchFacets.on('change', 'select', (event) => Search.facets.directLinkSelect(event.target));
         }
-        e.preventDefault();
-        $(this).closest('li').hide();
-        var facetName = $(this).data('facetName');
-        var facetValue = $(this).data('facetValue');
-        $('.facet-item input:checked').each(function() {
-            if ($(this).prop('name') === facetName
-                && $(this).prop('value') === String(facetValue)
-            ) {
-                $(this).prop('checked', false);
-            }
-        });
-        $('select.facet-items option:selected').each(function() {
-            if ($(this).closest('select').prop('name') === facetName
-                && $(this).prop('value') === String(facetValue)
-            ) {
-                $(this).prop('selected', false);
-                if (hasChosenSelect) {
-                    $(this).closest('select').trigger('chosen:updated');
-                }
-            }
-        });
-        var facetRange = $(`input[type=range][name="${facetName}"]`);
-        if (facetRange.length) {
-            if (facetName.includes('[to]')) {
-                facetRange.val(facetRange.attr('max'));
-                Search.rangeSliderDouble.controlSliderTo(facetRange[0]);
+
+        $searchFacets.on('click', '.facet-button, .facet-see-more-or-less', function() {
+            const button = $(this);
+            if (button.hasClass('expand')) {
+                $(this).removeClass('expand').addClass('collapse');
             } else {
-                facetRange.val(facetRange.attr('min'));
-                Search.rangeSliderDouble.controlSliderFrom(facetRange[0]);
+                $(this).removeClass('collapse').addClass('expand');
             }
-        }
-    });
-
-    $('.facets').on('change', 'input[type=checkbox]', function() {
-        if (!$('.facets-apply').length && $(this).data('url')) {
-            window.location = $(this).data('url');
-        }
-    });
-
-    $('.facets').on('change', 'select', function() {
-        if (!$('#facets-apply').length) {
-            // Replace the current select args by new ones.
-            // Names in facets may have no index in array ("[]") when it is a multiple one.
-            // But the select may be a single select too, in which case the url is already in data.
-            let url;
-            let selectValues = $(this).val();
-            if (typeof selectValues !== 'object') {
-                let option =  $(this).find('option:selected');
-                if (option.length && option[0].value !== '') {
-                    url = option.data('url');
-                    if (url && url.length) {
-                        window.location = url;
-                    }
-                } else {
-                    url = new URL(window.location.href);
-                    url.searchParams.delete($(this).prop('name'));
-                    window.location = url.toString();
-                }
-                return;
+            if (button.hasClass('facet-see-more-or-less')) {
+                Search.facets.seeMoreOrLess(button);
+            } else {
+                Search.facets.expandOrCollapse(button);
             }
-            // Prepare the url with the selected values.
-            url = new URL(window.location.href);
-            let selectName = $(this).prop('name');
-            url.searchParams.delete(selectName);
-            selectValues.forEach((element, index) => {
-                url.searchParams.set(selectName.substring(0, selectName.length - 2) + '[' + index + ']', element);
-            });
-            window.location = url.toString();
-        }
-    });
+        });
 
-    $('.facets').on('click', '.facet-button, .facet-see-more-or-less', function() {
-        const button = $(this);
-        if (button.hasClass('expand')) {
-            $(this).removeClass('expand').addClass('collapse');
-        } else {
-            $(this).removeClass('collapse').addClass('expand');
-        }
-        if (button.hasClass('facet-see-more-or-less')) {
-            Search.facets.seeMoreOrLess(button);
-        } else {
-            Search.facets.expandOrCollapse(button);
-        }
-    });
-
-    /* Init facets */
-
-    $('.facet-see-more-or-less').each((index, button) => Search.facets.seeMoreOrLess(button));
+        $searchFacets.find('.facet-see-more-or-less').each((index, button) => Search.facets.seeMoreOrLess(button));
+    }
 
     const rangeDoubles = document.querySelectorAll('.range-double');
 

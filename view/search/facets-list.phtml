@@ -26,7 +26,7 @@ $activeFacets = $response->getActiveFacets();
 // Don't display facet groups without facet elements.
 $facets = array_filter($facets);
 
-$isFacetModeButton = $searchConfig->subSetting('facet', 'mode') !== 'link';
+$isFacetModeButton = !in_array($searchConfig->subSetting('facet', 'mode'), ['link', 'js']);
 $displayActive = (bool) $searchConfig->subSetting('facet', 'display_active', true);
 $displayFacetButton = $isFacetModeButton && ($displayActive || !empty($facets));
 $displaySubmit = $displayFacetButton ? $searchConfig->subSetting('facet', 'display_submit', 'above') : 'none';

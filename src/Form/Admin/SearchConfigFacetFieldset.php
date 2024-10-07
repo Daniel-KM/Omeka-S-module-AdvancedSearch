@@ -55,7 +55,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                     // TODO Convert documentation into help. See application/view/common/form-row.phtml
                     'documentation' => nl2br(<<<'MARKDOWN'
                         #"></a><div class="field-description no-link">
-                        - Input types may be Checkbox (default), RangeDouble, Select, SelectRange, Thesaurus, Tree.
+                        - Input types may be Checkbox (default), RangeDouble, Select, SelectRange, Thesaurus, Tree and specific templates for mode "direct" if wanted.
                         - For "RangeDouble" and "SelectRange", the minimum and maximum should be set as "min" and "max", and "step" too.
                         - With type "Thesaurus", the option "thesaurus" should be set with the id. It requires the module Thesaurus.
                         - "Tree" can be used for item sets when module Item Sets Tree is enabled and data indexed recursively.
@@ -64,6 +64,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                     /** @see \AdvancedSearch\Form\MainSearchForm::init() */
                     'value_options' => [
                         'Checkbox' => 'Checkbox (default)', // @translate
+                        'Link' => 'Link (fake checkbox for mode "direct")', // @translate
                         'RangeDouble' => 'Range double with slider', // @translate
                         // A space is added to avoid an issue with translation.
                         'Select' => 'Select ', // @translate
@@ -73,6 +74,8 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                             'options' => [
                                 'Tree' => 'Item sets tree', // @translate
                                 'Thesaurus' => 'Thesaurus', // @translate
+                                'TreeLink' => 'Item sets tree link (fake checkbox)', // @translate
+                                'ThesaurusLink' => 'Thesaurus link (fake checkbox)', // @translate
                             ],
                         ],
                     ],

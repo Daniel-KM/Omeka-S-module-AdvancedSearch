@@ -467,7 +467,7 @@ class SearchConfigController extends AbstractActionController
             'more',
             'display_count',
         ];
-        $settings['facet']['mode'] = ($settings['facet']['mode'] ?? null) === 'link' ? 'link' : 'button';
+        $settings['facet']['mode'] = in_array($settings['facet']['mode'] ?? null, ['link', 'js']) ? $settings['facet']['mode'] : 'button';
         foreach ($settings['facet']['facets'] ?? [] as $key => $facet) {
             // Remove the mode of each facet to simplify config.
             unset($facet['mode']);
@@ -602,7 +602,7 @@ class SearchConfigController extends AbstractActionController
         }
         $params['display']['sort_list'] = $sortList;
 
-        $facetMode = ($params['facet']['mode'] ?? null) === 'link' ? 'link' : 'button';
+        $facetMode = in_array($params['facet']['mode'] ?? null, ['link', 'js']) ? $params['facet']['mode'] : 'button';
         $warnLanguage = false;
         $facets = [];
         $i = 0;

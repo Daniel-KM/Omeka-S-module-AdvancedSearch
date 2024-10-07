@@ -25,15 +25,17 @@ class FacetElements extends AbstractHelper
 
         // The type may be missing: the default is to use a checkbox.
         // Facet checkbox can be used in any case anyway, the js checks it.
-        $isFacetModeButton = ($options['mode'] ?? null) !== 'link';
+        $isFacetModeLink = ($options['mode'] ?? null) === 'link';
         $facetType = $options['type'] ?? null;
 
         // TODO Use match when Omeka will force php 8.
         switch ($facetType) {
             default:
             case 'Checkbox':
+                $facetElements = $plugins->get('facetCheckboxes');
+                break;
             case 'Link':
-                $facetElements = $isFacetModeButton ? $plugins->get('facetCheckboxes') : $plugins->get('facetLinks');
+                $facetElements = $plugins->get('facetLinks');
                 break;
             case 'RangeDouble':
                 $facetElements = $plugins->get('facetRangeDouble');
@@ -46,7 +48,11 @@ class FacetElements extends AbstractHelper
                 break;
             case 'Thesaurus':
             case 'Tree':
-                $facetElements = $isFacetModeButton ? $plugins->get('facetCheckboxesTree') : $plugins->get('facetLinksTree');
+                $facetElements = $plugins->get('facetCheckboxesTree');
+                break;
+            case 'ThesaurusLink':
+            case 'TreeLink':
+                $facetElements = $plugins->get('facetLinksTree');
                 break;
         }
 

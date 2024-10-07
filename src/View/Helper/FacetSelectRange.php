@@ -8,7 +8,7 @@ class FacetSelectRange extends AbstractFacet
 
     protected function prepareFacetData(string $facetField, array $facetValues, array $options): array
     {
-        $isFacetModeDirect = ($options['mode'] ?? '') === 'link';
+        $isFacetModeDirect = in_array($options['mode'] ?? null, ['link', 'js']);
 
         // It is simpler and better to get from/to from the query, because it
         // can manage discrete range.

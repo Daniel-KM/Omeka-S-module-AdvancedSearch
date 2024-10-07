@@ -14,7 +14,7 @@ class FacetRangeDouble extends AbstractFacet
      */
     protected function prepareFacetData(string $facetField, array $facetValues, array $options): array
     {
-        $isFacetModeDirect = ($options['mode'] ?? '') === 'link';
+        $isFacetModeDirect = in_array($options['mode'] ?? null, ['link', 'js']);
 
         $options['min'] = ($options['min'] ?? '') === '' ? null : (string) $options['min'];
         $options['max'] = ($options['max'] ?? '') === '' ? null : (string) $options['max'];

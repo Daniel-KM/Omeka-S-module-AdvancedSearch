@@ -87,14 +87,25 @@ class InternalQuerier extends AbstractQuerier
                     $apiResponse = $api->search($resourceType, $dataQuery, ['returnScalar' => 'id']);
                     $totalResults = $apiResponse->getTotalResults();
                     $result = $apiResponse->getContent();
-                    // TODO Currently experimental. To replace by a query + arg "querier=internal".
-                    $this->response->setAllResourceIdsForResourceType($resourceType, array_map('intval', $result) ?: []);
-                    if ($result && ($offset || $limit)) {
-                        $result = array_slice($result, $offset, $limit ?: null);
-                        // $apiResponse->setContent($result);
-                    }
                 } catch (\Omeka\Api\Exception\ExceptionInterface $e) {
                     throw new QuerierException($e->getMessage(), $e->getCode(), $e);
+                } catch (\Doctrine\DBAL\Exception\DriverException $e) {
+                    // The fix Omeka S is not ready.
+                    // @see https://github.com/omeka/omeka-s/pull/2224
+                    $this->logger->err('The fix https://github.com/omeka/omeka-s/pull/2224 is not integrated. You cannot set an order by relevance. A slow workaround is used.'); // @translate
+                    $apiResponse = $api->search($resourceType, $dataQuery, ['responseContent' => 'resource']);
+                    $totalResults = $apiResponse->getTotalResults();
+                    $result = [];
+                    foreach ($apiResponse->getContent() as $resource) {
+                        $id = $resource->getId();
+                        $result[$id] = $id;
+                    }
+                }
+                // TODO Currently experimental. To replace by a query + arg "querier=internal".
+                $this->response->setAllResourceIdsForResourceType($resourceType, array_map('intval', $result) ?: []);
+                if ($result && ($offset || $limit)) {
+                    $result = array_slice($result, $offset, $limit ?: null);
+                    // $apiResponse->setContent($result);
                 }
                 $this->response->setResourceTotalResults($resourceType, $totalResults);
                 if ($totalResults) {
@@ -114,14 +125,25 @@ class InternalQuerier extends AbstractQuerier
                 $apiResponse = $api->search($mainResourceType, $dataQuery, ['returnScalar' => 'id']);
                 $totalResults = $apiResponse->getTotalResults();
                 $result = $apiResponse->getContent();
-                // TODO Currently experimental. To replace by a query + arg "querier=internal".
-                $this->response->setAllResourceIdsForResourceType('resources', array_map('intval', $result) ?: []);
-                if ($result && ($offset || $limit)) {
-                    $result = array_slice($result, $offset, $limit ?: null);
-                    // $apiResponse->setContent($result);
-                }
             } catch (\Omeka\Api\Exception\ExceptionInterface $e) {
                 throw new QuerierException($e->getMessage(), $e->getCode(), $e);
+            } catch (\Doctrine\DBAL\Exception\DriverException $e) {
+                // The fix Omeka S is not ready.
+                // @see https://github.com/omeka/omeka-s/pull/2224
+                $this->logger->err('The fix https://github.com/omeka/omeka-s/pull/2224 is not integrated. You cannot set an order by relevance. A slow workaround is used.'); // @translate
+                $apiResponse = $api->search($mainResourceType, $dataQuery, ['responseContent' => 'resource']);
+                $totalResults = $apiResponse->getTotalResults();
+                $result = [];
+                foreach ($apiResponse->getContent() as $resource) {
+                    $id = $resource->getId();
+                    $result[$id] = $id;
+                }
+            }
+            // TODO Currently experimental. To replace by a query + arg "querier=internal".
+            $this->response->setAllResourceIdsForResourceType('resources', array_map('intval', $result) ?: []);
+            if ($result && ($offset || $limit)) {
+                $result = array_slice($result, $offset, $limit ?: null);
+                // $apiResponse->setContent($result);
             }
             $this->response->setResourceTotalResults('resources', $totalResults);
             if ($totalResults) {

@@ -1,4 +1,13 @@
 @media screen {
+    /* From omeka main styles. */
+    .collapse + .collapsible {
+        display: block;
+        clear: both;
+    }
+    .collapsible {
+        display: none;
+    }
+
     /* Search form */
     .form-search {
         margin-bottom: 24px;

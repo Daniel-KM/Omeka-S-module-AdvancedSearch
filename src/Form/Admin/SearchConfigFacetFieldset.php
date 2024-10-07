@@ -183,6 +183,20 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                     'placeholder' => '',
                 ],
             ])
+            ->add([
+                'type' => CommonElement\IniTextarea::class,
+                'name' => 'attributes',
+                'info' => 'List of specific attributes, in ini format.', // @translate
+                'options' => [
+                    'label' => 'Html attributes', // @translate
+                    'ini_typed_mode' => true,
+                ],
+                'attributes' => [
+                    'id' => 'form_facet_attributes',
+                    'required' => false,
+                    'placeholder' => '',
+                ],
+            ])
 
             ->add([
                 'name' => 'minus',

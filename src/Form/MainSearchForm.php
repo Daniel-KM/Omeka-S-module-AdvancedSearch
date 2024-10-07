@@ -178,50 +178,11 @@ class MainSearchForm extends Form
 
         // TODO Make q a standard filter, managed like all other ones, since all fields have them features.
         // TODO Allow to order and to skip "q" (include it as a standard filter).
-
-        $this
-            ->add([
-                'name' => 'q',
-                'type' => Element\Search::class,
-                'options' => [
-                    'label' => $hasVariant ? null : 'Search', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'q',
-                    'placeholder' => 'Search',
-                    'aria-label' => 'Search',
-                ] + $this->elementAttributes,
-            ])
-        ;
-
-        $autoSuggestUrl = $this->formSettings['q']['suggest_url'] ?? null;
-        if (!$autoSuggestUrl) {
-            $suggester = $this->formSettings['q']['suggester'] ?? null;
-            if ($suggester) {
-                // TODO Use url helper?
-                $autoSuggestUrl = $this->basePath
-                    . ($this->site ? '/s/' . $this->site->slug() : '/admin')
-                    . '/' . ($this->searchConfig ? $this->searchConfig->slug() : 'search')
-                    . '/suggest';
-            }
-        }
-        if ($autoSuggestUrl) {
-            $elementQ = $this->get('q')
-                ->setAttribute('class', 'autosuggest')
-                ->setAttribute('data-autosuggest-url', $autoSuggestUrl);
-            if (!empty($this->formSettings['q']['suggest_fill_input'])) {
-                $elementQ
-                    ->setAttribute('data-autosuggest-fill-input', '1');
-            }
-            if (empty($suggester) && !empty($this->formSettings['q']['suggest_url_param_name'])) {
-                $elementQ
-                    ->setAttribute('data-autosuggest-param-name', $this->formSettings['q']['suggest_url_param_name']);
-            }
-        }
-
-        // Add the button for record or full text search.
-        $recordOrFullText = in_array($this->variant, ['simple', 'csrf']) ? null : ($this->formSettings['q']['fulltext_search'] ?? null);
-        $this->appendRecordOrFullText($recordOrFullText);
+        $filter = $this->formSettings['q'] ?? [];
+        $element = $this->searchSearch($filter + [
+            'has_variant' => $hasVariant,
+        ]);
+        $this->add($element);
 
         foreach ($this->formSettings['form']['filters'] ?? [] as $filter) {
             if (empty($filter['field'])) {
@@ -671,6 +632,49 @@ class MainSearchForm extends Form
             ] + $filter['attributes'])
         ;
         return $element;
+    }
+
+    protected function searchSearch(array $filter): ?ElementInterface
+    {
+        $hasVariant = $filter['has_variant'];
+        $filter['options'] ??= [];
+        $filter['attributes'] = ($filter['attributes'] ?? []) + [
+            'placeholder' => 'Search',
+            'aria-label' => 'Search',
+        ];
+
+        $autoSuggestUrl = $filter['suggest_url'] ?? null;
+        if (!$autoSuggestUrl) {
+            $suggester = $filter['suggester'] ?? null;
+            if ($suggester) {
+                // TODO Use url helper?
+                $autoSuggestUrl = $this->basePath
+                . ($this->site ? '/s/' . $this->site->slug() : '/admin')
+                . '/' . ($this->searchConfig ? $this->searchConfig->slug() : 'search')
+                . '/suggest';
+            }
+        }
+
+        if ($autoSuggestUrl) {
+            $filter['attributes']['class'] = ($filter['attributes']['class'] ?? '') . ' autosuggest';
+            $filter['attributes']['data-autosuggest-url'] = $autoSuggestUrl;
+            if (!empty($this->formSettings['q']['suggest_fill_input'])) {
+                $filter['attributes']['data-autosuggest-fill-input'] = '1';
+            }
+            if (empty($suggester) && !empty($filter['suggest_url_param_name'])) {
+                $filter['attributes']['data-autosuggest-param-name'] = $filter['suggest_url_param_name'];
+            }
+        }
+
+        // Add the button for record or full text search.
+        $recordOrFullText = in_array($this->variant, ['simple', 'csrf']) ? null : ($filter['fulltext_search'] ?? null);
+        $this->appendRecordOrFullText($recordOrFullText);
+
+        $element = new Element\Search('q');
+        $element
+            ->setLabel($hasVariant ? null : (($filter['label'] ?? '') === '' ? ' ' : $filter['label']))
+        ;
+        return $this->appendOptionsAndAttributes($element, $filter);
     }
 
     protected function searchSelect(array $filter, array $valueOptions): ?ElementInterface

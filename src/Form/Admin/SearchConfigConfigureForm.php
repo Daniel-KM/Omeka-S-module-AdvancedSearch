@@ -166,6 +166,18 @@ class SearchConfigConfigureForm extends Form
             ])
             ->get('q')
             ->add([
+                'name' => 'label',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Label', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'q_label',
+                    'required' => false,
+                    'value' => 'Search', // @translate
+                ],
+            ])
+            ->add([
                 'name' => 'suggester',
                 'type' => CommonElement\OptionalSelect::class,
                 'options' => [
@@ -261,6 +273,37 @@ class SearchConfigConfigureForm extends Form
                 ])
             ;
         }
+
+        $this
+            ->get('q')
+            ->add([
+                'type' => CommonElement\IniTextarea::class,
+                'name' => 'options',
+                'options' => [
+                    'label' => 'Options', // @translate
+                    'info' => 'List of specific Omeka and Laminas options.', // @translate
+                    'ini_typed_mode' => true,
+                ],
+                'attributes' => [
+                    'id' => 'q_options',
+                    'required' => false,
+                    'placeholder' => '',
+                ],
+            ])
+            ->add([
+                'type' => CommonElement\IniTextarea::class,
+                'name' => 'attributes',
+                'options' => [
+                    'label' => 'Html attributes', // @translate
+                    'info' => 'Attributes to add to the input field, for example `class = "my-specific-class"`, data, etc.', // @translate
+                    'ini_typed_mode' => true,
+                ],
+                'attributes' => [
+                    'id' => 'q_attributes',
+                    'required' => false,
+                    'placeholder' => '',
+                ],
+            ]);
 
         $this
             ->add([

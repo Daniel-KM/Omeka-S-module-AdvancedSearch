@@ -1718,7 +1718,8 @@ class SearchResources
         // values table, so they're excluded from this optimization on both
         // sides: if either the current or previous row is a negative query,
         // the current row does a new join.
-        if ($previousPropertyIds === $propertyIds
+        if ($previousAlias
+            && $previousPropertyIds === $propertyIds
             && $previousPositive
             && $positive
             && $joiner === 'or'
@@ -2217,6 +2218,10 @@ class SearchResources
 
         // See above "Consecutive OR optimization" comment
         if (!$usePrevious || $hasSpecificJoinConditions) {
+            if ($usePrevious && $hasSpecificJoinConditions) {
+                $usePrevious = false;
+                $valuesAlias = $this->adapter->createAlias();
+            }
             if ($joinConditions) {
                 $qb->leftJoin($valuesJoin, $valuesAlias, Join::WITH, $expr->andX(...$joinConditions));
             } else {

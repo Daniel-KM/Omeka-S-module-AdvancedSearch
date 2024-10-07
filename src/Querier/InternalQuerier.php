@@ -62,6 +62,21 @@ class InternalQuerier extends AbstractQuerier
         $plugins = $this->services->get('ControllerPluginManager');
         $hasReferences = $plugins->has('references');
 
+        // Omeka S v4.1 does not allow to search fulltext and return scalar ids.
+        // Check if the fix Omeka S is not ready.
+        // @see https://github.com/omeka/omeka-s/pull/2224
+        if (isset($this->args['fulltext_search'])
+            && substr((string) $this->query->getSort(), 0, 9) === 'relevance'
+        ) {
+            $requireFix2224 = file_get_contents(OMEKA_PATH . '/application/src/Api/Adapter/AbstractEntityAdapter.php');
+            $requireFix2224 = !strpos($requireFix2224, '$hasFullTextSearchOrder');
+            if ($requireFix2224) {
+                $this->logger->warn('The fix https://github.com/omeka/omeka-s/pull/2224 is not integrated. A workaround is used.'); // @translate
+            }
+        } else {
+            $requireFix2224 = null;
+        }
+
         // The standard api way implies a double query, because scalar doesn't
         // set the full total and doesn't use paginator.
         // So get all ids, then slice it here.
@@ -84,22 +99,17 @@ class InternalQuerier extends AbstractQuerier
         if ($this->byResourceType || $isSpecificQuery) {
             foreach ($this->resourceTypes as $resourceType) {
                 try {
-                    $apiResponse = $api->search($resourceType, $dataQuery, ['returnScalar' => 'id']);
-                    $totalResults = $apiResponse->getTotalResults();
-                    $result = $apiResponse->getContent();
+                    if ($requireFix2224) {
+                        $apiResponse = $api->search($resourceType, $dataQuery, ['returnScalar' => 'id', 'require_fix_2224' => true]);
+                        $totalResults = $apiResponse->getRequest()->getOption('total_results', 0);
+                        $result = $apiResponse->getRequest()->getOption('results', []);
+                    } else {
+                        $apiResponse = $api->search($resourceType, $dataQuery, ['returnScalar' => 'id']);
+                        $totalResults = $apiResponse->getTotalResults();
+                        $result = $apiResponse->getContent();
+                    }
                 } catch (\Omeka\Api\Exception\ExceptionInterface $e) {
                     throw new QuerierException($e->getMessage(), $e->getCode(), $e);
-                } catch (\Doctrine\DBAL\Exception\DriverException $e) {
-                    // The fix Omeka S is not ready.
-                    // @see https://github.com/omeka/omeka-s/pull/2224
-                    $this->logger->err('The fix https://github.com/omeka/omeka-s/pull/2224 is not integrated. You cannot set an order by relevance. A slow workaround is used.'); // @translate
-                    $apiResponse = $api->search($resourceType, $dataQuery, ['responseContent' => 'resource']);
-                    $totalResults = $apiResponse->getTotalResults();
-                    $result = [];
-                    foreach ($apiResponse->getContent() as $resource) {
-                        $id = $resource->getId();
-                        $result[$id] = $id;
-                    }
                 }
                 // TODO Currently experimental. To replace by a query + arg "querier=internal".
                 $this->response->setAllResourceIdsForResourceType($resourceType, array_map('intval', $result) ?: []);
@@ -122,22 +132,17 @@ class InternalQuerier extends AbstractQuerier
                 // It is not possible to return the resource type for now with
                 // doctrine, but it is useless.
                 $mainResourceType = count($this->resourceTypes) === 1 ? reset($this->resourceTypes) : 'resources';
-                $apiResponse = $api->search($mainResourceType, $dataQuery, ['returnScalar' => 'id']);
-                $totalResults = $apiResponse->getTotalResults();
-                $result = $apiResponse->getContent();
+                if ($requireFix2224) {
+                    $apiResponse = $api->search($mainResourceType, $dataQuery, ['returnScalar' => 'id', 'require_fix_2224' => true]);
+                    $totalResults = $apiResponse->getRequest()->getOption('total_results', 0);
+                    $result = $apiResponse->getRequest()->getOption('results', []);
+                } else {
+                    $apiResponse = $api->search($mainResourceType, $dataQuery, ['returnScalar' => 'id']);
+                    $totalResults = $apiResponse->getTotalResults();
+                    $result = $apiResponse->getContent();
+                }
             } catch (\Omeka\Api\Exception\ExceptionInterface $e) {
                 throw new QuerierException($e->getMessage(), $e->getCode(), $e);
-            } catch (\Doctrine\DBAL\Exception\DriverException $e) {
-                // The fix Omeka S is not ready.
-                // @see https://github.com/omeka/omeka-s/pull/2224
-                $this->logger->err('The fix https://github.com/omeka/omeka-s/pull/2224 is not integrated. You cannot set an order by relevance. A slow workaround is used.'); // @translate
-                $apiResponse = $api->search($mainResourceType, $dataQuery, ['responseContent' => 'resource']);
-                $totalResults = $apiResponse->getTotalResults();
-                $result = [];
-                foreach ($apiResponse->getContent() as $resource) {
-                    $id = $resource->getId();
-                    $result[$id] = $id;
-                }
             }
             // TODO Currently experimental. To replace by a query + arg "querier=internal".
             $this->response->setAllResourceIdsForResourceType('resources', array_map('intval', $result) ?: []);

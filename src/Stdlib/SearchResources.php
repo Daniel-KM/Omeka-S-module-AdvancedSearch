@@ -1289,6 +1289,8 @@ class SearchResources
                 // ->addGroupBy('orderMatch')
                 // So add a hidden select and remove order before count, but
                 // directly in the adapter.
+                // When requesting scalar results, the fix is included via a
+                // later event, awaiting integration of fix omeka/omeka-s#2224.
                 ->addOrderBy($matchOrder, $sortOrder);
         }
 

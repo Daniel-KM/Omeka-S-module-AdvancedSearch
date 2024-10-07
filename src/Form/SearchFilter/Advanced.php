@@ -33,10 +33,12 @@ use AdvancedSearch\Stdlib\SearchResources;
 use AdvancedSearch\View\Helper\SearchFiltersTrait;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
+use Laminas\I18n\Translator\TranslatorAwareTrait;
 
 class Advanced extends Fieldset
 {
     use SearchFiltersTrait;
+    use TranslatorAwareTrait;
 
     public function init(): void
     {

@@ -123,7 +123,7 @@ return [
             Form\Admin\SearchSuggesterForm::class => Service\Form\SearchSuggesterFormFactory::class,
             Form\Element\FieldSelect::class => Service\Form\Element\FieldSelectFactory::class,
             Form\Element\SearchConfigSelect::class => Service\Form\Element\SearchConfigSelectFactory::class,
-            Form\SearchFilter\Advanced::class => \Common\Service\Form\GenericFormFactory::class,
+            Form\SearchFilter\Advanced::class => Service\Form\SearchFilterAdvancedFactory::class,
             Form\MainSearchForm::class => Service\Form\MainSearchFormFactory::class,
             Form\SearchingFormFieldset::class => Service\Form\SearchingFormFieldsetFactory::class,
             Form\SettingsFieldset::class => Service\Form\SettingsFieldsetFactory::class,

@@ -490,6 +490,8 @@ class MainSearchForm extends Form
             return null;
         }
 
+        $advanced->setTranslator($this->translator);
+
         $element = new Element\Collection('filter');
 
         // To use the label is the simplest to pass the button Plus inside the

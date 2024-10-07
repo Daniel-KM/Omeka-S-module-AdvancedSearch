@@ -1584,7 +1584,7 @@ if (version_compare($oldVersion, '3.4.31', '<')) {
     $sql = <<<SQL
     UPDATE `search_engine`
     SET
-        `settings` = REPLACE(`settings`, '"resources":[', '"resource_types":[')
+        `settings` = REPLACE(`settings`, '"resources":', '"resource_types":')
     ;
     SQL;
     $connection->executeStatement($sql);
@@ -1650,4 +1650,33 @@ if (version_compare($oldVersion, '3.4.31', '<')) {
         'You should check all your search engines: form, filters, results, sort, facets. It may be simpler to remove all your specific search files and to update only the css.' // @translate
     );
     $messenger->addWarning($message);
+}
+
+if (version_compare($oldVersion, '3.4.32', '<')) {
+    $qb = $connection->createQueryBuilder();
+    $qb
+        ->select('id', 'settings')
+        ->from('search_config', 'search_config')
+        ->orderBy('id', 'asc');
+    $searchConfigsSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    foreach ($searchConfigsSettings as $id => $searchConfigSettings) {
+        $searchEngineId = $searchConfigsEngines[$id] ?? null;
+        $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
+        $facetMode = $searchConfigSettings['facet']['mode'] ?? '';
+        if ($facetMode === 'link') {
+            foreach ($searchConfigSettings['facet']['facets'] ?? [] as $key => $facet) {
+                $facetType = $searchConfigSettings['facet']['facets'][$key]['type'] ?? '';
+                if (in_array($facetType, ['', 'Checkbox'])) {
+                    $searchConfigSettings['facet']['facets'][$key]['type'] = 'Link';
+                } elseif (in_array($facetType, ['', 'Tree'])) {
+                    $searchConfigSettings['facet']['facets'][$key]['type'] = 'TreeLink';
+                } elseif (in_array($facetType, ['', 'Thesaurus'])) {
+                    $searchConfigSettings['facet']['facets'][$key]['type'] = 'ThesaurusLink';
+                }
+                $searchConfigSettings['facet']['facets'][$key]['mode'] = 'link';
+            }
+            $sql = 'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?;';
+            $connection->executeStatement($sql, [json_encode($searchConfigSettings, 320), $id]);
+        }
+    }
 }

@@ -45,7 +45,7 @@ if (!empty($itemSet)) {
 }
 ?>
 
-<div class="facets">
+<div id="search-facets" class="facets">
 
     <?php if ($label = $searchConfig->subSetting('facet', 'label', $translate('Facets'))): ?>
     <h3><?= $escape($label) ?></h3>

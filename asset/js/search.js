@@ -33,6 +33,7 @@ const hasChosenSelect = typeof $.fn.chosen === 'function';
 const hasOmekaTranslate = typeof Omeka !== 'undefined' && typeof Omeka.jsTranslate === 'function';
 
 const $searchFiltersAdvanced = $('#search-filters');
+const $searchFacetsAdvanced = $('#search-facets');
 
 /**
  * Manage search form, search filters, search results, search facets.
@@ -346,6 +347,7 @@ var Search = (function() {
                 button.attr('aria-label', button.attr('data-label-collapse') ? button.attr('data-label-collapse') : (hasOmekaTranslate ? Omeka.jsTranslate('Collapse') : 'Collapse'));
                 button.closest('.facet').find('.facet-elements').removeAttr('hidden');
             }
+            $searchFacetsAdvanced.trigger('o:advanced-search.facet.expand-or-collapse');
             return self;
         };
 
@@ -359,6 +361,7 @@ var Search = (function() {
                 button.text(button.attr('data-label-see-less') ? button.attr('data-label-see-less') : (hasOmekaTranslate ? Omeka.jsTranslate('See less') : 'See less'));
                 button.closest('.facet').find('.facet-items .facet-item').removeAttr('hidden');
             }
+            $searchFacetsAdvanced.trigger('o:advanced-search.facet.see-more-or-less');
             return self;
         };
 

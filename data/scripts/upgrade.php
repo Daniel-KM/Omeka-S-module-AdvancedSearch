@@ -746,7 +746,7 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
         'facetOptions' => [
             'strings' => [
                 'themes/*/view/search/*' => [
-                    'facetActives(',
+                    '$facetActives(null, $activeFacets, $options)',
                 ],
             ],
             'message' => 'The template for facets was simplified. See view/search/facets-list.phtml. Matching templates: {json}', // @translate
@@ -1115,6 +1115,15 @@ SQL;
     } catch (\Exception $e) {
         // Already done.
     }
+
+    // There may be issue with cache when changing a column name.
+    if (function_exists('opcache_reset')) {
+        opcache_reset();
+    }
+    if (function_exists('apcu_clear_cache')) {
+        apcu_clear_cache();
+    }
+    @clearstatcache(true);
 
     $message = new PsrMessage(
         'New options were added in search config: the choice of the theme template (search/search) and an option to display the breadcrumbs.' // @translate

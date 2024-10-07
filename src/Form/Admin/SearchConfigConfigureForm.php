@@ -231,6 +231,16 @@ class SearchConfigConfigureForm extends Form
                     'value' => '',
                 ],
             ])
+            ->add([
+                'name' => 'remove_diacritics',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Process request without diacritic', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'q_remove_diacritics',
+                ],
+            ])
         ;
 
         // TODO Add the check in adapter interface, or allow specific fieldset by adapter.

@@ -208,6 +208,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
 
         $query
             ->setAliases($formSettings['aliases'] ?? [])
+            ->setOption('remove_diacritics', !empty($formSettings['remove_diacritics']))
             ->setOption('default_search_partial_word', !empty($formSettings['default_search_partial_word']));
 
         // Solr doesn't allow unavailable args anymore (invalid or unknown).

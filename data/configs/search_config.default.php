@@ -44,6 +44,7 @@ return [
             'suggest_limit' => null,
             'suggest_fill_input' => false,
             'fulltext_search' => null,
+            'remove_diacritics' => false,
             'default_search_partial_word' => false,
         ],
 

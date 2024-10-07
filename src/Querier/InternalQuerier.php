@@ -604,6 +604,15 @@ SQL;
             return;
         }
 
+        if ($this->query->getOption('remove_diacritics', false)) {
+            if (extension_loaded('intl')) {
+                $transliterator = \Transliterator::createFromRules(':: NFD; :: [:Nonspacing Mark:] Remove; :: NFC;');
+                $q = $transliterator->transliterate($q);
+            } elseif (extension_loaded('iconv')) {
+                $q = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $q);
+            }
+        }
+
         // TODO Try to support the exact search and the full text search (removed in version 3.5.17.3).
         if (mb_substr($q, 0, 1) === '"' && mb_substr($q, -1) === '"') {
             $q = trim($q, '" ');
@@ -638,6 +647,15 @@ SQL;
     {
         $q = $this->query->getQuery();
         $excludedFields = $this->query->getExcludedFields();
+
+        if ($this->query->getOption('remove_diacritics', false)) {
+            if (extension_loaded('intl')) {
+                $transliterator = \Transliterator::createFromRules(':: NFD; :: [:Nonspacing Mark:] Remove; :: NFC;');
+                $q = $transliterator->transliterate($q);
+            } elseif (extension_loaded('iconv')) {
+                $q = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $q);
+            }
+        }
 
         // TODO Try to support the exact search and the full text search (removed in previous version).
         if (mb_substr($q, 0, 1) === '"' && mb_substr($q, -1) === '"') {

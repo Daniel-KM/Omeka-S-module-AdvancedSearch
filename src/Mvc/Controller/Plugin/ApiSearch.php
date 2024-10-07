@@ -294,7 +294,8 @@ class ApiSearch extends AbstractPlugin
             && $searchAdapter instanceof \SearchSolr\Adapter\SolariumAdapter;
 
         $searchFormSettings['aliases'] = $this->searchConfig->subSetting('index', 'aliases', []);
-        $searchFormSettings['default_search_partial_word'] = $this->searchConfig->subSetting('q', 'default_search_partial_word', false);
+        $searchFormSettings['remove_diacritics'] = (bool) $this->searchConfig->subSetting('q', 'remove_diacritics', false);
+        $searchFormSettings['default_search_partial_word'] = (bool) $this->searchConfig->subSetting('q', 'default_search_partial_word', false);
 
         $searchQuery = $this->apiFormAdapter->toQuery($query, $searchFormSettings);
         $searchQuery->setResourceTypes([$resourceType]);

@@ -90,6 +90,7 @@ class ApiFormAdapter implements FormAdapterInterface
         $query = new Query();
         $query
             ->setAliases($formSettings['aliases'] ?? [])
+            ->setOption('remove_diacritics', !empty($formSettings['remove_diacritics']))
             ->setOption('default_search_partial_word', !empty($formSettings['default_search_partial_word']));
 
         if (isset($request['search'])) {

@@ -140,7 +140,8 @@ class SearchRequestToResponse extends AbstractPlugin
         $searchFormSettings['aliases'] = $this->searchConfig->subSetting('index', 'aliases', []);
 
         // TODO Add a way to pass any dynamically configured option to the search engine.
-        $searchFormSettings['default_search_partial_word'] = $this->searchConfig->subSetting('q', 'default_search_partial_word', false);
+        $searchFormSettings['remove_diacritics'] = (bool) $this->searchConfig->subSetting('q', 'remove_diacritics', false);
+        $searchFormSettings['default_search_partial_word'] = (bool) $this->searchConfig->subSetting('q', 'default_search_partial_word', false);
 
         /** @var \AdvancedSearch\Query $query */
         $query = $formAdapter->toQuery($request, $searchFormSettings);

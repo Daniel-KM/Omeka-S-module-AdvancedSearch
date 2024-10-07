@@ -348,6 +348,9 @@
     .facet-item input[type=checkbox] {
         vertical-align: initial;
     }
+    .facet-item a {
+        color: inherit;
+    }
     .facet-item a::before {
         display: inline-block;
         font-family: 'Font Awesome 5 Free';

@@ -252,7 +252,8 @@ class MainSearchForm extends Form
 
             // Append options and attributes early to simplify process.
             // Options and attributes don't override the ones set here in form.
-            $filter['label'] ??= '';
+            // Use a fake emtpy string in case to avoid issue with formLabel().
+            $filter['label'] = ($filter['label'] ?? '') === '' ? ' ' : (string) $filter['label'];
             $filter['options'] ??= [];
             $filter['attributes'] = array_key_exists('attributes', $filter)
                 ? $filter['attributes'] + $this->elementAttributes
@@ -740,7 +741,7 @@ class MainSearchForm extends Form
                     ? CommonElement\OptionalMultiCheckbox::class
                     : CommonElement\OptionalSelect::class,
                 'options' => [
-                    'label' => $filter['label'], // @translate
+                    'label' => $filter['label'],
                     'value_options' => $this->skipValues ? [] : $this->listItemSetsTree($filter['type'] !== 'MultiCheckbox'),
                     'empty_option' => '',
                 ] + $filter['options'],
@@ -801,8 +802,8 @@ class MainSearchForm extends Form
         $element = $this->formElementManager->get(\Thesaurus\Form\Element\ThesaurusSelect::class);
         $element
             ->setName($filter['field'])
+            ->setLabel($filter['label'])
             ->setOptions([
-                'label' => $filter['label'], // @translate
                 'empty_option' => '',
             ] + $filterOptions)
             ->setAttributes([
@@ -837,7 +838,7 @@ class MainSearchForm extends Form
                     ? CommonElement\OptionalMultiCheckbox::class
                     : CommonElement\OptionalSelect::class,
                 'options' => [
-                    'label' => $filter['label'], // @translate
+                    'label' => $filter['label'],
                     'value_options' => $this->skipValues ? [] : $this->listOwners(),
                     'empty_option' => '',
                 ] + $filter['options'],
@@ -871,7 +872,7 @@ class MainSearchForm extends Form
                     ? CommonElement\OptionalMultiCheckbox::class
                     : CommonElement\OptionalSelect::class,
                 'options' => [
-                    'label' => $filter['label'], // @translate
+                    'label' => $filter['label'],
                     'value_options' => $this->skipValues ? [] : $this->listSites(),
                     'empty_option' => '',
                 ] + $filter['options'],
@@ -953,7 +954,7 @@ class MainSearchForm extends Form
                     ? CommonElement\OptionalMultiCheckbox::class
                     : CommonElement\OptionalSelect::class,
                 'options' => [
-                    'label' => $filter['label'], // @translate
+                    'label' => $filter['label'],
                     'value_options' => $this->skipValues ? [] : $this->listItemSets($filter['type'] !== 'MultiCheckbox'),
                     'empty_option' => '',
                 ] + $filter['options'],
@@ -996,7 +997,7 @@ class MainSearchForm extends Form
                     ? CommonElement\OptionalRadio::class
                     : CommonElement\OptionalSelect::class,
                 'options' => [
-                    'label' => $filter['label'], // @translate
+                    'label' => $filter['label'],
                     'value_options' => $valueOptions,
                     'empty_option' => '',
                 ] + $filter['options'],

@@ -66,7 +66,6 @@ return [
             'formRangeDouble' => Form\View\Helper\FormRangeDouble::class,
             'getSearchConfig' => View\Helper\GetSearchConfig::class,
             'hiddenInputsFromFilteredQuery' => View\Helper\HiddenInputsFromFilteredQuery::class,
-            'searchConfigCurrent' => View\Helper\SearchConfigCurrent::class,
             'searchFilters' => View\Helper\SearchFilters::class,
             'searchingFilters' => View\Helper\SearchingFilters::class,
             'searchingForm' => View\Helper\SearchingForm::class,
@@ -96,6 +95,10 @@ return [
             \Omeka\View\Helper\UserBar::class => [
                 Service\ViewHelper\UserBarDelegatorFactory::class,
             ],
+        ],
+        'aliases' => [
+            // Deprecated.
+            'searchConfigCurrent' => View\Helper\GetSearchConfig::class,
         ],
     ],
     'block_layouts' => [

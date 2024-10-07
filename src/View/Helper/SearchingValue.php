@@ -30,22 +30,20 @@ class SearchingValue extends AbstractHelper
         $url = $plugins->get('url');
         $status = $plugins->get('status');
         $hyperlink = $plugins->get('hyperlink');
-        $advancedSearchConfig = $plugins->has('searchConfigCurrent') ? $plugins->get('searchConfigCurrent') : null;
+        $getSearchConfig = $plugins->get('getSearchConfig');
 
         // Check if the current site/admin has a search form.
         $isAdmin = $status->isAdminRequest();
         $isSite = $status->isSiteRequest();
         $siteSlug = $isSite ? $status->getRouteParam('site-slug') : null;
 
-        if ($advancedSearchConfig) {
-            $advancedSearchConfig = $advancedSearchConfig();
-            $engine = $advancedSearchConfig ? $advancedSearchConfig->engine() : null;
-            $querier = $engine ? $engine->querier() : null;
-            $isInternalSearch = $querier instanceof \AdvancedSearch\Querier\InternalQuerier;
-            // Fallback to standard search for module Advanced search.
-            if (!$querier || $querier instanceof \AdvancedSearch\Querier\NoopQuerier) {
-                $advancedSearchConfig = null;
-            }
+        $advancedSearchConfig = $getSearchConfig();
+        $engine = $advancedSearchConfig ? $advancedSearchConfig->engine() : null;
+        $querier = $engine ? $engine->querier() : null;
+        $isInternalSearch = $querier instanceof \AdvancedSearch\Querier\InternalQuerier;
+        // Fallback to standard search for module Advanced search.
+        if (!$querier || $querier instanceof \AdvancedSearch\Querier\NoopQuerier) {
+            $advancedSearchConfig = null;
         }
 
         $asUrl = !empty($options['as_url']);

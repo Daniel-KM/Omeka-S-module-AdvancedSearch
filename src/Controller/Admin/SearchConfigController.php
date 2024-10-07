@@ -645,6 +645,9 @@ class SearchConfigController extends AbstractActionController
             // Add a warning for languages of facets because it may be a hard to
             // understand issue.
             if (!empty($facet['languages'])) {
+                if (is_string($facet['languages'])) {
+                    $facet['languages'] = explode('|', $facet['languages']);
+                }
                 $facet['languages'] = array_values(array_unique(array_map('trim', $facet['languages'])));
                 if (!empty($facet['languages']) && !in_array('', $facet['languages'])) {
                     $warnLanguage = true;

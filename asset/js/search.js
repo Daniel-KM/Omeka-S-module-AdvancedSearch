@@ -296,11 +296,13 @@ var Search = (function() {
             for (var i = 0; i < countAppend; i++) {
                 $searchFiltersAdvanced.append(fieldsetTemplate.split('__index__').join(++maxIndex));
             }
+            $searchFiltersAdvanced.trigger('o:advanced-search.filter.append');
             return self;
         };
 
         self.removeFilter = function(filter) {
             $(filter).remove();
+            $searchFiltersAdvanced.trigger('o:advanced-search.filter.remove');
             return self;
         };
 

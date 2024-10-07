@@ -158,10 +158,6 @@ class InternalQuerier extends AbstractQuerier
         $this->response->setCurrentPage($limit ? 1 + (int) floor($offset / $limit) : 1);
         $this->response->setPerPage($limit);
 
-        if ($hasReferences) {
-            $this->fillFacetResponse();
-        }
-
         // Remove specific results when settings are not by resource type.
         // TODO The order may be different when "resources" is not used.
         // This is the same in SolariumQuerier.
@@ -182,6 +178,10 @@ class InternalQuerier extends AbstractQuerier
             $total = isset($totalResultsByType['resources']) ? $totalResultsByType['resources'] : array_sum($totalResultsByType);
             $this->response->setResourceTotalResults(['resources' => $total]);
             $this->response->setTotalResults($total);
+        }
+
+        if ($hasReferences) {
+            $this->fillFacetResponse();
         }
 
         return $this->response

@@ -172,11 +172,11 @@ class InternalQuerier extends AbstractQuerier
             if (isset($resultsByType['resources'])) {
                 $this->response->setResults(['resources' => $resultsByType['resources']]);
             } else {
-                $this->response->setResults(['resources' => array_replace(...$resultsByType)]);
+                $this->response->setResults(['resources' => array_replace(...array_values($resultsByType))]);
             }
             $totalResultsByType = $this->response->getResourceTotalResults();
             $total = isset($totalResultsByType['resources']) ? $totalResultsByType['resources'] : array_sum($totalResultsByType);
-            $this->response->setResourceTotalResults(['resources' => $total]);
+            $this->response->setResourceTotalResults('resources', $total);
             $this->response->setTotalResults($total);
         }
 

@@ -40,6 +40,6 @@ class SearchResources extends AbstractPlugin
      */
     public function __call(string $name, array $arguments)
     {
-        return $this->searchResources->$name(...$arguments);
+        return $this->searchResources->$name(...array_values($arguments));
     }
 }

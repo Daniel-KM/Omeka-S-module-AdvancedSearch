@@ -117,6 +117,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                         'static' => 'Static', // @ŧranslate
                         'expand' => 'Expanded', // @ŧranslate
                         'collapse' => 'Collapsed', // @ŧranslate
+                        'collapse_unless_set' => 'Collapsed unless a facet is set', // @ŧranslate
                     ],
                 ],
                 'attributes' => [

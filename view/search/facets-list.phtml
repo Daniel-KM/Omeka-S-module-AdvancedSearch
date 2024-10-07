@@ -85,10 +85,11 @@ if (!empty($itemSet)) {
         <ul class="facets-list">
             <?php foreach ($facets as $name => $facetValues): ?>
             <?php $facetOptions = $searchFacets[$name]; ?>
-            <?php $hasState = in_array($facetOptions['state'] ?? '', ['expand', 'collapse']); ?>
+            <?php $hasState = in_array($facetOptions['state'] ?? '', ['expand', 'collapse', 'collapse_unless_set']); ?>
             <li class="facet">
                 <?php if ($hasState): ?>
-                <button type="button" class="facet-button <?= $facetOptions['state'] === 'collapse' ? 'expand' : 'collapse' ?>" aria-label="<?= $translate($facetOptions['state'] === 'collapse' ? 'Expand' : 'Collapse') ?>" data-label-expand="<?= $translate('Expand') ?>" data-label-collapse="<?= $translate('Collapse') ?>"><?= $escape($translate($facetOptions['label'] ?? $name)) ?></button>
+                <?php $stateExpand = $facetOptions['state'] === 'expand' || ($facetOptions['state'] === 'collapse_unless_set' && !empty($activeFacets[$name])); ?>
+                <button type="button" class="facet-button <?= $stateExpand ? 'collapse' : 'expand' ?>" aria-label="<?= $translate($stateExpand ? 'Collapse' : 'Expand') ?>" data-label-expand="<?= $translate('Expand') ?>" data-label-collapse="<?= $translate('Collapse') ?>"><?= $escape($translate($facetOptions['label'] ?? $name)) ?></button>
                 <?php else: ?>
                 <h4><?= $escape($translate($facetOptions['label'] ?? $name)) ?></h4>
                 <?php endif; ?>

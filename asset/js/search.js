@@ -30,6 +30,8 @@
 
 const hasChosenSelect = typeof $.fn.chosen === 'function';
 
+const hasOmekaTranslate = typeof Omeka !== 'undefined' && typeof Omeka.jsTranslate === 'function';
+
 const $searchFiltersAdvanced = $('#search-filters');
 
 /**
@@ -336,10 +338,10 @@ var Search = (function() {
         self.expandOrCollapse = function(button) {
             button = $(button);
             if (button.hasClass('expand')) {
-                button.attr('aria-label', button.attr('data-label-expand') ? button.attr('data-label-expand') : Omeka.jsTranslate('Expand'));
+                button.attr('aria-label', button.attr('data-label-expand') ? button.attr('data-label-expand') : (hasOmekaTranslate ? Omeka.jsTranslate('Expand') : 'Expand'));
                 button.closest('.facet').find('.facet-elements').attr('hidden', 'hidden');
             } else {
-                button.attr('aria-label', button.attr('data-label-expand') ? button.attr('data-label-collapse') : Omeka.jsTranslate('Collapse'));
+                button.attr('aria-label', button.attr('data-label-collapse') ? button.attr('data-label-collapse') : (hasOmekaTranslate ? Omeka.jsTranslate('Collapse') : 'Collapse'));
                 button.closest('.facet').find('.facet-elements').removeAttr('hidden');
             }
             return self;
@@ -348,11 +350,11 @@ var Search = (function() {
         self.seeMoreOrLess = function(button) {
             button = $(button);
             if (button.hasClass('expand')) {
-                button.text(button.attr('data-label-see-more') ? button.attr('data-label-see-more') : Omeka.jsTranslate('See more'));
+                button.text(button.attr('data-label-see-more') ? button.attr('data-label-see-more') : (hasOmekaTranslate ? Omeka.jsTranslate('See more') : 'See more'));
                 const defaultCount = Number(button.attr('data-default-count')) + 1;
                 button.closest('.facet').find('.facet-items .facet-item:nth-child(n+' + defaultCount + ')').attr('hidden', 'hidden');
             } else {
-                button.text(button.attr('data-label-see-less') ? button.attr('data-label-see-less') : Omeka.jsTranslate('See less'));
+                button.text(button.attr('data-label-see-less') ? button.attr('data-label-see-less') : (hasOmekaTranslate ? Omeka.jsTranslate('See less') : 'See less'));
                 button.closest('.facet').find('.facet-items .facet-item').removeAttr('hidden');
             }
             return self;

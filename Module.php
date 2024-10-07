@@ -450,7 +450,7 @@ class Module extends AbstractModule
                 $defaultSite = (int) $settings->get('default_site');
                 if ($defaultSite) {
                     try {
-                        $site = $helpers->get('api')->read('sites', ['id' => $defaultSite])->getContent();
+                        $site = $services->get('Omeka\ApiManager')->read('sites', ['id' => $defaultSite])->getContent();
                         $siteSlug = $site->slug();
                     } catch (\Exception $e) {
                         // No default site slug.

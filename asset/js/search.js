@@ -203,7 +203,7 @@ var Search = (function() {
             // Managed by module, that uses the format of jQuery-Autocomplete
             // in data, or jQuery-Autocomplete directly.
             return response.data ? response.data : response;
-        }
+        };
 
         // Get the param name (always "q" for the internal suggester).
         let paramName = element.data('autosuggest-param-name');
@@ -242,7 +242,7 @@ var Search = (function() {
 
         self.countAll = function() {
             return $searchFiltersAdvanced.find('> fieldset.filter').length;
-        }
+        };
 
         self.countFilled = function() {
             var countFilled = 0;
@@ -297,12 +297,12 @@ var Search = (function() {
                 $searchFiltersAdvanced.append(fieldsetTemplate.split('__index__').join(++maxIndex));
             }
             return self;
-        }
+        };
 
         self.removeFilter = function(filter) {
             $(filter).remove();
             return self;
-        }
+        };
 
         self.updatePlus = function() {
             const buttonPlus = $searchFiltersAdvanced.find('.search-filter-plus');
@@ -312,7 +312,7 @@ var Search = (function() {
                 buttonPlus.show();
             }
             return self;
-        }
+        };
 
         return self;
     })();
@@ -345,7 +345,7 @@ var Search = (function() {
                 button.closest('.facet').find('.facet-elements').removeAttr('hidden');
             }
             return self;
-        }
+        };
 
         self.seeMoreOrLess = function(button) {
             button = $(button);
@@ -358,7 +358,7 @@ var Search = (function() {
                 button.closest('.facet').find('.facet-items .facet-item').removeAttr('hidden');
             }
             return self;
-        }
+        };
 
         return self;
     })();

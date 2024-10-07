@@ -13,7 +13,7 @@ class SearchingValue extends AbstractHelper
      * Adapted:
      * @see \AdvancedResourceTemplate\Module::handleRepresentationValueHtml()
      * @see \AdvancedSearch\View\Helper\SearchingValue::__invoke()
-
+     *
      * @var array $options Available options:
      * - as_url (bool)
      * - as_array (array): array with key "url" and "label". The label may have

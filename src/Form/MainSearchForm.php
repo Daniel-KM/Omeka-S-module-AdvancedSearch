@@ -491,7 +491,8 @@ class MainSearchForm extends Form
             return null;
         }
 
-        $advanced->setTranslator($this->translator);
+        $advanced
+            ->setTranslator($this->translator);
 
         $element = new Element\Collection('filter');
 

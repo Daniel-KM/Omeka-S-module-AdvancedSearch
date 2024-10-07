@@ -273,7 +273,8 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
      *   - skip_partial_headers (bool): Skip partial headers.
      *   - skip_values: Does not init form element values (quicker results).
      *   - variant: Name of a variant of the form, "quick" or "simple", or
-     *     "csrf" (internal use).
+     *     "csrf" (internal use). "quick" has "q", "rft" and hidden elements,
+     *     and "simple" has only "q" and hidden elements.
      *     To use a variant allows a quicker process than a template alone.
      *   Other options are passed to the partial.
      *

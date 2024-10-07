@@ -57,8 +57,7 @@ $setting = $plugins->get($isAdmin ? 'setting' : 'siteSetting');
 
 $filterLocale = (bool) $setting('filter_locale_values');
 $lang = $this->lang();
-$langTitle = $filterLocale ? $lang : null;
-// $langValue = $filterLocale ? [$lang, ''] : null;
+$langValue = $filterLocale ? [$lang, ''] : null;
 
 // TODO Use site item set ?
 // Used in case of a redirect of item-set/show to search, when used like item/browse.
@@ -104,9 +103,9 @@ $this->headScript()
             <?php if ($itemSet): ?>
             <li><?= $hyperlink($translate('Collections'), $url($isAdmin ? 'admin/default' : 'site/resource', ['controller' => 'item-set', 'action' => 'browse'], true)) ?></li>
             <?php // It may be a span or a link + search. ?>
-            <li><span aria-current="page"><?= $escape($itemSet->displayTitle(null, $langTitle)) ?></span></li>
+            <li><span aria-current="page"><?= $escape($itemSet->displayTitle(null, $langValue)) ?></span></li>
             <?php /*
-            <li><?= $hyperlink($itemSet->displayTitle(null, $langTitle), $isAdmin ? $itemSet->adminUrl() : $itemSet->siteUrl($site->slug())) ?></li>
+            <li><?= $hyperlink($itemSet->displayTitle(null, $langValue), $isAdmin ? $itemSet->adminUrl() : $itemSet->siteUrl($site->slug())) ?></li>
             */ ?>
             <?php else: ?>
             <li><span aria-current="page"><?= $escape($translate('Search')) ?></span></li>
@@ -118,7 +117,7 @@ $this->headScript()
 <?php endif; ?>
 
 <div id="search-page">
-<?php endif; // End isPartial. ?>
+<?php endif; // End NOT partial. ?>
 
 <?php if ($displayItemSet): ?>
 
@@ -126,7 +125,7 @@ $this->headScript()
     $vars->offsetSet('resourceType', 'item_sets'); // TODO Check if really needed.
     $this->htmlElement('body')->appendAttribute('class', 'search-page item-set resource browse');
     ?>
-    <?= $this->pageTitle($itemSet->displayTitle(null, $langTitle), 2) ?>
+    <?= $this->pageTitle($itemSet->displayTitle(null, $langValue), 2) ?>
     <h3><?= $translate('Item set') ?></h3>
     <div class="metadata">
         <?= $this->resourcePageBlocks($itemSet)->getBlocks() ?>

@@ -19,4 +19,14 @@ class TestQuerier extends AbstractQuerier
 
         return $response;
     }
+
+    public function querySuggestions(): Response
+    {
+        return new Response();
+    }
+
+    public function getPreparedQuery()
+    {
+        return [];
+    }
 }

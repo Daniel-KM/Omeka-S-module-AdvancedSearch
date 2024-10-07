@@ -38,7 +38,7 @@ $multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['lis
 <?php // Search filters. ?>
 
 <?php if (isset($displayParts['search_filters'])): ?>
-<?= $this->searchingFilters($searchConfig, $query, ['template' => 'common/search-filters-links']) ?>
+<?= $searchConfig->renderSearchFilters($query, ['template' => 'common/search-filters-links']) ?>
 <?php endif; ?>
 
 <?php // Active Facets. ?>

@@ -686,7 +686,7 @@ class SearchConfigController extends AbstractActionController
     }
 
     /**
-     * Remove all params starting with "available_".
+     * Remove empty params and all params starting with "available_".
      */
     protected function removeUselessFields(array $params): array
     {

@@ -1187,6 +1187,47 @@ class SearchResources
             }
         }
 
+        if (isset($query['has_asset']) && (string) $query['has_asset'] !== '') {
+            if ($query['has_asset']) {
+                $qb
+                    ->andWhere($expr->isNotNull('omeka_root.thumbnail'));
+            } else {
+                $qb
+                    ->andWhere($expr->isNull('omeka_root.thumbnail'));
+            }
+        }
+
+        if (isset($query['asset_id'])
+            && $query['asset_id'] !== ''
+            && $query['asset_id'] !== []
+        ) {
+            $assetIds = is_array($query['asset_id'])
+                ? array_values(array_unique($query['asset_id']))
+                : [$query['asset_id']];
+            if (array_values($assetIds) === [0]) {
+                $qb
+                    ->andWhere(
+                        $expr->isNull('omeka_root.thumbnail')
+                    );
+            } elseif (in_array(0, $assetIds, true)) {
+                $qb
+                    ->andWhere($expr->orX(
+                        $expr->isNull('omeka_root.thumbnail'),
+                        $expr->in(
+                            'omeka_root.thumbnail',
+                            $this->adapter->createNamedParameter($qb, $assetIds)
+                        )
+                    ));
+            } else {
+                $qb
+                    ->andWhere($expr->in(
+                        'omeka_root.thumbnail',
+                        $this->adapter->createNamedParameter($qb, $assetIds)
+                    ));
+            }
+        }
+
+        // Order by is the last part or a sql query.
         // Sort by listed id.
         // The list is the one set in key "sort_ids" or in main query key "id".
         // The sort order is "desc" for resource/browse (see plugin SetBrowseDefault::__invoke())
@@ -1235,50 +1276,20 @@ class SearchResources
             // The order is slightly different from the standard one, because
             // an order by id desc is appended automatically, so all results
             // with the same score are sorted by id desc and not randomly.
+            // Don't use "`" here for doctrine.
             $matchOrder = 'MATCH(omeka_fulltext_search.title, omeka_fulltext_search.text) AGAINST (:omeka_fulltext_search)';
             $sortOrder = $query['sort_by'] === 'relevance asc' ? 'ASC' : 'DESC';
             $qb
+                // The hidden select and "group by" avoids issue with mysql mode "only_full_group_by".
+                // But the select is not available when returning scalar ids.
+                // And to add it in AbstractEntityAdapter does not help, because
+                // the paginator requires a total count and remove all select
+                // to get it.
+                // ->addSelect($matchOrder . ' AS HIDDEN orderMatch')
+                // ->addGroupBy('orderMatch')
+                // So add a hidden select and remove order before count, but
+                // directly in the adapter.
                 ->addOrderBy($matchOrder, $sortOrder);
-        }
-
-        if (isset($query['has_asset']) && (string) $query['has_asset'] !== '') {
-            if ($query['has_asset']) {
-                $qb
-                    ->andWhere($expr->isNotNull('omeka_root.thumbnail'));
-            } else {
-                $qb
-                    ->andWhere($expr->isNull('omeka_root.thumbnail'));
-            }
-        }
-
-        if (isset($query['asset_id'])
-            && $query['asset_id'] !== ''
-            && $query['asset_id'] !== []
-        ) {
-            $assetIds = is_array($query['asset_id'])
-                ? array_values(array_unique($query['asset_id']))
-                : [$query['asset_id']];
-            if (array_values($assetIds) === [0]) {
-                $qb
-                    ->andWhere(
-                        $expr->isNull('omeka_root.thumbnail')
-                    );
-            } elseif (in_array(0, $assetIds, true)) {
-                $qb
-                    ->andWhere($expr->orX(
-                        $expr->isNull('omeka_root.thumbnail'),
-                        $expr->in(
-                            'omeka_root.thumbnail',
-                            $this->adapter->createNamedParameter($qb, $assetIds)
-                        )
-                    ));
-            } else {
-                $qb
-                    ->andWhere($expr->in(
-                        'omeka_root.thumbnail',
-                        $this->adapter->createNamedParameter($qb, $assetIds)
-                    ));
-            }
         }
 
         return $this;

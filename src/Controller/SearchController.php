@@ -92,7 +92,7 @@ class SearchController extends AbstractActionController
         $request = $this->params()->fromQuery();
 
         // Here, only the csrf is needed, if any.
-        $validateForm = (bool) $searchConfig->subSetting('search', 'validate_form');
+        $validateForm = (bool) $searchConfig->subSetting('request', 'validate_form');
         if ($validateForm) {
             // Check csrf issue.
             $request = $this->validateSearchRequest($searchConfig, $request);
@@ -110,21 +110,21 @@ class SearchController extends AbstractActionController
         // So the default query is used only on the search config.
         [$request, $isEmptyRequest] = $this->cleanRequest($request);
         if ($isEmptyRequest) {
-            $defaultResults = $searchConfig->subSetting('search', 'default_results') ?: 'default';
+            $defaultResults = $searchConfig->subSetting('request', 'default_results') ?: 'default';
             switch ($defaultResults) {
                 case 'none':
                     $defaultQuery = '';
                     $defaultQueryPost = '';
                     break;
                 case 'query':
-                    $defaultQuery = $searchConfig->subSetting('search', 'default_query') ?: '';
-                    $defaultQueryPost = $searchConfig->subSetting('search', 'default_query_post') ?: '';
+                    $defaultQuery = $searchConfig->subSetting('request', 'default_query') ?: '';
+                    $defaultQueryPost = $searchConfig->subSetting('request', 'default_query_post') ?: '';
                     break;
                 case 'default':
                 default:
                     // "*" means the default query managed by the search engine.
                     $defaultQuery = '*';
-                    $defaultQueryPost = $searchConfig->subSetting('search', 'default_query_post') ?: '';
+                    $defaultQueryPost = $searchConfig->subSetting('request', 'default_query_post') ?: '';
                     break;
             }
             if ($defaultQuery === '' && $defaultQueryPost === '') {
@@ -569,21 +569,21 @@ class SearchController extends AbstractActionController
         // So the default query is used only on the search config.
         [$request, $isEmptyRequest] = $this->cleanRequest($request);
         if ($isEmptyRequest) {
-            $defaultResults = $searchConfig->subSetting('search', 'default_results') ?: 'default';
+            $defaultResults = $searchConfig->subSetting('request', 'default_results') ?: 'default';
             switch ($defaultResults) {
                 case 'none':
                     $defaultQuery = '';
                     $defaultQueryPost = '';
                     break;
                 case 'query':
-                    $defaultQuery = $searchConfig->subSetting('search', 'default_query') ?: '';
-                    $defaultQueryPost = $searchConfig->subSetting('search', 'default_query_post') ?: '';
+                    $defaultQuery = $searchConfig->subSetting('request', 'default_query') ?: '';
+                    $defaultQueryPost = $searchConfig->subSetting('request', 'default_query_post') ?: '';
                     break;
                 case 'default':
                 default:
                     // "*" means the default query managed by the search engine.
                     $defaultQuery = '*';
-                    $defaultQueryPost = $searchConfig->subSetting('search', 'default_query_post') ?: '';
+                    $defaultQueryPost = $searchConfig->subSetting('request', 'default_query_post') ?: '';
                     break;
             }
             if ($defaultQuery === '' && $defaultQueryPost === '') {

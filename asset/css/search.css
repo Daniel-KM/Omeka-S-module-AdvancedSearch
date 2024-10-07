@@ -242,7 +242,7 @@
     /* Search facets */
 
     .search-facets {
-        /* flex-basis: 18.75%;*/
+        flex-basis: 18.75%;
         order: -1;
         padding: 0 0.5em;
         min-width: 240px;
@@ -405,9 +405,19 @@
     .range-double .range-numerics {
         display: flex;
         justify-content: space-between;
+        flex-wrap: wrap;
     }
     .range-double input[type=number] {
         border: none;
+    }
+    #search-facets .range-double .range-numerics {
+        flex-wrap: nowrap;
+    }
+    #search-facets .range-double .range-numeric {
+        width: 50%;
+    }
+    #search-facets .range-double .range-numeric input {
+        width:  100%;
     }
 
     /* Autocomplete */

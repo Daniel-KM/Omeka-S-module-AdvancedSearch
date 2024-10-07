@@ -289,8 +289,22 @@
         border-bottom: 1px inset;
         border-radius: 0;
     }
+    /* Don't use font-awasome glyph, that may be unavailable in public site. */
     .facets .facet-button::after {
         float: right;
+        content: '';
+        position: unset;
+        width: 12px;
+        height: 12px;
+        background: url(../img/caret-down-solid.svg) top left no-repeat;
+        padding: 3px;
+        border: none;
+    }
+    .facets .facet-button.collapse::after {
+        background-image: url(../img/caret-down-solid.svg);
+    }
+    .facets .facet-button.expand::after {
+        background-image: url(../img/caret-right-solid.svg);
     }
 
     .facet-items {

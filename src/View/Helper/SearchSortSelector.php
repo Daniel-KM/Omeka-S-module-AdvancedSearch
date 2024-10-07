@@ -55,13 +55,9 @@ class SearchSortSelector extends AbstractHelper
             ? $this->asUrl($query, $valueOptions)
             : $this->asForm($query, $valueOptions);
 
-        $label = is_null($params['label'])
-            ? $view->translate('Sort by') // @translate
-            : $params['label'];
-        if ($label !== '') {
-            $select
-                ->setLabel($label);
-        }
+        $label = $params['label'] ?? null;
+        $select
+            ->setLabel($label);
 
         return $view->partial($params['template'] ?: $this->partial, [
             'query' => $query,

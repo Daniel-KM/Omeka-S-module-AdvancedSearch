@@ -884,7 +884,6 @@ class SearchConfigConfigureForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'label_sort',
-                    'value' => 'Sort',
                 ],
             ])
 
@@ -1148,6 +1147,13 @@ class SearchConfigConfigureForm extends Form
                 ])
                 ->add([
                     'name' => 'max_number',
+                    'required' => false,
+                ])
+            ;
+            $inputFilter
+                ->get('display')
+                ->add([
+                    'name' => 'label_sort',
                     'required' => false,
                 ])
             ;

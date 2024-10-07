@@ -1286,7 +1286,7 @@ SQL;
                 // For performance, use the full list of resource ids when possible,
                 // instead of the original query.
                 // $referenceQuery = $this->args;
-                $ids = $this->response->getAllResourceIds($resourceType, $resourceType);
+                $ids = $this->response->getAllResourceIds($resourceType, false);
                 if (!$ids) {
                     continue;
                 }

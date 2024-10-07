@@ -47,6 +47,8 @@ class Advanced extends Fieldset
             return;
         }
 
+        $filterOptions = $this->getOption('options') ?? [];
+
         $this
             ->setLabel('')
             ->setAttributes([
@@ -70,14 +72,14 @@ class Advanced extends Fieldset
                     'options' => [
                         'value_options' => $valueOptions,
                         'label_attributes' => [
-                            'class' => 'search-boolean-label',
+                            'class' => 'search-join-label',
                         ],
-                    ],
+                    ] + ($filterOptions['join']['options'] ?? []),
                     'attributes' => [
                         'value' => 'and',
                         // TODO Manage width for chosen select (but useless: the number of options is small).
                         // 'class' => 'chosen-select',
-                    ],
+                    ] + ($filterOptions['join']['attributes'] ?? []),
                 ]);
         }
 
@@ -88,12 +90,12 @@ class Advanced extends Fieldset
                 'type' => Element\Select::class,
                 'options' => [
                     'value_options' => $filterFields,
-                ],
+                ]  + ($filterOptions['field']['options'] ?? []),
                 'attributes' => [
                     'value' => (string) key($filterFields),
                     // TODO Manage width for chosen select (but useless: the number of options is small).
                     // 'class' => 'chosen-select',
-                ],
+                ] + ($filterOptions['field']['attributes'] ?? []),
             ]);
 
         $operator = (bool) $this->getOption('field_operator');
@@ -111,19 +113,21 @@ class Advanced extends Fieldset
                         'label_attributes' => [
                             'class' => 'search-type-label',
                         ],
-                    ],
+                    ] + ($filterOptions['type']['options'] ?? []),
                     'attributes' => [
                         'value' => 'in',
                         // TODO Manage width for chosen select (but useless: the number of options is small).
                         // 'class' => 'chosen-select',
-                    ],
+                    ] + ($filterOptions['type']['attributes'] ?? []),
                 ]);
         }
 
         $this
             ->add([
-                'name' => 'value',
+                'name' => 'val',
                 'type' => Element\Text::class,
+                'options' => $filterOptions['val']['options'] ?? [],
+                'attributes' => $filterOptions['val']['attributes'] ?? [],
             ])
 
             ->add([

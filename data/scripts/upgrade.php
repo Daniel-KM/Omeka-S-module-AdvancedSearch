@@ -1680,3 +1680,24 @@ if (version_compare($oldVersion, '3.4.32', '<')) {
         }
     }
 }
+
+if (version_compare($oldVersion, '3.4.33', '<')) {
+    // Display item sets first in results when they are separated.
+    $qb = $connection->createQueryBuilder();
+    $qb
+        ->select('id', 'settings')
+        ->from('search_engine', 'search_engine')
+        ->orderBy('id', 'asc');
+    $searchEngineSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    foreach ($searchEngineSettings as $id => $searchEngineSettings) {
+        $searchEngineSettings = json_decode($searchEngineSettings, true) ?: [];
+        $resourceTypes = $searchEngineSettings['resource_types'] ?? ['items'];
+        if ($pos = array_search('item_sets', $resourceTypes)) {
+            unset($resourceTypes[$pos]);
+            array_unshift($searchEngineSettings['resource_types'], 'item_sets');
+            $searchEngineSettings['resource_types'] = array_values($searchEngineSettings['resource_types']);
+            $sql = 'UPDATE `search_engine` SET `settings` = ? WHERE `id` = ?;';
+            $connection->executeStatement($sql, [json_encode($searchEngineSettings, 320), $id]);
+        }
+    }
+}

@@ -954,6 +954,7 @@ class SearchConfigConfigureForm extends Form
                 'attributes' => [
                     'id' => 'facet_label_facets',
                     'value' => 'Facets',
+                    'required' => false,
                 ],
             ])
             ->add([
@@ -965,6 +966,7 @@ class SearchConfigConfigureForm extends Form
                 'attributes' => [
                     'id' => 'facet_label_no_facets',
                     'value' => 'No facets', // @translate
+                    'required' => false,
                 ],
             ])
             ->add([
@@ -1154,6 +1156,17 @@ class SearchConfigConfigureForm extends Form
                 ->get('display')
                 ->add([
                     'name' => 'label_sort',
+                    'required' => false,
+                ])
+            ;
+            $inputFilter
+                ->get('facet')
+                ->add([
+                    'name' => 'label',
+                    'required' => false,
+                ])
+                ->add([
+                    'name' => 'label_no_facets',
                     'required' => false,
                 ])
             ;

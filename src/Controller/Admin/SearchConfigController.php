@@ -696,10 +696,16 @@ class SearchConfigController extends AbstractActionController
     protected function removeUselessFields(array $params): array
     {
         foreach ($params as $k => $v) {
+            if (strpos($k, 'label') !== false) {
+                continue;
+            }
             if ($v === null || $v === '' || $v === []) {
                 unset($params[$k]);
             } elseif (is_array($v)) {
                 foreach ($v as $kk => $vv) {
+                    if (strpos($kk, 'label') !== false) {
+                        continue;
+                    }
                     if ($vv === null || $vv === '' || $vv === []) {
                         unset($params[$k][$kk]);
                     }

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-07 00:00+0000\n"
+"POT-Creation-Date: 2024-10-14 00:00+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
@@ -2735,7 +2735,7 @@ msgid "Add a button \"submit\""
 msgstr "Ajouter un bouton « Soumettre »"
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:386
-#: src/Form/Admin/SearchConfigConfigureForm.php:1049
+#: src/Form/Admin/SearchConfigConfigureForm.php:1051
 msgid "Label for submit"
 msgstr "Libellé pour « Soumettre »"
 
@@ -2744,7 +2744,7 @@ msgid "Add a button \"reset\""
 msgstr "Ajouter un bouton « Effacer les champs »"
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:409
-#: src/Form/Admin/SearchConfigConfigureForm.php:1080
+#: src/Form/Admin/SearchConfigConfigureForm.php:1082
 msgid "Label for reset"
 msgstr "Libellé pour « Effacer »"
 
@@ -2875,8 +2875,8 @@ msgstr "Après les résultats"
 #: src/Form/Admin/SearchConfigConfigureForm.php:741
 #: src/Form/Admin/SearchConfigConfigureForm.php:758
 #: src/Form/Admin/SearchConfigConfigureForm.php:775
-#: src/Form/Admin/SearchConfigConfigureForm.php:1036
-#: src/Form/Admin/SearchConfigConfigureForm.php:1067
+#: src/Form/Admin/SearchConfigConfigureForm.php:1038
+#: src/Form/Admin/SearchConfigConfigureForm.php:1069
 msgid "Both"
 msgstr "Les deux"
 
@@ -2976,33 +2976,33 @@ msgstr "Ajouter une option de tri"
 msgid "Label above the list of facets"
 msgstr "Afficher le libellé au dessus de la liste des facettes"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:963
+#: src/Form/Admin/SearchConfigConfigureForm.php:964
 msgid "Label \"No facets\""
 msgstr "Label « Pas de facettes »"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:974
+#: src/Form/Admin/SearchConfigConfigureForm.php:976
 msgid "Facet mode"
 msgstr "Mode des facettes"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:976
+#: src/Form/Admin/SearchConfigConfigureForm.php:978
 msgid "Send request with a button"
 msgstr "Utiliser un bouton pour envoyer la requête"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:977
+#: src/Form/Admin/SearchConfigConfigureForm.php:979
 msgid "Send request directly (use checkbox and js)"
 msgstr "Envoyer la requête directement (utilise une case à cocher et du js)"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:978
+#: src/Form/Admin/SearchConfigConfigureForm.php:980
 msgid "Send request directly (use a link looking like a checkbox)"
 msgstr ""
-"Envoyer la requête directement (utilise un lien affichée avec une case à "
+"Envoyer la requête directement (utilise un lien affiché avec une case à "
 "cocher)"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:991
+#: src/Form/Admin/SearchConfigConfigureForm.php:993
 msgid "List of facets"
 msgstr "Liste des facettes"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:992
+#: src/Form/Admin/SearchConfigConfigureForm.php:994
 msgid ""
 "With the internal search engine, the option \"all facets\" may be slow when "
 "there are facets and filters for item sets or sites."
@@ -3011,41 +3011,41 @@ msgstr ""
 "être lente lorsqu’il y a des facettes et des filtres pour des collections ou "
 "des sites."
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:994
+#: src/Form/Admin/SearchConfigConfigureForm.php:996
 msgid "Available facets only"
 msgstr "Facettes disponibles"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:995
+#: src/Form/Admin/SearchConfigConfigureForm.php:997
 msgid "All facets, even with 0 results (see info)"
 msgstr "Toutes les facettes, même avec 0 résultat (voir info)"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1008
+#: src/Form/Admin/SearchConfigConfigureForm.php:1010
 msgid "Display the list of active facets"
 msgstr "Afficher la liste des facettes actives"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1020
+#: src/Form/Admin/SearchConfigConfigureForm.php:1022
 msgid "Label \"Active facets\""
 msgstr "Label « Facettes actives »"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1031
+#: src/Form/Admin/SearchConfigConfigureForm.php:1033
 msgid "Position of the button \"Apply filters\""
 msgstr "Position du bouton « Appliquer les filtres »"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1034
-#: src/Form/Admin/SearchConfigConfigureForm.php:1065
+#: src/Form/Admin/SearchConfigConfigureForm.php:1036
+#: src/Form/Admin/SearchConfigConfigureForm.php:1067
 msgid "Above facets"
 msgstr "Au-dessus des facettes"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1035
-#: src/Form/Admin/SearchConfigConfigureForm.php:1066
+#: src/Form/Admin/SearchConfigConfigureForm.php:1037
+#: src/Form/Admin/SearchConfigConfigureForm.php:1068
 msgid "Below facets"
 msgstr "En dessous des facettes"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1062
+#: src/Form/Admin/SearchConfigConfigureForm.php:1064
 msgid "Position of the button \"Reset facets\""
 msgstr "Position du bouton « Effacer les facettes »"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1094
+#: src/Form/Admin/SearchConfigConfigureForm.php:1096
 msgid ""
 "List of facets that will be displayed in the search page, formatted as ini. "
 "The section is a unique name. Keys are: field, label, type, order, limit, "
@@ -3057,7 +3057,7 @@ msgstr ""
 "state, more, languages, data_types, main_types, values, display_count, et "
 "des options spécifiques, comme thesaurus, min et max."
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1125
+#: src/Form/Admin/SearchConfigConfigureForm.php:1127
 msgid "Add a facet"
 msgstr "Ajouter une facette"
 
@@ -3260,7 +3260,7 @@ msgstr "Choisir des propiétaires…"
 msgid "Select access…"
 msgstr "Choisir l’accès…"
 
-#: src/Form/MainSearchForm.php:1088
+#: src/Form/MainSearchForm.php:1086
 msgid "Is private"
 msgstr "Est privé"
 
@@ -3351,8 +3351,8 @@ msgstr "Le nom doit être unique."
 #: src/Controller/Admin/SearchSuggesterController.php:240
 #: src/Controller/Admin/SearchEngineController.php:72
 #: src/Controller/Admin/SearchEngineController.php:131
-#: src/Controller/Admin/SearchConfigController.php:214
-#: src/Controller/Admin/SearchConfigController.php:314
+#: src/Controller/Admin/SearchConfigController.php:219
+#: src/Controller/Admin/SearchConfigController.php:319
 msgid "There was an error during validation"
 msgstr "Il y a eu une erreur durant la validation"
 
@@ -3392,81 +3392,81 @@ msgstr "L’index de recherche « {name} » a été supprimé"
 msgid "Search index \"{name}\" could not be deleted"
 msgstr "L’index de recherche « {name} » ne peut pas être supprimé"
 
-#: src/Controller/Admin/SearchConfigController.php:92
+#: src/Controller/Admin/SearchConfigController.php:97
 msgid "Search page \"{name}\" created."
 msgstr "La page de recherche « {name} » a été créée."
 
-#: src/Controller/Admin/SearchConfigController.php:103
+#: src/Controller/Admin/SearchConfigController.php:108
 msgid "You can enable this page in your site settings or in admin settings."
 msgstr ""
 "Vous pouvez rendre cette page accessible dans les paramètres du site ou dans "
 "les paramètres généraux."
 
-#: src/Controller/Admin/SearchConfigController.php:108
+#: src/Controller/Admin/SearchConfigController.php:113
 msgid "The api adapter should be selected in the main settings."
 msgstr "L’adapteur api doit être sélectionné dans les paramètres généraux."
 
-#: src/Controller/Admin/SearchConfigController.php:144
+#: src/Controller/Admin/SearchConfigController.php:149
 msgid "Search page \"{name}\" saved."
 msgstr "La page de recherche « {name} » a été enregistrée."
 
-#: src/Controller/Admin/SearchConfigController.php:175
+#: src/Controller/Admin/SearchConfigController.php:180
 msgid "The engine adapter \"{label}\" is unavailable."
 msgstr "L’adaptateur pour le moteur « {label} » n’est pas disponible."
 
-#: src/Controller/Admin/SearchConfigController.php:176
-#: src/Controller/Admin/SearchConfigController.php:187
+#: src/Controller/Admin/SearchConfigController.php:181
+#: src/Controller/Admin/SearchConfigController.php:192
 msgid "label"
 msgstr "libellé"
 
-#: src/Controller/Admin/SearchConfigController.php:186
+#: src/Controller/Admin/SearchConfigController.php:191
 msgid "This engine adapter \"{label}\" has no config form."
 msgstr ""
 "L’adapteur du moteur « {label} » n’a pas de formulaire de configuration."
 
-#: src/Controller/Admin/SearchConfigController.php:228
+#: src/Controller/Admin/SearchConfigController.php:233
 msgid "Configuration \"{name}\" saved."
 msgstr "Configuration « {name} » enregistrée."
 
-#: src/Controller/Admin/SearchConfigController.php:259
+#: src/Controller/Admin/SearchConfigController.php:264
 msgid "Search page \"{name}\" successfully deleted"
 msgstr "La page de recherche « {name} » a été supprimée"
 
-#: src/Controller/Admin/SearchConfigController.php:264
+#: src/Controller/Admin/SearchConfigController.php:269
 msgid "Search page \"{name}\" could not be deleted"
 msgstr "La page de recherche « {name} » ne peut pas être supprimée"
 
-#: src/Controller/Admin/SearchConfigController.php:288
-#: src/Controller/Admin/SearchConfigController.php:295
+#: src/Controller/Admin/SearchConfigController.php:293
+#: src/Controller/Admin/SearchConfigController.php:300
 msgid "The slug should be unique."
 msgstr "Le nom doit être unique."
 
-#: src/Controller/Admin/SearchConfigController.php:301
+#: src/Controller/Admin/SearchConfigController.php:306
 msgid "The slug should be relative to the root of the site, like \"search\"."
 msgstr ""
 "Le chemin doit être relatif à la racine du site, par exemple \"recherche\"."
 
-#: src/Controller/Admin/SearchConfigController.php:378
+#: src/Controller/Admin/SearchConfigController.php:383
 msgid "The page has been set by default in admin board."
 msgstr "La page est désormais la page par défaut en admin."
 
-#: src/Controller/Admin/SearchConfigController.php:381
+#: src/Controller/Admin/SearchConfigController.php:386
 msgid "The page has been unset in admin board."
 msgstr "La page n’est plus la page par défaut en admin."
 
-#: src/Controller/Admin/SearchConfigController.php:390
+#: src/Controller/Admin/SearchConfigController.php:395
 msgid "The page has been disabled in all specified sites."
 msgstr "La page a été désactivée dans tous les sites indiqués."
 
-#: src/Controller/Admin/SearchConfigController.php:394
+#: src/Controller/Admin/SearchConfigController.php:399
 msgid "The page has been made available in all specified sites."
 msgstr "La page est désormais disponible dans tous les sites indiqués."
 
-#: src/Controller/Admin/SearchConfigController.php:398
+#: src/Controller/Admin/SearchConfigController.php:403
 msgid "The availability of pages of sites was let unmodified."
 msgstr "La disponibilité des pages dans les sites n’a pas été modifiée."
 
-#: src/Controller/Admin/SearchConfigController.php:668
+#: src/Controller/Admin/SearchConfigController.php:673
 msgid ""
 "Note that you didn’t set an empty language for some facets, so all values "
 "without language will be skipped in the facet."
@@ -3497,14 +3497,14 @@ msgstr ""
 msgid "Search form (module Advanced Search)"
 msgstr "Recherche (module Recherche avancée)"
 
-#: src/Site/BlockLayout/SearchingForm.php:88
+#: src/Site/BlockLayout/SearchingForm.php:90
 msgid ""
 "No search config specified for this block or not available for this site."
 msgstr ""
 "Pas de page de recherche spécifiée dans ce bloc ou non disponible dans le "
 "site."
 
-#: src/Site/BlockLayout/SearchingForm.php:96
+#: src/Site/BlockLayout/SearchingForm.php:98
 msgid "The search config \"{search_slug}\" has no form associated."
 msgstr ""
 "La configuration de recherche « {search_slug} » n’a pas de formulaire "

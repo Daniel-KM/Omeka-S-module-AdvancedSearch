@@ -61,8 +61,10 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
 
         $data = $block ? ($block->data() ?? []) + $defaultSettings : $defaultSettings;
 
-        $data['query'] = http_build_query($data['query'] ?? [], '', '&', PHP_QUERY_RFC3986);
-        $data['query_filter'] = http_build_query($data['query_filter'] ?? [], '', '&', PHP_QUERY_RFC3986);
+        $query = $data['query'] ?? '';
+        $data['query'] = is_array($query) ? http_build_query($query, '', '&', PHP_QUERY_RFC3986) : $query;
+        $queryFilter = $data['query_filter'] ?? '';
+        $data['query_filter'] = is_array($queryFilter) ? http_build_query($queryFilter, '', '&', PHP_QUERY_RFC3986) : $queryFilter;
 
         $dataForm = [];
         foreach ($data as $key => $value) {

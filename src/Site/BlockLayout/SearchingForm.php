@@ -136,7 +136,7 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
                 $request += $filterQuery;
                 $request = $this->validateSearchRequest($searchConfig, $form, $request) ?: $query;
             } else {
-                $request = $query;
+                $request = $query + ['page' => 1];
             }
             $vars['request'] = $request;
 

@@ -54,7 +54,7 @@ $thumbnailType = $searchConfig->subSetting('display', 'thumbnail_type', 'medium'
         $resourceUrl = isset($site) ? $resource->siteUrl($siteSlug) : $resource->adminUrl();
         $resourceType = $resource->getControllerName();
         $heading = $headingTerm ? $resource->value($headingTerm, ['default' => $untitled, 'lang' => $langValue]) : $resource->displayTitle(null, $langValue);
-        $body = $bodyTerm ? $resource->value($bodyTerm, ['lang' => $langValue]) : $resource->displayDescription(null, $langValue);
+        $body = $bodyTerm ? $resource->value($bodyTerm, ['lang' => $langValue, 'default' => '']) : $resource->displayDescription(null, $langValue);
         ?>
     <li class="resource <?= $resourceType ?>">
         <?php if (!$noThumbnail): ?>

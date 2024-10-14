@@ -13,7 +13,7 @@ use Omeka\Form\ConfirmForm;
 class SearchSuggesterController extends AbstractActionController
 {
     /**
-     * @var EntityManager
+     * @var \Doctrine\ORM\EntityManager
      */
     protected $entityManager;
 

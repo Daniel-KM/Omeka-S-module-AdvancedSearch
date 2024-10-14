@@ -42,12 +42,12 @@ use Omeka\Form\ConfirmForm;
 class SearchEngineController extends AbstractActionController
 {
     /**
-     * @var EntityManager
+     * @var \Doctrine\ORM\EntityManager
      */
     protected $entityManager;
 
     /**
-     * @var SearchAdapterManager
+     * @var \AdvancedSearch\Adapter\Manager
      */
     protected $searchAdapterManager;
 

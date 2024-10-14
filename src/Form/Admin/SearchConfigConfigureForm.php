@@ -1140,6 +1140,7 @@ class SearchConfigConfigureForm extends Form
         $inputFilter = $this->getInputFilter();
 
         // A check is done because the specific form may remove them.
+
         if ($inputFilter->has('form')) {
             $inputFilter
                 ->get('form')
@@ -1152,6 +1153,9 @@ class SearchConfigConfigureForm extends Form
                     'required' => false,
                 ])
             ;
+        }
+
+        if ($inputFilter->has('display')) {
             $inputFilter
                 ->get('display')
                 ->add([
@@ -1159,6 +1163,9 @@ class SearchConfigConfigureForm extends Form
                     'required' => false,
                 ])
             ;
+        }
+
+        if ($inputFilter->has('facet')) {
             $inputFilter
                 ->get('facet')
                 ->add([

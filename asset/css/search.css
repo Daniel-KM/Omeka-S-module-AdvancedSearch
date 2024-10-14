@@ -397,8 +397,11 @@
     .facet-see-more-or-less::after {
         margin-left: 6px;
     }
+    .facet-see-more-or-less.expand::after {
+        content: "🞃";
+    }
     .facet-see-more-or-less.collapse::after {
-        content: "";
+        content: "🞁";
     }
 
     /* Search range */

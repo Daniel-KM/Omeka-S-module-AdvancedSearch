@@ -567,7 +567,7 @@ class MainSearchForm extends Form
     protected function searchMultiSelectGroup(array $filter, array $valueOptions): ?ElementInterface
     {
         $filter['attributes']['multiple'] = true;
-        return $this->searchSelectFlat($filter, $valueOptions);
+        return $this->searchSelectGroup($filter, $valueOptions);
     }
 
     /**
@@ -1046,8 +1046,6 @@ class MainSearchForm extends Form
     }
 
     /**
-     * @todo Revert output for resource class and templates: flat by default.
-     *
      * @param array $filter
      * @return array
      */
@@ -1097,11 +1095,12 @@ class MainSearchForm extends Form
 
             case 'resource_class/o:id':
             case 'resource_class/o:term':
-                $grouped = !in_array($filter['type'] ?? '', ['SelectGroup', 'MultiSelectGroup']);
+                $grouped = in_array($filter['type'] ?? '', ['SelectGroup', 'MultiSelectGroup']);
                 return $this->listResourceClasses($grouped);
 
             case 'resource_template/o:id':
-                $grouped = !in_array($filter['type'] ?? '', ['SelectGroup', 'MultiSelectGroup']);
+                $grouped = in_array($filter['type'] ?? '', ['SelectGroup', 'MultiSelectGroup']);
+pù($filter);
                 return $this->listResourceTemplates($grouped);
 
             case 'site/o:id':

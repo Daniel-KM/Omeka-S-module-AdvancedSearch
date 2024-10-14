@@ -146,6 +146,7 @@ class IndexSearch extends AbstractJob
             );
         }
 
+        /** @var \Omeka\Entity\Resource[] $resources */
         $resources = [];
         $totals = [];
         foreach ($resourceTypes as $resourceType) {
@@ -191,13 +192,14 @@ class IndexSearch extends AbstractJob
                                 ['resource_type' => $resourceType, 'count' => $totals[$resourceType]]
                             ))->setTranslator($translator);
                         }
+                        /** @var \Omeka\Entity\Resource $resource */
                         $resource = array_pop($resources);
                         $this->logger->warn(
                             'Search index #{search_engine_id} ("{name}"): the indexing was stopped. Last indexed resource: {resource_type} #{resource_id}; {results}. Execution time: {duration} seconds.', // @translate
                             [
                                 'search_engine_id' => $searchEngine->id(),
                                 'name' => $searchEngine->name(),
-                                'resource_type' => $resource->getResourceType(),
+                                'resource_type' => $resource->getResourceName(),
                                 'resource_id' => $resource->getId(),
                                 'results' => implode('; ', $totalResults),
                                 'duration' => (int) (microtime(true) - $timeStart),

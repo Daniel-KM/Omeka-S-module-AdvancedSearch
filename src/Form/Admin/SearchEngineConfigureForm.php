@@ -74,10 +74,11 @@ class SearchEngineConfigureForm extends Form
      */
     protected function getResourcesTypes(): array
     {
+        // Set the order for the results: item sets before items.
         return [
             'resources' => 'Resources (mixed)', // @translate
-            'items' => 'Items',
             'item_sets' => 'Item sets',
+            'items' => 'Items',
             'media' => 'Media',
             // Value annotations are managed with resources.
             // 'value_annotations' => 'Value annotations',

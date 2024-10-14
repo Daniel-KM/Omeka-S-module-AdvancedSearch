@@ -29,7 +29,7 @@ class SearchingUrl extends AbstractHelper
         if ($searchMainConfig) {
             try {
                 /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
-                $searchConfig = $view->api()->read('search_configs', [isNumeric($searchMainConfig) ? 'id' : 'slug' => $searchMainConfig])->getContent();
+                $searchConfig = $view->api()->read('search_configs', [is_numeric($searchMainConfig) ? 'id' : 'slug' => $searchMainConfig])->getContent();
                 return $view->url('search-page-' . $searchConfig->slug(), [], $options, true);
             } catch (\Omeka\Api\Exception\NotFoundException $e) {
                 $view->logger()->err(

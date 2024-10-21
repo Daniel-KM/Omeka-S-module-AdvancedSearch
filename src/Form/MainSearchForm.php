@@ -1100,7 +1100,6 @@ class MainSearchForm extends Form
 
             case 'resource_template/o:id':
                 $grouped = in_array($filter['type'] ?? '', ['SelectGroup', 'MultiSelectGroup']);
-pù($filter);
                 return $this->listResourceTemplates($grouped);
 
             case 'site/o:id':

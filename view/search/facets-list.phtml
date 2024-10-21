@@ -86,7 +86,7 @@ if (!empty($itemSet)) {
             <?php foreach ($facets as $name => $facetValues): ?>
             <?php $facetParams = $searchFacets[$name]; ?>
             <?php $hasState = in_array($facetParams['state'] ?? '', ['expand', 'collapse', 'collapse_unless_set']); ?>
-            <li class="facet <?= empty($facetParams['attributes']['class']) ? '' : $escapeAttr($facetParams['attributes']['class']) ?>">
+            <li class="facet<?= empty($facetParams['attributes']['class']) ? '' : ' ' . $escapeAttr($facetParams['attributes']['class']) ?>">
                 <?php if ($hasState): ?>
                 <?php $stateExpand = $facetParams['state'] === 'expand' || ($facetParams['state'] === 'collapse_unless_set' && !empty($activeFacets[$name])); ?>
                 <button type="button" class="facet-button <?= $stateExpand ? 'collapse' : 'expand' ?>" aria-label="<?= $translate($stateExpand ? 'Collapse' : 'Expand') ?>" data-label-expand="<?= $translate('Expand') ?>" data-label-collapse="<?= $translate('Collapse') ?>"><?= $escape($translate($facetParams['label'] ?? $name)) ?></button>
@@ -99,8 +99,8 @@ if (!empty($itemSet)) {
                     <div class="facet-see-more">
                         <button type="button" class="facet-see-more-or-less expand" data-default-count="<?= (int) $facetParams['more'] ?>" data-more-count="<?= count($facetValues) - (int) $facetParams['more'] ?>" data-label-see-more="<?= $escapeAttr($translate('See more')) ?>" data-label-see-less="<?= $escapeAttr($translate('See less')) ?>"><?= $escape($translate('See more')) ?></button>
                     </div>
+                    <?php endif; ?>
                 </div>
-                <?php endif; ?>
             </li>
             <?php endforeach; ?>
         </ul>

@@ -124,11 +124,18 @@ class IndexSearch extends AbstractJob
             );
         }
 
+        // Use the option set in the form if any, only when the search engine
+        // manage all visibilities.
         $visibility = $searchEngine->setting('visibility');
         $visibility = in_array($visibility, ['public', 'private']) ? $visibility : null;
+        if (!$visibility) {
+            $visibilityJob = $this->getArg('visibility');
+            $visibility = in_array($visibilityJob, ['public', 'private']) ? $visibilityJob : null;
+        }
+
         if ($visibility) {
             $this->logger->notice(
-                'Search index #{search_engine_id} ("{name}"): Only {visibility} resources will be indexed', // @translate
+                'Search index #{search_engine_id} ("{name}"): Only {visibility} resources will be indexed.', // @translate
                 ['search_engine_id' => $searchEngine->id(), 'name' => $searchEngine->name(), 'visibility' => $visibility]
             );
         }

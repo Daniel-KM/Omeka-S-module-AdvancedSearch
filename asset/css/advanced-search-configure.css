@@ -17,6 +17,14 @@
         border: 0;
         box-shadow: none;
     }
+    .search-admin #sidebar-confirm .inputs label {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        font-weight: normal;
+    }
+    .search-admin #sidebar-confirm .inputs label::after {
+        content: initial;
+    }
 
     .ui-sortable {
         background-color: #eeeeee;

@@ -14,6 +14,9 @@ $resourceTypes = $resource->setting('resource_types', []);
 
 $this->form->setAttribute('action', $resource->url('index'));
 $this->form->setButtonLabel($translate('Confirm reindex'));
+
+$visibility = $resource->setting('visibility');
+$visibility = in_array($visibility, ['public', 'private']) ? $visibility : null;
 ?>
 
 <?php if ($this->wrapSidebar): ?>
@@ -40,6 +43,16 @@ $this->form->setButtonLabel($translate('Confirm reindex'));
         <input name="resource_types[]" value="<?= $resourceType ?>" type="checkbox" checked="checked" form="confirmform" /><?= $translate($resourceType) ?>
         <?php endforeach; ?>
         </p>
+        <?php if (!$visibility): ?>
+        <p>
+            <?= $translate('You may want to limit the reindexing to a visibility.') ?>
+            <span class="inputs">
+                <label><input type="radio" name="visibility" form="confirmform" value="all" checked="checked"><?= $translate('Public and private') ?></label>
+                <label><input type="radio" name="visibility" form="confirmform" value="public"><?= $translate('Public only') ?></label>
+                <label><input type="radio" name="visibility" form="confirmform" value="private"><?= $translate('Private only') ?></label>
+            </span>
+        </p>
+        <?php endif; ?>
         <p>
         <?php if ($totalJobs): ?>
         <?= sprintf($translate('%d running indexings.'), $totalJobs) ?><br />

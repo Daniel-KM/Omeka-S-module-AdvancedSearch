@@ -12,7 +12,7 @@
 
 if (!isset($response)) return;
 
-$searchFacets = $searchConfig->subSetting('facet', 'facets');
+$searchFacets = $searchConfig->subSetting('facet', 'facets', []);
 if (!count($searchFacets)) return;
 
 $plugins = $this->getHelperPluginManager();

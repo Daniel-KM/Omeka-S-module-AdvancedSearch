@@ -1701,3 +1701,10 @@ if (version_compare($oldVersion, '3.4.33', '<')) {
         }
     }
 }
+
+if (version_compare($oldVersion, '3.4.34', '<')) {
+    $message = new PsrMessage(
+        'It is now possible to configure a search engine to index only public resources.' // @translate
+    );
+    $messenger->addSuccess($message);
+}

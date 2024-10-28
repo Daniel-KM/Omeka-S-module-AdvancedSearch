@@ -131,6 +131,7 @@ class SearchEngineController extends AbstractActionController
                 $this->messenger()->addError('There was an error during validation'); // @translate
                 return $view;
             }
+
             $formData = $form->getData();
             $name = $formData['o:name'];
             unset($formData['csrf'], $formData['o:name']);

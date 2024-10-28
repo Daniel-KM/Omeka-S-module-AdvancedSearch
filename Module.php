@@ -972,8 +972,9 @@ class Module extends AbstractModule
             if ($indexer->canIndex($resourceType)
                 && in_array($resourceType, $searchEngine->setting('resource_types', []))
             ) {
+                $resourcesToIndex = $this->filterVisibility($resources);
                 try {
-                    $indexer->indexResources($resources);
+                    $indexer->indexResources($resourcesToIndex);
                 } catch (\Exception $e) {
                     $logger->err(
                         'Unable to batch index metadata for search engine "{name}": {message}', // @translate
@@ -1150,6 +1151,11 @@ class Module extends AbstractModule
      */
     protected function updateIndexResource(SearchEngineRepresentation $searchEngine, Resource $resource): void
     {
+        $resourceToIndex = $this->filterVisibility($searchEngine, [$resource]);
+        if (!count($resourceToIndex)) {
+            return;
+        }
+
         $indexer = $searchEngine->indexer();
         try {
             $indexer->indexResource($resource);
@@ -1166,6 +1172,29 @@ class Module extends AbstractModule
                 ['resource_id' => $resource->getId(), 'name' => $searchEngine->name()]
             ));
         }
+    }
+
+    protected function filterVisibility(SearchEngineRepresentation $searchEngine, array $resources): array
+    {
+        $visibility = $searchEngine->setting('visibility');
+        if (!in_array($visibility, ['public', 'private'])) {
+            return $resources;
+        }
+        /** @var \Omeka\Entity\Resource $resource */
+        if ($visibility === 'private') {
+            foreach ($resources as $key => $resource) {
+                if ($resource->isPublic()) {
+                    unset($resources[$key]);
+                }
+            }
+        } else {
+            foreach ($resources as $key => $resource) {
+                if (!$resource->isPublic()) {
+                    unset($resources[$key]);
+                }
+            }
+        }
+        return array_values($resources);
     }
 
     /**

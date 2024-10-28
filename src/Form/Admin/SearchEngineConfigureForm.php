@@ -64,6 +64,22 @@ class SearchEngineConfigureForm extends Form
                     ],
                 ],
             ])
+            ->add([
+                'name' => 'visibility',
+                'type' => Element\Radio::class,
+                'options' => [
+                    'label' => 'Visibility', // @translate
+                    'value_options' => [
+                        'all' => 'Public and private', // @translate
+                        'public' => 'Public only', // @translate
+                        'private' => 'Private only', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'visibility',
+                    'value' => 'all',
+                ],
+            ])
         ;
     }
 

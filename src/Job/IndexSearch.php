@@ -124,6 +124,15 @@ class IndexSearch extends AbstractJob
             );
         }
 
+        $visibility = $searchEngine->setting('visibility');
+        $visibility = in_array($visibility, ['public', 'private']) ? $visibility : null;
+        if ($visibility) {
+            $this->logger->notice(
+                'Search index #{search_engine_id} ("{name}"): Only {visibility} resources will be indexed', // @translate
+                ['search_engine_id' => $searchEngine->id(), 'name' => $searchEngine->name(), 'visibility' => $visibility]
+            );
+        }
+
         $timeStart = microtime(true);
 
         $this->logger->notice(
@@ -157,6 +166,7 @@ class IndexSearch extends AbstractJob
                 // earlier or later.
                 $query
                     // By default the query process public resources only.
+                    // TODO Check the purpose of the check of isPublic here.
                     ->setIsPublic(false)
                     ->setResourceTypes([$resourceType]);
                 $indexer->clearIndex($query);
@@ -174,6 +184,10 @@ class IndexSearch extends AbstractJob
             } elseif ($startResourceId) {
                 $dql .= ' WHERE resource.id >= :start_resource_id';
                 $parameter = ['name' => 'start_resource_id', 'bind' => $startResourceId, 'type' => \Doctrine\DBAL\ParameterType::INTEGER];
+            }
+            if ($visibility) {
+                $joiner = strpos($dql, ' WHERE ') ? ' AND' : ' WHERE';
+                $dql .= $joiner . ' resource.isPublic = ' . ($visibility === 'private' ? 0 : 1);
             }
             $dql .= " ORDER BY resource.id ASC";
 

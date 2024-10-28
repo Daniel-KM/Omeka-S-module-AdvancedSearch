@@ -410,6 +410,7 @@ return [
             'advancedsearch_redirect_itemset_browse' => ['all'],
             'advancedsearch_redirect_itemset_search' => [],
             'advancedsearch_redirect_itemset_search_first' => [],
+            'advancedsearch_redirect_itemset_page_url' => [],
             // Hidden options.
             // This option is a merge of the previous ones for simplicity.
             'advancedsearch_redirect_itemsets' => [],

@@ -5,6 +5,7 @@ namespace AdvancedSearch\Form;
 use Common\Form\Element as CommonElement;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
+use Omeka\Form\Element as OmekaElement;
 use Omeka\Settings\AbstractSettings;
 
 class SiteSettingsFieldset extends Fieldset
@@ -156,6 +157,20 @@ class SiteSettingsFieldset extends Fieldset
                     'multiple' => true,
                     'class' => 'chosen-select',
                     'data-placeholder' => 'Select item sets…', // @translate
+                ],
+            ])
+            ->add([
+                'name' => 'advancedsearch_redirect_itemset_page_url',
+                'type' => OmekaElement\ArrayTextarea::class,
+                'options' => [
+                    'element_group' => 'advanced_search',
+                    'label' => 'Redirect any item set to a page or a url', // @translate
+                    'info' => 'Set the item set id, then the sign "=", then a page slug or a url, relative or absolute.', // @translate
+                    'as_key_value' => true,
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearch_redirect_itemset_page_url',
+                    'placeholder' => '151 = events', // @translate
                 ],
             ])
         ;

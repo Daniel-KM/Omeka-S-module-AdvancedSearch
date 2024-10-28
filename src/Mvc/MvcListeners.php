@@ -26,6 +26,7 @@ class MvcListeners extends AbstractListenerAggregate
     {
         /**
          * @var \Omeka\Api\Manager $api
+         * @var \Omeka\Settings\SiteSettings $siteSettings
          */
 
         $routeMatch = $event->getRouteMatch();
@@ -42,8 +43,54 @@ class MvcListeners extends AbstractListenerAggregate
         // The other options are managed in templates search/search and
         // search/results-header-footer.
         $redirectItemSets = $siteSettings->get('advancedsearch_redirect_itemsets', ['default' => 'browse']);
-        $redirectItemSet = ($redirectItemSets[$itemSetId] ?? $redirectItemSets['default'] ?? 'browse') ?: 'browse';
-        if ($redirectItemSet === 'browse') {
+        $redirectItemSetTo = ($redirectItemSets[$itemSetId] ?? $redirectItemSets['default'] ?? 'browse') ?: 'browse';
+        if ($redirectItemSetTo === 'browse') {
+            return;
+        } elseif ($redirectItemSetTo !== 'search' && $redirectItemSetTo !== 'first') {
+            if (mb_substr($redirectItemSetTo, 0, 1) === '/'
+                || mb_substr($redirectItemSetTo, 0, 8) === 'https://'
+                || mb_substr($redirectItemSetTo, 0, 7) === 'http://'
+            ) {
+                /** @see \Laminas\Mvc\Controller\Plugin\Redirect::toUrl() */
+                /* // TODO Use event response in order to get statistics.
+                $event->setResponse(new \Laminas\Http\Response);
+                $event->getResponse()
+                    ->setStatusCode(302)
+                    ->getHeaders()->addHeaderLine('Location', $redirectItemSetTo);
+                return;
+                */
+                if (!headers_sent()) {
+                    $serverUrl = new \Laminas\View\Helper\ServerUrl();
+                    header('Referer: ' . $serverUrl(true));
+                    header('Location: ' . $redirectItemSetTo, true, 302);
+                } else {
+                    echo '<script>window.location.href="' . $redirectItemSetTo . '";</script>';
+                    echo '<noscript><meta http-equiv="refresh" content="0;url=' . $redirectItemSetTo . '"></noscript>';
+                }
+                die();
+            }
+
+            // This is a page slug. Check for its presence and visibility.
+            $api = $services->get('Omeka\ApiManager');
+            $siteSlug = $routeMatch->getParam('site-slug');
+            try {
+                $site = $api->read('sites', ['slug' => $siteSlug], [], ['responseContent' => 'resource', 'initialize' => false, 'finalize' => false])->getContent();
+                $api->read('site_pages', ['site' => $site->getId(), 'slug' => $redirectItemSetTo], [], ['responseContent' => 'resource', 'initialize' => false, 'finalize' => false]);
+            } catch (\Exception $e) {
+                return;
+            }
+            $params = [
+                '__NAMESPACE__' => 'Omeka\Controller\Site',
+                '__CONTROLLER__' => 'Page',
+                '__SITE__' => true,
+                'controller' => 'Omeka\Controller\Site\Page',
+                'action' => 'show',
+                'site-slug' => $siteSlug,
+                'page-slug' => $redirectItemSetTo,
+            ];
+            $routeMatch = new RouteMatch($params);
+            $routeMatch->setMatchedRouteName('site/page');
+            $event->setRouteMatch($routeMatch);
             return;
         }
 

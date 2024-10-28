@@ -631,9 +631,11 @@ class Module extends AbstractModule
         $redirectBrowse = $siteSettings->get('advancedsearch_redirect_itemset_browse', ['all']) ?: [];
         $redirectSearch = $siteSettings->get('advancedsearch_redirect_itemset_search', []) ?: [];
         $redirectSearchFirst = $siteSettings->get('advancedsearch_redirect_itemset_search_first', []) ?: [];
+        $redirectPageUrl = $siteSettings->get('advancedsearch_redirect_itemset_page_url', []) ?: [];
         $redirectBrowse = array_fill_keys($redirectBrowse, 'browse');
         $redirectSearch = array_fill_keys($redirectSearch, 'search');
         $redirectSearchFirst = array_fill_keys($redirectSearchFirst, 'first');
+        // Keep redirect page urls as it: this is already an array with data.
 
         // Don't use "else" in order to manage bad config. Default is browse.
         $merged = ['default' => 'browse'];
@@ -650,7 +652,10 @@ class Module extends AbstractModule
             unset($redirectBrowse['all']);
         }
 
-        $merged = $merged + $redirectBrowse + $redirectSearch + $redirectSearchFirst;
+        $merged += $redirectBrowse
+            + $redirectSearch
+            + $redirectSearchFirst
+            + $redirectPageUrl;
 
         $siteSettings->set('advancedsearch_redirect_itemsets', $merged);
         // Kept for compatibility with old themes.
@@ -1390,6 +1395,7 @@ class Module extends AbstractModule
         $siteSettings->set('advancedsearch_redirect_itemset_browse', ['all']);
         $siteSettings->set('advancedsearch_redirect_itemset_search', []);
         $siteSettings->set('advancedsearch_redirect_itemset_search_first', []);
+        $siteSettings->set('advancedsearch_redirect_itemset_page_url', []);
         $siteSettings->set('advancedsearch_redirect_itemsets', ['default' => 'browse']);
         $siteSettings->set('advancedsearch_redirect_itemset', 'browse');
     }

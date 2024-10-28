@@ -98,6 +98,12 @@ only via api, not in the advanced search form for now):
     - `≤`: lower than or equal
     - `≥`: greater than or equal
     - `>`: greater than
+- Date (year, via value casting to integer):
+    - `yreq`/`nyreq`: during or not during year
+    - `yrgt`: since year (excluded)
+    - `yrgte`: since year
+    - `yrlte`: until year
+    - `yrlt`: until year (excluded)
 - Curation:
     - `dup` and variants: has duplicate values, linked resources, uris, types and languages
       The variants allows to check duplicate for simple values only, linked
@@ -125,9 +131,9 @@ Furthermore:
 Finally, an option allows to display only the used properties and classes in the
 advanced search form, with chosen-select.
 
-**Warning**: the improvements done on query argument "property" were moved to
-"filter" and will be removed in a future version. So use "filter" instead of
-"property".
+**IMPORTANT**: the improvements done on query argument "property" were moved to
+"filter" and will be removed in a future version. So use the key "filter"
+instead of "property" for future compatibility.
 
 
 Installation

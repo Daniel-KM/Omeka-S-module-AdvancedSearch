@@ -57,7 +57,7 @@ class SiteSettingsFieldset extends Fieldset
                 'type' => Element\Checkbox::class,
                 'options' => [
                     'element_group' => 'search',
-                    'label' => 'Support improved search of properties (not recommended)', // @translate
+                    'label' => 'Support improved search of properties (not recommended: use filters)', // @translate
                     'info' => 'To override the default search elements is not recommended, so the improvements are now available in the element "filter".', // @translate
                 ],
                 'attributes' => [

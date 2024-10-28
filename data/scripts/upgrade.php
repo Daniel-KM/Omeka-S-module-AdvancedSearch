@@ -11,18 +11,22 @@ use Common\Stdlib\PsrMessage;
  * @var string $oldVersion
  *
  * @var \Omeka\Api\Manager $api
+ * @var \Laminas\Log\Logger $logger
  * @var \Omeka\Settings\Settings $settings
  * @var \Doctrine\DBAL\Connection $connection
+ * @var \Omeka\Settings\SiteSettings $siteSettings
  * @var \Doctrine\ORM\EntityManager $entityManager
  * @var \Omeka\Mvc\Controller\Plugin\Messenger $messenger
  */
 $plugins = $services->get('ControllerPluginManager');
 $api = $plugins->get('api');
+$logger = $services->get('Omeka\Logger');
 $settings = $services->get('Omeka\Settings');
 $translate = $plugins->get('translate');
 $translator = $services->get('MvcTranslator');
 $connection = $services->get('Omeka\Connection');
 $messenger = $plugins->get('messenger');
+$siteSettings = $services->get('Omeka\Settings\Site');
 $entityManager = $services->get('Omeka\EntityManager');
 
 $config = $services->get('Config');
@@ -538,7 +542,6 @@ if (version_compare($oldVersion, '3.4.24', '<')) {
         throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message->setTranslator($translator));
     }
 
-    $logger = $services->get('Omeka\Logger');
     $pageRepository = $entityManager->getRepository(\Omeka\Entity\SitePage::class);
 
     $viewHelpers = $services->get('ViewHelperManager');
@@ -692,7 +695,6 @@ SQL;
 }
 
 if (version_compare($oldVersion, '3.4.25', '<')) {
-    $siteSettings = $services->get('Omeka\Settings\Site');
     $siteIds = $api->search('sites', [], ['returnScalar' => 'id'])->getContent();
     foreach ($siteIds as $siteId) {
         $siteSettings->setTargetId($siteId);
@@ -1593,7 +1595,6 @@ if (version_compare($oldVersion, '3.4.31', '<')) {
     $sql = 'UPDATE `search_suggester` SET `name` = ? WHERE `name` = ?;';
     $connection->executeStatement($sql, [$translate('Main index'), 'Internal suggester (sql)']);
 
-    $siteSettings = $services->get('Omeka\Settings\Site');
     $siteIds = $api->search('sites', [], ['returnScalar' => 'id'])->getContent();
     foreach ($siteIds as $siteId) {
         $siteSettings->setTargetId($siteId);
@@ -1705,6 +1706,46 @@ if (version_compare($oldVersion, '3.4.33', '<')) {
 if (version_compare($oldVersion, '3.4.34', '<')) {
     $message = new PsrMessage(
         'It is now possible to configure a search engine to index only public resources.' // @translate
+    );
+    $messenger->addSuccess($message);
+}
+
+if (version_compare($oldVersion, '3.4.35', '<')) {
+    $siteIds = $api->search('sites', [], ['returnScalar' => 'id'])->getContent();
+    foreach ($siteIds as $siteId) {
+        $siteSettings->setTargetId($siteId);
+        // The old default was "first", but the new one is "browse".
+        $redirect = $siteSettings->get('advancedsearch_redirect_itemset', 'browse') ?: 'browse';
+        if ($redirect === 'first') {
+            $siteSettings->set('advancedsearch_redirect_itemset_browse', []);
+            $siteSettings->set('advancedsearch_redirect_itemset_search', []);
+            $siteSettings->set('advancedsearch_redirect_itemset_search_first', ['all']);
+            $siteSettings->set('advancedsearch_redirect_itemset_page_url', []);
+            $siteSettings->set('advancedsearch_redirect_itemsets', ['default' => 'first']);
+        } elseif ($redirect === 'all') {
+            $siteSettings->set('advancedsearch_redirect_itemset_browse', []);
+            $siteSettings->set('advancedsearch_redirect_itemset_search', ['all']);
+            $siteSettings->set('advancedsearch_redirect_itemset_search_first', []);
+            $siteSettings->set('advancedsearch_redirect_itemset_page_url', []);
+            $siteSettings->set('advancedsearch_redirect_itemsets', ['default' => 'search']);
+        } else {
+            $siteSettings->set('advancedsearch_redirect_itemset_browse', ['all']);
+            $siteSettings->set('advancedsearch_redirect_itemset_search', []);
+            $siteSettings->set('advancedsearch_redirect_itemset_search_first', []);
+            $siteSettings->set('advancedsearch_redirect_itemset_page_url', []);
+            $siteSettings->set('advancedsearch_redirect_itemsets', ['default' => 'browse']);
+        }
+        // The old option is not removed for now for compatibility with old themes (search, links).
+        // $siteSettings->delete('advancedsearch_redirect_itemset');
+    }
+
+    $message = new PsrMessage(
+        'It is now possible to configure the redirect to search for each item set separately in site settings.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new PsrMessage(
+        'Any item set can be redirected to the search page or any site page or url.' // @translate
     );
     $messenger->addSuccess($message);
 }

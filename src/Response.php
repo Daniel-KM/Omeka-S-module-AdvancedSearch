@@ -191,6 +191,15 @@ class Response implements JsonSerializable
     }
 
     /**
+     * @param array $resourceTotalResults All total results by resource type.
+     */
+    public function setAllResourceTotalResults(array $resourceTotalResults): self
+    {
+        $this->resourceTotalResults = $resourceTotalResults;
+        return $this;
+    }
+
+    /**
      * @param string $resourceType The resource type ("items", "item_sets"…).
      * @param int $totalResults
      */

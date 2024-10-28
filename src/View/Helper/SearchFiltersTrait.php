@@ -42,6 +42,12 @@ trait SearchFiltersTrait
                 '≤' => '≤',
                 '≥' => '≥',
                 '>' => '>',
+                'yreq' => $this->translator->translate('during year'),
+                'nyreq' => $this->translator->translate('not during year'),
+                'yrlt' => $this->translator->translate('until year (excluded)'),
+                'yrlte' => $this->translator->translate('until year'),
+                'yrgte' => $this->translator->translate('since year'),
+                'yrgt' => $this->translator->translate('since year (excluded)'),
                 // Internal.
                 'list' => $this->translator->translate('is in list'), // @translate
                 'nlist' => $this->translator->translate('is not in list'), // @translate

@@ -161,6 +161,12 @@ if ($isSiteRequest) {
                         <?= $queryOption('≤', $filter, 'type', '≤') ?>
                         <?= $queryOption('≥', $filter, 'type', '≥') ?>
                         <?= $queryOption('>', $filter, 'type', '>') ?>
+                        <?= $queryOption('yreq', $filter, 'type', $translate('during year')) ?>
+                        <?= $queryOption('nyreq', $filter, 'type', $translate('not during year')) ?>
+                        <?= $queryOption('yrgte', $filter, 'type', $translate('since year')) ?>
+                        <?= $queryOption('yrlte', $filter, 'type', $translate('until year')) ?>
+                        <?= $queryOption('yrgt', $filter, 'type', $translate('since year (excluded)')) ?>
+                        <?= $queryOption('yrlt', $filter, 'type', $translate('until year (excluded)')) ?>
                     </optgroup>
                     <optgroup label="<?= $translate('Resource') ?>">
                         <?= $queryOption('res', $filter, 'type', $translate('is resource with ID')) ?>

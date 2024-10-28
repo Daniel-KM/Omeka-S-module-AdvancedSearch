@@ -83,6 +83,12 @@ var Search = (function() {
             '≤',
             '≥',
             '>',
+            'yreq',
+            'nyreq',
+            'yrlt',
+            'yrlte',
+            'yrgte',
+            'yrgt',
         ],
         withoutValue: [
             'ex',

@@ -50,6 +50,13 @@ class SearchResources
             '≤' => '≤',
             '≥' => '≥',
             '>' => '>',
+            // Date (year).
+            'yreq' => 'nyreq',
+            'nyreq' => 'yreq',
+            'yrlt' => 'yrgte',
+            'yrlte' => 'yrgt',
+            'yrgte' => 'yrlt',
+            'yrgt' => 'yrlte',
             // Internal.
             'list' => 'nlist',
             'nlist' => 'list',
@@ -126,6 +133,8 @@ class SearchResources
             'nnear',
             'nma',
             'nlist',
+            // Date.
+            'nyreq',
             // Resource.
             'nres',
             'nresq',
@@ -176,6 +185,12 @@ class SearchResources
             'ndtp',
         ],
         'value_integer' => [
+            'yreq',
+            'nyreq',
+            'yrlt',
+            'yrlte',
+            'yrgte',
+            'yrgt',
             'res',
             'nres',
             'lres',
@@ -1527,6 +1542,13 @@ class SearchResources
      *   - ≤: lower than or equal
      *   - ≥: greater than or equal
      *   - >: greater than
+     *   Date (year: via casting to int):
+     *   - yreq: during year
+     *   - nyreq: not during year
+     *   - yrlt: until year (excluded)
+     *   - yrlte: until year
+     *   - yrgte: since year
+     *   - yrgt: since year (excluded)
      *   Internal, deprecated (any type can have multiple values)
      *   - list: is in list
      *   - nlist: is not in list
@@ -1906,6 +1928,36 @@ class SearchResources
                 $param = $this->adapter->createNamedParameter($qb, $value);
                 $qb->setParameter(substr($param, 1), $value, is_int($value) ? ParameterType::INTEGER : ParameterType::STRING);
                 $predicateExpr = $expr->gt("$valuesAlias.value", $param);
+                break;
+
+            case 'yreq':
+                // The casting to integer is the simplest way to get the year:
+                // it avoids multiple substring_index, replace, etc. and it
+                // works fine in most of the real cases, except when the date
+                // does not look like a standard date.
+                $param = $this->adapter->createNamedParameter($qb, $value);
+                $qb->setParameter(substr($param, 1), $value, is_int($value) ? ParameterType::INTEGER : ParameterType::STRING);
+                $predicateExpr = $expr->eq("$valuesAlias.value + 0", $param);
+                break;
+            case 'yrlt':
+                $param = $this->adapter->createNamedParameter($qb, $value);
+                $qb->setParameter(substr($param, 1), $value, is_int($value) ? ParameterType::INTEGER : ParameterType::STRING);
+                $predicateExpr = $expr->lt("$valuesAlias.value + 0", $param);
+                break;
+            case 'yrlte':
+                $param = $this->adapter->createNamedParameter($qb, $value);
+                $qb->setParameter(substr($param, 1), $value, is_int($value) ? ParameterType::INTEGER : ParameterType::STRING);
+                $predicateExpr = $expr->lte("$valuesAlias.value + 0", $param);
+                break;
+            case 'yrgte':
+                $param = $this->adapter->createNamedParameter($qb, $value);
+                $qb->setParameter(substr($param, 1), $value, is_int($value) ? ParameterType::INTEGER : ParameterType::STRING);
+                $predicateExpr = $expr->gte("$valuesAlias.value + 0", $param);
+                break;
+            case 'yrgt':
+                $param = $this->adapter->createNamedParameter($qb, $value);
+                $qb->setParameter(substr($param, 1), $value, is_int($value) ? ParameterType::INTEGER : ParameterType::STRING);
+                $predicateExpr = $expr->gt("$valuesAlias.value + 0", $param);
                 break;
 
             case 'res':

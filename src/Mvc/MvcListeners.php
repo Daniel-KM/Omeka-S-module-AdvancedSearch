@@ -34,13 +34,16 @@ class MvcListeners extends AbstractListenerAggregate
             return;
         }
 
+        $itemSetId = $routeMatch->getParam('item-set-id');
+
         $services = $event->getApplication()->getServiceManager();
         $siteSettings = $services->get('Omeka\Settings\Site');
 
         // The other options are managed in templates search/search and
         // search/results-header-footer.
-        $redirectItemSet = $siteSettings->get('advancedsearch_redirect_itemset');
-        if (!$redirectItemSet) {
+        $redirectItemSets = $siteSettings->get('advancedsearch_redirect_itemsets', ['default' => 'browse']);
+        $redirectItemSet = ($redirectItemSets[$itemSetId] ?? $redirectItemSets['default'] ?? 'browse') ?: 'browse';
+        if ($redirectItemSet === 'browse') {
             return;
         }
 
@@ -61,7 +64,6 @@ class MvcListeners extends AbstractListenerAggregate
         }
 
         $siteSlug = $routeMatch->getParam('site-slug');
-        $itemSetId = $routeMatch->getParam('item-set-id');
 
         $params = [
             '__NAMESPACE__' => 'AdvancedSearch\Controller',

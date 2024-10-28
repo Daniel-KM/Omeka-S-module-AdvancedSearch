@@ -617,6 +617,46 @@ class Module extends AbstractModule
         }
     }
 
+    public function handleSiteSettings(Event $event): void
+    {
+        $this->handleAnySettings($event, 'site_settings');
+
+        // Prepare a single setting with all values to simplify next checks.
+        // Most of the time, the array contains only the default value and
+        // sometime a few item sets.
+
+        $services = $this->getServiceLocator();
+        $siteSettings = $services->get('Omeka\Settings\Site');
+
+        $redirectBrowse = $siteSettings->get('advancedsearch_redirect_itemset_browse', ['all']) ?: [];
+        $redirectSearch = $siteSettings->get('advancedsearch_redirect_itemset_search', []) ?: [];
+        $redirectSearchFirst = $siteSettings->get('advancedsearch_redirect_itemset_search_first', []) ?: [];
+        $redirectBrowse = array_fill_keys($redirectBrowse, 'browse');
+        $redirectSearch = array_fill_keys($redirectSearch, 'search');
+        $redirectSearchFirst = array_fill_keys($redirectSearchFirst, 'first');
+
+        // Don't use "else" in order to manage bad config. Default is browse.
+        $merged = ['default' => 'browse'];
+        if (isset($redirectSearchFirst['all'])) {
+            $merged = ['default' => 'first'];
+            unset($redirectSearchFirst['all']);
+        }
+        if (isset($redirectSearch['all'])) {
+            $merged = ['default' => 'search'];
+            unset($redirectSearch['all']);
+        }
+        if (isset($redirectBrowse['all'])) {
+            $merged = ['default' => 'browse'];
+            unset($redirectBrowse['all']);
+        }
+
+        $merged = $merged + $redirectBrowse + $redirectSearch + $redirectSearchFirst;
+
+        $siteSettings->set('advancedsearch_redirect_itemsets', $merged);
+        // Kept for compatibility with old themes.
+        $siteSettings->set('advancedsearch_redirect_itemset', $merged['default']);
+    }
+
     /**
      * Clean useless fields and store some keys to process them one time only.
      *
@@ -1347,7 +1387,11 @@ class Module extends AbstractModule
         $siteSettings->setTargetId($site->getId());
         $siteSettings->set('advancedsearch_main_config', $searchConfig->id());
         $siteSettings->set('advancedsearch_configs', [$searchConfig->id()]);
-        $siteSettings->set('advancedsearch_redirect_itemset', 'first');
+        $siteSettings->set('advancedsearch_redirect_itemset_browse', ['all']);
+        $siteSettings->set('advancedsearch_redirect_itemset_search', []);
+        $siteSettings->set('advancedsearch_redirect_itemset_search_first', []);
+        $siteSettings->set('advancedsearch_redirect_itemsets', ['default' => 'browse']);
+        $siteSettings->set('advancedsearch_redirect_itemset', 'browse');
     }
 
     protected function installResources(): void

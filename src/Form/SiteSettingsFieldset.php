@@ -103,23 +103,59 @@ class SiteSettingsFieldset extends Fieldset
                     'id' => 'advancedsearch_configs',
                 ],
             ])
-            // TODO Move the option to redirect item set to search page or a search page setting?
+            // TODO Move these options to redirect item set to search page or a search page setting?
             ->add([
-                'name' => 'advancedsearch_redirect_itemset',
-                'type' => CommonElement\OptionalRadio::class,
+                'name' => 'advancedsearch_redirect_itemset_browse',
+                'type' => CommonElement\OptionalItemSetSelect::class,
                 'options' => [
                     'element_group' => 'advanced_search',
-                    'label' => 'Redirect item set page to search', // @translate
-                    'value_options' => [
-                        '' => 'No', // @translate
-                        'first' => 'First page only (default Omeka)', // @translate
-                        'all' => 'All pages', // @translate
+                    'label' => 'Redirect item sets to item/browse', // @translate
+                    'empty_option' => '',
+                    'prepend_value_options' => [
+                        'all' => 'All item sets', // @translate
                     ],
-                    'info' => 'By default, item-set/show is redirected to item/browse. This option redirects it to the search page.', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'advancedsearch_redirect_itemset',
-                    'value' => '',
+                    'id' => 'advancedsearch_redirect_itemset_browse',
+                    'multiple' => true,
+                    'class' => 'chosen-select',
+                    'data-placeholder' => 'Select item sets…', // @translate
+                ],
+            ])
+            ->add([
+                'name' => 'advancedsearch_redirect_itemset_search',
+                'type' => CommonElement\OptionalItemSetSelect::class,
+                'options' => [
+                    'element_group' => 'advanced_search',
+                    'label' => 'Redirect item sets to search', // @translate
+                    'empty_option' => '',
+                    'prepend_value_options' => [
+                        'all' => 'All item sets', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearch_redirect_itemset_search',
+                    'multiple' => true,
+                    'class' => 'chosen-select',
+                    'data-placeholder' => 'Select item sets…', // @translate
+                ],
+            ])
+            ->add([
+                'name' => 'advancedsearch_redirect_itemset_search_first',
+                'type' => CommonElement\OptionalItemSetSelect::class,
+                'options' => [
+                    'element_group' => 'advanced_search',
+                    'label' => 'Redirect item sets to search (display record only on first page, old default Omeka)', // @translate
+                    'empty_option' => '',
+                    'prepend_value_options' => [
+                        'all' => 'All item sets', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearch_redirect_itemset_search_first',
+                    'multiple' => true,
+                    'class' => 'chosen-select',
+                    'data-placeholder' => 'Select item sets…', // @translate
                 ],
             ])
         ;

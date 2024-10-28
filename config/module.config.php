@@ -407,7 +407,14 @@ return [
             ],
             'advancedsearch_main_config' => 1,
             'advancedsearch_configs' => [1],
-            'advancedsearch_redirect_itemset' => 'first',
+            'advancedsearch_redirect_itemset_browse' => ['all'],
+            'advancedsearch_redirect_itemset_search' => [],
+            'advancedsearch_redirect_itemset_search_first' => [],
+            // Hidden options.
+            // This option is a merge of the previous ones for simplicity.
+            'advancedsearch_redirect_itemsets' => [],
+            // The old option is not removed for now for compatibility with old themes (search, links).
+            'advancedsearch_redirect_itemset' => 'browse',
         ],
         'block_settings' => [
             'searchingForm' => [

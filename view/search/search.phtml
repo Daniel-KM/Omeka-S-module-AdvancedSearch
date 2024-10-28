@@ -77,7 +77,8 @@ $displayPartsFooter = array_filter($displayParts, fn ($v) => in_array($v, ['foot
 $displayFacets = $displayParts ? $displayParts['facets'] ?? 'before' : 'none';
 
 if ($itemSet && $site) {
-    $redirectItemSet = $this->siteSetting('advancedsearch_redirect_itemset');
+    $redirectItemSets = $this->siteSetting('advancedsearch_redirect_itemsets', ['default' => 'browse']);
+    $redirectItemSet = $redirectItemSets[$itemSetId] ?? $redirectItemSets['default'] ?? 'browse';
     $displayItemSet = $redirectItemSet === 'all' || ($redirectItemSet === 'first' && $response->getCurrentPage() === 1);
 } else {
     $displayItemSet = false;

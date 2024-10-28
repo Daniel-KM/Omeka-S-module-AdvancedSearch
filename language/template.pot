@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-14 00:00+0000\n"
+"POT-Creation-Date: 2024-10-28 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -86,7 +86,7 @@ msgstr ""
 msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr ""
 
-#: Module.php:1395
+#: Module.php:1424
 msgid "Main index"
 msgstr ""
 
@@ -745,62 +745,78 @@ msgstr ""
 msgid "Confirm reindex"
 msgstr ""
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:25
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:28
 #: view/advanced-search/admin/search-suggester/index-confirm.phtml:25
 #, php-format
 msgid "Reindex \"%s\""
 msgstr ""
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:26
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:29
 msgid "Are you sure you would like to reindex this index?"
 msgstr ""
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:28
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:31
 msgid "Set \"1\" to reindex all resources without clearing the current index."
 msgstr ""
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:29
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:32
 msgid ""
 "It avoids interruption in the search page, but in rare cases, it may keep "
 "indexes of deleted resources that were not removed."
 msgstr ""
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:30
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:33
 msgid ""
 "Set a greater resource id to reindex resources starting this resource id."
 msgstr ""
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:33
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:36
 msgid ""
 "With \"0\", the full index will be cleared first, so the search will be "
 "unavailable for a while."
 msgstr ""
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:34
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:37
 msgid "You may redirect the users to a clone of the current index temporary."
 msgstr ""
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:38
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:41
 msgid "You may want to limit the reindexing to a resource type."
 msgstr ""
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:45
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:48
+msgid "You may want to limit the reindexing to a visibility."
+msgstr ""
+
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:50
+msgid "Public and private"
+msgstr ""
+
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:51
+msgid "Public only"
+msgstr ""
+
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:52
+msgid "Private only"
+msgstr ""
+
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:58
 #: view/advanced-search/admin/search-suggester/index-confirm.phtml:41
 #, php-format
 msgid "%d running indexings."
 msgstr ""
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:46
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:59
 #: view/advanced-search/admin/search-suggester/index-confirm.phtml:42
 msgid "Force indexing"
 msgstr ""
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:48
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:61
 #: view/advanced-search/admin/search-suggester/index-confirm.phtml:44
 msgid "No running indexing: process can be launched."
 msgstr ""
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:54
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:67
 #: view/advanced-search/admin/search-suggester/index-confirm.phtml:53
 msgid "This index has no resource type to index."
 msgstr ""
@@ -1471,6 +1487,12 @@ msgid ""
 "update only the css."
 msgstr ""
 
+#: data/scripts/upgrade.php:1707
+msgid ""
+"It is now possible to configure a search engine to index only public "
+"resources."
+msgstr ""
+
 #: Module.php:95
 msgid ""
 "The module Reference is required to use the facets with the default internal "
@@ -1485,59 +1507,59 @@ msgstr ""
 msgid "The module {module} can be reenabled."
 msgstr ""
 
-#: Module.php:979
+#: Module.php:980
 msgid "Unable to batch index metadata for search engine \"{name}\": {message}"
 msgstr ""
 
-#: Module.php:984
+#: Module.php:985
 msgid "Unable to batch update the search engine \"{name}\": see log."
 msgstr ""
 
-#: Module.php:1032
+#: Module.php:1033
 msgid "Unable to launch index metadata for search engine \"{name}\": {message}"
 msgstr ""
 
-#: Module.php:1036
+#: Module.php:1037
 msgid "Unable to launch indexing for the search engine \"{name}\": see log."
 msgstr ""
 
-#: Module.php:1134
+#: Module.php:1135
 msgid ""
 "Unable to delete the search index for resource #{resource_id} in search "
 "engine \"{name}\": {message}"
 msgstr ""
 
-#: Module.php:1139
+#: Module.php:1140
 msgid ""
 "Unable to delete the search index for the deleted resource #{resource_id} in "
 "search engine \"{name}\": see log."
 msgstr ""
 
-#: Module.php:1160
+#: Module.php:1166
 msgid ""
 "Unable to index metadata of resource #{resource_id} for search in search "
 "engine \"{name}\": {message}"
 msgstr ""
 
-#: Module.php:1165
+#: Module.php:1171
 msgid ""
 "Unable to update the search index for resource #{resource_id} in search "
 "engine \"{name}\": see log."
 msgstr ""
 
-#: Module.php:1373
+#: Module.php:1402
 msgid ""
 "The internal search engine (sql) can be edited in the {link_url}search "
 "manager{link_end}."
 msgstr ""
 
-#: Module.php:1409
+#: Module.php:1438
 msgid ""
 "The {link_url}internal suggester{link_end} (sql) will be available after "
 "indexation."
 msgstr ""
 
-#: Module.php:1446
+#: Module.php:1475
 msgid ""
 "The default search config can be {link_1}edited{link_end}, {link_2}"
 "configured{link_end} and defined in the {link_3}main settings{link_end} for "
@@ -1617,6 +1639,12 @@ msgstr ""
 
 #: view/common/advanced-search/properties-improved.phtml:125
 msgid "[any property]"
+msgstr ""
+
+#: src/FormAdapter/AbstractFormAdapter.php:596
+msgid ""
+"The query contains a filter with the key \"value\", that must be replaced "
+"with \"val\"."
 msgstr ""
 
 #: src/FormAdapter/ApiFormAdapter.php:22
@@ -1759,33 +1787,39 @@ msgid ""
 "on the site."
 msgstr ""
 
-#: src/Job/IndexSearch.php:130
+#: src/Job/IndexSearch.php:138
+msgid ""
+"Search index #{search_engine_id} (\"{name}\"): Only {visibility} resources "
+"will be indexed."
+msgstr ""
+
+#: src/Job/IndexSearch.php:146
 msgid "Search index #{search_engine_id} (\"{name}\"): start of indexing"
 msgstr ""
 
-#: src/Job/IndexSearch.php:144
+#: src/Job/IndexSearch.php:160
 msgid ""
 "Search index is not cleared: reindexing starts at resource #{resource_id}."
 msgstr ""
 
-#: src/Job/IndexSearch.php:183
+#: src/Job/IndexSearch.php:205
 msgid ""
 "Search index #{search_engine_id} (\"{name}\"): the indexing was stopped. "
 "Nothing was indexed."
 msgstr ""
 
-#: src/Job/IndexSearch.php:190 src/Job/IndexSearch.php:234
+#: src/Job/IndexSearch.php:212 src/Job/IndexSearch.php:257
 msgid "{resource_type}: {count} indexed"
 msgstr ""
 
-#: src/Job/IndexSearch.php:196
+#: src/Job/IndexSearch.php:219
 msgid ""
 "Search index #{search_engine_id} (\"{name}\"): the indexing was stopped. "
 "Last indexed resource: {resource_type} #{resource_id}; {results}. Execution "
 "time: {duration} seconds."
 msgstr ""
 
-#: src/Job/IndexSearch.php:242
+#: src/Job/IndexSearch.php:265
 msgid ""
 "Search index #{search_engine_id} (\"{name}\"): end of indexing. {results}. "
 "Execution time: {duration} seconds. Failed indexed resources should be "
@@ -2112,7 +2146,7 @@ msgstr ""
 
 #: src/Form/Admin/SearchConfigFacetFieldset.php:68
 #: src/Form/Admin/SearchConfigFilterFieldset.php:97
-msgid "Range double with slider"
+msgid "Slider for a range of values"
 msgstr ""
 
 #: src/Form/Admin/SearchConfigFacetFieldset.php:70
@@ -2727,7 +2761,7 @@ msgstr ""
 msgid "Resources indexed and searchable"
 msgstr ""
 
-#: src/Form/Admin/SearchEngineConfigureForm.php:78
+#: src/Form/Admin/SearchEngineConfigureForm.php:95
 msgid "Resources (mixed)"
 msgstr ""
 
@@ -3009,25 +3043,25 @@ msgstr ""
 msgid "Adapter settings"
 msgstr ""
 
-#: src/Controller/Admin/SearchEngineController.php:143
+#: src/Controller/Admin/SearchEngineController.php:144
 msgid "Search index \"{name}\" successfully configured."
 msgstr ""
 
-#: src/Controller/Admin/SearchEngineController.php:146
+#: src/Controller/Admin/SearchEngineController.php:147
 msgid "Don’t forget to run the indexation of the search engine."
 msgstr ""
 
-#: src/Controller/Admin/SearchEngineController.php:196
+#: src/Controller/Admin/SearchEngineController.php:201
 msgid ""
 "Indexing of \"{name}\" started in job {link_job}#{job_id}{link_end} "
 "({link_log}logs{link_end})."
 msgstr ""
 
-#: src/Controller/Admin/SearchEngineController.php:240
+#: src/Controller/Admin/SearchEngineController.php:245
 msgid "Search index \"{name}\" successfully deleted"
 msgstr ""
 
-#: src/Controller/Admin/SearchEngineController.php:245
+#: src/Controller/Admin/SearchEngineController.php:250
 msgid "Search index \"{name}\" could not be deleted"
 msgstr ""
 

@@ -24,18 +24,20 @@ class SearchingValue extends AbstractHelper
         $view = $this->getView();
 
         /**
+         * @var \Omeka\View\Helper\Status $status
          * @var \Omeka\View\Helper\Hyperlink $hyperlink
          */
         $plugins = $view->getHelperPluginManager();
         $url = $plugins->get('url');
         $status = $plugins->get('status');
+        $params = $plugins->get('params');
         $hyperlink = $plugins->get('hyperlink');
         $getSearchConfig = $plugins->get('getSearchConfig');
 
         // Check if the current site/admin has a search form.
         $isAdmin = $status->isAdminRequest();
         $isSite = $status->isSiteRequest();
-        $siteSlug = $isSite ? $status->getRouteParam('site-slug') : null;
+        $siteSlug = $isSite ? $params->fromRoute('site-slug') : null;
 
         $advancedSearchConfig = $getSearchConfig();
         $engine = $advancedSearchConfig ? $advancedSearchConfig->engine() : null;

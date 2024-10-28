@@ -135,6 +135,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
             // Set a default empty query and response to simplify view.
             'query' => new Query,
             'response' => new Response,
+            'skipFormAction' => false,
         ];
 
         $options += [
@@ -173,7 +174,8 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
             }
         }
 
-        if (empty($options['skip_form_action'])) {
+        $vars['skipFormAction'] = !empty($options['skip_form_action']);
+        if (!$vars['skipFormAction']) {
             $status = $services->get('Omeka\Status');
             $isAdmin = $status->isAdminRequest();
             $formActionUrl = $isAdmin

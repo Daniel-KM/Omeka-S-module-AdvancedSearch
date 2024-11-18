@@ -1534,7 +1534,7 @@ if (version_compare($oldVersion, '3.4.31', '<')) {
                         } elseif (!is_array($filter['options'])) {
                             $filter['options'] = ['value_options' => [(string) $filter['options'] => (string) $filter['options']]];
                         } else {
-                            $filter['options']['value_options'] = (array) $filter['options'];
+                            $filter['options']['value_options'] = $filter['options'];
                         }
                         // Avoid issue with duplicates.
                         $filter['options']['value_options'] = array_filter(array_keys(array_flip($filter['options']['value_options'])), 'strlen');

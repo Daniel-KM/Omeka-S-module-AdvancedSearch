@@ -28,8 +28,12 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-const hasChosenSelect = typeof $.fn.chosen === 'function';
-const hasOmekaTranslate = typeof Omeka !== 'undefined' && typeof Omeka.jsTranslate === 'function';
+if (typeof hasChosenSelect === 'undefined') {
+    var hasChosenSelect = typeof $.fn.chosen === 'function';
+}
+if (typeof hasOmekaTranslate === 'undefined') {
+    var hasOmekaTranslate = typeof Omeka !== 'undefined' && typeof Omeka.jsTranslate === 'function';
+}
 
 const $searchFiltersAdvanced = $('#search-filters');
 const $searchFacets = $('#search-facets');
@@ -195,7 +199,12 @@ var Search = (function() {
             // @see https://solr.apache.org/guide/suggester.html#example-usages
             if (response.suggest) {
                 const answer = response.suggest[Object.keys(response.suggest)[0]];
-                const searchString = answer[Object.keys(answer)[0]];
+                const searchString = answer[Object.keys(answer)[0]] instanceof String
+                    ? answer[Object.keys(answer)[0]]
+                    : Object.keys(answer)[0];
+                if (!Object.keys(answer[searchString]).find((key) => 'suggestions' === key)) {
+                    return {};
+                }
                 return {
                     query: searchString,
                     suggestions: $.map(answer[searchString].suggestions, function(dataItem) {

@@ -8,6 +8,11 @@
         display: none;
     }
 
+    [hidden],
+    .hidden {
+        display: none;
+    }
+
     /* Search form */
     .form-search {
         margin-bottom: 24px;

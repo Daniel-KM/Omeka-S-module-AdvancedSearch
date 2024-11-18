@@ -6,6 +6,7 @@
  * @var \AdvancedSearch\Query $query
  * @var \AdvancedSearch\Response $response
  * @var ?string $resourceType The resource type may be "resources" or a specific one.
+ * @var \Omeka\Api\Representation\ItemSetRepresentation|null $itemSet
  */
 
 // A check is done: when page is not first, the resources may be empty even with results.
@@ -53,7 +54,7 @@ $thumbnailType = $searchConfig->subSetting('display', 'thumbnail_type', 'medium'
     foreach ($resources as $resource):
         $resourceUrl = isset($site) ? $resource->siteUrl($siteSlug) : $resource->adminUrl();
         $resourceType = $resource->getControllerName();
-        $heading = $headingTerm ? $resource->value($headingTerm, ['default' => $untitled, 'lang' => $langValue]) : $resource->displayTitle(null, $langValue);
+        $heading = $headingTerm ? $resource->value($headingTerm, ['default' => $untitled, 'lang' => $langValue]) : $resource->displayTitle($untitled, $langValue);
         $body = $bodyTerm ? $resource->value($bodyTerm, ['lang' => $langValue, 'default' => '']) : $resource->displayDescription(null, $langValue);
         ?>
     <li class="resource <?= $resourceType ?>">

@@ -96,7 +96,7 @@ $this->headScript()
     <?= $breadcrumbs() ?>
 <?php else: ?>
 <div class="breadcrumbs-parent">
-    <nav id="breadcrumb" class="breadcrumbs" aria-label="<?= $translate('Breadcrumb') ?>">
+    <nav id="breadcrumb" class="breadcrumbs" aria-label="<?= $translate('Breadcrumbs') ?>">
         <ul>
             <?php if (!$isAdmin): ?>
             <li><?= $hyperlink($translate('Home'), $site->siteUrl()) ?></li>

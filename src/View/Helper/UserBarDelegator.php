@@ -59,9 +59,9 @@ class UserBarDelegator extends UserBar
         $locale = null;
 
         if ($user) {
-            $hasAdminRights = $view->userIsAllowed('Omeka\Controller\Admin\Index', 'index');
+            $hasAdminRights = $view->userIsAllowed('Omeka\Controller\Admin\Index');
             if ($hasAdminRights) {
-                $locale = $view->userSetting('locale') ?: ($view->setting('locale') ?: null);
+                $locale = $view->userSetting('locale', null, $user->getId()) ?: ($view->setting('locale') ?: null);
                 $links = $this->links($view, $site, $user, $locale);
                 $partialName = $partialName ?: self::PARTIAL_NAME;
             } else {

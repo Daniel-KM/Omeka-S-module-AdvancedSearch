@@ -293,7 +293,7 @@ class Query implements JsonSerializable
     public function addFilterQuery(string $name, $val, ?string $type = 'in', ?string $join = 'and'): self
     {
         $this->filtersQuery[$name][] = [
-            'val' => trim((string) $val),
+            'val' => is_array($val) ? array_map('trim', array_map('strval', $val)) : trim((string) $val),
             'type' => trim((string) $type),
             'join' => trim((string) $join),
         ];

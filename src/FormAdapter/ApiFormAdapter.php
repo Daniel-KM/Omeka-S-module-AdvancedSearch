@@ -221,6 +221,10 @@ class ApiFormAdapter implements FormAdapterInterface
                 continue;
             }
 
+            if (is_array($property) && count($property) <= 1) {
+                $property = reset($property);
+            }
+            
             // Narrow to specific property, if one is selected, else use search.
             $property = $this->easyMeta->propertyTerm($property);
             // TODO Manage empty properties (main search and "any property").

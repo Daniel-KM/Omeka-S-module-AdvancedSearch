@@ -7,7 +7,7 @@ $(document).ready(function() {
     /**
      * Search configure form.
      *
-     * @see module AdvancedSearch asset/js/advanced-search-configure.js
+     * @see module AdvancedSearch asset/js/advanced-search-manager.js
      * @see module SingleSignOn asset/js/single-sign-on-admin.js
      */
 

@@ -1,15 +1,24 @@
 <?php
-
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var \AdvancedSearch\Form\Admin\SearchSuggesterForm $form
  */
 
-$translate = $this->plugin('translate');
+$plugins = $this->getHelperPluginManager();
+$assetUrl = $plugins->get('assetUrl');
+$translate = $plugins->get('translate');
+
+$this->headLink()
+    ->appendStylesheet($assetUrl('css/advanced-search-manager.css', 'AdvancedSearch'));
+$this->headScript()
+    ->appendFile($assetUrl('js/advanced-search-manager.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
+
+$this->htmlElement('body')->appendAttribute('class', 'search-admin search-suggester resource add');
+
 $form->prepare();
 ?>
 
-<?= $this->pageTitle($translate('Add suggester')) ?>
+<?= $this->pageTitle($translate('Add suggester'), 1, $translate('Search manager')) ?>
 
 <?= $this->form()->openTag($form) ?>
 <div id="page-actions">

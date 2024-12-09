@@ -38,10 +38,11 @@ $assetUrl = $plugins->get('assetUrl');
 $translate = $plugins->get('translate');
 
 $this->headLink()
-    ->appendStylesheet($assetUrl('css/advanced-search-configure.css', 'AdvancedSearch'));
+    ->appendStylesheet($assetUrl('css/advanced-search-manager.css', 'AdvancedSearch'));
 $this->headScript()
-    ->appendFile($assetUrl('js/advanced-search-configure.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
-;
+    ->appendFile($assetUrl('js/advanced-search-manager.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
+
+$this->htmlElement('body')->appendAttribute('class', 'search-admin search-config resource edit configure');
 
 $engine = $searchConfig->engine();
 $adapter = $engine ? $engine->adapter() : null;
@@ -57,7 +58,7 @@ foreach ($form->getFieldsets() as $fieldset) {
 }
 ?>
 
-<?= $this->pageTitle(sprintf($translate('Search page "%1$s" (%2$s)'), $searchConfig->name(), $searchConfig->slug())) ?>
+<?= $this->pageTitle(sprintf($translate('Search page "%1$s" (%2$s)'), $searchConfig->name(), $searchConfig->slug()), 1, $translate('Search manager')) ?>
 
 <div id="page-actions">
     <button form="form-search-config-configure"><?= $translate('Save') ?></button>

@@ -1,4 +1,8 @@
 @media screen {
+    .search-admin .subhead::before {
+        content:"";
+    }
+
     .search-admin .actions .disabled {
         color: currentColor;
         cursor: not-allowed;

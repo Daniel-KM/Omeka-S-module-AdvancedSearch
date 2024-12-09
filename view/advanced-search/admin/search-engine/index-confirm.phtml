@@ -8,7 +8,8 @@
  * @var int $totalJobs
  */
 
-$translate = $this->plugin('translate');
+$plugins = $this->getHelperPluginManager();
+$translate = $plugins->get('translate');
 
 $resourceTypes = $resource->setting('resource_types', []);
 

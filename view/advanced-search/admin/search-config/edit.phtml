@@ -32,11 +32,21 @@
  * @var \AdvancedSearch\Form\Admin\SearchConfigForm $form
  */
 
-$translate = $this->plugin('translate');
+$plugins = $this->getHelperPluginManager();
+$translate = $plugins->get('translate');
+$assetUrl = $plugins->get('assetUrl');
+
+$this->headLink()
+    ->appendStylesheet($assetUrl('css/advanced-search-manager.css', 'AdvancedSearch'));
+$this->headScript()
+    ->appendFile($assetUrl('js/advanced-search-manager.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
+
+$this->htmlElement('body')->appendAttribute('class', 'search-admin search-config resource edit');
+
 $form->prepare();
 ?>
 
-<?= $this->pageTitle($translate('Manage search page')) ?>
+<?= $this->pageTitle($translate('Manage search page'), 1, $translate('Search manager')) ?>
 
 <?= $this->form()->openTag($form) ?>
 

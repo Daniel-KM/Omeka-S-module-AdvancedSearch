@@ -59,10 +59,9 @@ class SettingsFieldset extends Fieldset
                 'type' => CommonElement\OptionalSelect::class,
                 'options' => [
                     'element_group' => 'advanced_search',
-                    'label' => 'Default search page (admin)', // @translate
-                    'info' => 'This search engine is used in the admin bar.', // @translate
+                    'label' => 'Default search page in admin side bar', // @translate
                     'value_options' => $this->searchConfigs,
-                    'empty_option' => 'Select the search engine for the admin bar…', // @translate
+                    'empty_option' => 'Select the search engine for the admin side bar…', // @translate
                 ],
                 'attributes' => [
                     'id' => 'advancedsearch_main_config',

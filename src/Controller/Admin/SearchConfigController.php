@@ -386,6 +386,8 @@ class SearchConfigController extends AbstractActionController
         $searchConfigId = $searchConfig->id();
         $searchConfigSiteDefaultsCurrent = $this->sitesWithSearchConfigAsDefault($searchConfig);
 
+        // Check default config first in order to add it as available config.
+
         // Manage admin settings.
         $settings = $this->settings();
 
@@ -724,7 +726,7 @@ class SearchConfigController extends AbstractActionController
     }
 
     /**
-     * Remove empty params and all params starting with "available_".
+     * Remove empty params except labels and params starting with "available_".
      */
     protected function removeUselessFields(array $params): array
     {

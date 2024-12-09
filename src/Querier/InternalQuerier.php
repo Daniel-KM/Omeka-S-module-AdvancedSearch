@@ -165,6 +165,7 @@ class InternalQuerier extends AbstractQuerier
 
         // Remove specific results when settings are not by resource type.
         // TODO The order may be different when "resources" is not used.
+        // Facets are always grouped.
         // This is the same in SolariumQuerier.
         if ($isSpecificQuery && !$this->byResourceType && count($this->resourceTypes) > 1) {
             $allResourceIdsByType = $this->response->getAllResourceIds(null, true);

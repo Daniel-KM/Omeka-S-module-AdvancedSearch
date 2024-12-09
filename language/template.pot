@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-28 00:00+0000\n"
+"POT-Creation-Date: 2024-12-09 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -65,7 +65,7 @@ msgstr ""
 msgid "Date (most recent first)"
 msgstr ""
 
-#: data/configs/search_config.default.php:524 view/search/facets-list.phtml:81
+#: data/configs/search_config.default.php:524 view/search/facets-list.phtml:93
 msgid "No facets"
 msgstr ""
 
@@ -81,12 +81,16 @@ msgstr ""
 msgid "Reset facets"
 msgstr ""
 
+#: data/configs/search_config.default.php:534 view/search/facets-list.phtml:30
+msgid "Refine search"
+msgstr ""
+
 #: data/scripts/upgrade.php:36 Module.php:79
 #, php-format
 msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr ""
 
-#: Module.php:1474
+#: Module.php:1472
 msgid "Main index"
 msgstr ""
 
@@ -113,23 +117,23 @@ msgstr ""
 msgid "[Missing adapter \"%s\"]"
 msgstr ""
 
-#: src/Controller/SearchController.php:218
+#: src/Controller/SearchController.php:222
 msgid "This action requires an ajax request."
 msgstr ""
 
-#: src/Controller/SearchController.php:246
+#: src/Controller/SearchController.php:250
 msgid "Not a search page for this site."
 msgstr ""
 
-#: src/Controller/SearchController.php:260
+#: src/Controller/SearchController.php:264
 msgid "The seach engine is not available."
 msgstr ""
 
-#: src/Controller/SearchController.php:272
+#: src/Controller/SearchController.php:276
 msgid "An error occurred."
 msgstr ""
 
-#: src/Controller/SearchController.php:381
+#: src/Controller/SearchController.php:385
 msgid "Logo"
 msgstr ""
 
@@ -1001,6 +1005,10 @@ msgstr ""
 msgid "Search by presence of thumbnails"
 msgstr ""
 
+#: view/common/navigation-link-form/searching-page.phtml:60
+msgid "Available pages"
+msgstr ""
+
 #: view/search/facet-actives.phtml:18
 #, php-format
 msgid "from %1$s"
@@ -1036,11 +1044,11 @@ msgstr ""
 msgid "Facets"
 msgstr ""
 
-#: view/search/facets-list.phtml:100
+#: view/search/facets-list.phtml:112
 msgid "See more"
 msgstr ""
 
-#: view/search/facets-list.phtml:100
+#: view/search/facets-list.phtml:112
 msgid "See less"
 msgstr ""
 
@@ -1052,12 +1060,12 @@ msgstr ""
 msgid "grid"
 msgstr ""
 
-#: view/search/results.phtml:45
+#: view/search/results.phtml:48
 msgid "No media"
 msgstr ""
 
 #: view/search/search.phtml:99
-msgid "Breadcrumb"
+msgid "Breadcrumbs"
 msgstr ""
 
 #: view/search/search.phtml:105
@@ -1540,6 +1548,12 @@ msgid ""
 "Any item set can be redirected to the search page or any site page or url."
 msgstr ""
 
+#: data/scripts/upgrade.php:1786
+msgid ""
+"Some search page configs were enabled for site \"{site_slug}\", because the "
+"navigation uses them."
+msgstr ""
+
 #: Module.php:95
 msgid ""
 "The module Reference is required to use the facets with the default internal "
@@ -1554,59 +1568,59 @@ msgstr ""
 msgid "The module {module} can be reenabled."
 msgstr ""
 
-#: Module.php:1025
+#: Module.php:1023
 msgid "Unable to batch index metadata for search engine \"{name}\": {message}"
 msgstr ""
 
-#: Module.php:1030
+#: Module.php:1028
 msgid "Unable to batch update the search engine \"{name}\": see log."
 msgstr ""
 
-#: Module.php:1078
+#: Module.php:1076
 msgid "Unable to launch index metadata for search engine \"{name}\": {message}"
 msgstr ""
 
-#: Module.php:1082
+#: Module.php:1080
 msgid "Unable to launch indexing for the search engine \"{name}\": see log."
 msgstr ""
 
-#: Module.php:1180
+#: Module.php:1178
 msgid ""
 "Unable to delete the search index for resource #{resource_id} in search "
 "engine \"{name}\": {message}"
 msgstr ""
 
-#: Module.php:1185
+#: Module.php:1183
 msgid ""
 "Unable to delete the search index for the deleted resource #{resource_id} in "
 "search engine \"{name}\": see log."
 msgstr ""
 
-#: Module.php:1211
+#: Module.php:1209
 msgid ""
 "Unable to index metadata of resource #{resource_id} for search in search "
 "engine \"{name}\": {message}"
 msgstr ""
 
-#: Module.php:1216
+#: Module.php:1214
 msgid ""
 "Unable to update the search index for resource #{resource_id} in search "
 "engine \"{name}\": see log."
 msgstr ""
 
-#: Module.php:1452
+#: Module.php:1450
 msgid ""
 "The internal search engine (sql) can be edited in the {link_url}search "
 "manager{link_end}."
 msgstr ""
 
-#: Module.php:1488
+#: Module.php:1486
 msgid ""
 "The {link_url}internal suggester{link_end} (sql) will be available after "
 "indexation."
 msgstr ""
 
-#: Module.php:1525
+#: Module.php:1523
 msgid ""
 "The default search config can be {link_1}edited{link_end}, {link_2}"
 "configured{link_end} and defined in the {link_3}main settings{link_end} for "
@@ -1690,7 +1704,7 @@ msgstr ""
 msgid "[any property]"
 msgstr ""
 
-#: src/FormAdapter/AbstractFormAdapter.php:598
+#: src/FormAdapter/AbstractFormAdapter.php:602
 msgid ""
 "The query contains a filter with the key \"value\", that must be replaced "
 "with \"val\"."
@@ -1902,7 +1916,7 @@ msgstr ""
 msgid "Select the default search engine for the site…"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:100 src/Form/SettingsFieldset.php:76
+#: src/Form/SiteSettingsFieldset.php:100
 msgid "Available search pages"
 msgstr ""
 
@@ -1954,52 +1968,48 @@ msgid ""
 msgstr ""
 
 #: src/Form/SettingsFieldset.php:62
-msgid "Default search page (admin)"
+msgid "Default search page in admin side bar"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:63
-msgid "This search engine is used in the admin bar."
+#: src/Form/SettingsFieldset.php:64
+msgid "Select the search engine for the admin side bar…"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:65
-msgid "Select the search engine for the admin bar…"
-msgstr ""
-
-#: src/Form/SettingsFieldset.php:88
+#: src/Form/SettingsFieldset.php:75
 msgid "Quick api search via external search engine"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:89
+#: src/Form/SettingsFieldset.php:76
 msgid ""
 "The method apiSearch() allows to do a quick search in some cases. It "
 "requires a mapping done with the Omeka api and the selected index."
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:91
+#: src/Form/SettingsFieldset.php:78
 msgid "Select the config for quick api search…"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:103
+#: src/Form/SettingsFieldset.php:90
 msgid "Indexing after a batch edit process"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:104
+#: src/Form/SettingsFieldset.php:91
 msgid "On some complex databases, an issue may occur after a batch process."
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:105
+#: src/Form/SettingsFieldset.php:92
 msgid "value_options"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:108
+#: src/Form/SettingsFieldset.php:95
 msgid "Synchronous"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:109
+#: src/Form/SettingsFieldset.php:96
 msgid "Asynchronous"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:110
+#: src/Form/SettingsFieldset.php:97
 msgid "Integrated"
 msgstr ""
 
@@ -2103,40 +2113,26 @@ msgstr ""
 msgid "Sort (for internal use only, don’t modify it)"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigForm.php:87
+#: src/Form/Admin/SearchConfigForm.php:86
 #: src/Form/Admin/SearchSuggesterForm.php:44
 #: src/Form/Admin/SearchSuggesterForm.php:62
 msgid "Select a search engine below…"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigForm.php:101
+#: src/Form/Admin/SearchConfigForm.php:100
 msgid "Select a form below…"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigForm.php:113
-msgid "Set as default search page for sites"
+#: src/Form/Admin/SearchConfigForm.php:112
+msgid "Default search page for admin and sites"
 msgstr ""
 
 #: src/Form/Admin/SearchConfigForm.php:115
-msgid ""
-"The page will be made available on all selected sites. This param can be set "
-"in each site settings too."
+msgid "[No site]"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigForm.php:132
+#: src/Form/Admin/SearchConfigForm.php:131
 msgid "Availability on sites"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigForm.php:133
-msgid "The admin settings are not modified."
-msgstr ""
-
-#: src/Form/Admin/SearchConfigForm.php:135
-msgid "Make unavailable in all sites"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigForm.php:136
-msgid "Don’t modify"
 msgstr ""
 
 #: src/Form/Admin/SearchConfigForm.php:137
@@ -2603,10 +2599,6 @@ msgstr ""
 msgid "The template to use in your theme. Default is search/search."
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:624
-msgid "Breadcrumbs"
-msgstr ""
-
 #: src/Form/Admin/SearchConfigConfigureForm.php:634
 msgid "List of query filters"
 msgstr ""
@@ -2809,7 +2801,15 @@ msgstr ""
 msgid "Position of the button \"Reset facets\""
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1096
+#: src/Form/Admin/SearchConfigConfigureForm.php:1095
+msgid "Display the input field to refine search"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigConfigureForm.php:1107
+msgid "Label for refine"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigConfigureForm.php:1121
 msgid ""
 "List of facets that will be displayed in the search page, formatted as ini. "
 "The section is a unique name. Keys are: field, label, type, order, limit, "
@@ -2817,7 +2817,7 @@ msgid ""
 "specific options, like thesaurus, min and max."
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1127
+#: src/Form/Admin/SearchConfigConfigureForm.php:1152
 msgid "Add a facet"
 msgstr ""
 
@@ -3090,8 +3090,8 @@ msgstr ""
 #: src/Controller/Admin/SearchSuggesterController.php:240
 #: src/Controller/Admin/SearchEngineController.php:72
 #: src/Controller/Admin/SearchEngineController.php:131
-#: src/Controller/Admin/SearchConfigController.php:219
-#: src/Controller/Admin/SearchConfigController.php:319
+#: src/Controller/Admin/SearchConfigController.php:220
+#: src/Controller/Admin/SearchConfigController.php:320
 msgid "There was an error during validation"
 msgstr ""
 
@@ -3141,76 +3141,86 @@ msgstr ""
 msgid "The api adapter should be selected in the main settings."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:149
+#: src/Controller/Admin/SearchConfigController.php:150
 msgid "Search page \"{name}\" saved."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:180
+#: src/Controller/Admin/SearchConfigController.php:181
 msgid "The engine adapter \"{label}\" is unavailable."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:181
-#: src/Controller/Admin/SearchConfigController.php:192
+#: src/Controller/Admin/SearchConfigController.php:182
+#: src/Controller/Admin/SearchConfigController.php:193
 msgid "label"
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:191
+#: src/Controller/Admin/SearchConfigController.php:192
 msgid "This engine adapter \"{label}\" has no config form."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:233
+#: src/Controller/Admin/SearchConfigController.php:234
 msgid "Configuration \"{name}\" saved."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:264
+#: src/Controller/Admin/SearchConfigController.php:265
 msgid "Search page \"{name}\" successfully deleted"
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:269
+#: src/Controller/Admin/SearchConfigController.php:270
 msgid "Search page \"{name}\" could not be deleted"
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:293
-#: src/Controller/Admin/SearchConfigController.php:300
+#: src/Controller/Admin/SearchConfigController.php:294
+#: src/Controller/Admin/SearchConfigController.php:301
 msgid "The slug should be unique."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:306
+#: src/Controller/Admin/SearchConfigController.php:307
 msgid "The slug should be relative to the root of the site, like \"search\"."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:383
+#: src/Controller/Admin/SearchConfigController.php:399
 msgid "The page has been set by default in admin board."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:386
+#: src/Controller/Admin/SearchConfigController.php:402
 msgid "The page has been unset in admin board."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:395
-msgid "The page has been disabled in all specified sites."
+#: src/Controller/Admin/SearchConfigController.php:455
+msgid "This search config is the default one in sites: {site_slugs}."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:399
-msgid "The page has been made available in all specified sites."
+#: src/Controller/Admin/SearchConfigController.php:460
+msgid "This search config is not used as default in any site."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:403
-msgid "The availability of pages of sites was let unmodified."
+#: src/Controller/Admin/SearchConfigController.php:466
+msgid "This search config is available in sites: {site_slugs}."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:673
+#: src/Controller/Admin/SearchConfigController.php:471
+msgid "This search config is not available in any site."
+msgstr ""
+
+#: src/Controller/Admin/SearchConfigController.php:708
 msgid ""
 "Note that you didn’t set an empty language for some facets, so all values "
 "without language will be skipped in the facet."
 msgstr ""
 
-#: src/Controller/SearchController.php:134
-#: src/Controller/SearchController.php:161
+#: src/Controller/SearchController.php:57
+msgid ""
+"The search engine {search_slug} is not available in site {site_slug}. Check "
+"site settings or search config."
+msgstr ""
+
+#: src/Controller/SearchController.php:138
+#: src/Controller/SearchController.php:165
 msgid "No query."
 msgstr ""
 
-#: src/Controller/SearchController.php:323
+#: src/Controller/SearchController.php:327
 msgid "Rss are available only via public interface."
 msgstr ""
 
@@ -3235,7 +3245,7 @@ msgstr ""
 msgid "The search config \"{search_slug}\" has no form associated."
 msgstr ""
 
-#: src/Querier/InternalQuerier.php:59 src/Querier/InternalQuerier.php:204
+#: src/Querier/InternalQuerier.php:59 src/Querier/InternalQuerier.php:205
 msgid "An issue occurred."
 msgstr ""
 
@@ -3245,35 +3255,35 @@ msgid ""
 "workaround is used."
 msgstr ""
 
-#: src/Querier/InternalQuerier.php:222
+#: src/Querier/InternalQuerier.php:223
 msgid "An issue occurred for the suggester."
 msgstr ""
 
-#: src/Querier/InternalQuerier.php:262 src/Querier/InternalQuerier.php:460
+#: src/Querier/InternalQuerier.php:263 src/Querier/InternalQuerier.php:461
 msgid "An internal issue in database occurred."
 msgstr ""
 
-#: src/Querier/InternalQuerier.php:452
+#: src/Querier/InternalQuerier.php:453
 msgid "This mode is currently not supported with the internal search engine."
 msgstr ""
 
-#: src/Querier/InternalQuerier.php:464
+#: src/Querier/InternalQuerier.php:465
 msgid "An internal issue occurred."
 msgstr ""
 
-#: src/Querier/InternalQuerier.php:542
+#: src/Querier/InternalQuerier.php:543
 msgid ""
 "The query \"{query}\" uses {count} properties or filters, that is more than "
 "the {total} supported currently. Excluded fields are removed."
 msgstr ""
 
-#: src/Querier/InternalQuerier.php:552
+#: src/Querier/InternalQuerier.php:553
 msgid ""
 "The query \"{query}\" uses {count} properties or filters, that is more than "
 "the {total} supported currently. Request is troncated."
 msgstr ""
 
-#: src/Querier/InternalQuerier.php:1174
+#: src/Querier/InternalQuerier.php:1196
 msgid "The field for the facet \"{name}\" is not set."
 msgstr ""
 
@@ -3307,22 +3317,22 @@ msgid ""
 "yet with the fields of the index"
 msgstr ""
 
-#: config/module.config.php:435
+#: config/module.config.php:434
 msgid "Full text"
 msgstr ""
 
-#: config/module.config.php:437
+#: config/module.config.php:436
 msgid "Properties (improved)"
 msgstr ""
 
-#: config/module.config.php:440 config/module.config.php:444
-#: config/module.config.php:445 config/module.config.php:449
-#: config/module.config.php:450 config/module.config.php:451
-#: config/module.config.php:452 config/module.config.php:454
-#: config/module.config.php:456 config/module.config.php:458
+#: config/module.config.php:439 config/module.config.php:443
+#: config/module.config.php:444 config/module.config.php:448
+#: config/module.config.php:449 config/module.config.php:450
+#: config/module.config.php:451 config/module.config.php:453
+#: config/module.config.php:455 config/module.config.php:457
 msgid "default"
 msgstr ""
 
-#: config/module.config.php:447
+#: config/module.config.php:446
 msgid "Date time"
 msgstr ""

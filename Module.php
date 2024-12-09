@@ -482,9 +482,7 @@ class Module extends AbstractModule
             if ($siteSlug) {
                 $baseRoutes[] = 'search-page-';
             }
-            $adminSearchConfigs = $settings->get('advancedsearch_configs', []);
-            $adminSearchConfigs = array_intersect_key($searchConfigs, array_flip($adminSearchConfigs));
-            foreach ($baseRoutes as $baseRoute) foreach ($adminSearchConfigs as $searchConfigId => $searchConfigSlug) {
+            foreach ($baseRoutes as $baseRoute) foreach ($searchConfigs as $searchConfigId => $searchConfigSlug) {
                 $router->addRoute(
                     $baseRoute . $searchConfigSlug,
                     [

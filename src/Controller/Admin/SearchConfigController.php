@@ -374,12 +374,6 @@ class SearchConfigController extends AbstractActionController
             $settings = $this->settings();
             if ($new) {
                 $settings->set('advancedsearch_main_config', $searchConfigId);
-                $searchConfigs = $settings->get('advancedsearch_configs', []);
-                $searchConfigs[] = $searchConfigId;
-                $searchConfigs = array_unique(array_filter(array_map('intval', $searchConfigs)));
-                sort($searchConfigs);
-                $settings->set('advancedsearch_configs', $searchConfigs);
-
                 $message = 'The page has been set by default in admin board.'; // @translate
             } else {
                 $settings->set('advancedsearch_main_config', null);

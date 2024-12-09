@@ -69,18 +69,6 @@ class SettingsFieldset extends Fieldset
                 ],
             ])
             ->add([
-                'name' => 'advancedsearch_configs',
-                'type' => CommonElement\OptionalMultiCheckbox::class,
-                'options' => [
-                    'element_group' => 'advanced_search',
-                    'label' => 'Available search pages', // @translate
-                    'value_options' => $this->searchConfigs,
-                ],
-                'attributes' => [
-                    'id' => 'advancedsearch_configs',
-                ],
-            ])
-            ->add([
                 'name' => 'advancedsearch_api_config',
                 'type' => CommonElement\OptionalSelect::class,
                 'options' => [

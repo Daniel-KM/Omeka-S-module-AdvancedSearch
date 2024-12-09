@@ -1089,6 +1089,31 @@ class SearchConfigConfigureForm extends Form
                 ],
             ])
             ->add([
+                'name' => 'display_refine',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Display the input field to refine search', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'facet_display_refine',
+                    'required' => false,
+                    'value' => true,
+                ],
+            ])
+            ->add([
+                'name' => 'label_refine',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Label for refine', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'facet_label_refine',
+                    'required' => false,
+                    'value' => 'Refine search', // @translate
+                    'placeholder' => 'Refine search', // @translate
+                ],
+            ])
+            ->add([
                 'name' => 'facets',
                 'type' => Element\Collection::class,
                 'options' => [

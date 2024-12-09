@@ -42,6 +42,11 @@ class Query implements JsonSerializable
     protected $query = '';
 
     /**
+     * @var string
+     */
+    protected $queryRefine = '';
+
+    /**
      * @var string[]
      */
     protected $resourceTypes = [];
@@ -159,6 +164,22 @@ class Query implements JsonSerializable
     public function getQuery(): string
     {
         return $this->query;
+    }
+
+    /**
+     * The query used to refine should be stringable and is always trimmed.
+     *
+     * This type of query may be used with the facets.
+     */
+    public function setQueryRefine($queryRefine): self
+    {
+        $this->queryRefine = trim((string) $queryRefine);
+        return $this;
+    }
+
+    public function getQueryRefine(): string
+    {
+        return $this->queryRefine;
     }
 
     /**

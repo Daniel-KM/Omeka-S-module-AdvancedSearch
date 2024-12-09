@@ -272,6 +272,10 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                     $query->setQuery($value);
                     continue 2;
 
+                case 'refine':
+                    $query->setQueryRefine($value);
+                    continue 2;
+
                 case 'rft':
                     // Two values: record only or all (record and full text).
                     // There is only one full text search index in internal

@@ -530,6 +530,8 @@ return [
             'label_submit' => $translate('Apply facets'),
             'display_reset' => 'above',
             'label_reset' => $translate('Reset facets'),
+            'display_refine' => true,
+            'label_refine' => $translate('Refine search'),
             // The mode is the always the same, but passed with each facet for simplicity.
             'facets' => [
                 'item_set_id' => [

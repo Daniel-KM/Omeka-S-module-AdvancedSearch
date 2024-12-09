@@ -711,6 +711,7 @@ SQL;
         $this->filterQueryFilters($this->query->getFiltersQuery());
         $this->argsWithoutActiveFacets = $this->args;
         $this->filterQueryValues($this->query->getActiveFacets(), true);
+        $this->filterQueryRefine($this->query->getQueryRefine());
     }
 
     protected function filterQueryValues(array $filters, bool $inListForFacets = false): void
@@ -958,6 +959,26 @@ SQL;
                     'val' => $value['val'],
                 ];
             }
+        }
+    }
+
+    /**
+     * Refine the main search.
+     *
+     * There may be only one full search by query, so use a property query.
+     *
+     * @todo Use excluded fields?
+     */
+    protected function filterQueryRefine($queryRefine): void
+    {
+        if (strlen((string) $queryRefine)) {
+            $this->args['filter'][] = [
+                'join' => 'and',
+                'field' => '',
+                // 'except' => $excludedFields,
+                'type' => 'in',
+                'val' => $queryRefine,
+            ];
         }
     }
 

@@ -20,6 +20,7 @@ $hyperlink = $plugins->get('hyperlink');
 $thumbnail = $plugins->get('thumbnail');
 $escapeValueOrGetHtml = $plugins->get('escapeValueOrGetHtml');
 
+$selectionButton = $site && $plugins->has('selectionButton') && $this->siteSetting('selection_append_items_browse_individual') ? $plugins->get('selectionButton') : null;
 $contactUsSelector = $site && $plugins->has('contactUsSelector') && $this->siteSetting('contactus_append_items_browse_individual') ? $plugins->get('contactUsSelector') : null;
 
 // Can be simplified in a public theme.
@@ -78,6 +79,9 @@ $thumbnailType = $searchConfig->subSetting('display', 'thumbnail_type', 'medium'
             </div>
             <?php endif; ?>
         </div>
+        <?php if ($selectionButton): ?>
+        <?= $selectionButton($resource) ?>
+        <?php endif; ?>
         <?php if ($contactUsSelector): ?>
         <?= $contactUsSelector($resource) ?>
         <?php endif; ?>

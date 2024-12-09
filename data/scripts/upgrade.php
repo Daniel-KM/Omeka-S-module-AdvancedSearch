@@ -742,7 +742,6 @@ SQL;
 if (version_compare($oldVersion, '3.4.28', '<')) {
     // TODO Move this in module Common in a new class "UpgradeTheme".
     // The previous version used shell commands, but they may be forbidden by some servers.
-    $logger = $services->get('Omeka\Logger');
     $doUpgrade = !empty($config['advancedsearch_upgrade_3.4.28']);
     $stringsAndMessages = [
         'facetOptions' => [
@@ -1156,7 +1155,6 @@ if (version_compare($oldVersion, '3.4.29', '<')) {
     );
     $messenger->addWarning($message);
 
-    $logger = $services->get('Omeka\Logger');
     $stringsAndMessages = [
         'search-facet' => [
             'strings' => [
@@ -1295,7 +1293,6 @@ if (version_compare($oldVersion, '3.4.29', '<')) {
 
 if (version_compare($oldVersion, '3.4.31', '<')) {
     // Check for upgraded features.
-    $logger = $services->get('Omeka\Logger');
     $stringsAndMessages = [
         'settings-search' => [
             'strings' => [
@@ -1748,4 +1745,61 @@ if (version_compare($oldVersion, '3.4.35', '<')) {
         'Any item set can be redirected to the search page or any site page or url.' // @translate
     );
     $messenger->addSuccess($message);
+}
+
+if (version_compare($oldVersion, '3.4.36', '<')) {
+    $strings = [
+        'name="reset"',
+        "->has('reset')",
+    ];
+    $manageModuleAndResources = $this->getManageModuleAndResources();
+    $result = $manageModuleAndResources->checkStringsInFiles($strings, 'themes/*/view/search/*');
+    if ($result) {
+        $message = new PsrMessage(
+            'The form element "reset" was renamed "form-reset" to avoid issues with javascript. You should fix your theme first: {json}', // @translate
+            ['json' => json_encode($result, 448)]
+        );
+        $logger->err($message->getMessage(), $message->getContext());
+        throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message->setTranslator($translator));
+    }
+
+    $settings->delete('advancedsearch_configs');
+
+    // Fixes navigation issues: make search configs available when they are used
+    // in site navigation.
+    // Adapted from \Omeka\Site\Navigation\Translator::ToZend().
+    $listNavSearchConfigs = null;
+    $listNavSearchConfigs = function (array $linksIn, array &$navSearchConfigs) use (&$listNavSearchConfigs) {
+        foreach ($linksIn as $data) {
+            if ($data['type'] === 'searchingPage') {
+                $navSearchConfigs[] = $data['data']['advancedsearch_config_id'];
+            }
+            if (!empty($data['links'])) {
+                $listNavSearchConfigs($data['links'], $navSearchConfigs);
+            }
+        }
+        return $navSearchConfigs;
+    };
+    // Navigation is not a scalar field, so use full site representation.
+    $sites = $api->search('sites')->getContent();
+    foreach ($sites as $site) {
+        $navSearchConfigs = [];
+        $listNavSearchConfigs($site->navigation() ?: [], $navSearchConfigs);
+        if ($navSearchConfigs) {
+            $siteSettings->setTargetId($site->id());
+            $searchConfigIdsForSite = $siteSettings->get('advancedsearch_configs', []);
+            $searchConfigIdsForSite = array_unique(array_filter(array_map('intval', $searchConfigIdsForSite)));
+            sort($searchConfigIdsForSite);
+            $newSearchConfigIdsForSite = array_unique(array_filter(array_map('intval', array_merge($searchConfigIdsForSite, $navSearchConfigs))));
+            sort($newSearchConfigIdsForSite);
+            if ($searchConfigIdsForSite !== $newSearchConfigIdsForSite) {
+                $siteSettings->set('advancedsearch_configs', $newSearchConfigIdsForSite);
+                $message = new PsrMessage(
+                    'Some search page configs were enabled for site "{site_slug}", because the navigation uses them.', // @translate
+                    ['site_slug' => $site->slug()]
+                );
+                $messenger->addWarning($message);
+            }
+        }
+    }
 }

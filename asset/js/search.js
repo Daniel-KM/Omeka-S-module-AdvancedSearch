@@ -506,6 +506,8 @@ var Search = (function() {
                 case 'checkbox':
                 case 'radio':
                     element.checked = false;
+                    // Fix reset issue with some config.
+                    $(element).prop('checked', false);
                     break;
                 case 'select-one':
                 case 'select-multiple':

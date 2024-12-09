@@ -172,10 +172,10 @@
         flex-flow: row wrap;
     }
     .search-results .resource-list.list .resource-thumbnail {
-        flex-basis: 42px;
+        flex-basis: 120px;
     }
     .search-results .resource-list.list .resource-heading {
-        flex-basis: calc(100% - 42px);
+        flex-basis: calc(100% - 120px);
     }
     .search-results .resource-list.list .resource-metadata,
     .search-results .resource-list.list .resource-body {

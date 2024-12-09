@@ -21,9 +21,9 @@ if (!$formId) {
 // Move buttons reset and submit outside of the form.
 $reset = null;
 $submit = null;
-if ($form->has('reset')) {
-    $reset = $form->get('reset');
-    $form->remove('reset');
+if ($form->has('form-reset')) {
+    $reset = $form->get('form-reset');
+    $form->remove('form-reset');
 }
 if ($form->has('submit')) {
     $submit = $form->get('submit');

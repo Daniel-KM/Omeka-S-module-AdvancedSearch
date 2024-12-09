@@ -321,7 +321,9 @@ class MainSearchForm extends Form
         if (!empty($this->formSettings['form']['button_reset']) && !in_array($this->variant, ['quick', 'simple', 'csrf'])) {
             $this
                 ->add([
-                    'name' => 'reset',
+                    // Don't use "reset" as name, it is not usable via js:
+                    // the method reset() won't be available.
+                    'name' => 'form-reset',
                     'type' => Element\Button::class,
                     'options' => [
                         'label' => $this->formSettings['form']['label_reset'] ?? 'Reset fields', // @translate

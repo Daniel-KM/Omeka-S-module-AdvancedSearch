@@ -53,6 +53,10 @@ class SearchController extends AbstractActionController
             $siteSettings = $this->siteSettings();
             $siteSearchConfigs = $siteSettings->get('advancedsearch_configs', []);
             if (!in_array($searchConfigId, $siteSearchConfigs)) {
+                $this->logger()->err(
+                    'The search engine {search_slug} is not available in site {site_slug}. Check site settings or search config.', // @translate
+                    ['search_slug' => $this->params('search-slug'), 'site_slug' => $site->slug()]
+                );
                 return $this->notFoundAction();
             }
             // Check if it is an item set redirection.

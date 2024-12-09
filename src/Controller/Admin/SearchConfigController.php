@@ -97,13 +97,13 @@ class SearchConfigController extends AbstractActionController
             'Search page "{name}" created.', // @translate
             ['name' => $searchConfig->name()]
         ));
-        $this->manageSearchConfigOnSites(
+        $this->manageSearchConfigSettings(
             $searchConfig,
-            $formData['manage_config_default'] ?: [],
-            $formData['manage_config_availability']
+            $formData['manage_config_availability'] ?: [],
+            $formData['manage_config_default'] ?: []
         );
         if (!in_array($formData['manage_config_availability'], ['disable', 'enable'])
-            && empty($formData['manage_config_default'])
+            && in_array($formData['manage_config_default'], ['', 'let'])
         ) {
             $this->messenger()->addWarning('You can enable this page in your site settings or in admin settings.'); // @translate
         }
@@ -126,7 +126,8 @@ class SearchConfigController extends AbstractActionController
 
         // $data = $searchConfig->jsonSerialize();
         $data = json_decode(json_encode($searchConfig), true);
-        $data['manage_config_default'] = $this->sitesWithSearchConfig($searchConfig);
+        $data['manage_config_default'] = $this->sitesWithSearchConfigAsDefault($searchConfig);
+        $data['manage_config_availability'] = $this->sitesWithSearchConfigAsAvailable($searchConfig);
         $data['o:engine'] = empty($data['o:engine']['o:id']) ? null : $data['o:engine']['o:id'];
 
         $form = $this->getForm(SearchConfigForm::class);
@@ -150,10 +151,10 @@ class SearchConfigController extends AbstractActionController
             ['name' => $searchConfig->name()]
         ));
 
-        $this->manageSearchConfigOnSites(
+        $this->manageSearchConfigSettings(
             $searchConfig,
-            $formData['manage_config_default'] ?: [],
-            $formData['manage_config_availability']
+            $formData['manage_config_availability'] ?: [],
+            $formData['manage_config_default'] ?: []
         );
 
         return $this->redirect()->toRoute('admin/search-manager');
@@ -331,24 +332,42 @@ class SearchConfigController extends AbstractActionController
             : null;
     }
 
-    protected function sitesWithSearchConfig(SearchConfigRepresentation $searchConfig): array
+    protected function sitesWithSearchConfigAsDefault(SearchConfigRepresentation $searchConfig): array
     {
         $result = [];
         $searchConfigId = $searchConfig->id();
 
         // Check admin.
-        $adminSearchId = $this->settings()->get('advancedsearch_main_config');
-        if ($adminSearchId && $adminSearchId == $searchConfigId) {
+        $adminSearchId = (int) $this->settings()->get('advancedsearch_main_config');
+        if ($adminSearchId && $adminSearchId === $searchConfigId) {
             $result[] = 'admin';
         }
 
         // Check all sites.
-        $settings = $this->siteSettings();
+        $siteSettings = $this->siteSettings();
         $sites = $this->api()->search('sites')->getContent();
         foreach ($sites as $site) {
-            $settings->setTargetId($site->id());
-            $siteSearchId = $settings->get('advancedsearch_main_config');
-            if ($siteSearchId && $siteSearchId == $searchConfigId) {
+            $siteSettings->setTargetId($site->id());
+            $siteSearchId = (int) $siteSettings->get('advancedsearch_main_config');
+            if ($siteSearchId && $siteSearchId === $searchConfigId) {
+                $result[] = $site->id();
+            }
+        }
+
+        return $result;
+    }
+
+    protected function sitesWithSearchConfigAsAvailable(SearchConfigRepresentation $searchConfig): array
+    {
+        $result = [];
+        $searchConfigId = $searchConfig->id();
+
+        $siteSettings = $this->siteSettings();
+        $sites = $this->api()->search('sites')->getContent();
+        foreach ($sites as $site) {
+            $siteSettings->setTargetId($site->id());
+            $searchConfigIdsForSite = $siteSettings->get('advancedsearch_configs', []);
+            if (in_array($searchConfigId, $searchConfigIdsForSite)) {
                 $result[] = $site->id();
             }
         }
@@ -357,21 +376,22 @@ class SearchConfigController extends AbstractActionController
     }
 
     /**
-     * Set the config for all sites.
+     * Set the search config for admin and sites.
      */
-    protected function manageSearchConfigOnSites(
+    protected function manageSearchConfigSettings(
         SearchConfigRepresentation $searchConfig,
-        array $newMainSearchConfigForSites,
-        $availability
+        array $searchConfigSiteAvailabilities,
+        array $searchConfigSiteDefaults
     ): void {
         $searchConfigId = $searchConfig->id();
-        $currentMainSearchConfigForSites = $this->sitesWithSearchConfig($searchConfig);
+        $searchConfigSiteDefaultsCurrent = $this->sitesWithSearchConfigAsDefault($searchConfig);
 
         // Manage admin settings.
-        $current = in_array('admin', $currentMainSearchConfigForSites);
-        $new = in_array('admin', $newMainSearchConfigForSites);
+        $settings = $this->settings();
+
+        $current = in_array('admin', $searchConfigSiteDefaultsCurrent);
+        $new = in_array('admin', $searchConfigSiteDefaults);
         if ($current !== $new) {
-            $settings = $this->settings();
             if ($new) {
                 $settings->set('advancedsearch_main_config', $searchConfigId);
                 $message = 'The page has been set by default in admin board.'; // @translate
@@ -382,54 +402,73 @@ class SearchConfigController extends AbstractActionController
             $this->messenger()->addSuccess($message);
         }
 
-        $allSites = in_array('all', $newMainSearchConfigForSites);
-        switch ($availability) {
-            case 'disable':
-                $available = false;
-                $message = 'The page has been disabled in all specified sites.'; // @translate
-                break;
-            case 'enable':
-                $available = true;
-                $message = 'The page has been made available in all specified sites.'; // @translate
-                break;
-            default:
-                $available = null;
-                $message = 'The availability of pages of sites was let unmodified.'; // @translate
-        }
-
         // Manage site settings.
         $siteSettings = $this->siteSettings();
+
+        $allDefaults = [];
+        $allAvailables = [];
+        $defaultForAllSitesAdded = in_array('all', $searchConfigSiteDefaults);
+        $defaultForAllSitesRemoved = in_array('none', $searchConfigSiteDefaults);
+        $availabilityForAllSitesEnabled = in_array('enable', $searchConfigSiteAvailabilities);
+        $availabilityForAllSitesDisabled = in_array('disable', $searchConfigSiteAvailabilities);
+
+        /** @var \Omeka\Api\Representation\SiteRepresentation[] $sites */
         $sites = $this->api()->search('sites')->getContent();
         foreach ($sites as $site) {
             $siteId = $site->id();
             $siteSettings->setTargetId($siteId);
-            $searchConfigs = $siteSettings->get('advancedsearch_configs', []);
-            $current = in_array($siteId, $currentMainSearchConfigForSites);
-            $new = $allSites || in_array($siteId, $newMainSearchConfigForSites);
-            if ($current !== $new) {
-                if ($new) {
-                    $siteSettings->set('advancedsearch_main_config', $searchConfigId);
-                    $searchConfigs[] = $searchConfigId;
-                } else {
-                    $siteSettings->set('advancedsearch_main_config', null);
-                }
+
+            $prevDefaultForSite = (int) $siteSettings->get('advancedsearch_main_config');
+            $setDefaultForSite = $defaultForAllSitesAdded
+                || in_array($siteId, $searchConfigSiteDefaults);
+            if ($setDefaultForSite) {
+                $siteSettings->set('advancedsearch_main_config', $searchConfigId);
+            } elseif ($defaultForAllSitesRemoved || $prevDefaultForSite === $searchConfigId) {
+                $siteSettings->set('advancedsearch_main_config', null);
+            }
+            if ($siteSettings->get('advancedsearch_main_config') === $searchConfigId) {
+                $allDefaults[] = $site->slug();
             }
 
-            if ($new || $available) {
-                $searchConfigs[] = $searchConfigId;
-            } else {
-                $key = array_search($searchConfigId, $searchConfigs);
-                if ($key === false) {
-                    continue;
-                }
-                unset($searchConfigs[$key]);
+            $searchConfigIdsForSite = $siteSettings->get('advancedsearch_configs', []);
+            $prevAvailableForSite = in_array($searchConfigId, $searchConfigIdsForSite);
+            $setAvailableForSite = $setDefaultForSite
+                || $availabilityForAllSitesEnabled
+                || in_array($siteId, $searchConfigSiteAvailabilities);
+            if ($setAvailableForSite) {
+                $searchConfigIdsForSite[] = $searchConfigId;
+            } elseif ($availabilityForAllSitesDisabled || $prevAvailableForSite) {
+                $searchConfigIdsForSite = array_diff($searchConfigIdsForSite, [$searchConfigId]);
             }
-            $searchConfigs = array_unique(array_filter(array_map('intval', $searchConfigs)));
-            sort($searchConfigs);
-            $siteSettings->set('advancedsearch_configs', $searchConfigs);
+            $searchConfigIdsForSite = array_unique(array_filter(array_map('intval', $searchConfigIdsForSite)));
+            sort($searchConfigIdsForSite);
+            $siteSettings->set('advancedsearch_configs', $searchConfigIdsForSite);
+            if (in_array($searchConfigId, $searchConfigIdsForSite)) {
+                $allAvailables[] = $site->slug();
+            }
         }
 
-        $this->messenger()->addSuccess($message);
+        if ($allDefaults) {
+            $this->messenger()->addSuccess(new PsrMessage(
+                'This search config is the default one in sites: {site_slugs}.', // @translate
+                ['site_slugs' => implode(', ', $allDefaults)]
+            ));
+        } else {
+            $this->messenger()->addSuccess(new PsrMessage(
+                'This search config is not used as default in any site.' // @translate
+            ));
+        }
+
+        if ($allAvailables) {
+            $this->messenger()->addSuccess(new PsrMessage(
+                'This search config is available in sites: {site_slugs}.', // @translate
+                ['site_slugs' => implode(', ', $allAvailables)]
+            ));
+        } else {
+            $this->messenger()->addSuccess(new PsrMessage(
+                'This search config is not available in any site.' // @translate
+            ));
+        }
     }
 
     /**

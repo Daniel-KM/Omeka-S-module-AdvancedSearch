@@ -35,7 +35,6 @@ use Common\Form\Element as CommonElement;
 use Laminas\Form\Element;
 use Laminas\Form\Form;
 use Omeka\Api\Manager as ApiManager;
-use Omeka\Form\Element as OmekaElement;
 
 class SearchConfigForm extends Form
 {
@@ -108,12 +107,12 @@ class SearchConfigForm extends Form
 
             ->add([
                 'name' => 'manage_config_default',
-                'type' => OmekaElement\SiteSelect::class,
+                'type' => CommonElement\OptionalSiteSelect::class,
                 'options' => [
-                    'label' => 'Set as default search page for sites', // @translate
-                    'empty_option' => '[No change]', // @translate
-                    'info' => 'The page will be made available on all selected sites. This param can be set in each site settings too.', // @translate
+                    'label' => 'Default search page for admin and sites', // @translate
+                    'empty_option' => '',
                     'prepend_value_options' => [
+                        'none' => '[No site]', // @translate
                         'all' => '[All sites]', // @translate
                         'admin' => 'Admin', // @translate
                     ],
@@ -127,19 +126,25 @@ class SearchConfigForm extends Form
             ])
             ->add([
                 'name' => 'manage_config_availability',
-                'type' => CommonElement\OptionalRadio::class,
+                'type' => CommonElement\OptionalSiteSelect::class,
                 'options' => [
                     'label' => 'Availability on sites', // @translate
-                    'info' => 'The admin settings are not modified.', // @translate
-                    'value_options' => [
-                        'disable' => 'Make unavailable in all sites', // @translate
-                        'let' => 'Don’t modify', // @translate
+                    'empty_option' => '',
+                    'prepend_value_options' => [
+                        // This option is useless, since each site should be
+                        // disable individually.
+                        // 'disable' => 'Make unavailable in all sites', // @ translate
                         'enable' => 'Make available in all sites', // @translate
                     ],
                 ],
                 'attributes' => [
                     'id' => 'manage_config_availability',
-                    'value' => 'let',
+                    'class' => 'chosen-select',
+                    'multiple' => true,
+                    'data-placeholder' => 'Select sites…', // @translate
+                    'value' => [
+                        'enable',
+                    ],
                 ],
             ])
         ;

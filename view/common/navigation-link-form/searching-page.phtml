@@ -36,12 +36,16 @@
  */
 
 $plugins = $this->getHelperPluginManager();
-$translate = $plugins->get('translate');
 $escape = $plugins->get('escapeHtml');
+$translate = $plugins->get('translate');
+$siteSetting = $plugins->get('siteSetting');
 
 $data = empty($data) ? [] : $data;
 $label = $data['label'] ?? null;
 $searchConfigId = $data['advancedsearch_config_id'] ?? null;
+
+// Only search configs available in the site can be set.
+$availableSearchConfigIds = $siteSetting('advancedsearch_configs', []);
 
 $searchConfigs = $this->api()->search('search_configs')->getContent();
 ?>
@@ -53,10 +57,12 @@ $searchConfigs = $this->api()->search('search_configs')->getContent();
     <input type="text" data-name="label" value="<?= $escape($label) ?>"/>
 </label>
 <label>
-    <?= $translate('Page') ?>
+    <?= $translate('Available pages') ?>
     <select data-name="advancedsearch_config_id">
-        <?php foreach ($searchConfigs as $searchConfig): ?>
-            <?php $selected = $searchConfigId && $searchConfigId == $searchConfig->id(); ?>
+        <?php foreach ($searchConfigs as $searchConfig):
+            if (!in_array($searchConfig->id(), $availableSearchConfigIds)) continue;
+            $selected = $searchConfigId && $searchConfigId == $searchConfig->id();
+            ?>
             <option value="<?= $searchConfig->id() ?>"<?= $selected ? ' selected="selected"' : '' ?>>
                 <?= $searchConfig->name() ?>
             </option>

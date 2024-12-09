@@ -221,19 +221,31 @@ class ApiFormAdapter implements FormAdapterInterface
                 continue;
             }
 
-            if (is_array($property) && count($property) <= 1) {
-                $property = reset($property);
-            }
-            
-            // Narrow to specific property, if one is selected, else use search.
-            $property = $this->easyMeta->propertyTerm($property);
-            // TODO Manage empty properties (main search and "any property").
+            // TODO Manage empty, multiple and all properties (main search and "any property").
+            // For now, it is managed via fields?
+
             if (!$property) {
                 continue;
             }
+
+            if (is_array($property)) {
+                if (count($property) <= 1) {
+                    $property = reset($property);
+                } else {
+                    continue;
+                }
+            }
+
+            // Narrow to specific property, if one is selected, else use search.
+            $property = $this->easyMeta->propertyTerm($property);
+            if (!$property) {
+                continue;
+            }
+
             if (empty($properties[$property])) {
                 continue;
             }
+
             $propertyField = $properties[$property];
 
             // $positive = true;
@@ -302,15 +314,31 @@ class ApiFormAdapter implements FormAdapterInterface
                 continue;
             }
 
+            // TODO Manage empty, multiple and all properties (main search and "any property").
+            // For now, it is managed via fields?
+
+            if (!$field) {
+                continue;
+            }
+
+            if (is_array($field)) {
+                if (count($field) <= 1) {
+                    $field = reset($field);
+                } else {
+                    continue;
+                }
+            }
+
             // Narrow to specific property, if one is selected, else use search.
             $property = $this->easyMeta->propertyTerm($field);
-            // TODO Manage empty properties (main search and "any property").
             if (!$property) {
                 continue;
             }
+
             if (empty($properties[$property])) {
                 continue;
             }
+
             $propertyField = $properties[$property];
 
             // $positive = true;

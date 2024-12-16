@@ -85,7 +85,7 @@ class ApiFormAdapter implements FormAdapterInterface
         return '';
     }
 
-    public function toQuery(array $request, array $formSettings): \AdvancedSearch\Query
+    public function toQuery(array $request, array $formSettings): Query
     {
         $query = new Query();
         $query

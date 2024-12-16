@@ -273,12 +273,15 @@ class ApiSearch extends AbstractPlugin
         // Begin building the search query.
         $resourceType = $request->getResource();
         $searchConfigSettings = $this->searchConfig->settings();
-        $searchFormSettings = $searchConfigSettings['form'] ?? [
+        $searchConfigSettingsDefault = [
             'options' => [],
             'metadata' => [],
             'properties' => [],
             'sort_fields' => [],
         ];
+        $searchFormSettings = empty($searchConfigSettings['form'])
+            ? $searchConfigSettingsDefault
+            : $searchConfigSettings['form'] + $searchConfigSettingsDefault;
         $searchFormSettings['resource'] = $resourceType;
         // Fix to be removed.
         $searchAdapter = $this->searchConfig->searchAdapter();
@@ -313,8 +316,8 @@ class ApiSearch extends AbstractPlugin
         // Finish building the search query.
         // The default sort is the one of the search engine, so it is not added,
         // except if it is specifically set.
-        $this->sortQuery($searchQuery, $query, $searchFormSettings['metadata'], $searchFormSettings['sort_fields']);
-        $this->limitQuery($searchQuery, $query, $searchFormSettings['options']);
+        $this->sortQuery($searchQuery, $query, $searchFormSettings['metadata'] ?? [], $searchFormSettings['sort_fields'] ?? []);
+        $this->limitQuery($searchQuery, $query, $searchFormSettings['options'] ?? []);
         // $searchQuery->addOrderBy("$entityClass.id", $query['sort_order']);
 
         // No filter for specific limits.

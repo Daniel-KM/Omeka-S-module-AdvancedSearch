@@ -207,7 +207,6 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
     {
         // TODO Prepare the full query here for simplification.
         $query = new Query;
-
         $query
             ->setAliases($formSettings['aliases'] ?? [])
             ->setOption('remove_diacritics', !empty($formSettings['remove_diacritics']))

@@ -351,11 +351,19 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
      */
     public function suggest(string $q, ?string $field, ?SiteRepresentation $site): Response
     {
+        /**
+         * @var \Laminas\ServiceManager\ServiceLocatorInterface $services
+         * @var \Laminas\Log\Logger $logger
+         * @var \Laminas\I18n\Translator\Translator $translator
+         * @var \Omeka\Mvc\Controller\Plugin\UserIsAllowed $userIsAllowed
+         */
         $services = $this->getServiceLocator();
+        $plugins = $services->get('ControllerPluginManager');
         $api = $services->get('Omeka\ApiManager');
         $logger = $services->get('Omeka\Logger');
         $translator = $services->get('MvcTranslator');
         $easyMeta = $services->get('Common\EasyMeta');
+        $userIsAllowed = $plugins->get('userIsAllowed');
 
         $response = new Response();
         $response->setApi($api);
@@ -410,17 +418,12 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
 
         $query->setQuery($q);
 
-        $user = $services->get('Omeka\AuthenticationService')->getIdentity();
+
         // TODO Manage roles from modules and visibility from modules (access resources).
-        $omekaRoles = [
-            \Omeka\Permissions\Acl::ROLE_GLOBAL_ADMIN,
-            \Omeka\Permissions\Acl::ROLE_SITE_ADMIN,
-            \Omeka\Permissions\Acl::ROLE_EDITOR,
-            \Omeka\Permissions\Acl::ROLE_REVIEWER,
-            \Omeka\Permissions\Acl::ROLE_AUTHOR,
-            \Omeka\Permissions\Acl::ROLE_RESEARCHER,
-        ];
-        if ($user && in_array($user->getRole(), $omekaRoles)) {
+        // FIXME Researcher and author may not access all private resources. So index resource owners and roles?
+        // Default is public only.
+        $accessToAdmin = $userIsAllowed('Omeka\Controller\Admin\Index', 'browse');
+        if ($accessToAdmin) {
             $query->setIsPublic(false);
         }
 

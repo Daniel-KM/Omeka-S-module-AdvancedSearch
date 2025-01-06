@@ -100,7 +100,7 @@ class FieldSelect extends Select implements EventManagerAwareInterface
                     '%s (%s)',
                     $valueOptions[$propertyId]['label'],
                     implode(', ', $altLabels)
-                    );
+                );
             }
         }
         // Sort options alphabetically.

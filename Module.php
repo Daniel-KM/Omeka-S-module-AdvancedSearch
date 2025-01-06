@@ -1424,21 +1424,21 @@ class Module extends AbstractModule
 
         // Check if the internal index exists.
         $sqlSearchEngineId = <<<'SQL'
-SELECT `id`
-FROM `search_engine`
-WHERE `adapter` = "internal"
-ORDER BY `id` ASC;
-SQL;
+            SELECT `id`
+            FROM `search_engine`
+            WHERE `adapter` = "internal"
+            ORDER BY `id` ASC;
+            SQL;
         $searchEngineId = (int) $connection->fetchOne($sqlSearchEngineId);
 
         if (!$searchEngineId) {
             // Create the internal adapter.
             $sql = <<<'SQL'
-INSERT INTO `search_engine`
-(`name`, `adapter`, `settings`, `created`)
-VALUES
-(?, ?, ?, NOW());
-SQL;
+                INSERT INTO `search_engine`
+                (`name`, `adapter`, `settings`, `created`)
+                VALUES
+                (?, ?, ?, NOW());
+                SQL;
             $searchEngineConfig = require __DIR__ . '/data/configs/search_engine.internal.php';
             $connection->executeStatement($sql, [
                 $searchEngineConfig['o:name'],
@@ -1460,23 +1460,23 @@ SQL;
 
         // Check if the internal suggester exists.
         $sqlSuggesterId = <<<SQL
-SELECT `id`
-FROM `search_suggester`
-WHERE `engine_id` = $searchEngineId
-ORDER BY `id` ASC
-LIMIT 1;
-SQL;
+            SELECT `id`
+            FROM `search_suggester`
+            WHERE `engine_id` = $searchEngineId
+            ORDER BY `id` ASC
+            LIMIT 1;
+            SQL;
         $suggesterId = (int) $connection->fetchOne($sqlSuggesterId);
 
         if (!$suggesterId) {
             $mainIndex = $translate('Main index'); // @translate
             // Create the internal suggester.
             $sql = <<<SQL
-INSERT INTO `search_suggester`
-(`engine_id`, `name`, `settings`, `created`)
-VALUES
-($searchEngineId, "$mainIndex", ?, NOW());
-SQL;
+                INSERT INTO `search_suggester`
+                (`engine_id`, `name`, `settings`, `created`)
+                VALUES
+                ($searchEngineId, "$mainIndex", ?, NOW());
+                SQL;
             $suggesterSettings = require __DIR__ . '/data/configs/search_suggester.internal.php';
             $connection->executeStatement($sql, [
                 json_encode($suggesterSettings),
@@ -1496,20 +1496,20 @@ SQL;
 
         // Check if the default search config exists.
         $sqlSearchConfigId = <<<SQL
-SELECT `id`
-FROM `search_config`
-WHERE `engine_id` = $searchEngineId
-ORDER BY `id` ASC;
-SQL;
+            SELECT `id`
+            FROM `search_config`
+            WHERE `engine_id` = $searchEngineId
+            ORDER BY `id` ASC;
+            SQL;
         $searchConfigId = (int) $connection->fetchOne($sqlSearchConfigId);
 
         if (!$searchConfigId) {
             $sql = <<<SQL
-INSERT INTO `search_config`
-(`engine_id`, `name`, `slug`, `form_adapter`, `settings`, `created`)
-VALUES
-($searchEngineId, ?, ?, ?, ?, NOW());
-SQL;
+                INSERT INTO `search_config`
+                (`engine_id`, `name`, `slug`, `form_adapter`, `settings`, `created`)
+                VALUES
+                ($searchEngineId, ?, ?, ?, ?, NOW());
+                SQL;
             $searchConfigConfig = require __DIR__ . '/data/configs/search_config.default.php';
             $connection->executeStatement($sql, [
                 $searchConfigConfig['o:name'],

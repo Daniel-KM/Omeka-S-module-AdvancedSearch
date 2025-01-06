@@ -78,8 +78,9 @@ class InternalQuerier extends AbstractQuerier
         }
 
         // The standard api way implies a double query, because scalar doesn't
-        // set the full total and doesn't use paginator.
+        // set the full total and doesn't use paginator, but return all values.
         // So get all ids, then slice it here.
+        // TODO Check if this fix is still needed.
         $dataQuery = $this->args;
         $limit = empty($dataQuery['limit']) ? null : (int) $dataQuery['limit'];
         $offset = empty($dataQuery['offset']) ? 0 : (int) $dataQuery['offset'];
@@ -244,16 +245,16 @@ class InternalQuerier extends AbstractQuerier
         ];
 
         $sql = <<<SQL
-SELECT DISTINCT
-    `text` AS "value",
-    `total_$column` AS "data"
-FROM `search_suggestion` AS `search_suggestion`
-WHERE `search_suggestion`.`suggester_id` = :suggester
-    AND `search_suggestion`.`text` LIKE :value_like
-ORDER BY data DESC
-LIMIT :limit
-;
-SQL;
+            SELECT DISTINCT
+                `text` AS "value",
+                `total_$column` AS "data"
+            FROM `search_suggestion` AS `search_suggestion`
+            WHERE `search_suggestion`.`suggester_id` = :suggester
+                AND `search_suggestion`.`text` LIKE :value_like
+            ORDER BY data DESC
+            LIMIT :limit
+            ;
+            SQL;
 
         try {
             $results = $connection->executeQuery($sql, $bind, $types)->fetchAllAssociative();
@@ -356,96 +357,96 @@ SQL;
         if ($mode === 'contain') {
             // TODO Improve direct sql for full suggestions.
             $sql = <<<SQL
-SELECT DISTINCT
-    SUBSTRING(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), 1, :length) AS "value",
-    COUNT(SUBSTRING(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), 1, :length)) AS "data"
-FROM `value` AS `value`
-INNER JOIN
-    `resource` ON `resource`.`id` = `value`.`resource_id`
-    $sqlResourceTypes
-$sqlSite
-WHERE
-    `value`.`value` LIKE :value_like
-    $sqlIsPublic
-    $sqlFields
-GROUP BY
-    SUBSTRING(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), 1, :length)
-ORDER BY data DESC
-LIMIT :limit
-;
-SQL;
+                SELECT DISTINCT
+                    SUBSTRING(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), 1, :length) AS "value",
+                    COUNT(SUBSTRING(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), 1, :length)) AS "data"
+                FROM `value` AS `value`
+                INNER JOIN
+                    `resource` ON `resource`.`id` = `value`.`resource_id`
+                    $sqlResourceTypes
+                $sqlSite
+                WHERE
+                    `value`.`value` LIKE :value_like
+                    $sqlIsPublic
+                    $sqlFields
+                GROUP BY
+                    SUBSTRING(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), 1, :length)
+                ORDER BY data DESC
+                LIMIT :limit
+                ;
+                SQL;
             $bind['value_like'] = '%' . str_replace(['%', '_'], ['\%', '\_'], $q) . '%';
             $types['value_like'] = \PDO::PARAM_STR;
         } elseif ($mode === 'start') {
             /*
             $sql = <<<SQL
-SELECT DISTINCT
-    SUBSTRING(SUBSTRING_INDEX(
-        CONCAT(
-            TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")),
-        " "), " ", 1
-    ), 1, :length) AS "value",
-    COUNT(SUBSTRING(SUBSTRING_INDEX(
-        CONCAT(
-            TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")),
-        " "), " ", 1
-    ), 1, :length)) as "data"
-FROM `value` AS `value`
-INNER JOIN
-    `resource` ON `resource`.`id` = `value`.`resource_id`
-    $sqlResourceTypes
-$sqlSite
-WHERE
-    `value`.`value` LIKE :value_like
-GROUP BY SUBSTRING(SUBSTRING_INDEX(
-        CONCAT(
-            TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")),
-        " "), " ", 1
-    ), 1, :length)
-ORDER BY data DESC
-LIMIT :limit
-;
-SQL;
-*/
+                SELECT DISTINCT
+                    SUBSTRING(SUBSTRING_INDEX(
+                        CONCAT(
+                            TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")),
+                        " "), " ", 1
+                    ), 1, :length) AS "value",
+                    COUNT(SUBSTRING(SUBSTRING_INDEX(
+                        CONCAT(
+                            TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")),
+                        " "), " ", 1
+                    ), 1, :length)) as "data"
+                FROM `value` AS `value`
+                INNER JOIN
+                    `resource` ON `resource`.`id` = `value`.`resource_id`
+                    $sqlResourceTypes
+                $sqlSite
+                WHERE
+                    `value`.`value` LIKE :value_like
+                GROUP BY SUBSTRING(SUBSTRING_INDEX(
+                        CONCAT(
+                            TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")),
+                        " "), " ", 1
+                    ), 1, :length)
+                ORDER BY data DESC
+                LIMIT :limit
+                ;
+                SQL;
+                */
             $sql = <<<SQL
-SELECT DISTINCT
-    SUBSTRING(
-        SUBSTRING(
-            TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")),
-            1,
-            LOCATE(" ", CONCAT(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), " "), :value_length)
-        ), 1, :length
-    ) AS "value",
-    COUNT(
-        SUBSTRING(
-            SUBSTRING(
-                TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")),
-                1,
-                LOCATE(" ", CONCAT(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), " "), :value_length)
-            ), 1, :length
-        )
-    ) AS "data"
-FROM `value` AS `value`
-INNER JOIN
-    `resource` ON `resource`.`id` = `value`.`resource_id`
-    $sqlResourceTypes
-$sqlSite
-WHERE
-    `value`.`value` LIKE :value_like
-    $sqlIsPublic
-    $sqlFields
-GROUP BY
-    SUBSTRING(
-        SUBSTRING(
-            TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")),
-            1,
-            LOCATE(" ", CONCAT(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), " "), :value_length)
-        ), 1, :length
-    )
-ORDER BY data DESC
-LIMIT :limit
-;
-SQL;
+                SELECT DISTINCT
+                    SUBSTRING(
+                        SUBSTRING(
+                            TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")),
+                            1,
+                            LOCATE(" ", CONCAT(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), " "), :value_length)
+                        ), 1, :length
+                    ) AS "value",
+                    COUNT(
+                        SUBSTRING(
+                            SUBSTRING(
+                                TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")),
+                                1,
+                                LOCATE(" ", CONCAT(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), " "), :value_length)
+                            ), 1, :length
+                        )
+                    ) AS "data"
+                FROM `value` AS `value`
+                INNER JOIN
+                    `resource` ON `resource`.`id` = `value`.`resource_id`
+                    $sqlResourceTypes
+                $sqlSite
+                WHERE
+                    `value`.`value` LIKE :value_like
+                    $sqlIsPublic
+                    $sqlFields
+                GROUP BY
+                    SUBSTRING(
+                        SUBSTRING(
+                            TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")),
+                            1,
+                            LOCATE(" ", CONCAT(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), " "), :value_length)
+                        ), 1, :length
+                    )
+                ORDER BY data DESC
+                LIMIT :limit
+                ;
+                SQL;
             $bind['value_like'] = str_replace(['%', '_'], ['\%', '\_'], $q) . '%';
             $types['value_like'] = \PDO::PARAM_STR;
         } else {
@@ -698,7 +699,7 @@ SQL;
     /**
      * Filter the query.
      *
-     * @todo Fix the process for facets: all the facets should be displayed, and "or" by group of facets.
+     * @todo Add an option for type of facets and/or by group/item. All the facets should be displayed, and "or" by group of facets.
      * @todo Make core search properties groupable ("or" inside a group, "and" between group).
      *
      * Note: when a facet is selected, it is managed like a filter.
@@ -727,7 +728,7 @@ SQL;
         };
 
         // Empty values are already filtered by the form adapter.
-        foreach ($filters as $field => $values) switch ($field) {
+        foreach ($filters as $fieldName => $values) switch ($fieldName) {
             // "resource_type" is used externally and "resource_name" internally
             // and "resource-type" by omeka main search engine in admin, with
             // the controller name, but it is a fake argument that redirect to
@@ -819,13 +820,12 @@ SQL;
                 continue 2;
 
             case $inListForFacets:
-                $fieldName = $field;
                 $fieldData = $this->query->getFacet($fieldName);
                 if (!$fieldData) {
                     break;
                 }
-                $field = $fieldData['field'] ?? $fieldName;
-                $field = $this->fieldToIndex($field);
+                $fieldNameFacet = $fieldData['field'] ?? $fieldName;
+                $field = $this->fieldToIndex($fieldNameFacet);
                 if (!$field) {
                     break;
                 }
@@ -860,7 +860,7 @@ SQL;
                 break;
 
             default:
-                $field = $this->fieldToIndex($field);
+                $field = $this->fieldToIndex($fieldName);
                 if (!$field) {
                     break;
                 }
@@ -1060,9 +1060,8 @@ SQL;
      */
     protected function fieldToIndex(string $field)
     {
-        $aliases = $this->query->getAliases();
         return $this->easyMeta->propertyTerm($field)
-            ?? $aliases[$field]['fields']
+            ?? $this->query->getAliases()[$field]['fields']
             ?? $this->underscoredNameToTerm($field)
             ?? null;
     }
@@ -1362,11 +1361,13 @@ SQL;
     }
 
     /**
-     * Convert a list of site slug into a list of site ids.
+     * Convert a list of site slugs into a list of site ids.
      *
      * @param array $values
      * @return array Only values that are slugs are converted into ids, the
      * other ones are removed.
+     *
+     * @todo Include in easyMeta? But the rights should be checked (but this is not the case here anyway).
      */
     protected function listSiteIds(array $values): array
     {
@@ -1406,6 +1407,8 @@ SQL;
      * @param array $values
      * @return array Only values that are user name are converted into ids, the
      * other ones are removed.
+     *
+     * @todo Include in easyMeta? But the rights should be checked (but this is not the case here anyway).
      */
     protected function listUserIds(array $values): array
     {

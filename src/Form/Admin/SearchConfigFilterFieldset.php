@@ -23,7 +23,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 'name' => 'name',
                 'type' => Element\Text::class,
                 'options' => [
-                    'label' => 'Name for query argument (alphanumeric)', // @translate
+                    'label' => 'Name (alphanumeric)', // @translate
                 ],
                 'attributes' => [
                     'id' => 'form_filter_name',

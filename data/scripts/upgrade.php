@@ -43,33 +43,33 @@ if (version_compare($oldVersion, '3.3.6.2', '<')) {
     $this->checkDependencies();
 
     $sqls = <<<'SQL'
-CREATE TABLE `search_suggester` (
-    `id` INT AUTO_INCREMENT NOT NULL,
-    `engine_id` INT NOT NULL,
-    `name` VARCHAR(190) NOT NULL,
-    `settings` LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json)',
-    `created` DATETIME NOT NULL,
-    `modified` DATETIME DEFAULT NULL,
-    INDEX IDX_F64D915AE78C9C0A (`engine_id`),
-    PRIMARY KEY(`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
-
-CREATE TABLE `search_suggestion` (
-    `id` INT AUTO_INCREMENT NOT NULL,
-    `suggester_id` INT NOT NULL,
-    `text` VARCHAR(190) NOT NULL,
-    `total_all` INT NOT NULL,
-    `total_public` INT NOT NULL,
-    INDEX IDX_536C3D170913F08 (`suggester_id`),
-    INDEX search_text_idx (`text`, `suggester_id`),
-    FULLTEXT INDEX IDX_536C3D13B8BA7C7 (`text`),
-    PRIMARY KEY(`id`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
-
-ALTER TABLE `search_suggester` ADD CONSTRAINT FK_F64D915AE78C9C0A FOREIGN KEY (`engine_id`) REFERENCES `search_engine` (`id`) ON DELETE CASCADE;
-
-ALTER TABLE `search_suggestion` ADD CONSTRAINT FK_536C3D170913F08 FOREIGN KEY (`suggester_id`) REFERENCES `search_suggester` (`id`) ON DELETE CASCADE;
-SQL;
+        CREATE TABLE `search_suggester` (
+            `id` INT AUTO_INCREMENT NOT NULL,
+            `engine_id` INT NOT NULL,
+            `name` VARCHAR(190) NOT NULL,
+            `settings` LONGTEXT DEFAULT NULL COMMENT '(DC2Type:json)',
+            `created` DATETIME NOT NULL,
+            `modified` DATETIME DEFAULT NULL,
+            INDEX IDX_F64D915AE78C9C0A (`engine_id`),
+            PRIMARY KEY(`id`)
+        ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+        
+        CREATE TABLE `search_suggestion` (
+            `id` INT AUTO_INCREMENT NOT NULL,
+            `suggester_id` INT NOT NULL,
+            `text` VARCHAR(190) NOT NULL,
+            `total_all` INT NOT NULL,
+            `total_public` INT NOT NULL,
+            INDEX IDX_536C3D170913F08 (`suggester_id`),
+            INDEX search_text_idx (`text`, `suggester_id`),
+            FULLTEXT INDEX IDX_536C3D13B8BA7C7 (`text`),
+            PRIMARY KEY(`id`)
+        ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+        
+        ALTER TABLE `search_suggester` ADD CONSTRAINT FK_F64D915AE78C9C0A FOREIGN KEY (`engine_id`) REFERENCES `search_engine` (`id`) ON DELETE CASCADE;
+        
+        ALTER TABLE `search_suggestion` ADD CONSTRAINT FK_536C3D170913F08 FOREIGN KEY (`suggester_id`) REFERENCES `search_suggester` (`id`) ON DELETE CASCADE;
+        SQL;
     foreach (array_filter(explode(";\n", $sqls)) as $sql) {
         $connection->executeStatement($sql);
     }
@@ -80,8 +80,8 @@ if (version_compare($oldVersion, '3.3.6.3', '<')) {
     // connection.
     // $searchConfigPaths = $api->search('search_configs', [], ['returnScalar' => 'path'])->getContent();
     $sql = <<<'SQL'
-SELECT `id`, `path` FROM `search_config` ORDER BY `id` ASC;
-SQL;
+        SELECT `id`, `path` FROM `search_config` ORDER BY `id` ASC;
+        SQL;
     $searchConfigPaths = $connection->fetchAllAssociative($sql);
     $searchConfigPaths = array_column($searchConfigPaths, 'path', 'id');
     $settings->set('advancedsearch_all_configs', $searchConfigPaths);
@@ -91,52 +91,52 @@ SQL;
 
 if (version_compare($oldVersion, '3.3.6.7', '<')) {
     $sql = <<<SQL
-UPDATE `search_config`
-SET
-    `settings` =
-        REPLACE(
-        REPLACE(
-        REPLACE(
-        REPLACE(
-        REPLACE(
-        REPLACE(
-        REPLACE(
-        REPLACE(
-        REPLACE(
-        REPLACE(
-            `settings`,
-        '"resource_name"',
-        '"resource_type"'
-        ),
-        '"resource_field"',
-        '"id"'
-        ),
-        '"is_public_field"',
-        '"is_public"'
-        ),
-        '"owner_id_field"',
-        '"owner_id"'
-        ),
-        '"site_id_field"',
-        '"site_id"'
-        ),
-        '"resource_class_id_field"',
-        '"resource_class_id"'
-        ),
-        '"resource_template_id_field"',
-        '"resource_template_id"'
-        ),
-        '"items_set_id_field"',
-        '"item_set_id"'
-        ),
-        '"item_set_id_field"',
-        '"item_set_id"'
-        ),
-        '"items_set_id"',
-        '"item_set_id"'
-        )
-    ;
-SQL;
+        UPDATE `search_config`
+        SET
+            `settings` =
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                    `settings`,
+                '"resource_name"',
+                '"resource_type"'
+                ),
+                '"resource_field"',
+                '"id"'
+                ),
+                '"is_public_field"',
+                '"is_public"'
+                ),
+                '"owner_id_field"',
+                '"owner_id"'
+                ),
+                '"site_id_field"',
+                '"site_id"'
+                ),
+                '"resource_class_id_field"',
+                '"resource_class_id"'
+                ),
+                '"resource_template_id_field"',
+                '"resource_template_id"'
+                ),
+                '"items_set_id_field"',
+                '"item_set_id"'
+                ),
+                '"item_set_id_field"',
+                '"item_set_id"'
+                ),
+                '"items_set_id"',
+                '"item_set_id"'
+                )
+            ;
+        SQL;
     $connection->executeStatement($sql);
 
     // Add the core type when needed.
@@ -162,13 +162,13 @@ SQL;
             }
         }
         $sql = <<<'SQL'
-UPDATE `search_config`
-SET
-    `settings` = ?
-WHERE
-    `id` = ?
-;
-SQL;
+            UPDATE `search_config`
+            SET
+                `settings` = ?
+            WHERE
+                `id` = ?
+            ;
+            SQL;
         $connection->executeStatement($sql, [
             json_encode($searchConfigSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
             $id,
@@ -199,13 +199,13 @@ SQL;
         );
 
         $sql = <<<'SQL'
-UPDATE `search_engine`
-SET
-    `settings` = ?
-WHERE
-    `id` = ?
-;
-SQL;
+            UPDATE `search_engine`
+            SET
+                `settings` = ?
+            WHERE
+                `id` = ?
+            ;
+            SQL;
         $connection->executeStatement($sql, [
             json_encode($searchEngineSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
             $id,
@@ -296,13 +296,13 @@ if (version_compare($oldVersion, '3.3.6.16', '<')) {
 
 if (version_compare($oldVersion, '3.3.6.19', '<')) {
     $sql = <<<'SQL'
-UPDATE `site_page_block`
-SET
-    `data` = REPLACE(data, '"search_page":', '"search_config":')
-WHERE
-    `data` LIKE '%"search_page":%'
-;
-SQL;
+        UPDATE `site_page_block`
+        SET
+            `data` = REPLACE(data, '"search_page":', '"search_config":')
+        WHERE
+            `data` LIKE '%"search_page":%'
+        ;
+        SQL;
     $connection->executeStatement($sql);
 
     $message = new PsrMessage(
@@ -322,20 +322,20 @@ if (version_compare($oldVersion, '3.4.7', '<')) {
 
 if (version_compare($oldVersion, '3.4.10', '<')) {
     $sql = <<<'SQL'
-UPDATE `search_config`
-SET
-    `settings` = REPLACE(`settings`, '"display_button"', '"display_submit"')
-;
-SQL;
+        UPDATE `search_config`
+        SET
+            `settings` = REPLACE(`settings`, '"display_button"', '"display_submit"')
+        ;
+        SQL;
     $connection->executeStatement($sql);
 }
 
 if (version_compare($oldVersion, '3.4.11', '<')) {
     $sql = <<<'SQL'
-ALTER TABLE `search_config` CHANGE `created` `created` datetime NOT NULL DEFAULT NOW() AFTER `settings`;
-ALTER TABLE `search_engine` CHANGE `created` `created` datetime NOT NULL DEFAULT NOW() AFTER `settings`;
-ALTER TABLE `search_suggester` CHANGE `created` `created` datetime NOT NULL DEFAULT NOW() AFTER `settings`;
-SQL;
+        ALTER TABLE `search_config` CHANGE `created` `created` datetime NOT NULL DEFAULT NOW() AFTER `settings`;
+        ALTER TABLE `search_engine` CHANGE `created` `created` datetime NOT NULL DEFAULT NOW() AFTER `settings`;
+        ALTER TABLE `search_suggester` CHANGE `created` `created` datetime NOT NULL DEFAULT NOW() AFTER `settings`;
+        SQL;
     $connection->executeStatement($sql);
 
     /** @var \Omeka\Module\Manager $moduleManager */
@@ -353,10 +353,10 @@ SQL;
 
 if (version_compare($oldVersion, '3.4.12', '<')) {
     $sql = <<<'SQL'
-ALTER TABLE `search_config` CHANGE `created` `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `settings`;
-ALTER TABLE `search_engine` CHANGE `created` `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `settings`;
-ALTER TABLE `search_suggester` CHANGE `created` `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `settings`;
-SQL;
+        ALTER TABLE `search_config` CHANGE `created` `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `settings`;
+        ALTER TABLE `search_engine` CHANGE `created` `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `settings`;
+        ALTER TABLE `search_suggester` CHANGE `created` `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `settings`;
+        SQL;
     $connection->executeStatement($sql);
 }
 
@@ -401,9 +401,9 @@ if (version_compare($oldVersion, '3.4.14', '<')) {
 
 if (version_compare($oldVersion, '3.4.15', '<')) {
     $sql = <<<'SQL'
-DELETE FROM `site_setting`
-WHERE `id` = "advancedsearch_restrict_used_terms";
-SQL;
+        DELETE FROM `site_setting`
+        WHERE `id` = "advancedsearch_restrict_used_terms";
+        SQL;
     $connection->executeStatement($sql);
 
     $message = new PsrMessage(
@@ -428,9 +428,9 @@ if (version_compare($oldVersion, '3.4.19', '<')) {
     // Repeated because of an issue in previous version.
     $settings->delete('advancedsearch_restrict_used_terms');
     $sql = <<<'SQL'
-DELETE FROM `site_setting`
-WHERE `id` = "advancedsearch_restrict_used_terms";
-SQL;
+        DELETE FROM `site_setting`
+        WHERE `id` = "advancedsearch_restrict_used_terms";
+        SQL;
     $connection->executeStatement($sql);
 }
 
@@ -677,20 +677,20 @@ if (version_compare($oldVersion, '3.4.24', '<')) {
     // Add sort label.
     $sortLabel = $translate('Sort by');
     $sql = <<<SQL
-UPDATE `search_config`
-SET
-    `settings` = REPLACE(`settings`, '"sort":{"fields":', '"sort":{"label":"$sortLabel","fields":')
-;
-SQL;
+        UPDATE `search_config`
+        SET
+            `settings` = REPLACE(`settings`, '"sort":{"fields":', '"sort":{"label":"$sortLabel","fields":')
+        ;
+        SQL;
     $connection->executeStatement($sql);
 
     // Add option to enable facets.
-    $sql = <<<SQL
-UPDATE `search_config`
-SET
-    `settings` = REPLACE(`settings`, '"display":{', '"display":{"facets":"after",')
-;
-SQL;
+    $sql = <<<'SQL'
+        UPDATE `search_config`
+        SET
+            `settings` = REPLACE(`settings`, '"display":{', '"display":{"facets":"after",')
+        ;
+        SQL;
     $connection->executeStatement($sql);
 }
 
@@ -710,32 +710,32 @@ if (version_compare($oldVersion, '3.4.25', '<')) {
 
 if (version_compare($oldVersion, '3.4.26', '<')) {
     // Fixed upgrade to 3.4.24.
-    $sql = <<<SQL
-UPDATE `search_config`
-SET
-    `settings` = REPLACE(
-    REPLACE(
-    REPLACE(
-    REPLACE(
-    REPLACE(
-    `settings`,
-    '"after""', '"after","'),
-    '""search_filters"', ',","search_filters"'),
-    '"after"search_filters"', '"after","search_filters"'),
-    ':",', ':"",'),
-    ':"}', ':""}')
-;
-SQL;
+    $sql = <<<'SQL'
+        UPDATE `search_config`
+        SET
+            `settings` = REPLACE(
+            REPLACE(
+            REPLACE(
+            REPLACE(
+            REPLACE(
+            `settings`,
+            '"after""', '"after","'),
+            '""search_filters"', ',","search_filters"'),
+            '"after"search_filters"', '"after","search_filters"'),
+            ':",', ':"",'),
+            ':"}', ':""}')
+        ;
+        SQL;
     $connection->executeStatement($sql);
 
     // Add option "default_number" for advanced filters.
     $sortLabel = $translate('Sort by');
-    $sql = <<<SQL
-UPDATE `search_config`
-SET
-    `settings` = REPLACE(`settings`, '"max_number":', '"default_number":1,"max_number":')
-;
-SQL;
+    $sql = <<<'SQL'
+        UPDATE `search_config`
+        SET
+            `settings` = REPLACE(`settings`, '"max_number":', '"default_number":1,"max_number":')
+        ;
+        SQL;
     $connection->executeStatement($sql);
 }
 
@@ -1097,20 +1097,20 @@ The list of issues is available in logs too.' // @translate
     // The process can be repeated in case of issue.
 
     // Update name of the navigation link.
-    $sql = <<<SQL
-UPDATE `site`
-SET
-    `navigation` = REPLACE(`navigation`, '"type":"searchPage"', '"type":"searchingPage"')
-;
-SQL;
+    $sql = <<<'SQL'
+        UPDATE `site`
+        SET
+            `navigation` = REPLACE(`navigation`, '"type":"searchPage"', '"type":"searchingPage"')
+        ;
+        SQL;
     $connection->executeStatement($sql);
 
     // Normalize name of a column.
-    $sql = <<<SQL
-ALTER TABLE `search_config`
-CHANGE `path` `slug` varchar(190) NOT NULL AFTER `name`
-;
-SQL;
+    $sql = <<<'SQL'
+        ALTER TABLE `search_config`
+        CHANGE `path` `slug` varchar(190) NOT NULL AFTER `name`
+        ;
+        SQL;
     try {
         $connection->executeStatement($sql);
     } catch (\Exception $e) {
@@ -1579,13 +1579,13 @@ if (version_compare($oldVersion, '3.4.31', '<')) {
         $connection->executeStatement($sql, [json_encode($searchConfigSettings, 320), $id]);
     }
 
-    // Engine.
-    $sql = <<<SQL
-    UPDATE `search_engine`
-    SET
-        `settings` = REPLACE(`settings`, '"resources":', '"resource_types":')
-    ;
-    SQL;
+    // Engines.
+    $sql = <<<'SQL'
+        UPDATE `search_engine`
+        SET
+            `settings` = REPLACE(`settings`, '"resources":', '"resource_types":')
+        ;
+        SQL;
     $connection->executeStatement($sql);
 
     // Suggest.

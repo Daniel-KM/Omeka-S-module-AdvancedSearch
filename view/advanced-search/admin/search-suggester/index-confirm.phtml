@@ -33,7 +33,7 @@ $this->form->setButtonLabel($translate('Confirm reindex'));
             <br/>
             <br/>
             <input form="<?= $form->getName() ?>" type="radio" name="process_mode" id="process_mode" value="sql"/><?= $translate('Direct sql (in particular mode "full")') ?>
-            </br/>
+            <br/>
             <input form="<?= $form->getName() ?>" type="radio" name="process_mode" id="process_mode" value="orm" checked="checked"/><?= $translate('Orm (slower but more precise index, required for old database, or small memory)') ?>
         </p>
         <p>

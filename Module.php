@@ -121,6 +121,63 @@ class Module extends AbstractModule
         $this->installResources();
     }
 
+    protected function postUpgrade(?string $oldVersion, ?string $newVersion): void
+    {
+        $this->warnOverriddenSearch();
+        $this->postUpgradeAuto($oldVersion, $newVersion);
+    }
+
+    /**
+     * Adapted:
+     * @see \AdvancedSearch\Module::warnOverriddenSearch()
+     * @see \AdvancedSearch\Controller\Admin\IndexController::warnOverriddenSearch()
+     *
+     * @todo Identify modules, blocks and queries that use old features.
+     */
+    protected function warnOverriddenSearch(): bool
+    {
+        $services = $this->getServiceLocator();
+        $api = $services->get('Omeka\ApiManager');
+        $logger = $services->get('Omeka\Logger');
+        $settings = $services->get('Omeka\Settings');
+        $siteSettings = $services->get('Omeka\Settings\Site');
+        $messenger = $services->get('ControllerPluginManager')->get('messenger');
+
+        $settingKeys = [
+            'advancedsearch_property_improved'
+                => 'The setting to override search element "properties" is enabled. This feature is deprecated and will be removed in a future version. All improved queries should be replaced by the equivalent filter queries. Check your pages and settings. Matching sites: {json}', // @translate
+            'advancedsearch_metadata_improved'
+                => 'The setting to override search resource metadata is enabled to allow to search resources without owner, class, template or item set. This feature is deprecated and will be removed in a future version. All improved queries should be replaced by the equivalent filter meta queries. Check your pages and settings. Matching sites: {json}', // @translate
+            'advancedsearch_media_type_improved'
+                => 'The setting to override search element "media type" is enabled to allow to search main and multiple media-types. This feature is deprecated and will be removed in a future version. All improved queries should be replaced by the equivalent filter meta queries. Check your pages and settings. Matching sites: {json}', // @translate
+        ];
+
+        foreach ($settingKeys as $settingKey => $settingMessage) {
+            $results = [];
+            if ($settings->get($settingKey)) {
+                $results[0] = 'admin';
+            }
+
+            $siteSlugs = $api->search('sites', [], ['returnScalar' => 'slug'])->getContent();
+            foreach ($siteSlugs as $siteId => $siteSlug) {
+                $siteSettings->setTargetId($siteId);
+                if ($siteSettings->get($settingKey)) {
+                    $results[$siteId] = $siteSlug;
+                }
+            }
+
+            if (!count($results)) {
+                return false;
+            }
+
+            $message = new PsrMessage($settingMessage, ['json' => json_encode($results, 448)]);
+            $logger->warn($message->getMessage(), $message->getContext());
+            $messenger->addWarning($message);
+        }
+
+        return true;
+    }
+
     public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
     {
         $sharedEventManager->attach(

@@ -30,6 +30,7 @@
 
 namespace AdvancedSearch\Controller\Admin;
 
+use Common\Stdlib\PsrMessage;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 
@@ -37,6 +38,8 @@ class IndexController extends AbstractActionController
 {
     public function browseAction()
     {
+        $this->warnOverriddenSearch();
+
         $api = $this->api();
         $engines = $api->search('search_engines', ['sort_by' => 'name'])->getContent();
         $searchConfigs = $api->search('search_configs', ['sort_by' => 'name'])->getContent();
@@ -63,5 +66,55 @@ class IndexController extends AbstractActionController
             $searchConfigSlugs[$searchConfig->id()] = $searchConfig->slug();
         }
         $this->settings()->set('advancedsearch_all_configs', $searchConfigSlugs);
+    }
+
+    /**
+     * Adapted:
+     * @see \AdvancedSearch\Module::warnOverriddenSearch()
+     * @see \AdvancedSearch\Controller\Admin\IndexController::warnOverriddenSearch()
+     *
+     * @todo Identify modules, blocks and queries that use old features.
+     */
+    protected function warnOverriddenSearch(): bool
+    {
+        $api = $this->plugins->get('api');
+        $logger = $this->plugins->get('logger')();
+        $settings = $this->plugins->get('settings')();
+        $siteSettings = $this->plugins->get('siteSettings')();
+        $messenger = $this->plugins->get('messenger');
+
+        $settingKeys = [
+            'advancedsearch_property_improved'
+                => 'The setting to override search element "properties" is enabled. This feature is deprecated and will be removed in a future version. All improved queries should be replaced by the equivalent filter queries. Check your pages and settings. Matching sites: {json}', // @translate
+            'advancedsearch_metadata_improved'
+                => 'The setting to override search resource metadata is enabled to allow to search resources without owner, class, template or item set. This feature is deprecated and will be removed in a future version. All improved queries should be replaced by the equivalent filter meta queries. Check your pages and settings. Matching sites: {json}', // @translate
+            'advancedsearch_media_type_improved'
+                => 'The setting to override search element "media type" is enabled to allow to search main and multiple media-types. This feature is deprecated and will be removed in a future version. All improved queries should be replaced by the equivalent filter meta queries. Check your pages and settings. Matching sites: {json}', // @translate
+        ];
+
+        foreach ($settingKeys as $settingKey => $settingMessage) {
+            $results = [];
+            if ($settings->get($settingKey)) {
+                $results[0] = 'admin';
+            }
+
+            $siteSlugs = $api->search('sites', [], ['returnScalar' => 'slug'])->getContent();
+            foreach ($siteSlugs as $siteId => $siteSlug) {
+                $siteSettings->setTargetId($siteId);
+                if ($siteSettings->get($settingKey)) {
+                    $results[$siteId] = $siteSlug;
+                }
+            }
+
+            if (!count($results)) {
+                return false;
+            }
+
+            $message = new PsrMessage($settingMessage, ['json' => json_encode($results, 448)]);
+            $logger->warn($message->getMessage(), $message->getContext());
+            $messenger->addWarning($message);
+        }
+
+        return true;
     }
 }

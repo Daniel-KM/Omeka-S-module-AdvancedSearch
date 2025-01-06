@@ -31,6 +31,8 @@ namespace AdvancedSearch\FormAdapter;
 
 class MainFormAdapter extends AbstractFormAdapter implements FormAdapterInterface
 {
+    use TraitFormAdapterClassic;
+
     protected $formClass = \AdvancedSearch\Form\MainSearchForm::class;
 
     protected $formPartial = 'search/search-form-main';

@@ -2,7 +2,6 @@
 
 namespace AdvancedSearch\FormAdapter;
 
-use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use AdvancedSearch\Query;
 use AdvancedSearch\Stdlib\SearchResources;
 use Common\Stdlib\EasyMeta;
@@ -13,13 +12,9 @@ use Omeka\Api\Representation\SiteRepresentation;
  * Simulate an api search for an external search engine.
  *
  * Only main search and properties are managed currently, with the joiner "and".
- *
- * This is not a sub-class of AbstractFormAdapter.
  */
-class ApiFormAdapter implements FormAdapterInterface
+class ApiFormAdapter extends AbstractFormAdapter implements FormAdapterInterface
 {
-    use TraitRequest;
-
     protected $configFormClass = \AdvancedSearch\Form\Admin\ApiFormConfigFieldset::class;
 
     protected $label = 'Api'; // @translate
@@ -34,58 +29,12 @@ class ApiFormAdapter implements FormAdapterInterface
      */
     protected $easyMeta;
 
-    /**
-     * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation
-     */
-    protected $searchConfig;
-
     public function __construct(
         Connection $connection,
         EasyMeta $easyMeta
     ) {
         $this->connection = $connection;
         $this->easyMeta = $easyMeta;
-    }
-
-    public function setSearchConfig(SearchConfigRepresentation $searchConfig): self
-    {
-        $this->searchConfig = $searchConfig;
-        return $this;
-    }
-
-    public function getConfigFormClass(): ?string
-    {
-        return $this->configFormClass;
-    }
-
-    public function getLabel(): string
-    {
-        return $this->label;
-    }
-
-    public function getFormClass(): ?string
-    {
-        return null;
-    }
-
-    public function getFormPartialHeaders(): ?string
-    {
-        return null;
-    }
-
-    public function getFormPartial(): ?string
-    {
-        return null;
-    }
-
-    public function getForm(array $options = []): ?\Laminas\Form\Form
-    {
-        return null;
-    }
-
-    public function renderForm(array $options = []): string
-    {
-        return '';
     }
 
     public function toQuery(array $request, array $formSettings): Query

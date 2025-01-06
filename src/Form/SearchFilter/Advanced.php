@@ -182,11 +182,11 @@ class Advanced extends Fieldset
         }
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $this->getOption('search_config');
-        $searchAdapter = $searchConfig ? $searchConfig->searchAdapter() : null;
-        if (!$searchAdapter) {
+        $engineAdapter = $searchConfig ? $searchConfig->engineAdapter() : null;
+        if (!$engineAdapter) {
             return [];
         }
-        $availableFields = $searchAdapter->getAvailableFields();
+        $availableFields = $engineAdapter->getAvailableFields();
         if (!$availableFields) {
             return [];
         }

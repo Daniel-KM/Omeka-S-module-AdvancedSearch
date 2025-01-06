@@ -23,7 +23,7 @@ return [
             Mvc\MvcListeners::class => Mvc\MvcListeners::class,
         ],
         'factories' => [
-            'AdvancedSearch\AdapterManager' => Service\Adapter\ManagerFactory::class,
+            'AdvancedSearch\EngineAdapterManager' => Service\EngineAdapter\ManagerFactory::class,
             'AdvancedSearch\FormAdapterManager' => Service\FormAdapter\ManagerFactory::class,
             'AdvancedSearch\SearchResources' => Service\Stdlib\SearchResourcesFactory::class,
         ],
@@ -358,9 +358,9 @@ return [
         'Try to map automatically the metadata and the properties that are not mapped yet with the fields of the index', // @translate
         '[Edit below]', // @translate
     ],
-    'advanced_search_adapters' => [
+    'advanced_search_engine_adapters' => [
         'factories' => [
-            'internal' => Service\Adapter\InternalAdapterFactory::class,
+            'internal' => Service\EngineAdapter\InternalFactory::class,
         ],
     ],
     'advanced_search_form_adapters' => [

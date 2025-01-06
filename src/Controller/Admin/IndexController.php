@@ -41,14 +41,14 @@ class IndexController extends AbstractActionController
         $this->warnOverriddenSearch();
 
         $api = $this->api();
-        $engines = $api->search('search_engines', ['sort_by' => 'name'])->getContent();
+        $searchEngines = $api->search('search_engines', ['sort_by' => 'name'])->getContent();
         $searchConfigs = $api->search('search_configs', ['sort_by' => 'name'])->getContent();
         $suggesters = $api->search('search_suggesters', ['sort_by' => 'name'])->getContent();
 
         $this->updateListSearchSlugs($searchConfigs);
 
         return new ViewModel([
-            'engines' => $engines,
+            'searchEngines' => $searchEngines,
             'searchConfigs' => $searchConfigs,
             'suggesters' => $suggesters,
         ]);

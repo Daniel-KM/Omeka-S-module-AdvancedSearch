@@ -21,7 +21,7 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
         $modified = $this->resource->getModified();
         return [
             'o:name' => $this->resource->getName(),
-            'o:engine' => $this->engine()->getReference(),
+            'o:search_engine' => $this->searchEngine()->getReference(),
             'o:settings' => $this->resource->getSettings(),
             'o:created' => $this->getDateTime($this->resource->getCreated()),
             'o:modified' => $modified ? $this->getDateTime($modified) : null,
@@ -52,10 +52,15 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
         return $this->resource->getName();
     }
 
-    public function engine(): \AdvancedSearch\Api\Representation\SearchEngineRepresentation
+    public function searchEngine(): \AdvancedSearch\Api\Representation\SearchEngineRepresentation
     {
         $searchEngine = $this->resource->getEngine();
         return $this->getAdapter('search_engines')->getRepresentation($searchEngine);
+    }
+
+    public function engineAdapter(): ?\AdvancedSearch\EngineAdapter\EngineAdapterInterface
+    {
+        return $this->searchEngine()->engineAdapter();
     }
 
     public function settings(): array
@@ -139,12 +144,12 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
             }
         }
 
-        $engine = $this->engine();
-        $engineSettings = $engine->settings();
+        $searchEngine = $this->searchEngine();
+        $searchEngineSettings = $searchEngine->settings();
         $suggesterSettings = $this->settings();
 
         $query
-            ->setResourceTypes($engineSettings['resource_types'])
+            ->setResourceTypes($searchEngineSettings['resource_types'])
             ->setLimitPage(1, empty($suggesterSettings['limit']) ? \Omeka\Stdlib\Paginator::PER_PAGE : (int) $suggesterSettings['limit'])
             ->setSuggestOptions([
                 'suggester' => $this->resource->getId(),
@@ -158,7 +163,7 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
         ;
 
         /** @var \AdvancedSearch\Querier\QuerierInterface $querier */
-        $querier = $engine
+        $querier = $searchEngine
             ->querier()
             ->setQuery($query);
         try {

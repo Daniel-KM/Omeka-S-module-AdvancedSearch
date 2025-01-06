@@ -486,7 +486,7 @@ class InternalQuerier extends AbstractQuerier
 
         // TODO Normalize search url arguments. Here, the ones from default form, adapted from Solr, are taken.
 
-        $indexerResourceTypes = $this->engine->setting('resource_types', []);
+        $indexerResourceTypes = $this->searchEngine->setting('resource_types', []);
         $this->resourceTypes = $this->query->getResourceTypes() ?: $indexerResourceTypes;
         $this->resourceTypes = array_intersect($this->resourceTypes, $indexerResourceTypes);
         if (empty($this->resourceTypes)) {

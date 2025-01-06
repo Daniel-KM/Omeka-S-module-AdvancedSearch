@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016-2017
- * Copyright Daniel Berthereau, 2018-2024
+ * Copyright Daniel Berthereau, 2018-2025
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -28,19 +28,13 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace AdvancedSearch\Adapter;
+namespace AdvancedSearch\EngineAdapter;
 
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
-use Laminas\ServiceManager\ServiceLocatorInterface;
 
-abstract class AbstractAdapter implements AdapterInterface
+abstract class AbstractEngineAdapter implements EngineAdapterInterface
 {
-    /**
-     * @var \Laminas\ServiceManager\ServiceLocatorInterface
-     */
-    protected $services;
-
     /**
      * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation
      */
@@ -70,12 +64,6 @@ abstract class AbstractAdapter implements AdapterInterface
      * @var string
      */
     protected $querierClass = null;
-
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): self
-    {
-        $this->services = $serviceLocator;
-        return $this;
-    }
 
     public function setSearchConfig(SearchConfigRepresentation $searchConfig): self
     {
@@ -162,10 +150,5 @@ abstract class AbstractAdapter implements AdapterInterface
             array_column($fields, 'name', 'name'),
             array_filter(array_column($fields, 'label', 'name'))
         );
-    }
-
-    protected function getServiceLocator(): ServiceLocatorInterface
-    {
-        return $this->services;
     }
 }

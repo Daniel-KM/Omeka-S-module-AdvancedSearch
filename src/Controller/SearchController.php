@@ -190,9 +190,9 @@ class SearchController extends AbstractActionController
                 ]);
             }
 
-            $engineSettings = $searchConfig->engine()->settings();
+            $searchEngineSettings = $searchConfig->searchEngine()->settings();
             $result = [];
-            foreach ($engineSettings['resource_types'] as $resourceType) {
+            foreach ($searchEngineSettings['resource_types'] as $resourceType) {
                 $result[$resourceType] = $response->getResults($resourceType);
             }
             return new JsonModel($result);

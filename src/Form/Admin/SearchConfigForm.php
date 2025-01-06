@@ -78,21 +78,21 @@ class SearchConfigForm extends Form
             ])
 
             ->add([
-                'name' => 'o:engine',
+                'name' => 'o:search_engine',
                 'type' => Element\Select::class,
                 'options' => [
                     'label' => 'Search engine', // @translate
-                    'value_options' => $this->getEnginesOptions(),
+                    'value_options' => $this->getSearchEngineOptions(),
                     'empty_option' => 'Select a search engine below…', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'engine',
+                    'id' => 'search_engine',
                     'required' => true,
                 ],
             ])
 
             ->add([
-                'name' => 'o:form',
+                'name' => 'o:form_adapter',
                 'type' => Element\Select::class,
                 'options' => [
                     'label' => 'Form', // @translate
@@ -100,7 +100,7 @@ class SearchConfigForm extends Form
                     'empty_option' => 'Select a form below…', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'form',
+                    'id' => 'form_adapter',
                     'required' => true,
                 ],
             ])
@@ -170,14 +170,15 @@ class SearchConfigForm extends Form
         return $this;
     }
 
-    protected function getEnginesOptions(): array
+    protected function getSearchEngineOptions(): array
     {
         $options = [];
 
-        $engines = $this->apiManager->search('search_engines')->getContent();
-        foreach ($engines as $engine) {
-            $options[$engine->id()] =
-                sprintf('%s (%s)', $engine->name(), $engine->adapterLabel());
+        /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
+        $searchEngines = $this->apiManager->search('search_engines')->getContent();
+        foreach ($searchEngines as $searchEngine) {
+            $options[$searchEngine->id()] =
+            sprintf('%s (%s)', $searchEngine->name(), $searchEngine->engineAdapterLabel());
         }
 
         return $options;

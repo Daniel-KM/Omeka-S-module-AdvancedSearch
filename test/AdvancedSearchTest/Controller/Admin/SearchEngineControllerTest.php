@@ -16,7 +16,7 @@ class SearchEngineControllerTest extends \AdvancedSearchTest\Controller\SearchCo
         $this->assertResponseStatusCode(200);
 
         $this->assertQuery('input[name="o:name"]');
-        $this->assertQuery('select[name="o:adapter"]');
+        $this->assertQuery('select[name="o:engine_adapter"]');
     }
 
     public function testAddPostAction(): void
@@ -26,7 +26,7 @@ class SearchEngineControllerTest extends \AdvancedSearchTest\Controller\SearchCo
 
         $this->dispatch('/admin/search-manager/engine/add', 'POST', [
             'o:name' => 'TestEngine2',
-            'o:adapter' => 'test',
+            'o:engine_adapter' => 'test',
             'csrf' => $form->get('csrf')->getValue(),
         ]);
         $response = $this->api()->search('search_engines', [

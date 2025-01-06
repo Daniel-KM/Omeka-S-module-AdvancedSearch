@@ -41,7 +41,7 @@ class SearchEngineAdapter extends AbstractEntityAdapter
     protected $sortFields = [
         'id' => 'id',
         'name' => 'name',
-        'adapter' => 'adapter',
+        'engine_adapter' => 'adapter',
         'created' => 'created',
         'modified' => 'modified',
     ];
@@ -49,7 +49,7 @@ class SearchEngineAdapter extends AbstractEntityAdapter
     protected $scalarFields = [
         'id' => 'id',
         'name' => 'name',
-        'adapter' => 'adapter',
+        'engine_adapter' => 'adapter',
         'settings' => 'settings',
         'created' => 'created',
         'modified' => 'modified',
@@ -80,10 +80,10 @@ class SearchEngineAdapter extends AbstractEntityAdapter
                 $this->createNamedParameter($qb, $query['name']))
             );
         }
-        if (isset($query['adapter'])) {
+        if (isset($query['engine_adapter'])) {
             $qb->andWhere($expr->eq(
                 'omeka_root.adapter',
-                $this->createNamedParameter($qb, $query['adapter']))
+                $this->createNamedParameter($qb, $query['engine_adapter']))
             );
         }
     }
@@ -94,8 +94,8 @@ class SearchEngineAdapter extends AbstractEntityAdapter
         if ($this->shouldHydrate($request, 'o:name')) {
             $entity->setName($request->getValue('o:name'));
         }
-        if ($this->shouldHydrate($request, 'o:adapter')) {
-            $entity->setAdapter($request->getValue('o:adapter'));
+        if ($this->shouldHydrate($request, 'o:engine_adapter')) {
+            $entity->setAdapter($request->getValue('o:engine_adapter'));
         }
         if ($this->shouldHydrate($request, 'o:settings')) {
             $entity->setSettings($request->getValue('o:settings') ?? []);

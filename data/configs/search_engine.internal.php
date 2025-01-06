@@ -13,12 +13,12 @@ return [
     '@type' => 'o:SearchEngine',
     'o:id' => null,
     'o:name' => 'Internal (sql)',
-    'o:adapter' => 'internal',
+    'o:engine_adapter' => 'internal',
     'o:settings' => [
         'resource_types' => [
             'items',
         ],
-        'adapter' => [
+        'engine_adapter' => [
         ],
     ],
     'o:created' => null,

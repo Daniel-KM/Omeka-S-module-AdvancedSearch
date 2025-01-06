@@ -2,6 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016-2017
+ * Copyright Daniel Berthereau, 2024-2025
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -27,11 +28,11 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace AdvancedSearch\Adapter;
+namespace AdvancedSearch\EngineAdapter;
 
 use Omeka\ServiceManager\AbstractPluginManager;
 
 class Manager extends AbstractPluginManager
 {
-    protected $instanceOf = AdapterInterface::class;
+    protected $instanceOf = EngineAdapterInterface::class;
 }

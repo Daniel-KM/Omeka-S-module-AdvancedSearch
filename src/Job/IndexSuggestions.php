@@ -66,9 +66,9 @@ class IndexSuggestions extends AbstractJob
         /** @var \AdvancedSearch\Api\Representation\SearchSuggesterRepresentation $suggester */
         $suggester = $this->api->read('search_suggesters', $suggesterId)->getContent();
 
-        $engine = $suggester->engine();
-        $searchAdapter = $engine->adapter();
-        if (!$searchAdapter || !($searchAdapter instanceof \AdvancedSearch\Adapter\InternalAdapter)) {
+        $searchEngine = $suggester->searchEngine();
+        $engineAdapter = $searchEngine->engineAdapter();
+        if (!$engineAdapter || !($engineAdapter instanceof \AdvancedSearch\EngineAdapter\Internal)) {
             $this->logger->err(
                 'Suggester #{search_suggester_id} ("{name}"): Only search engine with the intenal adapter (sql) can be indexed currently.', // @translate
                 ['search_suggester_id' => $suggester->id(), 'name' => $suggester->name()]
@@ -76,7 +76,7 @@ class IndexSuggestions extends AbstractJob
             return;
         }
 
-        $resourceTypes = $engine->setting('resource_types', []);
+        $resourceTypes = $searchEngine->setting('resource_types', []);
         $mapResources = [
             'resources' => \Omeka\Entity\Resource::class,
             'items' => \Omeka\Entity\Item::class,
@@ -152,7 +152,7 @@ class IndexSuggestions extends AbstractJob
 
         // TODO Index value annotations with resources (for now, they can't be selected individually in the config).
 
-        $resourceTypes = $suggester->engine()->setting('resource_types', []);
+        $resourceTypes = $suggester->searchEngine()->setting('resource_types', []);
         $mapResourcesToClasses = [
             'items' => \Omeka\Entity\Item::class,
             'item_sets' => \Omeka\Entity\ItemSet::class,

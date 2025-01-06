@@ -51,9 +51,9 @@ abstract class AbstractQuerier implements QuerierInterface
     protected $services;
 
     /**
-     * @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation $engine
+     * @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation
      */
-    protected $engine;
+    protected $searchEngine;
 
     /**
      * @var \AdvancedSearch\Query
@@ -67,9 +67,9 @@ abstract class AbstractQuerier implements QuerierInterface
         return $this;
     }
 
-    public function setSearchEngine(SearchEngineRepresentation $engine): self
+    public function setSearchEngine(SearchEngineRepresentation $searchEngine): self
     {
-        $this->engine = $engine;
+        $this->searchEngine = $searchEngine;
         return $this;
     }
 

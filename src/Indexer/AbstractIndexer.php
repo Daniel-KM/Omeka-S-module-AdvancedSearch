@@ -46,11 +46,11 @@ abstract class AbstractIndexer implements IndexerInterface
     /**
      * @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation
      */
-    protected $engine;
+    protected $searchEngine;
 
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): self
+    public function setServiceLocator(ServiceLocatorInterface $services): self
     {
-        $this->services = $serviceLocator;
+        $this->services = $services;
         return $this;
     }
 
@@ -59,9 +59,9 @@ abstract class AbstractIndexer implements IndexerInterface
         return $this->services;
     }
 
-    public function setSearchEngine(SearchEngineRepresentation $engine): self
+    public function setSearchEngine(SearchEngineRepresentation $searchEngine): self
     {
-        $this->engine = $engine;
+        $this->searchEngine = $searchEngine;
         return $this;
     }
 }

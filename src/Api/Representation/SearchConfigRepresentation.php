@@ -50,9 +50,8 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         return [
             'o:name' => $this->resource->getName(),
             'o:slug' => $this->resource->getSlug(),
-            'o:engine' => $this->engine()->getReference(),
-            // TODO Don't use "o:form" for the form adapter.
-            'o:form' => $this->resource->getFormAdapter(),
+            'o:search_engine' => $this->searchEngine()->getReference(),
+            'o:form_adapter' => $this->resource->getFormAdapter(),
             'o:settings' => $this->resource->getSettings(),
             'o:created' => $this->getDateTime($this->resource->getCreated()),
             'o:modified' => $modified ? $this->getDateTime($modified) : null,
@@ -116,7 +115,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         return $this->resource->getSlug();
     }
 
-    public function engine(): ?\AdvancedSearch\Api\Representation\SearchEngineRepresentation
+    public function searchEngine(): ?\AdvancedSearch\Api\Representation\SearchEngineRepresentation
     {
         $searchEngine = $this->resource->getEngine();
         return $searchEngine
@@ -124,13 +123,13 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
             : null;
     }
 
-    public function searchAdapter(): ?\AdvancedSearch\Adapter\AdapterInterface
+    public function engineAdapter(): ?\AdvancedSearch\EngineAdapter\EngineAdapterInterface
     {
-        $searchEngine = $this->engine();
+        $searchEngine = $this->searchEngine();
         if ($searchEngine) {
-            $adapter = $searchEngine->adapter();
-            if ($adapter) {
-                return $adapter->setSearchConfig($this);
+            $engineAdapter = $searchEngine->engineAdapter();
+            if ($engineAdapter) {
+                return $engineAdapter->setSearchConfig($this);
             }
         }
         return null;
@@ -415,8 +414,8 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         // When a field is set, there is no suggester for now, so use a direct
         // query.
 
-        $engine = $this->engine();
-        if (!$engine) {
+        $searchEngine = $this->searchEngine();
+        if (!$searchEngine) {
             $message = new PsrMessage(
                 'The search page "{search_page}" has no search engine.', // @translate
                 ['search_page' => $this->slug()]
@@ -473,10 +472,10 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
             $fields = (array) $cleanField;
         }
 
-        $engineSettings = $engine->settings();
+        $searchEngineSettings = $searchEngine->settings();
 
         $query
-            ->setResourceTypes($engineSettings['resource_types'])
+            ->setResourceTypes($searchEngineSettings['resource_types'])
             ->setLimitPage(1, \Omeka\Stdlib\Paginator::PER_PAGE)
             ->setSuggestOptions([
                 'suggester' => null,
@@ -490,7 +489,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         ;
 
         /** @var \AdvancedSearch\Querier\QuerierInterface $querier */
-        $querier = $engine
+        $querier = $searchEngine
             ->querier()
             ->setQuery($query);
         try {

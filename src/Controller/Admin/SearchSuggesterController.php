@@ -54,9 +54,9 @@ class SearchSuggesterController extends AbstractActionController
 
         /** @var \AdvancedSearch\Api\Representation\SearchSuggesterRepresentation $suggester */
         $suggester = $this->api()->read('search_suggesters', ['id' => $id])->getContent();
-        $searchEngine = $suggester->engine();
-        $searchAdapter = $searchEngine->adapter();
-        if (!$searchAdapter) {
+        $searchEngine = $suggester->searchEngine();
+        $engineAdapter = $searchEngine->engineAdapter();
+        if (!$engineAdapter) {
             $this->messenger()->addError(new PsrMessage(
                 'The search adapter for engine "{name}" is not available.', // @translate
                 ['name' => $searchEngine->name()]
@@ -65,8 +65,8 @@ class SearchSuggesterController extends AbstractActionController
         }
 
         $data = $suggester->jsonSerialize();
-        $data['o:engine'] = $searchEngine->id();
-        $isInternal = $searchAdapter instanceof \AdvancedSearch\Adapter\InternalAdapter;
+        $data['o:search_engine'] = $searchEngine->id();
+        $isInternal = $engineAdapter instanceof \AdvancedSearch\EngineAdapter\Internal;
 
         $form = $this->getForm(SearchSuggesterForm::class, [
             'add' => false,
@@ -86,7 +86,7 @@ class SearchSuggesterController extends AbstractActionController
         $formData = $form->getData();
 
         // The engine cannot be modified.
-        $formData['o:engine'] = $searchEngine->getEntity();
+        $formData['o:search_engine'] = $searchEngine->getEntity();
 
         $suggester = $this->api()
             ->update('search_suggesters', $id, $formData, [], ['isPartial' => true])

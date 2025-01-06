@@ -12,12 +12,12 @@ class NoopIndexer implements IndexerInterface
 {
     use LoggerAwareTrait;
 
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): self
+    public function setServiceLocator(ServiceLocatorInterface $services): self
     {
         return $this;
     }
 
-    public function setSearchEngine(SearchEngineRepresentation $engine): self
+    public function setSearchEngine(SearchEngineRepresentation $searchEngine): self
     {
         return $this;
     }

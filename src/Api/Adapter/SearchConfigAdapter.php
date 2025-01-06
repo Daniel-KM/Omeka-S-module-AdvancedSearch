@@ -45,6 +45,8 @@ class SearchConfigAdapter extends AbstractEntityAdapter
         'name' => 'name',
         'slug' => 'slug',
         'engine' => 'engine',
+        'search_engine' => 'engine',
+        'form_adapter' => 'formAdapter',
         'created' => 'created',
         'modified' => 'modified',
     ];
@@ -54,6 +56,7 @@ class SearchConfigAdapter extends AbstractEntityAdapter
         'name' => 'name',
         'slug' => 'slug',
         'engine' => 'engine',
+        'search_engine' => 'engine',
         'form_adapter' => 'formAdapter',
         'settings' => 'settings',
         'created' => 'created',
@@ -137,17 +140,17 @@ class SearchConfigAdapter extends AbstractEntityAdapter
         if ($this->shouldHydrate($request, 'o:slug')) {
             $entity->setSlug($request->getValue('o:slug'));
         }
-        if ($this->shouldHydrate($request, 'o:engine')) {
-            $engine = $request->getValue('o:engine');
-            if (is_array($engine)) {
-                $engine = $this->getAdapter('search_engines')->findEntity($engine['o:id'] ?? 0);
-            } elseif (is_numeric($engine)) {
-                $engine = $this->getAdapter('search_engines')->findEntity((int) $engine);
+        if ($this->shouldHydrate($request, 'o:search_engine')) {
+            $searchEngine = $request->getValue('o:search_engine');
+            if (is_array($searchEngine)) {
+                $searchEngine = $this->getAdapter('search_engines')->findEntity($searchEngine['o:id'] ?? 0);
+            } elseif (is_numeric($searchEngine)) {
+                $searchEngine = $this->getAdapter('search_engines')->findEntity((int) $searchEngine);
             }
-            $entity->setEngine($engine);
+            $entity->setEngine($searchEngine);
         }
-        if ($this->shouldHydrate($request, 'o:form')) {
-            $entity->setFormAdapter($request->getValue('o:form'));
+        if ($this->shouldHydrate($request, 'o:form_adapter')) {
+            $entity->setFormAdapter($request->getValue('o:form_adapter'));
         }
         if ($this->shouldHydrate($request, 'o:settings')) {
             $entity->setSettings($request->getValue('o:settings') ?? []);

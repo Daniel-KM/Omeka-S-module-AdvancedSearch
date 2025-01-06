@@ -1614,7 +1614,7 @@ class Module extends AbstractModule
             $connection->executeStatement($sql, [
                 $searchConfigConfig['o:name'],
                 $searchConfigConfig['o:slug'],
-                $searchConfigConfig['o:form'],
+                $searchConfigConfig['o:form_adapter'],
                 json_encode($searchConfigConfig['o:settings']),
             ]);
 

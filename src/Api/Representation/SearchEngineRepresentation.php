@@ -46,7 +46,7 @@ class SearchEngineRepresentation extends AbstractEntityRepresentation
         $modified = $this->resource->getModified();
         return [
             'o:name' => $this->resource->getName(),
-            'o:adapter' => $this->resource->getAdapter(),
+            'o:engine_adapter' => $this->resource->getEngineAdapter(),
             'o:settings' => $this->resource->getSettings(),
             'o:created' => $this->getDateTime($this->resource->getCreated()),
             'o:modified' => $modified ? $this->getDateTime($modified) : null,
@@ -91,13 +91,18 @@ class SearchEngineRepresentation extends AbstractEntityRepresentation
         return base_convert((string) $this->id(), 10, 36);
     }
 
-    public function adapter(): ?\AdvancedSearch\Adapter\AdapterInterface
+    public function engineAdapter(): ?\AdvancedSearch\EngineAdapter\EngineAdapterInterface
     {
         $name = $this->resource->getAdapter();
-        $adapterManager = $this->getServiceLocator()->get('AdvancedSearch\AdapterManager');
-        return $adapterManager->has($name)
-            ? $adapterManager->get($name)->setSearchEngine($this)
+        $engineAdapterManager = $this->getServiceLocator()->get('AdvancedSearch\EngineAdapterManager');
+        return $engineAdapterManager->has($name)
+            ? $engineAdapterManager->get($name)->setSearchEngine($this)
             : null;
+    }
+
+    public function engineAdapterName(): ?string
+    {
+        return $this->resource->getAdapter();
     }
 
     public function settings(): array
@@ -115,9 +120,9 @@ class SearchEngineRepresentation extends AbstractEntityRepresentation
         return $this->resource->getSettings()[$mainName][$name] ?? $default;
     }
 
-    public function settingAdapter(string $name, $default = null)
+    public function settingEngineAdapter(string $name, $default = null)
     {
-        return $this->resource->getSettings()['adapter'][$name] ?? $default;
+        return $this->resource->getSettings()['engine_adapter'][$name] ?? $default;
     }
 
     public function created(): \DateTime
@@ -135,16 +140,16 @@ class SearchEngineRepresentation extends AbstractEntityRepresentation
         return $this->resource;
     }
 
-    public function adapterLabel(): string
+    public function engineAdapterLabel(): string
     {
-        $adapter = $this->adapter();
-        if (!$adapter) {
+        $engineAdapter = $this->engineAdapter();
+        if (!$engineAdapter) {
             $translator = $this->getServiceLocator()->get('MvcTranslator');
-            return sprintf($translator->translate('[Missing adapter "%s"]'), // @translate
+            return sprintf($translator->translate('[Missing engine adapter "%s"]'), // @translate
                 $this->resource->getAdapter()
             );
         }
-        return $adapter->getLabel();
+        return $engineAdapter->getLabel();
     }
 
     /**
@@ -153,9 +158,9 @@ class SearchEngineRepresentation extends AbstractEntityRepresentation
     public function indexer(): \AdvancedSearch\Indexer\IndexerInterface
     {
         $services = $this->getServiceLocator();
-        $adapter = $this->adapter();
-        if ($adapter) {
-            $indexerClass = $adapter->getIndexerClass() ?: NoopIndexer::class;
+        $engineAdapter = $this->engineAdapter();
+        if ($engineAdapter) {
+            $indexerClass = $engineAdapter->getIndexerClass() ?: NoopIndexer::class;
         } else {
             $indexerClass = NoopIndexer::class;
         }
@@ -174,9 +179,9 @@ class SearchEngineRepresentation extends AbstractEntityRepresentation
     public function querier(): \AdvancedSearch\Querier\QuerierInterface
     {
         $services = $this->getServiceLocator();
-        $adapter = $this->adapter();
-        if ($adapter) {
-            $querierClass = $adapter->getQuerierClass() ?: \AdvancedSearch\Querier\NoopQuerier::class;
+        $engineAdapter = $this->engineAdapter();
+        if ($engineAdapter) {
+            $querierClass = $engineAdapter->getQuerierClass() ?: \AdvancedSearch\Querier\NoopQuerier::class;
         } else {
             $querierClass = \AdvancedSearch\Querier\NoopQuerier::class;
         }

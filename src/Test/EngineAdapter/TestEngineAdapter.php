@@ -1,15 +1,15 @@
 <?php declare(strict_types=1);
 
-namespace AdvancedSearch\Test\Adapter;
+namespace AdvancedSearch\Test\EngineAdapter;
 
-use AdvancedSearch\Adapter\AbstractAdapter;
+use AdvancedSearch\EngineAdapter\AbstractEngineAdapter;
 use Laminas\Form\Fieldset;
 
-class TestAdapter extends AbstractAdapter
+class TestEnginerAdapter extends AbstractEngineAdapter
 {
     public function getLabel()
     {
-        return 'TestAdapter';
+        return 'TestEngineAdapter';
     }
 
     public function getConfigFieldset()

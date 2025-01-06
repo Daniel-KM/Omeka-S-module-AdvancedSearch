@@ -568,11 +568,11 @@ trait TraitFormAdapterClassic
 
         $searchFormSettings = $searchConfigSettings['form'] ?? [];
 
-        $searchEngine = $this->searchConfig->engine();
+        $searchEngine = $this->searchConfig->searchEngine();
 
-        $searchAdapter = $this->searchConfig->searchAdapter();
-        if ($searchAdapter) {
-            $availableFields = $searchAdapter->getAvailableFields();
+        $engineAdapter = $this->searchConfig->engineAdapter();
+        if ($engineAdapter) {
+            $availableFields = $engineAdapter->getAvailableFields();
             // Include the specific fields to simplify querying with main form.
             $searchFormSettings['available_fields'] = $availableFields;
             $specialFieldsToInputFields = [
@@ -600,8 +600,8 @@ trait TraitFormAdapterClassic
         }
 
         // Solr doesn't allow unavailable args anymore (invalid or unknown).
-        $searchFormSettings['only_available_fields'] = $searchAdapter
-            && $searchAdapter instanceof \SearchSolr\Adapter\SolariumAdapter;
+        $searchFormSettings['only_available_fields'] = $engineAdapter
+            && $engineAdapter instanceof \SearchSolr\EngineAdapter\Solarium;
 
         // TODO Copy the option for per page in the search config form (keeping the default).
 
@@ -635,7 +635,7 @@ trait TraitFormAdapterClassic
 
         // Add global parameters.
 
-        $engineSettings = $searchEngine->settings();
+        $searchEngineSettings = $searchEngine->settings();
 
         // Manage rights of resources to search: visibility public/private.
 
@@ -658,12 +658,12 @@ trait TraitFormAdapterClassic
         // Check resources.
         $resourceTypes = $query->getResourceTypes();
         // TODO Check why resources may not be filled.
-        $engineSettings['resource_types'] ??= ['resources'];
+        $searchEngineSettings['resource_types'] ??= ['resources'];
         if ($resourceTypes) {
-            $resourceTypes = array_intersect($resourceTypes, $engineSettings['resource_types']) ?: $engineSettings['resource_types'];
+            $resourceTypes = array_intersect($resourceTypes, $searchEngineSettings['resource_types']) ?: $searchEngineSettings['resource_types'];
             $query->setResourceTypes($resourceTypes);
         } else {
-            $query->setResourceTypes($engineSettings['resource_types']);
+            $query->setResourceTypes($searchEngineSettings['resource_types']);
         }
 
         // Check sort.
@@ -746,7 +746,7 @@ trait TraitFormAdapterClassic
             $response->setFacetCounts($facetCounts);
         }
 
-        $totalResults = array_map(fn ($resource) => $response->getResourceTotalResults($resource), $engineSettings['resource_types']);
+        $totalResults = array_map(fn ($resource) => $response->getResourceTotalResults($resource), $searchEngineSettings['resource_types']);
         $plugins->get('paginator')(max($totalResults), $query->getPage() ?: 1, $query->getPerPage());
 
         return [
@@ -767,11 +767,11 @@ trait TraitFormAdapterClassic
         if (empty($sortFieldsSettings)) {
             return [];
         }
-        $searchAdapter = $this->searchConfig->searchAdapter();
-        if (empty($searchAdapter)) {
+        $engineAdapter = $this->searchConfig->engineAdapter();
+        if (empty($engineAdapter)) {
             return [];
         }
-        $availableSortFields = $searchAdapter->getAvailableSortFields();
+        $availableSortFields = $engineAdapter->getAvailableSortFields();
         return array_intersect_key($sortFieldsSettings, $availableSortFields);
     }
 }

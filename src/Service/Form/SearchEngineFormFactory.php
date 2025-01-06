@@ -11,6 +11,6 @@ class SearchEngineFormFactory implements FactoryInterface
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
         return (new SearchEngineForm(null, $options ?? []))
-            ->setSearchAdapterManager($services->get('AdvancedSearch\AdapterManager'));
+            ->setEngineAdapterManager($services->get('AdvancedSearch\EngineAdapterManager'));
     }
 }

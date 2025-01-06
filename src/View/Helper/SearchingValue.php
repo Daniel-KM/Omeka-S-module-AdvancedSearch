@@ -40,8 +40,8 @@ class SearchingValue extends AbstractHelper
         $siteSlug = $isSite ? $params->fromRoute('site-slug') : null;
 
         $advancedSearchConfig = $getSearchConfig();
-        $engine = $advancedSearchConfig ? $advancedSearchConfig->engine() : null;
-        $querier = $engine ? $engine->querier() : null;
+        $searchEngine = $advancedSearchConfig ? $advancedSearchConfig->searchEngine() : null;
+        $querier = $searchEngine ? $searchEngine->querier() : null;
         $isInternalSearch = $querier instanceof \AdvancedSearch\Querier\InternalQuerier;
         // Fallback to standard search for module Advanced search.
         if (!$querier || $querier instanceof \AdvancedSearch\Querier\NoopQuerier) {

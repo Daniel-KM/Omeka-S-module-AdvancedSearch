@@ -38,9 +38,12 @@ use Laminas\ServiceManager\ServiceLocatorInterface;
 
 interface QuerierInterface extends LoggerAwareInterface
 {
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): self;
+    /**
+     * @deprecated Use factories.
+     */
+    public function setServiceLocator(ServiceLocatorInterface $services): self;
 
-    public function setSearchEngine(SearchEngineRepresentation $engine): self;
+    public function setSearchEngine(SearchEngineRepresentation $searchEngine): self;
 
     public function setQuery(Query $query): self;
 

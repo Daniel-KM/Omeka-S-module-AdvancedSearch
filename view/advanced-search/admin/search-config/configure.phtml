@@ -44,9 +44,9 @@ $this->headScript()
 
 $this->htmlElement('body')->appendAttribute('class', 'search-admin search-config resource edit configure');
 
-$engine = $searchConfig->engine();
-$adapter = $engine ? $engine->adapter() : null;
-if (empty($adapter)) {
+$searchEngine = $searchConfig->searchEngine();
+$engineAdapter = $searchEngine ? $searchEngine->engineAdapter() : null;
+if (empty($engineAdapter)) {
     return;
 }
 

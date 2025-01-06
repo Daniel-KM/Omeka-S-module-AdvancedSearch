@@ -15,6 +15,7 @@ class SearchSuggesterAdapter extends AbstractEntityAdapter
         'id' => 'id',
         'name' => 'name',
         'engine' => 'engine',
+        'search_engine' => 'engine',
         'created' => 'created',
         'modified' => 'modified',
     ];
@@ -23,6 +24,7 @@ class SearchSuggesterAdapter extends AbstractEntityAdapter
         'id' => 'id',
         'name' => 'name',
         'engine' => 'engine',
+        'search_engine' => 'engine',
         'settings' => 'settings',
         'created' => 'created',
         'modified' => 'modified',
@@ -80,15 +82,15 @@ class SearchSuggesterAdapter extends AbstractEntityAdapter
         }
         // The related engine cannot be modified once created.
         if ($request->getOperation() === Request::CREATE
-            && $this->shouldHydrate($request, 'o:engine')
+            && $this->shouldHydrate($request, 'o:search_engine')
         ) {
-            $engine = $request->getValue('o:engine');
-            if (is_array($engine)) {
-                $engine = $this->getAdapter('search_engines')->findEntity($engine['o:id'] ?? 0);
-            } elseif (is_numeric($engine)) {
-                $engine = $this->getAdapter('search_engines')->findEntity((int) $engine);
+            $searchEngine = $request->getValue('o:search_engine');
+            if (is_array($searchEngine)) {
+                $searchEngine = $this->getAdapter('search_engines')->findEntity($searchEngine['o:id'] ?? 0);
+            } elseif (is_numeric($searchEngine)) {
+                $searchEngine = $this->getAdapter('search_engines')->findEntity((int) $searchEngine);
             }
-            $entity->setEngine($engine);
+            $entity->setEngine($searchEngine);
         }
         if ($this->shouldHydrate($request, 'o:settings')) {
             $entity->setSettings($request->getValue('o:settings') ?? []);

@@ -1302,8 +1302,8 @@ class MainSearchForm extends Form
             'annotations',
         ];
         if ($this->searchConfig) {
-            $engine = $this->searchConfig->engine();
-            $resourceTypes = $engine->setting('resource_types');
+            $searchEngine = $this->searchConfig->searchEngine();
+            $resourceTypes = $searchEngine->setting('resource_types');
         }
         $result = [];
         foreach ($resourceTypes ?: $resourceTypesDefault as $resourceType) {
@@ -1330,10 +1330,10 @@ class MainSearchForm extends Form
         if (!$this->searchConfig) {
             return ['resources'];
         }
-        $engine = $this->searchConfig->engine();
-        $engineTypes = $engine->setting('resource_types');
-        return $engineTypes
-            ? array_intersect_key($types, array_flip($engineTypes))
+        $searchEngine = $this->searchConfig->searchEngine();
+        $searchEngineTypes = $searchEngine->setting('resource_types');
+        return $searchEngineTypes
+            ? array_intersect_key($types, array_flip($searchEngineTypes))
             : ['resources'];
     }
 
@@ -1425,7 +1425,7 @@ class MainSearchForm extends Form
 
     protected function getAvailableFields(): array
     {
-        $adapter = $this->searchConfig ? $this->searchConfig->searchAdapter() : null;
+        $adapter = $this->searchConfig ? $this->searchConfig->engineAdapter() : null;
         return $adapter ? $adapter->getAvailableFields() : [];
     }
 

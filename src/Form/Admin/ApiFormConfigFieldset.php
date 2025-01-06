@@ -360,11 +360,11 @@ class ApiFormConfigFieldset extends Fieldset
     {
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $this->getOption('search_config');
-        $searchAdapter = $searchConfig ? $searchConfig->searchAdapter() : null;
-        if (empty($searchAdapter)) {
+        $engineAdapter = $searchConfig ? $searchConfig->engineAdapter() : null;
+        if (empty($engineAdapter)) {
             return [];
         }
-        $fields = $searchAdapter->getAvailableFields();
+        $fields = $engineAdapter->getAvailableFields();
         $options = [];
         foreach ($fields as $name => $field) {
             $options[$name] = $field['label'] ?? $name;
@@ -376,11 +376,11 @@ class ApiFormConfigFieldset extends Fieldset
     {
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $this->getOption('search_config');
-        $searchAdapter = $searchConfig ? $searchConfig->searchAdapter() : null;
-        if (empty($searchAdapter)) {
+        $engineAdapter = $searchConfig ? $searchConfig->engineAdapter() : null;
+        if (empty($engineAdapter)) {
             return [];
         }
-        $fields = $searchAdapter->getAvailableSortFields();
+        $fields = $engineAdapter->getAvailableSortFields();
         $options = [];
         foreach ($fields as $name => $field) {
             $options[$name] = $field['label'] ?? $name;

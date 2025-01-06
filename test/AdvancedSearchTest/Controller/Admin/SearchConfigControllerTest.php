@@ -13,8 +13,8 @@ class SearchConfigControllerTest extends \AdvancedSearchTest\Controller\SearchCo
 
         $this->assertQuery('input[name="o:name"]');
         $this->assertQuery('input[name="o:slug"]');
-        $this->assertQuery('select[name="o:engine"]');
-        $this->assertQuery('select[name="o:form"]');
+        $this->assertQuery('select[name="o:search_engine[o:id]"');
+        $this->assertQuery('select[name="o:form_adapter"]');
     }
 
     public function testAddPostAction(): void
@@ -25,8 +25,8 @@ class SearchConfigControllerTest extends \AdvancedSearchTest\Controller\SearchCo
         $this->dispatch('/admin/search-manager/config/add', 'POST', [
             'o:name' => 'TestPage [testAddPostAction]',
             'o:slug' => 'search/test2',
-            'o:engine' => $this->searchEngine->id(),
-            'o:form' => 'basic',
+            'o:search_engine' => ['o:id' => $this->searchEngine->id()],
+            'o:form_manager' => 'basic',
             'manage_config_default' => '0',
             'manage_config_availability' => 'let',
             'csrf' => $form->get('csrf')->getValue(),

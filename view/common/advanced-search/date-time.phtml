@@ -44,10 +44,10 @@ $queryInputText = function (array $search, $engine) use ($translate, $escape) {
     </div>
     <div class="inputs">
         <?php
-        $engine = 0;
+        $index = 0;
         foreach ($datetimes as $datetime):
-            $stem = 'datetime[' . $engine . ']';
-        ?>
+            $stem = 'datetime[' . $index . ']';
+            ?>
         <div class="value">
             <select class="joiner chosen-select" name="<?= $escape($stem . '[joiner]') ?>">
                 <?= $querySelectOption('and', $datetime, 'joiner', $translate('And')) ?>
@@ -77,11 +77,11 @@ $queryInputText = function (array $search, $engine) use ($translate, $escape) {
                 <?= $querySelectOption('ex', $datetime, 'type', $translate('has any date / time')) // @translate ?>
                 <?= $querySelectOption('nex', $datetime, 'type', $translate('has no date / time')) // @translate ?>
             </select>
-            <?= $queryInputText($datetime, $engine) ?>
+            <?= $queryInputText($datetime, $index) ?>
             <button type="button" class="o-icon-delete remove-value button"><?= $translate('Remove date / time') // @translate ?></button>
         </div>
         <?php
-            $engine++;
+            ++$index;
         endforeach;
         ?>
     </div>

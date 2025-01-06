@@ -38,9 +38,12 @@ use Omeka\Entity\Resource;
 
 interface IndexerInterface extends LoggerAwareInterface
 {
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): self;
+    /**
+     * @deprecated Use factories.
+     */
+    public function setServiceLocator(ServiceLocatorInterface $services): self;
 
-    public function setSearchEngine(SearchEngineRepresentation $engine): self;
+    public function setSearchEngine(SearchEngineRepresentation $searchEngine): self;
 
     /**
      * Inidicate if the resource can be indexed.

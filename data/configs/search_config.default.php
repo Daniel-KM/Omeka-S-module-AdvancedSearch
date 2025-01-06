@@ -24,8 +24,8 @@ return [
     'o:id' => null,
     'o:name' => $translate('Default'),
     'o:slug' => 'find',
-    'o:engine' => ['o:id' => 1],
-    'o:form' => 'main',
+    'o:search_engine' => ['o:id' => 1],
+    'o:form_adapter' => 'main',
     'o:settings' => [
         'request' => [
             'default_results' => 'default',

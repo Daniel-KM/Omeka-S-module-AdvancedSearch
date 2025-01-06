@@ -30,12 +30,10 @@
 
 namespace AdvancedSearch\Controller\Admin;
 
-use AdvancedSearch\Adapter\Manager as SearchAdapterManager;
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use AdvancedSearch\Form\Admin\SearchConfigConfigureForm;
 use AdvancedSearch\Form\Admin\SearchConfigFilterFieldset;
 use AdvancedSearch\Form\Admin\SearchConfigForm;
-use AdvancedSearch\FormAdapter\Manager as SearchFormAdapterManager;
 use Common\Stdlib\PsrMessage;
 use Doctrine\ORM\EntityManager;
 use Laminas\Form\FormElementManager;
@@ -55,26 +53,12 @@ class SearchConfigController extends AbstractActionController
      */
     protected $formElementManager;
 
-    /**
-     * @var \AdvancedSearch\Adapter\Manager
-     */
-    protected $searchAdapterManager;
-
-    /**
-     * @var \AdvancedSearch\FormAdapter\Manager
-     */
-    protected $searchFormAdapterManager;
-
     public function __construct(
         EntityManager $entityManager,
-        FormElementManager $formElementManager,
-        SearchAdapterManager $searchAdapterManager,
-        SearchFormAdapterManager $searchFormAdapterManager
+        FormElementManager $formElementManager
     ) {
         $this->entityManager = $entityManager;
         $this->formElementManager = $formElementManager;
-        $this->searchAdapterManager = $searchAdapterManager;
-        $this->searchFormAdapterManager = $searchFormAdapterManager;
     }
 
     public function addAction()
@@ -128,7 +112,7 @@ class SearchConfigController extends AbstractActionController
         $data = json_decode(json_encode($searchConfig), true);
         $data['manage_config_default'] = $this->sitesWithSearchConfigAsDefault($searchConfig);
         $data['manage_config_availability'] = $this->sitesWithSearchConfigAsAvailable($searchConfig);
-        $data['o:engine'] = empty($data['o:engine']['o:id']) ? null : $data['o:engine']['o:id'];
+        $data['o:search_engine'] = empty($data['o:search_engine']['o:id']) ? null : $data['o:search_engine']['o:id'];
 
         $form = $this->getForm(SearchConfigForm::class);
         $form->setData($data);
@@ -174,12 +158,12 @@ class SearchConfigController extends AbstractActionController
             'searchConfig' => $searchConfig,
         ]);
 
-        $engine = $searchConfig->engine();
-        $adapter = $engine ? $engine->adapter() : null;
-        if (empty($adapter)) {
+        $searchEngine = $searchConfig->searchEngine();
+        $engineAdapter = $searchEngine ? $searchEngine->engineAdapter() : null;
+        if (empty($engineAdapter)) {
             $message = new PsrMessage(
                 'The engine adapter "{label}" is unavailable.', // @translate
-                ['label' => $engine->adapterLabel()]
+                ['label' => $searchEngine->engineAdapterLabel()]
             );
             $this->messenger()->addError($message); // @translate
             return $view;
@@ -190,7 +174,7 @@ class SearchConfigController extends AbstractActionController
         if (empty($form)) {
             $message = new PsrMessage(
                 'This engine adapter "{label}" has no config form.', // @translate
-                ['label' => $engine->adapterLabel()]
+                ['label' => $searchEngine->engineAdapterLabel()]
             );
             $this->messenger()->addWarning($message); // @translate
             return $view;
@@ -327,7 +311,7 @@ class SearchConfigController extends AbstractActionController
      */
     protected function getConfigureForm(SearchConfigRepresentation $searchConfig): ?\AdvancedSearch\Form\Admin\SearchConfigConfigureForm
     {
-        return $searchConfig->engine()
+        return $searchConfig->searchEngine()
             ? $this->getForm(SearchConfigConfigureForm::class, ['search_config' => $searchConfig])
             : null;
     }

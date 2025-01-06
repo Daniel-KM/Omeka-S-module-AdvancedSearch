@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace AdvancedSearch\Adapter;
+namespace AdvancedSearch\EngineAdapter;
 
 /**
  * This adapter is not registered in manager, so only for internal purpose.
  */
-class NoopAdapter extends AbstractAdapter
+class Noop extends AbstractEngineAdapter
 {
     protected $label = 'No operation (noop)'; // @translate
 

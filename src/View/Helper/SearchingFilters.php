@@ -86,9 +86,9 @@ class SearchingFilters extends AbstractHelper
         $this->baseUrl = $url(null, [], true);
         $this->query = $query;
 
-        $searchAdapter = $searchConfig->searchAdapter();
-        $availableFields = $searchAdapter
-            ? $searchAdapter->getAvailableFields()
+        $engineAdapter = $searchConfig->engineAdapter();
+        $availableFields = $engineAdapter
+            ? $engineAdapter->getAvailableFields()
             : [];
         $searchFormSettings = $searchConfig->setting('form') ?: [];
 

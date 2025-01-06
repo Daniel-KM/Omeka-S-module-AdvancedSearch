@@ -2,7 +2,7 @@
 
 /*
  * Copyright BibLibre, 2016-2017
- * Copyright Daniel Berthereau, 2018-2024
+ * Copyright Daniel Berthereau, 2018-2025
  *
  * This software is governed by the CeCILL license under French law and abiding
  * by the rules of distribution of free software.  You can use, modify and/ or
@@ -28,16 +28,13 @@
  * knowledge of the CeCILL license and that you accept its terms.
  */
 
-namespace AdvancedSearch\Adapter;
+namespace AdvancedSearch\EngineAdapter;
 
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
-use Laminas\ServiceManager\ServiceLocatorInterface;
 
-interface AdapterInterface
+interface EngineAdapterInterface
 {
-    public function setServiceLocator(ServiceLocatorInterface $serviceLocator): self;
-
     /**
      * Set the search config for this adapter.
      */

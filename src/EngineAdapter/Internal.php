@@ -1,9 +1,22 @@
 <?php declare(strict_types=1);
 
-namespace AdvancedSearch\Adapter;
+namespace AdvancedSearch\EngineAdapter;
 
-class InternalAdapter extends AbstractAdapter
+use Common\Stdlib\EasyMeta;
+use Laminas\I18n\Translator\TranslatorInterface;
+
+class Internal extends AbstractEngineAdapter
 {
+    /**
+     * @var \Common\Stdlib\EasyMeta
+     */
+    protected $easyMeta;
+
+    /**
+     * @param \Laminas\I18n\Translator\TranslatorInterface
+     */
+    protected $translator;
+
     protected $label = 'Internal [sql]'; // @translate
 
     // TODO No specific engine config, but specificities in config configure.
@@ -12,6 +25,12 @@ class InternalAdapter extends AbstractAdapter
     protected $indexerClass = \AdvancedSearch\Indexer\InternalIndexer::class;
 
     protected $querierClass = \AdvancedSearch\Querier\InternalQuerier::class;
+
+    public function __construct(EasyMeta $easyMeta, TranslatorInterface $translator)
+    {
+        $this->easyMeta = $easyMeta;
+        $this->translator = $translator;
+    }
 
     public function getAvailableFields(): array
     {
@@ -32,9 +51,7 @@ class InternalAdapter extends AbstractAdapter
         // Don't bypass default fields with the specific ones.
         $fields = array_merge($fields, $aliases);
 
-        /** @var \Common\Stdlib\EasyMeta $easyMeta */
-        $easyMeta = $this->getServiceLocator()->get('Common\EasyMeta');
-        $propertyLabelsByTerms = $easyMeta->propertyLabels();
+        $propertyLabelsByTerms = $this->easyMeta->propertyLabels();
         foreach ($propertyLabelsByTerms as $term => $label) {
             $propertyLabelsByTerms[$term] = ['name' => $term, 'label' => $label];
         }
@@ -57,11 +74,9 @@ class InternalAdapter extends AbstractAdapter
 
         $availableFields = $this->getAvailableFields();
 
-        $translator = $this->getServiceLocator()->get('MvcTranslator');
-
         $directionLabels = [
-            'asc' => $translator->translate('Asc'),
-            'desc' => $translator->translate('Desc'),
+            'asc' => $this->translator->translate('Asc'),
+            'desc' => $this->translator->translate('Desc'),
         ];
 
         // There is no default score sort, except for full text search.
@@ -69,11 +84,11 @@ class InternalAdapter extends AbstractAdapter
         $sortFields = [
             'relevance desc' => [
                 'name' => 'relevance desc',
-                'label' => $translator->translate('Relevance'), // @translate
+                'label' => $this->translator->translate('Relevance'), // @translate
             ],
             'relevance asc' => [
                 'name' => 'relevance asc',
-                'label' => $translator->translate('Relevance (inversed)'), // @translate
+                'label' => $this->translator->translate('Relevance (inversed)'), // @translate
             ],
         ];
 
@@ -103,19 +118,9 @@ class InternalAdapter extends AbstractAdapter
         // Special fields of Omeka.
         $defaultFields = $this->getDefaultFields();
 
-        /**
-         * @var \Omeka\Api\Representation\VocabularyRepresentation $vocabulary
-         */
-        $services = $this->getServiceLocator();
-        $api = $services->get('Omeka\ApiManager');
-        $easyMeta = $services->get('Common\EasyMeta');
-        $viewHelperManager = $services->get('ViewHelperManager');
-        $translate = $viewHelperManager->get('translate');
-
-        $vocabularies = $api->search('vocabularies', ['sort_by' => 'label'])->getContent();
-        $propertyLabelsByTerms = $easyMeta->propertyLabels();
+        $propertyLabelsByTerms = $this->easyMeta->propertyLabels();
         foreach ($propertyLabelsByTerms as &$label) {
-            $label = $translate($label);
+            $label = $this->translator->translate($label);
         }
         unset($label);
         asort($propertyLabelsByTerms);
@@ -142,10 +147,10 @@ class InternalAdapter extends AbstractAdapter
         // Set Dublin Core terms and types first vocabularies.
         // There is no property in dctype.
         $properties = ['dcterms' => []];
-        foreach ($vocabularies as $vocabulary) {
-            $prefix = $vocabulary->prefix();
+        $vocabularies = $this->easyMeta->vocabularyLabels();
+        foreach ($vocabularies as $prefix => $label) {
             $properties[$prefix] = [
-                'label' => $vocabulary->label(),
+                'label' => $label,
                 'options' => [],
             ];
             foreach ($propertyLabelsByTerms as $term => $label) {
@@ -177,18 +182,16 @@ class InternalAdapter extends AbstractAdapter
 
         $availableFields = $this->getAvailableFieldsForSelect();
 
-        $translator = $this->getServiceLocator()->get('MvcTranslator');
-
         $directionLabels = [
-            'asc' => $translator->translate('ascendant'), // @ŧranslate
-            'desc' => $translator->translate('descendant'), // @translate
+            'asc' => $this->translator->translate('ascendant'), // @ŧranslate
+            'desc' => $this->translator->translate('descendant'), // @translate
         ];
 
         // There is no default score sort, except for full text search.
         // According to mysql, the default for relevance is "desc".
         $sortFields = [
-            'relevance desc' => $translator->translate('Relevance'), // @translate
-            'relevance asc' => $translator->translate('Relevance (inversed)'), // @translate
+            'relevance desc' => $this->translator->translate('Relevance'), // @translate
+            'relevance asc' => $this->translator->translate('Relevance (inversed)'), // @translate
         ];
 
         foreach ($availableFields as $name => $availableField) {

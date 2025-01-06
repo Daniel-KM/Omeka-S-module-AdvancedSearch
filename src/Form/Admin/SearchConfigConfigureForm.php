@@ -30,7 +30,7 @@
 
 namespace AdvancedSearch\Form\Admin;
 
-use AdvancedSearch\Adapter\InternalAdapter;
+use AdvancedSearch\EngineAdapter\Internal;
 use Common\Form\Element as CommonElement;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
@@ -64,14 +64,14 @@ class SearchConfigConfigureForm extends Form
     {
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $this->getOption('search_config');
-        $searchEngine = $searchConfig->engine();
+        $searchEngine = $searchConfig->searchEngine();
         if (empty($searchEngine)) {
             return;
         }
 
         // TODO Add a method or an event to modify or append specific field to each fieldset.
-        $searchAdapter = $searchEngine->adapter();
-        $isInternalEngine = $searchAdapter && $searchAdapter instanceof InternalAdapter;
+        $engineAdapter = $searchEngine->engineAdapter();
+        $isInternalEngine = $engineAdapter && $engineAdapter instanceof Internal;
 
         // This is the settings for the search config, not the search form one.
 

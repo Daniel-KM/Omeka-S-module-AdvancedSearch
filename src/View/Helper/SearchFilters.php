@@ -87,9 +87,9 @@ class SearchFilters extends AbstractHelper
             $this->query['__searchCleanQuery']
         );
 
-        $searchAdapter = $this->searchConfig ? $this->searchConfig->searchAdapter() : null;
-        $availableFields = $searchAdapter
-            ? $searchAdapter->getAvailableFields()
+        $engineAdapter = $this->searchConfig ? $this->searchConfig->engineAdapter() : null;
+        $availableFields = $engineAdapter
+            ? $engineAdapter->getAvailableFields()
             : [];
         $searchFormSettings = $this->searchConfig ? ($this->searchConfig->setting('form') ?: []) : [];
 
@@ -483,7 +483,7 @@ class SearchFilters extends AbstractHelper
                     ];
 
                     $value = $this->query['datetime'];
-                    $engine = 0;
+                    $engineIndex = 0;
                     foreach ($value as $subKey => $queryRow) {
                         $joiner = $queryRow['join'];
                         $field = $queryRow['field'];
@@ -494,7 +494,7 @@ class SearchFilters extends AbstractHelper
                             ? $translate('Modified') // @translate
                             : $translate('Created'); // @translate
                         $filterLabel = $fieldLabel . ' ' . $queryTypesDatetime[$type];
-                        if ($engine > 0) {
+                        if ($engineIndex > 0) {
                             $joiners = [
                                 'or' => $translate('OR'), // @translate
                                 'not' => $translate('EXCEPT'), // @translate
@@ -503,7 +503,7 @@ class SearchFilters extends AbstractHelper
                             $filterLabel = ($joiners[$joiner] ?? $joiners['and']) . ' ' . $filterLabel;
                         }
                         $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $datetimeValue;
-                        ++$engine;
+                        ++$engineIndex;
                     }
                     break;
 

@@ -178,9 +178,9 @@ class SearchConfigSortFieldset extends Fieldset implements InputFilterProviderIn
     {
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $this->getOption('search_config');
-        $searchAdapter = $searchConfig ? $searchConfig->searchAdapter() : null;
-        return $searchAdapter
-            ? $searchAdapter->getAvailableSortFieldsForSelect()
+        $engineAdapter = $searchConfig ? $searchConfig->engineAdapter() : null;
+        return $engineAdapter
+            ? $engineAdapter->getAvailableSortFieldsForSelect()
             : [];
     }
 }

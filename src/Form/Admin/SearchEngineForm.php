@@ -35,7 +35,7 @@ use Laminas\Form\Form;
 
 class SearchEngineForm extends Form
 {
-    protected $searchAdapterManager;
+    protected $engineAdapterManager;
 
     public function init(): void
     {
@@ -52,23 +52,23 @@ class SearchEngineForm extends Form
                 ],
             ])
             ->add([
-                'name' => 'o:adapter',
+                'name' => 'o:engine_adapter',
                 'type' => Element\Select::class,
                 'options' => [
-                    'label' => 'Adapter', // @translate
-                    'value_options' => $this->getAdaptersOptions(),
-                    'empty_option' => 'Select an adapter below…', // @translate
+                    'label' => 'Engine adapter', // @translate
+                    'value_options' => $this->getEngineAdaptersOptions(),
+                    'empty_option' => 'Select an engine adapter below…', // @translate
                 ],
                 'attributes' => [
-                    'id' => 'o-adapter',
+                    'id' => 'o-engine-adapter',
                     'required' => true,
                 ],
             ]);
     }
 
-    protected function getAdaptersOptions(): array
+    protected function getEngineAdaptersOptions(): array
     {
-        $adapterManager = $this->getSearchAdapterManager();
+        $adapterManager = $this->getEngineAdapterManager();
         $adapterNames = $adapterManager->getRegisteredNames();
 
         $options = [];
@@ -81,14 +81,14 @@ class SearchEngineForm extends Form
         return $options;
     }
 
-    public function setSearchAdapterManager($searchAdapterManager): self
+    public function setEngineAdapterManager($engineAdapterManager): self
     {
-        $this->searchAdapterManager = $searchAdapterManager;
+        $this->engineAdapterManager = $engineAdapterManager;
         return $this;
     }
 
-    public function getSearchAdapterManager()
+    public function getEngineAdapterManager()
     {
-        return $this->searchAdapterManager;
+        return $this->engineAdapterManager;
     }
 }

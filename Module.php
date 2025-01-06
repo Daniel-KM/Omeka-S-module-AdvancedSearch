@@ -898,6 +898,51 @@ class Module extends AbstractModule
         // Reorder, deduplicate the list and filter with selected list.
         $partials = array_values(array_intersect(array_keys($searchFields), array_unique($partials), $selectedSearchFields));
 
+        // Clean query early to avoid issues and deprecation notices.
+        // In particular, some arguments support array, but only one in form.
+        $query = $event->getParam('query', []);
+        if ($query) {
+            if (!empty($query['property'])) {
+                // TODO Clean joiner and type for property.
+                if (in_array('common/advanced-search/properties-improved', $partials)) {
+                    foreach ($query['property'] as $propertyField) {
+                        if (array_key_exists('property', $propertyField) && !is_array($propertyField['property'])) {
+                            $propertyField['property'] = (array) $propertyField['property'];
+                        }
+                        if (array_key_exists('text', $propertyField) && is_array($propertyField['text'])) {
+                            $propertyField['text'] = count($propertyField['text']) === 1 ? reset($propertyField['text']) : '';
+                        }
+                    }
+                }
+                if (in_array('common/advanced-search/properties', $partials)) {
+                    foreach ($query['property'] as $propertyField) {
+                        // TODO Clean joiner and type for property.
+                        if (isset($propertyField['property']) && is_array($propertyField['property'])) {
+                            $propertyField['property'] = count($propertyField['property']) === 1 ? reset($propertyField['property']) : '';
+                        }
+                        if (isset($propertyField['text']) && is_array($propertyField['text'])) {
+                            $propertyField['text'] = count($propertyField['text']) === 1 ? reset($propertyField['text']) : '';
+                        }
+                    }
+                }
+            }
+            if (in_array('common/advanced-search/media-type-improved', $partials) && array_key_exists('media_type', $query) && !is_array($query['media_type'])) {
+                $query['media_type'] = (array) $query['media_type'];
+            } elseif (in_array('common/advanced-search/media-type', $partials)  && array_key_exists('media_type', $query) && is_array($query['media_type'])) {
+                $query['media_type'] = $query['media_type'] ? reset($query['media_type']) : '';
+            }
+            if (array_key_exists('owner_id', $query) && is_array($query['owner_id'])) {
+                $query['owner_id'] = $query['owner_id'] ? (int) reset($query['owner_id']) : '';
+            }
+            if (array_key_exists('site_id', $query) && is_array($query['site_id'])) {
+                $query['site_id'] = $query['site_id'] ? (int) reset($query['site_id']) : '';
+            }
+            if (array_key_exists('asset_id', $query) && is_array($query['asset_id'])) {
+                $query['asset_id'] = $query['asset_id'] ? (int) reset($query['asset_id']) : '';
+            }
+        }
+        $event->setParam('query', $query);
+
         $event->setParam('partials', $partials);
     }
 

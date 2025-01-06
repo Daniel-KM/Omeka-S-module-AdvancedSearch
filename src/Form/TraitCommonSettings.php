@@ -2,10 +2,16 @@
 
 namespace AdvancedSearch\Form;
 
+use Common\Form\Element as CommonElement;
 use Laminas\Form\Element;
 
 trait TraitCommonSettings
 {
+    /**
+     * @var array
+     */
+    protected $listSearchFields = [];
+
     protected function initImprovedSearch(): self
     {
         return $this
@@ -46,5 +52,31 @@ trait TraitCommonSettings
                 ],
             ])
         ;
+    }
+
+    protected function initSearchFields(): self
+    {
+        return $this
+            ->add([
+                'name' => 'advancedsearch_search_fields',
+                'type' => CommonElement\OptionalMultiCheckbox::class,
+                'options' => [
+                    'element_group' => 'search',
+                    'label' => 'Fields for standard advanced search form', // @translate
+                    'info' => 'The fields marked with a "*" are available only when matching option is set above.', // @translate
+                    'value_options' => $this->listSearchFields,
+                    'use_hidden_element' => true,
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearch_search_fields',
+                ],
+            ])
+        ;
+    }
+
+    public function setListSearchFields(array $listSearchFields): self
+    {
+        $this->listSearchFields = $listSearchFields;
+        return $this;
     }
 }

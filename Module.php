@@ -209,24 +209,12 @@ class Module extends AbstractModule
             // TODO Add user.
         ];
         foreach ($controllers as $controller) {
-            // Add the search field to the advanced search pages.
-            $sharedEventManager->attach(
-                $controller,
-                'view.advanced_search',
-                [$this, 'handleViewAdvancedSearch']
-            );
-        }
-        $controllers = [
-            'Omeka\Controller\Site\Item',
-            'Omeka\Controller\Site\ItemSet',
-            'Omeka\Controller\Site\Media',
-        ];
-        foreach ($controllers as $controller) {
             // Specify fields to filter from the advanced search form.
+            // Let other modules append partial first.
             $sharedEventManager->attach(
                 $controller,
                 'view.advanced_search',
-                [$this, 'handleViewAdvancedSearchPost'],
+                [$this, 'handleViewAdvancedSearch'],
                 -100
             );
         }
@@ -804,9 +792,11 @@ class Module extends AbstractModule
         $services = $this->getServiceLocator();
         $plugins = $view->getHelperPluginManager();
         $status = $services->get('Omeka\Status');
+        $config = $services->get('Config');
         $assetUrl = $plugins->get('assetUrl');
         $headLink = $plugins->get('headLink');
         $headScript = $plugins->get('headScript');
+        $searchFields = $config['advancedsearch']['search_fields'];
 
         // Include chosen-select in sites.
         $isSite = $status->isSiteRequest();
@@ -815,15 +805,6 @@ class Module extends AbstractModule
                 ->prependStylesheet($assetUrl('vendor/chosen-js/chosen.min.css', 'Omeka'));
             $headScript
                 ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.js', 'Omeka'), 'text/javascript', ['defer' => 'defer']);
-            $siteSettings = $services->get('Omeka\Settings\Site');
-            $isPropertyImproved = (bool) $siteSettings->get('advancedsearch_property_improved');
-            $isMetadataImproved = (bool) $siteSettings->get('advancedsearch_metadata_improved');
-            $isMediaTypeImproved = (bool) $siteSettings->get('advancedsearch_media_type_improved');
-        } else {
-            $settings = $services->get('Omeka\Settings');
-            $isPropertyImproved = (bool) $settings->get('advancedsearch_property_improved');
-            $isMetadataImproved = (bool) $settings->get('advancedsearch_metadata_improved');
-            $isMediaTypeImproved = (bool) $settings->get('advancedsearch_media_type_improved');
         }
 
         $headLink
@@ -831,142 +812,91 @@ class Module extends AbstractModule
         $headScript
             ->appendFile($assetUrl('js/advanced-search-form.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
 
-        $this->handlePartialsAdvancedSearch(
-            $event,
-            $isPropertyImproved,
-            $isMetadataImproved,
-            $isMediaTypeImproved
-        );
-    }
-
-    protected function handlePartialsAdvancedSearch(
-        Event $event,
-        bool $isPropertyImproved,
-        bool $isMetadataImproved,
-        bool $isMediaTypeImproved
-    ): void {
         // Adapted from application/view/common/advanced-search.phtml.
-
-        $query = $event->getParam('query', []);
+        /** @see application/view/common/advanced-search.phtml */
 
         $partials = $event->getParam('partials', []);
         $resourceType = $event->getParam('resourceType');
 
-        $isItem = $resourceType === 'item' || $resourceType === 'items';
-        $isMedia = $resourceType === 'media';
-
-        if ($isMedia) {
-            $query['item_set_id'] = isset($query['item_set_id']) ? (array) $query['item_set_id'] : [];
-            $partials[] = 'common/advanced-search/media-item-sets';
-        }
-
-        $query['datetime'] ??= '';
-        $partials[] = 'common/advanced-search/date-time';
-
-        // Visibility filter was included in Omeka S v4.0.
-
-        if ($isItem) {
-            $query['has_media'] ??= '';
-            $partials[] = 'common/advanced-search/has-media';
-        }
-
-        $query['has_asset'] ??= '';
-        $partials[] = 'common/advanced-search/has-asset';
-
-        $query['asset_id'] ??= '';
-        $partials[] = 'common/advanced-search/asset';
-
-        if ($isItem || $isMedia) {
-            $query['has_original'] ??= '';
-            $partials[] = 'common/advanced-search/has-original';
-            $query['has_thumbnails'] ??= '';
-            $partials[] = 'common/advanced-search/has-thumbnails';
-        }
-
-        // "media-types" and "media-type-improved" are the same, but
-        // "media-types" is used by items and "media-type-improved" by media.
-        if ($isItem) {
-            $query['media_types'] = isset($query['media_types']) ? (array) $query['media_types'] : [];
-            $partials[] = 'common/advanced-search/media-types';
-        }
-
-        $metadataTemplates = [
-            'common/advanced-search/item-sets' => 'common/advanced-search/item-sets-improved',
-            'common/advanced-search/media-type' => 'common/advanced-search/media-type-improved',
-            'common/advanced-search/owner' => 'common/advanced-search/owner-improved',
-            'common/advanced-search/resource-class' => 'common/advanced-search/resource-class-improved',
-            'common/advanced-search/resource-template' => 'common/advanced-search/resource-template-improved',
-            'common/advanced-search/site' => 'common/advanced-search/site-improved',
+        $resourceNames = [
+            'item' => 'items',
+            'media' => 'media',
+            'item-set' => 'item_sets',
+            'value-annotation' => 'value_annotations',
+            'annotation' => 'annotations',
+            'resource' => 'resources',
         ];
+        $resourceName = $resourceNames[$resourceType] ?? $resourceType;
 
-        $p = $partials;
-        $partials = [];
-        foreach ($p as $partial) {
-            // Manage improved properties.
-            if ($isPropertyImproved && $partial === 'common/advanced-search/properties') {
-                $partial = 'common/advanced-search/properties-improved';
-            } elseif (!$isPropertyImproved && $partial === 'common/advanced-search/properties-improved') {
-                $partial = 'common/advanced-search/properties';
-            }
-            $partials[] = $partial;
-
-            // Manage improved metadata.
-            if ($isMetadataImproved && isset($metadataTemplates[$partial])) {
-                $partial = $metadataTemplates[$partial];
-            } elseif (!$isMetadataImproved && in_array($partial, $metadataTemplates)) {
-                $partial = array_search($partial, $metadataTemplates);
-            }
-            // Duplicates are removed below.
-            $partials[] = $partial;
-
-            if ($isMedia) {
-                // Manage improved media types for media.
-                if ($isMediaTypeImproved && $partial === 'common/advanced-search/media-type') {
-                    $partial = 'common/advanced-search/media-type-improved';
-                } elseif (!$isMediaTypeImproved && $partial === 'common/advanced-search/media-type-improved') {
-                    $partial = 'common/advanced-search/media-type';
-                }
-                // Duplicates are removed below.
+        // The list is reordered below.
+        $improveds = [];
+        foreach ($searchFields as $partial => $searchFieldData) {
+            if (isset($searchFieldData['module'])
+                && $searchFieldData['module'] === 'AdvancedSearch'
+                && (empty($searchFieldData['resource_type']) || in_array($resourceName, $searchFieldData['resource_type']))
+            ) {
                 $partials[] = $partial;
             }
-
-            // Insert "filter" after "properties".
-            if ($partial === 'common/advanced-search/properties'
-                || $partial === 'common/advanced-search/properties-improved'
-            ) {
-                $partials[] = 'common/advanced-search/filters';
+            if (!empty($searchFieldData['improve'])) {
+                $improveds[$partial] = $searchFieldData['improve'];
             }
         }
 
         $partials = array_unique($partials);
 
-        $event->setParam('query', $query);
-        $event->setParam('partials', $partials);
-    }
+        // Check improved/deprecated features.
+        $isSite = $status->isSiteRequest();
+        if ($isSite) {
+            $siteSettings = $services->get('Omeka\Settings\Site');
+            $selectedSearchFields = $siteSettings->get('advancedsearch_search_fields', array_filter($searchFields, fn ($v) => !isset($v['site']) || $v['site']));
+            $isPropertyImproved = (bool) $siteSettings->get('advancedsearch_property_improved');
+            $isMetadataImproved = (bool) $siteSettings->get('advancedsearch_metadata_improved');
+            $isMediaTypeImproved = (bool) $siteSettings->get('advancedsearch_media_type_improved');
+        } else {
+            $settings = $services->get('Omeka\Settings');
+            $selectedSearchFields = $settings->get('advancedsearch_search_fields', $searchFields);
+            $isPropertyImproved = (bool) $settings->get('advancedsearch_property_improved');
+            $isMetadataImproved = (bool) $settings->get('advancedsearch_metadata_improved');
+            $isMediaTypeImproved = (bool) $settings->get('advancedsearch_media_type_improved');
+        }
 
-    /**
-     * Update partials (search fields) to the advanced search form.
-     *
-     * @param Event $event
-     */
-    public function handleViewAdvancedSearchPost(Event $event): void
-    {
-        $config = $this->getServiceLocator()->get('Config');
-        $defaultSearchFields = $config['advancedsearch']['search_fields'];
+        if (!$isPropertyImproved && ($key = array_search('common/advanced-search/properties-improved', $partials)) !== false) {
+            unset($partials[$key]);
+        }
 
-        $view = $event->getTarget();
-        $partials = $event->getParam('partials', []);
-
-        $partials = array_unique($partials);
-
-        // Don't add new partials, only remove existing ones: by default, they
-        // are forbidden partials for sites.
-        $searchFields = $view->siteSetting('advancedsearch_search_fields', $defaultSearchFields) ?: [];
-        foreach ($partials as $key => $partial) {
-            if (isset($defaultSearchFields[$partial]) && !in_array($partial, $searchFields)) {
+        if (!$isMetadataImproved) {
+            if (($key = array_search('common/advanced-search/resource-class-improved', $partials)) !== false) {
+                unset($partials[$key]);
+            }
+            if (($key = array_search('common/advanced-search/resource-template-improved', $partials)) !== false) {
+                unset($partials[$key]);
+            }
+            if (($key = array_search('common/advanced-search/item-sets-improved', $partials)) !== false) {
+                unset($partials[$key]);
+            }
+            if (($key = array_search('common/advanced-search/site-improved', $partials)) !== false) {
+                unset($partials[$key]);
+            }
+            if (($key = array_search('common/advanced-search/owner-improved', $partials)) !== false) {
                 unset($partials[$key]);
             }
         }
+
+        if (!$isMediaTypeImproved && ($key = array_search('common/advanced-search/media-type-improved', $partials)) !== false) {
+            unset($partials[$key]);
+        }
+
+        // Avoid duplicates on improved partials.
+        foreach ($improveds as $improved => $base) {
+            if (($key = array_search($base, $partials)) !== false
+                && array_search($improved, $partials) !== false
+            ) {
+                unset($partials[$key]);
+            }
+        }
+
+        // Reorder, deduplicate the list and filter with selected list.
+        $partials = array_values(array_intersect(array_keys($searchFields), array_unique($partials), $selectedSearchFields));
 
         $event->setParam('partials', $partials);
     }

@@ -21,10 +21,19 @@ class SettingsFieldsetFactory implements FactoryInterface
                 $apiOptions[$searchConfig->id()] = $labelSearchConfig;
             }
         }
+
+        $config = $services->get('Config');
+
+        $listSearchFields = $config['advancedsearch']['search_fields'] ?: [];
+        foreach ($listSearchFields as $key => $searchField) {
+            $listSearchFields[$key] = $searchField['label'] ?? $key;
+        }
+
         $fieldset = new SettingsFieldset(null, $options ?? []);
         return $fieldset
             ->setSearchConfigs($valueOptions)
             ->setSearchConfigsApi($apiOptions)
+            ->setListSearchFields($listSearchFields)
         ;
     }
 }

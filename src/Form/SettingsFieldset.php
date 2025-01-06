@@ -35,6 +35,8 @@ class SettingsFieldset extends Fieldset
 
             ->initImprovedSearch()
 
+            ->initSearchFields()
+
             ->add([
                 'name' => 'advancedsearch_fulltextsearch_alto',
                 'type' => Element\Checkbox::class,

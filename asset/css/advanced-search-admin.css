@@ -2,7 +2,7 @@
  * Manage the simple search field in admin board.
  * Adapted from application/asset/sass/_screen.scss
  */
-@media screen {
+@media all {
     #search-form-quick {
         width: 100%;
         display: inline-block;

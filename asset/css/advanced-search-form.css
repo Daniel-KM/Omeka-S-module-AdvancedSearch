@@ -3,7 +3,7 @@
  *
  * Adapted from application/asset/sass/_screen.scss and application/asset/sass/advanced-search-form.scss.
  */
-@media screen {
+@media all {
     #advanced-search .item-set-select-type + .chosen-container {
         margin: .25rem .25rem 0 0;
         max-width: 25%;

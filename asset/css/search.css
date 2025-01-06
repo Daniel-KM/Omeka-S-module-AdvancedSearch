@@ -1,4 +1,4 @@
-@media screen {
+@media all {
     /* From omeka main styles. */
     .collapse + .collapsible {
         display: block;

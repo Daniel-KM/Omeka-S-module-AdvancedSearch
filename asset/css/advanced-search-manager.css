@@ -1,4 +1,4 @@
-@media screen {
+@media all {
     .search-admin .subhead::before {
         content:"";
     }

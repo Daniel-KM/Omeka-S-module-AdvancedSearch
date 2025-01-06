@@ -2,7 +2,6 @@
 
 namespace AdvancedSearch\Site\BlockLayout;
 
-use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use Laminas\View\Renderer\PhpRenderer;
 use Omeka\Api\Representation\SitePageBlockRepresentation;
 use Omeka\Api\Representation\SitePageRepresentation;
@@ -135,16 +134,19 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
             $query += $filterQuery;
 
             $request = $view->params()->fromQuery();
-            $request = array_filter($request, fn ($v) => $v !== '' && $v !== [] && $v !== null);
-            if ($request) {
-                $request += $filterQuery;
-                $request = $formAdapter->validateRequest($searchConfig, $request) ?: $query;
-            } else {
+            $request = $formAdapter->cleanRequest($request);
+            $isEmptyRequest = $formAdapter->isEmptyRequest($request);
+            if ($isEmptyRequest) {
                 $request = $query + ['page' => 1];
+            } else {
+                $request += $filterQuery;
+                if (!$formAdapter->validateRequest($request)) {
+                    $request = $query;
+                }
             }
             $vars['request'] = $request;
 
-            $result = $formAdapter->toResponse($request, $searchConfig, $site);
+            $result = $formAdapter->toResponse($request, $site);
             if ($result['status'] === 'success') {
                 $vars = array_replace($vars, $result['data']);
             } elseif ($result['status'] === 'error') {

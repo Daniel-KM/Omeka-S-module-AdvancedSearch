@@ -281,9 +281,10 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
      *   - skip_form_action (bool): Don't set form action, so use the current page.
      *   - skip_partial_headers (bool): Skip partial headers.
      *   - skip_values: Does not init form element values (quicker results).
-     *   - variant: Name of a variant of the form, "quick" or "simple", or
-     *     "csrf" (internal use). "quick" has "q", "rft" and hidden elements,
-     *     and "simple" has only "q" and hidden elements.
+     *   - variant: Name of a variant of the form;
+     *     - "quick": only "q", "rft" and hidden elements
+     *     - "simple": only "q" and hidden elements
+     *     - "csrf": for internal use
      *     To use a variant allows a quicker process than a template alone.
      *   Other options are passed to the partial.
      *
@@ -299,6 +300,9 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
 
     /**
      * Render the search filters of the query.
+     *
+     * The search filters are the list of the query arguments used in the
+     * request when the advanced search form is used.
      */
     public function renderSearchFilters(Query $query, array $options = []): string
     {

@@ -41,6 +41,8 @@ use Omeka\Stdlib\Paginator;
 
 abstract class AbstractFormAdapter implements FormAdapterInterface
 {
+    use TraitRequest;
+
     /**
      * @var string|null
      */
@@ -76,7 +78,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
      */
     protected $searchEngine;
 
-    public function setSearchConfig(?SearchConfigRepresentation $searchConfig): self
+    public function setSearchConfig(SearchConfigRepresentation $searchConfig): self
     {
         $this->searchConfig = $searchConfig;
         return $this;
@@ -195,7 +197,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
 
         if (!empty($options['request'])) {
             $form->setData($options['request']);
-            $result = $this->requestToResponse($options['request'], $this->searchConfig, $vars['site']);
+            $result = $this->toResponse($options['request'], $vars['site']);
             if ($result['status'] === 'fail') {
                 return '';
             } elseif ($result['status'] === 'error') {
@@ -612,20 +614,15 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
         return $query;
     }
 
-    public function toResponse(
-        array $request,
-        SearchConfigRepresentation $searchConfig,
-        ?SiteRepresentation $site = null
-    ): array {
-        $this->searchConfig = $searchConfig;
-
+    public function toResponse(array $request, ?SiteRepresentation $site = null): array
+    {
         // The controller may not be available.
-        $services = $searchConfig->getServiceLocator();
+        $services = $this->searchConfig->getServiceLocator();
         $plugins = $services->get('ControllerPluginManager');
         $logger = $services->get('Omeka\Logger');
         $translator = $services->get('MvcTranslator');
 
-        $formAdapterName = $searchConfig->formAdapterName();
+        $formAdapterName = $this->searchConfig->formAdapterName();
         if (!$formAdapterName) {
             $message = new PsrMessage('This search config has no form adapter.'); // @translate
             $logger->err($message->getMessage());
@@ -636,7 +633,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
         }
 
         /** @var \AdvancedSearch\FormAdapter\FormAdapterInterface $formAdapter */
-        $formAdapter = $searchConfig->formAdapter();
+        $formAdapter = $this->searchConfig->formAdapter();
         if (!$formAdapter) {
             $message = new PsrMessage(
                 'Form adapter "{name}" not found.', // @translate
@@ -649,9 +646,10 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
             ];
         }
 
-        $searchConfigSettings = $searchConfig->settings();
+        $searchConfigSettings = $this->searchConfig->settings();
 
-        [$request, $isEmptyRequest] = $this->cleanRequest($request);
+        $request = $formAdapter->cleanRequest($request);
+        $isEmptyRequest = $formAdapter->isEmptyRequest($request);
         if ($isEmptyRequest) {
             // Keep the other arguments of the request (mainly pagination, sort,
             // and facets).
@@ -662,8 +660,8 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
 
         $searchFormSettings = $searchConfigSettings['form'] ?? [];
 
-        $this->searchEngine = $searchConfig->engine();
-        $searchAdapter = $searchConfig->searchAdapter();
+        $this->searchEngine = $this->searchConfig->engine();
+        $searchAdapter = $this->searchConfig->searchAdapter();
         if ($searchAdapter) {
             $availableFields = $searchAdapter->getAvailableFields();
             // Include the specific fields to simplify querying with main form.
@@ -829,7 +827,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
             'request' => $request,
             'query' => $query,
         ]);
-        $eventManager->triggerEvent(new Event('search.query.pre', $searchConfig, $eventArgs));
+        $eventManager->triggerEvent(new Event('search.query.pre', $this->searchConfig, $eventArgs));
         /** @var \AdvancedSearch\Query $query */
         $query = $eventArgs['query'];
 
@@ -870,82 +868,6 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
                 'response' => $response,
             ],
         ];
-    }
-
-    public function cleanRequest(array $request): array
-    {
-        // They should be already removed.
-        unset(
-            $request['csrf'],
-            $request['submit']
-        );
-
-        /**
-         * Remove null, empty array and zero-length values of an array, recursively.
-         */
-        $arrayFilterRecursive = function(array &$array): array {
-            foreach ($array as $key => $value) {
-                if ($value === null || $value === '' || $value === []) {
-                    unset($array[$key]);
-                } elseif (is_array($value)) {
-                    $array[$key] = $this->arrayFilterRecursive($value);
-                    if (!count($array[$key])) {
-                        unset($array[$key]);
-                    }
-                }
-            }
-            return $array;
-        };
-
-        $arrayFilterRecursive($request);
-
-        $checkRequest = array_diff_key(
-            $request,
-            [
-                // @see \Omeka\Api\Adapter\AbstractEntityAdapter::limitQuery().
-                'page' => null,
-                'per_page' => null,
-                'limit' => null,
-                'offset' => null,
-                // @see \Omeka\Api\Adapter\AbstractEntityAdapter::search().
-                'sort_by' => null,
-                'sort_order' => null,
-                // Used by Advanced Search.
-                'resource_type' => null,
-                'sort' => null,
-            ]
-        );
-
-        return [
-            $request,
-            !count($checkRequest),
-        ];
-    }
-
-    public function validateRequest(
-        SearchConfigRepresentation $searchConfig,
-        array $request
-    ) {
-        // Only validate the csrf.
-        // Note: The search engine is used to display item sets too via the mvc
-        // redirection. In that case, there is no csrf element, so no check to
-        // do.
-        // There may be no csrf element for initial query.
-        if (array_key_exists('csrf', $request)) {
-            $form = $searchConfig->form([
-                'variant' => 'csrf',
-            ]);
-            $form->setData($request);
-            if (!$form->isValid()) {
-                $messages = $form->getMessages();
-                if (isset($messages['csrf'])) {
-                    $messenger = $searchConfig->getServiceLocator()->get('ControllerPluginManager')->get('messenger');
-                    $messenger->addError('Invalid or missing CSRF token'); // @translate
-                    return false;
-                }
-            }
-        }
-        return $request;
     }
 
     /**

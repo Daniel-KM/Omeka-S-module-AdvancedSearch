@@ -100,19 +100,15 @@ class SearchController extends AbstractActionController
         $hasForm = $formAdapter ? (bool) $formAdapter->getFormClass() : false;
         $isJsonQuery = !$hasForm;
 
-        // Here, only the csrf is needed, if any.
-        $validateForm = (bool) $searchConfig->subSetting('request', 'validate_form');
-        if ($validateForm) {
-            // Check csrf issue.
-            $request = $formAdapter->validateRequest($searchConfig, $request);
-            if ($request === false) {
-                return $view;
-            }
+        // If wanted, only the csrf is needed and checked, if any.
+        if (!$formAdapter->validateRequest($request)) {
+            return $view;
         }
 
         // Check if the query is empty and use the default query in that case.
         // So the default query is used only on the search config.
-        [$request, $isEmptyRequest] = $formAdapter->cleanRequest($request);
+        $request = $formAdapter->cleanRequest($request);
+        $isEmptyRequest = $formAdapter->isEmptyRequest($request);
         if ($isEmptyRequest) {
             $defaultResults = $searchConfig->subSetting('request', 'default_results') ?: 'default';
             switch ($defaultResults) {
@@ -154,7 +150,7 @@ class SearchController extends AbstractActionController
             $request = $parsedQuery + $request + $parsedQueryPost;
         }
 
-        $result = $formAdapter->toResponse($request, $searchConfig, $site);
+        $result = $formAdapter->toResponse($request, $site);
 
         if ($result['status'] === 'fail') {
             // Currently only "no query".
@@ -478,7 +474,8 @@ class SearchController extends AbstractActionController
 
         // Check if the query is empty and use the default query in that case.
         // So the default query is used only on the search config.
-        [$request, $isEmptyRequest] = $formAdapter->cleanRequest($request);
+        $request = $formAdapter->cleanRequest($request);
+        $isEmptyRequest = $formAdapter->isEmptyRequest($request);
         if ($isEmptyRequest) {
             $defaultResults = $searchConfig->subSetting('request', 'default_results') ?: 'default';
             switch ($defaultResults) {
@@ -514,7 +511,7 @@ class SearchController extends AbstractActionController
             $request = $parsedQuery + $request + $parsedQueryPost;
         }
 
-        $result = $formAdapter->toResponse($request, $searchConfig, $site);
+        $result = $formAdapter->toResponse($request, $site);
         if ($result['status'] === 'fail'
             || $result['status'] === 'error'
         ) {

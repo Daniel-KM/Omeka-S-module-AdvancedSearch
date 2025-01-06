@@ -18,6 +18,8 @@ use Omeka\Api\Representation\SiteRepresentation;
  */
 class ApiFormAdapter implements FormAdapterInterface
 {
+    use TraitRequest;
+
     protected $configFormClass = \AdvancedSearch\Form\Admin\ApiFormConfigFieldset::class;
 
     protected $label = 'Api'; // @translate
@@ -45,7 +47,7 @@ class ApiFormAdapter implements FormAdapterInterface
         $this->easyMeta = $easyMeta;
     }
 
-    public function setSearchConfig(?SearchConfigRepresentation $searchConfig): self
+    public function setSearchConfig(SearchConfigRepresentation $searchConfig): self
     {
         $this->searchConfig = $searchConfig;
         return $this;
@@ -110,96 +112,13 @@ class ApiFormAdapter implements FormAdapterInterface
         return $query;
     }
 
-    public function toResponse(
-        array $request,
-        SearchConfigRepresentation $searchConfig,
-        ?SiteRepresentation $site = null
-    ): array {
+    public function toResponse(array $request, ?SiteRepresentation $site = null): array
+    {
         // TODO ApiFormAdapter::toResponse().
         return [
             'status' => 'error',
             'message' => 'Not implemented. See MainFormAdapter.',
         ];
-    }
-
-    public function cleanRequest(array $request): array
-    {
-        // TODO Factorize ApiFormAdapter::cleanRequest().
-
-        // They should be already removed.
-        unset(
-            $request['csrf'],
-            $request['submit']
-            );
-
-        /**
-         * Remove null, empty array and zero-length values of an array, recursively.
-         */
-        $arrayFilterRecursive = function(array &$array): array {
-            foreach ($array as $key => $value) {
-                if ($value === null || $value === '' || $value === []) {
-                    unset($array[$key]);
-                } elseif (is_array($value)) {
-                    $array[$key] = $this->arrayFilterRecursive($value);
-                    if (!count($array[$key])) {
-                        unset($array[$key]);
-                    }
-                }
-            }
-            return $array;
-        };
-
-        $arrayFilterRecursive($request);
-
-        $checkRequest = array_diff_key(
-            $request,
-            [
-                // @see \Omeka\Api\Adapter\AbstractEntityAdapter::limitQuery().
-                'page' => null,
-                'per_page' => null,
-                'limit' => null,
-                'offset' => null,
-                // @see \Omeka\Api\Adapter\AbstractEntityAdapter::search().
-                'sort_by' => null,
-                'sort_order' => null,
-                // Used by Advanced Search.
-                'resource_type' => null,
-                'sort' => null,
-            ]
-        );
-
-        return [
-            $request,
-            !count($checkRequest),
-        ];
-    }
-
-    public function validateRequest(
-        SearchConfigRepresentation $searchConfig,
-        array $request
-    ) {
-        // TODO Factorize ApiFormAdapter::validateRequest().
-
-        // Only validate the csrf.
-        // Note: The search engine is used to display item sets too via the mvc
-        // redirection. In that case, there is no csrf element, so no check to
-        // do.
-        // There may be no csrf element for initial query.
-        if (array_key_exists('csrf', $request)) {
-            $form = $searchConfig->form([
-                'variant' => 'csrf',
-            ]);
-            $form->setData($request);
-            if (!$form->isValid()) {
-                $messages = $form->getMessages();
-                if (isset($messages['csrf'])) {
-                    $messenger = $searchConfig->getServiceLocator()->get('ControllerPluginManager')->get('messenger');
-                    $messenger->addError('Invalid or missing CSRF token'); // @translate
-                    return false;
-                }
-            }
-        }
-        return $request;
     }
 
     /**

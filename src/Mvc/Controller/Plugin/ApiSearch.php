@@ -234,6 +234,8 @@ class ApiSearch extends AbstractPlugin
      */
     protected function doAdapterSearch(Request $request)
     {
+        // TODO Clarify the process.
+
         // TODO Manage all standard params.
         // See \Omeka\Api\Adapter\AbstractEntityAdapter::search() to normalize params.
         // See \AdvancedSearch\Controller\SearchController::searchAction() for process.

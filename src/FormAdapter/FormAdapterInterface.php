@@ -37,7 +37,7 @@ interface FormAdapterInterface
 {
     public function getLabel(): string;
 
-    public function setSearchConfig(?SearchConfigRepresentation $searchConfig): self;
+    public function setSearchConfig(SearchConfigRepresentation $searchConfig): self;
 
     public function getConfigFormClass(): ?string;
 
@@ -110,17 +110,21 @@ interface FormAdapterInterface
      * @param array $request Validated request.
      * @return array Result with a status, data, and message if error.
      */
-    public function toResponse(array $request, SearchConfigRepresentation $searchConfig, ?SiteRepresentation $site = null): array;
+    public function toResponse(array $request, ?SiteRepresentation $site = null): array;
 
     /**
      * Temporary function during refactoring.
      *
-     * Remove all empty values (zero length strings) and check empty request.
-     *
-     * @return array First key is the cleaned request, the second a bool to
-     * indicate if it is empty.
+     * Remove all empty values (null, zero length strings, empty arrays).
      */
     public function cleanRequest(array $requet): array;
+
+    /**
+     * Temporary function during refactoring.
+     *
+     * Check if a clean request is empty: no value except generic args.
+     */
+    public function isEmptyRequest(array $requet): bool;
 
     /**
      * Temporary function during refactoring.
@@ -132,5 +136,5 @@ interface FormAdapterInterface
      *
      * @todo Clarify process of force validation if it is really useful.
      */
-    public function validateRequest(SearchConfigRepresentation $searchConfig, array $request): bool;
+    public function validateRequest(array $request): bool;
 }

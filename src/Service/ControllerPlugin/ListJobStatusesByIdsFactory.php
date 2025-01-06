@@ -1,15 +1,16 @@
 <?php declare(strict_types=1);
+
 namespace AdvancedSearch\Service\ControllerPlugin;
 
-use AdvancedSearch\Mvc\Controller\Plugin\TotalJobs;
+use AdvancedSearch\Mvc\Controller\Plugin\ListJobStatusesByIds;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
-class TotalJobsFactory implements FactoryInterface
+class ListJobStatusesByIdsFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        return new TotalJobs(
+        return new ListJobStatusesByIds(
             $services->get('Omeka\EntityManager')
         );
     }

@@ -107,20 +107,25 @@ class IndexSearch extends AbstractJob
             return;
         }
 
-        $totalJobs = $services->get('ControllerPluginManager')->get('totalJobs');
-        $totalJobs = $totalJobs(self::class, true);
+        $listJobStatusesByIds = $services->get('ControllerPluginManager')->get('listJobStatusesByIds');
+        $listJobStatusesByIds = $listJobStatusesByIds(self::class, true, null, $this->job->getId());
         $force = $this->getArg('force');
-        if ($totalJobs > 1) {
+        if (count($listJobStatusesByIds)) {
             if (!$force) {
                 $this->logger->err(
-                    'Search index #{search_engine_id} ("{name}"): There are already {total} other jobs "Index Search" and the current one is not forced.', // @translate
-                    ['search_engine_id' => $searchEngine->id(), 'name' => $searchEngine->name(), 'total' => $totalJobs - 1]
+                    'Search index #{search_engine_id} ("{name}"): There are already {total} other jobs "Index Search" (#{list}) and the current one is not forced.', // @translate
+                    [
+                        'search_engine_id' => $searchEngine->id(),
+                        'name' => $searchEngine->name(),
+                        'total' => count($listJobStatusesByIds),
+                        'list' => implode(', #', array_keys($listJobStatusesByIds)),
+                    ]
                 );
                 return;
             }
             $this->logger->warn(
                 'There are already {total} other jobs "Index Search". Slowdowns may occur on the site.', // @translate
-                ['total' => $totalJobs - 1]
+                ['total' => $listJobStatusesByIds]
             );
         }
 

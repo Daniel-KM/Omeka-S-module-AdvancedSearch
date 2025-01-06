@@ -1,10 +1,11 @@
 <?php declare(strict_types=1);
+
 namespace AdvancedSearch\Mvc\Controller\Plugin;
 
 use Doctrine\ORM\EntityManager;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
-class TotalJobs extends AbstractPlugin
+class ListJobStatusesByIds extends AbstractPlugin
 {
     /**
      * @var EntityManager
@@ -20,22 +21,28 @@ class TotalJobs extends AbstractPlugin
     }
 
     /**
-     * Get the number of jobs acoording to their status.
+     * Get the list of jobs statuses according to their status or owner.
      *
-     * @param string $class Job class
+     * @param string $class Job class to filter
      * @param bool|array $statusesOrProcessing If true, running jobs. If false, ended jobs.
      * If array, list of statuses to check.
      * @param int $ownerId
-     * @return int
+     * @param int $excludeJobId
+     * @return array List of job statuses by id.
      */
-    public function __invoke($class = null, $statusesOrProcessing = [], $ownerId = null)
-    {
+    public function __invoke(
+        $class = null,
+        $statusesOrProcessing = [],
+        ?int $ownerId = null,
+        ?int $excludeJobId = null
+    ): array {
         $qb = $this->entityManager->createQueryBuilder();
         $result = $qb
-            ->select('COUNT(job.id)')
+            ->select('job.id', 'job.status')
             ->from(\Omeka\Entity\Job::class, 'job');
         if ($class) {
-            $qb->andWhere($qb->expr()->eq('job.class', ':class'))
+            $qb
+                ->andWhere($qb->expr()->eq('job.class', ':class'))
                 ->setParameter('class', $class);
         }
         if (!is_array($statusesOrProcessing)) {
@@ -56,15 +63,22 @@ class TotalJobs extends AbstractPlugin
         if ($statusesOrProcessing) {
             $connection = $this->entityManager->getConnection();
             $quoted = implode(',', array_map([$connection, 'quote'], $statusesOrProcessing));
-            $qb->andWhere('job.status IN (' . $quoted . ')');
+            $qb
+                ->andWhere('job.status IN (' . $quoted . ')');
         }
         if ($ownerId) {
-            $qb->andWhere($qb->expr()->eq('job.owner_id', 'owner'))
-                ->setParameter('owner', (int) $ownerId);
+            $qb
+                ->andWhere($qb->expr()->eq('job.owner_id', 'owner'))
+                ->setParameter('owner', $ownerId);
+        }
+        if ($excludeJobId) {
+            $qb
+                ->andWhere($qb->expr()->neq('job.id', 'job_id'))
+                ->setParameter('job_id', $excludeJobId);
         }
         $result = $qb
             ->getQuery()
-            ->getSingleScalarResult();
-        return $result;
+            ->getScalarResult();
+        return array_column($result, 'status', 'id');
     }
 }

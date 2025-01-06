@@ -162,8 +162,8 @@ return [
         'factories' => [
             'apiSearch' => Service\ControllerPlugin\ApiSearchFactory::class,
             'apiSearchOne' => Service\ControllerPlugin\ApiSearchOneFactory::class,
+            'listJobStatusesByIds' => Service\ControllerPlugin\ListJobStatusesByIdsFactory::class,
             'searchResources' => Service\ControllerPlugin\SearchResourcesFactory::class,
-            'totalJobs' => Service\ControllerPlugin\TotalJobsFactory::class,
         ],
     ],
     'router' => [

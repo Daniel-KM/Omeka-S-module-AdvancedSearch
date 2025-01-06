@@ -94,20 +94,25 @@ class IndexSuggestions extends AbstractJob
             return;
         }
 
-        $totalJobs = $services->get('ControllerPluginManager')->get('totalJobs');
-        $totalJobs = $totalJobs(self::class, true);
+        $listJobStatusesByIds = $services->get('ControllerPluginManager')->get('listJobStatusesByIds');
+        $listJobStatusesByIds = $listJobStatusesByIds(self::class, true, null, $this->job->getId());
         $force = $this->getArg('force');
-        if ($totalJobs > 1) {
+        if (count($listJobStatusesByIds)) {
             if (!$force) {
                 $this->logger->err(
-                    'Suggester #{search_suggester_id} ("{name}"): There are already {count} other jobs "Index Suggestions" and the current one is not forced.', // @translate
-                    ['search_suggester_id' => $suggester->id(), 'name' => $suggester->name(), 'count' => $totalJobs - 1]
+                    'Suggester #{search_suggester_id} ("{name}"): There are already {total} other jobs "Index Suggestion" (#{list}) and the current one is not forced.', // @translate
+                    [
+                        'search_suggester_id' => $suggester->id(),
+                        'name' => $suggester->name(),
+                        'total' => count($listJobStatusesByIds),
+                        'list' => implode(', #', array_keys($listJobStatusesByIds)),
+                    ]
                 );
                 return;
             }
             $this->logger->warn(
-                'There are already {count} other jobs "Index Suggestions". Slowdowns may occur on the site.', // @translate
-                ['count' => $totalJobs - 1]
+                'There are already {total} other jobs "Index Suggestions". Slowdowns may occur on the site.', // @translate
+                ['total' => $listJobStatusesByIds]
             );
         }
 

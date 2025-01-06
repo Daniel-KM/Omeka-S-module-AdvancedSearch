@@ -3,13 +3,13 @@
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation $resource
  * @var string $resourceLabel
- * @var int $totalJobs
+ * @var array $listJobsStatusesByIds
  * @var string $partialPath
  */
 
 ?>
 
-<?= $this->searchSuggesterConfirm($this->resource, $this->resourceLabel, false, $totalJobs) ?>
+<?= $this->searchSuggesterConfirm($this->resource, $this->resourceLabel, false, $listJobsStatusesByIds) ?>
 <?php if (isset($this->partialPath)): ?>
     <?= $this->partial($this->partialPath) ?>
 <?php endif; ?>

@@ -155,12 +155,12 @@ class SearchEngineController extends AbstractActionController
     {
         $engine = $this->api()->read('search_engines', $this->params('id'))->getContent();
 
-        $totalJobs = $this->totalJobs(\AdvancedSearch\Job\IndexSearch::class, true);
+        $listJobStatusesByIds = $this->listJobStatusesByIds(\AdvancedSearch\Job\IndexSearch::class, true);
 
         $view = new ViewModel([
             'resourceLabel' => 'search index',
             'resource' => $engine,
-            'totalJobs' => $totalJobs,
+            'listJobsStatusesByIds' => $listJobStatusesByIds,
         ]);
         return $view
             ->setTerminal(true)

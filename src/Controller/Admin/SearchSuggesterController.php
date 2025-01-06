@@ -108,12 +108,12 @@ class SearchSuggesterController extends AbstractActionController
     {
         $suggester = $this->api()->read('search_suggesters', $this->params('id'))->getContent();
 
-        $totalJobs = $this->totalJobs(IndexSuggestions::class, true);
+        $listJobStatusesByIds = $this->listJobStatusesByIds(IndexSuggestions::class, true);
 
         $view = new ViewModel([
             'resourceLabel' => 'search suggester',
             'resource' => $suggester,
-            'totalJobs' => $totalJobs,
+            'listJobsStatusesByIds' => $listJobStatusesByIds,
         ]);
         return $view
             ->setTerminal(true)

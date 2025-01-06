@@ -30,11 +30,12 @@ $siteSettings = $services->get('Omeka\Settings\Site');
 $entityManager = $services->get('Omeka\EntityManager');
 
 $config = $services->get('Config');
+$localConfig = require dirname(__DIR__, 2) . '/config/module.config.php';
 
-if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.64')) {
+if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.65')) {
     $message = new \Omeka\Stdlib\Message(
         $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
-        'Common', '3.4.64'
+        'Common', '3.4.65'
     );
     throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
 }
@@ -1802,4 +1803,80 @@ if (version_compare($oldVersion, '3.4.36', '<')) {
             }
         }
     }
+}
+
+if (version_compare($oldVersion, '3.4.37', '<')) {
+    $strings = [
+        "etting('display',",
+    ];
+    $manageModuleAndResources = $this->getManageModuleAndResources();
+    $result = $manageModuleAndResources->checkStringsInFiles($strings, 'themes/*/view/search/*');
+    if ($result) {
+        $message = new PsrMessage(
+            'The search config setting "display" was renamed "results". Check your theme. Matching templates: {json}', // @translate
+            ['json' => json_encode($result, 448)]
+        );
+        $logger->err($message->getMessage(), $message->getContext());
+        $messenger->addError($message);
+    }
+
+    $siteIds = $api->search('sites', [], ['returnScalar' => 'id'])->getContent();
+    foreach ($siteIds as $siteId) {
+        $siteSettings->setTargetId($siteId);
+        $siteSettings->set('advancedsearch_metadata_improved', true);
+        $siteSettings->set('advancedsearch_media_type_improved', true);
+    }
+    $settings->set('advancedsearch_metadata_improved', true);
+    $settings->set('advancedsearch_media_type_improved', true);
+
+    $listSearchFields = $localConfig['advancedsearch']['search_fields'] ?: [];
+    $defaultSelectedSearchFieldsAdmin = [];
+    $defaultSelectedSearchFieldsSite = [];
+    foreach ($listSearchFields as $key => $searchField) {
+        if (!array_key_exists('default_admin', $searchField) || $searchField['default_admin'] === true) {
+            $defaultSelectedSearchFieldsAdmin[] = $key;
+        }
+        if (!array_key_exists('default_site', $searchField) || $searchField['default_site'] === true) {
+            $defaultSelectedSearchFieldsSite[] = $key;
+        }
+    }
+    $settings->set('advancedsearch_search_fields', $defaultSelectedSearchFieldsAdmin);
+    foreach ($siteIds as $siteId) {
+        $siteSettings->setTargetId($siteId);
+        $current = $siteSettings->get('advancedsearch_search_fields', $defaultSelectedSearchFieldsSite);
+        $siteSettings->set('advancedsearch_search_fields', $current ?: $defaultSelectedSearchFieldsSite);
+    }
+
+    $message = new PsrMessage(
+        'New site settings and main settings were added to manage standard search form or improved search elements.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $qb = $connection->createQueryBuilder();
+    $qb
+        ->select('id', 'settings')
+        ->from('search_config', 'search_config')
+        ->orderBy('id', 'asc');
+    $searchConfigsSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    foreach ($searchConfigsSettings as $id => $searchConfigSettings) {
+        $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
+        if (!isset($searchConfigSettings['results'])) {
+            $searchConfigSettings = ['results' => $searchConfigSettings['display'] ?? []] + $searchConfigSettings;
+            unset($searchConfigSettings['display']);
+        }
+        if (!isset($searchConfigSettings['form']['default'])) {
+            $searchConfigSettings = ['form' => ['default' => ['name' => 'default'] + ($searchConfigSettings['form'] ?? [])]] + $searchConfigSettings;
+        }
+        $sql = 'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?;';
+        $connection->executeStatement($sql, [json_encode($searchConfigSettings, 320), $id]);
+    }
+
+    // Engines.
+    $sql = <<<'SQL'
+        UPDATE `search_engine`
+        SET
+            `settings` = REPLACE(`settings`, '"adapter":', '"engine_adapter":')
+        ;
+        SQL;
+    $connection->executeStatement($sql);
 }

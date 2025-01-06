@@ -307,10 +307,24 @@ class SearchResources
      */
     protected $easyMeta;
 
-    public function __construct(Connection $connection, EasyMeta $easyMeta)
-    {
+    /**
+     * Contains two keys: aliases and query_args.
+     *
+     * @var array
+     */
+    protected $searchIndex = [
+        'aliases' => [],
+        'query_args' => [],
+    ];
+
+    public function __construct(
+        Connection $connection,
+        EasyMeta $easyMeta,
+        array $searchIndex
+    ) {
         $this->connection = $connection;
         $this->easyMeta = $easyMeta;
+        $this->searchIndex = $searchIndex;
     }
 
     public function __invoke(): self
@@ -445,6 +459,8 @@ class SearchResources
      */
     public function buildInitialQuery(QueryBuilder $qb, array $query): void
     {
+        $query = $this->expandFieldQueryArgs($query);
+
         // Process advanced search plus features.
         $this
             // Override for multiple sites. Replaced upstream by "in_sites".
@@ -915,6 +931,36 @@ class SearchResources
             }
         }
 
+        return $query;
+    }
+
+    /**
+     * Copy:
+     * @see \AdvancedSearch\View\Helper\SearchFilters::expandFieldQueryArgs()
+     * @see \AdvancedSearch\Stdlib\SearchResources::expandFieldQueryArgs()
+     */
+    protected function expandFieldQueryArgs(array $query): array
+    {
+        foreach ($query as $field => $value) {
+            if (isset($this->searchIndex['query_args'][$field])) {
+                $query['filter'][] = [
+                    'join' => $this->searchIndex['query_args'][$field]['join'] ?? 'and',
+                    'field' => $this->searchIndex['aliases'][$field]['fields'] ?? $field,
+                    'type' => $this->searchIndex['query_args'][$field]['type'] ?? 'eq',
+                    'val' => $value,
+                    'datatype' => $this->searchIndex['query_args'][$field]['datatype'] ?? null,
+                ];
+                unset($query[$field]);
+            } elseif ($term = $this->easyMeta->propertyTerm($field)) {
+                $query['filter'][] = [
+                    'join' => 'and',
+                    'field' => $term,
+                    'type' =>'eq',
+                    'val' => $value,
+                ];
+                unset($query[$field]);
+            }
+        }
         return $query;
     }
 

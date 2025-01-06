@@ -589,13 +589,13 @@ class SearchConfigConfigureForm extends Form
 
         $this
             ->add([
-                'name' => 'display',
+                'name' => 'results',
                 'type' => Fieldset::class,
                 'options' => [
-                    'label' => 'Display', // @translate
+                    'label' => 'Results', // @translate
                 ],
             ])
-            ->get('display')
+            ->get('results')
             ->add([
                 'name' => 'by_resource_type',
                 'type' => Element\Checkbox::class,
@@ -1180,9 +1180,9 @@ class SearchConfigConfigureForm extends Form
             ;
         }
 
-        if ($inputFilter->has('display')) {
+        if ($inputFilter->has('results')) {
             $inputFilter
-                ->get('display')
+                ->get('results')
                 ->add([
                     'name' => 'label_sort',
                     'required' => false,

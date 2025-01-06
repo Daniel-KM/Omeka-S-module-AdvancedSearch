@@ -212,12 +212,21 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
             $name = $news[$name] ?? $name;
             $logger->err($message->getMessage(), $message->getContext());
             return ['q', $name, $subName];
+        } elseif ($mainName === 'display') {
+            $services = $this->getServiceLocator();
+            $logger = $services->get('Omeka\Logger');
+            $message = new PsrMessage(
+                'The search config setting "{display}" was renamed "{results}". You should update your theme.', // @translate
+                ['old' => 'display', 'new' => 'results']
+            );
+            $logger->err($message->getMessage(), $message->getContext());
+            return ['results', $name, $subName];
         } elseif ($mainName === 'sort') {
             $services = $this->getServiceLocator();
             $logger = $services->get('Omeka\Logger');
             $message = new PsrMessage(
                 'The search config setting "{old}" was renamed "{new}". You should update your theme.', // @translate
-                ['old' => 'sort', 'new' => 'display']
+                ['old' => 'sort', 'new' => 'results']
             );
             if ($name === 'label') {
                 $name = 'label_sort';
@@ -225,7 +234,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
                 $name = 'sort_list';
             }
             $logger->err($message->getMessage(), $message->getContext());
-            return ['display', $name, $subName];
+            return ['results', $name, $subName];
         }
         return [$mainName, $name, $subName];
     }

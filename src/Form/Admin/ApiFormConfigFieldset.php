@@ -348,7 +348,9 @@ class ApiFormConfigFieldset extends Fieldset
             'index',
             // The form is overwrittable.
             // 'form',
+            // TODO Remove display?
             'display',
+            'results',
             'sort',
             'facet',
         ];

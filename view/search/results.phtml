@@ -37,19 +37,19 @@ $untitled = $translate('[Untitled]');
 $headingTerm = $setting('browse_heading_property_term');
 $bodyTerm = $setting('browse_body_property_term');
 
-$gridListMode = $searchConfig->subSetting('display', 'grid_list_mode', 'auto');
+$gridListMode = $searchConfig->subSetting('results', 'grid_list_mode', 'auto');
 
 // A list does not have html-code in a consistant user interface.
-$allowHtml = (bool) $searchConfig->subSetting('display', 'allow_html');
+$allowHtml = (bool) $searchConfig->subSetting('results', 'allow_html');
 
-$thumbnailMode = $searchConfig->subSetting('display', 'thumbnail_mode', 'default');
+$thumbnailMode = $searchConfig->subSetting('results', 'thumbnail_mode', 'default');
 $noThumbnail = $thumbnailMode === 'none';
 $allThumbnail = $thumbnailMode === 'all';
 $defaultThumbnail = $allThumbnail
     ? sprintf('<img loading="lazy" src="%1$s" title="%2$s"/>', $assetUrl('thumbnails/default.png', 'Omeka', true), $translate('No media'))
     : '';
 
-$thumbnailType = $searchConfig->subSetting('display', 'thumbnail_type', 'medium');
+$thumbnailType = $searchConfig->subSetting('results', 'thumbnail_type', 'medium');
 ?>
 
 <ul class="resource-list search-results-list<?= $gridListMode === 'list_only' ? ' list' : ($gridListMode === 'grid_only' ? ' grid' : '') ?>">

@@ -188,7 +188,7 @@ class SearchRequestToResponse extends AbstractPlugin
             $query->setSiteId($site->id());
         }
 
-        $query->setByResourceType(!empty($searchConfigSettings['display']['by_resource_type']));
+        $query->setByResourceType(!empty($searchConfigSettings['results']['by_resource_type']));
 
         // Check resources.
         $resourceTypes = $query->getResourceTypes();
@@ -355,7 +355,7 @@ class SearchRequestToResponse extends AbstractPlugin
      */
     protected function getSortOptions(): array
     {
-        $sortFieldsSettings = $this->searchConfig->subSetting('display', 'sort_list', []);
+        $sortFieldsSettings = $this->searchConfig->subSetting('results', 'sort_list', []);
         if (empty($sortFieldsSettings)) {
             return [];
         }

@@ -71,7 +71,7 @@ $variables = $vars->getArrayCopy();
 $isPartial = $skipFormAction = !empty($skipFormAction);
 
 $documentCount = $response->getTotalResults();
-$displayParts = $searchConfig->setting('display', []);
+$displayParts = $searchConfig->setting('results', []);
 $displayPartsHeader = array_filter($displayParts, fn ($v) => in_array($v, ['header', 'both']));
 $displayPartsFooter = array_filter($displayParts, fn ($v) => in_array($v, ['footer', 'both']));
 $displayFacets = $displayParts ? $displayParts['facets'] ?? 'before' : 'none';
@@ -91,7 +91,7 @@ $this->headScript()
 ?>
 
 <?php if (empty($isPartial)): ?>
-<?php if ($searchConfig->subSetting('display', 'breadcrumbs')): ?>
+<?php if ($searchConfig->subSetting('results', 'breadcrumbs')): ?>
 <?php if ($breadcrumbs): ?>
     <?= $breadcrumbs() ?>
 <?php else: ?>
@@ -177,7 +177,7 @@ $this->headScript()
             <?php elseif (empty($query) && $itemSet): ?>
             <?= $translate('This item set has no items.') ?>
             <?php else: ?>
-            <?php if (in_array($searchConfig->subSetting('display', 'search_filters', 'header'), ['header', 'both'])): ?>
+            <?php if (in_array($searchConfig->subSetting('results', 'search_filters', 'header'), ['header', 'both'])): ?>
             <div class="search-results-part search-results-header">
                 <?= $searchConfig->renderSearchFilters($query, ['template' => 'common/search-filters-links']) ?>
             </div>

@@ -635,12 +635,12 @@ class SearchConfigController extends AbstractActionController
         $params['form']['advanced'] = $advanced;
 
         $sortList = [];
-        foreach ($params['display']['sort_list'] ?? [] as $sort) {
+        foreach ($params['results']['sort_list'] ?? [] as $sort) {
             if (!empty($sort['name'])) {
                 $sortList[$sort['name']] = $sort;
             }
         }
-        $params['display']['sort_list'] = $sortList;
+        $params['results']['sort_list'] = $sortList;
 
         $facetMode = in_array($params['facet']['mode'] ?? null, ['link', 'js']) ? $params['facet']['mode'] : 'button';
         $warnLanguage = false;
@@ -767,7 +767,7 @@ class SearchConfigController extends AbstractActionController
 
         $collections = [
             'form' => 'filters',
-            'display' => 'sort_list',
+            'results' => 'sort_list',
             'facet' => 'facets',
         ];
         foreach ($collections as $mainName => $name) {

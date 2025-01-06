@@ -463,7 +463,7 @@ return [
             ],
         ],
 
-        'display' => [
+        'results' => [
             'by_resource_type' => false,
             'template' => null,
             'breadcrumbs' => false,

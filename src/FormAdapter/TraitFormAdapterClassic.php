@@ -90,15 +90,16 @@ trait TraitFormAdapterClassic
 
         if (!empty($options['request'])) {
             $form->setData($options['request']);
-            $result = $this->toResponse($options['request'], $vars['site']);
-            if ($result['status'] === 'fail') {
-                return '';
-            } elseif ($result['status'] === 'error') {
-                $this->messenger()->addError($result['message']);
+            $response = $this->toResponse($options['request'], $vars['site']);
+            if (!$response->isSuccess()) {
+                $msg = $response->getMessage();
+                if ($msg) {
+                    $this->messenger()->addError($msg);
+                }
                 return '';
             }
-            // Data contain query and response.
-            $vars = $result['data'] + $vars;
+            $vars['query'] = $response->getQuery();
+            $vars['response'] = $response;
         }
 
         $vars['form'] = $form;
@@ -507,7 +508,7 @@ trait TraitFormAdapterClassic
         return $query;
     }
 
-    public function toResponse(array $request, ?SiteRepresentation $site = null): array
+    public function toResponse(array $request, ?SiteRepresentation $site = null): Response
     {
         /**
          * The controller may not be available.
@@ -527,28 +528,31 @@ trait TraitFormAdapterClassic
         $userIsAllowed = $plugins->get('userIsAllowed');
         $fallbackSettings = $services->get('Omeka\Settings\Fallback');
 
+        $response = new Response();
+
         $formAdapterName = $this->searchConfig->formAdapterName();
         if (!$formAdapterName) {
-            $message = new PsrMessage('This search config has no form adapter.'); // @translate
-            $logger->err($message->getMessage());
-            return [
-                'status' => 'error',
-                'message' => $message->setTranslator($translator),
-            ];
+            $message = new PsrMessage(
+                'The search config {search_config} has no form adapter.', // @translate
+                ['search_config' => $this->searchConfig->getLabel()]
+            );
+            $logger->err($message->getMessage(), $message->getContext());
+            return $response
+                ->setIsSuccess(false)
+                ->setMessage($message->setTranslator($translator));
         }
 
         /** @var \AdvancedSearch\FormAdapter\FormAdapterInterface $formAdapter */
         $formAdapter = $this->searchConfig->formAdapter();
         if (!$formAdapter) {
             $message = new PsrMessage(
-                'Form adapter "{name}" not found.', // @translate
-                ['name' => $formAdapterName]
+                'The search config {search_config} has a unavailable form adapter {form_adapter}.', // @translate
+                ['search_config' => $this->searchConfig->getLabel(), 'form_adapter' => $formAdapterName]
             );
             $logger->err($message->getMessage(), $message->getContext());
-            return [
-                'status' => 'error',
-                'message' => $message->setTranslator($translator),
-            ];
+            return $response
+                ->setIsSuccess(false)
+                ->setMessage($message->setTranslator($translator));
         }
 
         $searchConfigSettings = $this->searchConfig->settings();
@@ -733,10 +737,9 @@ trait TraitFormAdapterClassic
                 ['message' => $e->getMessage(), 'json_query' => json_encode($query->jsonSerialize(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)]
             );
             $logger->err($message->getMessage(), $message->getContext());
-            return [
-                'status' => 'error',
-                'message' => $message->setTranslator($translator),
-            ];
+            return $response
+                ->setIsSuccess(false)
+                ->setMessage($message->setTranslator($translator));
         }
 
         // Order facet according to settings of the search page.
@@ -749,13 +752,9 @@ trait TraitFormAdapterClassic
         $totalResults = array_map(fn ($resource) => $response->getResourceTotalResults($resource), $searchEngineSettings['resource_types']);
         $plugins->get('paginator')(max($totalResults), $query->getPage() ?: 1, $query->getPerPage());
 
-        return [
-            'status' => 'success',
-            'data' => [
-                'query' => $query,
-                'response' => $response,
-            ],
-        ];
+        return $response
+            ->setIsSuccess(true)
+            ->setQuery($query);
     }
 
     /**

@@ -146,13 +146,17 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
             }
             $vars['request'] = $request;
 
-            $result = $formAdapter->toResponse($request, $site);
-            if ($result['status'] === 'success') {
-                $vars = array_replace($vars, $result['data']);
-            } elseif ($result['status'] === 'error') {
-                $plugins = $block->getServiceLocator()->get('ControllerPluginManager');
-                $messenger = $plugins->get('messenger');
-                $messenger->addError($result['message']);
+            $response = $formAdapter->toResponse($request, $site);
+            if ($response->isSuccess()) {
+                $vars['query'] = $response->getQuery();
+                $vars['response'] = $response;
+            } else {
+                $msg = $response->getMessage();
+                if ($msg) {
+                    $plugins = $block->getServiceLocator()->get('ControllerPluginManager');
+                    $messenger = $plugins->get('messenger');
+                    $messenger->addError($msg);
+                }
             }
         }
 

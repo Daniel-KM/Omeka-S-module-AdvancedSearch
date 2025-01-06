@@ -79,9 +79,9 @@ class SearchController extends AbstractActionController
         // TODO Factorize with rss output below.
         /** @see \AdvancedSearch\FormAdapter\AbstractFormAdapter::renderForm() */
         $view = new ViewModel([
+            'site' => $site,
             // The form is set via searchConfig.
             'searchConfig' => $searchConfig,
-            'site' => $site,
             // Set a default empty query and response to simplify view.
             // They will be filled in formAdapter.
             'query' => new Query,
@@ -130,12 +130,15 @@ class SearchController extends AbstractActionController
             if ($defaultQuery === '' && $defaultQueryPost === '') {
                 if ($isJsonQuery) {
                     return new JsonModel([
-                        'status' => 'error',
-                        'message' => 'No query.', // @translate
+                        'status' => 'fail',
+                        'data' => [
+                            'query' => $this->translate('No query.'), // @translate
+                        ],
                     ]);
                 }
                 return $view;
             }
+
             $parsedQuery = [];
             if ($defaultQuery) {
                 parse_str($defaultQuery, $parsedQuery);
@@ -150,46 +153,23 @@ class SearchController extends AbstractActionController
             $request = $parsedQuery + $request + $parsedQueryPost;
         }
 
-        $result = $formAdapter->toResponse($request, $site);
-
-        if ($result['status'] === 'fail') {
-            // Currently only "no query".
+        $response = $formAdapter->toResponse($request, $site);
+        if (!$response->isSuccess()) {
+            $this->getResponse()->setStatusCode(\Laminas\Http\Response::STATUS_CODE_500);
+            $msg = $response->getMessage();
             if ($isJsonQuery) {
                 return new JsonModel([
                     'status' => 'error',
-                    'message' => 'No query.', // @translate
+                    'message' => $this->translate($msg ?: 'An error occurred.'), // @translate
                 ]);
             }
-            return $view;
-        }
-
-        if ($result['status'] === 'error') {
-            if ($isJsonQuery) {
-                return new JsonModel($result);
+            if ($msg) {
+                $this->messenger()->addError($msg);
             }
-            $this->messenger()->addError($result['message']);
             return $view;
         }
 
         if ($isJsonQuery) {
-            /** @var \AdvancedSearch\Response $response */
-            $response = $result['data']['response'];
-            if (!$response) {
-                $this->getResponse()->setStatusCode(\Laminas\Http\Response::STATUS_CODE_500);
-                return new JsonModel([
-                    'status' => 'error',
-                    'message' => 'An error occurred.', // @translate
-                ]);
-            }
-
-            if (!$response->isSuccess()) {
-                $this->getResponse()->setStatusCode(\Laminas\Http\Response::STATUS_CODE_500);
-                return new JsonModel([
-                    'status' => 'error',
-                    'message' => $response->getMessage(),
-                ]);
-            }
-
             $searchEngineSettings = $searchConfig->searchEngine()->settings();
             $result = [];
             foreach ($searchEngineSettings['resource_types'] as $resourceType) {
@@ -201,8 +181,8 @@ class SearchController extends AbstractActionController
         $vars = [
             'searchConfig' => $searchConfig,
             'site' => $site,
-            'query' => $result['data']['query'],
-            'response' => $result['data']['response'],
+            'query' => $response->getQuery(),
+            'response' => $response,
         ];
 
         return $view
@@ -511,16 +491,9 @@ class SearchController extends AbstractActionController
             $request = $parsedQuery + $request + $parsedQueryPost;
         }
 
-        $result = $formAdapter->toResponse($request, $site);
-        if ($result['status'] === 'fail'
-            || $result['status'] === 'error'
-        ) {
-            return;
-        }
-
         /** @var \AdvancedSearch\Response $response */
-        $response = $result['data']['response'];
-        if (!$response) {
+        $response = $formAdapter->toResponse($request, $site);
+        if (!$response->isSuccess()) {
             return;
         }
 

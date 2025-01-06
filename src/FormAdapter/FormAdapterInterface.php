@@ -31,6 +31,8 @@
 namespace AdvancedSearch\FormAdapter;
 
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
+use AdvancedSearch\Query;
+use AdvancedSearch\Response;
 use Omeka\Api\Representation\SiteRepresentation;
 
 interface FormAdapterInterface
@@ -100,7 +102,7 @@ interface FormAdapterInterface
      * @param array $formSettings The specific settings of the form page.
      * @return \AdvancedSearch\Query The normalized query of the module Search.
      */
-    public function toQuery(array $request, array $formSettings): \AdvancedSearch\Query;
+    public function toQuery(array $request, array $formSettings): Query;
 
     /**
      * Get response from a search request.
@@ -108,9 +110,10 @@ interface FormAdapterInterface
      * @uses self::toQuery().
      *
      * @param array $request Validated request.
+     * @param SiteRepresentation $site When set, limit the query to the site.
      * @return array Result with a status, data, and message if error.
      */
-    public function toResponse(array $request, ?SiteRepresentation $site = null): array;
+    public function toResponse(array $request, ?SiteRepresentation $site = null): Response;
 
     /**
      * Temporary function during refactoring.

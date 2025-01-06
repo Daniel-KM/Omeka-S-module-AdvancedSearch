@@ -3,6 +3,7 @@
 namespace AdvancedSearch\FormAdapter;
 
 use AdvancedSearch\Query;
+use AdvancedSearch\Response;
 use AdvancedSearch\Stdlib\SearchResources;
 use Common\Stdlib\EasyMeta;
 use Doctrine\DBAL\Connection;
@@ -61,13 +62,12 @@ class ApiFormAdapter extends AbstractFormAdapter implements FormAdapterInterface
         return $query;
     }
 
-    public function toResponse(array $request, ?SiteRepresentation $site = null): array
+    public function toResponse(array $request, ?SiteRepresentation $site = null): Response
     {
-        // TODO ApiFormAdapter::toResponse().
-        return [
-            'status' => 'error',
-            'message' => 'Not implemented. See MainFormAdapter.',
-        ];
+        $response = new Response();
+        return $response
+            ->setIsSuccess(false)
+            ->setMessage('Not implemented in this form adapter.'); // @translate
     }
 
     /**

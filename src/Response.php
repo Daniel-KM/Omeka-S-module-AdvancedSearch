@@ -44,6 +44,11 @@ class Response implements JsonSerializable
     protected $api;
 
     /**
+     * @var \AdvancedSearch\Query
+     */
+    protected $query;
+
+    /**
      * @var bool
      */
     protected $isSuccess = false;
@@ -113,6 +118,17 @@ class Response implements JsonSerializable
     {
         $this->api = $api;
         return $this;
+    }
+
+    public function setQuery(Query $query): self
+    {
+        $this->query = $query;
+        return $this;
+    }
+
+    public function getQuery(): ?Query
+    {
+        return $this->query;
     }
 
     public function setIsSuccess(bool $isSuccess): self

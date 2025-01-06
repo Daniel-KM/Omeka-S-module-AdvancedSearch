@@ -30,6 +30,7 @@
 
 namespace AdvancedSearch\Api\Representation;
 
+use AdvancedSearch\EngineAdapter\EngineAdapterInterface;
 use AdvancedSearch\Indexer\NoopIndexer;
 use AdvancedSearch\Querier\NoopQuerier;
 use Omeka\Api\Representation\AbstractEntityRepresentation;
@@ -91,7 +92,7 @@ class SearchEngineRepresentation extends AbstractEntityRepresentation
         return base_convert((string) $this->id(), 10, 36);
     }
 
-    public function engineAdapter(): ?\AdvancedSearch\EngineAdapter\EngineAdapterInterface
+    public function engineAdapter(): ?EngineAdapterInterface
     {
         $name = $this->resource->getAdapter();
         $engineAdapterManager = $this->getServiceLocator()->get('AdvancedSearch\EngineAdapterManager');

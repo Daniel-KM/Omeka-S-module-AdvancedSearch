@@ -430,7 +430,6 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
 
         $query->setQuery($q);
 
-
         // TODO Manage roles from modules and visibility from modules (access resources).
         // FIXME Researcher and author may not access all private resources. So index resource owners and roles?
         // Default is public only.

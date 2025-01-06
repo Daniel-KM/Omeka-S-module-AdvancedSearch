@@ -2542,7 +2542,7 @@ class SearchResources
             $itemSetIds = is_array($query['item_set_id'])
                 ? array_values($query['item_set_id'])
                 : [$query['item_set_id']];
-                $itemSetAlias = $this->adapter->createAlias();
+            $itemSetAlias = $this->adapter->createAlias();
             if (array_values($itemSetIds) === [0]) {
                 $qb
                     ->leftJoin(

@@ -19,7 +19,7 @@ trait TraitRequest
          * Remove null, empty array and zero-length values of an array, recursively.
          */
         $arrayFilterRecursive = null;
-        $arrayFilterRecursive = function(array &$array) use (&$arrayFilterRecursive): array {
+        $arrayFilterRecursive = function (array &$array) use (&$arrayFilterRecursive): array {
             foreach ($array as $key => $value) {
                 if ($value === null || $value === '' || $value === []) {
                     unset($array[$key]);
@@ -36,8 +36,8 @@ trait TraitRequest
         return $arrayFilterRecursive($request);
     }
 
-   public function isEmptyRequest(array $request): bool
-   {
+    public function isEmptyRequest(array $request): bool
+    {
         $checkRequest = array_diff_key(
             $request,
             [

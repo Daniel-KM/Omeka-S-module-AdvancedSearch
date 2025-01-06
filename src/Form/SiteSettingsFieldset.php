@@ -5,7 +5,6 @@ namespace AdvancedSearch\Form;
 use Common\Form\Element as CommonElement;
 use Laminas\Form\Fieldset;
 use Omeka\Form\Element as OmekaElement;
-use Omeka\Settings\AbstractSettings;
 
 class SiteSettingsFieldset extends Fieldset
 {

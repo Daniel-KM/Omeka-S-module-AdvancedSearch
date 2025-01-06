@@ -813,11 +813,11 @@ class Module extends AbstractModule
             ->select(['omeka_root.id' => 'omeka_root.' . $scalarField])
             ->addSelect($matchOrder . ' AS HIDDEN orderMatch')
             ->addGroupBy('orderMatch');
-         $content = array_column($fixQb->getQuery()->getScalarResult(), $scalarField, 'id');
+        $content = array_column($fixQb->getQuery()->getScalarResult(), $scalarField, 'id');
 
-         // The response is not yet available, so store results as options of
-         // the request.
-         $request
+        // The response is not yet available, so store results as options of
+        // the request.
+        $request
             ->setOption('results', $content)
             ->setOption('total_results', count($content));
 
@@ -1003,7 +1003,7 @@ class Module extends AbstractModule
             }
             if (in_array('common/advanced-search/media-type-improved', $partials) && array_key_exists('media_type', $query) && !is_array($query['media_type'])) {
                 $query['media_type'] = (array) $query['media_type'];
-            } elseif (in_array('common/advanced-search/media-type', $partials)  && array_key_exists('media_type', $query) && is_array($query['media_type'])) {
+            } elseif (in_array('common/advanced-search/media-type', $partials) && array_key_exists('media_type', $query) && is_array($query['media_type'])) {
                 $query['media_type'] = $query['media_type'] ? reset($query['media_type']) : '';
             }
             if (array_key_exists('owner_id', $query) && is_array($query['owner_id'])) {
@@ -1470,7 +1470,7 @@ class Module extends AbstractModule
         $searchConfig = null;
         if ($searchConfigId) {
             try {
-                $searchConfig = $api->read('search_configs', [is_numeric($searchConfigId) ? 'id' : 'slug'  => $searchConfigId])->getContent();
+                $searchConfig = $api->read('search_configs', [is_numeric($searchConfigId) ? 'id' : 'slug' => $searchConfigId])->getContent();
             } catch (\Exception $e) {
             }
         }

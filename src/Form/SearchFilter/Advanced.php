@@ -90,7 +90,7 @@ class Advanced extends Fieldset
                 'type' => Element\Select::class,
                 'options' => [
                     'value_options' => $filterFields,
-                ]  + ($filterOptions['field']['options'] ?? []),
+                ] + ($filterOptions['field']['options'] ?? []),
                 'attributes' => [
                     'value' => (string) key($filterFields),
                     // TODO Manage width for chosen select (but useless: the number of options is small).

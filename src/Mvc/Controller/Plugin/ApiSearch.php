@@ -299,6 +299,7 @@ class ApiSearch extends AbstractPlugin
             && $engineAdapter instanceof \SearchSolr\EngineAdapter\Solarium;
 
         $searchFormSettings['aliases'] = $this->searchConfig->subSetting('index', 'aliases', []);
+        $searchFormSettings['fields_query_args'] = $this->searchConfig->subSetting('index', 'query_args', []);
         $searchFormSettings['remove_diacritics'] = (bool) $this->searchConfig->subSetting('q', 'remove_diacritics', false);
         $searchFormSettings['default_search_partial_word'] = (bool) $this->searchConfig->subSetting('q', 'default_search_partial_word', false);
 

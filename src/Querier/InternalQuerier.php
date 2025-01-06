@@ -262,6 +262,7 @@ class InternalQuerier extends AbstractQuerier
     {
         // TODO Manage site id and item set id and any other filter query.
         // TODO Use the full text search table.
+        // TODO Manage the field query args for suggestion.
 
         $mapResourcesToClasses = [
             'items' => \Omeka\Entity\Item::class,
@@ -793,6 +794,7 @@ class InternalQuerier extends AbstractQuerier
                 continue 2;
 
             case $inListForFacets:
+                // TODO Facets does not manage field query args.
                 $fieldData = $this->query->getFacet($fieldName);
                 if (!$fieldData) {
                     break;
@@ -802,7 +804,6 @@ class InternalQuerier extends AbstractQuerier
                 if (!$field) {
                     break;
                 }
-                // "In list" is used for facets.
                 $firstKey = key($values);
                 // Check for a facet range.
                 if (count($values) <= 2 && ($firstKey === 'from' || $firstKey === 'to')) {
@@ -823,20 +824,34 @@ class InternalQuerier extends AbstractQuerier
                         ];
                     }
                 } else {
-                    $this->args['filter'][] = [
-                        'join' => 'and',
-                        'field' => $field,
-                        'type' => 'list',
-                        'val' => $flatArray($values),
-                    ];
+                    $fieldQueryArgs = $this->query->getFieldQueryArgs($fieldName);
+                    if ($fieldQueryArgs) {
+                        $this->args['filter'][] = [
+                            'join' => $fieldQueryArgs['join'] ?? 'and',
+                            'field' => $field,
+                            'type' => $fieldQueryArgs['type'] ?? 'list',
+                            'val' => $flatArray($values),
+                            'datatype' => $fieldQueryArgs['datatype'] ?? null,
+                        ];
+                    } else {
+                        $this->args['filter'][] = [
+                            'join' => 'and',
+                            'field' => $field,
+                            'type' => 'list',
+                            'val' => $flatArray($values),
+                        ];
+                    }
                 }
                 break;
 
             default:
+                // Normally, the fields are already converted in standard
+                // advanced search form.
                 $field = $this->fieldToIndex($fieldName);
                 if (!$field) {
                     break;
                 }
+                $fieldQueryArgs = $this->query->getFieldQueryArgs($fieldName);
                 foreach ($values as $value) {
                     if (is_array($value)) {
                         // Skip date range queries (for hidden queries).
@@ -854,19 +869,39 @@ class InternalQuerier extends AbstractQuerier
                         ) {
                             continue;
                         }
-                        $this->args['filter'][] = [
-                            'join' => 'and',
-                            'field' => $field,
-                            'type' => 'list',
-                            'val' => $value,
-                        ];
+                        if ($fieldQueryArgs) {
+                            $this->args['filter'][] = [
+                                'join' => $fieldQueryArgs['join'] ?? 'and',
+                                'field' => $field,
+                                'type' => $fieldQueryArgs['type'] ?? 'list',
+                                'val' => $value,
+                                'datatype' => $fieldQueryArgs['datatype'] ?? null,
+                            ];
+                        } else {
+                            $this->args['filter'][] = [
+                                'join' => 'and',
+                                'field' => $field,
+                                'type' => 'list',
+                                'val' => $value,
+                            ];
+                        }
                     } else {
-                        $this->args['filter'][] = [
-                            'join' => 'and',
-                            'field' => $field,
-                            'type' => 'eq',
-                            'val' => $value,
-                        ];
+                        if ($fieldQueryArgs) {
+                            $this->args['filter'][] = [
+                                'join' => $fieldQueryArgs['join'] ?? 'and',
+                                'field' => $field,
+                                'type' => $fieldQueryArgs['type'] ?? 'eq',
+                                'val' => $value,
+                                'datatype' => $fieldQueryArgs['datatype'] ?? null,
+                            ];
+                        } else {
+                            $this->args['filter'][] = [
+                                'join' => 'and',
+                                'field' => $field,
+                                'type' => 'eq',
+                                'val' => $value,
+                            ];
+                        }
                     }
                 }
                 break;
@@ -1042,6 +1077,8 @@ class InternalQuerier extends AbstractQuerier
     /**
      * Convert a name with an underscore into a standard term.
      *
+     * The input name should not be a term (should be checked before).
+     *
      * Manage dcterms_subject_ss, ss_dcterms_subject, etc. from specific search
      * forms, so they can be used with the internal querier without change.
      *
@@ -1054,18 +1091,13 @@ class InternalQuerier extends AbstractQuerier
 
         // Quick check for adapted forms.
         $name = (string) $name;
-        if (strpos($name, ':') || !strpos($name, '_')) {
-            return $name;
-        }
-
-        // A common name for Omeka resources.
-        if ($name === 'title') {
-            return 'dcterms:title';
-        }
-
-        if (is_null($underscoredTerms)) {
+        if ($underscoredTerms === null) {
             $underscoredTerms = $this->getUnderscoredUsedProperties();
             $underscoredTermsRegex = '~(?:' . implode('|', array_keys($underscoredTerms)) . '){1}~';
+        }
+
+        if (isset($underscoredTerms[$name])) {
+            return $underscoredTerms[$name];
         }
 
         $matches = [];

@@ -62,6 +62,11 @@ class Query implements JsonSerializable
     protected $aliases = [];
 
     /**
+     * @var array
+     */
+    protected $fieldsQueryArgs;
+
+    /**
      * @var bool
      */
     protected $isPublic = true;
@@ -243,6 +248,47 @@ class Query implements JsonSerializable
     public function getAliases(): array
     {
         return $this->aliases;
+    }
+
+    public function getAlias(string $alias): ?array
+    {
+        return $this->aliases[$alias] ?? null;
+    }
+
+/**
+     * Allow to manage a list of simple query arguments with a specific query.
+     *
+     * For example "author[]=Bossuet&author[]=Rabelais" can be expanded to:
+     * ```
+     *  filter => [[
+     *      join => and,
+     *      field => [
+     *          dcterms:creator,
+     *          dcterms:contributor,
+     *      ],
+     *      type => res,
+     *      val => [
+     *          Bossuet,
+     *          Rabelais,
+     *       ],
+     *  ]]
+     * ```
+     * The default expansion is: join = and, type = eq.
+     */
+    public function setFieldsQueryArgs(array $fieldsQueryArgs): self
+    {
+        $this->fieldsQueryArgs = $fieldsQueryArgs;
+        return $this;
+    }
+
+    public function getFieldsQueryArgs(): array
+    {
+        return $this->fieldsQueryArgs;
+    }
+
+    public function getFieldQueryArgs(string $field): ?array
+    {
+        return $this->fieldsQueryArgs[$field] ?? null;
     }
 
     public function setIsPublic($isPublic): self
@@ -589,6 +635,7 @@ class Query implements JsonSerializable
             'resource_types' => $this->getResourceTypes(),
             'by_resource_type' => $this->getByResourceType(),
             'aliases' => $this->getAliases(),
+            'fields_query_args' => $this->getFieldsQueryArgs(),
             'is_public' => $this->getIsPublic(),
             'filters' => $this->getFilters(),
             'filters_range' => $this->getFiltersRange(),

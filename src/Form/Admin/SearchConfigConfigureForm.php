@@ -170,7 +170,7 @@ class SearchConfigConfigureForm extends Form
                 'type' => CommonElement\DataTextarea::class,
                 'options' => [
                     'label' => 'Aliases and aggregated fields', // @translate
-                    'info' => 'List of fields that refers to one or multiple indexes (properties with internal search engine, native indexes with Solr), formatted "name = label", then the list of properties and an empty line. The name must not be a property term or a reserved keyword.', // @translate
+                    'info' => 'List of fields that refers to one or multiple indexes (properties with internal search engine, native indexes with Solr), formatted "name = label", then the list of properties and an empty line. The name must not be a property term or a reserved keyword. With query args below, they can be seen as simple shortcuts of filters easy to implement in forms.', // @translate
                     'documentation' => 'https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch/-/blob/master/data/configs/search_engine.internal.php',
                     'as_key_value' => true,
                     'key_value_separator' => '=',
@@ -196,6 +196,28 @@ class SearchConfigConfigureForm extends Form
                         dcterms:date
                         dcterms:created
                         dcterms:issued
+                        STRING,
+                    'rows' => 30,
+                ],
+            ])
+            ->add([
+                'type' => CommonElement\IniTextarea::class,
+                'name' => 'query_args',
+                'options' => [
+                    'label' => 'Query arguments for fields', // @translate
+                    'info' => 'Define the query arguments to use with simple fields. Defaults are "type" = "eq" and "join" = "and". Type may be any of the query type of filters. Join may be "and", "or", "not".', // @translate
+                    'documentation' => 'https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch',
+                    'ini_typed_mode' => true,
+                ],
+                'attributes' => [
+                    'id' => 'index_query_args',
+                    'required' => false,
+                    'placeholder' => <<<'STRING'
+                        [title]
+                        type = list
+                        
+                        [author]
+                        type = res
                         STRING,
                     'rows' => 30,
                 ],

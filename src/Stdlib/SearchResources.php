@@ -265,6 +265,29 @@ class SearchResources
             'eq' => 'list',
             'neq' => 'nlist',
         ],
+        // The main type may be value, resource or uri.
+        // Only resource is useful for now.
+        'main_type' => [
+            // The
+            'value' => [
+            ],
+            'resource' => [
+                // Resource.
+                'res',
+                'nres',
+                'resq',
+                'nresq',
+                // Linked resource.
+                'lex',
+                'nlex',
+                'lres',
+                'nlres',
+                'lkq',
+                'nlkq',
+            ],
+            'uri' => [
+            ],
+        ],
     ];
 
     /**

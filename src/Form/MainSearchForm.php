@@ -30,6 +30,7 @@
 namespace AdvancedSearch\Form;
 
 use AdvancedSearch\Form\Element as AdvancedSearchElement;
+use AdvancedSearch\Stdlib\SearchResources;
 use Common\Form\Element as CommonElement;
 use Common\Stdlib\EasyMeta;
 use Doctrine\ORM\EntityManager;
@@ -1223,19 +1224,41 @@ class MainSearchForm extends Form
 
         $qb = $this->entityManager->createQueryBuilder();
         $expr = $qb->expr();
-        $qb
-            ->select('COALESCE(value.value, valueResource.title, value.uri) AS val')
-            ->from(\Omeka\Entity\Value::class, 'value')
-            // This join allow to check visibility automatically too.
-            ->innerJoin(\Omeka\Entity\Item::class, 'resource', Join::WITH, $expr->eq('value.resource', 'resource'))
-            // The values should be distinct for each type.
-            ->leftJoin(\Omeka\Entity\Item::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'))
-            ->andWhere($expr->in('value.property', ':properties'))
-            ->setParameter('properties', implode(',', $propertyIds))
-            ->groupBy('val')
-            ->orderBy('val', 'asc')
-        ;
+
+        // For example to list all authors that are a resource.
+        $fieldQueryArgs = $searchConfig->subSetting('index', 'query_args', []);
+        $isResourceQuery = $fieldQueryArgs
+            && isset($fieldQueryArgs[$field]['type'])
+            && isset($fieldQueryArgs[$fieldQueryArgs[$field]['type']])
+            && in_array($fieldQueryArgs[$fieldQueryArgs[$field]['type']], SearchResources::FIELD_QUERY['main_type']['resource']);
+
+        if ($isResourceQuery) {
+            $qb
+                ->select('valueResource.title AS val')
+                ->from(\Omeka\Entity\Value::class, 'value')
+                // This join allow to check visibility automatically too.
+                ->innerJoin(\Omeka\Entity\Item::class, 'resource', Join::WITH, $expr->eq('value.resource', 'resource'))
+                ->innerJoin(\Omeka\Entity\Item::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'))
+                ->andWhere($expr->in('value.property', ':properties'))
+                ->setParameter('properties', implode(',', $propertyIds))
+                ->groupBy('val')
+                ->orderBy('val', 'asc');
+        } else {
+            $qb
+                ->select('COALESCE(value.value, valueResource.title, value.uri) AS val')
+                ->from(\Omeka\Entity\Value::class, 'value')
+                // This join allow to check visibility automatically too.
+                ->innerJoin(\Omeka\Entity\Item::class, 'resource', Join::WITH, $expr->eq('value.resource', 'resource'))
+                // The values should be distinct for each type.
+                ->leftJoin(\Omeka\Entity\Item::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'))
+                ->andWhere($expr->in('value.property', ':properties'))
+                ->setParameter('properties', implode(',', $propertyIds))
+                ->groupBy('val')
+                ->orderBy('val', 'asc');
+        }
+
         $list = array_column($qb->getQuery()->getScalarResult(), 'val', 'val');
+
         // Fix false empty duplicate or values without title.
         $list = array_keys(array_flip($list));
         unset($list['']);

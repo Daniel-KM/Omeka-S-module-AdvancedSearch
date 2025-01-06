@@ -135,8 +135,10 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
                 /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig*/
                 $searchConfig = $api->read('search_configs', ['id' => $searchConfigId])->getContent();
                 $aliases = $searchConfig->subSetting('index', 'aliases', []);
+                $fieldQueryArgs = $searchConfig->subSetting('index', 'query_args', []);
                 $query
                     ->setAliases($aliases)
+                    ->setFieldsQueryArgs($fieldQueryArgs)
                     ->setOption('remove_diacritics', (bool) $searchConfig->subSetting('q', 'remove_diacritics', false))
                     ->setOption('default_search_partial_word', (bool) $searchConfig->subSetting('q', 'default_search_partial_word', false));
             } catch (\Exception $e) {

@@ -296,6 +296,19 @@ return [
                     ],
                 ],
             ],
+            'query_args' => [
+                /**
+                 * Default options for filters are: join = and, type = eq.
+                 * The keys and values are the filter ones.
+                 * @see \AdvancedSearch\Stdlib\SearchResources::buildFilterQuery()
+                 */
+                /*
+                'author' => [
+                    'join' => 'and',
+                    'type' => 'res',
+                ],
+                */
+            ],
         ],
 
         // TODO To be moved in form.

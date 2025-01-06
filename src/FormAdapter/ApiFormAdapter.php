@@ -43,6 +43,7 @@ class ApiFormAdapter extends AbstractFormAdapter implements FormAdapterInterface
         $query = new Query();
         $query
             ->setAliases($formSettings['aliases'] ?? [])
+            ->setFieldsQueryArgs($formSettings['fields_query_args'] ?? [])
             ->setOption('remove_diacritics', !empty($formSettings['remove_diacritics']))
             ->setOption('default_search_partial_word', !empty($formSettings['default_search_partial_word']));
 

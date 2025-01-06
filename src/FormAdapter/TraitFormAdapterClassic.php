@@ -113,6 +113,7 @@ trait TraitFormAdapterClassic
         $query = new Query;
         $query
             ->setAliases($formSettings['aliases'] ?? [])
+            ->setFieldsQueryArgs($formSettings['fields_query_args'] ?? [])
             ->setOption('remove_diacritics', !empty($formSettings['remove_diacritics']))
             ->setOption('default_search_partial_word', !empty($formSettings['default_search_partial_word']));
 
@@ -617,6 +618,7 @@ trait TraitFormAdapterClassic
         $searchFormSettings['facet'] = $searchConfigSettings['facet'] ?? [];
 
         $searchFormSettings['aliases'] = $this->searchConfig->subSetting('index', 'aliases', []);
+        $searchFormSettings['fields_query_args'] = $this->searchConfig->subSetting('index', 'query_args', []);
 
         $searchFormSettings['remove_diacritics'] = (bool) $this->searchConfig->subSetting('q', 'remove_diacritics', false);
         $searchFormSettings['default_search_partial_word'] = (bool) $this->searchConfig->subSetting('q', 'default_search_partial_word', false);

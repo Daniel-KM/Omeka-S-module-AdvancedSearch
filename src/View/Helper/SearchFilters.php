@@ -521,6 +521,13 @@ class SearchFilters extends AbstractHelper
                     }
                     break;
 
+                case 'is_dynamic':
+                    $filterLabel = $translate('Is dynamic'); // @translate
+                    $filters[$filterLabel][$this->urlQuery($key)] = $value
+                        ? $translate('yes') // @translate
+                        : $translate('no'); // @translate
+                    break;
+
                 case 'has_media':
                     $filterLabel = $translate('Media presence'); // @translate
                     $filters[$filterLabel][$this->urlQuery($key)] = $value

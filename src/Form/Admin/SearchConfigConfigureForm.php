@@ -853,6 +853,22 @@ class SearchConfigConfigureForm extends Form
                 ],
             ])
 
+            ->add([
+                'name' => 'pagination_per_page',
+                'type' => CommonElement\OptionalNumber::class,
+                'options' => [
+                    'label' => 'Pagination per page (use site settings by default)', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'pagination_per_page',
+                    'required' => false,
+                    'value' => '0',
+                    'min' => '0',
+                    // 'max' => '1000',
+                    'step' => '1',
+                ],
+            ])
+
             // TODO Add the style of pagination (prev/next or list of pages).
 
             ->add([

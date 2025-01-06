@@ -622,7 +622,11 @@ trait TraitFormAdapterClassic
         $searchFormSettings['default_search_partial_word'] = (bool) $this->searchConfig->subSetting('q', 'default_search_partial_word', false);
 
         // TODO Add a max per_page.
-        $searchFormSettings['request']['per_page'] = $fallbackSettings->get('pagination_per_page', $site ? ['site', 'global'] : ['global'], Paginator::PER_PAGE);
+        $searchConfigSettings['results']['pagination_per_page'] = !empty($searchConfigSettings['results']['pagination_per_page'])
+            ? $searchConfigSettings['results']['pagination_per_page']
+            : $fallbackSettings->get('pagination_per_page', $site ? ['site', 'global'] : ['global'], Paginator::PER_PAGE);
+
+        $searchFormSettings['request']['per_page'] = $searchConfigSettings['results']['pagination_per_page'];
 
         // This is the main process done by this method.
         $query = $formAdapter->toQuery($request, $searchFormSettings);

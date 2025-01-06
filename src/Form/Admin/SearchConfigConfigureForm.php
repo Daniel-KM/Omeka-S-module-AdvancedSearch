@@ -156,6 +156,53 @@ class SearchConfigConfigureForm extends Form
         ;
 
         $this
+            ->add([
+                'name' => 'index',
+                'type' => Fieldset::class,
+                'options' => [
+                    'label' => 'Indexes', // @translate
+                ],
+            ])
+            ->get('index')
+
+            ->add([
+                'name' => 'aliases',
+                'type' => CommonElement\DataTextarea::class,
+                'options' => [
+                    'label' => 'Aliases and aggregated fields', // @translate
+                    'info' => 'List of fields that refers to one or multiple indexes (properties with internal search engine, native indexes with Solr), formatted "name = label", then the list of properties and an empty line. The name must not be a property term or a reserved keyword.', // @translate
+                    'documentation' => 'https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch/-/blob/master/data/configs/search_engine.internal.php',
+                    'as_key_value' => true,
+                    'key_value_separator' => '=',
+                    'data_options' => [
+                        'name' => null,
+                        'label' => null,
+                        'fields' => ',',
+                    ],
+                    'data_text_mode' => 'last_is_list',
+                ],
+                'attributes' => [
+                    'id' => 'index_aliases',
+                    'placeholder' => <<<'STRING'
+                        author = Author
+                        dcterms:creator
+                        dcterms:contributor
+                        
+                        title = Title
+                        dcterms:title
+                        dcterms:alternative
+                        
+                        date = Date
+                        dcterms:date
+                        dcterms:created
+                        dcterms:issued
+                        STRING,
+                    'rows' => 30,
+                ],
+            ])
+        ;
+
+        $this
             // The main search field is "q", not "fulltext_search" or "search".
             ->add([
                 'name' => 'q',
@@ -304,53 +351,6 @@ class SearchConfigConfigureForm extends Form
                     'placeholder' => '',
                 ],
             ]);
-
-        $this
-            ->add([
-                'name' => 'index',
-                'type' => Fieldset::class,
-                'options' => [
-                    'label' => 'Indexes', // @translate
-                ],
-            ])
-            ->get('index')
-
-            ->add([
-                'name' => 'aliases',
-                'type' => CommonElement\DataTextarea::class,
-                'options' => [
-                    'label' => 'Aliases and aggregated fields', // @translate
-                    'info' => 'List of fields that refers to one or multiple indexes (properties with internal search engine, native indexes with Solr), formatted "name = label", then the list of properties and an empty line. The name must not be a property term or a reserved keyword.', // @translate
-                    'documentation' => 'https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch/-/blob/master/data/configs/search_engine.internal.php',
-                    'as_key_value' => true,
-                    'key_value_separator' => '=',
-                    'data_options' => [
-                        'name' => null,
-                        'label' => null,
-                        'fields' => ',',
-                    ],
-                    'data_text_mode' => 'last_is_list',
-                ],
-                'attributes' => [
-                    'id' => 'index_aliases',
-                    'placeholder' => <<<'STRING'
-                        author = Author
-                        dcterms:creator
-                        dcterms:contributor
-                        
-                        title = Title
-                        dcterms:title
-                        dcterms:alternative
-                        
-                        date = Date
-                        dcterms:date
-                        dcterms:created
-                        dcterms:issued
-                        STRING,
-                    'rows' => 30,
-                ],
-            ])
-        ;
 
         // Settings for the form querier (advanced form and filters).
 

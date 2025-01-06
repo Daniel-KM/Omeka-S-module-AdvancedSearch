@@ -36,18 +36,6 @@ return [
             'validate_form' => false,
         ],
 
-        // To be moved in filters? This is only the first form filter q and nothing really specific, once auto-indexing for filters will be implemented.
-        'q' => [
-            'suggester' => 1,
-            'suggest_url' => '',
-            'suggest_url_param_name' => '',
-            'suggest_limit' => null,
-            'suggest_fill_input' => false,
-            'fulltext_search' => null,
-            'remove_diacritics' => false,
-            'default_search_partial_word' => false,
-        ],
-
         'index' => [
             'aliases' => [
                 'title' => [
@@ -308,6 +296,20 @@ return [
                     ],
                 ],
             ],
+        ],
+
+        // TODO To be moved in form.
+        // This is only the first form filter q and nothing really specific, once auto-indexing for filters will be implemented.
+        'q' => [
+            'label' => $translate('Search'),
+            'suggester' => 1,
+            'suggest_url' => '',
+            'suggest_url_param_name' => '',
+            'suggest_limit' => null,
+            'suggest_fill_input' => false,
+            'fulltext_search' => null,
+            'remove_diacritics' => false,
+            'default_search_partial_word' => false,
         ],
 
         // All filters except "advanced" are managed the same via querier:

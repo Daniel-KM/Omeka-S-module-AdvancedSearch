@@ -63,19 +63,9 @@ class InternalQuerier extends AbstractQuerier
         $hasReferences = $plugins->has('references');
 
         // Omeka S v4.1 does not allow to search fulltext and return scalar ids.
-        // Check if the fix Omeka S is not ready.
-        // @see https://github.com/omeka/omeka-s/pull/2224
-        if (isset($this->args['fulltext_search'])
-            && substr((string) $this->query->getSort(), 0, 9) === 'relevance'
-        ) {
-            $requireFix2224 = file_get_contents(OMEKA_PATH . '/application/src/Api/Adapter/AbstractEntityAdapter.php');
-            $requireFix2224 = !strpos($requireFix2224, '$hasFullTextSearchOrder');
-            if ($requireFix2224) {
-                $this->logger->warn('The fix https://github.com/omeka/omeka-s/pull/2224 is not integrated. A workaround is used.'); // @translate
-            }
-        } else {
-            $requireFix2224 = null;
-        }
+        /** @see https://github.com/omeka/omeka-s/pull/2224 */
+        $requireFix2224 = isset($this->args['fulltext_search'])
+            && substr((string) $this->query->getSort(), 0, 9) === 'relevance';
 
         // The standard api way implies a double query, because scalar doesn't
         // set the full total and doesn't use paginator, but return all values.

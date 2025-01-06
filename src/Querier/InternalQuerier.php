@@ -883,14 +883,14 @@ class InternalQuerier extends AbstractQuerier
                         }
                         $this->args['filter'][] = [
                             'join' => 'and',
-                            'filter' => $field,
+                            'field' => $field,
                             'type' => 'list',
                             'val' => $value,
                         ];
                     } else {
                         $this->args['filter'][] = [
                             'join' => 'and',
-                            'filter' => $field,
+                            'field' => $field,
                             'type' => 'eq',
                             'val' => $value,
                         ];

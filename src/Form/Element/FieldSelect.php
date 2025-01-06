@@ -14,6 +14,9 @@ use Omeka\Api\Manager as ApiManager;
  * The element FieldSelect is derivated from PropertySelect with specific fields.
  * For now, it is the same output with the same options.
  *
+ * Warning: aliases should not be mixed with other properties: the process is
+ * notto expand aliases is not recursive for now.
+ *
  * @todo Manage aliases and labels of properties for each resource template.
  */
 class FieldSelect extends Select implements EventManagerAwareInterface
@@ -27,18 +30,24 @@ class FieldSelect extends Select implements EventManagerAwareInterface
      */
     protected $api;
 
+    /**
+     * @var array
+     */
+    protected $searchIndex = [
+        'aliases' => [],
+        'query_args' => [],
+    ];
+
     public function setApiManager(ApiManager $apiManager): self
     {
         $this->api = $apiManager;
         return $this;
     }
 
-    /**
-     * @return ApiManager
-     */
-    public function getApiManager(): ApiManager
+    public function setSearchIndex(array $searchIndex): self
     {
-        return $this->api;
+        $this->searchIndex = $searchIndex;
+        return $this;
     }
 
     /**
@@ -64,14 +73,19 @@ class FieldSelect extends Select implements EventManagerAwareInterface
         $applyTemplates = is_array($applyTemplates) ? $applyTemplates : false;
         if (!$applyTemplates) {
             // Use default method.
-            return $this->_getValueOptions();
+            $result = $this->_getValueOptions();
+            return $result;
         }
+
+        $valueOptions = $this->getOption('prepend_index_aliases')
+            ? $this->searchIndex['aliases']
+            : [];
+
         // Get only the properties of the configured resource templates.
-        $valueOptions = [];
         $termAsValue = $this->getOption('term_as_value');
         foreach ($applyTemplates as $templateId) {
             try {
-                $template = $this->getApiManager()->read('resource_templates', $templateId)->getContent();
+                $template = $this->api->read('resource_templates', $templateId)->getContent();
             } catch (NotFoundException $e) {
                 continue;
             }
@@ -92,6 +106,7 @@ class FieldSelect extends Select implements EventManagerAwareInterface
                 $valueOptions[$property->id()]['alternate_labels'][] = $templateProperty->alternateLabel();
             }
         }
+
         // Include alternate labels, if any.
         foreach ($valueOptions as $propertyId => $option) {
             $altLabels = array_unique(array_filter($valueOptions[$propertyId]['alternate_labels']));
@@ -103,6 +118,7 @@ class FieldSelect extends Select implements EventManagerAwareInterface
                 );
             }
         }
+
         // Sort options alphabetically.
         usort($valueOptions, fn ($a, $b) => strcasecmp($a['label'], $b['label']));
         return $valueOptions;
@@ -129,7 +145,7 @@ class FieldSelect extends Select implements EventManagerAwareInterface
         $query = $args['query'];
 
         $valueOptions = [];
-        $response = $this->getApiManager()->search($resourceName, $query);
+        $response = $this->api->search($resourceName, $query);
         $termAsValue = $this->getOption('term_as_value');
         foreach ($response->getContent() as $member) {
             $attributes = ['data-term' => $member->term()];
@@ -159,6 +175,16 @@ class FieldSelect extends Select implements EventManagerAwareInterface
         }
         if (isset($valueOptions['dctype'])) {
             $valueOptions = ['dctype' => $valueOptions['dctype']] + $valueOptions;
+        }
+
+        // Prepend aliases.
+        if ($this->getOption('prepend_index_aliases')
+            && $aliases = $this->searchIndex['aliases']
+        ) {
+            $valueOptions = ['fields' => [
+                'label' => 'Fields', // @translate
+                'options' => $aliases,
+            ]] + $valueOptions;
         }
 
         // Prepend configured value options.

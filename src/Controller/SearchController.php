@@ -83,7 +83,7 @@ class SearchController extends AbstractActionController
             'searchConfig' => $searchConfig,
             'site' => $site,
             // Set a default empty query and response to simplify view.
-            // They will be filled in searchRequestToResponse.
+            // They will be filled in formAdapter.
             'query' => new Query,
             'response' => new Response,
         ]);
@@ -95,24 +95,24 @@ class SearchController extends AbstractActionController
 
         $request = $this->params()->fromQuery();
 
-        // Here, only the csrf is needed, if any.
-        $validateForm = (bool) $searchConfig->subSetting('request', 'validate_form');
-        if ($validateForm) {
-            // Check csrf issue.
-            $request = $this->validateSearchRequest($searchConfig, $request);
-            if ($request === false) {
-                return $view;
-            }
-        }
-
         // The form may be empty for a direct query.
         $formAdapter = $searchConfig->formAdapter();
         $hasForm = $formAdapter ? (bool) $formAdapter->getFormClass() : false;
         $isJsonQuery = !$hasForm;
 
+        // Here, only the csrf is needed, if any.
+        $validateForm = (bool) $searchConfig->subSetting('request', 'validate_form');
+        if ($validateForm) {
+            // Check csrf issue.
+            $request = $formAdapter->validateRequest($searchConfig, $request);
+            if ($request === false) {
+                return $view;
+            }
+        }
+
         // Check if the query is empty and use the default query in that case.
         // So the default query is used only on the search config.
-        [$request, $isEmptyRequest] = $this->cleanRequest($request);
+        [$request, $isEmptyRequest] = $formAdapter->cleanRequest($request);
         if ($isEmptyRequest) {
             $defaultResults = $searchConfig->subSetting('request', 'default_results') ?: 'default';
             switch ($defaultResults) {
@@ -154,8 +154,7 @@ class SearchController extends AbstractActionController
             $request = $parsedQuery + $request + $parsedQueryPost;
         }
 
-        /** @see \AdvancedSearch\Mvc\Controller\Plugin\SearchRequestToResponse */
-        $result = $this->searchRequestToResponse($request, $searchConfig, $site);
+        $result = $formAdapter->toResponse($request, $searchConfig, $site);
 
         if ($result['status'] === 'fail') {
             // Currently only "no query".
@@ -434,101 +433,7 @@ class SearchController extends AbstractActionController
     }
 
     /**
-     * Get the request from the query and check it according to the search page.
-     *
-     * In fact, only check the csrf, but the csrf is removed from the form in
-     * most of the cases, so it is useless.
-     *
-     * @todo Factorize with \AdvancedSearch\Site\BlockLayout\SearchingForm::getSearchRequest()
-     * @todo Clarify process of force validation if it is really useful.
-     *
-     * @return array|bool
-     */
-    protected function validateSearchRequest(
-        SearchConfigRepresentation $searchConfig,
-        array $request
-    ) {
-        // Only validate the csrf.
-        // Note: The search engine is used to display item sets too via the mvc
-        // redirection. In that case, there is no csrf element, so no check to
-        // do.
-        if (array_key_exists('csrf', $request)) {
-            $form = $searchConfig->form([
-                'variant' => 'csrf',
-            ]);
-            $form->setData($request);
-            if (!$form->isValid()) {
-                $messages = $form->getMessages();
-                if (isset($messages['csrf'])) {
-                    $this->messenger()->addError('Invalid or missing CSRF token'); // @translate
-                    return false;
-                }
-            }
-        }
-        return $request;
-    }
-
-    /**
-     * Remove all empty values (zero length strings) and check empty request.
-     *
-     * @todo Factorize with \AdvancedSearch\Mvc\Controller\Plugin\SearchRequestToResponse::cleanRequest()
-     * @see \AdvancedSearch\Mvc\Controller\Plugin\SearchRequestToResponse::cleanRequest()
-     *
-     * @return array First key is the cleaned request, the second a bool to
-     * indicate if it is empty.
-     */
-    protected function cleanRequest(array $request): array
-    {
-        // They should be already removed.
-        unset($request['csrf'], $request['submit']);
-
-        $this->arrayFilterRecursive($request);
-
-        $checkRequest = array_diff_key(
-            $request,
-            [
-                // @see \Omeka\Api\Adapter\AbstractEntityAdapter::limitQuery().
-                'page' => null,
-                'per_page' => null,
-                'limit' => null,
-                'offset' => null,
-                // @see \Omeka\Api\Adapter\AbstractEntityAdapter::search().
-                'sort_by' => null,
-                'sort_order' => null,
-                // Used by Search.
-                'resource_type' => null,
-                'sort' => null,
-            ]
-        );
-
-        return [
-            $request,
-            !count($checkRequest),
-        ];
-    }
-
-    /**
-     * Remove zero-length values or an array, recursively.
-     *
-     * @todo Factorize with \AdvancedSearch\Mvc\Controller\Plugin\SearchRequestToResponse::arrayFilterRecursive()
-     */
-    protected function arrayFilterRecursive(array &$array): array
-    {
-        foreach ($array as $key => $value) {
-            if (is_array($value)) {
-                $array[$key] = $this->arrayFilterRecursive($value);
-                if (!count($array[$key])) {
-                    unset($array[$key]);
-                }
-            } elseif (!strlen(trim((string) $array[$key]))) {
-                unset($array[$key]);
-            }
-        }
-        return $array;
-    }
-
-    /**
-     * Fill each entry according to the search query.
+     * Fill each rss entry according to the search query.
      *
      * Adaptation of module Feed.
      * @see \Feed\Controller\FeedController::appendEntriesDynamic()
@@ -567,11 +472,13 @@ class SearchController extends AbstractActionController
 
         $site = $currentSite;
 
+        $formAdapter = $searchConfig->formAdapter();
+
         $request = $this->params()->fromQuery();
 
         // Check if the query is empty and use the default query in that case.
         // So the default query is used only on the search config.
-        [$request, $isEmptyRequest] = $this->cleanRequest($request);
+        [$request, $isEmptyRequest] = $formAdapter->cleanRequest($request);
         if ($isEmptyRequest) {
             $defaultResults = $searchConfig->subSetting('request', 'default_results') ?: 'default';
             switch ($defaultResults) {
@@ -607,7 +514,7 @@ class SearchController extends AbstractActionController
             $request = $parsedQuery + $request + $parsedQueryPost;
         }
 
-        $result = $this->searchRequestToResponse($request, $searchConfig, $site);
+        $result = $formAdapter->toResponse($request, $searchConfig, $site);
         if ($result['status'] === 'fail'
             || $result['status'] === 'error'
         ) {

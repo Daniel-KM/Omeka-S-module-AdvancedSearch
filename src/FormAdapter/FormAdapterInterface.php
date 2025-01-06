@@ -31,6 +31,7 @@
 namespace AdvancedSearch\FormAdapter;
 
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
+use Omeka\Api\Representation\SiteRepresentation;
 
 interface FormAdapterInterface
 {
@@ -100,4 +101,36 @@ interface FormAdapterInterface
      * @return \AdvancedSearch\Query The normalized query of the module Search.
      */
     public function toQuery(array $request, array $formSettings): \AdvancedSearch\Query;
+
+    /**
+     * Get response from a search request.
+     *
+     * @uses self::toQuery().
+     *
+     * @param array $request Validated request.
+     * @return array Result with a status, data, and message if error.
+     */
+    public function toResponse(array $request, SearchConfigRepresentation $searchConfig, ?SiteRepresentation $site = null): array;
+
+    /**
+     * Temporary function during refactoring.
+     *
+     * Remove all empty values (zero length strings) and check empty request.
+     *
+     * @return array First key is the cleaned request, the second a bool to
+     * indicate if it is empty.
+     */
+    public function cleanRequest(array $requet): array;
+
+    /**
+     * Temporary function during refactoring.
+     *
+     * Get the request from the query and check it according to the search page.
+     *
+     * In fact, only check the csrf, but the csrf is removed from the form in
+     * most of the cases, so it is useless.
+     *
+     * @todo Clarify process of force validation if it is really useful.
+     */
+    public function validateRequest(SearchConfigRepresentation $searchConfig, array $request): bool;
 }

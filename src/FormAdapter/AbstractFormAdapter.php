@@ -30,9 +30,14 @@
 namespace AdvancedSearch\FormAdapter;
 
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
+use AdvancedSearch\Querier\Exception\QuerierException;
 use AdvancedSearch\Query;
 use AdvancedSearch\Response;
 use AdvancedSearch\Stdlib\SearchResources;
+use Common\Stdlib\PsrMessage;
+use Laminas\EventManager\Event;
+use Omeka\Api\Representation\SiteRepresentation;
+use Omeka\Stdlib\Paginator;
 
 abstract class AbstractFormAdapter implements FormAdapterInterface
 {
@@ -65,6 +70,11 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
      * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation
      */
     protected $searchConfig;
+
+    /**
+     * @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation
+     */
+    protected $searchEngine;
 
     public function setSearchConfig(?SearchConfigRepresentation $searchConfig): self
     {
@@ -119,7 +129,6 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
          * @var \Laminas\Mvc\Controller\PluginManager $plugins
          * @var \Laminas\View\HelperPluginManager $helpers
          * @var \Omeka\Mvc\Status $status
-         * @var \AdvancedSearch\Mvc\Controller\Plugin\SearchRequestToResponse $searchRequestToResponse
          *
          * @see \AdvancedSearch\Controller\SearchController::searchAction()
          */
@@ -186,8 +195,7 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
 
         if (!empty($options['request'])) {
             $form->setData($options['request']);
-            $searchRequestToResponse = $plugins->get('searchRequestToResponse');
-            $result = $searchRequestToResponse($options['request'], $this->searchConfig, $vars['site']);
+            $result = $this->requestToResponse($options['request'], $this->searchConfig, $vars['site']);
             if ($result['status'] === 'fail') {
                 return '';
             } elseif ($result['status'] === 'error') {
@@ -602,5 +610,358 @@ abstract class AbstractFormAdapter implements FormAdapterInterface
         }
 
         return $query;
+    }
+
+    public function toResponse(
+        array $request,
+        SearchConfigRepresentation $searchConfig,
+        ?SiteRepresentation $site = null
+    ): array {
+        $this->searchConfig = $searchConfig;
+
+        // The controller may not be available.
+        $services = $searchConfig->getServiceLocator();
+        $plugins = $services->get('ControllerPluginManager');
+        $logger = $services->get('Omeka\Logger');
+        $translator = $services->get('MvcTranslator');
+
+        $formAdapterName = $searchConfig->formAdapterName();
+        if (!$formAdapterName) {
+            $message = new PsrMessage('This search config has no form adapter.'); // @translate
+            $logger->err($message->getMessage());
+            return [
+                'status' => 'error',
+                'message' => $message->setTranslator($translator),
+            ];
+        }
+
+        /** @var \AdvancedSearch\FormAdapter\FormAdapterInterface $formAdapter */
+        $formAdapter = $searchConfig->formAdapter();
+        if (!$formAdapter) {
+            $message = new PsrMessage(
+                'Form adapter "{name}" not found.', // @translate
+                ['name' => $formAdapterName]
+            );
+            $logger->err($message->getMessage(), $message->getContext());
+            return [
+                'status' => 'error',
+                'message' => $message->setTranslator($translator),
+            ];
+        }
+
+        $searchConfigSettings = $searchConfig->settings();
+
+        [$request, $isEmptyRequest] = $this->cleanRequest($request);
+        if ($isEmptyRequest) {
+            // Keep the other arguments of the request (mainly pagination, sort,
+            // and facets).
+            $request = ['*' => ''] + $request;
+        }
+
+        // TODO Prepare the full query here for simplification (or in FormAdapter).
+
+        $searchFormSettings = $searchConfigSettings['form'] ?? [];
+
+        $this->searchEngine = $searchConfig->engine();
+        $searchAdapter = $searchConfig->searchAdapter();
+        if ($searchAdapter) {
+            $availableFields = $searchAdapter->getAvailableFields();
+            // Include the specific fields to simplify querying with main form.
+            $searchFormSettings['available_fields'] = $availableFields;
+            $specialFieldsToInputFields = [
+                'resource_type' => 'resource_type',
+                'is_public' => 'is_public',
+                'owner/o:id' => 'owner',
+                'site/o:id' => 'site',
+                'resource_class/o:id' => 'class',
+                'resource_template/o:id' => 'template',
+                'item_set/o:id' => 'item_set',
+            ];
+            foreach ($availableFields as $field) {
+                if (!empty($field['from'])
+                    && isset($specialFieldsToInputFields[$field['from']])
+                    && empty($availableFields[$specialFieldsToInputFields[$field['from']]])
+                ) {
+                    $searchFormSettings['available_fields'][$specialFieldsToInputFields[$field['from']]] = [
+                        'name' => $specialFieldsToInputFields[$field['from']],
+                        'to' => $field['name'],
+                    ];
+                }
+            }
+        } else {
+            $searchFormSettings['available_fields'] = [];
+        }
+
+        // Solr doesn't allow unavailable args anymore (invalid or unknown).
+        $searchFormSettings['only_available_fields'] = $searchAdapter
+            && $searchAdapter instanceof \SearchSolr\Adapter\SolariumAdapter;
+
+        // TODO Copy the option for per page in the search config form (keeping the default).
+        // TODO Add a max per_page.
+        if ($site) {
+            $siteSettings = $plugins->get('siteSettings')();
+            $settings = $plugins->get('settings')();
+            $perPage = (int) $siteSettings->get('pagination_per_page')
+                ?: (int) $settings->get('pagination_per_page', Paginator::PER_PAGE);
+        } else {
+            $settings = $plugins->get('settings')();
+            $perPage = (int) $settings->get('pagination_per_page', Paginator::PER_PAGE);
+        }
+        $searchFormSettings['request']['per_page'] = $perPage ?: Paginator::PER_PAGE;
+
+        // Specific options. There are options that may change the process to
+        // get the query. Anyway, they should be set one time early.
+
+        // Facets are needed to check active facets with range, where the
+        // default value should be skipped.
+        $searchFormSettings['facet'] = $searchConfigSettings['facet'] ?? [];
+
+        $searchFormSettings['aliases'] = $this->searchConfig->subSetting('index', 'aliases', []);
+
+        // TODO Add a way to pass any dynamically configured option to the search engine.
+        $searchFormSettings['remove_diacritics'] = (bool) $this->searchConfig->subSetting('q', 'remove_diacritics', false);
+        $searchFormSettings['default_search_partial_word'] = (bool) $this->searchConfig->subSetting('q', 'default_search_partial_word', false);
+
+        /** @var \AdvancedSearch\Query $query */
+        $query = $formAdapter->toQuery($request, $searchFormSettings);
+
+        // Append hidden query if any (filter, date range filter, filter query).
+        $hiddenFilters = $searchConfigSettings['request']['hidden_query_filters'] ?? [];
+        if ($hiddenFilters) {
+            // TODO Convert a generic hidden query filters into a specific one?
+            // $hiddenFilters = $formAdapter->toQuery($hiddenFilters, $searchFormSettings);
+            $query->setFiltersQueryHidden($hiddenFilters);
+        }
+
+        // Add global parameters.
+
+        $engineSettings = $this->searchEngine->settings();
+
+        // Manage rights of resources to search: visibility public/private.
+
+        // TODO Researcher and author may not access all private resources.
+        // TODO Manage roles from modules and access level from module Access.
+
+        // For module Access, this is a standard filter.
+
+        $user = $plugins->get('identity')();
+        $omekaRoles = [
+            \Omeka\Permissions\Acl::ROLE_GLOBAL_ADMIN,
+            \Omeka\Permissions\Acl::ROLE_SITE_ADMIN,
+            \Omeka\Permissions\Acl::ROLE_EDITOR,
+            \Omeka\Permissions\Acl::ROLE_REVIEWER,
+            \Omeka\Permissions\Acl::ROLE_AUTHOR,
+            \Omeka\Permissions\Acl::ROLE_RESEARCHER,
+        ];
+        $userRole = $user ? $user->getRole() : null;
+
+        $accessToAdmin = $user && in_array($userRole, $omekaRoles);
+        if ($accessToAdmin) {
+            $query->setIsPublic(false);
+            // } elseif ($user && !in_array($userRole, $omekaRoles)) {
+            // This is the default.
+            // $query->setIsPublic(true);
+        }
+
+        if ($site) {
+            $query->setSiteId($site->id());
+        }
+
+        $query->setByResourceType(!empty($searchConfigSettings['results']['by_resource_type']));
+
+        // Check resources.
+        $resourceTypes = $query->getResourceTypes();
+        // TODO Check why resources may not be filled.
+        $engineSettings['resource_types'] ??= ['resources'];
+        if ($resourceTypes) {
+            $resourceTypes = array_intersect($resourceTypes, $engineSettings['resource_types']) ?: $engineSettings['resource_types'];
+            $query->setResourceTypes($resourceTypes);
+        } else {
+            $query->setResourceTypes($engineSettings['resource_types']);
+        }
+
+        // Check sort.
+        // Don't sort if it's already managed by the form, like the api form.
+        // TODO Previously: don't sort if it's already managed by the form, like the api form.
+        $sort = $query->getSort();
+        $sortOptions = $this->getSortOptions();
+        if ($sort) {
+            if (empty($request['sort']) || !isset($sortOptions[$request['sort']])) {
+                reset($sortOptions);
+                $sort = key($sortOptions);
+                $query->setSort($sort);
+            }
+        } else {
+            reset($sortOptions);
+            $sort = key($sortOptions);
+            $query->setSort($sort);
+        }
+
+        // Set the settings for facets.
+        $hasFacets = !empty($searchConfigSettings['facet']['facets']);
+        if ($hasFacets) {
+            // Set all keys to simplify later process.
+            $facetConfigDefault = [
+                'field' => null,
+                'label' => null,
+                'type' => null,
+                'order' => null,
+                'limit' => 0,
+                'languages' => [],
+                'data_types' => [],
+                'main_types' => [],
+                'values' => [],
+                // TODO "list" is currently a global setting, because the main query with the internal querier depends on it for all facets.
+                // 'list' => null,
+                'display_count' => false,
+            ];
+            foreach ($searchConfigSettings['facet']['facets'] as &$facetConfig) {
+                $facetConfig += $facetConfigDefault;
+            }
+            unset($facetConfig);
+            $query->setFacets($searchConfigSettings['facet']['facets']);
+        }
+
+        $query->setOption('facet_list', $searchConfigSettings['facet']['list'] ?? 'available');
+
+        $eventManager = $services->get('Application')->getEventManager();
+        $eventArgs = $eventManager->prepareArgs([
+            'request' => $request,
+            'query' => $query,
+        ]);
+        $eventManager->triggerEvent(new Event('search.query.pre', $searchConfig, $eventArgs));
+        /** @var \AdvancedSearch\Query $query */
+        $query = $eventArgs['query'];
+
+        // Send the query to the search engine.
+
+        /** @var \AdvancedSearch\Querier\QuerierInterface $querier */
+        $querier = $this->searchEngine
+            ->querier()
+            ->setQuery($query);
+        try {
+            $response = $querier->query();
+        } catch (QuerierException $e) {
+            $message = new PsrMessage(
+                "Query error: {message}\nQuery: {json_query}", // @translate
+                ['message' => $e->getMessage(), 'json_query' => json_encode($query->jsonSerialize(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)]
+            );
+            $logger->err($message->getMessage(), $message->getContext());
+            return [
+                'status' => 'error',
+                'message' => $message->setTranslator($translator),
+            ];
+        }
+
+        // Order facet according to settings of the search page.
+        if ($hasFacets) {
+            $facetCounts = $response->getFacetCounts();
+            $facetCounts = array_intersect_key($facetCounts, $searchConfigSettings['facet']['facets']);
+            $response->setFacetCounts($facetCounts);
+        }
+
+        $totalResults = array_map(fn ($resource) => $response->getResourceTotalResults($resource), $engineSettings['resource_types']);
+        $plugins->get('paginator')(max($totalResults), $query->getPage() ?: 1, $query->getPerPage());
+
+        return [
+            'status' => 'success',
+            'data' => [
+                'query' => $query,
+                'response' => $response,
+            ],
+        ];
+    }
+
+    public function cleanRequest(array $request): array
+    {
+        // They should be already removed.
+        unset(
+            $request['csrf'],
+            $request['submit']
+        );
+
+        /**
+         * Remove null, empty array and zero-length values of an array, recursively.
+         */
+        $arrayFilterRecursive = function(array &$array): array {
+            foreach ($array as $key => $value) {
+                if ($value === null || $value === '' || $value === []) {
+                    unset($array[$key]);
+                } elseif (is_array($value)) {
+                    $array[$key] = $this->arrayFilterRecursive($value);
+                    if (!count($array[$key])) {
+                        unset($array[$key]);
+                    }
+                }
+            }
+            return $array;
+        };
+
+        $arrayFilterRecursive($request);
+
+        $checkRequest = array_diff_key(
+            $request,
+            [
+                // @see \Omeka\Api\Adapter\AbstractEntityAdapter::limitQuery().
+                'page' => null,
+                'per_page' => null,
+                'limit' => null,
+                'offset' => null,
+                // @see \Omeka\Api\Adapter\AbstractEntityAdapter::search().
+                'sort_by' => null,
+                'sort_order' => null,
+                // Used by Advanced Search.
+                'resource_type' => null,
+                'sort' => null,
+            ]
+        );
+
+        return [
+            $request,
+            !count($checkRequest),
+        ];
+    }
+
+    public function validateRequest(
+        SearchConfigRepresentation $searchConfig,
+        array $request
+    ) {
+        // Only validate the csrf.
+        // Note: The search engine is used to display item sets too via the mvc
+        // redirection. In that case, there is no csrf element, so no check to
+        // do.
+        // There may be no csrf element for initial query.
+        if (array_key_exists('csrf', $request)) {
+            $form = $searchConfig->form([
+                'variant' => 'csrf',
+            ]);
+            $form->setData($request);
+            if (!$form->isValid()) {
+                $messages = $form->getMessages();
+                if (isset($messages['csrf'])) {
+                    $messenger = $searchConfig->getServiceLocator()->get('ControllerPluginManager')->get('messenger');
+                    $messenger->addError('Invalid or missing CSRF token'); // @translate
+                    return false;
+                }
+            }
+        }
+        return $request;
+    }
+
+    /**
+     * Normalize the sort options of the index.
+     */
+    protected function getSortOptions(): array
+    {
+        $sortFieldsSettings = $this->searchConfig->subSetting('results', 'sort_list', []);
+        if (empty($sortFieldsSettings)) {
+            return [];
+        }
+        $searchAdapter = $this->searchConfig->searchAdapter();
+        if (empty($searchAdapter)) {
+            return [];
+        }
+        $availableSortFields = $searchAdapter->getAvailableSortFields();
+        return array_intersect_key($sortFieldsSettings, $availableSortFields);
     }
 }

@@ -8,21 +8,31 @@ use Laminas\View\Helper\AbstractHelper;
 class GetSearchConfig extends AbstractHelper
 {
     /**
-     * Check and get a search config or get the default one.
+     * Check and get a search config or get the current one.
      *
      * The search config should be available in the current site or in admin.
      */
     public function __invoke($searchConfigIdOrSlug = null): ?SearchConfigRepresentation
     {
+        // Most of the time, only the current main search config is stored.
+        static $searchConfigs = [];
+
+        if (array_key_exists($searchConfigIdOrSlug, $searchConfigs)) {
+            return $searchConfigs[$searchConfigIdOrSlug];
+        }
+
         $plugins = $this->getView()->getHelperPluginManager();
         $isSiteRequest = $plugins->get('status')->isSiteRequest();
         $setting = $plugins->get('setting');
         $siteSetting = $plugins->get('siteSetting');
 
+        $originalSearchConfigIdOrSlug = $searchConfigIdOrSlug;
+
         if (empty($searchConfigIdOrSlug)) {
             $searchConfigIdOrSlug = $isSiteRequest
                 ? $siteSetting('advancedsearch_main_config')
                 : $setting('advancedsearch_main_config');
+            $searchConfigs[$originalSearchConfigIdOrSlug] = null;
             if (!$searchConfigIdOrSlug) {
                 return null;
             }
@@ -41,14 +51,19 @@ class GetSearchConfig extends AbstractHelper
         if (($isNumeric && !isset($allConfigs[$searchConfigIdOrSlug]))
             || (!$isNumeric && !in_array($searchConfigIdOrSlug, $allConfigs))
         ) {
+            $searchConfigs[$originalSearchConfigIdOrSlug] = null;
             return null;
         }
 
         $api = $plugins->get('api');
         try {
-            return $api->read('search_configs', [$isNumeric ? 'id' : 'slug' => $searchConfigIdOrSlug])->getContent();
+            $searchConfigs[$originalSearchConfigIdOrSlug] = $api
+                ->read('search_configs', [$isNumeric ? 'id' : 'slug' => $searchConfigIdOrSlug])
+                ->getContent();
         } catch (\Omeka\Api\Exception\NotFoundException $e) {
-            return null;
+            $searchConfigs[$originalSearchConfigIdOrSlug] = null;
         }
+
+        return $searchConfigs[$originalSearchConfigIdOrSlug];
     }
 }

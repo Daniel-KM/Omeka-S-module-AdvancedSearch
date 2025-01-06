@@ -215,7 +215,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
             $services = $this->getServiceLocator();
             $logger = $services->get('Omeka\Logger');
             $message = new PsrMessage(
-                'The search config setting "{display}" was renamed "{results}". You should update your theme.', // @translate
+                'The search config setting "{old}" was renamed "{new}". You should update your theme.', // @translate
                 ['old' => 'display', 'new' => 'results']
             );
             $logger->err($message->getMessage(), $message->getContext());

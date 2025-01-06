@@ -419,27 +419,38 @@ class SearchResources
      */
     public function buildInitialQuery(QueryBuilder $qb, array $query): void
     {
-        // Process advanced search plus keys.
+        // Process advanced search plus features.
         $this
+            // Override for multiple sites. Replaced upstream by "in_sites".
             ->searchSites($qb, $query)
+            // Override for without owner, resource class id, and resource
+            // template id (with value "0").
             ->searchResources($qb, $query)
+            ->searchResourceAssets($qb, $query)
             ->searchResourceClassTerm($qb, $query)
+            // Partially implemented upstream.
             ->searchDateTime($qb, $query)
+            // Override property with many features, replaced by filter.
             ->buildPropertyQuery($qb, $query)
             ->buildFilterQuery($qb, $query);
         if ($this->adapter instanceof ItemAdapter) {
             $this
+                // Override for without item set id (with value "0").
+                ->searchItemItemSets($qb, $query)
                 ->searchItemMediaData($qb, $query);
         } elseif ($this->adapter instanceof MediaAdapter) {
             $this
                 ->searchMediaByItemSet($qb, $query)
                 ->searchHasOriginal($qb, $query)
                 ->searchHasThumbnails($qb, $query)
+                // Override for multiple and main media type.
                 ->searchByMediaType($qb, $query);
         } elseif ($this->adapter instanceof ResourceAdapter) {
             $this
                 ->searchResourcesByType($qb, $query);
         }
+        $this
+            ->sortQuery($qb, $query);
     }
 
     /**
@@ -1163,44 +1174,12 @@ class SearchResources
             }
         }
 
-        if ($this->adapter instanceof ItemAdapter
-            && isset($query['item_set_id'])
-            && $query['item_set_id'] !== ''
-            && $query['item_set_id'] !== []
-        ) {
-            $itemSetIds = is_array($query['item_set_id'])
-                ? array_values($query['item_set_id'])
-                : [$query['item_set_id']];
-            $itemSetAlias = $this->adapter->createAlias();
-            if (array_values($itemSetIds) === [0]) {
-                $qb
-                    ->leftJoin(
-                        'omeka_root.itemSets',
-                        $itemSetAlias
-                    )
-                    ->andWhere($expr->isNull("$itemSetAlias.id"));
-            } elseif (in_array(0, $itemSetIds, true)) {
-                $qb
-                    ->leftJoin(
-                        'omeka_root.itemSets',
-                        $itemSetAlias
-                    )
-                    ->andWhere($expr->orX(
-                        $expr->isNull("$itemSetAlias.id"),
-                        $expr->in(
-                            "$itemSetAlias.id",
-                            $this->adapter->createNamedParameter($qb, $itemSetIds)
-                        )
-                    ));
-            } else {
-                $qb
-                    ->innerJoin(
-                        'omeka_root.itemSets',
-                        $itemSetAlias, Join::WITH,
-                        $expr->in("$itemSetAlias.id", $this->adapter->createNamedParameter($qb, $itemSetIds))
-                    );
-            }
-        }
+        return $this;
+    }
+
+    protected function searchResourceAssets(QueryBuilder $qb, array $query): self
+    {
+        $expr = $qb->expr();
 
         if (isset($query['has_asset']) && (string) $query['has_asset'] !== '') {
             if ($query['has_asset']) {
@@ -1240,73 +1219,6 @@ class SearchResources
                         $this->adapter->createNamedParameter($qb, $assetIds)
                     ));
             }
-        }
-
-        // Order by is the last part or a sql query.
-        // Sort by listed id.
-        // The list is the one set in key "sort_ids" or in main query key "id".
-        // The sort order is "desc" for resource/browse (see plugin SetBrowseDefault::__invoke())
-        // and as "asc" in api (see AbstractEntityAdapter::buildQuery()).
-        if (isset($query['sort_by'])
-            && $query['sort_by'] === 'ids'
-            && (!empty($query['sort_ids']) || !empty($query['id']))
-        ) {
-            /** @see \Omeka\Api\Adapter\AbstractEntityAdapter::buildBaseQuery() */
-            // Avoid a strict type issue, so convert ids as string.
-            // Normally, the query is cleaned before.
-            $ids = empty($query['sort_ids']) ? $query['id'] : $query['sort_ids'];
-            if (is_int($ids)) {
-                $ids = [(string) $ids];
-            } elseif (is_string($ids)) {
-                $ids = strpos($ids, ',') === false ? [$ids] : explode(',', $ids);
-            } elseif (!is_array($ids)) {
-                $ids = [];
-            }
-            $ids = array_map('trim', $ids);
-            $ids = array_filter($ids, 'strlen');
-            if ($ids) {
-                $idsAlias = $this->adapter->createAlias();
-                $idsPlaceholder = ':' . $idsAlias;
-                $qb
-                    ->setParameter($idsAlias, $ids, Connection::PARAM_INT_ARRAY)
-                    ->addOrderBy("FIELD(omeka_root.id, $idsPlaceholder)", $query['sort_order'])
-                    // In AbstractEntityAdapter::search(), the countQb is a
-                    // clone of this qb that removes the orderBy part, but not
-                    // the parameters associated to it. So a fake argument Where
-                    // is added , to avoid a doctrine issue.
-                    // TODO Patch omeka: get the dql part orderBy, get the parameter associated to it, check if is used somewhere before removing it.
-                    ->andWhere($expr->in(
-                        $this->adapter->createNamedParameter($qb, reset($ids)),
-                        $idsPlaceholder
-                    ));
-            }
-        } elseif (isset($query['sort_by'])
-            // The event "api.search.query.finalize is skipped In scalar search,
-            // so pass it here.
-            /** @see \Omeka\Module::searchFullText() */
-            && isset($query['fulltext_search'])
-            && in_array($query['sort_by'], ['relevance', 'relevance desc', 'relevance asc'])
-            && trim($query['fulltext_search']) !== ''
-        ) {
-            // The order is slightly different from the standard one, because
-            // an order by id desc is appended automatically, so all results
-            // with the same score are sorted by id desc and not randomly.
-            // Don't use "`" here for doctrine.
-            $matchOrder = 'MATCH(omeka_fulltext_search.title, omeka_fulltext_search.text) AGAINST (:omeka_fulltext_search)';
-            $sortOrder = $query['sort_by'] === 'relevance asc' ? 'ASC' : 'DESC';
-            $qb
-                // The hidden select and "group by" avoids issue with mysql mode "only_full_group_by".
-                // But the select is not available when returning scalar ids.
-                // And to add it in AbstractEntityAdapter does not help, because
-                // the paginator requires a total count and remove all select
-                // to get it.
-                // ->addSelect($matchOrder . ' AS HIDDEN orderMatch')
-                // ->addGroupBy('orderMatch')
-                // So add a hidden select and remove order before count, but
-                // directly in the adapter.
-                // When requesting scalar results, the fix is included via a
-                // later event, awaiting integration of fix omeka/omeka-s#2224.
-                ->addOrderBy($matchOrder, $sortOrder);
         }
 
         return $this;
@@ -1428,7 +1340,7 @@ class SearchResources
     }
 
     /**
-     * Build query filter on value.
+     * Build query filter on value on a field (property, term or index).
      *
      * @see \Omeka\Api\Adapter\AbstractResourceEntityAdapter::buildPropertyQuery()
      * @see \AdvancedSearch\Stdlib\SearchResources::buildPropertyQuery()
@@ -1437,7 +1349,8 @@ class SearchResources
      * Query format:
      *
      * - filter[{index}][join]: "and" OR "or" OR "not" joiner with previous query
-     * - filter[{index}][field]: property ID or term or array of property IDs or terms
+     * - filter[{index}][field]: property ID, term or indexed field, or array of
+     *   property IDs, terms or indexed fields
      * - filter[{index}][val]: search text or array of texts or values
      * - filter[{index}][type]: search type
      * - filter[{index}][datatype]: filter on data type(s)
@@ -2466,6 +2379,127 @@ class SearchResources
         return $this;
     }
 
+    protected function sortQuery(QueryBuilder $qb, array $query): self
+    {
+        // Order by is the last part or a sql query.
+        // Sort by listed id.
+        // The list is the one set in key "sort_ids" or in main query key "id".
+        // The sort order is "desc" for resource/browse (see plugin SetBrowseDefault::__invoke())
+        // and as "asc" in api (see AbstractEntityAdapter::buildQuery()).
+        if (isset($query['sort_by'])
+            && $query['sort_by'] === 'ids'
+            && (!empty($query['sort_ids']) || !empty($query['id']))
+        ) {
+            $expr = $qb->expr();
+            /** @see \Omeka\Api\Adapter\AbstractEntityAdapter::buildBaseQuery() */
+            // Avoid a strict type issue, so convert ids as string.
+            // Normally, the query is cleaned before.
+            $ids = empty($query['sort_ids']) ? $query['id'] : $query['sort_ids'];
+            if (is_int($ids)) {
+                $ids = [(string) $ids];
+            } elseif (is_string($ids)) {
+                $ids = strpos($ids, ',') === false ? [$ids] : explode(',', $ids);
+            } elseif (!is_array($ids)) {
+                $ids = [];
+            }
+            $ids = array_map('trim', $ids);
+            $ids = array_filter($ids, 'strlen');
+            if ($ids) {
+                $idsAlias = $this->adapter->createAlias();
+                $idsPlaceholder = ':' . $idsAlias;
+                $qb
+                    ->setParameter($idsAlias, $ids, Connection::PARAM_INT_ARRAY)
+                    ->addOrderBy("FIELD(omeka_root.id, $idsPlaceholder)", $query['sort_order'])
+                    // In AbstractEntityAdapter::search(), the countQb is a
+                    // clone of this qb that removes the orderBy part, but not
+                    // the parameters associated to it. So a fake argument Where
+                    // is added , to avoid a doctrine issue.
+                    // TODO Patch omeka: get the dql part orderBy, get the parameter associated to it, check if is used somewhere before removing it.
+                    ->andWhere($expr->in(
+                        $this->adapter->createNamedParameter($qb, reset($ids)),
+                        $idsPlaceholder
+                    ));
+            }
+        } elseif (isset($query['sort_by'])
+            // The event "api.search.query.finalize is skipped In scalar search,
+            // so pass it here.
+            /** @see \Omeka\Module::searchFullText() */
+            && isset($query['fulltext_search'])
+            && in_array($query['sort_by'], ['relevance', 'relevance desc', 'relevance asc'])
+            && trim($query['fulltext_search']) !== ''
+        ) {
+            // The order is slightly different from the standard one, because
+            // an order by id desc is appended automatically, so all results
+            // with the same score are sorted by id desc and not randomly.
+            // Don't use "`" here for doctrine.
+            $matchOrder = 'MATCH(omeka_fulltext_search.title, omeka_fulltext_search.text) AGAINST (:omeka_fulltext_search)';
+            $sortOrder = $query['sort_by'] === 'relevance asc' ? 'ASC' : 'DESC';
+            $qb
+                // The hidden select and "group by" avoids issue with mysql mode "only_full_group_by".
+                // But the select is not available when returning scalar ids.
+                // And to add it in AbstractEntityAdapter does not help, because
+                // the paginator requires a total count and remove all select
+                // to get it.
+                // ->addSelect($matchOrder . ' AS HIDDEN orderMatch')
+                // ->addGroupBy('orderMatch')
+                // So add a hidden select and remove order before count, but
+                // directly in the adapter.
+                // When requesting scalar results, the fix is included via a
+                // later event, awaiting integration of fix omeka/omeka-s#2224.
+                ->addOrderBy($matchOrder, $sortOrder);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Build query to check data of empty item sets for items.
+     */
+    protected function searchItemItemSets(QueryBuilder $qb, array $query): self
+    {
+        if ($this->adapter instanceof ItemAdapter
+            && isset($query['item_set_id'])
+            && $query['item_set_id'] !== ''
+            && $query['item_set_id'] !== []
+        ) {
+            $expr = $qb->expr();
+            $itemSetIds = is_array($query['item_set_id'])
+                ? array_values($query['item_set_id'])
+                : [$query['item_set_id']];
+                $itemSetAlias = $this->adapter->createAlias();
+            if (array_values($itemSetIds) === [0]) {
+                $qb
+                    ->leftJoin(
+                        'omeka_root.itemSets',
+                        $itemSetAlias
+                        )
+                    ->andWhere($expr->isNull("$itemSetAlias.id"));
+            } elseif (in_array(0, $itemSetIds, true)) {
+                $qb
+                    ->leftJoin(
+                        'omeka_root.itemSets',
+                        $itemSetAlias
+                    )
+                    ->andWhere($expr->orX(
+                        $expr->isNull("$itemSetAlias.id"),
+                        $expr->in(
+                            "$itemSetAlias.id",
+                            $this->adapter->createNamedParameter($qb, $itemSetIds)
+                        )
+                    ));
+            } else {
+                $qb
+                    ->innerJoin(
+                        'omeka_root.itemSets',
+                        $itemSetAlias, Join::WITH,
+                        $expr->in("$itemSetAlias.id", $this->adapter->createNamedParameter($qb, $itemSetIds))
+                    );
+            }
+        }
+
+        return $this;
+    }
+
     /**
      * Build query to check data of medias from items.
      *
@@ -2572,7 +2606,7 @@ class SearchResources
     }
 
     /**
-     * Build query to check by media types.
+     * Build query to check by multiple media types.
      */
     protected function searchByMediaType(QueryBuilder $qb, array $query): self
     {

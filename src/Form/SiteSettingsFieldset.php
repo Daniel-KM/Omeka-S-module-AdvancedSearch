@@ -10,6 +10,8 @@ use Omeka\Settings\AbstractSettings;
 
 class SiteSettingsFieldset extends Fieldset
 {
+    use TraitCommonSettings;
+
     /**
      * @var AbstractSettings
      */
@@ -52,18 +54,9 @@ class SiteSettingsFieldset extends Fieldset
         $this
             ->setAttribute('id', 'advanced-search')
             ->setOption('element_groups', $this->elementGroups)
-            ->add([
-                'name' => 'advancedsearch_property_improved',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'element_group' => 'search',
-                    'label' => 'Support improved search of properties (not recommended: use filters)', // @translate
-                    'info' => 'To override the default search elements is not recommended, so the improvements are now available in the element "filter".', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'advancedsearch_property_improved',
-                ],
-            ])
+
+            ->initImprovedSearch()
+
             ->add([
                 'name' => 'advancedsearch_search_fields',
                 'type' => CommonElement\OptionalMultiCheckbox::class,

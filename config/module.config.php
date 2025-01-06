@@ -374,6 +374,8 @@ return [
     'advancedsearch' => [
         'settings' => [
             'advancedsearch_property_improved' => false,
+            'advancedsearch_metadata_improved' => false,
+            'advancedsearch_media_type_improved' => false,
             'advancedsearch_fulltextsearch_alto' => false,
             'advancedsearch_main_config' => 1,
             'advancedsearch_api_config' => '',
@@ -384,6 +386,8 @@ return [
         ],
         'site_settings' => [
             'advancedsearch_property_improved' => false,
+            'advancedsearch_resource_metadata_improved' => false,
+            'advancedsearch_media_type_improved' => false,
             'advancedsearch_search_fields' => [
                 'common/advanced-search/sort',
                 'common/advanced-search/fulltext',
@@ -391,13 +395,18 @@ return [
                 // 'common/advanced-search/properties-improved',
                 'common/advanced-search/filters',
                 'common/advanced-search/resource-class',
+                // 'common/advanced-search/resource-class-improved',
                 // 'common/advanced-search/resource-template',
+                // 'common/advanced-search/resource-template-improved',
                 'common/advanced-search/item-sets',
+                // 'common/advanced-search/item-sets-improved',
                 'common/advanced-search/date-time',
                 'common/advanced-search/has-media',
                 'common/advanced-search/ids',
                 // Modules.
+                'common/advanced-search/media-types',
                 'common/advanced-search/media-type',
+                // 'common/advanced-search/media-type-improved',
                 'common/advanced-search/data-type-geography',
                 'common/numeric-data-types-advanced-search',
             ],

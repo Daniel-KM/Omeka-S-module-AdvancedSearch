@@ -282,6 +282,7 @@ class SearchingFilters extends AbstractHelper
                 // case 'id':
                 case 'in_sites':
                 // Added by this module.
+                // Dynamic aliases are already checked too.
                 case 'datetime':
                 case 'filter':
                 case 'has_original':

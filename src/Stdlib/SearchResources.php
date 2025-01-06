@@ -935,7 +935,7 @@ class SearchResources
     }
 
     /**
-     * Copy:
+     * Adapted:
      * @see \AdvancedSearch\View\Helper\SearchFilters::expandFieldQueryArgs()
      * @see \AdvancedSearch\Stdlib\SearchResources::expandFieldQueryArgs()
      */
@@ -952,6 +952,7 @@ class SearchResources
                 ];
                 unset($query[$field]);
             } elseif ($term = $this->easyMeta->propertyTerm($field)) {
+                // When the shortcut is not listed, it means a standard query.
                 $query['filter'][] = [
                     'join' => 'and',
                     'field' => $term,

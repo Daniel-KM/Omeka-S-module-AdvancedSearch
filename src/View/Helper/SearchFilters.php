@@ -36,6 +36,11 @@ class SearchFilters extends AbstractHelper
     protected $query;
 
     /**
+     * @var \Common\Stdlib\EasyMeta
+     */
+    protected $easyMeta;
+
+    /**
      * The cleaned query.
      *
      * @var array
@@ -46,6 +51,14 @@ class SearchFilters extends AbstractHelper
      * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation
      */
     protected $searchConfig;
+
+    /**
+     * @var array
+     */
+    protected $searchIndex = [
+        'aliases' => [],
+        'query_args' => [],
+    ];
 
     /**
      * @var \AdvancedSearch\Query
@@ -67,11 +80,22 @@ class SearchFilters extends AbstractHelper
         $api = $plugins->get('api');
         $params = $plugins->get('params');
         $translate = $plugins->get('translate');
+        $this->easyMeta = $plugins->get('easyMeta')();
         $cleanQuery = $plugins->get('cleanQuery');
         $dataTypeHelper = $plugins->get('dataType');
 
         $filters = [];
         $query ??= $params->fromQuery();
+
+        // Use aliases and query args of the current search config when not set.
+        $searchConf = $this->searchConfig ?? $plugins->get('getSearchConfig')();
+        // TODO Add aliases and query args in all configs.
+        $this->searchIndex = ['aliases' => [], 'query_args' => []];
+        if ($searchConf) {
+            $this->searchIndex = $searchConf->setting('index', []) + $this->searchIndex;
+        }
+
+        $query = $this->expandFieldQueryArgs($query);
 
         $this->baseUrl = $url(null, [], true);
         $this->query = $cleanQuery($query);
@@ -169,8 +193,6 @@ class SearchFilters extends AbstractHelper
                 // Search values (by property or all)
                 case 'property':
                     $queryTypesLabels = $this->getQueryTypesLabels();
-                    /** @var \Common\Stdlib\EasyMeta $easyMeta */
-                    $easyMeta = $plugins->get('easyMeta')();
                     // TODO The array may be more than zero when firsts are standard (see core too for inverse).
                     $index = 0;
                     foreach ($value as $subKey => $queryRow) {
@@ -203,7 +225,7 @@ class SearchFilters extends AbstractHelper
                             $propertyLabel = [];
                             $properties = is_array($queriedProperties) ? $queriedProperties : [$queriedProperties];
                             foreach ($properties as $property) {
-                                $label = $easyMeta->propertyLabel($property);
+                                $label = $this->easyMeta->propertyLabel($property);
                                 $propertyLabel[] = $label ? $translate($label) : $translate('Unknown property'); // @translate
                             }
                             $propertyLabel = implode(' ' . $translate('OR') . ' ', array_unique($propertyLabel));
@@ -393,9 +415,6 @@ class SearchFilters extends AbstractHelper
                         $vrTitles = array_column($qb->getQuery()->getScalarResult(), 'title', 'id');
                     }
 
-                    /** @var \Common\Stdlib\EasyMeta $easyMeta */
-                    $easyMeta = $plugins->get('easyMeta')();
-
                     $queryTypesLabels = $this->getQueryTypesLabels();
                     $searchFormAdvancedLabels = array_column($searchFormSettings['advanced']['fields'] ?? [], 'label', 'value');
                     $fieldFiltersLabels = array_replace($fieldLabels, array_filter($searchFormAdvancedLabels));
@@ -434,17 +453,15 @@ class SearchFilters extends AbstractHelper
                         }
 
                         // Prepare label.
-                        // Support default solr index names to simplify
-                        // compatibility of custom themes.
-                        if ($queryFields) {
+                        if (isset($queryRow['label'])) {
+                            $fieldLabel = $queryRow['label'];
+                        } elseif ($queryFields) {
                             $fieldLabel = [];
                             foreach (is_array($queryFields) ? $queryFields : [$queryFields] as $queryField) {
                                 if (isset($fieldFiltersLabels[$queryField])) {
                                     $fieldLabel[] = $fieldFiltersLabels[$queryField];
-                                } elseif (strpos($queryField, '_')) {
-                                    $fieldLabel[] = $fieldFiltersLabels[strtok($queryField, '_') . ':' . strtok('_')] ?? $translate('Unknown field'); // @translate
                                 } else {
-                                    $propertyLabel = $easyMeta->propertyLabel($queryField);
+                                    $propertyLabel = $this->easyMeta->propertyLabel($queryField);
                                     if ($propertyLabel) {
                                         $fieldLabel[] = $translate($propertyLabel);
                                     } else {
@@ -664,5 +681,40 @@ class SearchFilters extends AbstractHelper
         return $newQuery
             ? $this->baseUrl . '?' . http_build_query($newQuery, '', '&', PHP_QUERY_RFC3986)
             : $this->baseUrl;
+    }
+
+    /**
+     * Adapted:
+     * @see \AdvancedSearch\View\Helper\SearchFilters::expandFieldQueryArgs()
+     * @see \AdvancedSearch\Stdlib\SearchResources::expandFieldQueryArgs()
+     */
+    protected function expandFieldQueryArgs(array $query): array
+    {
+        foreach ($query as $field => $value) {
+            if (isset($this->searchIndex['query_args'][$field])) {
+                $query['filter'][] = [
+                    'join' => $this->searchIndex['query_args'][$field]['join'] ?? 'and',
+                    'field' => $field,
+                    'type' => $this->searchIndex['query_args'][$field]['type'] ?? 'eq',
+                    'val' => $value,
+                    'datatype' => $this->searchIndex['query_args'][$field]['datatype'] ?? null,
+                    // TODO Use the label of the search config filter when present. For now, the admin should be consistent.
+                    'label' => $this->searchIndex['aliases'][$field]['label'] ?? null,
+                ];
+                unset($query[$field]);
+            } elseif ($term = $this->easyMeta->propertyTerm($field)) {
+                // When the shortcut is not listed, it means a standard query
+                // a dynamic query arg.
+                $query['filter'][] = [
+                    'join' => 'and',
+                    'field' => $term,
+                    'type' =>'eq',
+                    'val' => $value,
+                    'label' => $this->searchIndex['aliases'][$field]['label'] ?? null,
+                ];
+                unset($query[$field]);
+            }
+        }
+        return $query;
     }
 }

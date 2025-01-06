@@ -895,6 +895,22 @@ class Module extends AbstractModule
             }
         }
 
+        // Manage a special omeka option for sites.
+        if ($isSite) {
+            if ($siteSettings->get('search_restrict_templates')) {
+                if (($key = array_search('common/advanced-search/resource-template', $partials)) !== false) {
+                    $partials[$key] = 'common/advanced-search/resource-template-restrict';
+                }
+                if (($key = array_search('common/advanced-search/resource-template-improved', $partials)) !== false) {
+                    $partials[$key] = 'common/advanced-search/resource-template-restrict';
+                }
+            } elseif (($key = array_search('common/advanced-search/resource-template-restrict', $partials)) !== false) {
+                unset($partials[$key]);
+            }
+        } elseif (($key = array_search('common/advanced-search/resource-template-restrict', $partials)) !== false) {
+            unset($partials[$key]);
+        }
+
         // Reorder, deduplicate the list and filter with selected list.
         $partials = array_values(array_intersect(array_keys($searchFields), array_unique($partials), $selectedSearchFields));
 

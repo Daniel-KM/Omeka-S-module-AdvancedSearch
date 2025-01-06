@@ -80,6 +80,10 @@ class SearchResources
             'exm' => 'nexm',
             'nexm' => 'exm',
             // Data type.
+            'dt' => 'ndt',
+            'ndt' => 'dt',
+            'dtp' => 'ndtp',
+            'ndtp' => 'dtp',
             'tp' => 'ntp',
             'ntp' => 'tp',
             'tpl' => 'ntpl',
@@ -88,8 +92,6 @@ class SearchResources
             'ntpr' => 'tpr',
             'tpu' => 'ntpu',
             'ntpu' => 'tpu',
-            'dtp' => 'ndtp',
-            'ndtp' => 'dtp',
             // Curation (duplicates).
             'dup' => 'ndup',
             'ndup' => 'dup',
@@ -147,11 +149,12 @@ class SearchResources
             'nexs',
             'nexm',
             // Data type.
+            'ndt',
+            'ndtp',
             'ntp',
             'ntpl',
             'ntpr',
             'ntpu',
-            'ndtp',
             // Curation (duplicates).
             'ndup',
             'ndupl',
@@ -1351,8 +1354,8 @@ class SearchResources
      * - filter[{index}][join]: "and" OR "or" OR "not" joiner with previous query
      * - filter[{index}][field]: property ID, term or indexed field, or array of
      *   property IDs, terms or indexed fields
-     * - filter[{index}][val]: search text or array of texts or values
      * - filter[{index}][type]: search type
+     * - filter[{index}][val]: search text or array of texts or values
      * - filter[{index}][datatype]: filter on data type(s)
      *
      * @see self::buildQueryForRow() for details.
@@ -1485,6 +1488,8 @@ class SearchResources
      *   - exm: has multiple values
      *   - nexm: does not have multiple values
      * Data type
+     *   - dt: has data type (core)
+     *   - ndt: does not have data type (core)
      *   - dtp: has data type
      *   - ndtp: does not have data type
      *   - tp: has main type
@@ -2027,6 +2032,7 @@ class SearchResources
                 );
                 break;
 
+            case 'dt':
             case 'dtp':
                 if (count($value) <= 1) {
                     $dataTypeAlias = $this->adapter->createNamedParameter($qb, reset($value));

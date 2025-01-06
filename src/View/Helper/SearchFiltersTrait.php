@@ -75,6 +75,10 @@ trait SearchFiltersTrait
                 'exm' => $this->translator->translate('has multiple values'), // @translate
                 'nexm' => $this->translator->translate('does not have multiple values'), // @translate
                 // Data type.
+                'dt' => $this->translator->translate('has data type'), // @translate
+                'ndt' => $this->translator->translate('does not have data type'), // @translate
+                'dtp' => $this->translator->translate('has data type'), // @translate
+                'ndtp' => $this->translator->translate('does not have data type'), // @translate
                 'tp' => $this->translator->translate('has main type'), // @translate
                 'ntp' => $this->translator->translate('does not have main type'), // @translate
                 'tpl' => $this->translator->translate('has type literal-like'), // @translate
@@ -83,8 +87,6 @@ trait SearchFiltersTrait
                 'ntpr' => $this->translator->translate('does not have type resource-like'), // @translate
                 'tpu' => $this->translator->translate('has type uri-like'), // @translate
                 'ntpu' => $this->translator->translate('does not have type uri-like'), // @translate
-                'dtp' => $this->translator->translate('has data type'), // @translate
-                'ndtp' => $this->translator->translate('does not have data type'), // @translate
                 // Curation (duplicates).
                 'dup' => $this->translator->translate('has duplicate values'), // @translate
                 'ndup' => $this->translator->translate('does not have duplicate values'), // @translate

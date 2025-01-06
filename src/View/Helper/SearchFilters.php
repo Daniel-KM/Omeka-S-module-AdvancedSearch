@@ -68,6 +68,7 @@ class SearchFilters extends AbstractHelper
         $params = $plugins->get('params');
         $translate = $plugins->get('translate');
         $cleanQuery = $plugins->get('cleanQuery');
+        $dataTypeHelper = $plugins->get('dataType');
 
         $filters = [];
         $query ??= $params->fromQuery();
@@ -221,7 +222,12 @@ class SearchFilters extends AbstractHelper
                                 $filterLabel = $translate('AND') . ' ' . $filterLabel;
                             }
                         }
-                        if (in_array($queryType, ['resq', 'nresq', 'lkq', 'nlkq']) && !$noValue) {
+                        // If this is a data type query, convert the value to
+                        // the data type's label.
+                        // This is a single value, so don't use improved 'dtp'/'ndtp'.
+                        if (in_array($queryType, ['dt', 'ndt'])) {
+                            $text = $dataTypeHelper->getLabel($text);
+                        } elseif (in_array($queryType, ['resq', 'nresq', 'lkq', 'nlkq']) && !$noValue) {
                             $text = array_map('urldecode', $text);
                         }
                         $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $noValue
@@ -461,9 +467,19 @@ class SearchFilters extends AbstractHelper
                             $filterLabel = ($joiners[$joiner] ?? $joiners['and']) . ' ' . $filterLabel;
                         }
 
-                        $vals = in_array($queryType, SearchResources::FIELD_QUERY['value_subject'])
-                            ? $flatArrayValueResourceIds($val, $vrTitles)
-                            : $flatArray($val);
+                        if (in_array($queryType, SearchResources::FIELD_QUERY['value_subject'])) {
+                            $vals = $flatArrayValueResourceIds($val, $vrTitles);
+                        } else {
+                            $vals = $flatArray($val);
+                            // If this is a data type query, convert the value
+                            // to the data type's label.
+                            if (in_array($queryType, ['dt', 'ndt', 'dtp', 'ndtp'])) {
+                                $vals = array_map(fn ($v) => $dataTypeHelper->getLabel($v), $vals);
+                            } elseif (in_array($queryType, ['resq', 'nresq', 'lkq', 'nlkq']) && !$noValue) {
+                                $vals = array_map(fn ($v) => urldecode($v), $vals);
+                            }
+                        }
+
                         $filters[$filterLabel][$this->urlQuery($key, $subKey)] = implode(', ', $vals);
 
                         ++$index;

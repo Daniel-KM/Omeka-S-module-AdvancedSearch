@@ -45,7 +45,7 @@ $(document).ready(function() {
         const typeQuery = queryType.val();
         const isTypeWithoutText = ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'lex', 'nlex', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu', 'dup', 'ndup', 'dupl', 'ndupl', 'dupt', 'ndupt', 'duptl', 'nduptl', 'dupv', 'ndupv', 'dupvl', 'ndupvl', 'dupvt', 'ndupvt', 'dupvtl', 'ndupvtl', 'dupr', 'ndupr', 'duprl', 'nduprl', 'duprt', 'nduprt', 'duprtl', 'nduprtl', 'dupu', 'ndupu', 'dupul', 'ndupul', 'duput', 'nduput', 'duputl', 'nduputl'].includes(typeQuery);
         const isTypeSubQuery = ['resq', 'nresq', 'lkq', 'nlkq'].includes(typeQuery);
-        const isTypeDataType = ['dtp', 'ndtp'].includes(typeQuery);
+        const isTypeDataType = ['dt', 'ndt', 'dtp', 'ndtp'].includes(typeQuery);
         const isTypeMainType = ['tp', 'ntp'].includes(typeQuery);
         const queryTextInput = queryType.siblings('.query-text:not(.query-data-type):not(.query-main-type)');
         const queryTextSubQuery = queryType.closest('.value').find('.sub-query .query-form-query');
@@ -121,7 +121,7 @@ $(document).ready(function() {
             'seconds',
             'integer',
         ];
-        const fieldQueryTypeWithText = ['eq', 'neq', 'in', 'nin', 'sw', 'nsw', 'ew', 'new', 'near', 'nnear', 'ma', 'nma', 'lt', 'lte', 'gte', 'gt', '<', '≤', '≥', '>', 'yreq', 'nyreq', 'yrlt', 'yrlte', 'yrgte', 'yrgt', 'list', 'nlist', 'res', 'nres', 'resq', 'nresq', 'lres', 'nlres', 'lkq', 'nlkq', 'dtp', 'ndtp', 'tp', 'ntp'];
+        const fieldQueryTypeWithText = ['eq', 'neq', 'in', 'nin', 'sw', 'nsw', 'ew', 'new', 'near', 'nnear', 'ma', 'nma', 'lt', 'lte', 'gte', 'gt', '<', '≤', '≥', '>', 'yreq', 'nyreq', 'yrlt', 'yrlte', 'yrgte', 'yrgt', 'list', 'nlist', 'res', 'nres', 'resq', 'nresq', 'lres', 'nlres', 'lkq', 'nlkq', 'dt', 'ndt', 'dtp', 'ndtp', 'tp', 'ntp'];
         form.find(":input[name]:not([name='']):not(:disabled)").each(function(index) {
             const input = $(this);
             const inputName = input.attr('name');

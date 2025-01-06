@@ -75,6 +75,8 @@ var Search = (function() {
             'nlres',
             'lkq',
             'nlkq',
+            'dt',
+            'ndt',
             'dtp',
             'ndtp',
             'tp',

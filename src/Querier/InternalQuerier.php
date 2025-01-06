@@ -518,44 +518,27 @@ class InternalQuerier extends AbstractQuerier
         $this->appendHiddenFilters();
         $this->filterQuery();
 
+        // Estimate the number of joins early.
         $totalProperties = count($this->args['property'] ?? []);
         $totalFilters = count($this->args['filter'] ?? []);
-        $totalPropertiesAndFilters = $totalProperties + $totalFilters;
-
+        $totalPropertiesAndFilters = $totalProperties + $totalFilters + count($this->args) - 10;
         if ($totalPropertiesAndFilters > self::REQUEST_MAX_ARGS) {
             $plugins = $this->services->get('ControllerPluginManager');
+            $messenger = $plugins->get('messenger');
             $params = $plugins->get('params');
             $req = $params->fromQuery();
             unset($req['csrf']);
             $req = urldecode(http_build_query(array_filter($req), '', '&', PHP_QUERY_RFC3986));
-            $messenger = $plugins->get('messenger');
-            if ($this->query->getExcludedFields()) {
-                $message = new PsrMessage(
-                    'The query "{query}" uses {count} properties or filters, that is more than the {total} supported currently. Excluded fields are removed.', // @translate
-                    ['query' => $req, 'count' => $totalPropertiesAndFilters, 'total' => self::REQUEST_MAX_ARGS]
-                );
-                $this->query->setExcludedFields([]);
-                $messenger->addWarning($message);
-                $this->logger->warn($message->getMessage(), $message->getContext());
-                return $this->getPreparedQuery();
-            }
-
             $message = new PsrMessage(
-                'The query "{query}" uses {count} properties or filters, that is more than the {total} supported currently. Request is troncated.', // @translate
+                'The query "{query}" uses {count} properties or filters, that is more than the {total} supported currently. The query should be simplified.', // @translate
                 ['query' => $req, 'count' => $totalPropertiesAndFilters, 'total' => self::REQUEST_MAX_ARGS]
             );
             $messenger->addWarning($message);
-            $this->logger->warn($message->getMessage(), $message->getContext());
-            if ($totalProperties) {
-                $this->args['property'] = array_slice($this->args['property'] ?? [], 0, self::REQUEST_MAX_ARGS);
-            } else {
-                unset($this->args['property']);
-            }
-            if (!$totalFilters || ((self::REQUEST_MAX_ARGS - $totalProperties) <= 0)) {
-                unset($this->args['filter']);
-            } else {
-                $this->args['filter'] = array_slice($this->args['filter'] ?? [], 0, self::REQUEST_MAX_ARGS - $totalProperties);
-            }
+            $this->logger->warn(
+                'A user tried a query with {count} arguments. The config or theme should be checked to forbid them earlier. Query: {query}', // @translate
+                ['count' => $totalPropertiesAndFilters, 'query' => $req]
+            );
+            return null;
         }
 
         $sort = $this->query->getSort();

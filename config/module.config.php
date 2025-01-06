@@ -397,6 +397,7 @@ return [
                 'common/advanced-search/visibility-radio',
                 'common/advanced-search/ids',
                 // Modules.
+                'common/advanced-search/item-set-is-dynamic',
                 'common/advanced-search/data-type-geography',
                 'common/numeric-data-types-advanced-search',
             ],
@@ -625,6 +626,14 @@ return [
             'common/advanced-search/data-type-geography' => [
                 'module' => 'DataTypeGeometry',
                 'label' => 'Geography', // @translate
+            ],
+
+            // From module dynamic item sets.
+            'common/advanced-search/item-set-is-dynamic' => [
+                'module' => 'Dynamic Item Sets',
+                'label' => 'Is dynamic item set', // @translate
+                'default_site' => false,
+                'resource_type' => ['item_sets'],
             ],
 
             // From module numeric data type.

@@ -86,10 +86,12 @@ class IndexController extends AbstractActionController
         $settingKeys = [
             'advancedsearch_property_improved'
                 => 'The setting to override search element "properties" is enabled. This feature is deprecated and will be removed in a future version. All improved queries should be replaced by the equivalent filter queries. Check your pages and settings. Matching sites: {json}', // @translate
+            /*
             'advancedsearch_metadata_improved'
                 => 'The setting to override search resource metadata is enabled to allow to search resources without owner, class, template or item set. This feature is deprecated and will be removed in a future version. All improved queries should be replaced by the equivalent filter meta queries. Check your pages and settings. Matching sites: {json}', // @translate
             'advancedsearch_media_type_improved'
                 => 'The setting to override search element "media type" is enabled to allow to search main and multiple media-types. This feature is deprecated and will be removed in a future version. All improved queries should be replaced by the equivalent filter meta queries. Check your pages and settings. Matching sites: {json}', // @translate
+            */
         ];
 
         foreach ($settingKeys as $settingKey => $settingMessage) {

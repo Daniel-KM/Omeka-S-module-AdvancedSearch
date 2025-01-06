@@ -80,14 +80,14 @@ only via api, not in the advanced search form for now):
     - `lkq`/`nlkq`: is or is not linked with resources matching query
 - Count:
     - `ex`/`nex`: has any value or has no value (default Omeka)
-    - `exs`/`nexs`: has or has not a single value
-    - `exm`/`nexm`: has or has not multiple values
+    - `exs`/`nexs`: has or does not have a single value
+    - `exm`/`nexm`: has or does not have multiple values
 - Data Type:
-    - `tp`/`ntp`: has or has not main type (literal-like, resource-like, uri-like)
-    - `tpl`/`ntpl`: has or has not type literal-like
-    - `tpr`/`ntpr`: has or has not type resource-like
-    - `tpu`/`ntpu`: has or has not type uri-like
-    - `dtp`/`ndtp`: has or has not data type
+    - `tp`/`ntp`: has or does not have main type (literal-like, resource-like, uri-like)
+    - `tpl`/`ntpl`: has or does not have type literal-like
+    - `tpr`/`ntpr`: has or does not have type resource-like
+    - `tpu`/`ntpu`: has or does not have type uri-like
+    - `dtp`/`ndtp`: has or does not have data type
 - Comparisons (alphabetical):
     - `lt`: lower than
     - `lte`: lower than or equal

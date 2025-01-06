@@ -385,7 +385,7 @@ msgstr ""
 #: src/View/Helper/SearchFiltersTrait.php:74
 #: view/common/advanced-search/filters.phtml:189
 #: view/common/advanced-search/properties-improved.phtml:182
-msgid "has not a single value"
+msgid "does not have a single value"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:75
@@ -397,7 +397,7 @@ msgstr ""
 #: src/View/Helper/SearchFiltersTrait.php:76
 #: view/common/advanced-search/filters.phtml:191
 #: view/common/advanced-search/properties-improved.phtml:184
-msgid "has not multiple values"
+msgid "does not have multiple values"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:78
@@ -409,7 +409,7 @@ msgstr ""
 #: src/View/Helper/SearchFiltersTrait.php:79
 #: view/common/advanced-search/filters.phtml:197
 #: view/common/advanced-search/properties-improved.phtml:190
-msgid "has not main type"
+msgid "does not have main type"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:80
@@ -421,7 +421,7 @@ msgstr ""
 #: src/View/Helper/SearchFiltersTrait.php:81
 #: view/common/advanced-search/filters.phtml:199
 #: view/common/advanced-search/properties-improved.phtml:192
-msgid "has not type literal-like"
+msgid "does not have type literal-like"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:82
@@ -433,7 +433,7 @@ msgstr ""
 #: src/View/Helper/SearchFiltersTrait.php:83
 #: view/common/advanced-search/filters.phtml:201
 #: view/common/advanced-search/properties-improved.phtml:194
-msgid "has not type resource-like"
+msgid "does not have type resource-like"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:84
@@ -445,7 +445,7 @@ msgstr ""
 #: src/View/Helper/SearchFiltersTrait.php:85
 #: view/common/advanced-search/filters.phtml:203
 #: view/common/advanced-search/properties-improved.phtml:196
-msgid "has not type uri-like"
+msgid "does not have type uri-like"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:86
@@ -457,7 +457,7 @@ msgstr ""
 #: src/View/Helper/SearchFiltersTrait.php:87
 #: view/common/advanced-search/filters.phtml:195
 #: view/common/advanced-search/properties-improved.phtml:188
-msgid "has not data type"
+msgid "does not have data type"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:89
@@ -469,7 +469,7 @@ msgstr ""
 #: src/View/Helper/SearchFiltersTrait.php:90
 #: view/common/advanced-search/filters.phtml:207
 #: view/common/advanced-search/properties-improved.phtml:200
-msgid "has not duplicate values"
+msgid "does not have duplicate values"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:91
@@ -481,7 +481,7 @@ msgstr ""
 #: src/View/Helper/SearchFiltersTrait.php:92
 #: view/common/advanced-search/filters.phtml:209
 #: view/common/advanced-search/properties-improved.phtml:202
-msgid "has not duplicate values and type"
+msgid "does not have duplicate values and type"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:93
@@ -493,7 +493,7 @@ msgstr ""
 #: src/View/Helper/SearchFiltersTrait.php:94
 #: view/common/advanced-search/filters.phtml:211
 #: view/common/advanced-search/properties-improved.phtml:204
-msgid "has not duplicate values and language"
+msgid "does not have duplicate values and language"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:95
@@ -505,7 +505,7 @@ msgstr ""
 #: src/View/Helper/SearchFiltersTrait.php:96
 #: view/common/advanced-search/filters.phtml:213
 #: view/common/advanced-search/properties-improved.phtml:206
-msgid "has not duplicate values, type and language"
+msgid "does not have duplicate values, type and language"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:97
@@ -517,7 +517,7 @@ msgstr ""
 #: src/View/Helper/SearchFiltersTrait.php:98
 #: view/common/advanced-search/filters.phtml:215
 #: view/common/advanced-search/properties-improved.phtml:208
-msgid "has not duplicate simple values"
+msgid "does not have duplicate simple values"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:99
@@ -529,7 +529,7 @@ msgstr ""
 #: src/View/Helper/SearchFiltersTrait.php:100
 #: view/common/advanced-search/filters.phtml:217
 #: view/common/advanced-search/properties-improved.phtml:210
-msgid "has not duplicate simple values and type"
+msgid "does not have duplicate simple values and type"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:101
@@ -541,7 +541,7 @@ msgstr ""
 #: src/View/Helper/SearchFiltersTrait.php:102
 #: view/common/advanced-search/filters.phtml:219
 #: view/common/advanced-search/properties-improved.phtml:212
-msgid "has not duplicate simple values and language"
+msgid "does not have duplicate simple values and language"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:103
@@ -553,7 +553,7 @@ msgstr ""
 #: src/View/Helper/SearchFiltersTrait.php:104
 #: view/common/advanced-search/filters.phtml:221
 #: view/common/advanced-search/properties-improved.phtml:214
-msgid "has not duplicate simple values, type and language"
+msgid "does not have duplicate simple values, type and language"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:105
@@ -565,7 +565,7 @@ msgstr ""
 #: src/View/Helper/SearchFiltersTrait.php:106
 #: view/common/advanced-search/filters.phtml:223
 #: view/common/advanced-search/properties-improved.phtml:216
-msgid "has not duplicate linked resources"
+msgid "does not have duplicate linked resources"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:107
@@ -577,7 +577,7 @@ msgstr ""
 #: src/View/Helper/SearchFiltersTrait.php:108
 #: view/common/advanced-search/filters.phtml:225
 #: view/common/advanced-search/properties-improved.phtml:218
-msgid "has not duplicate linked resources and type"
+msgid "does not have duplicate linked resources and type"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:109
@@ -589,7 +589,7 @@ msgstr ""
 #: src/View/Helper/SearchFiltersTrait.php:110
 #: view/common/advanced-search/filters.phtml:227
 #: view/common/advanced-search/properties-improved.phtml:220
-msgid "has not duplicate linked resources and language"
+msgid "does not have duplicate linked resources and language"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:111
@@ -601,7 +601,7 @@ msgstr ""
 #: src/View/Helper/SearchFiltersTrait.php:112
 #: view/common/advanced-search/filters.phtml:229
 #: view/common/advanced-search/properties-improved.phtml:222
-msgid "has not duplicate linked resources, type and language"
+msgid "does not have duplicate linked resources, type and language"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:113
@@ -613,7 +613,7 @@ msgstr ""
 #: src/View/Helper/SearchFiltersTrait.php:114
 #: view/common/advanced-search/filters.phtml:231
 #: view/common/advanced-search/properties-improved.phtml:224
-msgid "has not duplicate uris"
+msgid "does not have duplicate uris"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:115
@@ -625,7 +625,7 @@ msgstr ""
 #: src/View/Helper/SearchFiltersTrait.php:116
 #: view/common/advanced-search/filters.phtml:233
 #: view/common/advanced-search/properties-improved.phtml:226
-msgid "has not duplicate uris and type"
+msgid "does not have duplicate uris and type"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:117
@@ -637,7 +637,7 @@ msgstr ""
 #: src/View/Helper/SearchFiltersTrait.php:118
 #: view/common/advanced-search/filters.phtml:235
 #: view/common/advanced-search/properties-improved.phtml:228
-msgid "has not duplicate uris and language"
+msgid "does not have duplicate uris and language"
 msgstr ""
 
 #: src/View/Helper/SearchFiltersTrait.php:119
@@ -649,7 +649,7 @@ msgstr ""
 #: src/View/Helper/SearchFiltersTrait.php:120
 #: view/common/advanced-search/filters.phtml:237
 #: view/common/advanced-search/properties-improved.phtml:230
-msgid "has not duplicate uris, type and language"
+msgid "does not have duplicate uris, type and language"
 msgstr ""
 
 #: src/View/Helper/SearchingFilters.php:234

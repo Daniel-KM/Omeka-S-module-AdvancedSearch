@@ -1568,57 +1568,57 @@ class SearchResources
      *   - ex: has any value (core)
      *   - nex: has no values (core)
      *   - exs: has a single value
-     *   - nexs: has not a single value
+     *   - nexs: does not have a single value
      *   - exm: has multiple values
-     *   - nexm: has not multiple values
+     *   - nexm: does not have multiple values
      * Data type
      *   - dtp: has data type
-     *   - ndtp: has not data type
+     *   - ndtp: does not have data type
      *   - tp: has main type
-     *   - ntp: has not main type
+     *   - ntp: does not have main type
      *   - tpl: has type literal-like
-     *   - ntpl: has not type literal-like
+     *   - ntpl: does not have type literal-like
      *   - tpr: has type resource-like
-     *   - ntpr: has not type resource-like
+     *   - ntpr: does not have type resource-like
      *   - tpu: has type uri-like
-     *   - ntpu: has not type uri-like
+     *   - ntpu: does not have type uri-like
      * Curation (duplicates)
      *   Curation duplicate all (values as generic)
      *   - dup: has duplicate values
-     *   - ndup: has not duplicate values
+     *   - ndup: does not have duplicate values
      *   - dupt: has duplicate values and type
-     *   - ndupt: has not duplicate values and type
+     *   - ndupt: does not have duplicate values and type
      *   - dupl: has duplicate values and language
-     *   - ndupl: has not duplicate values and language
+     *   - ndupl: does not have duplicate values and language
      *   - duptl: has duplicate values, type and language
-     *   - nduptl: has not duplicate values, type and language
+     *   - nduptl: does not have duplicate values, type and language
      *   Curation duplicate values (values as strict)
      *   - dupv: has duplicate simple values
-     *   - ndupv: has not duplicate simple values
+     *   - ndupv: does not have duplicate simple values
      *   - dupvt: has duplicate simple values and type
-     *   - ndupvt: has not duplicate simple values and type
+     *   - ndupvt: does not have duplicate simple values and type
      *   - dupvl: has duplicate simple values and language
-     *   - ndupvl: has not duplicate simple values and language
+     *   - ndupvl: does not have duplicate simple values and language
      *   - dupvtl: has duplicate simple values, type and language
-     *   - ndupvtl: has not duplicate simple values, type and language
+     *   - ndupvtl: does not have duplicate simple values, type and language
      *   Curation duplicate linked resources
      *   - dupr: has duplicate linked resources
-     *   - ndupr: has not duplicate linked resources
+     *   - ndupr: does not have duplicate linked resources
      *   - duprt: has duplicate linked resources and type
-     *   - nduprt: has not duplicate linked resources and type
+     *   - nduprt: does not have duplicate linked resources and type
      *   - duprl: has duplicate linked resources and language
-     *   - nduprl: has not duplicate linked resources and language
+     *   - nduprl: does not have duplicate linked resources and language
      *   - duprtl: has duplicate linked resources, type and language
-     *   - nduprtl: has not duplicate linked resources, type and language
+     *   - nduprtl: does not have duplicate linked resources, type and language
      *   Curation duplicate uris
      *   - dupu: has duplicate uris
-     *   - ndupu: has not duplicate uris
+     *   - ndupu: does not have duplicate uris
      *   - duput: has duplicate uris and type
-     *   - nduput: has not duplicate uris and type
+     *   - nduput: does not have duplicate uris and type
      *   - dupul: has duplicate uris and language
-     *   - ndupul: has not duplicate uris and language
+     *   - ndupul: does not have duplicate uris and language
      *   - duputl: has duplicate uris, type and language
-     *   - nduputl: has not duplicate uris, type and language
+     *   - nduputl: does not have duplicate uris, type and language
      *
      * @todo Add specific types to compare date and time (probably useless: alphabetical is enough with formatted date, or use module NumericDataTypes).
      * @todo The multiple types of duplicates are related to the database structure, only first should be needed.

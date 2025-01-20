@@ -901,7 +901,7 @@ class InternalQuerier extends AbstractQuerier
                             $this->args['filter'][] = [
                                 'join' => $fieldQueryArgs['join'] ?? 'and',
                                 'field' => $field,
-                                'type' => $fieldQueryArgs['type'] ?? 'eq',
+                                'type' => $fieldQueryArgs['type'] ?? 'list',
                                 'val' => $value,
                                 'datatype' => $fieldQueryArgs['datatype'] ?? null,
                             ];

@@ -382,7 +382,7 @@
         width: 1.5em;
         content: "\f0c8";
     }
-    .facet-item .active a::before {
+    .facet-item.active a::before {
         content: "\f14a";
     }
 

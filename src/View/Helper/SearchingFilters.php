@@ -11,6 +11,7 @@ use Omeka\Api\Exception\NotFoundException;
  * View helper for rendering search filters for the advanced search response.
  *
  * @deprecated Use $searchConfig->renderSearchFilters() instead.
+ * @todo Once the main standard form will support any index cleanly, all this class will be moved to SearchFilters.
  */
 class SearchingFilters extends AbstractHelper
 {
@@ -22,11 +23,18 @@ class SearchingFilters extends AbstractHelper
     protected $baseUrl;
 
     /**
-     * The cleaned query.
+     * The cleaned query without specific keys.
      *
      * @var array
      */
     protected $query;
+
+    /**
+     * The cleaned query without specific keys to build new queries.
+     *
+     * @var array
+     */
+    protected $queryForUrl;
 
     /**
      * Render filters from advanced search query.
@@ -64,6 +72,7 @@ class SearchingFilters extends AbstractHelper
      * @see \AdvancedSearch\FormAdapter\AbstractFormAdapter
      *
      * @todo Use Query instead of query? The Query is available in the request.
+     * @deprecated Will be moved to SearchFilters once refactorized.
      *
      * @var array $query The query is the cleaned query.
      * @return array The updated filters.
@@ -85,8 +94,18 @@ class SearchingFilters extends AbstractHelper
 
         $processed = $query['__processed'] ?? [];
 
+        $skip = [
+            'page' => null,
+            'offset' => null,
+            'submit' => null,
+            '__processed' => null,
+            '__original_query' => null,
+            '__searchConfig' => null,
+            '__searchQuery' => null,
+        ];
+
+        $this->query = array_diff_key($query, $skip);
         $this->baseUrl = $url(null, [], true);
-        $this->query = $query;
 
         $engineAdapter = $searchConfig->engineAdapter();
         $availableFields = $engineAdapter
@@ -100,15 +119,10 @@ class SearchingFilters extends AbstractHelper
         $availableFieldLabels = array_combine(array_keys($availableFields), array_column($availableFields ?? [], 'label'));
         $fieldLabels = array_replace($availableFieldLabels, array_filter($formFieldLabels));
 
-        $skip = [
-            'page' => null,
-            'offset' => null,
-            'submit' => null,
-            '__processed' => null,
-            '__original_query' => null,
-            '__searchConfig' => null,
-            '__searchQuery' => null,
-        ];
+        // To build tje new search filters urls, the keys should be the original
+        // ones, so clean the key filter and rebuild original query from the
+        // cleaned query.
+        $this->prepareQueryForUrl();
 
         // id is overridden.
         unset($processed['id']);
@@ -325,19 +339,45 @@ class SearchingFilters extends AbstractHelper
     }
 
     /**
+     * Prepare original query to use to build new urls skipping a part.
+     *
+     * @see \AdvancedSearch\Stdlib\SearchResources::expandFieldQueryArgs()
+     * @see \AdvancedSearch\View\Helper\SearchFilters::prepareQueryForUrl()
+     */
+    protected function prepareQueryForUrl(): self
+    {
+        $this->queryForUrl = $this->query;
+        if (empty($this->queryForUrl['filter'])) {
+            return $this;
+        }
+        foreach ($this->queryForUrl['filter'] ?? [] as $key => $filter) {
+            if (!empty($filter['is_form_filter'])) {
+                $this->queryForUrl[$filter['replaced_field']] = $filter['replaced_value'];
+                unset($this->queryForUrl['filter'][$key]);
+            }
+        }
+        if (empty($this->queryForUrl['filter'])) {
+            unset($this->queryForUrl['filter']);
+        }
+        return $this;
+    }
+
+    /**
      * Get the url of the query without the specified key and subkey.
      *
      * @param string|int $key
      * @param string|int|null $subKey
      * @return string
      *
-     * Copy:
+     * Adapted:
      * @see \AdvancedSearch\View\Helper\SearchFilters::urlQuery()
      * @see \AdvancedSearch\View\Helper\SearchingFilters::urlQuery()
+     *
+     * There is no filter here.
      */
     protected function urlQuery($key, $subKey = null): string
     {
-        $newQuery = $this->query;
+        $newQuery = $this->queryForUrl;
         if (is_null($subKey) || !is_array($newQuery[$key]) || count($newQuery[$key]) <= 1) {
             unset($newQuery[$key]);
         } else {
@@ -359,7 +399,7 @@ class SearchingFilters extends AbstractHelper
      */
     protected function urlQueryId($key, $subKey): string
     {
-        $newQuery = $this->query;
+        $newQuery = $this->queryForUrl;
         if (!is_array($newQuery[$key]) || !is_array($newQuery[$key]['id']) || count($newQuery[$key]['id']) <= 1) {
             unset($newQuery[$key]);
         } else {

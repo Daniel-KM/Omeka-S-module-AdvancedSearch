@@ -36,6 +36,13 @@ class SearchFilters extends AbstractHelper
     protected $query;
 
     /**
+     * The cleaned query without specific keys to build new queries.
+     *
+     * @var array
+     */
+    protected $queryForUrl;
+
+    /**
      * @var \Common\Stdlib\EasyMeta
      */
     protected $easyMeta;
@@ -104,8 +111,10 @@ class SearchFilters extends AbstractHelper
         $query ??= $params->fromQuery();
         unset($query['submit']);
 
-        $this->baseUrl = $url(null, [], true);
+        // The cleaned query means expanded query too.
         $this->query = $searchResources->cleanQuery($query);
+
+        $this->baseUrl = $url(null, [], true);
         $this->searchCleanQuery = $this->query;
         $this->searchProcesseds = [];
         $this->searchConfig = $this->query['__searchConfig'] ?? null;
@@ -126,6 +135,11 @@ class SearchFilters extends AbstractHelper
             'replaced_value',
             'replaced_field'
         );
+
+        // To build tje new search filters urls, the keys should be the original
+        // ones, so clean the key filter and rebuild original query from the
+        // cleaned query.
+        $this->prepareQueryForUrl();
 
         // Normally, query is already cleaned.
         // TODO Remove checks of search keys, already done during event api.search.pre.
@@ -568,7 +582,7 @@ class SearchFilters extends AbstractHelper
         $availableFieldLabels = array_combine(array_keys($availableFields), array_column($availableFields ?? [], 'label'));
         $fieldLabels = array_replace($availableFieldLabels, array_filter($formFieldLabels));
 
-        // Get all resources titles with one query.
+        // Get resources titles of all filters with one query.
         $vrTitles = [];
         $vrIds = [];
         foreach ($filterFilters as $queryRow) {
@@ -688,7 +702,7 @@ class SearchFilters extends AbstractHelper
                 }
             }
 
-            $filters[$filterLabel][$this->urlQuery('filter', $subKey)] = implode(', ', $vals);
+            $filters[$filterLabel][$this->urlQuery('filter', $subKey, !empty($queryRow['is_form_filter']))] = implode(', ', $vals);
 
             if (!isset($queryRow['replaced_filter_key'])
                 && isset($queryRow['replaced_field'])
@@ -754,20 +768,47 @@ class SearchFilters extends AbstractHelper
     }
 
     /**
+     * Prepare original query to use to build new urls skipping a part.
+     *
+     * @see \AdvancedSearch\Stdlib\SearchResources::expandFieldQueryArgs()
+     * @see \AdvancedSearch\View\Helper\SearchFilters::prepareQueryForUrl()
+     */
+    protected function prepareQueryForUrl(): self
+    {
+        $this->queryForUrl = $this->query;
+        if (empty($this->queryForUrl['filter'])) {
+            return $this;
+        }
+        foreach ($this->queryForUrl['filter'] ?? [] as $key => $filter) {
+            if (!empty($filter['is_form_filter'])) {
+                $this->queryForUrl[$filter['replaced_field']] = $filter['replaced_value'];
+                unset($this->queryForUrl['filter'][$key]);
+            }
+        }
+        if (empty($this->queryForUrl['filter'])) {
+            unset($this->queryForUrl['filter']);
+        }
+        return $this;
+    }
+
+    /**
      * Get url of the query without the specified key and subkey.
      *
      * @param string|int $key
      * @param string|int|null $subKey
+     * @param bool $isFilterShortcut
      * @return string
      *
      * Copy:
      * @see \AdvancedSearch\View\Helper\SearchFilters::urlQuery()
      * @see \AdvancedSearch\View\Helper\SearchingFilters::urlQuery()
      */
-    protected function urlQuery($key, $subKey = null): string
+    protected function urlQuery($key, $subKey = null, bool $isFilterShortcut = false): string
     {
-        $newQuery = $this->query;
-        if (is_null($subKey) || !is_array($newQuery[$key]) || count($newQuery[$key]) <= 1) {
+        $newQuery = $this->queryForUrl;
+        if ($isFilterShortcut) {
+            unset($newQuery[$this->query['filter'][$subKey]['replaced_field']]);
+        } elseif (is_null($subKey) || !is_array($newQuery[$key]) || count($newQuery[$key]) <= 1) {
             unset($newQuery[$key]);
         } else {
             unset($newQuery[$key][$subKey]);

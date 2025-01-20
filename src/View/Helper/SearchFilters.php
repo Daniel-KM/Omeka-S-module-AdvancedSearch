@@ -96,6 +96,9 @@ class SearchFilters extends AbstractHelper
         }
 
         $query = $this->expandFieldQueryArgs($query);
+        if ($searchConf) {
+            $query = $this->expandAdvancedFilters($query);
+        }
 
         $this->baseUrl = $url(null, [], true);
         $this->query = $cleanQuery($query);
@@ -733,6 +736,33 @@ class SearchFilters extends AbstractHelper
                 unset($query[$field]);
             }
         }
+        return $query;
+    }
+
+    /**
+     * Expand advanced filters of the advanced search form of the search config.
+     *
+     * Unlike expandFieldQueryArgs(), it's managed by Query so searchResources()
+     * doesn't need it.
+     *
+     * Adapted:
+     * @see \AdvancedSearch\View\Helper\SearchFilters::expandAdvancedFilters()
+     * @see \AdvancedSearch\FormAdapter\TraitFormAdapterClassic::toQuery()
+     */
+    protected function expandAdvancedFilters(array $query): array
+    {
+        if (empty($query['filter'])) {
+            return $query;
+        }
+
+        $typeDefault = 'in';
+
+        foreach ($query['filter'] as $key => $filter) {
+            if (empty($filter['type'])) {
+                $query['filter'][$key]['type'] = $typeDefault;
+            }
+        }
+
         return $query;
     }
 }

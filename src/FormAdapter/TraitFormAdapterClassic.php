@@ -238,9 +238,16 @@ trait TraitFormAdapterClassic
                     continue 2;
 
                 case 'filter':
+                    /**
+                     * Adapted:
+                     * @see \AdvancedSearch\View\Helper\SearchFilters::expandAdvancedFilters()
+                     * @see \AdvancedSearch\FormAdapter\TraitFormAdapterClassic::toQuery()
+                     */
+
                     // The request filters are the advanced ones in the form settings.
                     // The default query type is "in" (contains).
                     // TODO Clarify the default field joiner an operator between standard fields.
+                    $typeDefault = 'in';
                     $joiner = !empty($formSettings['advanced']['field_joiner']);
                     $operator = !empty($formSettings['advanced']['field_operator']);
 
@@ -261,7 +268,7 @@ trait TraitFormAdapterClassic
                         } else {
                             foreach ($value as $filter) {
                                 if (isset($filter['field']) && $checkAvailableField($filter['field'])) {
-                                    $type = empty($filter['type']) ? 'in' : $filter['type'];
+                                    $type = empty($filter['type']) ? $typeDefault : $filter['type'];
                                     if (in_array($type, SearchResources::FIELD_QUERY['value_none'])) {
                                         $query->addFilterQuery($filter['field'], null, $type);
                                     } elseif (isset($filter['val']) && trim($filter['val']) !== '') {
@@ -274,7 +281,7 @@ trait TraitFormAdapterClassic
                         if (empty($operator)) {
                             foreach ($value as $filter) {
                                 if (isset($filter['field']) && isset($filter['val']) && trim($filter['val']) !== '' && $checkAvailableField($filter['field'])) {
-                                    $type = empty($filter['type']) ? 'in' : $filter['type'];
+                                    $type = empty($filter['type']) ? $typeDefault : $filter['type'];
                                     $join = isset($filter['join']) && in_array($filter['join'], ['or', 'not']) ? $filter['join'] : 'and';
                                     $query->addFilterQuery($filter['field'], $filter['val'], $type, $join);
                                 }
@@ -282,7 +289,7 @@ trait TraitFormAdapterClassic
                         } else {
                             foreach ($value as $filter) {
                                 if (isset($filter['field']) && $checkAvailableField($filter['field'])) {
-                                    $type = empty($filter['type']) ? 'in' : $filter['type'];
+                                    $type = empty($filter['type']) ? $typeDefault : $filter['type'];
                                     if (in_array($type, SearchResources::FIELD_QUERY['value_none'])) {
                                         $join = isset($filter['join']) && in_array($filter['join'], ['or', 'not']) ? $filter['join'] : 'and';
                                         $query->addFilterQuery($filter['field'], null, $type, $join);

@@ -1612,6 +1612,10 @@ class SearchResources
                 true
             );
 
+            if (!$result) {
+                continue;
+            }
+
             [
                 // The only output required.
                 $where,

@@ -39,6 +39,11 @@ $visibility = in_array($visibility, ['public', 'private']) ? $visibility : null;
         <input name="start_resource_id" placeholder="0" value="1" min="0" type="number" form="confirmform" />
         </p>
         <p>
+            <?= $translate('Number of resources processed by loop.') ?>
+            <?= $translate('This option slows reindexing and may avoid overload when records are big.') ?>
+            <input name="resources_by_step" placeholder="0" value="100" min="0" type="number" form="confirmform" />
+        </p>
+        <p>
         <?= $translate('You may want to limit the reindexing to a resource type.') ?>
         <?php foreach ($resourceTypes as $resourceType): ?>
         <input name="resource_types[]" value="<?= $resourceType ?>" type="checkbox" checked="checked" form="confirmform" /><?= $translate($resourceType) ?>

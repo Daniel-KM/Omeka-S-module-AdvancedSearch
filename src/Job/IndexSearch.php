@@ -68,11 +68,10 @@ class IndexSearch extends AbstractJob
         $referenceIdProcessor->setReferenceId('search/index/job_' . $this->job->getId());
         $this->logger->addProcessor($referenceIdProcessor);
 
-        $batchSize = self::BATCH_SIZE;
-
         $searchEngineId = $this->getArg('search_engine_id');
         $startResourceId = (int) $this->getArg('start_resource_id');
         $resourceIds = $this->getArg('resource_ids', []) ?: [];
+        $batchSize = abs((int) $this->getArg('resources_by_step')) ?: self::BATCH_SIZE;
 
         /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation $searchEngine */
         $searchEngine = $api->read('search_engines', $searchEngineId)->getContent();

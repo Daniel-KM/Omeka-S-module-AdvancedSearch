@@ -180,6 +180,7 @@ class SearchEngineController extends AbstractActionController
         $searchEngine = $this->api()->read('search_engines', $searchEngineId)->getContent();
 
         $startResourceId = (int) $this->params()->fromPost('start_resource_id');
+        $resourcesByStep = (int) $this->params()->fromPost('resources_by_step');
         $resourceTypes = $this->params()->fromPost('resource_types') ?: [];
         $visibility = $this->params()->fromPost('visibility');
         $visibility = in_array($visibility, ['public', 'private']) ? $visibility : null;
@@ -188,6 +189,7 @@ class SearchEngineController extends AbstractActionController
         $jobArgs = [];
         $jobArgs['search_engine_id'] = $searchEngine->id();
         $jobArgs['start_resource_id'] = $startResourceId;
+        $jobArgs['resources_by_step'] = $resourcesByStep;
         $jobArgs['resource_types'] = $resourceTypes;
         $jobArgs['visibility'] = $visibility;
         $jobArgs['force'] = $force;

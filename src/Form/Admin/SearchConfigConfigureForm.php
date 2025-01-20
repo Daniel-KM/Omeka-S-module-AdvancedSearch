@@ -1070,7 +1070,7 @@ class SearchConfigConfigureForm extends Form
                 'name' => 'display_submit',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [
-                    'label' => 'Position of the button "Apply filters"', // @translate
+                    'label' => 'Position of the button "Apply facets"', // @translate
                     'value_options' => [
                         'none' => 'None', // @translate
                         'above' => 'Above facets', // @translate

@@ -209,6 +209,13 @@ class SearchConfigController extends AbstractActionController
         $params = $form->getData();
 
         $params = $this->prepareDataToSave($params);
+        if (($params['facet']['mode'] ?? 'button') === 'button'
+            && ($params['facet']['display_submit'] ?? 'none') === 'none'
+        ) {
+            $this->messenger()->addWarning(new PsrMessage(
+                'The mode for facets is "Button", but the button "Apply facets" is hidden, so it should be added in the theme.' // @translate
+            ));
+        }
 
         $searchConfig = $searchConfig->getEntity();
         $searchConfig->setSettings($params);

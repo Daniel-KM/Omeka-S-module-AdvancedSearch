@@ -224,6 +224,7 @@ class SearchConfigConfigureForm extends Form
             ])
         ;
 
+        // TODO Make option "q" a standard filter.
         $this
             // The main search field is "q", not "fulltext_search" or "search".
             ->add([
@@ -292,24 +293,6 @@ class SearchConfigConfigureForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'q_suggest_fill_input',
-                ],
-            ])
-            ->add([
-                'name' => 'fulltext_search',
-                'type' => CommonElement\OptionalRadio::class,
-                'options' => [
-                    'label' => 'Add a button to search record or full text (for content not stored in a property)', // @translate
-                    'value_options' => [
-                        '' => 'None', // @translate
-                        'fulltext_checkbox' => 'Check box "Search full text"', // @translate
-                        'record_checkbox' => 'Check box "Record only"', // @translate
-                        'fulltext_radio' => 'Radio "Full text" and "Record only"', // @translate
-                        'record_radio' => 'Radio "Record only" and "Full text"', // @translate
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'fulltext_search',
-                    'value' => '',
                 ],
             ])
             ->add([
@@ -445,6 +428,25 @@ class SearchConfigConfigureForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'attribute_form',
+                ],
+            ])
+            // TODO Make option "rft" a standard filter.
+            ->add([
+                'name' => 'rft',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Add a button to search record or full text (for content not stored in a property)', // @translate
+                    'value_options' => [
+                        '' => 'None', // @translate
+                        'fulltext_checkbox' => 'Check box "Search full text"', // @translate
+                        'record_checkbox' => 'Check box "Record only"', // @translate
+                        'fulltext_radio' => 'Radio "Full text" and "Record only"', // @translate
+                        'record_radio' => 'Radio "Record only" and "Full text"', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'rft',
+                    'value' => '',
                 ],
             ])
             ->add([

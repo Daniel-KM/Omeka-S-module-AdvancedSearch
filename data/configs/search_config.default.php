@@ -320,7 +320,6 @@ return [
             'suggest_url_param_name' => '',
             'suggest_limit' => null,
             'suggest_fill_input' => false,
-            'fulltext_search' => null,
             'remove_diacritics' => false,
             'default_search_partial_word' => false,
         ],
@@ -333,6 +332,8 @@ return [
             'button_reset' => false,
             'label_reset' => $translate('Reset fields'),
             'attribute_form' => false,
+
+            'rft' => null,
 
             'filters' => [
                 // Ordered list of specific filters.

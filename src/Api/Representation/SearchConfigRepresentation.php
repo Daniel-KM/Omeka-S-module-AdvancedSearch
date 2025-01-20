@@ -234,7 +234,17 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
             }
             $logger->err($message->getMessage(), $message->getContext());
             return ['results', $name, $subName];
+        } elseif ($mainName === 'q' && $name ==='fulltext_search') {
+            $services = $this->getServiceLocator();
+            $logger = $services->get('Omeka\Logger');
+            $message = new PsrMessage(
+                'The search config setting "{old}" was renamed "{new}". You should update your theme.', // @translate
+                ['old' => 'q[fulltext_search]', 'new' => 'form[rft]']
+            );
+            $logger->err($message->getMessage(), $message->getContext());
+            return ['form', 'rft', null];
         }
+
         return [$mainName, $name, $subName];
     }
 

@@ -180,6 +180,7 @@ class MainSearchForm extends Form
         // TODO Make q a standard filter, managed like all other ones, since all fields have them features.
         // TODO Allow to order and to skip "q" (include it as a standard filter).
         $filter = $this->formSettings['q'] ?? [];
+        $filter['rft'] ??= $this->formSettings['form']['rft'] ?? null;
         $element = $this->searchSearch($filter + [
             'has_variant' => $hasVariant,
         ]);
@@ -670,7 +671,10 @@ class MainSearchForm extends Form
         }
 
         // Add the button for record or full text search.
-        $recordOrFullText = in_array($this->variant, ['simple', 'csrf']) ? null : ($filter['fulltext_search'] ?? null);
+        $recordOrFullText = in_array($this->variant, ['simple', 'csrf'])
+            ? null
+            // Key "fulltext_search" is normally removed.
+            : ($filter['rft'] ?? $filter['fulltext_search'] ?? null);
         $this->appendRecordOrFullText($recordOrFullText);
 
         $element = new Element\Search('q');

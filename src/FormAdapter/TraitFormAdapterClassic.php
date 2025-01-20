@@ -109,6 +109,12 @@ trait TraitFormAdapterClassic
 
     public function toQuery(array $request, array $formSettings): Query
     {
+        /**
+         * @var \AdvancedSearch\Stdlib\SearchResources $searchResources
+         */
+        $services = $this->searchConfig->getServiceLocator();
+        $searchResources = $services->get('AdvancedSearch\SearchResources');
+
         // TODO Prepare the full query here for simplification.
         $query = new Query;
         $query
@@ -165,6 +171,8 @@ trait TraitFormAdapterClassic
         $sort = null;
         $sortBy = null;
         $sortOrder = null;
+
+        $request = $searchResources->expandFieldQueryArgs($request);
 
         foreach ($request as $name => $value) {
             if ($value === '' || $value === [] || $value === null) {
@@ -238,11 +246,18 @@ trait TraitFormAdapterClassic
                     continue 2;
 
                 case 'filter':
-                    /**
-                     * Adapted:
-                     * @see \AdvancedSearch\View\Helper\SearchFilters::expandAdvancedFilters()
-                     * @see \AdvancedSearch\FormAdapter\TraitFormAdapterClassic::toQuery()
-                     */
+                    // The filters may have been filled during process that does
+                    // expand shortcuts and clean args, so check them first.
+                    foreach ($value as $key => $filter) {
+                        // TODO Check available fields?
+                        if (isset($filter['replaced_field'])) {
+                            // Other filter keys (except and datatype), that are
+                            // not set by end user, are managed via the search
+                            // engine (via the name of the field).
+                            $query->addFilterQuery($filter['replaced_field'], $filter['val'], $filter['type'], $filter['join']);
+                            unset($value[$key]);
+                        }
+                    }
 
                     // The request filters are the advanced ones in the form settings.
                     // The default query type is "in" (contains).

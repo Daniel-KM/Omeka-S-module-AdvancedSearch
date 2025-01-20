@@ -19,7 +19,10 @@ class SearchResourcesFactory implements FactoryInterface
         $searchConfig = $getSearchConfig();
 
         // TODO Add aliases and query args in all configs.
-        $searchIndex = ['aliases' => [], 'query_args' => []];
+        $searchIndex = [
+            'aliases' => [],
+            'query_args' => [],
+        ];
         if ($searchConfig) {
             $searchIndex = $searchConfig->setting('index', []) + $searchIndex;
         }

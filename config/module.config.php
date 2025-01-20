@@ -77,12 +77,12 @@ return [
         'factories' => [
             'apiSearch' => Service\ViewHelper\ApiSearchFactory::class,
             'apiSearchOne' => Service\ViewHelper\ApiSearchOneFactory::class,
-            'cleanQuery' => Service\ViewHelper\CleanQueryFactory::class,
             'escapeValueOrGetHtml' => Service\ViewHelper\EscapeValueOrGetHtmlFactory::class,
             'fieldSelect' => Service\ViewHelper\FieldSelectFactory::class,
             'paginationSearch' => Service\ViewHelper\PaginationSearchFactory::class,
             'queryInput' => Service\ViewHelper\QueryInputFactory::class,
             'searchEngineConfirm' => Service\ViewHelper\SearchEngineConfirmFactory::class,
+            'searchResources' => Service\ViewHelper\SearchResourcesFactory::class,
             'searchSuggesterConfirm' => Service\ViewHelper\SearchSuggesterConfirmFactory::class,
         ],
         'delegators' => [

@@ -2,15 +2,15 @@
 
 namespace AdvancedSearch\Service\ViewHelper;
 
-use AdvancedSearch\View\Helper\CleanQuery;
+use AdvancedSearch\View\Helper\SearchResources;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
-class CleanQueryFactory implements FactoryInterface
+class SearchResourcesFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
-        return new CleanQuery(
+        return new SearchResources(
             $services->get('AdvancedSearch\SearchResources')
         );
     }

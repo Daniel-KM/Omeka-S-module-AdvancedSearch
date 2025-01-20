@@ -4,23 +4,23 @@ namespace AdvancedSearch\View\Helper;
 
 use Laminas\View\Helper\AbstractHelper;
 
-class CleanQuery extends AbstractHelper
+class SearchResources extends AbstractHelper
 {
     /**
      * @var \AdvancedSearch\Stdlib\SearchResources
      */
-    protected $searchResources;
+    protected $searchResourcesService;
 
     public function __construct(\AdvancedSearch\Stdlib\SearchResources $searchResources)
     {
-        $this->searchResources = $searchResources;
+        $this->searchResourcesService = $searchResources;
     }
 
     /**
-     * The advanced search form returns all keys, so remove useless ones.
+     * Get SearchResources.
      */
-    public function __invoke(array $query): array
+    public function __invoke(): \AdvancedSearch\Stdlib\SearchResources
     {
-        return $this->searchResources->cleanQuery($query);
+        return $this->searchResourcesService;
     }
 }

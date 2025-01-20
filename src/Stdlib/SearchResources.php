@@ -1075,8 +1075,24 @@ class SearchResources
         return $query;
     }
 
-    protected function expandFieldQueryArgs(array $query): array
+    /**
+     * Expand form fields according to the config.
+     *
+     * This method is used early by the form adapter.
+     */
+    public function expandFieldQueryArgs(array $query): array
     {
+        static $expandedQueries = [];
+
+        $originalQuery = $query;
+        unset($originalQuery['__searchConfig']);
+        unset($originalQuery['__searchQuery']);
+
+        $sum = md5(serialize($originalQuery));
+        if (isset($expandedQueries[$sum])) {
+            return $expandedQueries[$sum];
+        }
+
         // TODO Use an option to specify the default type (eq or in) to have the same than field query args.
         // For now, use "in" in main search form filters and "eq" in standard
         // advanced form (see TraitFormAdapterClassic).
@@ -1098,6 +1114,9 @@ class SearchResources
                     'val' => $query['filter'][$key]['val'] ?? null,
                     'datatype' => $this->searchIndex['query_args'][$field]['datatype'] ?? null,
                     'label' => $this->searchIndex['aliases'][$field]['label'] ?? null,
+                    'replaced_field' => $field,
+                    'replaced_value' => $filter,
+                    'replaced_filter_key' => $key,
                 ];
                 $query['filter'][$key] = array_filter($filter, fn ($v) => $v !== null);
             }
@@ -1113,28 +1132,35 @@ class SearchResources
                     'join' => $this->searchIndex['query_args'][$field]['join'] ?? 'and',
                     'field' => $this->searchIndex['aliases'][$field]['fields'] ?? $field,
                     'except' => $this->searchIndex['query_args'][$field]['except'] ?? null,
-                    // TODO Use an option to specify the default type (eq or in) to have the same than field query args.
-                    // For now, it is "in" in main search form filters and "eq" in standard advanced form (see TraitFormAdapterClassic).
                     'type' => $this->searchIndex['query_args'][$field]['type'] ?? $typeDefault,
                     'val' => $value,
                     'datatype' => $this->searchIndex['query_args'][$field]['datatype'] ?? null,
                     // TODO Use the label of the search config filter when present. For now, the admin should be consistent.
-                    'label' => $this->searchIndex['aliases'][$field]['label'] ?? null,
+                    'label' => $this->searchIndex['aliases'][$field] ?? null,
+                    'replaced_field' => $field,
+                    'replaced_value' => $value,
+                    'replaced_filter_key' => null,
                 ];
                 $query['filter'][] = array_filter($filter, fn ($v) => $v !== null);
                 unset($query[$field]);
             } elseif ($term = $this->easyMeta->propertyTerm($field)) {
                 // When the shortcut is not listed, it means a standard query.
-                $query['filter'][] = [
+                $filter = [
                     'join' => 'and',
                     'field' => $term,
-                    'type' => 'eq',
+                    'type' => $typeDefault,
                     'val' => $value,
                     'label' => $this->searchIndex['aliases'][$field]['label'] ?? null,
+                    'replaced_field' => $field,
+                    'replaced_value' => $value,
+                    'replaced_filter_key' => null,
                 ];
+                $query['filter'][] = $filter;
                 unset($query[$field]);
             }
         }
+
+        $expandedQueries[$sum] = $query;
 
         return $query;
     }

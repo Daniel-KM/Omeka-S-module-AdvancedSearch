@@ -631,7 +631,7 @@ class MainSearchForm extends Form
                 ] + $filter['options'],
             ])
             ->setAttributes([
-                'placeholder' => 'YYYY', // @translate
+                'placeholder' => $filter['attributes']['placeholder'] ?? 'YYYY', // @translate
             ] + $filter['attributes'])
         ;
         return $element;
@@ -692,10 +692,11 @@ class MainSearchForm extends Form
                 'empty_option' => '',
             ] + $filter['options'])
         ;
-        // Use chosen-select by default, but without placeholder.
+        // Use chosen-select by default, but without placeholder, except when
+        // set manually.
         if (!isset($filter['attributes']['class'])) {
             $filter['attributes']['class'] = 'chosen-select';
-            $filter['attributes']['data-placeholder'] = ' ';
+            $filter['attributes']['data-placeholder'] ??= ' ';
         }
         $element
             ->setAttributes($filter['attributes']);
@@ -758,7 +759,7 @@ class MainSearchForm extends Form
                     'multiple' => false,
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
                     // End users understand "collections" more than "item sets".
-                    'data-placeholder' => 'Select collections…', // @translate
+                    'data-placeholder' => $filter['attributes']['data-placeholder'] ?? 'Select collections…', // @translate
                 ] + $filter['attributes'],
             ])
         ;
@@ -818,7 +819,7 @@ class MainSearchForm extends Form
                 'id' => 'search-thesaurus',
                 'multiple' => true,
                 'class' => 'chosen-select',
-                'data-placeholder' => ' ',
+                'data-placeholder' => $filter['attributes']['data-placeholder'] ?? ' ',
             ] + $filter['attributes'])
         ;
 
@@ -854,7 +855,7 @@ class MainSearchForm extends Form
                     'id' => 'search-owner-id',
                     'multiple' => true,
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
-                    'data-placeholder' => 'Select owners…', // @translate
+                    'data-placeholder' => $filter['attributes']['data-placeholder'] ?? 'Select owners…', // @translate
                 ] + $filter['attributes'],
             ])
         ;
@@ -888,7 +889,7 @@ class MainSearchForm extends Form
                     'id' => 'search-site-id',
                     'multiple' => true,
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
-                    'data-placeholder' => 'Select sites…', // @translate
+                    'data-placeholder' => $filter['attributes']['data-placeholder'] ?? 'Select sites…', // @translate
                 ] + $filter['attributes'],
             ])
         ;
@@ -971,7 +972,7 @@ class MainSearchForm extends Form
                     'multiple' => true,
                     'class' => $filter['type'] === 'MultiCheckbox' ? '' : 'chosen-select',
                     // End users understand "collections" more than "item sets".
-                    'data-placeholder' => 'Select collections…', // @translate
+                    'data-placeholder' => $filter['attributes']['data-placeholder'] ?? 'Select collections…', // @translate
                 ] + $filter['attributes'],
             ])
         ;
@@ -1013,7 +1014,7 @@ class MainSearchForm extends Form
                     'id' => 'search-access',
                     // 'multiple' => false,
                     'class' => $filter['type'] === 'Radio' ? '' : 'chosen-select',
-                    'data-placeholder' => 'Select access…', // @translate
+                    'data-placeholder' => $filter['attributes']['data-placeholder'] ?? 'Select access…', // @translate
                 ] + $filter['attributes'],
             ])
         ;

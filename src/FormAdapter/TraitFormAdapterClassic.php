@@ -246,18 +246,9 @@ trait TraitFormAdapterClassic
 
                     // TODO The filter field can be multiple (as array).
 
-                    // Previously, the key "val" was named "value".
-                    // The compatibility is checked with old queries and forms.
-                    $hasFilterKeyValue = false;
-
                     if (empty($joiner)) {
                         if (empty($operator)) {
                             foreach ($value as $filter) {
-                                if (!isset($filter['val']) && isset($filter['value'])) {
-                                    $hasFilterKeyValue = true;
-                                    $filter['val'] = $filter['value'];
-                                    unset($filter['value']);
-                                }
                                 if (isset($filter['field'])
                                     && isset($filter['val'])
                                     && !is_array($filter['val'])
@@ -269,11 +260,6 @@ trait TraitFormAdapterClassic
                             }
                         } else {
                             foreach ($value as $filter) {
-                                if (!isset($filter['val']) && isset($filter['value'])) {
-                                    $hasFilterKeyValue = true;
-                                    $filter['val'] = $filter['value'];
-                                    unset($filter['value']);
-                                }
                                 if (isset($filter['field']) && $checkAvailableField($filter['field'])) {
                                     $type = empty($filter['type']) ? 'in' : $filter['type'];
                                     if (in_array($type, SearchResources::FIELD_QUERY['value_none'])) {
@@ -287,11 +273,6 @@ trait TraitFormAdapterClassic
                     } else {
                         if (empty($operator)) {
                             foreach ($value as $filter) {
-                                if (!isset($filter['val']) && isset($filter['value'])) {
-                                    $hasFilterKeyValue = true;
-                                    $filter['val'] = $filter['value'];
-                                    unset($filter['value']);
-                                }
                                 if (isset($filter['field']) && isset($filter['val']) && trim($filter['val']) !== '' && $checkAvailableField($filter['field'])) {
                                     $type = empty($filter['type']) ? 'in' : $filter['type'];
                                     $join = isset($filter['join']) && in_array($filter['join'], ['or', 'not']) ? $filter['join'] : 'and';
@@ -300,11 +281,6 @@ trait TraitFormAdapterClassic
                             }
                         } else {
                             foreach ($value as $filter) {
-                                if (!isset($filter['val']) && isset($filter['value'])) {
-                                    $hasFilterKeyValue = true;
-                                    $filter['val'] = $filter['value'];
-                                    unset($filter['value']);
-                                }
                                 if (isset($filter['field']) && $checkAvailableField($filter['field'])) {
                                     $type = empty($filter['type']) ? 'in' : $filter['type'];
                                     if (in_array($type, SearchResources::FIELD_QUERY['value_none'])) {
@@ -499,11 +475,6 @@ trait TraitFormAdapterClassic
             $query->setSort($sort);
         } elseif ($sortBy) {
             $query->setSort($sortBy . ($sortOrder ? ' ' . $sortOrder : ''));
-        }
-
-        if (!empty($hasFilterKeyValue)) {
-            $this->searchConfig->getServiceLocator()->get('Omeka\Logger')
-                ->err('The query contains a filter with the key "value", that must be replaced with "val".'); // @translate
         }
 
         return $query;

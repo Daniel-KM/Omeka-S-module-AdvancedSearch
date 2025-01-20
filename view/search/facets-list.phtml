@@ -82,7 +82,7 @@ if (!empty($itemSet)) {
             <?php if ($labelRefine): ?>
             <h4><label for="search-refine"><?= $escape($labelRefine) ?></label></h4>
             <?php endif; ?>
-            <input id="search-refine" name="refine" class="search-refine" value="<?= $escape($query->getQueryRefine()) ?>"<?= $labelRefine ? ' data-placeholder="' . $escapeAttr($labelRefine) : ''?>"/>
+            <input id="search-refine" name="refine" class="search-refine" value="<?= $escape($query->getQueryRefine()) ?>"<?= $labelRefine ? ' data-placeholder="' . $escapeAttr($labelRefine) . '"' : '' ?>/>
             <?php if (!$displayButtonSubmit): ?>
             <button id="search-refine-submit" class="search-refine" type="submit"><?= $escape($translate('Submit')) ?></button>
             <?php endif; ?>

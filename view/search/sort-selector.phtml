@@ -11,5 +11,7 @@ if (count($select->getValueOptions()) <= 1) return;
 
 <div class="search-sort<?= empty($params['as_url']) ? '' : ' as-url' ?>">
     <?= $select->getlabel() ? $this->formLabel($select) : '' ?>
-    <?= $this->formSelect($select) ?>
+    <div class="select-parent">
+        <?= $this->formSelect($select) ?>
+    </div>
 </div>

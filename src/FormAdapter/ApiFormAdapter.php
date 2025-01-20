@@ -217,6 +217,7 @@ class ApiFormAdapter extends AbstractFormAdapter implements FormAdapterInterface
                     $query->addFilter($propertyField, $value);
                     break;
 
+                /** @deprecated Use eq/neq, that supports array internally. */
                 case 'nlist':
                 case 'list':
                     $list = is_array($value) ? $value : explode("\n", $value);
@@ -225,6 +226,7 @@ class ApiFormAdapter extends AbstractFormAdapter implements FormAdapterInterface
                         continue 2;
                     }
                     $value = $list;
+                    $queryType = $queryType === 'nlist' ? 'neq' : 'eq';
                     // no break;
                 case isset(SearchResources::FIELD_QUERY['reciprocal'][$queryType]):
                     $query->addFilterQuery($propertyField, $value, $queryType);
@@ -310,6 +312,7 @@ class ApiFormAdapter extends AbstractFormAdapter implements FormAdapterInterface
                     $query->addFilter($propertyField, $val);
                     break;
 
+                /** @deprecated Use eq/neq, that supports array internally. */
                 case 'nlist':
                 case 'list':
                     $list = is_array($val) ? $val : explode("\n", $val);
@@ -318,6 +321,7 @@ class ApiFormAdapter extends AbstractFormAdapter implements FormAdapterInterface
                         continue 2;
                     }
                     $val = $list;
+                    $queryType = $queryType === 'nlist' ? 'neq' : 'eq';
                     // no break;
                 case isset(SearchResources::FIELD_QUERY['reciprocal'][$queryType]):
                     $query->addFilterQuery($propertyField, $val, $queryType);

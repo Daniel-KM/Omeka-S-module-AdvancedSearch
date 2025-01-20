@@ -50,7 +50,7 @@ trait SearchFiltersTrait
                 'yrlte' => $this->translator->translate('until year'),
                 'yrgte' => $this->translator->translate('since year'),
                 'yrgt' => $this->translator->translate('since year (excluded)'),
-                // Internal.
+                // Internal (deprecated: to be replaced by eq/neq).
                 'list' => $this->translator->translate('is in list'), // @translate
                 'nlist' => $this->translator->translate('is not in list'), // @translate
                 // Resource (duplcated for translation).

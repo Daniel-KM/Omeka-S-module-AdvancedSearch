@@ -1150,6 +1150,7 @@ class MainSearchForm extends Form
             ];
         }
         $values = $this->listValues($filter);
+
         // Negative numbers are accepted in all cases (int parsing).
         $firstDigits = isset($filter['options']['first_digits'])
             && in_array($filter['options']['first_digits'], [1, true, '1', 'true'], true);

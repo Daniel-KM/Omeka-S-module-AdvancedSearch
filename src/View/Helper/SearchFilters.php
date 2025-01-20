@@ -95,11 +95,6 @@ class SearchFilters extends AbstractHelper
             $this->searchIndex = $searchConf->setting('index', []) + $this->searchIndex;
         }
 
-        $query = $this->expandFieldQueryArgs($query);
-        if ($searchConf) {
-            $query = $this->expandAdvancedFilters($query);
-        }
-
         $this->baseUrl = $url(null, [], true);
         $this->query = $cleanQuery($query);
         $this->searchCleanQuery = $this->query;
@@ -112,9 +107,10 @@ class SearchFilters extends AbstractHelper
             $this->query['submit'],
             $this->query['__searchConfig'],
             $this->query['__searchQuery'],
-            $this->query['__searchCleanQuery']
+            $this->query['__searchCleanQuery'],
+            $this->query['__original_query']['__searchConfig'],
+            $this->query['__original_query']['__searchConfig']
         );
-
         $engineAdapter = $this->searchConfig ? $this->searchConfig->engineAdapter() : null;
         $availableFields = $engineAdapter
             ? $engineAdapter->getAvailableFields()
@@ -701,68 +697,5 @@ class SearchFilters extends AbstractHelper
         return $newQuery
             ? $this->baseUrl . '?' . http_build_query($newQuery, '', '&', PHP_QUERY_RFC3986)
             : $this->baseUrl;
-    }
-
-    /**
-     * Adapted:
-     * @see \AdvancedSearch\View\Helper\SearchFilters::expandFieldQueryArgs()
-     * @see \AdvancedSearch\Stdlib\SearchResources::expandFieldQueryArgs()
-     */
-    protected function expandFieldQueryArgs(array $query): array
-    {
-        foreach ($query as $field => $value) {
-            if (isset($this->searchIndex['query_args'][$field])) {
-                $query['filter'][] = [
-                    'join' => $this->searchIndex['query_args'][$field]['join'] ?? 'and',
-                    'field' => $field,
-                    'except' => $this->searchIndex['query_args'][$field]['except'] ?? null,
-                    'type' => $this->searchIndex['query_args'][$field]['type'] ?? 'eq',
-                    'val' => $value,
-                    'datatype' => $this->searchIndex['query_args'][$field]['datatype'] ?? null,
-                    // TODO Use the label of the search config filter when present. For now, the admin should be consistent.
-                    'label' => $this->searchIndex['aliases'][$field]['label'] ?? null,
-                ];
-                unset($query[$field]);
-            } elseif ($term = $this->easyMeta->propertyTerm($field)) {
-                // When the shortcut is not listed, it means a standard query
-                // a dynamic query arg.
-                $query['filter'][] = [
-                    'join' => 'and',
-                    'field' => $term,
-                    'type' =>'eq',
-                    'val' => $value,
-                    'label' => $this->searchIndex['aliases'][$field]['label'] ?? null,
-                ];
-                unset($query[$field]);
-            }
-        }
-        return $query;
-    }
-
-    /**
-     * Expand advanced filters of the advanced search form of the search config.
-     *
-     * Unlike expandFieldQueryArgs(), it's managed by Query so searchResources()
-     * doesn't need it.
-     *
-     * Adapted:
-     * @see \AdvancedSearch\View\Helper\SearchFilters::expandAdvancedFilters()
-     * @see \AdvancedSearch\FormAdapter\TraitFormAdapterClassic::toQuery()
-     */
-    protected function expandAdvancedFilters(array $query): array
-    {
-        if (empty($query['filter'])) {
-            return $query;
-        }
-
-        $typeDefault = 'in';
-
-        foreach ($query['filter'] as $key => $filter) {
-            if (empty($filter['type'])) {
-                $query['filter'][$key]['type'] = $typeDefault;
-            }
-        }
-
-        return $query;
     }
 }

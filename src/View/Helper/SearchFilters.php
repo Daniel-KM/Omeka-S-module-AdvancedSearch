@@ -550,7 +550,8 @@ class SearchFilters extends AbstractHelper
             $query['__searchQuery'] = $this->searchQuery;
         }
 
-        // Run event for modules, included AdvancedSearch.
+        // Run event for modules, included AdvancedSearch itself: see
+        // SearchingFilters.
         $result = $view->trigger(
             'view.search.filters',
             ['filters' => $filters, 'query' => $query, 'baseUrl' => $this->baseUrl],

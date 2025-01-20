@@ -1880,7 +1880,7 @@ class SearchResources
         $escapeSqlLike = fn ($string) => str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], (string) $string);
 
         // Quick check of value.
-        // A empty string "" is not a value, but "0" is a value.
+        // An empty string "" is not a value, but "0" is a value.
         if (in_array($queryType, self::FIELD_QUERY['value_none'], true)) {
             $value = null;
         }

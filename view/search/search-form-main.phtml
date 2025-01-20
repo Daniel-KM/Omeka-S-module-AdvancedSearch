@@ -23,10 +23,14 @@ $reset = null;
 $submit = null;
 if ($form->has('form-reset')) {
     $reset = $form->get('form-reset');
+    $reset
+        ->setAttribute('form', $formId);
     $form->remove('form-reset');
 }
 if ($form->has('submit')) {
     $submit = $form->get('submit');
+    $submit
+        ->setAttribute('form', $formId);
     $form->remove('submit');
 }
 

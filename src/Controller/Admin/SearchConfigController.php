@@ -498,9 +498,10 @@ class SearchConfigController extends AbstractActionController
             'more',
             'display_count',
         ];
-        $settings['facet']['mode'] = in_array($settings['facet']['mode'] ?? null, ['link', 'js']) ? $settings['facet']['mode'] : 'button';
+        $settings['facet']['mode'] = in_array($settings['facet']['mode'] ?? null, ['button', 'link', 'js']) ? $settings['facet']['mode'] : 'button';
         foreach ($settings['facet']['facets'] ?? [] as $key => $facet) {
-            // Remove the mode of each facet to simplify config.
+            // Remove the mode of each facet to simplify config: it is stored
+            // in each facet to simplify theming, but it is a global option.
             unset($facet['mode']);
             // Simplify some values too (integer and boolean).
             if (isset($facet['display_count'])) {
@@ -633,7 +634,8 @@ class SearchConfigController extends AbstractActionController
         }
         $params['results']['sort_list'] = $sortList;
 
-        $facetMode = in_array($params['facet']['mode'] ?? null, ['link', 'js']) ? $params['facet']['mode'] : 'button';
+        // Three possible modes: button, link, checkbox js as link.
+        $facetMode = in_array($params['facet']['mode'] ?? null, ['button', 'link', 'js']) ? $params['facet']['mode'] : 'button';
         $warnLanguage = false;
         $facets = [];
         $i = 0;
@@ -648,7 +650,8 @@ class SearchConfigController extends AbstractActionController
             if (isset($facets[$name])) {
                 $name .= '_' . ++$i;
             }
-            // Add the mode to each facet to simplify theme.
+            // There can be only one mode for all facets, so add the mode to
+            // each facet to simplify theme.
             $facet['mode'] = $facetMode;
             // Move specific settings to the root of the array.
             foreach ($facet['options'] as $k => $v) {

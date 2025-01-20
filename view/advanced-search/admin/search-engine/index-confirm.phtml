@@ -29,14 +29,14 @@ $visibility = in_array($visibility, ['public', 'private']) ? $visibility : null;
         <h3><?= sprintf($translate('Reindex "%s"'), $resource->name()) ?></h3>
         <p><?= $translate('Are you sure you would like to reindex this index?') ?></p>
         <p>
-        <?= $translate('Set "1" to reindex all resources without clearing the current index.') ?>
-        <?= $translate('It avoids interruption in the search page, but in rare cases, it may keep indexes of deleted resources that were not removed.') ?>
-        <?= $translate('Set a greater resource id to reindex resources starting this resource id.') ?>
+            <?= $translate('Set "1" to reindex all resources without clearing the current index.') ?>
+            <?= $translate('It avoids interruption in the search page, but in rare cases, it may keep indexes of deleted resources that were not removed.') ?>
+            <?= $translate('Set a greater resource id to reindex resources starting this resource id.') ?>
         </p>
         <p>
-        <?= $translate('With "0", the full index will be cleared first, so the search will be unavailable for a while.') ?>
-        <?= $translate('You may redirect the users to a clone of the current index temporary.') ?>
-        <input name="start_resource_id" placeholder="0" value="1" min="0" type="number" form="confirmform" />
+            <?= $translate('With "0", the full index will be cleared first, so the search will be unavailable for a while.') ?>
+            <?= $translate('You may redirect the users to a clone of the current index temporary.') ?>
+            <input name="start_resource_id" placeholder="0" value="1" min="0" type="number" form="confirmform" />
         </p>
         <p>
             <?= $translate('Number of resources processed by loop.') ?>
@@ -44,10 +44,10 @@ $visibility = in_array($visibility, ['public', 'private']) ? $visibility : null;
             <input name="resources_by_step" placeholder="0" value="100" min="0" type="number" form="confirmform" />
         </p>
         <p>
-        <?= $translate('You may want to limit the reindexing to a resource type.') ?>
-        <?php foreach ($resourceTypes as $resourceType): ?>
-        <input name="resource_types[]" value="<?= $resourceType ?>" type="checkbox" checked="checked" form="confirmform" /><?= $translate($resourceType) ?>
-        <?php endforeach; ?>
+            <?= $translate('You may want to limit the reindexing to a resource type.') ?>
+            <?php foreach ($resourceTypes as $resourceType): ?>
+            <input name="resource_types[]" value="<?= $resourceType ?>" type="checkbox" checked="checked" form="confirmform" /><?= $translate($resourceType) ?>
+            <?php endforeach; ?>
         </p>
         <?php if (!$visibility): ?>
         <p>
@@ -61,10 +61,10 @@ $visibility = in_array($visibility, ['public', 'private']) ? $visibility : null;
         <?php endif; ?>
         <p>
         <?php if ($listJobsStatusesByIds): ?>
-        <?= sprintf($translate('%1$d running indexings: #%2$s.'), count($listJobsStatusesByIds), implode(', #', array_keys($listJobsStatusesByIds))) ?><br />
-        <input form="<?= $form->getName() ?>" name="force" type="checkbox" /><?= $translate('Force indexing') ?><br />
+            <?= sprintf($translate('%1$d running indexings: #%2$s.'), count($listJobsStatusesByIds), implode(', #', array_keys($listJobsStatusesByIds))) ?><br />
+            <input form="<?= $form->getName() ?>" name="force" type="checkbox" /><?= $translate('Force indexing') ?><br />
         <?php else: ?>
-        <?= $translate('No running indexing: process can be launched.') ?>
+            <?= $translate('No running indexing: process can be launched.') ?>
         <?php endif; ?>
         </p>
         <?= $this->form($form) ?>

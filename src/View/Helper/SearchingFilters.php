@@ -80,7 +80,9 @@ class SearchingFilters extends AbstractHelper
     public function filterSearchingFilters(SearchConfigRepresentation $searchConfig, array $query, array $filters): array
     {
         /**
+         * @var \Omeka\View\Helper\Url $url
          * @var \Omeka\View\Helper\Api $api
+         * @var \Laminas\I18n\View\Helper\Translate $translate
          * @var \Common\Stdlib\EasyMeta $easyMeta
          *
          * Warning: unlike plugin helper, view helper api() cannot use options.
@@ -140,7 +142,7 @@ class SearchingFilters extends AbstractHelper
                     $filters[$filterLabel][$this->urlQuery($key)] = $value;
                     break;
 
-                // Resource type is the api name ("items", "item_sets", etc.).
+                // Here, resource type is the api name (items, item_sets, etc.).
                 case 'resource_type':
                     $filterLabel = $translate('Resource type'); // @translate
                     foreach ($this->checkAndFlatArray($value) as $subKey => $subValue) {
@@ -150,7 +152,7 @@ class SearchingFilters extends AbstractHelper
                     break;
 
                 // Resource id.
-                // Override standard search filters.
+                // Override standard search filters, so use the same label.
                 case 'id':
                     $filterLabel = $translate('ID'); // @translate
                     foreach (array_filter(array_map('intval', $this->checkAndFlatArray($value))) as $subKey => $subValue) {

@@ -805,6 +805,12 @@ class Module extends AbstractModule
         $qb = $event->getParam('queryBuilder');
         $query = $request->getContent();
 
+        // A full text search cannot be "*" alone. Anyway it has no meaning.
+        $qValue = $qb->getParameter('omeka_fulltext_search');
+        if (in_array($qValue, [null, '', '*'], true)) {
+            return;
+        }
+
         $scalarField = $request->getOption('returnScalar') ?? $query['return_scalar'] ?? 'id';
         $matchOrder = 'MATCH(omeka_fulltext_search.title, omeka_fulltext_search.text) AGAINST (:omeka_fulltext_search)';
 

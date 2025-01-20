@@ -1310,7 +1310,8 @@ class SearchResources
      */
     public function searchResourcesFullText(QueryBuilder $qb, array $query): self
     {
-        if (empty($query['fulltext_search'])) {
+        // A full text search cannot be "*" alone. Anyway it has no meaning.
+        if (empty($query['fulltext_search']) || $query['fulltext_search'] === '*') {
             return $this;
         }
 
@@ -2879,7 +2880,7 @@ class SearchResources
             /** @see \Omeka\Module::searchFullText() */
             && isset($query['fulltext_search'])
             && in_array($query['sort_by'], ['relevance', 'relevance desc', 'relevance asc'])
-            && trim($query['fulltext_search']) !== ''
+            && !in_array(trim($query['fulltext_search']), ['', '*'], true)
         ) {
             // The order is slightly different from the standard one, because
             // an order by id desc is appended automatically, so all results

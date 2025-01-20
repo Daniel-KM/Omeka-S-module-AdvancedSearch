@@ -65,6 +65,8 @@ class InternalQuerier extends AbstractQuerier
         // Omeka S v4.1 does not allow to search fulltext and return scalar ids.
         /** @see https://github.com/omeka/omeka-s/pull/2224 */
         $requireFix2224 = isset($this->args['fulltext_search'])
+            // A full text search cannot be "*" alone. Anyway it has no meaning.
+            && in_array($this->args['fulltext_search'], ['', '*'], true)
             && substr((string) $this->query->getSort(), 0, 9) === 'relevance';
 
         // The standard api way implies a double query, because scalar doesn't
@@ -624,7 +626,8 @@ class InternalQuerier extends AbstractQuerier
             } else {
                 $this->args['search'] = $q;
             }
-        } else {
+        } elseif ($q !== '*') {
+            // A full text search cannot be "*" alone. Anyway it has no meaning.
             $this->args['fulltext_search'] = $q;
         }
     }
@@ -662,6 +665,11 @@ class InternalQuerier extends AbstractQuerier
                 'type' => 'in',
                 'val' => $q,
             ];
+            return;
+        }
+
+        // A full text search cannot be "*" alone. Anyway it has no meaning.
+        if ($q === '*') {
             return;
         }
 

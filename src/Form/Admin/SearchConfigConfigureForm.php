@@ -266,7 +266,7 @@ class SearchConfigConfigureForm extends Form
                 'name' => 'suggest_url',
                 'type' => CommonElement\OptionalUrl::class,
                 'options' => [
-                    'label' => 'Direct endpoint', // @translate
+                    'label' => 'Direct endpoint for suggester', // @translate
                     // @see https://solr.apache.org/guide/suggester.html#suggest-request-handler-parameters
                     'info' => 'This url allows to use an external endpoint to manage keywords and is generally quicker. Needed params should be appended.', // @translate
                 ],
@@ -494,7 +494,7 @@ class SearchConfigConfigureForm extends Form
                 'name' => 'advanced',
                 'type' => Fieldset::class,
                 'options' => [
-                    'label' => 'Advanced  filters', // @translate
+                    'label' => 'Configuration of the element "Advanced filters"', // @translate
                 ],
             ])
             ->get('advanced')

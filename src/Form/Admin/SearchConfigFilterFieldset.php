@@ -127,7 +127,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 'name' => 'options',
                 'options' => [
                     'label' => 'Options', // @translate
-                    'info' => 'List of specific options according to types. Omeka and Laminas options are accepted, for example `empty_option = ""`, `checked_value = "yes"`, `autosuggest = true`, `value_options.first = "First"`.', // @translate
+                    'info' => 'List of specific options according to types. Omeka and Laminas options are accepted, for example `empty_option = ""`, `checked_value = "yes"`, `autosuggest = true`, `value_options.first = "First"`, `first_digits = true`.', // @translate
                     'ini_typed_mode' => true,
                 ],
                 'attributes' => [

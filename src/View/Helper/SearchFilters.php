@@ -504,13 +504,29 @@ class SearchFilters extends AbstractHelper
                     break;
 
                 case 'datetime':
+                    $dateTimeQueryTypes = [
+                        '<' => '<',
+                        '≤' => '≤',
+                        '=' => '=',
+                        '≠' => '≠',
+                        '≥' => '≥',
+                        '>' => '>',
+                        'lt' => '<',
+                        'lte' => '≤',
+                        'eq' => '=',
+                        'neq' => '≠',
+                        'gte' => '≥',
+                        'gt' => '>',
+                        'ex' => 'ex',
+                        'nex' => 'nex',
+                    ];
                     $queryTypesDatetime = [
-                        'lt' => $translate('before'), // @translate
-                        'lte' => $translate('before or on'), // @translate
-                        'eq' => $translate('on'), // @translate
-                        'neq' => $translate('not on'), // @translate
-                        'gte' => $translate('after or on'), // @translate
-                        'gt' => $translate('after'), // @translate
+                        '<' => $translate('before'), // @translate
+                        '≤' => $translate('before or on'), // @translate
+                        '=' => $translate('on'), // @translate
+                        '≠' => $translate('not on'), // @translate
+                        '≥' => $translate('after or on'), // @translate
+                        '>' => $translate('after'), // @translate
                         'ex' => $translate('has any date / time'), // @translate
                         'nex' => $translate('has no date / time'), // @translate
                     ];
@@ -522,6 +538,7 @@ class SearchFilters extends AbstractHelper
                         $field = $queryRow['field'];
                         $type = $queryRow['type'];
                         $datetimeValue = $queryRow['val'];
+                        $type = $dateTimeQueryTypes[$type];
 
                         $fieldLabel = $field === 'modified'
                             ? $translate('Modified') // @translate

@@ -23,9 +23,9 @@ $querySelectOption = function ($value, array $search, $key, $text) {
 
 // TODO Use a widget or a validator (but allow partial date/time: year only, date only, etc.).
 $queryInputText = function (array $search, $engine) use ($translate, $escape) {
-    $value = $search['value'] ?? null;
+    $value = $search['val'] ?? null;
     return sprintf('<input type="text" class="query-datetime query-text" name="%s" value="%s" aria-label="%s" placeholder="2017-11-07 17:21:17">',
-        $escape("datetime[$engine][value]"),
+        $escape("datetime[$engine][val]"),
         $escape($value),
         $escape($translate('Date / time'))); // @translate
 }
@@ -49,9 +49,9 @@ $queryInputText = function (array $search, $engine) use ($translate, $escape) {
             $stem = 'datetime[' . $index . ']';
             ?>
         <div class="value">
-            <select class="joiner chosen-select" name="<?= $escape($stem . '[joiner]') ?>">
-                <?= $querySelectOption('and', $datetime, 'joiner', $translate('And')) ?>
-                <?= $querySelectOption('or', $datetime, 'joiner', $translate('Or')) ?>
+            <select class="joiner chosen-select" name="<?= $escape($stem . '[join]') ?>">
+                <?= $querySelectOption('and', $datetime, 'join', $translate('And')) ?>
+                <?= $querySelectOption('or', $datetime, 'join', $translate('Or')) ?>
             </select>
             <?php
             $select = (new \Laminas\Form\Element\Select())
@@ -70,8 +70,8 @@ $queryInputText = function (array $search, $engine) use ($translate, $escape) {
             <select class="query-type chosen-select" name="<?= $escape($stem . '[type]') ?>" aria-label="<?= $translate('Query type') // @translate ?>">
                 <?= $querySelectOption('<', $datetime, 'type', $translate('before')) // @translate ?>
                 <?= $querySelectOption('≤', $datetime, 'type', $translate('before or on')) // @translate ?>
-                <?= $querySelectOption('eq', $datetime, 'type', $translate('on')) // @translate ?>
-                <?= $querySelectOption('neq', $datetime, 'type', $translate('not on')) // @translate ?>
+                <?= $querySelectOption('=', $datetime, 'type', $translate('on')) // @translate ?>
+                <?= $querySelectOption('≠', $datetime, 'type', $translate('not on')) // @translate ?>
                 <?= $querySelectOption('≥', $datetime, 'type', $translate('after or on')) // @translate ?>
                 <?= $querySelectOption('>', $datetime, 'type', $translate('after')) // @translate ?>
                 <?= $querySelectOption('ex', $datetime, 'type', $translate('has any date / time')) // @translate ?>

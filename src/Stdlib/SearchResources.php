@@ -46,10 +46,10 @@ class SearchResources
             'lte' => 'gt',
             'gte' => 'lt',
             'gt' => 'lte',
-            '<' => '<',
-            '≤' => '≤',
-            '≥' => '≥',
-            '>' => '>',
+            '<' => '≥',
+            '≤' => '>',
+            '≥' => '<',
+            '>' => '≤',
             // Date (year).
             'yreq' => 'nyreq',
             'nyreq' => 'yreq',
@@ -701,10 +701,26 @@ class SearchResources
                     $query['datetime'] = [[
                         'join' => 'and',
                         'field' => 'created',
-                        'type' => 'eq',
+                        'type' => '=',
                         'val' => $query['datetime'],
                     ]];
                 } else {
+                    $dateTimeQueryTypes = [
+                        '<' => '<',
+                        '≤' => '≤',
+                        '=' => '=',
+                        '≠' => '≠',
+                        '≥' => '≥',
+                        '>' => '>',
+                        'lt' => '<',
+                        'lte' => '≤',
+                        'eq' => '=',
+                        'neq' => '≠',
+                        'gte' => '≥',
+                        'gt' => '>',
+                        'ex' => 'ex',
+                        'nex' => 'nex',
+                    ];
                     foreach ($query['datetime'] as $key => &$queryRow) {
                         if (empty($queryRow)) {
                             unset($query['datetime'][$key]);
@@ -733,13 +749,14 @@ class SearchResources
                             }
 
                             if (empty($queryRow['type'])) {
-                                $queryRow['type'] = 'eq';
+                                $queryRow['type'] = '=';
                             } else {
                                 // "ex" and "nex" are useful only for the modified time.
-                                if (!in_array($queryRow['type'], ['lt', 'lte', 'eq', 'gte', 'gt', 'neq', 'ex', 'nex'])) {
+                                if (!isset($dateTimeQueryTypes[$queryRow['type']])) {
                                     unset($query['datetime'][$key]);
                                     continue;
                                 }
+                                $queryRow['type'] = $dateTimeQueryTypes[$queryRow['type']];
                             }
 
                             if (in_array($queryRow['type'], ['ex', 'nex'])) {
@@ -755,7 +772,7 @@ class SearchResources
                             $queryRow = [
                                 'join' => 'and',
                                 'field' => 'created',
-                                'type' => 'eq',
+                                'type' => '=',
                                 'val' => $queryRow,
                             ];
                         }
@@ -2308,7 +2325,7 @@ class SearchResources
     }
 
     /**
-     * Build query on date time (created/modified), partial date/time allowed.
+     * Build query on created/modified date time with partial date/time allowed.
      *
      * The query format is inspired by Doctrine and properties.
      *
@@ -2317,12 +2334,12 @@ class SearchResources
      * - datetime[{index}][join]: "and" OR "or" joiner with previous query
      * - datetime[{index}][field]: the field "created" or "modified"
      * - datetime[{index}][type]: search type
-     *   - lt: lower than (before)
-     *   - lte: lower than or equal
-     *   - eq: is exactly
-     *   - neq: is not exactly
-     *   - gte: greater than or equal
-     *   - gt: greater than (after)
+     *   - < / lt: lower than (before)
+     *   - ≤ / lte: lower than or equal
+     *   - = / eq: is exactly
+     *   - ≠ / neq: is not exactly
+     *   - ≥ / gte: greater than or equal
+     *   - > / gt: greater than (after)
      *   - ex: has any value
      *   - nex: has no value
      * - datetime[{index}][val]: search date time (sql format: "2017-11-07 17:21:17",
@@ -2341,35 +2358,57 @@ class SearchResources
         $where = '';
         $expr = $qb->expr();
 
+        $dateTimeQueryTypes = [
+            '<' => '<',
+            'lt' => '<',
+            '≤' => '≤',
+            'lte' => '≤',
+            '=' => '=',
+            'eq' => '=',
+            '≠' => '≠',
+            'neq' => '≠',
+            '≥' => '≥',
+            'gte' => '≥',
+            '>' => '>',
+            'gt' => '>',
+            'ex' => 'ex',
+            'nex' => 'nex',
+        ];
+
         foreach ($query['datetime'] as $queryRow) {
+            $type = $queryRow['type'] ?? null;
+            if (!isset($dateTimeQueryTypes[$type])) {
+                continue;
+            }
+
+            $type = $dateTimeQueryTypes[$type];
             $joiner = $queryRow['join'] ?? null;
             $field = $queryRow['field'] ?? null;
-            $type = $queryRow['type'] ?? null;
             $value = $queryRow['val'] ?? null;
             $incorrectValue = false;
 
             // By default, sql replace missing time by 00:00:00, but this is not
             // clear for the user. And it doesn't allow partial date/time.
             switch ($type) {
-                case 'gt':
-                    $valueNorm = $this->getDateTimeFromValue($value, false) ?? $this->getDateTimeViaAnyString($value);
-                    if ($valueNorm === null) {
-                        $incorrectValue = true;
-                    } else {
-                        $param = $this->adapter->createNamedParameter($qb, $valueNorm);
-                        $predicateExpr = $expr->gt('omeka_root.' . $field, $param);
-                    }
-                    break;
-                case 'gte':
+                case '<':
                     $valueNorm = $this->getDateTimeFromValue($value, true) ?? $this->getDateTimeViaAnyString($value);
                     if ($valueNorm === null) {
                         $incorrectValue = true;
                     } else {
                         $param = $this->adapter->createNamedParameter($qb, $valueNorm);
-                        $predicateExpr = $expr->gte('omeka_root.' . $field, $param);
+                        $predicateExpr = $expr->lt('omeka_root.' . $field, $param);
                     }
                     break;
-                case 'eq':
+                case '≤':
+                    $valueNorm = $this->getDateTimeFromValue($value, false) ?? $this->getDateTimeViaAnyString($value);
+                    if ($valueNorm === null) {
+                        $incorrectValue = true;
+                    } else {
+                        $param = $this->adapter->createNamedParameter($qb, $valueNorm);
+                        $predicateExpr = $expr->lte('omeka_root.' . $field, $param);
+                    }
+                    break;
+                case '=':
                     $valueFromNorm = $this->getDateTimeFromValue($value, true) ?? $this->getDateTimeViaAnyString($value);
                     $valueToNorm = $this->getDateTimeFromValue($value, false) ?? $this->getDateTimeViaAnyString($value);
                     if ($valueFromNorm === null || $valueToNorm === null) {
@@ -2385,7 +2424,7 @@ class SearchResources
                         }
                     }
                     break;
-                case 'neq':
+                case '≠':
                     $valueFromNorm = $this->getDateTimeFromValue($value, true) ?? $this->getDateTimeViaAnyString($value);
                     $valueToNorm = $this->getDateTimeFromValue($value, false) ?? $this->getDateTimeViaAnyString($value);
                     if ($valueFromNorm === null || $valueToNorm === null) {
@@ -2403,22 +2442,22 @@ class SearchResources
                         }
                     }
                     break;
-                case 'lte':
-                    $valueNorm = $this->getDateTimeFromValue($value, false) ?? $this->getDateTimeViaAnyString($value);
-                    if ($valueNorm === null) {
-                        $incorrectValue = true;
-                    } else {
-                        $param = $this->adapter->createNamedParameter($qb, $valueNorm);
-                        $predicateExpr = $expr->lte('omeka_root.' . $field, $param);
-                    }
-                    break;
-                case 'lt':
+                case '≥':
                     $valueNorm = $this->getDateTimeFromValue($value, true) ?? $this->getDateTimeViaAnyString($value);
                     if ($valueNorm === null) {
                         $incorrectValue = true;
                     } else {
                         $param = $this->adapter->createNamedParameter($qb, $valueNorm);
-                        $predicateExpr = $expr->lt('omeka_root.' . $field, $param);
+                        $predicateExpr = $expr->gte('omeka_root.' . $field, $param);
+                    }
+                    break;
+                case '>':
+                    $valueNorm = $this->getDateTimeFromValue($value, false) ?? $this->getDateTimeViaAnyString($value);
+                    if ($valueNorm === null) {
+                        $incorrectValue = true;
+                    } else {
+                        $param = $this->adapter->createNamedParameter($qb, $valueNorm);
+                        $predicateExpr = $expr->gt('omeka_root.' . $field, $param);
                     }
                     break;
                 case 'ex':

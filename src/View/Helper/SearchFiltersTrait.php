@@ -40,6 +40,8 @@ trait SearchFiltersTrait
                 // Comparison (numerical).
                 '<' => '<',
                 '≤' => '≤',
+                '=' => '=',
+                '≠' => '≠',
                 '≥' => '≥',
                 '>' => '>',
                 'yreq' => $this->translator->translate('during year'),

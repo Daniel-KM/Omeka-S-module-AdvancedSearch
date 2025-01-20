@@ -1880,3 +1880,35 @@ if (version_compare($oldVersion, '3.4.37', '<')) {
         SQL;
     $connection->executeStatement($sql);
 }
+
+if (version_compare($oldVersion, '3.4.38', '<')) {
+    $qb = $connection->createQueryBuilder();
+    $qb
+        ->select('id', 'settings')
+        ->from('search_config', 'search_config')
+        ->orderBy('id', 'asc');
+    $searchConfigsSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    foreach ($searchConfigsSettings as $id => $searchConfigSettings) {
+        $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
+        $searchConfigSettings['form']['rft'] = $searchConfigSettings['q']['fulltext_search']
+            ?? $searchConfigSettings['form']['rft'] ?? null;
+        unset($searchConfigSettings['q']['fulltext_search']);
+        if (empty($searchConfigSettings['index']['aliases']['full_text'])) {
+            $searchConfigSettings['index']['aliases']['full_text'] = [
+                'name' => 'full_text',
+                'label' => $translate('Full text'), // @translate
+                'fields' => [
+                    'bibo:content',
+                    'extracttext:extracted_text',
+                ],
+            ];
+        }
+        $sql = 'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?;';
+        $connection->executeStatement($sql, [json_encode($searchConfigSettings, 320), $id]);
+    }
+
+    $message = new PsrMessage(
+        'The option "Record or Full text" is now configurable with alias "full_text" to define properties with full text.' // @translate
+    );
+    $messenger->addSuccess($message);
+}

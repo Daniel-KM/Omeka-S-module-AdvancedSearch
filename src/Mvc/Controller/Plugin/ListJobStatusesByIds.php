@@ -2,6 +2,7 @@
 
 namespace AdvancedSearch\Mvc\Controller\Plugin;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Laminas\Mvc\Controller\Plugin\AbstractPlugin;
 
@@ -37,6 +38,7 @@ class ListJobStatusesByIds extends AbstractPlugin
         ?int $excludeJobId = null
     ): array {
         $qb = $this->entityManager->createQueryBuilder();
+        $expr = $qb->expr();
         $result = $qb
             ->select('job.id', 'job.status')
             ->from(\Omeka\Entity\Job::class, 'job');
@@ -61,19 +63,18 @@ class ListJobStatusesByIds extends AbstractPlugin
             }
         }
         if ($statusesOrProcessing) {
-            $connection = $this->entityManager->getConnection();
-            $quoted = implode(',', array_map([$connection, 'quote'], $statusesOrProcessing));
             $qb
-                ->andWhere('job.status IN (' . $quoted . ')');
+                ->andWhere($expr->in('job.status', ':quote'))
+                ->setParameter('quote', $statusesOrProcessing, Connection::PARAM_STR_ARRAY);
         }
         if ($ownerId) {
             $qb
-                ->andWhere($qb->expr()->eq('job.owner_id', 'owner'))
+                ->andWhere($expr->eq('job.owner_id', ':owner'))
                 ->setParameter('owner', $ownerId);
         }
         if ($excludeJobId) {
             $qb
-                ->andWhere($qb->expr()->neq('job.id', 'job_id'))
+                ->andWhere($expr->neq('job.id', ':job_id'))
                 ->setParameter('job_id', $excludeJobId);
         }
         $result = $qb

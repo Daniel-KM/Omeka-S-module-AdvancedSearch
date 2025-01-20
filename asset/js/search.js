@@ -356,8 +356,9 @@ var Search = (function() {
 
         /**
          * Modes may be "click a button to apply facets" or "reload the page directly".
+         * .apply-facets is kept for compatibility with old themes.
          */
-        self.useApplyFacets = $searchFacets.find('.apply-facets').length > 0;
+        self.useApplyFacets = $searchFacets.find('.facets-apply, .apply-facets').length > 0;
 
         self.expandOrCollapse = function(button) {
             button = $(button);

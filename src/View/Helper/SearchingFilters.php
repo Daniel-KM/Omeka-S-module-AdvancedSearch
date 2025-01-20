@@ -105,12 +105,17 @@ class SearchingFilters extends AbstractHelper
             'offset' => null,
             'submit' => null,
             '__processed' => null,
+            '__original_query' => null,
             '__searchConfig' => null,
             '__searchQuery' => null,
-            '__searchCleanQuery' => null,
         ];
 
-        foreach (array_diff_key($this->query, $skip) as $key => $value) {
+        // id is overridden.
+        unset($processed['id']);
+
+        $remainingQueryKeys = array_diff_key($this->query, $skip, $processed);
+
+        foreach ($remainingQueryKeys as $key => $value) {
             if ($value === null || $value === '' || $value === []) {
                 continue;
             }
@@ -262,7 +267,10 @@ class SearchingFilters extends AbstractHelper
                 default:
                     // Append only fields that are not yet processed somewhere
                     // else, included searchFilters helper.
-                    if (isset($fieldLabels[$key]) && !isset($filters[$fieldLabels[$key]])) {
+                    if (isset($fieldLabels[$key])
+                        && !isset($filters[$fieldLabels[$key]])
+                    ) {
+                        // Manage ranges.
                         if (is_array($value) && (array_key_exists('from', $value) || array_key_exists('to', $value))) {
                             $valueFrom = $value['from'] ?? '';
                             $valueTo = $value['to'] ?? '';
@@ -274,12 +282,13 @@ class SearchingFilters extends AbstractHelper
                             } elseif ($valueTo !== '') {
                                 $filters[$filterLabel][$this->urlQuery($key)] = sprintf($translate('until %s'), $valueTo); // @translate
                             }
-                            break;
                         }
-
-                        $filterLabel = $fieldLabels[$key];
-                        foreach (array_filter(array_map('trim', array_map('strval', $this->checkAndFlatArray($value))), 'strlen') as $subKey => $subValue) {
-                            $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $subValue;
+                        // Else manage raw label/value.
+                        else {
+                            $filterLabel = $fieldLabels[$key];
+                            foreach (array_filter(array_map('trim', array_map('strval', $this->checkAndFlatArray($value))), 'strlen') as $subKey => $subValue) {
+                                $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $subValue;
+                            }
                         }
                     }
                     break;

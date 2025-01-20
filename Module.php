@@ -1041,16 +1041,17 @@ class Module extends AbstractModule
             return;
         }
 
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $query['__searchConfig'] ?? null;
-
         if (!$searchConfig) {
             return;
         }
 
+        $view = $event->getTarget();
         $filters = $event->getParam('filters');
 
-        $view = $event->getTarget();
-        $filters = $view->searchingFilters()->filterSearchingFilters($searchConfig, $query['__searchCleanQuery'] ?? $query, $filters);
+        $filters = $view->searchingFilters()
+            ->filterSearchingFilters($searchConfig, $query, $filters);
 
         $event->setParam('filters', $filters);
     }

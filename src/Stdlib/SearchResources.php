@@ -336,6 +336,7 @@ class SearchResources
     protected $searchIndex = [
         'aliases' => [],
         'query_args' => [],
+        'form_filters_fields' => [],
     ];
 
     public function __construct(
@@ -1113,7 +1114,10 @@ class SearchResources
                     'type' => $this->searchIndex['query_args'][$field]['type'] ?? $typeDefault,
                     'val' => $query['filter'][$key]['val'] ?? null,
                     'datatype' => $this->searchIndex['query_args'][$field]['datatype'] ?? null,
-                    'label' => $this->searchIndex['aliases'][$field]['label'] ?? null,
+                    'label' => $this->searchIndex['form_filters_fields'][$field]
+                        ?? $this->searchIndex['aliases'][$field]['label']
+                        ?? null,
+                    'is_form_filter' => !empty($this->searchIndex['form_filters_fields'][$field]),
                     'replaced_field' => $field,
                     'replaced_value' => $filter,
                     'replaced_filter_key' => $key,
@@ -1135,8 +1139,11 @@ class SearchResources
                     'type' => $this->searchIndex['query_args'][$field]['type'] ?? $typeDefault,
                     'val' => $value,
                     'datatype' => $this->searchIndex['query_args'][$field]['datatype'] ?? null,
-                    // TODO Use the label of the search config filter when present. For now, the admin should be consistent.
-                    'label' => $this->searchIndex['aliases'][$field] ?? null,
+                    // Label and next data  are kept for search filters.
+                    'label' => $this->searchIndex['form_filters_fields'][$field]
+                        ?? $this->searchIndex['aliases'][$field]
+                        ?? null,
+                    'is_form_filter' => !empty($this->searchIndex['form_filters_fields'][$field]),
                     'replaced_field' => $field,
                     'replaced_value' => $value,
                     'replaced_filter_key' => null,
@@ -1150,7 +1157,10 @@ class SearchResources
                     'field' => $term,
                     'type' => $typeDefault,
                     'val' => $value,
-                    'label' => $this->searchIndex['aliases'][$field]['label'] ?? null,
+                    'label' => $this->searchIndex['form_filters_fields'][$field]
+                        ?? $this->searchIndex['aliases'][$field]['label']
+                        ?? null,
+                    'is_form_filter' => !empty($this->searchIndex['form_filters_fields'][$field]),
                     'replaced_field' => $field,
                     'replaced_value' => $value,
                     'replaced_filter_key' => null,

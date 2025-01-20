@@ -22,9 +22,13 @@ class SearchResourcesFactory implements FactoryInterface
         $searchIndex = [
             'aliases' => [],
             'query_args' => [],
+            'form_filters_fields' => [],
         ];
         if ($searchConfig) {
             $searchIndex = $searchConfig->setting('index', []) + $searchIndex;
+            // With form filters, the filter name and the field are not the same.
+            // The filter name is not really used for now.
+            $searchIndex['form_filters_fields'] = array_column($searchConfig->subSetting('form', 'filters', []), 'label', 'field');
         }
 
         return new SearchResources(

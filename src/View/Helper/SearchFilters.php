@@ -117,7 +117,6 @@ class SearchFilters extends AbstractHelper
             $this->query['submit'],
             $this->query['__searchConfig'],
             $this->query['__searchQuery'],
-            $this->query['__searchCleanQuery'],
             $this->query['__original_query'],
         );
 
@@ -535,7 +534,6 @@ class SearchFilters extends AbstractHelper
         if ($this->searchConfig) {
             $query['__searchConfig'] = $this->searchConfig;
             $query['__searchQuery'] = $this->searchQuery;
-            $query['__searchCleanQuery'] = $this->searchCleanQuery;
         }
 
         // Run event for modules, included AdvancedSearch.
@@ -661,7 +659,13 @@ class SearchFilters extends AbstractHelper
                 $fieldLabel = $translate('[Any field]'); // @translate
             }
 
-            $filterLabel = $fieldLabel . ' ' . $queryTypesLabels[$queryType];
+            // Don't add the query type for shortcut filters in main form.
+            // TODO Clarify use in standard form and module main form.
+            if (!empty($queryRow['is_form_filter'])) {
+                $filterLabel = $fieldLabel;
+            } else {
+                $filterLabel = $fieldLabel . ' ' . $queryTypesLabels[$queryType];
+            }
             if ($index > 0) {
                 $joiners = [
                     'or' => $translate('OR'), // @translate

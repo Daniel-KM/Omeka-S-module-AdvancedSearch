@@ -73,8 +73,8 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                             'label' => 'Modules', // @translate
                             'options' => [
                                 'Tree' => 'Item sets tree', // @translate
-                                'Thesaurus' => 'Thesaurus', // @translate
                                 'TreeLink' => 'Item sets tree link (fake checkbox)', // @translate
+                                'Thesaurus' => 'Thesaurus', // @translate
                                 'ThesaurusLink' => 'Thesaurus link (fake checkbox)', // @translate
                             ],
                         ],

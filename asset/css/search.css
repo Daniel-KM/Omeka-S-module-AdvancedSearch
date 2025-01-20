@@ -141,6 +141,7 @@
     .search-results .search-filters {
         width: 100%;
         flex: 0 0 100%;
+        padding-left: 0;
     }
     .search-results .search-filters .filter a::after {
         content: "×";

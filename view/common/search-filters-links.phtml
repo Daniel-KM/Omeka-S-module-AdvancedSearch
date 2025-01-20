@@ -11,13 +11,13 @@ $escape = $plugins->get('escapeHtml');
 $escapeAttr = $this->plugin('escapeHtmlAttr');
 ?>
 
-<div class="search-filters">
+<ul class="search-filters">
     <?php foreach ($filters as $filterLabel => $filterValues): ?>
-    <div class="filter">
+    <li class="filter">
         <span class="filter-label"><?= $escape($filterLabel) ?></span>
         <?php foreach ($filterValues as $urlQuery => $filterValue): ?>
         <a href="<?= $escapeAttr($urlQuery) ?>" class="filter-value"><?= $escape($filterValue) ?></a>
         <?php endforeach; ?>
-    </div>
+    </li>
     <?php endforeach; ?>
-</div>
+</ul>

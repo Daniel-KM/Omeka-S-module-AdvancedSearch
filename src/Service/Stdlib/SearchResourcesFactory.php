@@ -27,6 +27,7 @@ class SearchResourcesFactory implements FactoryInterface
         return new SearchResources(
             $services->get('Omeka\Connection'),
             $services->get('Common\EasyMeta'),
+            $services->get('Omeka\Logger'),
             $searchIndex
         );
     }

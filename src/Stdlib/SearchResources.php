@@ -9,6 +9,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
+use Laminas\Log\Logger;
 use Omeka\Api\Adapter\AbstractResourceEntityAdapter;
 use Omeka\Api\Adapter\ItemAdapter;
 use Omeka\Api\Adapter\ItemSetAdapter;
@@ -308,6 +309,11 @@ class SearchResources
     protected $easyMeta;
 
     /**
+     * @var \Laminas\Log\Logger
+     */
+    protected $logger;
+
+    /**
      * Contains two keys: aliases and query_args.
      *
      * @var array
@@ -320,10 +326,12 @@ class SearchResources
     public function __construct(
         Connection $connection,
         EasyMeta $easyMeta,
+        Logger $logger,
         array $searchIndex
     ) {
         $this->connection = $connection;
         $this->easyMeta = $easyMeta;
+        $this->logger = $logger;
         $this->searchIndex = $searchIndex;
     }
 
@@ -1354,10 +1362,18 @@ class SearchResources
      *
      * Query format:
      *
+     * - property[{index}][joiner]: "and" OR "or" joiner with previous query
+     * - property[{index}][property]: property ID or term
+     * - property[{index}][type]: search type
+     * - property[{index}][text]: search text
+     *
+     * Improved query format (deprecated: use filters for portability):
+     *
      * - property[{index}][joiner]: "and" OR "or" OR "not" joiner with previous query
      * - property[{index}][property]: property ID or term or array of property IDs or terms
-     * - property[{index}][text]: search text or array of texts or values
+     * - property[{index}][except]: list of property IsD or terms to exclude
      * - property[{index}][type]: search type
+     * - property[{index}][text]: search text or array of texts or values
      * - property[{index}][datatype]: filter on data type(s)
      *
      * @see self::buildQueryForRow() for details.
@@ -1367,6 +1383,8 @@ class SearchResources
         if (empty($query['property']) || !is_array($query['property'])) {
             return $this;
         }
+
+        $isFilter = false;
 
         $valuesJoin = 'omeka_root.values';
         $where = '';
@@ -1404,7 +1422,8 @@ class SearchResources
                     'queryType',
                     'joiner',
                     'value',
-                    'dataType'
+                    'dataType',
+                    'isFilter'
                 ),
                 true
             );
@@ -1455,6 +1474,8 @@ class SearchResources
             return $this;
         }
 
+        $isFilter = true;
+
         $valuesJoin = 'omeka_root.values';
         $where = '';
 
@@ -1491,7 +1512,8 @@ class SearchResources
                     'queryType',
                     'joiner',
                     'value',
-                    'dataType'
+                    'dataType',
+                    'isFilter'
                 ),
                 false
             );
@@ -1522,7 +1544,7 @@ class SearchResources
     }
 
     /**
-     * Manage improved query for properties and query for filters.
+     * Manage standard and improved query for properties and query for filters.
      *
      * Value
      *   - eq: is exactly (core)
@@ -1653,6 +1675,7 @@ class SearchResources
          * @var string $joiner
          * @var mixed $value
          * @var string $dataType
+         * @var bool $isFilter
          */
         extract($vars);
 
@@ -1670,8 +1693,8 @@ class SearchResources
         if (in_array($queryType, self::FIELD_QUERY['value_none'], true)) {
             $value = null;
         }
-        // Check array of values.
-        elseif (in_array($queryType, self::FIELD_QUERY['value_array'], true)) {
+        // Check array of values, that are allowed only by filters.
+        elseif ($isFilter && in_array($queryType, self::FIELD_QUERY['value_array'], true)) {
             if ((is_array($value) && !count($value))
                 || (!is_array($value) && !strlen((string) $value))
             ) {
@@ -1687,6 +1710,36 @@ class SearchResources
             if (empty($value)) {
                 return null;
             }
+        }
+        // Warn array of values for property with list/nlist for compatibility.
+        elseif (!$isFilter && ($queryType === 'list' || $queryType === 'nlist')) {
+            $this->logger->warn(
+                'The query type "list" is still used with property. Check your queries: {url}', // @translate
+                ['url' => $_SERVER['REQUEST_URI']]
+            );
+            if ((is_array($value) && !count($value))
+                || (!is_array($value) && !strlen((string) $value))
+            ) {
+                return null;
+            }
+            if (!is_array($value)) {
+                $value = [$value];
+            }
+            // To use array_values() avoids doctrine issue with string keys.
+            $value = in_array($queryType, self::FIELD_QUERY['value_integer'])
+                ? array_values(array_unique(array_map('intval', $value)))
+                : array_values(array_unique(array_filter(array_map('trim', array_map('strval', $value)), 'strlen')));
+            if (empty($value)) {
+                return null;
+            }
+        }
+        // Add error with an array of values for property for other query types.
+        elseif (!$isFilter && in_array($queryType, self::FIELD_QUERY['value_array'], true)) {
+            $this->logger->err(
+                'The query arg "property" does not support type {type} with an array as value. Check your queries: {url}', // @translate
+                ['type' => $queryType, 'url' => $_SERVER['REQUEST_URI']]
+            );
+            return null;
         }
         // The value should be scalar in all other cases (int or string).
         elseif (is_array($value)) {

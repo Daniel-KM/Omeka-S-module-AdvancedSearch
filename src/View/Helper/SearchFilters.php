@@ -712,6 +712,7 @@ class SearchFilters extends AbstractHelper
                 $query['filter'][] = [
                     'join' => $this->searchIndex['query_args'][$field]['join'] ?? 'and',
                     'field' => $field,
+                    'except' => $this->searchIndex['query_args'][$field]['except'] ?? null,
                     'type' => $this->searchIndex['query_args'][$field]['type'] ?? 'eq',
                     'val' => $value,
                     'datatype' => $this->searchIndex['query_args'][$field]['datatype'] ?? null,

@@ -612,7 +612,18 @@ class InternalQuerier extends AbstractQuerier
         // Full text search is the default Omeka mode.
         // TODO It uses fulltext_search, but when more than 50% results, no results, not understandable by end user (or use boolean mode).
         if ($this->query->getRecordOrFullText() === 'record') {
-            $this->args['search'] = $q;
+            $rft = $this->query->getAlias('full_text');
+            if ($rft && !empty($rft['fields'])) {
+                $this->args['filter'][] = [
+                    'join' => 'and',
+                    'field' => '',
+                    'except' => $rft['fields'],
+                    'type' => 'in',
+                    'val' => $q,
+                ];
+            } else {
+                $this->args['search'] = $q;
+            }
         } else {
             $this->args['fulltext_search'] = $q;
         }

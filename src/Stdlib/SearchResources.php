@@ -963,6 +963,7 @@ class SearchResources
                 $query['filter'][] = [
                     'join' => $this->searchIndex['query_args'][$field]['join'] ?? 'and',
                     'field' => $this->searchIndex['aliases'][$field]['fields'] ?? $field,
+                    'except' => $this->searchIndex['query_args'][$field]['except'] ?? null,
                     'type' => $this->searchIndex['query_args'][$field]['type'] ?? 'eq',
                     'val' => $value,
                     'datatype' => $this->searchIndex['query_args'][$field]['datatype'] ?? null,
@@ -1441,6 +1442,7 @@ class SearchResources
      * - filter[{index}][join]: "and" OR "or" OR "not" joiner with previous query
      * - filter[{index}][field]: property ID, term or indexed field, or array of
      *   property IDs, terms or indexed fields
+     * - filter[{index}][except]: list of property IsD or terms to exclude
      * - filter[{index}][type]: search type
      * - filter[{index}][val]: search text or array of texts or values
      * - filter[{index}][datatype]: filter on data type(s)

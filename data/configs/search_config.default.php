@@ -255,8 +255,8 @@ return [
                         'dcterms:educationLevel',
                     ],
                 ],
-                'rightsHolder' => [
-                    'name' => 'rightsHolder',
+                'rights_holder' => [
+                    'name' => 'rights_holder',
                     'label' => 'Rights holder',
                     'fields' => [
                         'dcterms:rightsHolder',
@@ -267,8 +267,8 @@ return [
                 // These groups don't follow rdf rules.
 
                 // Group similar and rarely used unrefined data.
-                'accrualAndInstructional' => [
-                    'name' => 'accrualAndInstructional',
+                'accrual_and_instructional' => [
+                    'name' => 'accrual_and_instructional',
                     'label' => 'Accrual and instructional metadata',
                     'fields' => [
                         'dcterms:accrualMethod',
@@ -277,8 +277,8 @@ return [
                         'dcterms:instructionalMethod',
                     ],
                 ],
-                'bibliographicData' => [
-                    'name' => 'bibliographicData',
+                'bibliographic_data' => [
+                    'name' => 'bibliographic_data',
                     'label' => 'Bibliographic data',
                     'fields' => [
                         'bibo:chapter',
@@ -295,11 +295,19 @@ return [
                         'bibo:volume',
                     ],
                 ],
+                'full_text' => [
+                    'name' => 'full_text',
+                    'label' => 'Full text',
+                    'fields' => [
+                        'bibo:content',
+                        'extracttext:extracted_text',
+                    ],
+                ],
             ],
             'query_args' => [
                 /**
                  * Default options for filters are: join = and, type = eq.
-                 * The keys and values are the filter ones.
+                 * The keys and values are the filter ones: join, field, type, except, datatype.
                  * @see \AdvancedSearch\Stdlib\SearchResources::buildFilterQuery()
                  */
                 /*

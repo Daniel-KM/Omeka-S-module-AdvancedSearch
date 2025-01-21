@@ -1960,6 +1960,13 @@ class SearchResources
                     $value = (int) $value;
                 }
             }
+            // Convert single values into array except if array is not supported
+            // in order to manage next process with properties.
+            if (!in_array($queryType, self::FIELD_QUERY['value_single_array_or_string'], true)
+                && !in_array($queryType, self::FIELD_QUERY['value_single'], true)
+            ) {
+                $value = [$value];
+            }
         }
 
         // The three joiners are "and" (default), "or" and "not".

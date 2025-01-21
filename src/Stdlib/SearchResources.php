@@ -840,7 +840,8 @@ class SearchResources
             // Init the short properties to prepare optimization.
             // Joiner should be "OR", because "AND" cannot be used with sql "IN()".
             // @see https://github.com/Daniel-KM/Omeka-S-module-AdvancedSearch/issues/4
-            if ($query['property'][$k]['joiner'] === 'or'
+            if (isset($query['property'][$k]['joiner'])
+                && $query['property'][$k]['joiner'] === 'or'
                 && in_array($queryType, ['eq', 'list', 'neq', 'nlist'])
             ) {
                 // TODO Manage the case where the property is numeric or term (simplify above instead of in the process below).
@@ -1014,7 +1015,8 @@ class SearchResources
                 // The joiner should be "OR", because "AND" cannot be used with sql
                 // "IN()". But some types for min/max don't use it.
                 // @see https://github.com/Daniel-KM/Omeka-S-module-AdvancedSearch/issues/4
-                if (!($query['filter'][$k]['join'] === 'or'
+                if (!(
+                    (isset($query['filter'][$k]['join']) && $query['filter'][$k]['join'] === 'or')
                     || in_array($queryType, ['lt', 'lte', 'gte', 'gt', '<', '≤', '≥', '>', 'yreq', 'yrlt', 'yrlte', 'yrgte', 'yrgt', 'nyreq', 'nyrlt', 'nyrlte', 'nyrgte', 'nyrgt'])
                 )) {
                     continue;

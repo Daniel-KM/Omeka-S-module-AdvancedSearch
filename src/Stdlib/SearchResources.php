@@ -849,22 +849,22 @@ class SearchResources
                 $short = '/or'
                     . '/' . $queryRowProperty
                     . '/' . (empty($queryRow['except']) ? '' : serialize($queryRow['except']))
-                    . '/' . (in_array($queryRow['type'], ['neq', 'nlist'] ? 'nlist' : 'list'))
+                    . '/' . ((in_array($queryRow['type'], ['neq', 'nlist'])) ? 'nlist' : 'list')
                     . '/' . (empty($queryRow['datatype']) ? '' : serialize($queryRow['datatype']))
                     . '/';
                 if (isset($shortProperties[$short])) {
                     ++$shortProperties[$short]['total'];
-                    $shortProperties[$short]['texts'] = array_values(array_unique(array_merge(
+                    $shortProperties[$short]['texts'] = array_values(array_unique(array(
                         $shortProperties[$short]['texts'],
-                        array_values($queryRow['text']
-                    ))));
+                        $queryRow['text']
+                    )));
                 } else {
                     $shortProperties[$short]['property_string'] = $queryRowProperty;
                     $shortProperties[$short]['joiner'] = 'or';
                     $shortProperties[$short]['property'] = $queryRowProp;
                     $shortProperties[$short]['except'] = $queryRow['except'] ?? '';
                     $shortProperties[$short]['type'] = $queryRow['type'];
-                    $shortProperties[$short]['texts'] = array_values($queryRow['text']);
+                    $shortProperties[$short]['texts'] = $queryRow['text'];
                     $shortProperties[$short]['datatype'] = $queryRow['datatype'] ?? '';
                     $shortProperties[$short]['total'] = 1;
                 }
@@ -1041,7 +1041,7 @@ class SearchResources
                     $shortFilters[$short]['field'] = $queryRowField;
                     $shortFilters[$short]['except'] = $queryRow['except'] ?? '';
                     $shortFilters[$short]['type'] = $queryRow['type'];
-                    $shortFilters[$short]['vals'] = array_values($queryRow['val']);
+                    $shortFilters[$short]['vals'] = $queryRow['val'];
                     $shortFilters[$short]['datatype'] = $queryRow['datatype'] ?? '';
                     $shortFilters[$short]['total'] = 1;
                 }

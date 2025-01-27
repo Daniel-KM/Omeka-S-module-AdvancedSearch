@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-20 00:00+0000\n"
+"POT-Creation-Date: 2025-01-27 00:00+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
@@ -97,28 +97,28 @@ msgstr ""
 msgid "[Missing engine adapter \"%s\"]"
 msgstr "[Adaptateur « %s » manquant]"
 
-#: src/Controller/SearchController.php:135
+#: src/Controller/SearchController.php:138
 msgid "No query."
 msgstr "Pas de requête."
 
-#: src/Controller/SearchController.php:163
-#: src/Controller/SearchController.php:251
+#: src/Controller/SearchController.php:166
+#: src/Controller/SearchController.php:255
 msgid "An error occurred."
 msgstr "Une erreur est survenue."
 
-#: src/Controller/SearchController.php:197
+#: src/Controller/SearchController.php:201
 msgid "This action requires an ajax request."
 msgstr "Cette action nécessite une requête ajax."
 
-#: src/Controller/SearchController.php:225
+#: src/Controller/SearchController.php:229
 msgid "Not a search page for this site."
 msgstr "Page de recherche indisponible dans ce site."
 
-#: src/Controller/SearchController.php:239
+#: src/Controller/SearchController.php:243
 msgid "The seach engine is not available."
 msgstr "Le moteur de recherche et indisponible."
 
-#: src/Controller/SearchController.php:360
+#: src/Controller/SearchController.php:364
 msgid "Logo"
 msgstr "Logo"
 
@@ -1119,28 +1119,28 @@ msgstr "grille"
 msgid "No media"
 msgstr "Pas de média"
 
-#: view/search/search.phtml:99
+#: view/search/search.phtml:92
 msgid "Breadcrumbs"
 msgstr "Fil d’Ariane"
 
-#: view/search/search.phtml:105
+#: view/search/search.phtml:98
 msgid "Collections"
 msgstr "Collections"
 
-#: view/search/search.phtml:167
+#: view/search/search.phtml:160
 #, php-format
 msgid "%1$d %2$s"
 msgstr "%1$d %2$s"
 
-#: view/search/search.phtml:176
+#: view/search/search.phtml:169
 msgid "Fill a query and get results."
 msgstr "Faîtes une requête pour obtenir des résultats."
 
-#: view/search/search.phtml:178
+#: view/search/search.phtml:171
 msgid "This item set has no items."
 msgstr "Cette collection n’a pas de contenus."
 
-#: view/search/search.phtml:185
+#: view/search/search.phtml:178
 msgid "The query returned no results"
 msgstr "Votre recherche n'a retourné aucun résultat"
 
@@ -1824,8 +1824,8 @@ msgid ""
 "The option \"Record or Full text\" is now configurable with alias "
 "\"full_text\" to define properties with full text."
 msgstr ""
-"L’option The option « Notice ou plein texte » est désormais configurable "
-"avec l’alias « full_text » pour définir les propriétés contenant du texte."
+"L’option « Notice ou plein texte » est désormais configurable avec l’alias "
+"« full_text » pour définir les propriétés contenant du texte."
 
 #: Module.php:95
 msgid ""
@@ -1845,44 +1845,43 @@ msgstr ""
 msgid "The module {module} can be reenabled."
 msgstr "Le module {module} peut être réactivé."
 
-#: Module.php:148 src/Controller/Admin/IndexController.php:88
+#: Module.php:189 src/Controller/Admin/IndexController.php:129
 msgid ""
-"The setting to override search element \"properties\" is enabled. This "
-"feature is deprecated and will be removed in a future version. All improved "
-"queries should be replaced by the equivalent filter queries. Check your "
-"pages and settings. Matching sites: {json}"
+"The setting to override search element \"property\" is enabled. This feature "
+"will be removed in a future version and should be {link}replaced by the "
+"search element \"filter\"{link_end}. Check your pages and settings. Matching "
+"sites: {json}"
 msgstr ""
-"Le paramètre pour contourner les limites du filtre de recherche « property » "
-"est activé. Cette fonctionnalité est obsolète et sera supprimée dans une "
-"future version. Toutes les requêtes améliorées doivent être remplacées par "
-"leur équivalent avec « filter ». Vérifier vos pages et paramètres. Sites "
-"identifiés : {json}"
+"Le filtre de recherche amélioré « property » est activé. Cette "
+"fonctionnalité sera supprimée dans une future version et doit être {link}"
+"remplacée par l’élément « filter »{link_end}. Vérifier vos pages et "
+"paramètres. Sites identifiés : {json}"
 
-#: Module.php:1132
+#: Module.php:1115
 msgid "Unable to batch index metadata for search engine \"{name}\": {message}"
 msgstr ""
 "Impossible d’indexer les métadonnées en lot pour le moteur de recherche "
 "« {name} » : {message}"
 
-#: Module.php:1137
+#: Module.php:1120
 msgid "Unable to batch update the search engine \"{name}\": see log."
 msgstr ""
 "Impossible de mettre à jour le moteur de recherche « {name} » : voir les "
 "journaux."
 
-#: Module.php:1185
+#: Module.php:1168
 msgid "Unable to launch index metadata for search engine \"{name}\": {message}"
 msgstr ""
 "Impossible d’indexer les métadonnées en lot pour le moteur de recherche "
 "« {name} » : {message}"
 
-#: Module.php:1189
+#: Module.php:1172
 msgid "Unable to launch indexing for the search engine \"{name}\": see log."
 msgstr ""
 "Impossible de mettre à jour le moteur de recherche « {name} » : voir les "
 "journaux."
 
-#: Module.php:1287
+#: Module.php:1270
 msgid ""
 "Unable to delete the search index for resource #{resource_id} in search "
 "engine \"{name}\": {message}"
@@ -1890,7 +1889,7 @@ msgstr ""
 "Impossible de supprimer l’index de recherche pour la ressource "
 "#{resource_id} dans le moteur « {name} » : {message}"
 
-#: Module.php:1292
+#: Module.php:1275
 msgid ""
 "Unable to delete the search index for the deleted resource #{resource_id} in "
 "search engine \"{name}\": see log."
@@ -1898,7 +1897,7 @@ msgstr ""
 "Impossible de supprimer l’index de recherche pour la ressource supprimée "
 "#{resource_id} dans le moteur « {name} » : voir les journaux."
 
-#: Module.php:1318
+#: Module.php:1301
 msgid ""
 "Unable to index metadata of resource #{resource_id} for search in search "
 "engine \"{name}\": {message}"
@@ -1906,7 +1905,7 @@ msgstr ""
 "Impossible d’indexer les métadonnées de la ressource #{resource_id} dans le "
 "moteur « {name} » : {message}"
 
-#: Module.php:1323
+#: Module.php:1306
 msgid ""
 "Unable to update the search index for resource #{resource_id} in search "
 "engine \"{name}\": see log."
@@ -1914,7 +1913,7 @@ msgstr ""
 "Impossible de mettre à jour l’index pour la ressource #{resource_id} dans le "
 "moteur « {name} » : voir les journaux."
 
-#: Module.php:1559
+#: Module.php:1542
 msgid ""
 "The internal search engine (sql) can be edited in the {link_url}search "
 "manager{link_end}."
@@ -1922,11 +1921,11 @@ msgstr ""
 "Le moteur de recherche interne (sql) peut être configuré dans le menu "
 "{link_url}Moteurs de recherche{link_end}."
 
-#: Module.php:1581
+#: Module.php:1564
 msgid "Main index"
 msgstr "Index principal"
 
-#: Module.php:1595
+#: Module.php:1578
 msgid ""
 "The {link_url}internal suggester{link_end} (sql) will be available after "
 "indexation."
@@ -1934,7 +1933,7 @@ msgstr ""
 "Le {link_url}suggéreur interne{link_end} (sql) sera disponible après "
 "indexation."
 
-#: Module.php:1632
+#: Module.php:1615
 msgid ""
 "The default search config can be {link_1}edited{link_end}, {link_2}"
 "configured{link_end} and defined in the {link_3}main settings{link_end} for "
@@ -1978,7 +1977,7 @@ msgid "Presence of original file"
 msgstr "Présence d’un fichier original"
 
 #: view/common/advanced-search/has-original.phtml:16
-#: config/module.config.php:606
+#: config/module.config.php:600
 msgid "Has original file"
 msgstr "A un fichier original"
 
@@ -3518,50 +3517,19 @@ msgstr "Méthode %1$s requiert un élément de type %2$s"
 msgid "Method %s requires that the value be an associative array"
 msgstr "Méthode %1$s requiert une valeur avec un tableau associatif"
 
-#: src/Form/TraitCommonSettings.php:23
-msgid "Support improved search of properties (deprecated: use filters)"
-msgstr ""
-"Prise en charge de la recherche améliorée de propriétés (non recommandé : "
-"utiliser les filtres)"
-
-#: src/Form/TraitCommonSettings.php:24
-msgid ""
-"To override the default search elements is not recommended, so the "
-"improvements are now available in the element \"filter\"."
-msgstr ""
-"Il n’est pas recommandé de remplacer les éléments de recherche par défaut. "
-"Les améliorations sont donc désormais disponibles dans l’élément « filter »."
-
-#: src/Form/TraitCommonSettings.php:35
-msgid ""
-"Support improved search of resource, without owner, class, template, or item "
-"set"
-msgstr ""
-"Prise en charge de la recherche améliorée des ressources, sans propriétaire, "
-"classe, modèle ou collection"
-
-#: src/Form/TraitCommonSettings.php:36 src/Form/TraitCommonSettings.php:48
-msgid "To override the default search elements is not recommended"
-msgstr ""
-"Il n’est pas recommandé de remplacer les éléments de recherche par défaut"
-
-#: src/Form/TraitCommonSettings.php:47
-msgid "Support improved search of media types, main and multiple media types"
-msgstr ""
-"Prise en charge de la recherche améliorée des types de médias, principaux et "
-"multiples"
-
-#: src/Form/TraitCommonSettings.php:65
+#: src/Form/TraitCommonSettings.php:22
 msgid "Fields for standard advanced search form"
 msgstr "Champs pour le formulaire de recherche avancée standard"
 
-#: src/Form/TraitCommonSettings.php:66
+#: src/Form/TraitCommonSettings.php:23
 msgid ""
-"The fields marked with a \"*\" are available only when matching option is "
-"set above."
+"The check box marked with a \"*\" are improvements of the standard search "
+"fields. They should be replaced by equivalent arguments of the module "
+"Advanced Search to avoid side effects."
 msgstr ""
-"Les champs marqués avec une « * » sont disponibles seulement quand les "
-"options ci-dessus sont activées."
+"Les valeurs marquées avec une « * » sont des améliorations des champs de "
+"recherche standard. Ils doivent être remplacés par les arguments équivalents "
+"du module Advanced Search pour éviter les effets de bord."
 
 #: src/Form/SearchingFormFieldset.php:22
 msgid "Search config page"
@@ -3650,7 +3618,7 @@ msgid "The slug \"{search_slug}\" is already taken."
 msgstr "Le chemin « {search_slug} » est déjà utilisé."
 
 #: src/Api/Representation/SearchSuggesterRepresentation.php:175
-#: src/Api/Representation/SearchConfigRepresentation.php:510
+#: src/Api/Representation/SearchConfigRepresentation.php:511
 msgid ""
 "Query error: {message}\n"
 "Query:{query}"
@@ -3670,15 +3638,15 @@ msgstr ""
 "Le paramètre de configuration de la recherche « {old} » a été renommé "
 "« {new} ». Vous devez mettre à jour votre thème."
 
-#: src/Api/Representation/SearchConfigRepresentation.php:400
+#: src/Api/Representation/SearchConfigRepresentation.php:401
 msgid "The search page \"{search_page}\" has no suggester."
 msgstr "La page de recherche « {search_page} » n’a pas de suggéreur."
 
-#: src/Api/Representation/SearchConfigRepresentation.php:413
+#: src/Api/Representation/SearchConfigRepresentation.php:414
 msgid "The search page \"{search_page}\" has no more suggester."
 msgstr "La page de recherche « {search_page} » n’a plus de suggéreur."
 
-#: src/Api/Representation/SearchConfigRepresentation.php:430
+#: src/Api/Representation/SearchConfigRepresentation.php:431
 msgid "The search page \"{search_page}\" has no search engine."
 msgstr ""
 "La page de recherche « {search_page} » n’a pas de moteur de recherche "
@@ -3869,7 +3837,7 @@ msgstr ""
 "{site_slug}. Vérifiez les paramètres du site ou la configuration de la page "
 "de recherche."
 
-#: src/Controller/SearchController.php:302
+#: src/Controller/SearchController.php:306
 msgid "Rss are available only via public interface."
 msgstr "Les fils rss sont disponibles seulement sur l’interface publique."
 
@@ -3900,21 +3868,37 @@ msgstr ""
 "La configuration de recherche « {search_slug} » n’a pas de formulaire "
 "associé."
 
-#: src/Stdlib/SearchResources.php:1918
+#: src/Stdlib/SearchResources.php:574
 msgid ""
-"The query arg \"property\" does not support type {type} with an array as "
-"value. Check your queries: {url}"
+"The query arg \"property\" won’t support multiple properties in a future "
+"version, because it’s overriding the default behavior. Use arg \"filter\" "
+"instead. Check your queries: {url}"
 msgstr ""
-"L’argument de requête « property » ne prend pas en charge le type {type} "
-"avec une liste de valeurs. Vérifiez vos requêtes : {url}"
-
-#: src/Stdlib/SearchResources.php:1925
-msgid ""
-"The query type \"list\" is still used with property. Check your queries: "
+"L’argument de requête « property » ne prendra plus en charge les propriétés "
+"multiples dans une version future, car cela contourne le comportement par "
+"défaut. Utilisez l’argument « filter » à la place. Vérifiez vos requêtes : "
 "{url}"
+
+#: src/Stdlib/SearchResources.php:580
+msgid ""
+"The query arg \"property\" won’t support type {type} in a future version, "
+"because it’s overriding the default behavior. Use arg \"filter\" instead. "
+"Check your queries: {url}"
 msgstr ""
-"Le type de requête « list » est encore utilisé avec « property ». Vérifiez "
-"vos requêtes : {url}"
+"L’argument de requête « property » ne prendra plus en charge le type {type} "
+"dans une version future, car cela contourne le comportement par défaut. "
+"Utilisez l’argument « filter » à la place. Vérifiez vos requêtes : {url}"
+
+#: src/Stdlib/SearchResources.php:586
+msgid ""
+"The query arg \"property\" won’t support multiple values in a future "
+"version, because it’s overriding the default behavior. Use arg \"filter\" "
+"instead. Check your queries: {url}"
+msgstr ""
+"L’argument de requête « property » ne prendra plus en charge les valeurs "
+"multiples dans une version future, car cela contourne le comportement par "
+"défaut. Utilisez l’argument « filter » à la place. Vérifiez vos requêtes : "
+"{url}"
 
 #: src/Querier/InternalQuerier.php:59 src/Querier/InternalQuerier.php:198
 msgid "An issue occurred."
@@ -3990,85 +3974,129 @@ msgstr ""
 "Essaie d’aligner les métadonnées et les propriétés qui ne le sont pas déjà "
 "avec les champs de l’'index"
 
-#: config/module.config.php:477
+#: config/module.config.php:471
 msgid "Properties *"
 msgstr "Propriétés *"
 
-#: config/module.config.php:491
+#: config/module.config.php:485
 msgid "Classes *"
 msgstr "Classes *"
 
-#: config/module.config.php:502
+#: config/module.config.php:496
 msgid "Templates *"
 msgstr "Modèles *"
 
-#: config/module.config.php:509
+#: config/module.config.php:503
 msgid "Templates (specific option \"restricted\")"
 msgstr "Modèles (option spécifique « restreint »)"
 
-#: config/module.config.php:521
+#: config/module.config.php:515
 msgid "Item sets *"
 msgstr "Collections *"
 
-#: config/module.config.php:527
+#: config/module.config.php:521
 msgid "default_site"
 msgstr "default_site"
 
-#: config/module.config.php:533
+#: config/module.config.php:527
 msgid "Site *"
 msgstr "Site *"
 
-#: config/module.config.php:540
+#: config/module.config.php:534
 msgid "Has media (select)"
 msgstr "A un média (sélecteur)"
 
-#: config/module.config.php:547
+#: config/module.config.php:541
 msgid "Has media (radio)"
 msgstr "A un média (radio)"
 
-#: config/module.config.php:557
+#: config/module.config.php:551
 msgid "Media type (single)"
 msgstr "Types de média (unique)"
 
-#: config/module.config.php:562
+#: config/module.config.php:556
 msgid "Media types *"
 msgstr "Types de média *"
 
-#: config/module.config.php:578
+#: config/module.config.php:572
 msgid "Owner *"
 msgstr "Propriétaire *"
 
-#: config/module.config.php:585
+#: config/module.config.php:579
 msgid "Visibility (select)"
 msgstr "Visibilité (sélecteur)"
 
-#: config/module.config.php:591
+#: config/module.config.php:585
 msgid "Visibility (radio)"
 msgstr "Visibilité (radio)"
 
-#: config/module.config.php:595
+#: config/module.config.php:589
 msgid "Id"
 msgstr "Id"
 
-#: config/module.config.php:601
+#: config/module.config.php:595
 msgid "Date time"
 msgstr "Date / heure"
 
-#: config/module.config.php:621
+#: config/module.config.php:615
 msgid "Has a specific asset"
 msgstr "A un fichier spécifique"
 
-#: config/module.config.php:628
+#: config/module.config.php:622
 msgid "Geography"
 msgstr "Géographie"
 
-#: config/module.config.php:634
+#: config/module.config.php:628
 msgid "Is dynamic item set"
 msgstr "Est une collection dynamique"
 
-#: config/module.config.php:644
+#: config/module.config.php:638
 msgid "Numeric"
 msgstr "Numérique"
+
+#~ msgid "Support improved search of properties (deprecated: use filters)"
+#~ msgstr ""
+#~ "Prise en charge de la recherche améliorée de propriétés (non recommandé : "
+#~ "utiliser les filtres)"
+
+#~ msgid ""
+#~ "To override the default search elements is not recommended, so the "
+#~ "improvements are now available in the element \"filter\"."
+#~ msgstr ""
+#~ "Il n’est pas recommandé de remplacer les éléments de recherche par "
+#~ "défaut. Les améliorations sont donc désormais disponibles dans l’élément "
+#~ "« filter »."
+
+#~ msgid ""
+#~ "Support improved search of resource, without owner, class, template, or "
+#~ "item set"
+#~ msgstr ""
+#~ "Prise en charge de la recherche améliorée des ressources, sans "
+#~ "propriétaire, classe, modèle ou collection"
+
+#~ msgid "To override the default search elements is not recommended"
+#~ msgstr ""
+#~ "Il n’est pas recommandé de remplacer les éléments de recherche par défaut"
+
+#~ msgid ""
+#~ "Support improved search of media types, main and multiple media types"
+#~ msgstr ""
+#~ "Prise en charge de la recherche améliorée des types de médias, principaux "
+#~ "et multiples"
+
+#~ msgid ""
+#~ "The fields marked with a \"*\" are available only when matching option is "
+#~ "set above."
+#~ msgstr ""
+#~ "Les champs marqués avec une « * » sont disponibles seulement quand les "
+#~ "options ci-dessus sont activées."
+
+#~ msgid ""
+#~ "The query type \"list\" is still used with property. Check your queries: "
+#~ "{url}"
+#~ msgstr ""
+#~ "Le type de requête « list » est encore utilisé avec « property ». "
+#~ "Vérifiez vos requêtes : {url}"
 
 #~ msgid ""
 #~ "It is now possible to define multiple forms and filters for the same "

@@ -1534,7 +1534,7 @@ class Module extends AbstractModule
             $searchEngineConfig = require __DIR__ . '/data/configs/search_engine.internal.php';
             $connection->executeStatement($sql, [
                 $searchEngineConfig['o:name'],
-                $searchEngineConfig['o:adapter'],
+                $searchEngineConfig['o:engine_adapter'],
                 json_encode($searchEngineConfig['o:settings']),
             ]);
             $searchEngineId = $connection->fetchOne($sqlSearchEngineId);

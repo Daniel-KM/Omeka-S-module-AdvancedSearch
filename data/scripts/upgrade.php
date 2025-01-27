@@ -1912,3 +1912,16 @@ if (version_compare($oldVersion, '3.4.38', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.39', '<')) {
+    $settings->delete('advancedsearch_property_improved');
+    $settings->delete('advancedsearch_resource_metadata_improved');
+    $settings->delete('advancedsearch_media_type_improved');
+    $siteIds = $api->search('sites', [], ['returnScalar' => 'id'])->getContent();
+    foreach ($siteIds as $siteId) {
+        $siteSettings->setTargetId($siteId);
+        $siteSettings->delete('advancedsearch_property_improved');
+        $siteSettings->delete('advancedsearch_resource_metadata_improved');
+        $siteSettings->delete('advancedsearch_media_type_improved');
+    }
+}

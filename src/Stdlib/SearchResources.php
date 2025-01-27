@@ -274,7 +274,7 @@ class SearchResources
             'lkq',
             'nlkq',
         ],
-        // Optimize for properties. Deprecated.
+        // Deprecated. Optimize for properties.
         'optimize' => [
             'eq' => 'list',
             'neq' => 'nlist',
@@ -303,6 +303,22 @@ class SearchResources
             ],
             'uri' => [
             ],
+        ],
+        'core' => [
+            'eq',
+            'neq',
+            'in',
+            'nin',
+            'ex',
+            'nex',
+            'sw',
+            'nsw',
+            'ew',
+            'new',
+            'res',
+            'nres',
+            'dt',
+            'ndt',
         ],
     ];
 
@@ -550,6 +566,28 @@ class SearchResources
         }
 
         $query = $this->expandFieldQueryArgs($query);
+
+        // Add warning before cleaning. The right queries are still processed.
+        foreach ($query['property'] ?? [] as $queryRow) {
+            if (isset($queryRow['property']) && is_array($queryRow['property'])) {
+                $this->logger->warn(
+                    'The query arg "property" won’t support multiple properties in a future version, because it’s overriding the default behavior. Use arg "filter" instead. Check your queries: {url}', // @translate
+                    ['url' => $_SERVER['REQUEST_URI']]
+                );
+            }
+            if (isset($queryRow['type']) && !in_array($queryRow['type'], self::FIELD_QUERY['core'])) {
+                $this->logger->warn(
+                    'The query arg "property" won’t support type {type} in a future version, because it’s overriding the default behavior. Use arg "filter" instead. Check your queries: {url}', // @translate
+                    ['type' => $queryRow['type'], 'url' => $_SERVER['REQUEST_URI']]
+                );
+            }
+            if (isset($queryRow['text']) && is_array($queryRow['text'])) {
+                $this->logger->warn(
+                    'The query arg "property" won’t support multiple values in a future version, because it’s overriding the default behavior. Use arg "filter" instead. Check your queries: {url}', // @translate
+                    ['url' => $_SERVER['REQUEST_URI']]
+                );
+            }
+        }
 
         foreach ($query as $key => $value) {
             if ($key === 'sort_by_default' || $key === 'sort_order_default') {
@@ -1887,7 +1925,7 @@ class SearchResources
             $value = null;
         }
         // Check array of values, that are allowed only by filters.
-        elseif ($isFilter && !in_array($queryType, self::FIELD_QUERY['value_single'], true)) {
+        elseif (!in_array($queryType, self::FIELD_QUERY['value_single'], true)) {
             if ((is_array($value) && !count($value))
                 || (!is_array($value) && !strlen((string) $value))
             ) {
@@ -1917,30 +1955,6 @@ class SearchResources
                 }
             }
         }
-        // Add error with an array of values for property for other query types.
-        elseif (!$isFilter && in_array($queryType, self::FIELD_QUERY['value_array'], true)) {
-            if (!in_array($queryType, ['list', 'nlist'])) {
-                $this->logger->err(
-                    'The query arg "property" does not support type {type} with an array as value. Check your queries: {url}', // @translate
-                    ['type' => $queryType, 'url' => $_SERVER['REQUEST_URI']]
-                );
-                return null;
-            }
-            // Warn array of values for property with list/nlist for compatibility.
-            $this->logger->warn(
-                'The query type "list" is still used with property. Check your queries: {url}', // @translate
-                ['url' => $_SERVER['REQUEST_URI']]
-            );
-            if ((is_array($value) && !count($value))
-                || (!is_array($value) && !strlen((string) $value))
-            ) {
-                return null;
-            }
-            $value = array_values(array_unique(array_filter(array_map('trim', array_map('strval', is_array($value) ? $value: [$value])), 'strlen')));
-            if (empty($value)) {
-                return null;
-            }
-        }
         // The value should be scalar in all other cases (integer or string).
         elseif (is_array($value) || $value === '') {
             return null;
@@ -1962,8 +1976,7 @@ class SearchResources
                     $value = (int) $value;
                 }
             }
-            // Convert single values into array except if array is not supported
-            // in order to manage next process with properties.
+            // Convert single values into array except if array isn't supported.
             if (!in_array($queryType, self::FIELD_QUERY['value_single_array_or_string'], true)
                 && !in_array($queryType, self::FIELD_QUERY['value_single'], true)
             ) {

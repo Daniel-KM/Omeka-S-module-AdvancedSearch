@@ -373,9 +373,6 @@ return [
     ],
     'advancedsearch' => [
         'settings' => [
-            'advancedsearch_property_improved' => false,
-            'advancedsearch_metadata_improved' => false,
-            'advancedsearch_media_type_improved' => false,
             'advancedsearch_search_fields' => [
                 // Any resource type.
                 'common/advanced-search/sort',
@@ -410,9 +407,6 @@ return [
             'advancedsearch_all_configs' => [1 => 'find'],
         ],
         'site_settings' => [
-            'advancedsearch_property_improved' => false,
-            'advancedsearch_resource_metadata_improved' => false,
-            'advancedsearch_media_type_improved' => false,
             // See the full list below.
             'advancedsearch_search_fields' => [
                 // Any resource type.

@@ -33,8 +33,6 @@ class SettingsFieldset extends Fieldset
             ->setAttribute('id', 'advanced-search')
             ->setOption('element_groups', $this->elementGroups)
 
-            ->initImprovedSearch()
-
             ->initSearchFields()
 
             ->add([

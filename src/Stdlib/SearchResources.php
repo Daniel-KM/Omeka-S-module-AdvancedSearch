@@ -887,7 +887,7 @@ class SearchResources
                 $short = '/or'
                     . '/' . $queryRowProperty
                     . '/' . (empty($queryRow['except']) ? '' : serialize($queryRow['except']))
-                    . '/' . (in_array($queryRow['type'], ['neq', 'nlist'] ? 'nlist' : 'list'))
+                    . '/' . (in_array($queryRow['type'], ['neq', 'nlist']) ? 'nlist' : 'list')
                     . '/' . (empty($queryRow['datatype']) ? '' : serialize($queryRow['datatype']))
                     . '/';
                 if (isset($shortProperties[$short])) {

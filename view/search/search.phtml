@@ -31,6 +31,7 @@
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var \Omeka\Api\Representation\SiteRepresentation|null $site
  * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
+ * @var \Omeka\Api\Representation\ItemSetRepresentation|null $itemSet
  * @var \AdvancedSearch\Query $query
  * @var \AdvancedSearch\Response $response
  *
@@ -40,7 +41,6 @@
 
 $plugins = $this->getHelperPluginManager();
 $url = $plugins->get('url');
-$api = $plugins->get('api');
 $partial = $plugins->get('partial');
 $escape = $plugins->get('escapeHtml');
 $assetUrl = $plugins->get('assetUrl');
@@ -59,13 +59,6 @@ $filterLocale = (bool) $setting('filter_locale_values');
 $lang = $this->lang();
 $langValue = $filterLocale ? [$lang, ''] : null;
 
-// TODO Use site item set ?
-// Used in case of a redirect of item-set/show to search, when used like item/browse.
-/** @var \Omeka\Api\Representation\ItemSetRepresentation $itemSet */
-$itemSetId = (int) $this->params()->fromRoute('item-set-id');
-$itemSet = $itemSetId ? $api->read('item_sets', ['id' => $itemSetId])->getContent() : null;
-$vars->offsetSet('itemSet', $itemSet);
-
 $variables = $vars->getArrayCopy();
 
 $isPartial = $skipFormAction = !empty($skipFormAction);
@@ -78,7 +71,7 @@ $displayFacets = $displayParts ? $displayParts['facets'] ?? 'before' : 'none';
 
 if ($itemSet && $site) {
     $redirectItemSets = $this->siteSetting('advancedsearch_redirect_itemsets', ['default' => 'browse']);
-    $redirectItemSet = $redirectItemSets[$itemSetId] ?? $redirectItemSets['default'] ?? 'browse';
+    $redirectItemSet = $redirectItemSets[$itemSet ? $itemSet->id() : null] ?? $redirectItemSets['default'] ?? 'browse';
     $displayItemSet = $redirectItemSet === 'all' || ($redirectItemSet === 'first' && $response->getCurrentPage() === 1);
 } else {
     $displayItemSet = false;

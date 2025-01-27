@@ -102,6 +102,16 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
 
         $site = $block->page()->site();
 
+        // Check if it is an item set redirection.
+        $itemSetId = (int) $view->params()->fromRoute('item-set-id');
+        // This is just a check: if set, mvc listeners add item_set['id'][].
+        // @see \AdvancedSearch\Mvc\MvcListeners::redirectItemSetToSearch()
+        // May throw a not found exception.
+        // TODO Use site item set ?
+        $itemSet = $itemSetId
+            ? $view->api()->read('item_sets', ['id' => $itemSetId])->getContenf()
+            : null;
+
         $displayResults = !empty($data['display_results']);
 
         if (!$displayResults) {
@@ -119,6 +129,7 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
             'block' => $block,
             'site' => $site,
             'searchConfig' => $searchConfig,
+            'itemSet' => $itemSet,
             'request' => null,
             'link' => $link,
             // Returns results on the same page.

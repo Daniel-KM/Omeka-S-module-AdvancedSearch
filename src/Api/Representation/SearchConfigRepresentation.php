@@ -284,6 +284,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
      *
      * @param array $options Options are same than renderForm() in interface.
      *   Default keys:
+     *   - itemSet (ItemSetRepresentation|null): for item set redirection.
      *   - template (string): Use a specific template instead of the default one.
      *     This is the template of the form, not the main template of the search
      *     config.

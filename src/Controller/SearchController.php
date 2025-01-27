@@ -60,15 +60,17 @@ class SearchController extends AbstractActionController
                 return $this->notFoundAction();
             }
             // Check if it is an item set redirection.
-            $itemSetId = (int) $this->params('item-set-id');
+            $itemSetId = (int) $this->params()->fromRoute('item-set-id');
             // This is just a check: if set, mvc listeners add item_set['id'][].
             // @see \AdvancedSearch\Mvc\MvcListeners::redirectItemSetToSearch()
-            if ($itemSetId) {
-                // May throw a not found exception.
-                $this->api()->read('item_sets', $itemSetId);
-            }
+            // May throw a not found exception.
+            // TODO Use site item set ?
+            $itemSet = $itemSetId
+                ? $this->api()->read('item_sets', ['id' => $itemSetId])->getContenf()
+                : null;
         } else {
             $site = null;
+            $itemSet = null;
         }
 
         // The config is required, else there is no form.
@@ -82,6 +84,7 @@ class SearchController extends AbstractActionController
             'site' => $site,
             // The form is set via searchConfig.
             'searchConfig' => $searchConfig,
+            'itemSet' => $itemSet,
             // Set a default empty query and response to simplify view.
             // They will be filled in formAdapter.
             'query' => new Query,
@@ -180,6 +183,7 @@ class SearchController extends AbstractActionController
 
         $vars = [
             'searchConfig' => $searchConfig,
+            'itemSet' => $itemSet,
             'site' => $site,
             'query' => $response->getQuery(),
             'response' => $response,
@@ -291,7 +295,7 @@ class SearchController extends AbstractActionController
                 return $this->notFoundAction();
             }
             // Check if it is an item set redirection.
-            $itemSetId = (int) $this->params('item-set-id');
+            $itemSetId = (int) $this->params()->fromRoute('item-set-id');
             // This is just a check: if set, mvc listeners add item_set['id'][].
             // @see \AdvancedSearch\Mvc\MvcListeners::redirectItemSetToSearch()
             if ($itemSetId) {

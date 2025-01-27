@@ -4,6 +4,7 @@
  * @var \Omeka\Api\Representation\SitePageBlockRepresentation $block
  * @var \Omeka\Api\Representation\SiteRepresentation $site
  * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
+ * @var \Omeka\Api\Representation\ItemSetRepresentation|null $itemSet
  * @var array|null $request The user request completed with the hidden one.
  * @var array $link
  * @var bool $skipFormAction Allow to display results on same form.
@@ -17,6 +18,7 @@ $hyperlink = $plugins->get('hyperlink');
 <div class="block block-search">
     <?= $searchConfig->renderForm([
         'site' => $site,
+        'itemSet' => $itemSet,
         'template' => $displayResults ? 'search/search' :  null,
         'skip_form_action' => $skipFormAction,
         'request' => $request,

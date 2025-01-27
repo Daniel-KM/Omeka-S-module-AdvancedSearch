@@ -484,6 +484,37 @@ is saved and the moment when it is fully available in the search engine (it may
 be some minutes with Solr, according to your configuration).
 
 
+Deprecated improvements of the advanced search elements
+-------------------------------------------------------
+
+The default advanced search form is improved mainly for the element "property"
+to support multiple properties, many more search types, and multiple values.
+For example you can search for dcterms:creator and dcterms:contributor at the
+same time, and search for strings that look like "bossuet" and "ralelais", and
+only for data type literal:
+
+```
+property[0] => [
+  property => [dcterms:creator, dcterms:contributor],
+  type => near,
+  text => [bossuet, rabelais]
+]
+```
+
+Such a query should be replaced by this one:
+```
+filter[0] => [
+  field => [dcterms:creator, dcterms:contributor],
+  type => near,
+  val => [bossuet, rabelais]
+]
+```
+
+The change should be done mainly in the site pages when there are queries, for
+example for the block Browse Preview. You can do it directly in the user
+interface. There will be an automatic upgrade when the feature will be removed.
+
+
 TODO
 ----
 

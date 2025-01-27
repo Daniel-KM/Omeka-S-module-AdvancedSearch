@@ -2326,9 +2326,10 @@ class SearchResources
 
             case 'resq':
                 // TODO For now, only one sub-query (and the sub-query may be a complex one and it is largely enough in most of the cases).
-                // TODO Allow to pass an array instead of encoded url args (but it is cleaned above).
-                // $value = is_numeric(key($value)) ? reset($value) : $value;
-                $value = reset($value);
+                // TODO Allow to pass an array instead of encoded url args (but it is cleaned above). See 'lkq' too.
+                if (is_array($value) && is_numeric(key($value))) {
+                    $value = reset($value);
+                }
                 if (!is_array($value)) {
                     $aValue = null;
                     parse_str($value, $aValue);
@@ -2393,7 +2394,9 @@ class SearchResources
                     }
                 } elseif (in_array($queryType, ['lkq', 'nlkq'])) {
                     // Only a single level: see above "resq"/"nresq".
-                    $value = reset($value);
+                    if (is_array($value) && is_numeric(key($value))) {
+                        $value = reset($value);
+                    }
                     if (!is_array($value)) {
                         $aValue = null;
                         parse_str($value, $aValue);

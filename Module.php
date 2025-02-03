@@ -189,6 +189,7 @@ class Module extends AbstractModule
             'The setting to override search element "property" is enabled. This feature will be removed in a future version and should be {link}replaced by the search element "filter"{link_end}. Check your pages and settings. Matching sites: {json}', // @translate
             ['link' => '<a href="https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch#deprecated-improvements-of-the-advanced-search-elements" target="_blank" rel="noopener">', 'link_end' => '</a>', 'json' => json_encode($results, 448)]
         );
+        $message->setEscapeHtml(false);
         $messenger->addWarning($message);
 
         return true;

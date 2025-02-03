@@ -595,6 +595,7 @@ class InternalQuerier extends AbstractQuerier
             } elseif (extension_loaded('iconv')) {
                 $q = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $q);
             }
+            // TODO See transliterator from solr.
         }
 
         // TODO Try to support the exact search and the full text search (removed in version 3.5.17.3).
@@ -651,6 +652,7 @@ class InternalQuerier extends AbstractQuerier
             } elseif (extension_loaded('iconv')) {
                 $q = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $q);
             }
+            // TODO See transliterator from solr.
         }
 
         // TODO Try to support the exact search and the full text search (removed in previous version).

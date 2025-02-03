@@ -352,17 +352,21 @@ class Query implements JsonSerializable
     }
 
     /**
-     * Add advanced filters, that work similarly to Omeka ones.
+     * Add advanced filters, that work similarly to "filter" in SearchResources.
+     *
+     * Unlike SearchResources, the list is grouped by field first.
+     *
+     * @todo Manage filters like the SearchResources (with compatibility for old themes)?
      *
      * Note: Some types and joiners may not be managed by the querier.
-     * @todo Support multi-fields (name).
+     * @todo Support multi-fields (name) (but useless with aliases).
      */
     public function addFilterQuery(string $name, $val, ?string $type = 'in', ?string $join = 'and'): self
     {
         $this->filtersQuery[$name][] = [
-            'val' => is_array($val) ? array_map('trim', array_map('strval', $val)) : trim((string) $val),
-            'type' => trim((string) $type),
             'join' => trim((string) $join),
+            'type' => trim((string) $type),
+            'val' => is_array($val) ? array_map('trim', array_map('strval', $val)) : trim((string) $val),
         ];
         return $this;
     }

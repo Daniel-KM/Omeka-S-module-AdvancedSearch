@@ -254,6 +254,7 @@ trait TraitFormAdapterClassic
                             // Other filter keys (except and datatype), that are
                             // not set by end user, are managed via the search
                             // engine (via the name of the field).
+                            // TODO Prepare all arguements early in query with filter query.
                             $query->addFilterQuery($filter['replaced_field'], $filter['val'], $filter['type'], $filter['join']);
                             unset($value[$key]);
                         }

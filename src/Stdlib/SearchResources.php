@@ -2086,6 +2086,7 @@ class SearchResources
         // Note: a list of "or" with the same property should be optimized
         // early with type "list".
         // TODO Optimize early search type "or" with same properties and type.
+        // TODO Remove this optimization since it is done during cleaning and value array building.
 
         // Consecutive OR optimization
         //

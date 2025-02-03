@@ -66,7 +66,7 @@ class SearchController extends AbstractActionController
             // May throw a not found exception.
             // TODO Use site item set ?
             $itemSet = $itemSetId
-                ? $this->api()->read('item_sets', ['id' => $itemSetId])->getContenf()
+                ? $this->api()->read('item_sets', ['id' => $itemSetId])->getContent()
                 : null;
         } else {
             $site = null;

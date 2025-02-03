@@ -109,7 +109,7 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
         // May throw a not found exception.
         // TODO Use site item set ?
         $itemSet = $itemSetId
-            ? $view->api()->read('item_sets', ['id' => $itemSetId])->getContenf()
+            ? $view->api()->read('item_sets', ['id' => $itemSetId])->getContent()
             : null;
 
         $displayResults = !empty($data['display_results']);

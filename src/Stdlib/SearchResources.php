@@ -386,6 +386,11 @@ class SearchResources
     {
         $query = $request->getContent();
 
+        // Check if the request is already overridden.
+        if ($request->getOption('override') !== null) {
+            return $this;
+        }
+
         $override = [];
         $query = $this->startOverrideQuery($query, $override);
         if (!empty($override)) {
@@ -419,7 +424,7 @@ class SearchResources
      *
      * @see \AdvancedSearch\Api\ManagerDelegator::search()
      */
-    public function startOverrideQuery(array $query, array &$override): array
+    public function startOverrideQuery(array $query, ?array &$override): array
     {
         $override = [];
 

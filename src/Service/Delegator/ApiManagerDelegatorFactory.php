@@ -27,6 +27,8 @@ class ApiManagerDelegatorFactory implements DelegatorFactoryInterface
         $controllerPlugins = $serviceLocator->get('ControllerPluginManager');
 
         return $manager
-            ->setControllerPlugins($controllerPlugins);
+            ->setControllerPlugins($controllerPlugins)
+            ->setSearchResources($serviceLocator->get('AdvancedSearch\SearchResources'))
+        ;
     }
 }

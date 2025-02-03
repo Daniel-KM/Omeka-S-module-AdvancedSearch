@@ -3,6 +3,7 @@
 namespace AdvancedSearch\Api;
 
 // use AdvancedSearch\Mvc\Controller\Plugin\ApiSearch;
+use AdvancedSearch\Stdlib\SearchResources;
 use Laminas\Mvc\Controller\PluginManager as ControllerPluginManager;
 
 /**
@@ -14,6 +15,11 @@ class ManagerDelegator extends \Omeka\Api\Manager
      * @var ControllerPluginManager
      */
     protected $controllerPlugins;
+
+    /**
+     * @var \AdvancedSearch\Stdlib\SearchResources
+     */
+    protected $searchResources;
 
     /**
      * @var bool
@@ -42,8 +48,12 @@ class ManagerDelegator extends \Omeka\Api\Manager
         static $apiSearch;
 
         /** @see \AdvancedSearch\Module::onApiSearchPre() */
-        if (empty($options['index']) && empty($data['index'])) {
+        if (empty($options['index'])
+            && empty($data['index'])
+            && empty($options['is_index_search'])
+        ) {
             // Use the standard process when possible.
+            // When option "initialized" is set false, init search here.
             if (array_key_exists('initialize', $options)
                 && !$options['initialize']
                 && in_array($resource, [
@@ -57,77 +67,9 @@ class ManagerDelegator extends \Omeka\Api\Manager
                     // 'generations',
                 ])
             ) {
-                $query = &$data;
-
-                // Clean simple useless fields to avoid useless checks in many places.
-                // TODO Clean property, numeric, dates, etc.
-                foreach ($query as $key => $value) {
-                    if ($value === '' || $value === null || $value === []) {
-                        unset($query[$key]);
-                    } elseif ($key === 'id') {
-                        $values = is_array($value) ? $value : [$value];
-                        $values = array_filter($values, fn ($id) => $id !== '' && $id !== null);
-                        if (count($values)) {
-                            $query[$key] = $values;
-                        } else {
-                            unset($query[$key]);
-                        }
-                    } elseif (in_array($key, [
-                        'owner_id',
-                        'site_id',
-                    ])) {
-                        if (is_numeric($value)) {
-                            $query[$key] = (int) $value;
-                        } else {
-                            unset($query[$key]);
-                        }
-                    } elseif (in_array($key, [
-                        'resource_class_id',
-                        'resource_template_id',
-                        'item_set_id',
-                    ])) {
-                        $values = is_array($value) ? $value : [$value];
-                        $values = array_map('intval', array_filter($values, 'is_numeric'));
-                        if (count($values)) {
-                            $query[$key] = $values;
-                        } else {
-                            unset($query[$key]);
-                        }
-                    }
-                }
-
-                // Override some keys (separated from loop for clean process).
-                $override = [];
-                if (isset($query['owner_id'])) {
-                    $override['owner_id'] = $query['owner_id'];
-                    unset($query['owner_id']);
-                }
-                if (isset($query['resource_class_id'])) {
-                    $override['resource_class_id'] = $query['resource_class_id'];
-                    unset($query['resource_class_id']);
-                }
-                if (isset($query['resource_template_id'])) {
-                    $override['resource_template_id'] = $query['resource_template_id'];
-                    unset($query['resource_template_id']);
-                }
-                if (isset($query['item_set_id'])) {
-                    $override['item_set_id'] = $query['item_set_id'];
-                    unset($query['item_set_id']);
-                }
-                if (!empty($query['property'])) {
-                    $override['property'] = $query['property'];
-                    unset($query['property']);
-                }
-                // "site" is more complex and has already a special key "in_sites", that
-                // can be true or false. This key is not overridden.
-                // When the key "site_id" is set, the key "in_sites" is skipped in core.
-                if (isset($query['site_id']) && (int) $query['site_id'] === 0) {
-                    $query['in_sites'] = false;
-                    unset($query['site_id']);
-                }
-                if ($override) {
-                    $options['override'] = $override;
-                }
+                $override = null;
+                $data = $this->searchResources->startOverrideQuery($data, $override);
+                $options['override'] = $override;
             }
             return parent::search($resource, $data, $options);
         }
@@ -139,9 +81,15 @@ class ManagerDelegator extends \Omeka\Api\Manager
         return $apiSearch($resource, $data, $options);
     }
 
-    public function setControllerPlugins(ControllerPluginManager $controllerPlugins)
+    public function setControllerPlugins(ControllerPluginManager $controllerPlugins): self
     {
         $this->controllerPlugins = $controllerPlugins;
+        return $this;
+    }
+
+    public function setSearchResources(SearchResources $searchResources): self
+    {
+        $this->searchResources = $searchResources;
         return $this;
     }
 }

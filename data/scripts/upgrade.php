@@ -1925,3 +1925,14 @@ if (version_compare($oldVersion, '3.4.39', '<')) {
         $siteSettings->delete('advancedsearch_media_type_improved');
     }
 }
+
+if (version_compare($oldVersion, '3.4.40', '<')) {
+    if (!$this->isModuleActive('Reference')) {
+        $messenger->addWarning('The module Reference is required to use the facets with the default internal adapter, but not for the Solr adapter.'); // @translate
+    } elseif (!$this->isModuleVersionAtLeast('Reference', '3.4.52')) {
+        $messenger->addWarning(new PsrMessage(
+            'The module {module} should be upgraded to version {version} or later.', // @translate
+            ['module' => 'Reference', 'version' => '3.4.52']
+        ));
+    }
+}

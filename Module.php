@@ -73,6 +73,7 @@ class Module extends AbstractModule
     {
         $services = $this->getServiceLocator();
         $translate = $services->get('ControllerPluginManager')->get('translate');
+        $messenger = $services->get('ControllerPluginManager')->get('messenger');
 
         if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.66')) {
             $message = new \Omeka\Stdlib\Message(
@@ -80,6 +81,15 @@ class Module extends AbstractModule
                 'Common', '3.4.66'
             );
             throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
+        }
+
+        if (!$this->isModuleActive('Reference')) {
+            $messenger->addWarning('The module Reference is required to use the facets with the default internal adapter, but not for the Solr adapter.'); // @translate
+        } elseif (!$this->isModuleVersionAtLeast('Reference', '3.4.52')) {
+            $messenger->addWarning(new PsrMessage(
+                'The module {module} should be upgraded to version {version} or later.', // @translate
+                ['module' => 'Reference', 'version' => '3.4.52']
+            ));
         }
     }
 
@@ -90,9 +100,13 @@ class Module extends AbstractModule
         $moduleManager = $services->get('Omeka\ModuleManager');
         $messenger = $services->get('ControllerPluginManager')->get('messenger');
 
-        $optionalModule = 'Reference';
-        if (!$this->isModuleActive($optionalModule)) {
+        if (!$this->isModuleActive('Reference')) {
             $messenger->addWarning('The module Reference is required to use the facets with the default internal adapter, but not for the Solr adapter.'); // @translate
+        } elseif (!$this->isModuleVersionAtLeast('Reference', '3.4.52')) {
+            $messenger->addWarning(new PsrMessage(
+                'The module {module} should be upgraded to version {version} or later.', // @translate
+                ['module' => 'Reference', 'version' => '3.4.52']
+            ));
         }
 
         // The module is automatically disabled when Search is uninstalled.
@@ -103,18 +117,16 @@ class Module extends AbstractModule
             \Omeka\Module\Manager::STATE_NEEDS_UPGRADE,
         ])) {
             $version = $module->getIni('version');
-            if (version_compare($version, '3.5.49', '<')) {
-                $message = new PsrMessage(
+            if (version_compare($version, '3.5.53', '<')) {
+                $messenger->addWarning(new PsrMessage(
                     'The module {module} should be upgraded to version {version} or later.', // @translate
-                    ['module' => 'SearchSolr', 'version' => '3.5.49']
-                );
-                $messenger->addWarning($message);
+                    ['module' => 'SearchSolr', 'version' => '3.5.53']
+                ));
             } elseif ($module->getState() !== \Omeka\Module\Manager::STATE_ACTIVE) {
-                $message = new PsrMessage(
+                $messenger->addNotice(new PsrMessage(
                     'The module {module} can be reenabled.', // @translate
                     ['module' => 'SearchSolr']
-                );
-                $messenger->addNotice($message);
+                ));
             }
         }
 

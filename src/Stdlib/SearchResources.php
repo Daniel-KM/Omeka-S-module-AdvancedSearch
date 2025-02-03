@@ -992,7 +992,7 @@ class SearchResources
                     // Normalize as array of integers or strings for next process.
                     // To use array_values() avoids doctrine issue with string keys.
                     if (in_array($queryType, self::FIELD_QUERY['value_integer'])) {
-                        $queryVal = array_values(array_unique(array_map('intval', array_filter($queryVal, fn ($v) => is_numeric($queryVal) && $v == (int) $v))));
+                        $queryVal = array_values(array_unique(array_map('intval', array_filter($queryVal, fn ($v) => is_numeric($v) && $v == (int) $v))));
                     } elseif (in_array($queryType, ['<', '≤', '≥', '>'])) {
                         // Casting to float is complex and rarely used, so only integer.
                         $queryVal = array_values(array_unique($queryVal, array_map(fn ($v) => is_numeric($v) && $v == (int) $v ? (int) $v : $v, $queryVal)));
@@ -1938,7 +1938,7 @@ class SearchResources
                 // Normalize as array of integers or strings for next process.
                 // To use array_values() avoids doctrine issue with string keys.
                 if (in_array($queryType, self::FIELD_QUERY['value_integer'])) {
-                    $value = array_values(array_unique(array_map('intval', array_filter($value, fn ($v) => is_numeric($value) && $v == (int) $v))));
+                    $value = array_values(array_unique(array_map('intval', array_filter($value, fn ($v) => is_numeric($v) && $v == (int) $v))));
                 } elseif (in_array($queryType, ['<', '≤', '≥', '>'])) {
                     // Casting to float is complex and rarely used, so only integer.
                     $value = array_values(array_unique($value, array_map(fn ($v) => is_numeric($v) && $v == (int) $v ? (int) $v : $v, $value)));

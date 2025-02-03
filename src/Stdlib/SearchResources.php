@@ -897,9 +897,9 @@ class SearchResources
                     . '/';
                 if (isset($shortProperties[$short])) {
                     ++$shortProperties[$short]['total'];
-                    $shortProperties[$short]['texts'] = array_values(array_unique(array(
+                    $shortProperties[$short]['texts'] = array_values(array_unique(array_merge(
                         $shortProperties[$short]['texts'],
-                        $queryRow['text']
+                        is_array($queryRow['text']) ? array_values($queryRow['text']) : [$queryRow['text']]
                     )));
                 } else {
                     $shortProperties[$short]['property_string'] = $queryRowProperty;
@@ -907,7 +907,7 @@ class SearchResources
                     $shortProperties[$short]['property'] = $queryRowProp;
                     $shortProperties[$short]['except'] = $queryRow['except'] ?? '';
                     $shortProperties[$short]['type'] = $queryRow['type'];
-                    $shortProperties[$short]['texts'] = $queryRow['text'];
+                    $shortProperties[$short]['texts'] = is_array($queryRow['text']) ? array_values($queryRow['text']) : [$queryRow['text']];
                     $shortProperties[$short]['datatype'] = $queryRow['datatype'] ?? '';
                     $shortProperties[$short]['total'] = 1;
                 }
@@ -1000,7 +1000,7 @@ class SearchResources
                         $queryVal = array_values(array_unique(array_map('intval', array_filter($queryVal, fn ($v) => is_numeric($v) && $v == (int) $v))));
                     } elseif (in_array($queryType, ['<', '≤', '≥', '>'])) {
                         // Casting to float is complex and rarely used, so only integer.
-                        $queryVal = array_values(array_unique($queryVal, array_map(fn ($v) => is_numeric($v) && $v == (int) $v ? (int) $v : $v, $queryVal)));
+                        $queryVal = array_values(array_unique(array_map(fn ($v) => is_numeric($v) && $v == (int) $v ? (int) $v : $v, $queryVal)));
                         // When there is at least one string, set all values as
                         // string for doctrine.
                         if (count(array_filter($queryVal, 'is_int')) !== count($queryVal)) {
@@ -1076,7 +1076,7 @@ class SearchResources
                     ++$shortFilters[$short]['total'];
                     $shortFilters[$short]['vals'] = array_values(array_unique(array_merge(
                         $shortFilters[$short]['vals'],
-                        array_values($queryRow['val'])
+                        is_array($queryRow['val']) ? array_values($queryRow['val']) : [$queryRow['val']]
                     )));
                 } else {
                     $shortFilters[$short]['join'] = $queryRow['join'] ?? 'and';
@@ -1084,7 +1084,7 @@ class SearchResources
                     $shortFilters[$short]['field'] = $queryRowField;
                     $shortFilters[$short]['except'] = $queryRow['except'] ?? '';
                     $shortFilters[$short]['type'] = $queryRow['type'];
-                    $shortFilters[$short]['vals'] = $queryRow['val'];
+                    $shortFilters[$short]['vals'] = is_array($queryRow['val']) ? array_values($queryRow['val']) : [$queryRow['val']];
                     $shortFilters[$short]['datatype'] = $queryRow['datatype'] ?? '';
                     $shortFilters[$short]['total'] = 1;
                 }
@@ -1946,7 +1946,7 @@ class SearchResources
                     $value = array_values(array_unique(array_map('intval', array_filter($value, fn ($v) => is_numeric($v) && $v == (int) $v))));
                 } elseif (in_array($queryType, ['<', '≤', '≥', '>'])) {
                     // Casting to float is complex and rarely used, so only integer.
-                    $value = array_values(array_unique($value, array_map(fn ($v) => is_numeric($v) && $v == (int) $v ? (int) $v : $v, $value)));
+                    $value = array_values(array_unique(array_map(fn ($v) => is_numeric($v) && $v == (int) $v ? (int) $v : $v, $value)));
                     // When there is at least one string, set all values as
                     // string for doctrine.
                     if (count(array_filter($value, 'is_int')) !== count($value)) {

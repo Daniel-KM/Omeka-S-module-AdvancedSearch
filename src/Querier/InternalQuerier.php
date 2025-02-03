@@ -105,7 +105,7 @@ class InternalQuerier extends AbstractQuerier
                     throw new QuerierException($e->getMessage(), $e->getCode(), $e);
                 }
                 // TODO Currently experimental. To replace by a query + arg "querier=internal".
-                $this->response->setAllResourceIdsForResourceType($resourceType, array_map('intval', $result) ?: []);
+                $this->response->setAllResourceIdsForResourceType($resourceType, array_keys($result) ?: []);
                 if ($result && ($offset || $limit)) {
                     $result = array_slice($result, $offset, $limit ?: null);
                     // $apiResponse->setContent($result);
@@ -138,7 +138,7 @@ class InternalQuerier extends AbstractQuerier
                 throw new QuerierException($e->getMessage(), $e->getCode(), $e);
             }
             // TODO Currently experimental. To replace by a query + arg "querier=internal".
-            $this->response->setAllResourceIdsForResourceType('resources', array_map('intval', $result) ?: []);
+            $this->response->setAllResourceIdsForResourceType('resources', array_keys($result) ?: []);
             if ($result && ($offset || $limit)) {
                 $result = array_slice($result, $offset, $limit ?: null);
                 // $apiResponse->setContent($result);
@@ -1295,7 +1295,7 @@ class InternalQuerier extends AbstractQuerier
                     if (!$ids) {
                         return;
                     }
-                    $referenceQuery = ['id' => array_values($ids)];
+                    $referenceQuery = ['id' => array_keys($ids)];
                 }
             } else {
                 // For performance, use the full list of resource ids when possible,

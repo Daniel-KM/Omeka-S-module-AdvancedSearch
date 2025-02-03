@@ -33,10 +33,10 @@ class SearchSuggesterConfirm extends AbstractHelper
      * @param \Omeka\Api\Representation\RepresentationInterface $resource
      * @param string $resourceLabel
      * @param bool $wrapSidebar
-     * @param int $totalJobs
+     * @param array $listJobsStatusesByIds
      * @return string
      */
-    public function __invoke($resource, $resourceLabel = null, $wrapSidebar = true, $totalJobs = 0)
+    public function __invoke($resource, ?string $resourceLabel = null, ?bool $wrapSidebar = true, array $listJobsStatusesByIds = [])
     {
         $form = $this->formElementManager->get(ConfirmForm::class);
         $form->setAttribute('action', $resource->url('index'));
@@ -48,7 +48,7 @@ class SearchSuggesterConfirm extends AbstractHelper
                 'resource' => $resource,
                 'resourceLabel' => $resourceLabel,
                 'form' => $form,
-                'totalJobs' => $totalJobs,
+                'listJobsStatusesByIds' => $listJobsStatusesByIds,
             ]
         );
     }

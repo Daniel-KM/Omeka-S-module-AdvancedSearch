@@ -4,6 +4,7 @@ namespace AdvancedSearch\Querier;
 
 use AdvancedSearch\Querier\Exception\QuerierException;
 use AdvancedSearch\Response;
+use AdvancedSearch\Stdlib\SearchResources;
 use Common\Stdlib\PsrMessage;
 
 class InternalQuerier extends AbstractQuerier
@@ -972,22 +973,33 @@ class InternalQuerier extends AbstractQuerier
      */
     protected function filterQueryFilters(array $filters): void
     {
-        foreach ($filters as $field => $values) {
+        // The filter is a query row in SearchResource, but the filters are
+        // grouped by field.
+        foreach ($filters as $field => $filter) {
+            if (!is_array($filter)) {
+                continue;
+            }
+
             $field = $this->fieldToIndex($field);
             if (!$field) {
                 continue;
             }
-            foreach ($values as $value) {
+
+            foreach ($filter as $queryFilter) {
                 // Skip simple filters (for hidden queries).
-                if (!$value || !is_array($value)) {
+                if (!$queryFilter
+                    || !is_array($queryFilter)
+                    || empty($queryFilter['type'])
+                    || !isset(SearchResources::FIELD_QUERY['reciprocal'][$queryFilter['type']])
+                ) {
                     continue;
                 }
-                $value += ['join' => null, 'type' => null, 'val' => null];
+                $queryFilter += ['join' => null, 'type' => null, 'val' => null];
                 $this->args['filter'][] = [
-                    'join' => $value['join'],
+                    'join' => $queryFilter['join'],
                     'field' => $field,
-                    'type' => $value['type'],
-                    'val' => $value['val'],
+                    'type' => $queryFilter['type'],
+                    'val' => $queryFilter['val'],
                 ];
             }
         }

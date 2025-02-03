@@ -174,21 +174,6 @@ class SearchResources
             'nduput',
             'nduputl',
         ],
-        // Deprecated key: all types allow array, except single and none below.
-        'value_array' => [
-            'list',
-            'nlist',
-            'res',
-            'nres',
-            'resq',
-            'nresq',
-            'lres',
-            'nlres',
-            'lkq',
-            'nlkq',
-            'dtp',
-            'ndtp',
-        ],
         // These types allow only one value, but it may be an array.
         'value_single_array_or_string' => [
             'resq',
@@ -886,6 +871,21 @@ class SearchResources
 
         $shortProperties = [];
 
+        $valueArray = [
+            'list',
+            'nlist',
+            'res',
+            'nres',
+            'resq',
+            'nresq',
+            'lres',
+            'nlres',
+            'lkq',
+            'nlkq',
+            'dtp',
+            'ndtp',
+        ];
+
         foreach ($query['property'] as $k => $queryRow) {
             if (!is_array($queryRow)
                 || empty($queryRow['type'])
@@ -905,7 +905,8 @@ class SearchResources
             }
             // Check array of values.
             // This feature is deprecated.
-            elseif (in_array($queryType, self::FIELD_QUERY['value_array'], true)) {
+            // TODO Copy and deduplicate cleaning and buildPropertyQuery().
+            elseif (in_array($queryType, $valueArray, true)) {
                 if ((is_array($queryValue) && !count($queryValue))
                     || (!is_array($queryValue) && !strlen((string) $queryValue))
                 ) {
@@ -1985,6 +1986,7 @@ class SearchResources
 
         $escapeSqlLike = fn ($string) => str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], (string) $string);
 
+        // Adapted in SearchSolr.
         // Quick check of value.
         // An empty string "" is not a value, but "0" is a value.
         if (in_array($queryType, self::FIELD_QUERY['value_none'], true)) {

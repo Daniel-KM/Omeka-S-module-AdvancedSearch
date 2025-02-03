@@ -1688,9 +1688,10 @@ class SearchResources
                 continue;
             }
 
-            $propertyIds = $queryRow['property'] ?? null;
-            $queryType = $queryRow['type'];
             $joiner = $queryRow['joiner'] ?? '';
+            $propertyIds = $queryRow['property'] ?? null;
+            $except = $queryRow['except'] ?? null;
+            $queryType = $queryRow['type'];
             $value = $queryRow['text'] ?? '';
             $dataType = $queryRow['datatype'] ?? '';
 
@@ -1704,9 +1705,10 @@ class SearchResources
                     'valuesJoin',
                     'where',
                     'queryRow',
-                    'propertyIds',
-                    'queryType',
                     'joiner',
+                    'propertyIds',
+                    'except',
+                    'queryType',
                     'value',
                     'dataType',
                     'isFilter'
@@ -1782,9 +1784,10 @@ class SearchResources
                 continue;
             }
 
-            $propertyIds = $queryRow['field'] ?? null;
-            $queryType = $queryRow['type'];
             $joiner = $queryRow['join'] ?? '';
+            $propertyIds = $queryRow['field'] ?? null;
+            $except = $queryRow['except'] ?? null;
+            $queryType = $queryRow['type'];
             $value = $queryRow['val'] ?? '';
             $dataType = $queryRow['datatype'] ?? '';
 
@@ -1798,9 +1801,10 @@ class SearchResources
                     'valuesJoin',
                     'where',
                     'queryRow',
-                    'propertyIds',
-                    'queryType',
                     'joiner',
+                    'propertyIds',
+                    'except',
+                    'queryType',
                     'value',
                     'dataType',
                     'isFilter'
@@ -1960,9 +1964,10 @@ class SearchResources
          * @var string $valuesJoin
          * @var string $where
          * @var array $queryRow
-         * @var array $propertyIds
-         * @var string $queryType
          * @var string $joiner
+         * @var array $propertyIds
+         * @var array|string $except
+         * @var string $queryType
          * @var mixed $value
          * @var string $dataType
          * @var bool $isFilter
@@ -2663,9 +2668,9 @@ class SearchResources
             }
         } else {
             // TODO What if a property is ""?
-            $excludePropertyIds = $propertyIds || empty($queryRow['except'])
+            $excludePropertyIds = $propertyIds || empty($except)
                 ? false
-                : array_values(array_unique($this->easyMeta->propertyIds($queryRow['except'])));
+                : array_values(array_unique($this->easyMeta->propertyIds($except)));
             // Use standard query if nothing to exclude, else limit search.
             if ($excludePropertyIds) {
                 // The aim is to search anywhere except ocr content.

@@ -848,6 +848,7 @@ class InternalQuerier extends AbstractQuerier
                         $this->args['filter'][] = [
                             'join' => $fieldQueryArgs['join'] ?? 'and',
                             'field' => $field,
+                            'except' => $fieldQueryArgs['except'] ?? null,
                             'type' => $fieldQueryArgs['type'] ?? 'eq',
                             'val' => $flatArray($values),
                             'datatype' => $fieldQueryArgs['datatype'] ?? null,
@@ -892,6 +893,7 @@ class InternalQuerier extends AbstractQuerier
                             $this->args['filter'][] = [
                                 'join' => $fieldQueryArgs['join'] ?? 'and',
                                 'field' => $field,
+                                'except' => $fieldQueryArgs['except'] ?? null,
                                 'type' => $fieldQueryArgs['type'] ?? 'eq',
                                 'val' => $value,
                                 'datatype' => $fieldQueryArgs['datatype'] ?? null,
@@ -909,6 +911,7 @@ class InternalQuerier extends AbstractQuerier
                             $this->args['filter'][] = [
                                 'join' => $fieldQueryArgs['join'] ?? 'and',
                                 'field' => $field,
+                                'except' => $fieldQueryArgs['except'] ?? null,
                                 'type' => $fieldQueryArgs['type'] ?? 'eq',
                                 'val' => $value,
                                 'datatype' => $fieldQueryArgs['datatype'] ?? null,

@@ -83,5 +83,7 @@ abstract class AbstractQuerier implements QuerierInterface
 
     abstract public function querySuggestions(): Response;
 
+    abstract public function queryValues(string $field): array;
+
     abstract public function getPreparedQuery();
 }

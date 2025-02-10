@@ -30,11 +30,10 @@
 namespace AdvancedSearch\Form;
 
 use AdvancedSearch\Form\Element as AdvancedSearchElement;
-use AdvancedSearch\Stdlib\SearchResources;
+use AdvancedSearch\Query;
 use Common\Form\Element as CommonElement;
 use Common\Stdlib\EasyMeta;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query\Expr\Join;
 use Laminas\Form\Element;
 use Laminas\Form\ElementInterface;
 use Laminas\Form\Fieldset;
@@ -1088,6 +1087,7 @@ class MainSearchForm extends Form
         $nativeField = $availableFields[$field]['from'] ?? null;
 
         switch ($nativeField) {
+            case 'resource_name':
             case 'resource_type':
                 return $this->listResourceTypes();
 
@@ -1096,27 +1096,38 @@ class MainSearchForm extends Form
                 return $this->listResourceIdTitles();
 
             case 'is_public':
+            case 'o:is_public':
                 return [
                     '0' => 'Is private', // @translate
                     '1' => 'Is public', // @translate
                 ];
 
             case 'item_set/o:id':
+            case 'item_set_id':
+            case 'o:item_set':
                 return $this->listItemSets();
 
             case 'owner/o:id':
+            case 'owner_id':
+            case 'o:owner':
                 return $this->listOwners();
 
             case 'resource_class/o:id':
             case 'resource_class/o:term':
+            case 'resource_class_id':
+            case 'o:resource_class':
                 $grouped = in_array($filter['type'] ?? '', ['SelectGroup', 'MultiSelectGroup']);
                 return $this->listResourceClasses($grouped);
 
             case 'resource_template/o:id':
+            case 'resource_template_id':
+            case 'o:resource_template':
                 $grouped = in_array($filter['type'] ?? '', ['SelectGroup', 'MultiSelectGroup']);
                 return $this->listResourceTemplates($grouped);
 
             case 'site/o:id':
+            case 'site_id':
+            case 'o:site':
                 return $this->listSites();
 
             case 'access':
@@ -1178,106 +1189,22 @@ class MainSearchForm extends Form
     }
 
     /**
-     * Get an associative list of all unique values of a property.
-     *
-     * @todo Use the real search engine, not the internal one.
-     * @todo Support any resources, not only item.
-     *
-     * Note: In version previous 3.4.15, the module Reference was used, that
-     * managed languages, but a lot slower for big databases.
-     *
-     * @todo Factorize with \AdvancedSearch\Querier\InternalQuerier::fillFacetResponse()
-     *
-     * @todo Get list for form select from Solr.
-     *
-     * Adapted:
-     * @see \AdvancedSearch\Api\Representation\SearchConfigRepresentation::suggest()
-     * @see \AdvancedSearch\Api\Representation\SearchSuggesterRepresentation::suggest()
-     * @see \AdvancedSearch\Form\MainSearchForm::listValuesForField()
-     * @see \Reference\Mvc\Controller\Plugin\References
+     * Get an associative list of all unique values of a field.
      */
     protected function listValuesForField(string $field): array
     {
-        // Check if the field is a special or a multifield.
+        $aliases = $this->searchConfig->subSetting('index', 'aliases', []);
+        $fieldQueryArgs = $this->searchConfig->subSetting('index', 'query_args', []);
 
-        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
-        $searchConfig = $this->getOption('search_config');
+        $query = new Query();
+        $query
+            ->setAliases($aliases)
+            ->setFieldsQueryArgs($fieldQueryArgs);
 
-        $metadataFieldsToNames = [
-            'resource_name' => 'resource_type',
-            'resource_type' => 'resource_type',
-            'is_public' => 'is_public',
-            'owner_id' => 'o:owner',
-            'site_id' => 'o:site',
-            'resource_class_id' => 'o:resource_class',
-            'resource_template_id' => 'o:resource_template',
-            'item_set_id' => 'o:item_set',
-            'access' => 'access',
-            'item_sets_tree' => 'o:item_set',
-        ];
-
-        // Convert multi-fields into a list of property terms.
-        // Normalize search query keys as omeka keys for items and item sets.
-        $aliases = $searchConfig->subSetting('index', 'aliases', []);
-        $fields = [];
-        $fields[$field] = $metadataFieldsToNames[$field]
-            ?? $this->easyMeta->propertyTerm($field)
-            ?? $aliases[$field]['fields']
-            ?? $field;
-
-        // Simplified from References::listDataForProperty().
-        /** @see \Reference\Mvc\Controller\Plugin\References::listDataForProperties() */
-        $fields = reset($fields);
-        if (!is_array($fields)) {
-            $fields = [$fields];
-        }
-        $propertyIds = $this->easyMeta->propertyIds($fields);
-        if (!$propertyIds) {
-            return [];
-        }
-
-        $qb = $this->entityManager->createQueryBuilder();
-        $expr = $qb->expr();
-
-        // For example to list all authors that are a resource.
-        $fieldQueryArgs = $searchConfig->subSetting('index', 'query_args', []);
-        $isResourceQuery = $fieldQueryArgs
-            && isset($fieldQueryArgs[$field]['type'])
-            && isset($fieldQueryArgs[$fieldQueryArgs[$field]['type']])
-            && in_array($fieldQueryArgs[$fieldQueryArgs[$field]['type']], SearchResources::FIELD_QUERY['main_type']['resource']);
-
-        if ($isResourceQuery) {
-            $qb
-                ->select('valueResource.title AS val')
-                ->from(\Omeka\Entity\Value::class, 'value')
-                // This join allow to check visibility automatically too.
-                ->innerJoin(\Omeka\Entity\Item::class, 'resource', Join::WITH, $expr->eq('value.resource', 'resource'))
-                ->innerJoin(\Omeka\Entity\Item::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'))
-                ->andWhere($expr->in('value.property', ':properties'))
-                ->setParameter('properties', implode(',', $propertyIds))
-                ->groupBy('val')
-                ->orderBy('val', 'asc');
-        } else {
-            $qb
-                ->select('COALESCE(value.value, valueResource.title, value.uri) AS val')
-                ->from(\Omeka\Entity\Value::class, 'value')
-                // This join allow to check visibility automatically too.
-                ->innerJoin(\Omeka\Entity\Item::class, 'resource', Join::WITH, $expr->eq('value.resource', 'resource'))
-                // The values should be distinct for each type.
-                ->leftJoin(\Omeka\Entity\Item::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'))
-                ->andWhere($expr->in('value.property', ':properties'))
-                ->setParameter('properties', implode(',', $propertyIds))
-                ->groupBy('val')
-                ->orderBy('val', 'asc');
-        }
-
-        $list = array_column($qb->getQuery()->getScalarResult(), 'val', 'val');
-
-        // Fix false empty duplicate or values without title.
-        $list = array_keys(array_flip($list));
-        unset($list['']);
-
-        return array_combine($list, $list);
+        $querier = $this->searchConfig->searchEngine()->querier();
+        return $querier
+            ->setQuery($query)
+            ->queryValues($field);
     }
 
     protected function listItemSets($byOwner = false): array

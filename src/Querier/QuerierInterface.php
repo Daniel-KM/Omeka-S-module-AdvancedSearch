@@ -58,6 +58,13 @@ interface QuerierInterface extends LoggerAwareInterface
     public function querySuggestions(): Response;
 
     /**
+     * Process a search query for lists, in particular to fill filters.
+     *
+     * @return array Key-value pairs for name and label, generally the same.
+     */
+    public function queryValues(string $field): array;
+
+    /**
      * Prepare a search query.
      *
      * @return mixed|null The query formatted for this specific search engine.

@@ -6,6 +6,7 @@ use AdvancedSearch\Querier\Exception\QuerierException;
 use AdvancedSearch\Response;
 use AdvancedSearch\Stdlib\SearchResources;
 use Common\Stdlib\PsrMessage;
+use Doctrine\ORM\Query\Expr\Join;
 
 class InternalQuerier extends AbstractQuerier
 {
@@ -463,6 +464,90 @@ class InternalQuerier extends AbstractQuerier
         return $this->response
             ->setSuggestions($results)
             ->setIsSuccess(true);
+    }
+
+    /**
+     * Get an associative list of all unique values of a field.
+     *
+     * @todo Support any resources, not only item.
+     *
+     * Note: In version previous 3.4.15, the module Reference was used, that
+     * managed languages, but a lot slower for big databases.
+     *
+     * @todo Factorize with \AdvancedSearch\Querier\InternalQuerier::fillFacetResponse()
+     *
+     * Adapted:
+     * @see \AdvancedSearch\Api\Representation\SearchConfigRepresentation::suggest()
+     * @see \AdvancedSearch\Api\Representation\SearchSuggesterRepresentation::suggest()
+     * @see \AdvancedSearch\Querier\InternalQuerier::queryValues()
+     * @see \Reference\Mvc\Controller\Plugin\References
+     */
+    public function queryValues(string $field): array
+    {
+        // Check if the field is a special or a multifield.
+
+        // Convert multi-fields into a list of property terms.
+        // Normalize search query keys as omeka keys for items and item sets.
+        $aliases = $this->query ? $this->query->getAliases() : [];
+        $fields = [];
+        $fields[$field] = $this->easyMeta->propertyTerm($field)
+            ?? $aliases[$field]['fields']
+            ?? $field;
+
+        // Simplified from References::listDataForProperty().
+        /** @see \Reference\Mvc\Controller\Plugin\References::listDataForProperties() */
+        $fields = reset($fields);
+        if (!is_array($fields)) {
+            $fields = [$fields];
+        }
+        $propertyIds = $this->easyMeta->propertyIds($fields);
+        if (!$propertyIds) {
+            return [];
+        }
+
+        $entityManager = $this->services->get('Omeka\EntityManager');
+        $qb = $entityManager->createQueryBuilder();
+        $expr = $qb->expr();
+
+        // For example to list all authors that are a resource.
+        $fieldQueryArgs = $this->query ? $this->query->getFieldsQueryArgs() : [];
+        $isResourceQuery = $fieldQueryArgs
+            && isset($fieldQueryArgs[$field]['type'])
+            && isset($fieldQueryArgs[$fieldQueryArgs[$field]['type']])
+            && in_array($fieldQueryArgs[$fieldQueryArgs[$field]['type']], SearchResources::FIELD_QUERY['main_type']['resource']);
+
+        if ($isResourceQuery) {
+            $qb
+                ->select('valueResource.title AS val')
+                ->from(\Omeka\Entity\Value::class, 'value')
+                // This join allow to check visibility automatically too.
+                ->innerJoin(\Omeka\Entity\Item::class, 'resource', Join::WITH, $expr->eq('value.resource', 'resource'))
+                ->innerJoin(\Omeka\Entity\Item::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'))
+                ->andWhere($expr->in('value.property', ':properties'))
+                ->setParameter('properties', implode(',', $propertyIds))
+                ->groupBy('val')
+                ->orderBy('val', 'asc');
+        } else {
+            $qb
+                ->select('COALESCE(value.value, valueResource.title, value.uri) AS val')
+                ->from(\Omeka\Entity\Value::class, 'value')
+                // This join allow to check visibility automatically too.
+                ->innerJoin(\Omeka\Entity\Item::class, 'resource', Join::WITH, $expr->eq('value.resource', 'resource'))
+                // The values should be distinct for each type.
+                ->leftJoin(\Omeka\Entity\Item::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'))
+                ->andWhere($expr->in('value.property', ':properties'))
+                ->setParameter('properties', implode(',', $propertyIds))
+                ->groupBy('val')
+                ->orderBy('val', 'asc');
+        }
+
+        $list = array_column($qb->getQuery()->getScalarResult(), 'val', 'val');
+
+        // Fix false empty duplicate or values without title.
+        $list = array_keys(array_flip($list));
+        unset($list['']);
+
+        return array_combine($list, $list);
     }
 
     /**

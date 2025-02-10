@@ -40,6 +40,7 @@ use Laminas\Form\ElementInterface;
 use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
 use Laminas\Form\FormElementManager;
+use Laminas\Log\Logger;
 use Laminas\Mvc\I18n\Translator;
 use Laminas\View\Helper\EscapeHtml;
 use Omeka\Api\Manager as ApiManager;
@@ -79,6 +80,11 @@ class MainSearchForm extends Form
      * @var \ItemSetsTree\ViewHelper\ItemSetsTree
      */
     protected $itemSetsTree;
+
+    /**
+     * @var \Laminas\Log\Logger
+     */
+    protected $logger;
 
     /**
      * @var \Omeka\Settings\Settings
@@ -1182,6 +1188,8 @@ class MainSearchForm extends Form
      *
      * @todo Factorize with \AdvancedSearch\Querier\InternalQuerier::fillFacetResponse()
      *
+     * @todo Get list for form select from Solr.
+     *
      * Adapted:
      * @see \AdvancedSearch\Api\Representation\SearchConfigRepresentation::suggest()
      * @see \AdvancedSearch\Api\Representation\SearchSuggesterRepresentation::suggest()
@@ -1506,6 +1514,12 @@ class MainSearchForm extends Form
     public function setItemSetsTree($itemSetsTree): self
     {
         $this->itemSetsTree = $itemSetsTree;
+        return $this;
+    }
+
+    public function setLogger(Logger $logger): self
+    {
+        $this->logger = $logger;
         return $this;
     }
 

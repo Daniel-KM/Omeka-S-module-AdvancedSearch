@@ -52,6 +52,7 @@ class MainSearchFormFactory implements FactoryInterface
             ->setEscapeHtml($helpers->get('escapeHtml'))
             ->setFormElementManager($services->get('FormElementManager'))
             ->setItemSetsTree($services->has('ItemSetsTree') ? $services->get('ItemSetsTree') : null)
+            ->setLogger($services->get('Omeka\Logger'))
             ->setSettings($services->get('Omeka\Settings'))
             ->setSiteSettings($siteSettings)
             ->setTranslator($services->get('MvcTranslator'))

@@ -61,7 +61,7 @@ foreach ($form->getFieldsets() as $fieldset) {
 <?= $this->pageTitle(sprintf($translate('Search page "%1$s" (%2$s)'), $searchConfig->name(), $searchConfig->slug()), 1, $translate('Search manager')) ?>
 
 <div id="page-actions">
-    <button form="form-search-config-configure"><?= $translate('Save') ?></button>
+    <button form="form-search-config-configure" class="button"><?= $translate('Save') ?></button>
 </div>
 
 <nav class="section-nav">

@@ -44,7 +44,7 @@ if ($isSiteRequest) {
         <div class="collapsible">
             <div class="field-description"><?= $translate('Searches for resources that are any of these classes.') ?></div>
         </div>
-        <button type="button" class="add-value o-icon-add button" aria-label="<?= $translate('Add new class') ?>" title="<?= $translate('Add new class') ?>"></button>
+        <button type="button" class="button add-value o-icon-add" aria-label="<?= $translate('Add new class') ?>" title="<?= $translate('Add new class') ?>"></button>
     </div>
     <div class="inputs">
         <?php foreach ($ids as $id): ?>
@@ -65,7 +65,7 @@ if ($isSiteRequest) {
                     'query' => $optionsQuery,
                 ],
             ]) ?>
-            <button type="button" class="o-icon-delete remove-value button" aria-label="<?= $translate('Remove value') ?>" title="<?= $translate('Remove value') ?>"></button>
+            <button type="button" class="button o-icon-delete remove-value" aria-label="<?= $translate('Remove value') ?>" title="<?= $translate('Remove value') ?>"></button>
         </div>
         <?php endforeach; ?>
     </div>

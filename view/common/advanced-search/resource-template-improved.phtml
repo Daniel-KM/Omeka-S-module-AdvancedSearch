@@ -34,7 +34,7 @@ $ids = array_filter($ids) ?: [null];
         <div class="collapsible">
             <div class="field-description"><?= $translate('Searches for resources that use any of these templates.') ?></div>
         </div>
-        <button type="button" class="add-value o-icon-add button" aria-label="<?= $translate('Add new template') ?>" title="<?= $translate('Add new template') ?>"></button>
+        <button type="button" class="button add-value o-icon-add" aria-label="<?= $translate('Add new template') ?>" title="<?= $translate('Add new template') ?>"></button>
     </div>
     <div class="inputs">
         <?php foreach ($ids as $id): ?>
@@ -53,7 +53,7 @@ $ids = array_filter($ids) ?: [null];
                     'class' => 'chosen-select',
                 ],
             ]) ?>
-            <button type="button" class="o-icon-delete remove-value button" aria-label="<?= $translate('Remove value') ?>" title="<?= $translate('Remove value') ?>"></button>
+            <button type="button" class="button o-icon-delete remove-value" aria-label="<?= $translate('Remove value') ?>" title="<?= $translate('Remove value') ?>"></button>
         </div>
         <?php endforeach; ?>
     </div>

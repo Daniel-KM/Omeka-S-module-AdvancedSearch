@@ -340,7 +340,7 @@ class MainSearchForm extends Form
                     'attributes' => [
                         'id' => 'search-reset',
                         'type' => 'reset',
-                        'class' => 'search-reset',
+                        'class' => 'search-reset button',
                     ] + $this->elementAttributes,
                 ]);
         }
@@ -359,7 +359,7 @@ class MainSearchForm extends Form
                     'attributes' => [
                         'id' => 'search-submit',
                         'type' => 'submit',
-                        'class' => 'search-submit',
+                        'class' => 'search-submit button',
                     ] + $this->elementAttributes,
                 ]);
         }

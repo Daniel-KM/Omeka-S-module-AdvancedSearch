@@ -72,7 +72,7 @@ if ($isSiteRequest) {
         <div class="collapsible">
             <div class="field-description"><?= $translate('Searches for items that are assigned to any of these item sets.') ?></div>
         </div>
-        <button type="button" class="add-value o-icon-add button" aria-label="<?= $translate('Add new item set') ?>" title="<?= $translate('Add new item set') ?>"></button>
+        <button type="button" class="button add-value o-icon-add" aria-label="<?= $translate('Add new item set') ?>" title="<?= $translate('Add new item set') ?>"></button>
     </div>
     <div class="inputs">
         <?php foreach ($itemSets as $itemSet): ?>
@@ -90,7 +90,7 @@ if ($isSiteRequest) {
                 ],
                 'options' => $selectOptions,
             ]); ?>
-            <button type="button" class="o-icon-delete remove-value button" aria-label="<?= $translate('Remove value') ?>" title="<?= $translate('Remove value') ?>"></button>
+            <button type="button" class="button o-icon-delete remove-value" aria-label="<?= $translate('Remove value') ?>" title="<?= $translate('Remove value') ?>"></button>
         </div>
         <?php endforeach; ?>
     </div>

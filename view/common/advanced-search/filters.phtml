@@ -100,7 +100,7 @@ if ($isSiteRequest) {
 <div id="filter-queries" class="field removable multi-value" role="group" aria-labelledby="by-value-label">
     <div class="field-meta">
         <span id="by-value-label" class="label"><?= $translate('Filters') ?></span>
-        <button type="button" class="add-value o-icon-add button" aria-label="<?= $translate('Add new value') ?>" title="<?= $translate('Add new value') ?>"></button>
+        <button type="button" class="button add-value o-icon-add" aria-label="<?= $translate('Add new value') ?>" title="<?= $translate('Add new value') ?>"></button>
     </div>
     <div class="inputs">
         <?php
@@ -240,7 +240,7 @@ if ($isSiteRequest) {
                 <?= $queryText($isSubQuery ? [] : $filter, $index) ?>
                 <?= $dataTypeHelper->getSelect($stem . '[val]', "filter[$index][val]" ?? null, ['multiple' => false, 'class' => 'query-text query-data-type chosen-select', 'aria-label' => 'Data types', 'data-placeholder' => $translate('Select data type…')]) // TODO Manage search on property for multiple data types. ?>
                 <?= $formSelect($selectMainDataType->setName($stem . '[val]')->setValue("filter[$index][val]" ?? null)) ?>
-                <button type="button" class="o-icon-delete remove-value button" aria-label="<?= $translate('Remove value') ?>" title="<?= $translate('Remove value') ?>"></button>
+                <button type="button" class="button o-icon-delete remove-value" aria-label="<?= $translate('Remove value') ?>" title="<?= $translate('Remove value') ?>"></button>
             </div>
             <div class="value-common sub-query">
                 <?= $formQuery($queryInput) ?>

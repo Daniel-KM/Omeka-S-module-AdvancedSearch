@@ -69,10 +69,10 @@ if (!empty($itemSet)) {
         <?php if ($displayButtonReset || $displayButtonSubmit): ?>
         <div class="facets-actions facets-actions-top">
             <?php if ($displayButtonSubmit): ?>
-            <button id="facets-apply" class="facets-apply" type="submit"><?= $escape($labelSubmit) ?></button>
+            <button id="facets-apply" class="button facets-apply" type="submit"><?= $escape($labelSubmit) ?></button>
             <?php endif; ?>
             <?php if ($displayButtonReset): ?>
-            <button id="facets-reset" class="facets-reset" type="reset"><?= $escape($labelReset) ?></button>
+            <button id="facets-reset" class="button facets-reset" type="reset"><?= $escape($labelReset) ?></button>
             <?php endif; ?>
         </div>
         <?php endif; ?>
@@ -84,7 +84,7 @@ if (!empty($itemSet)) {
             <?php endif; ?>
             <input id="search-refine" name="refine" class="search-refine" value="<?= $escape($query->getQueryRefine()) ?>"<?= $labelRefine ? ' data-placeholder="' . $escapeAttr($labelRefine) . '"' : '' ?>/>
             <?php if (!$displayButtonSubmit): ?>
-            <button id="search-refine-submit" class="search-refine" type="submit"><?= $escape($translate('Submit')) ?></button>
+            <button id="search-refine-submit" class="button search-refine" type="submit"><?= $escape($translate('Submit')) ?></button>
             <?php endif; ?>
         </div>
         <?php endif; ?>
@@ -101,7 +101,7 @@ if (!empty($itemSet)) {
             <li class="facet<?= empty($facetParams['attributes']['class']) ? '' : ' ' . $escapeAttr($facetParams['attributes']['class']) ?>">
                 <?php if ($hasState): ?>
                 <?php $stateExpand = $facetParams['state'] === 'expand' || ($facetParams['state'] === 'collapse_unless_set' && !empty($activeFacets[$name])); ?>
-                <button type="button" class="facet-button <?= $stateExpand ? 'collapse' : 'expand' ?>" aria-label="<?= $translate($stateExpand ? 'Collapse' : 'Expand') ?>" data-label-expand="<?= $translate('Expand') ?>" data-label-collapse="<?= $translate('Collapse') ?>"><?= $escape($translate($facetParams['label'] ?? $name)) ?></button>
+                <button type="button" class="button facet-button <?= $stateExpand ? 'collapse' : 'expand' ?>" aria-label="<?= $translate($stateExpand ? 'Collapse' : 'Expand') ?>" data-label-expand="<?= $translate('Expand') ?>" data-label-collapse="<?= $translate('Collapse') ?>"><?= $escape($translate($facetParams['label'] ?? $name)) ?></button>
                 <?php else: ?>
                 <h4><?= $escape($translate($facetParams['label'] ?? $name)) ?></h4>
                 <?php endif; ?>
@@ -109,7 +109,7 @@ if (!empty($itemSet)) {
                     <?= $facetElements($name, $facetValues, $facetParams) ?>
                     <?php if (($facetParams['more'] ?? '') !== '' && in_array($facetParams['type'] ?? '', ['', 'Checkbox', 'Link', 'Tree', 'TreeLink', 'Thesaurus', 'ThesaurusLink']) && count($facetValues) > (int) $facetParams['more']): ?>
                     <div class="facet-see-more">
-                        <button type="button" class="facet-see-more-or-less expand" data-default-count="<?= (int) $facetParams['more'] ?>" data-more-count="<?= count($facetValues) - (int) $facetParams['more'] ?>" data-label-see-more="<?= $escapeAttr($translate('See more')) ?>" data-label-see-less="<?= $escapeAttr($translate('See less')) ?>"><?= $escape($translate('See more')) ?></button>
+                        <button type="button" class="button facet-see-more-or-less expand" data-default-count="<?= (int) $facetParams['more'] ?>" data-more-count="<?= count($facetValues) - (int) $facetParams['more'] ?>" data-label-see-more="<?= $escapeAttr($translate('See more')) ?>" data-label-see-less="<?= $escapeAttr($translate('See less')) ?>"><?= $escape($translate('See more')) ?></button>
                     </div>
                     <?php endif; ?>
                 </div>
@@ -123,10 +123,10 @@ if (!empty($itemSet)) {
         <?php if ($displayButtonReset || $displayButtonSubmit): ?>
         <div class="facets-actions facets-actions-bottom">
             <?php if ($displayButtonSubmit): ?>
-            <button id="facets-apply" class="facets-apply" type="submit"><?= $escape($labelSubmit) ?></button>
+            <button id="facets-apply" class="button facets-apply" type="submit"><?= $escape($labelSubmit) ?></button>
             <?php endif; ?>
             <?php if ($displayButtonReset): ?>
-            <button id="facets-reset" class="facets-reset" type="reset"><?= $escape($labelReset) ?></button>
+            <button id="facets-reset" class="button facets-reset" type="reset"><?= $escape($labelReset) ?></button>
             <?php endif; ?>
         </div>
         <?php endif; ?>

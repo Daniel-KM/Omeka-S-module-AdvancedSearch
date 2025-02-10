@@ -40,7 +40,7 @@ $queryInputText = function (array $search, $engine) use ($translate, $escape) {
                 <?= $translate('Date / time can be full like "2018-01-23 12:34:56", or partial like "2018-12-25" or "2017-11".') // @translate ?>
             </div>
         </div>
-        <button type="button" class="add-value o-icon-add button" aria-label="<?= $translate('Add new value') ?>" title="<?= $translate('Add new value') ?>"></button>
+        <button type="button" class="button add-value o-icon-add" aria-label="<?= $translate('Add new value') ?>" title="<?= $translate('Add new value') ?>"></button>
     </div>
     <div class="inputs">
         <?php
@@ -78,7 +78,7 @@ $queryInputText = function (array $search, $engine) use ($translate, $escape) {
                 <?= $querySelectOption('nex', $datetime, 'type', $translate('has no date / time')) // @translate ?>
             </select>
             <?= $queryInputText($datetime, $index) ?>
-            <button type="button" class="o-icon-delete remove-value button"><?= $translate('Remove date / time') // @translate ?></button>
+            <button type="button" class="button o-icon-delete remove-value"><?= $translate('Remove date / time') // @translate ?></button>
         </div>
         <?php
             ++$index;

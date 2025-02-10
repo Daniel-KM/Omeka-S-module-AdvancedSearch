@@ -255,7 +255,7 @@ trait TraitFormAdapterClassic
                             // not set by end user, are managed via the search
                             // engine (via the name of the field).
                             // TODO Prepare all arguements early in query with filter query.
-                            $query->addFilterQuery($filter['replaced_field'], $filter['val'], $filter['type'], $filter['join']);
+                            $query->addFilterQuery($filter['replaced_field'], $filter['val'] ?? null, $filter['type'] ?? null, $filter['join'] ?? null);
                             unset($value[$key]);
                         }
                     }

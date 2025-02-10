@@ -637,6 +637,15 @@ trait TraitFormAdapterClassic
             $query->setFiltersQueryHidden($hiddenFilters);
         }
 
+        
+        // Set query default field if provided
+        // $searchConfigSettings['request']['query_default_field'] = 'public_property_values_txt'; // Fake retrieval
+        if (!empty($searchConfigSettings['request']['query_default_field'])) {
+            $query->setQueryDefaultField(
+                $searchConfigSettings['request']['query_default_field']
+            );
+        }
+
         // Add global parameters.
 
         $searchEngineSettings = $searchEngine->settings();

@@ -139,25 +139,22 @@ class MainSearchForm extends Form
 
     public function init(): void
     {
-        // The attribute "form" is appended to all fields to simplify themes,
-        // unless the settings skip it.
+        $this->searchConfig = $this->getOption('search_config');
+        $this->formSettings = $this->searchConfig ? $this->searchConfig->settings() : [];
+        $this->skipValues = (bool) $this->getOption('skip_values');
+        $this->variant = $this->getOption('variant');
+
+        $hasVariant = in_array($this->variant, ['quick', 'simple', 'csrf']);
+        $hasFormVariant = in_array($this->variant, ['quick', 'simple']);
 
         // The id is different from the Omeka search to avoid issues in js. The
         // css should be adapted.
         $this
             ->setAttributes([
                 'id' => 'form-search',
-                'class' => 'search-form form-search',
+                'class' => 'search-form form-search'
+                    . ($hasFormVariant ? ' form-search-' . $this->variant : ''),
             ]);
-
-        $this->searchConfig = $this->getOption('search_config');
-
-        $this->skipValues = (bool) $this->getOption('skip_values');
-
-        $this->variant = $this->getOption('variant');
-        $hasVariant = in_array($this->variant, ['quick', 'simple', 'csrf']);
-
-        $this->formSettings = $this->searchConfig ? $this->searchConfig->settings() : [];
 
         // Omeka adds a csrf automatically in \Omeka\Form\Initializer\Csrf.
         // Remove the csrf, because it is useless for a search form and the url
@@ -176,6 +173,8 @@ class MainSearchForm extends Form
             return;
         }
 
+        // The attribute "form" may be appended to all fields to simplify
+        // themes.
         $this->elementAttributes = empty($this->formSettings['form']['attribute_form'])
             ? []
             : ['form' => 'form-search'];

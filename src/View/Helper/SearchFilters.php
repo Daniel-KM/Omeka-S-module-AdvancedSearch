@@ -603,7 +603,9 @@ class SearchFilters extends AbstractHelper
             // Currently, "resources" cannot be searched, so use adapter
             // directly. Rights are managed.
             /** @var \Doctrine\ORM\EntityManager $entityManager */
-            $services = $this->getServiceLocator();
+            $services = $this->searchConfig
+                ? $this->searchConfig->getServiceLocator()
+                : $view->api()->read('vocabularies', 1)->getContent()->getServiceLocator();
             $entityManager = $services->get('Omeka\EntityManager');
             $qb = $entityManager->createQueryBuilder();
             $qb

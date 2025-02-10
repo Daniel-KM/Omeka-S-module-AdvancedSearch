@@ -74,7 +74,7 @@ class SearchingValue extends AbstractHelper
                 $query->addFilterQuery($property, $vr->id(), 'res');
             } else {
                 $val = (string) $value->value();
-                $query->addFilter($property, $uriOrVal);
+                $query->addFilterQuery($property, $uriOrVal, 'eq');
             }
             $urlQuery = $advancedSearchConfig->toRequest($query);
             */

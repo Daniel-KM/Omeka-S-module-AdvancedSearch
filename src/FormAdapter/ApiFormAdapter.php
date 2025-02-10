@@ -92,7 +92,7 @@ class ApiFormAdapter extends AbstractFormAdapter implements FormAdapterInterface
         // Copied from \Omeka\Api\Adapter\ItemAdapter::buildQuery(), etc.
 
         if (isset($metadata['is_public']) && isset($request['is_public'])) {
-            $query->addFilter($metadata['is_public'], (bool) $request['is_public']);
+            $query->addFilterQuery($metadata['is_public'], (bool) $request['is_public'], 'eq');
         }
 
         if (isset($metadata['id']) && !empty($request['id'])) {
@@ -134,12 +134,12 @@ class ApiFormAdapter extends AbstractFormAdapter implements FormAdapterInterface
         }
 
         if (isset($metadata['is_open']) && isset($request['is_open'])) {
-            $query->addFilter($metadata['is_open'], (bool) $request['is_open']);
+            $query->addFilterQuery($metadata['is_open'], (bool) $request['is_open'], 'eq');
         }
 
         // Module Access.
         if (isset($metadata['access']) && isset($request['access'])) {
-            $query->addFilter($metadata['access'], (string) $request['access']);
+            $query->addFilterQuery($metadata['access'], (string) $request['access'], 'eq');
         }
     }
 
@@ -213,10 +213,6 @@ class ApiFormAdapter extends AbstractFormAdapter implements FormAdapterInterface
             // $positive = true;
 
             switch ($queryType) {
-                case 'eq':
-                    $query->addFilter($propertyField, $value);
-                    break;
-
                 /** @deprecated Use eq/neq, that supports array internally. */
                 case 'nlist':
                 case 'list':
@@ -308,10 +304,6 @@ class ApiFormAdapter extends AbstractFormAdapter implements FormAdapterInterface
             // $positive = true;
 
             switch ($queryType) {
-                case 'eq':
-                    $query->addFilter($propertyField, $val);
-                    break;
-
                 /** @deprecated Use eq/neq, that supports array internally. */
                 case 'nlist':
                 case 'list':
@@ -344,7 +336,7 @@ class ApiFormAdapter extends AbstractFormAdapter implements FormAdapterInterface
     {
         $dataValues = trim(is_array($value) ? array_shift($value) : $value);
         if (strlen($dataValues)) {
-            $query->addFilter($filterName, $dataValues);
+            $query->addFilterQuery($filterName, $dataValues, 'eq');
         }
     }
 
@@ -359,7 +351,7 @@ class ApiFormAdapter extends AbstractFormAdapter implements FormAdapterInterface
     {
         $dataValues = (int) (is_array($value) ? array_shift($value) : $value);
         if ($dataValues) {
-            $query->addFilter($filterName, $dataValues);
+            $query->addFilterQuery($filterName, $dataValues, 'eq');
         }
     }
 
@@ -375,7 +367,7 @@ class ApiFormAdapter extends AbstractFormAdapter implements FormAdapterInterface
         $dataValues = is_array($value) ? $value : [$value];
         $dataValues = array_filter(array_map('trim', $dataValues), 'strlen');
         if ($dataValues) {
-            $query->addFilter($filterName, $dataValues);
+            $query->addFilterQuery($filterName, $dataValues, 'eq');
         }
     }
 
@@ -391,7 +383,7 @@ class ApiFormAdapter extends AbstractFormAdapter implements FormAdapterInterface
         $dataValues = is_array($value) ? $value : [$value];
         $dataValues = array_filter(array_map('intval', $dataValues));
         if ($dataValues) {
-            $query->addFilter($filterName, $dataValues);
+            $query->addFilterQuery($filterName, $dataValues, 'eq');
         }
     }
 }

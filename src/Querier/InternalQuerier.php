@@ -781,9 +781,9 @@ class InternalQuerier extends AbstractQuerier
         if (!$hiddenFilters) {
             return;
         }
-        $this->filterQueryValues($hiddenFilters);
+        $this->filterQueryAny($hiddenFilters, false, true);
         $this->filterQueryRanges($hiddenFilters);
-        $this->filterQueryFilters($hiddenFilters);
+        $this->filterQueryAny($hiddenFilters);
     }
 
     /**
@@ -798,15 +798,15 @@ class InternalQuerier extends AbstractQuerier
     protected function filterQuery(): void
     {
         // Don't use excluded fields for filters.
-        $this->filterQueryValues($this->query->getFilters());
+        $this->filterQueryAny($this->query->getFilters(), false, true);
         $this->filterQueryRanges($this->query->getFiltersRange());
-        $this->filterQueryFilters($this->query->getFiltersQuery());
+        $this->filterQueryAny($this->query->getFiltersQuery());
         $this->argsWithoutActiveFacets = $this->args;
-        $this->filterQueryValues($this->query->getActiveFacets(), true);
+        $this->filterQueryAny($this->query->getActiveFacets(), true, true);
         $this->filterQueryRefine($this->query->getQueryRefine());
     }
 
-    protected function filterQueryValues(array $filters, bool $inListForFacets = false): void
+    protected function filterQueryAny(array $filters, bool $inListForFacets = false, bool $isSimpleValue = false): void
     {
         $flatArray = function ($values): array {
             if (!is_array($values)) {
@@ -961,6 +961,37 @@ class InternalQuerier extends AbstractQuerier
                 }
                 break;
 
+            case !$isSimpleValue:
+                // The filter is a query row in SearchResource, but the filters
+                // are grouped by field.
+                if (!is_array($values)) {
+                    continue 2;
+                }
+
+                $field = $this->fieldToIndex($fieldName);
+                if (!$field) {
+                    continue 2;
+                }
+
+                foreach ($values as $queryFilter) {
+                    // Skip simple filters (for hidden queries).
+                    if (!$queryFilter
+                        || !is_array($queryFilter)
+                        || empty($queryFilter['type'])
+                        || !isset(SearchResources::FIELD_QUERY['reciprocal'][$queryFilter['type']])
+                    ) {
+                        continue;
+                    }
+                    $queryFilter += ['join' => null, 'type' => null, 'val' => null];
+                    $this->args['filter'][] = [
+                        'join' => $queryFilter['join'],
+                        'field' => $field,
+                        'type' => $queryFilter['type'],
+                        'val' => $queryFilter['val'],
+                    ];
+                }
+                break;
+
             default:
                 // Normally, the fields are already converted in standard
                 // advanced search form.
@@ -1060,43 +1091,6 @@ class InternalQuerier extends AbstractQuerier
                         'val' => $filterValue['to'],
                     ];
                 }
-            }
-        }
-    }
-
-    /**
-     * @todo In internal querier, advanced filters manage only properties for now.
-     */
-    protected function filterQueryFilters(array $filters): void
-    {
-        // The filter is a query row in SearchResource, but the filters are
-        // grouped by field.
-        foreach ($filters as $field => $filter) {
-            if (!is_array($filter)) {
-                continue;
-            }
-
-            $field = $this->fieldToIndex($field);
-            if (!$field) {
-                continue;
-            }
-
-            foreach ($filter as $queryFilter) {
-                // Skip simple filters (for hidden queries).
-                if (!$queryFilter
-                    || !is_array($queryFilter)
-                    || empty($queryFilter['type'])
-                    || !isset(SearchResources::FIELD_QUERY['reciprocal'][$queryFilter['type']])
-                ) {
-                    continue;
-                }
-                $queryFilter += ['join' => null, 'type' => null, 'val' => null];
-                $this->args['filter'][] = [
-                    'join' => $queryFilter['join'],
-                    'field' => $field,
-                    'type' => $queryFilter['type'],
-                    'val' => $queryFilter['val'],
-                ];
             }
         }
     }

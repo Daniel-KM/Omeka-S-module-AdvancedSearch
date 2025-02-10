@@ -320,8 +320,8 @@ class Query implements JsonSerializable
     }
 
     /**
-     * @todo Support multi-fields (name).
      * @param array|string $value
+     * @deprecated Use addFilterQuery().
      */
     public function addFilter(string $name, $value): self
     {
@@ -329,6 +329,10 @@ class Query implements JsonSerializable
         return $this;
     }
 
+    /**
+     * @return array
+     * @deprecated Use getFilters().
+     */
     public function getFilters(): array
     {
         return $this->filters;
@@ -336,6 +340,7 @@ class Query implements JsonSerializable
 
     /**
      * @todo Support multi-fields (name).
+     * @todo Merge addFilterRange with addFilterQuery().
      */
     public function addFilterRange(string $name, string $from, string $to): self
     {
@@ -360,6 +365,7 @@ class Query implements JsonSerializable
      *
      * Note: Some types and joiners may not be managed by the querier.
      * @todo Support multi-fields (name) (but useless with aliases).
+     * @todo Add other keys: except, datatype (but useless with indexes and aliases). Only for internal?
      */
     public function addFilterQuery(string $name, $val, ?string $type = 'in', ?string $join = 'and'): self
     {

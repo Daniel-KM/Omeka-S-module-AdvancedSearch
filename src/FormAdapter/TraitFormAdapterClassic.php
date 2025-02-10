@@ -210,7 +210,7 @@ trait TraitFormAdapterClassic
 
                 case 'id':
                     $valueArray = $flatArray($value);
-                    $query->addFilter('id', $valueArray);
+                    $query->addFilterQuery('id', $valueArray, 'eq');
                     continue 2;
 
                     // Specific fields.
@@ -221,7 +221,7 @@ trait TraitFormAdapterClassic
                         && strlen($value)
                         && isset($formSettings['available_fields'][$name]['to'])
                     ) {
-                        $query->addFilter($formSettings['available_fields'][$name]['to'], (bool) $value);
+                        $query->addFilterQuery($formSettings['available_fields'][$name]['to'], (bool) $value, 'eq');
                     }
                     continue 2;
 
@@ -232,7 +232,7 @@ trait TraitFormAdapterClassic
                 case 'item_set':
                     if (isset($formSettings['available_fields'][$name]['to'])) {
                         $valueArray = $flatArray($value);
-                        $query->addFilter($formSettings['available_fields'][$name]['to'], $valueArray);
+                        $query->addFilterQuery($formSettings['available_fields'][$name]['to'], $valueArray, 'eq');
                     }
                     continue 2;
 
@@ -241,7 +241,7 @@ trait TraitFormAdapterClassic
                         && strlen($value)
                         && isset($formSettings['available_fields'][$name]['to'])
                     ) {
-                        $query->addFilter($formSettings['available_fields'][$name]['to'], $value);
+                        $query->addFilterQuery($formSettings['available_fields'][$name]['to'], $value, 'eq');
                     }
                     continue 2;
 
@@ -278,7 +278,7 @@ trait TraitFormAdapterClassic
                                     && trim($filter['val']) !== ''
                                     && $checkAvailableField($filter['field'])
                                 ) {
-                                    $query->addFilter($filter['field'], $filter['val']);
+                                    $query->addFilterQuery($filter['field'], $filter['val'], $filter['type'] ?? $typeDefault, $filter['join'] ?? null);
                                 }
                             }
                         } else {
@@ -442,7 +442,7 @@ trait TraitFormAdapterClassic
                                 || $element instanceof \AdvancedSearch\Form\Element\MultiText
                             ) {
                                 foreach ($valueArray as $val) {
-                                    $query->addFilter($name, $val);
+                                    $query->addFilterQuery($name, $val, 'eq');
                                 }
                             } else {
                                 // Included \AdvancedSearch\Form\Element\MultiText.
@@ -452,7 +452,7 @@ trait TraitFormAdapterClassic
                             }
                         } else {
                             foreach ($valueArray as $val) {
-                                $query->addFilter($name, $val);
+                                $query->addFilterQuery($name, $val, 'eq');
                             }
                         }
                         continue 2;
@@ -467,7 +467,7 @@ trait TraitFormAdapterClassic
                     $firstKey = key($value);
                     switch ($firstKey) {
                         default:
-                            $query->addFilter($name, $value);
+                            $query->addFilterQuery($name, $value, 'eq');
                             continue 3;
 
                         case 'from':

@@ -219,16 +219,15 @@ class IndexSuggestions extends AbstractJob
         }
 
         $sql = <<<'SQL'
-# Process listing in a temporary table: the table has no auto-increment id.
-DROP TABLE IF EXISTS `_suggestions_temporary`;
-CREATE TEMPORARY TABLE `_suggestions_temporary` (
-    `text` VARCHAR(190) NOT NULL COLLATE utf8mb4_unicode_ci,
-    `total_all` INT NOT NULL DEFAULT 1,
-    `total_public` INT NOT NULL DEFAULT 0,
-    PRIMARY KEY(`text`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
-
-SQL;
+            # Process listing in a temporary table: the table has no auto-increment id.
+            DROP TABLE IF EXISTS `_suggestions_temporary`;
+            CREATE TEMPORARY TABLE `_suggestions_temporary` (
+                `text` VARCHAR(190) NOT NULL COLLATE utf8mb4_unicode_ci,
+                `total_all` INT NOT NULL DEFAULT 1,
+                `total_public` INT NOT NULL DEFAULT 0,
+                PRIMARY KEY(`text`)
+            ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+            SQL;
 
         $sqlsVisibility = [
             'all' => '',
@@ -239,80 +238,78 @@ SQL;
             foreach ($sqlsVisibility as $column => $sqlVisibility) {
                 for ($numberWords = 3; $numberWords >= 1; $numberWords--) {
                     // Don't "insert ignore and distinct", increment on duplicate.
-                    $sql .= <<<SQL
-# Create $numberWords words index (compute $column).
-INSERT INTO `_suggestions_temporary` (`text`)
-SELECT
-    SUBSTRING(
-        TRIM(
-            # Security replacements.
-            TRIM('"' FROM
-            TRIM("'" FROM
-            TRIM("\\\\" FROM
-            TRIM("%" FROM
-            TRIM("_" FROM
-            TRIM("#" FROM
-            TRIM("?" FROM
-            TRIM("$" FROM
-            # Cleaning replacements.
-            TRIM("," FROM
-            TRIM(";" FROM
-            TRIM("!" FROM
-            TRIM(":" FROM
-            TRIM("." FROM
-            TRIM("[" FROM
-            TRIM("]" FROM
-            TRIM("<" FROM
-            TRIM(">" FROM
-            TRIM("(" FROM
-            TRIM(")" FROM
-            TRIM("{" FROM
-            TRIM("}" FROM
-            TRIM("=" FROM
-            TRIM("&" FROM
-            TRIM("’" FROM
-            TRIM(
-                SUBSTRING_INDEX(
-                    CONCAT(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), " "),
-                    " ",
-                    $numberWords
-                )
-            )))))))))))))))))))))))))
-        ),
-    1, 190)
-FROM `value` AS `value`
-INNER JOIN `resource`
-    ON `resource`.`id` = `value`.`resource_id`
-    $sqlResourceTypes
-WHERE
-    `value`.`value` IS NOT NULL
-    $sqlFields
-    $sqlVisibility
-ON DUPLICATE KEY UPDATE `_suggestions_temporary`.`total_$column` = `_suggestions_temporary`.`total_$column` + 1;
-
-SQL;
+                    $sql .= "\n\n" . <<<SQL
+                        # Create $numberWords words index (compute $column).
+                        INSERT INTO `_suggestions_temporary` (`text`)
+                        SELECT
+                            SUBSTRING(
+                                TRIM(
+                                    # Security replacements.
+                                    TRIM('"' FROM
+                                    TRIM("'" FROM
+                                    TRIM("\\\\" FROM
+                                    TRIM("%" FROM
+                                    TRIM("_" FROM
+                                    TRIM("#" FROM
+                                    TRIM("?" FROM
+                                    TRIM("$" FROM
+                                    # Cleaning replacements.
+                                    TRIM("," FROM
+                                    TRIM(";" FROM
+                                    TRIM("!" FROM
+                                    TRIM(":" FROM
+                                    TRIM("." FROM
+                                    TRIM("[" FROM
+                                    TRIM("]" FROM
+                                    TRIM("<" FROM
+                                    TRIM(">" FROM
+                                    TRIM("(" FROM
+                                    TRIM(")" FROM
+                                    TRIM("{" FROM
+                                    TRIM("}" FROM
+                                    TRIM("=" FROM
+                                    TRIM("&" FROM
+                                    TRIM("’" FROM
+                                    TRIM(
+                                        SUBSTRING_INDEX(
+                                            CONCAT(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), " "),
+                                            " ",
+                                            $numberWords
+                                        )
+                                    )))))))))))))))))))))))))
+                                ),
+                            1, 190)
+                        FROM `value` AS `value`
+                        INNER JOIN `resource`
+                            ON `resource`.`id` = `value`.`resource_id`
+                            $sqlResourceTypes
+                        WHERE
+                            `value`.`value` IS NOT NULL
+                            $sqlFields
+                            $sqlVisibility
+                        ON DUPLICATE KEY UPDATE `_suggestions_temporary`.`total_$column` = `_suggestions_temporary`.`total_$column` + 1;
+                        SQL;
                 }
             }
         }
 
         if ($modeIndex === 'full' || $modeIndex === 'start_full') {
-            $sql .= $this->appendSqlFull($sqlResourceTypes, $sqlFields);
+            $sql .= "\n\n" . $this->appendSqlFull($sqlResourceTypes, $sqlFields);
         }
 
-        $sql .= <<<SQL
-# Finalize creation of suggestions.
-INSERT INTO `search_suggestion` (`suggester_id`, `text`, `total_all`, `total_public`)
-SELECT DISTINCT
-    :suggester_id,
-    `text`,
-    `total_all`,
-    `total_public`
-FROM `_suggestions_temporary`
-WHERE
-    LENGTH(`text`) > 1;
-DROP TABLE IF EXISTS `_suggestions_temporary`;
-
-SQL;
+        $sql .= "\n\n" . <<<SQL
+            # Finalize creation of suggestions.
+            INSERT INTO `search_suggestion` (`suggester_id`, `text`, `total_all`, `total_public`)
+            SELECT DISTINCT
+                :suggester_id,
+                `text`,
+                `total_all`,
+                `total_public`
+            FROM `_suggestions_temporary`
+            WHERE
+                LENGTH(`text`) > 1;
+            DROP TABLE IF EXISTS `_suggestions_temporary`;
+            SQL;
 
         $this->connection->executeStatement($sql, $bind, $types);
 
@@ -355,16 +352,15 @@ SQL;
         }
 
         $sql = <<<'SQL'
-# Process listing in a temporary table: the table has no auto-increment id and size is not limited.
-DROP TABLE IF EXISTS `_suggestions_temporary`;
-CREATE TEMPORARY TABLE `_suggestions_temporary` (
-    `text` LONGTEXT NOT NULL COLLATE utf8mb4_unicode_ci,
-    `total_all` INT NOT NULL DEFAULT 1,
-    `total_public` INT NOT NULL DEFAULT 0,
-    PRIMARY KEY(`text`(190))
-) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
-
-SQL;
+            # Process listing in a temporary table: the table has no auto-increment id and size is not limited.
+            DROP TABLE IF EXISTS `_suggestions_temporary`;
+            CREATE TEMPORARY TABLE `_suggestions_temporary` (
+                `text` LONGTEXT NOT NULL COLLATE utf8mb4_unicode_ci,
+                `total_all` INT NOT NULL DEFAULT 1,
+                `total_public` INT NOT NULL DEFAULT 0,
+                PRIMARY KEY(`text`(190))
+            ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+            SQL;
 
         $sqlsVisibility = [
             'all' => '',
@@ -375,126 +371,124 @@ SQL;
             foreach ($sqlsVisibility as $column => $sqlVisibility) {
                 // Only one word for now.
                 // Don't "insert ignore and distinct", increment on duplicate.
-                $sql .= <<<SQL
-# Create single words index (compute $column).
-# TODO Divide values by 1000 and use a loop.
-SET @pr = CONCAT(
-    "INSERT INTO `_suggestions_temporary` (`text`) VALUES ('",
-    REPLACE(
-        (SELECT
-            GROUP_CONCAT( DISTINCT
-                TRIM(
-                    REPLACE(
-                    REPLACE(
-                    REPLACE(
-                    REPLACE(
-                    REPLACE(
-                    REPLACE(
-                    REPLACE(
-                    REPLACE(
-                    REPLACE(
-                    REPLACE(
-                    REPLACE(
-                    REPLACE(
-                    REPLACE(
-                    REPLACE(
-                    REPLACE(
-                        `value`.`value`,
-                    "\n", " "),
-                    "\r", " "),
-                    # Security replacements.
-                    '"', " "),
-                    "'", " "),
-                    "\\\\", " "),
-                    "%", " "),
-                    "_", " "),
-                    "#", " "),
-                    "?", " "),
-                    "$", " "),
-                    # More common separators to avoid too long data.
-                    ",", " "),
-                    ";", " "),
-                    "!", " "),
-                    "’", " "),
-                    "  ", " ")
-                )
-                SEPARATOR " "
-            ) AS data
-            FROM `value`
-            JOIN `resource`
-                ON `resource`.`id` = `value`.`resource_id`
-                $sqlResourceTypes
-            WHERE
-                `value`.`value` IS NOT NULL
-                $sqlFields
-                $sqlVisibility
-        ),
-        " ",
-        "'),('"),
-        "')",
-        "ON DUPLICATE KEY UPDATE `_suggestions_temporary`.`total_$column` = `_suggestions_temporary`.`total_$column` + 1;"
-    );
-PREPARE stmt1 FROM @pr;
-EXECUTE stmt1;
-
-SQL;
+                $sql .= "\n\n" . <<<SQL
+                    # Create single words index (compute $column).
+                    # TODO Divide values by 1000 and use a loop.
+                    SET @pr = CONCAT(
+                        "INSERT INTO `_suggestions_temporary` (`text`) VALUES ('",
+                        REPLACE(
+                            (SELECT
+                                GROUP_CONCAT( DISTINCT
+                                    TRIM(
+                                        REPLACE(
+                                        REPLACE(
+                                        REPLACE(
+                                        REPLACE(
+                                        REPLACE(
+                                        REPLACE(
+                                        REPLACE(
+                                        REPLACE(
+                                        REPLACE(
+                                        REPLACE(
+                                        REPLACE(
+                                        REPLACE(
+                                        REPLACE(
+                                        REPLACE(
+                                        REPLACE(
+                                            `value`.`value`,
+                                        "\n", " "),
+                                        "\r", " "),
+                                        # Security replacements.
+                                        '"', " "),
+                                        "'", " "),
+                                        "\\\\", " "),
+                                        "%", " "),
+                                        "_", " "),
+                                        "#", " "),
+                                        "?", " "),
+                                        "$", " "),
+                                        # More common separators to avoid too long data.
+                                        ",", " "),
+                                        ";", " "),
+                                        "!", " "),
+                                        "’", " "),
+                                        "  ", " ")
+                                    )
+                                    SEPARATOR " "
+                                ) AS data
+                                FROM `value`
+                                JOIN `resource`
+                                    ON `resource`.`id` = `value`.`resource_id`
+                                    $sqlResourceTypes
+                                WHERE
+                                    `value`.`value` IS NOT NULL
+                                    $sqlFields
+                                    $sqlVisibility
+                            ),
+                            " ",
+                            "'),('"),
+                            "')",
+                            "ON DUPLICATE KEY UPDATE `_suggestions_temporary`.`total_$column` = `_suggestions_temporary`.`total_$column` + 1;"
+                        );
+                    PREPARE stmt1 FROM @pr;
+                    EXECUTE stmt1;
+                    SQL;
             }
         }
 
         if ($modeIndex === 'full' || $modeIndex === 'contain_full') {
-            $sql .= $this->appendSqlFull($sqlResourceTypes, $sqlFields);
+            $sql .= "\n\n" . $this->appendSqlFull($sqlResourceTypes, $sqlFields);
         }
 
-        $sql .= <<<SQL
-# Finalize creation of suggestions.
-INSERT INTO `search_suggestion` (`suggester_id`, `text`, `total_all`, `total_public`)
-SELECT DISTINCT
-    :suggester_id,
-    SUBSTRING(
-        TRIM(
-            # Security replacements.
-            TRIM('"' FROM
-            TRIM("'" FROM
-            TRIM("\\\\" FROM
-            TRIM("%" FROM
-            TRIM("_" FROM
-            TRIM("#" FROM
-            # Cleaning replacements.
-            TRIM("," FROM
-            TRIM(";" FROM
-            TRIM("!" FROM
-            TRIM("?" FROM
-            TRIM(":" FROM
-            TRIM("." FROM
-            TRIM("[" FROM
-            TRIM("]" FROM
-            TRIM("<" FROM
-            TRIM(">" FROM
-            TRIM("(" FROM
-            TRIM(")" FROM
-            TRIM("{" FROM
-            TRIM("}" FROM
-            TRIM("=" FROM
-            TRIM("&" FROM
-            TRIM(
-               `text`
-            )))))))))))))))))))))))
-        ),
-    1, 190) AS "val",
-    `total_all`,
-    `total_public`
-FROM `_suggestions_temporary`
-WHERE
-    LENGTH(`text`) > 1;
-
-# Remove useless rows.
-DELETE FROM `search_suggestion`
-WHERE `suggester_id` = :suggester_id
-    AND LENGTH(`text`) <= 1;
-
-DROP TABLE IF EXISTS `_suggestions_temporary`;
-
-SQL;
+        $sql .= "\n\n" . <<<'SQL'
+            # Finalize creation of suggestions.
+            INSERT INTO `search_suggestion` (`suggester_id`, `text`, `total_all`, `total_public`)
+            SELECT DISTINCT
+                :suggester_id,
+                SUBSTRING(
+                    TRIM(
+                        # Security replacements.
+                        TRIM('"' FROM
+                        TRIM("'" FROM
+                        TRIM("\\\\" FROM
+                        TRIM("%" FROM
+                        TRIM("_" FROM
+                        TRIM("#" FROM
+                        # Cleaning replacements.
+                        TRIM("," FROM
+                        TRIM(";" FROM
+                        TRIM("!" FROM
+                        TRIM("?" FROM
+                        TRIM(":" FROM
+                        TRIM("." FROM
+                        TRIM("[" FROM
+                        TRIM("]" FROM
+                        TRIM("<" FROM
+                        TRIM(">" FROM
+                        TRIM("(" FROM
+                        TRIM(")" FROM
+                        TRIM("{" FROM
+                        TRIM("}" FROM
+                        TRIM("=" FROM
+                        TRIM("&" FROM
+                        TRIM(
+                           `text`
+                        )))))))))))))))))))))))
+                    ),
+                1, 190) AS "val",
+                `total_all`,
+                `total_public`
+            FROM `_suggestions_temporary`
+            WHERE
+                LENGTH(`text`) > 1;
+            
+            # Remove useless rows.
+            DELETE FROM `search_suggestion`
+            WHERE `suggester_id` = :suggester_id
+                AND LENGTH(`text`) <= 1;
+            
+            DROP TABLE IF EXISTS `_suggestions_temporary`;
+            SQL;
 
         $this->connection->executeStatement($sql, $bind, $types);
 
@@ -510,22 +504,21 @@ SQL;
         ];
         foreach ($sqlsVisibility as $column => $sqlVisibility) {
             // Don't "insert ignore and distinct", increment on duplicate.
-            $sql .= <<<SQL
-# Create full value index (compute $column).
-INSERT INTO `_suggestions_temporary` (`text`)
-SELECT
-    TRIM(SUBSTRING(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " "), 1, 190))
-FROM `value` AS `value`
-INNER JOIN `resource`
-    ON `resource`.`id` = `value`.`resource_id`
-    $sqlResourceTypes
-WHERE
-    `value`.`value` IS NOT NULL
-    $sqlFields
-    $sqlVisibility
-ON DUPLICATE KEY UPDATE `_suggestions_temporary`.`total_$column` = `_suggestions_temporary`.`total_$column` + 1;
-
-SQL;
+            $sql .= "\n\n" . <<<SQL
+                # Create full value index (compute $column).
+                INSERT INTO `_suggestions_temporary` (`text`)
+                SELECT
+                    TRIM(SUBSTRING(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " "), 1, 190))
+                FROM `value` AS `value`
+                INNER JOIN `resource`
+                    ON `resource`.`id` = `value`.`resource_id`
+                    $sqlResourceTypes
+                WHERE
+                    `value`.`value` IS NOT NULL
+                    $sqlFields
+                    $sqlVisibility
+                ON DUPLICATE KEY UPDATE `_suggestions_temporary`.`total_$column` = `_suggestions_temporary`.`total_$column` + 1;
+                SQL;
         }
         return $sql;
     }

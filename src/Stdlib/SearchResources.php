@@ -1243,7 +1243,7 @@ class SearchResources
                     'datatype' => $this->searchIndex['query_args'][$field]['datatype'] ?? null,
                     // Label and next data  are kept for search filters.
                     'label' => $this->searchIndex['form_filters_fields'][$field]
-                        ?? $this->searchIndex['aliases'][$field]
+                        ?? $this->searchIndex['aliases'][$field]['label']
                         ?? null,
                     'is_form_filter' => !empty($this->searchIndex['form_filters_fields'][$field]),
                     'replaced_field' => $field,

@@ -153,6 +153,17 @@ class SearchConfigConfigureForm extends Form
                     'id' => 'validate_form',
                 ],
             ])
+            ->add([
+                'name' => 'query_default_field',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Query default field', // @translate
+                    'info' => 'Optional. Specifies a default search field in case it is not made explicit in the query.', // @translated
+                ],
+                'attributes' => [
+                    'id' => 'query_default_field',
+                ],
+            ])
         ;
 
         $this

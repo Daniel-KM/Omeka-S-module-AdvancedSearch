@@ -64,6 +64,7 @@ class Module extends AbstractModule
 
     public function onBootstrap(MvcEvent $event): void
     {
+
         parent::onBootstrap($event);
         $this->addAclRules();
         $this->addRoutes();
@@ -524,25 +525,11 @@ class Module extends AbstractModule
 
         // A specific check to manage site admin or public site.
         // The site slug is required to build public routes in background job.
-        $siteSlug = $status->getRouteParam('site-slug');
-        if (!$siteSlug) {
-            $helpers = $services->get('ViewHelperManager');
-            // This check is used when module Common is upgraded.
-            if ($helpers->has('defaultSite')) {
-                $defaultSite = $helpers->get('defaultSite');
-                $siteSlug = $defaultSite('slug');
-            } else {
-                $defaultSite = (int) $settings->get('default_site');
-                if ($defaultSite) {
-                    try {
-                        $site = $services->get('Omeka\ApiManager')->read('sites', ['id' => $defaultSite])->getContent();
-                        $siteSlug = $site->slug();
-                    } catch (\Exception $e) {
-                        // No default site slug.
-                    }
-                }
-            }
-        }
+        $siteSlug = $status->getRouteParam('site-slug')
+            ?: $services->get('ViewHelperManager')->get('defaultSite')('slug');
+
+        // The search routes are all literal an contains all data.
+        // They are all built early. Check is done in controller.
 
         // To avoid collision with module Search, the routes use the slug.
         // The search slug is stored in options to simplify checks.

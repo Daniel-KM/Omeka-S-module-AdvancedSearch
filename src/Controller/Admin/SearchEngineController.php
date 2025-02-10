@@ -160,7 +160,7 @@ class SearchEngineController extends AbstractActionController
         $view = new ViewModel([
             'resourceLabel' => 'search index',
             'resource' => $searchEngine,
-            'listJobsStatusesByIds' => $listJobStatusesByIds,
+            'listJobStatusesByIds' => $listJobStatusesByIds,
         ]);
         return $view
             ->setTerminal(true)

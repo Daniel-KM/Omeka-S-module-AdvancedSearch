@@ -5,7 +5,7 @@
  * @var \Omeka\Form\ConfirmForm $form
  * @var string $wrapSidebar
  * @var string $resourceLabel
- * @var array $listJobsStatusesByIds
+ * @var array $listJobStatusesByIds
  */
 
 $translate = $this->plugin('translate');
@@ -37,8 +37,8 @@ $this->form->setButtonLabel($translate('Confirm reindex'));
             <input form="<?= $form->getName() ?>" type="radio" name="process_mode" id="process_mode" value="orm" checked="checked"/><?= $translate('Orm (slower but more precise index, required for old database, or small memory)') ?>
         </p>
         <p>
-        <?php if ($listJobsStatusesByIds): ?>
-	        <?= sprintf($translate('%1$d running indexings: #%2$s.'), count($listJobsStatusesByIds), implode(', #', array_keys($listJobsStatusesByIds))) ?><br />
+        <?php if ($listJobStatusesByIds): ?>
+	        <?= sprintf($translate('%1$d running indexings: #%2$s.'), count($listJobStatusesByIds), implode(', #', array_keys($listJobStatusesByIds))) ?><br />
             <input form="<?= $form->getName() ?>" name="force" type="checkbox" /><?= $translate('Force indexing') ?><br />
         <?php else: ?>
             <?= $translate('No running indexing: process can be launched.') ?>

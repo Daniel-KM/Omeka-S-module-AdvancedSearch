@@ -113,7 +113,7 @@ class SearchSuggesterController extends AbstractActionController
         $view = new ViewModel([
             'resourceLabel' => 'search suggester',
             'resource' => $suggester,
-            'listJobsStatusesByIds' => $listJobStatusesByIds,
+            'listJobStatusesByIds' => $listJobStatusesByIds,
         ]);
         return $view
             ->setTerminal(true)

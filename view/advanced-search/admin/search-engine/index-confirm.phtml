@@ -5,7 +5,7 @@
  * @var \Omeka\Form\ConfirmForm $form
  * @var string $wrapSidebar
  * @var string $resourceLabel
- * @var array $listJobsStatusesByIds
+ * @var array $listJobStatusesByIds
  */
 
 $plugins = $this->getHelperPluginManager();
@@ -60,8 +60,8 @@ $visibility = in_array($visibility, ['public', 'private']) ? $visibility : null;
         </p>
         <?php endif; ?>
         <p>
-        <?php if ($listJobsStatusesByIds): ?>
-            <?= sprintf($translate('%1$d running indexings: #%2$s.'), count($listJobsStatusesByIds), implode(', #', array_keys($listJobsStatusesByIds))) ?><br />
+        <?php if ($listJobStatusesByIds): ?>
+            <?= sprintf($translate('%1$d running indexings: #%2$s.'), count($listJobStatusesByIds), implode(', #', array_keys($listJobStatusesByIds))) ?><br />
             <input form="<?= $form->getName() ?>" name="force" type="checkbox" /><?= $translate('Force indexing') ?><br />
         <?php else: ?>
             <?= $translate('No running indexing: process can be launched.') ?>

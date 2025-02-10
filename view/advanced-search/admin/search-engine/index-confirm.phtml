@@ -27,15 +27,14 @@ $visibility = in_array($visibility, ['public', 'private']) ? $visibility : null;
 <?php if (count($resourceTypes)): ?>
     <div id="sidebar-confirm">
         <h3><?= sprintf($translate('Reindex "%s"'), $resource->name()) ?></h3>
-        <p><?= $translate('Are you sure you would like to reindex this index?') ?></p>
         <p>
-            <?= $translate('Set "1" to reindex all resources without clearing the current index.') ?>
-            <?= $translate('It avoids interruption in the search page, but in rare cases, it may keep indexes of deleted resources that were not removed.') ?>
-            <?= $translate('Set a greater resource id to reindex resources starting this resource id.') ?>
+            <?= $translate('Clearing index will make the search unavailable during reindexation, but it avoids the rare cases where indexes of deleted resources were not removed.') ?>
+            <?= $translate('You may redirect the users to a clone of the current index temporary.') ?>
+            <br/>
+            <input name="clear_index" value="1" type="checkbox" form="confirmform" /><?= $translate('Clear index') ?>
         </p>
         <p>
-            <?= $translate('With "0", the full index will be cleared first, so the search will be unavailable for a while.') ?>
-            <?= $translate('You may redirect the users to a clone of the current index temporary.') ?>
+            <?= $translate('Set the first resource id to reindex.') ?>
             <input name="start_resource_id" placeholder="0" value="1" min="0" type="number" form="confirmform" />
         </p>
         <p>
@@ -45,6 +44,7 @@ $visibility = in_array($visibility, ['public', 'private']) ? $visibility : null;
         </p>
         <p>
             <?= $translate('You may want to limit the reindexing to a resource type.') ?>
+            <br/>
             <?php foreach ($resourceTypes as $resourceType): ?>
             <input name="resource_types[]" value="<?= $resourceType ?>" type="checkbox" checked="checked" form="confirmform" /><?= $translate($resourceType) ?>
             <?php endforeach; ?>

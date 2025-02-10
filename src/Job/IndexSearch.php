@@ -69,6 +69,7 @@ class IndexSearch extends AbstractJob
         $this->logger->addProcessor($referenceIdProcessor);
 
         $searchEngineId = $this->getArg('search_engine_id');
+        $clearIndex = (bool) $this->getArg('clear_index');
         $startResourceId = (int) $this->getArg('start_resource_id');
         $resourceIds = $this->getArg('resource_ids', []) ?: [];
         $batchSize = abs((int) $this->getArg('resources_by_step')) ?: self::BATCH_SIZE;
@@ -151,17 +152,16 @@ class IndexSearch extends AbstractJob
             ['search_engine_id' => $searchEngine->id(), 'name' => $searchEngine->name()]
         );
 
-        $rTypes = $resourceTypes;
-        sort($rTypes);
-        $fullClearIndex = empty($resourceIds)
-            && $startResourceId <= 0
-            && array_values($rTypes) === ['item_sets', 'items'];
-
-        if ($fullClearIndex) {
-            $indexer->clearIndex();
-        } elseif (empty($resourceIds) && $startResourceId > 0) {
+        if ($clearIndex && empty($resourceTypes)) {
             $this->logger->info(
-                'Search index is not cleared: reindexing starts at resource #{resource_id}.', // @translate
+                'Search index is fully cleared.' // @translate
+            );
+            $indexer->clearIndex();
+        }
+
+        if ($startResourceId > 1) {
+            $this->logger->info(
+                'Reindexing starts at resource #{resource_id}.', // @translate
                 ['resource_id' => $startResourceId]
             );
         }
@@ -170,7 +170,7 @@ class IndexSearch extends AbstractJob
         $resources = [];
         $totals = [];
         foreach ($resourceTypes as $resourceType) {
-            if (!$fullClearIndex && empty($resourceIds) && $startResourceId <= 0) {
+            if ($clearIndex) {
                 $query = new Query();
                 // Here, no need to init the aliases and aggregated fields
                 // because there is no site or admin and aliases are managed

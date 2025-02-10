@@ -1699,7 +1699,7 @@ if (version_compare($oldVersion, '3.4.33', '<')) {
         if ($pos = array_search('item_sets', $resourceTypes)) {
             unset($resourceTypes[$pos]);
             array_unshift($searchEngineSettings['resource_types'], 'item_sets');
-            $searchEngineSettings['resource_types'] = array_values($searchEngineSettings['resource_types']);
+            $searchEngineSettings['resource_types'] = array_values(array_unique($searchEngineSettings['resource_types']));
             $sql = 'UPDATE `search_engine` SET `settings` = ? WHERE `id` = ?;';
             $connection->executeStatement($sql, [json_encode($searchEngineSettings, 320), $id]);
         }
@@ -1939,5 +1939,21 @@ if (version_compare($oldVersion, '3.4.40', '<')) {
             'The module {module} should be upgraded to version {version} or later.', // @translate
             ['module' => 'Reference', 'version' => '3.4.52']
         ));
+    }
+}
+
+if (version_compare($oldVersion, '3.4.41', '<')) {
+    // There may not be unique resource types in search configs (see previous upgrade 3.4.33).
+    $qb = $connection->createQueryBuilder();
+    $qb
+        ->select('id', 'settings')
+        ->from('search_config', 'search_config')
+        ->orderBy('id', 'asc');
+    $searchConfigsSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    foreach ($searchConfigsSettings as $id => $searchConfigSettings) {
+        $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
+        $searchConfigSettings['resource_types'] = array_values(array_unique($searchConfigSettings['resource_types'] ?? []));
+        $sql = 'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?;';
+        $connection->executeStatement($sql, [json_encode($searchConfigSettings, 320), $id]);
     }
 }

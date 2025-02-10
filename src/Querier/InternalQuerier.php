@@ -541,6 +541,15 @@ class InternalQuerier extends AbstractQuerier
                 ->orderBy('val', 'asc');
         }
 
+        $siteId = $this->query->getSiteId();
+        $siteAlias = 'site';
+        if ($siteId) {
+            $qb
+                ->innerJoin('resource.sites', $siteAlias, 'WITH', $expr->eq("$siteAlias.id", ':site_id'))
+                ->setParameter('site_id', $siteId);
+            // TODO Manage settigns site_attachements_only. See ItemAdapter.
+        }
+
         $list = array_column($qb->getQuery()->getScalarResult(), 'val', 'val');
 
         // Fix false empty duplicate or values without title.

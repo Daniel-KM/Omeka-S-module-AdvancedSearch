@@ -1199,7 +1199,8 @@ class MainSearchForm extends Form
         $query = new Query();
         $query
             ->setAliases($aliases)
-            ->setFieldsQueryArgs($fieldQueryArgs);
+            ->setFieldsQueryArgs($fieldQueryArgs)
+            ->setSiteId($this->site ? $this->site->id() : null);
 
         $querier = $this->searchConfig->searchEngine()->querier();
         return $querier
@@ -1241,6 +1242,12 @@ class MainSearchForm extends Form
         // The select and module Search Solr use term by default,
         // but the internal adapter manages terms automatically.
         // TODO Clarify name for the list of values for resource class for internal.
+
+        $args = ['used' => true];
+        if ($this->site) {
+            $args['site_id'] = $this->site->id();
+        }
+
         /** @var \Omeka\Form\Element\ResourceClassSelect $element */
         $element = $this->formElementManager->get(OmekaElement\ResourceClassSelect::class);
         $element
@@ -1250,7 +1257,7 @@ class MainSearchForm extends Form
                 'empty_option' => '',
                 // TODO Manage list of resource classes by site.
                 'used_terms' => true,
-                'query' => ['used' => true],
+                'query' => $args,
                 'disable_group_by_vocabulary' => !$grouped,
             ]);
         return $element->getValueOptions();
@@ -1269,10 +1276,11 @@ class MainSearchForm extends Form
             $searchEngine = $this->searchConfig->searchEngine();
             $resourceTypes = $searchEngine->setting('resource_types');
         }
+        $args = $this->site ? ['site_id' => $this->site->id()] : [];
         $result = [];
         foreach ($resourceTypes ?: $resourceTypesDefault as $resourceType) {
             // Don't use array_merge because keys are numeric.
-            $result = array_replace($result, $this->api->search($resourceType, [], ['returnScalar' => 'title'])->getContent());
+            $result = array_replace($result, $this->api->search($resourceType, $args, ['returnScalar' => 'title'])->getContent());
         }
         return $result;
     }
@@ -1303,6 +1311,11 @@ class MainSearchForm extends Form
 
     protected function listResourceTemplates(bool $grouped = false): array
     {
+        $args = ['used' => true];
+        if ($this->site) {
+            $args['site_id'] = $this->site->id();
+        }
+
         /** @var \Omeka\Form\Element\ResourceTemplateSelect $element */
         $element = $this->formElementManager->get(OmekaElement\ResourceTemplateSelect::class);
         $element
@@ -1311,7 +1324,7 @@ class MainSearchForm extends Form
                 'empty_option' => '',
                 'disable_group_by_owner' => !$grouped,
                 'used' => true,
-                'query' => ['used' => true],
+                'query' => $args,
             ]);
         $values = $element->getValueOptions();
         if (!$this->siteSettings

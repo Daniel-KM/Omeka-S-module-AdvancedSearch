@@ -534,7 +534,7 @@ class MainSearchForm extends Form
     {
         $value = $filter['value'] ?? '';
         if (!is_scalar($value)) {
-            $value = json_serialize($value, 320);
+            $value = json_encode($value, 320);
         }
         $element = new Element\Hidden($filter['field']);
         $element

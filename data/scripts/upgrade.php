@@ -1957,3 +1957,10 @@ if (version_compare($oldVersion, '3.4.41', '<')) {
         $connection->executeStatement($sql, [json_encode($searchConfigSettings, 320), $id]);
     }
 }
+
+if (version_compare($oldVersion, '3.4.42', '<')) {
+    $message = new PsrMessage(
+        'It is now possible to limit filters and facets to the language of the site.' // @translate
+    );
+    $messenger->addSuccess($message);
+}

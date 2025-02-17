@@ -172,6 +172,13 @@ class SearchController extends AbstractActionController
             return $view;
         }
 
+        /** @see \Omeka\Mvc\Controller\Plugin\Paginator */
+        $this->paginator(
+            $response->getTotalResults(),
+            $response->getCurrentPage(),
+            $response->getPerPage()
+        );
+
         if ($isJsonQuery) {
             $searchEngineSettings = $searchConfig->searchEngine()->settings();
             $result = [];

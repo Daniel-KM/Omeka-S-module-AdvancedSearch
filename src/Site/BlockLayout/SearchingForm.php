@@ -161,6 +161,13 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
             if ($response->isSuccess()) {
                 $vars['query'] = $response->getQuery();
                 $vars['response'] = $response;
+                /** @var \Omeka\Mvc\Controller\Plugin\Paginator $paginator */
+                $paginator = $block->getServiceLocator()->get('ControllerPluginManager')->get('paginator');
+                $paginator(
+                    $response->getTotalResults(),
+                    $response->getCurrentPage(),
+                    $response->getPerPage()
+                );
             } else {
                 $msg = $response->getMessage();
                 if ($msg) {

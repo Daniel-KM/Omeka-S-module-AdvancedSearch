@@ -47,9 +47,19 @@ class AbstractFacet extends AbstractHelper
     protected $route = '';
 
     /**
+     * @var \Omeka\Api\Representation\SiteRepresentation
+     */
+    protected $site = null;
+
+    /**
      * @var int
      */
-    protected $siteId;
+    protected $siteId = null;
+
+    /**
+     * @var array
+     */
+    protected $siteLocales = [];
 
     /**
      * @var array
@@ -98,11 +108,17 @@ class AbstractFacet extends AbstractHelper
 
         $isSiteRequest = $plugins->get('status')->isSiteRequest();
         if ($isSiteRequest) {
-            $this->siteId = $plugins
-                ->get('Laminas\View\Helper\ViewModel')
+            $this->site = $plugins
+                ->get(\Laminas\View\Helper\ViewModel::class)
                 ->getRoot()
-                ->getVariable('site')
-                ->id();
+                ->getVariable('site');
+            $this->siteId = $this->site->id();
+            $locale = $plugins->get('siteSetting')('locale');
+            $this->siteLocales = array_unique([
+                $locale,
+                substr($locale, 0, 2),
+                null,
+            ]);
         }
 
         unset($this->queryBase['page']);
@@ -220,7 +236,7 @@ class AbstractFacet extends AbstractHelper
                 } catch (\Exception $e) {
                 }
                 return $resource
-                    ? (string) $resource->displayTitle()
+                    ? (string) $resource->displayTitle(null, $this->siteLocales)
                     // Manage the case where a resource was indexed but removed.
                     // In public side, the item set should belong to a site too.
                     : null;
@@ -289,7 +305,7 @@ class AbstractFacet extends AbstractHelper
                 }
                 $resource = $this->api->searchOne('resource_templates', ['label' => $value])->getContent();
                 return $resource
-                    ? $resource->label()
+                    ? $this->translate->__invoke($resource->label())
                     // Manage the case where a resource was indexed but removed.
                     : null;
 
@@ -323,7 +339,7 @@ class AbstractFacet extends AbstractHelper
                 /** @var \Omeka\Api\Representation\ItemSetRepresentation $resource */
                 $resource = $this->api->searchOne('item_sets', $data)->getContent();
                 return $resource
-                    ? (string) $resource->displayTitle()
+                    ? (string) $resource->displayTitle(null, $this->siteLocales)
                     // Manage the case where a resource was indexed but removed.
                     // In public side, the item set should belong to a site too.
                     : null;

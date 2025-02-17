@@ -91,6 +91,7 @@ class AbstractFacetTree extends AbstractFacet
             : 'resource.title';
 
         // TODO Use query builder.
+        // TODO Translate title.
         $sql = <<<SQL
 SELECT
     item_sets_tree_edge.item_set_id,

@@ -49,6 +49,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                     'data-placeholder' => 'Set field or index…', // @translate
                 ],
             ])
+
             ->add([
                 'name' => 'label',
                 'type' => Element\Text::class,
@@ -120,6 +121,72 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                     'class' => 'chosen-select',
                     'required' => false,
                     'data-placeholder' => 'Set filter type…', // @translate
+                ],
+            ])
+            ->add([
+                'name' => 'language_site',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Limit languages of filters (internal querier)', // @ŧranslate
+                    'value_options' => [
+                        '' => 'No limit', // @translate
+                        'site' => 'Limit filters to site language or empty language', // @ŧranslate
+                        'site_setting' => 'Use site setting "Filter values based on site locale"', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_language_site',
+                    'required' => false,
+                    'value' => '',
+                ],
+            ])
+            ->add([
+                'name' => 'languages',
+                'type' => CommonElement\ArrayText::class,
+                'options' => [
+                    'label' => 'Limit filters to specific languages (internal querier)', // @translate
+                    'info' => <<<'TXT'
+                        Use "|" to separate multiple languages. Use a trailing "|" for values without language. When fields with languages (like subjects) and fields without language (like date) are facets, the empty language must be set to get results.
+                        TXT, // @translate
+                    'value_separator' => '|',
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_languages',
+                    'placeholder' => 'fra|way|apy|',
+                ],
+            ])
+            ->add([
+                'name' => 'order',
+                'type' => CommonElement\OptionalSelect::class,
+                'options' => [
+                    'label' => 'Order', // @translate
+                    'value_options' => [
+                        'alphabetic asc' => 'Alphabetic (default)', // @ŧranslate
+                        'alphabetic desc' => 'Alphabetic descendant', // @ŧranslate
+                        'total desc' => 'Total', // @ŧranslate
+                        'total asc' => 'Total ascendant', // @ŧranslate
+                        'values asc' => 'Values (listed below)', // @ŧranslate
+                        'values desc' => 'Values descendant', // @ŧranslate
+                    ],
+                    'empty_option' => '',
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_order',
+                    'multiple' => false,
+                    'class' => 'chosen-select',
+                    'data-placeholder' => 'Select order…', // @translate
+                ],
+            ])
+            ->add([
+                'name' => 'limit',
+                'type' => Element\Number::class,
+                'options' => [
+                    'label' => 'Maximum number of filters', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_limit',
+                    'required' => false,
+                    'value' => '100',
                 ],
             ])
             ->add([

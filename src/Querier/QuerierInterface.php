@@ -60,6 +60,8 @@ interface QuerierInterface extends LoggerAwareInterface
     /**
      * Process a search query for lists, in particular to fill filters.
      *
+     * Options (languages, order, limit) may be appended to query args.
+     *
      * @return array Key-value pairs for name and label, generally the same.
      */
     public function queryValues(string $field): array;

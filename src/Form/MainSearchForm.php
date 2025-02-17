@@ -116,6 +116,11 @@ class MainSearchForm extends Form
     protected $site;
 
     /**
+     * @var int
+     */
+    protected $siteId;
+
+    /**
      * @var array
      */
     protected $elementAttributes = [];
@@ -759,7 +764,9 @@ class MainSearchForm extends Form
                     : CommonElement\OptionalSelect::class,
                 'options' => [
                     'label' => $filter['label'],
-                    'value_options' => $this->skipValues ? [] : $this->listItemSetsTree($filter['type'] !== 'MultiCheckbox'),
+                    'value_options' => $this->skipValues
+                        ? []
+                        : $this->listItemSetsTree($filter + ['grouped' => $filter['type'] !== 'MultiCheckbox']),
                     'empty_option' => '',
                 ] + $filter['options'],
                 'attributes' => [
@@ -791,6 +798,8 @@ class MainSearchForm extends Form
             // TODO Add a fallback for ThesaurusSelect.
             return null;
         }
+
+        // TODO Add languages.
 
         $filterOptions = $filter['options'];
         $thesaurusId = (int) ($filterOptions['thesaurus'] ?? $filter['thesaurus'] ?? 0);
@@ -856,7 +865,7 @@ class MainSearchForm extends Form
                     : CommonElement\OptionalSelect::class,
                 'options' => [
                     'label' => $filter['label'],
-                    'value_options' => $this->skipValues ? [] : $this->listOwners(),
+                    'value_options' => $this->skipValues ? [] : $this->listOwners($filter),
                     'empty_option' => '',
                 ] + $filter['options'],
                 'attributes' => [
@@ -890,7 +899,7 @@ class MainSearchForm extends Form
                     : CommonElement\OptionalSelect::class,
                 'options' => [
                     'label' => $filter['label'],
-                    'value_options' => $this->skipValues ? [] : $this->listSites(),
+                    'value_options' => $this->skipValues ? [] : $this->listSites($filter),
                     'empty_option' => '',
                 ] + $filter['options'],
                 'attributes' => [
@@ -917,9 +926,9 @@ class MainSearchForm extends Form
             'id' => 'search-classes',
         ]);
 
-        $grouped = $filter['type'] !== 'SelectFlat';
-        $valueOptions = $this->listResourceClasses($grouped);
-        $element = $grouped
+        $filter['grouped'] = $filter['type'] !== 'SelectFlat';
+        $valueOptions = $this->listResourceClasses($filter);
+        $element = $filter['grouped']
             ? $this->searchMultiSelectGroup($valueOptions)
             : $this->searchMultiSelectFlat($valueOptions);
 
@@ -941,9 +950,9 @@ class MainSearchForm extends Form
             'id' => 'search-templates',
         ]);
 
-        $grouped = $filter['type'] !== 'SelectFlat';
-        $valueOptions = $this->listResourceTemplates($grouped);
-        $element = $grouped
+        $filter['grouped'] = $filter['type'] !== 'SelectFlat';
+        $valueOptions = $this->listResourceTemplates($filter);
+        $element = $filter['grouped']
             ? $this->searchMultiSelectGroup($valueOptions)
             : $this->searchMultiSelectFlat($valueOptions);
 
@@ -972,7 +981,7 @@ class MainSearchForm extends Form
                     : CommonElement\OptionalSelect::class,
                 'options' => [
                     'label' => $filter['label'],
-                    'value_options' => $this->skipValues ? [] : $this->listItemSets($filter['type'] !== 'MultiCheckbox'),
+                    'value_options' => $this->skipValues ? [] : $this->listItemSets($filter + ['by_owner' => $filter['type'] !== 'MultiCheckbox']),
                     'empty_option' => '',
                 ] + $filter['options'],
                 'attributes' => [
@@ -1088,11 +1097,11 @@ class MainSearchForm extends Form
         switch ($nativeField) {
             case 'resource_name':
             case 'resource_type':
-                return $this->listResourceTypes();
+                return $this->listResourceTypes($filter);
 
             case 'id':
             case 'o:id':
-                return $this->listResourceIdTitles();
+                return $this->listResourceIdTitles($filter);
 
             case 'is_public':
             case 'o:is_public':
@@ -1104,7 +1113,7 @@ class MainSearchForm extends Form
             case 'item_set/o:id':
             case 'item_set_id':
             case 'o:item_set':
-                return $this->listItemSets();
+                return $this->listItemSets($filter);
 
             case 'owner/o:id':
             case 'owner_id':
@@ -1115,19 +1124,19 @@ class MainSearchForm extends Form
             case 'resource_class/o:term':
             case 'resource_class_id':
             case 'o:resource_class':
-                $grouped = in_array($filter['type'] ?? '', ['SelectGroup', 'MultiSelectGroup']);
-                return $this->listResourceClasses($grouped);
+                $filter['grouped'] = in_array($filter['type'] ?? '', ['SelectGroup', 'MultiSelectGroup']);
+                return $this->listResourceClasses($filter);
 
             case 'resource_template/o:id':
             case 'resource_template_id':
             case 'o:resource_template':
-                $grouped = in_array($filter['type'] ?? '', ['SelectGroup', 'MultiSelectGroup']);
-                return $this->listResourceTemplates($grouped);
+                $filter['grouped'] = in_array($filter['type'] ?? '', ['SelectGroup', 'MultiSelectGroup']);
+                return $this->listResourceTemplates($filter);
 
             case 'site/o:id':
             case 'site_id':
             case 'o:site':
-                return $this->listSites();
+                return $this->listSites($filter);
 
             case 'access':
                 // For now, there is a special type for access.
@@ -1140,7 +1149,8 @@ class MainSearchForm extends Form
 
             case 'item_sets_tree':
                 // For now, there is a special type for item sets tree.
-                return $this->listItemSetsTree(false);
+                $filter['grouped'] = false;
+                return $this->listItemSetsTree($filter);
                 break;
 
             case 'thesaurus':
@@ -1151,7 +1161,7 @@ class MainSearchForm extends Form
                     : [];
 
             default:
-                return $this->listValuesForField($field);
+                return $this->listValuesForField($field, $filter);
         }
     }
 
@@ -1189,17 +1199,36 @@ class MainSearchForm extends Form
 
     /**
      * Get an associative list of all unique values of a field.
+     *
+     * The options set in the filter override the options set in field query
+     * args, if any.
      */
-    protected function listValuesForField(string $field): array
+    protected function listValuesForField(string $field, array $filter = []): array
     {
+        $query = new Query();
+
         $aliases = $this->searchConfig->subSetting('index', 'aliases', []);
         $fieldQueryArgs = $this->searchConfig->subSetting('index', 'query_args', []);
 
-        $query = new Query();
+        $locales = $this->getFilterLanguages($filter);
+        if ($locales) {
+            $fieldQueryArgs[$field]['lang'] = $locales;
+        }
+
         $query
             ->setAliases($aliases)
             ->setFieldsQueryArgs($fieldQueryArgs)
-            ->setSiteId($this->site ? $this->site->id() : null);
+            ->setSiteId($this->siteId);
+
+        if (!empty($filter['order'])) {
+            $query
+                ->setSort($filter['order']);
+        }
+
+        if (!empty($filter['limit'])) {
+            $query
+                ->setLimitPage(1, (int) $filter['limit']);
+        }
 
         $querier = $this->searchConfig->searchEngine()->querier();
         return $querier
@@ -1207,13 +1236,22 @@ class MainSearchForm extends Form
             ->queryValues($field);
     }
 
-    protected function listItemSets($byOwner = false): array
+    protected function listItemSets(array $filter = []): array
     {
+        $args = [
+            'sort_by' => 'dcterms:title',
+            'sort_order' => 'asc',
+        ];
+
+        if (!empty($filter['limit'])) {
+            $args['limit'] = (int) $filter['limit'];
+        }
+
         /** @var \Omeka\Form\Element\ItemSetSelect $select */
         $select = $this->formElementManager->get(\Omeka\Form\Element\ItemSetSelect::class, []);
         if ($this->site) {
             $select->setOptions([
-                'query' => ['site_id' => $this->site->id(), 'sort_by' => 'dcterms:title', 'sort_order' => 'asc'],
+                'query' => ['site_id' => $this->siteId] + $args,
                 'disable_group_by_owner' => true,
             ]);
             // By default, sort is case sensitive. So use a case insensitive sort.
@@ -1221,30 +1259,42 @@ class MainSearchForm extends Form
             natcasesort($valueOptions);
         } else {
             $select->setOptions([
-                'query' => ['sort_by' => 'dcterms:title', 'sort_order' => 'asc'],
-                'disable_group_by_owner' => !$byOwner,
+                'query' => $args,
+                'disable_group_by_owner' => empty($filter['by_owner']),
             ]);
             $valueOptions = $select->getValueOptions();
         }
+
         return $valueOptions;
     }
 
-    protected function listOwners(): array
+    protected function listOwners(array $filter = []): array
     {
         /** @var \Omeka\Form\Element\UserSelect $select */
         $select = $this->formElementManager->get(\Omeka\Form\Element\UserSelect::class, []);
-        return $select->getValueOptions();
+        $values = $select->getValueOptions();
+        if (!empty($filter['limit'])) {
+            $values = array_slice($values, 0, $filter['limit'], true);
+        }
+        return $values;
     }
 
-    protected function listResourceClasses(bool $grouped = false): array
+    protected function listResourceClasses(array $filter = []): array
     {
         // The select and module Search Solr use term by default,
         // but the internal adapter manages terms automatically.
         // TODO Clarify name for the list of values for resource class for internal.
 
-        $args = ['used' => true];
+        $args = [
+            'used' => true,
+        ];
+
         if ($this->site) {
-            $args['site_id'] = $this->site->id();
+            $args['site_id'] = $this->siteId;
+        }
+
+        if (!empty($filter['limit'])) {
+            $args['limit'] = (int) $filter['limit'];
         }
 
         /** @var \Omeka\Form\Element\ResourceClassSelect $element */
@@ -1257,12 +1307,12 @@ class MainSearchForm extends Form
                 // TODO Manage list of resource classes by site.
                 'used_terms' => true,
                 'query' => $args,
-                'disable_group_by_vocabulary' => !$grouped,
+                'disable_group_by_vocabulary' => empty($filter['grouped']),
             ]);
         return $element->getValueOptions();
     }
 
-    protected function listResourceIdTitles(): array
+    protected function listResourceIdTitles(array $filter = []): array
     {
         // Option "returnScalar" is not available for resources in Omeka S v4.1.
         $resourceTypesDefault = [
@@ -1275,19 +1325,40 @@ class MainSearchForm extends Form
             $searchEngine = $this->searchConfig->searchEngine();
             $resourceTypes = $searchEngine->setting('resource_types');
         }
-        $args = $this->site ? ['site_id' => $this->site->id()] : [];
+
+        $isOldOmeka = version_compare(\Omeka\Module::VERSION, '4.2', '<');
+
+        $args = $this->site
+            ? ['site_id' => $this->siteId]
+            : [];
+
+        // Sort by title is not available in Omeka S v4.1.
+        if (!$isOldOmeka) {
+            $args['sort_by'] = 'title';
+            $args['sort_order'] = 'asc';
+        }
+
+        if (!empty($filter['limit'])) {
+            $args['limit'] = (int) $filter['limit'];
+        }
+
         $result = [];
         foreach ($resourceTypes ?: $resourceTypesDefault as $resourceType) {
             // Don't use array_merge because keys are numeric.
             $result = array_replace($result, $this->api->search($resourceType, $args, ['returnScalar' => 'title'])->getContent());
         }
+
+        if ($isOldOmeka) {
+            natcasesort($result);
+        }
+
         return $result;
     }
 
     /**
      * This resource list is mainly used for internal purpose.
      */
-    protected function listResourceTypes(): array
+    protected function listResourceTypes(array $filter = []): array
     {
         $types = [
             'resources' => 'Resources',
@@ -1308,11 +1379,15 @@ class MainSearchForm extends Form
             : ['resources'];
     }
 
-    protected function listResourceTemplates(bool $grouped = false): array
+    protected function listResourceTemplates(array $filter = []): array
     {
         $args = ['used' => true];
         if ($this->site) {
-            $args['site_id'] = $this->site->id();
+            $args['site_id'] = $this->siteId;
+        }
+
+        if (!empty($filter['limit'])) {
+            $args['limit'] = (int) $filter['limit'];
         }
 
         /** @var \Omeka\Form\Element\ResourceTemplateSelect $element */
@@ -1321,7 +1396,7 @@ class MainSearchForm extends Form
             ->setOptions([
                 'label' => ' ',
                 'empty_option' => '',
-                'disable_group_by_owner' => !$grouped,
+                'disable_group_by_owner' => empty($filter['grouped']),
                 'used' => true,
                 'query' => $args,
             ]);
@@ -1335,7 +1410,7 @@ class MainSearchForm extends Form
         if (!$appliedValues) {
             return $values;
         }
-        if (!$grouped) {
+        if (empty($filter['grouped'])) {
             return array_intersect_key($values, array_flip($appliedValues));
         }
         $result = [];
@@ -1349,22 +1424,27 @@ class MainSearchForm extends Form
         return $result;
     }
 
-    protected function listSites(): array
+    protected function listSites(array $filter = []): array
     {
         /** @var \Omeka\Form\Element\SiteSelect $select */
         $select = $this->formElementManager->get(\Omeka\Form\Element\SiteSelect::class, []);
-        return $select->setOption('disable_group_by_owner', true)->getValueOptions();
+        $values = $select->setOption('disable_group_by_owner', true)->getValueOptions();
+        natcasesort($values);
+        if (!empty($filter['limit'])) {
+            $values = array_slice($values, 0, $filter['limit'], true);
+        }
+        return $values;
     }
 
     /**
      * @todo Use form element itemSetsTreeSelect when exists (only a view helper for now).
      * @see \ItemSetsTree\ViewHelper\ItemSetsTreeSelect
      */
-    protected function listItemSetsTree($byOwner = false): array
+    protected function listItemSetsTree(array $filter = []): array
     {
         // Fallback when the module ItemSetsTree is not present.
         if (!$this->itemSetsTree) {
-            return $this->listItemSets($byOwner);
+            return $this->listItemSets($filter);
         }
 
         if ($this->formElementManager->has(\ItemSetsTree\Form\Element\ItemSetsTreeSelect::class)) {
@@ -1375,7 +1455,7 @@ class MainSearchForm extends Form
 
         $options = [];
         if ($this->site) {
-            $options['site_id'] = $this->site->id();
+            $options['site_id'] = $this->siteId;
         }
 
         $itemSetsTree = $this->itemSetsTree->getItemSetsTree(null, $options);
@@ -1399,6 +1479,29 @@ class MainSearchForm extends Form
         return array_column($valueOptions, 'label', 'value');
     }
 
+    protected function getFilterLanguages(array $filter): array
+    {
+        $languages = array_values($filter['languages'] ?? []);
+        if ($this->site
+            && !empty($filter['language_site'])
+            && ($filter['language_site'] === 'site'
+                || ($filter['language_site'] === 'site_setting' && $this->siteSettings->get('filter_locale_values', false, $this->siteId))
+            )
+        ) {
+            $locale = $this->siteSettings->get('locale', null, $this->siteId);
+            if ($locale) {
+                $locales = [
+                    $locale,
+                    substr($locale, 0, 2),
+                    // TODO It should be a null, but $resource->value() requires a string.
+                    '',
+                ];
+                $languages = array_unique(array_merge($locales, $languages));
+            }
+        }
+        return $languages;
+    }
+
     protected function getAvailableFields(): array
     {
         $adapter = $this->searchConfig ? $this->searchConfig->engineAdapter() : null;
@@ -1414,6 +1517,7 @@ class MainSearchForm extends Form
     public function setSite(?SiteRepresentation $site): self
     {
         $this->site = $site;
+        $this->siteId = $site ? $site->id() : null;
         return $this;
     }
 

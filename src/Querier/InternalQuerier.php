@@ -505,16 +505,19 @@ class InternalQuerier extends AbstractQuerier
             return [];
         }
 
+        /** @var \Doctrine\ORM\EntityManager $entityManager */
         $entityManager = $this->services->get('Omeka\EntityManager');
         $qb = $entityManager->createQueryBuilder();
         $expr = $qb->expr();
 
         // For example to list all authors that are a resource.
-        $fieldQueryArgs = $this->query ? $this->query->getFieldsQueryArgs() : [];
+        // TODO Manage custom vocabs with item set.
+        // TODO This usage of arg type is not standard and uncommon. Documentate it.
+        $fieldQueryArgs = $this->query ? $this->query->getFieldQueryArgs($field) : null;
         $isResourceQuery = $fieldQueryArgs
-            && isset($fieldQueryArgs[$field]['type'])
-            && isset($fieldQueryArgs[$fieldQueryArgs[$field]['type']])
-            && in_array($fieldQueryArgs[$fieldQueryArgs[$field]['type']], SearchResources::FIELD_QUERY['main_type']['resource']);
+            && isset($fieldQueryArgs['type'])
+            && isset($fieldQueryArgs[$fieldQueryArgs['type']])
+            && in_array($fieldQueryArgs[$fieldQueryArgs['type']], SearchResources::FIELD_QUERY['main_type']['resource']);
 
         if ($isResourceQuery) {
             $qb
@@ -522,11 +525,7 @@ class InternalQuerier extends AbstractQuerier
                 ->from(\Omeka\Entity\Value::class, 'value')
                 // This join allow to check visibility automatically too.
                 ->innerJoin(\Omeka\Entity\Item::class, 'resource', Join::WITH, $expr->eq('value.resource', 'resource'))
-                ->innerJoin(\Omeka\Entity\Item::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'))
-                ->andWhere($expr->in('value.property', ':properties'))
-                ->setParameter('properties', implode(',', $propertyIds))
-                ->groupBy('val')
-                ->orderBy('val', 'asc');
+                ->innerJoin(\Omeka\Entity\Item::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'));
         } else {
             $qb
                 ->select('COALESCE(value.value, valueResource.title, value.uri) AS val')
@@ -534,11 +533,30 @@ class InternalQuerier extends AbstractQuerier
                 // This join allow to check visibility automatically too.
                 ->innerJoin(\Omeka\Entity\Item::class, 'resource', Join::WITH, $expr->eq('value.resource', 'resource'))
                 // The values should be distinct for each type.
-                ->leftJoin(\Omeka\Entity\Item::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'))
-                ->andWhere($expr->in('value.property', ':properties'))
-                ->setParameter('properties', implode(',', $propertyIds))
-                ->groupBy('val')
-                ->orderBy('val', 'asc');
+                ->leftJoin(\Omeka\Entity\Item::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'));
+        }
+
+        if (!empty($fieldQueryArgs['lang'])) {
+            $fieldLangs = is_array($fieldQueryArgs['lang']) ? $fieldQueryArgs['lang'] : [$fieldQueryArgs['lang']];
+            if (in_array('', $fieldLangs)) {
+                $qb
+                    ->andWhere($expr->orX(
+                        $expr->isNull('value.lang'),
+                        $expr->in('value.lang', ':lang'))
+                    );
+            } else {
+                $qb
+                    ->andWhere($expr->in('value.lang', ':lang'));
+            }
+            $qb
+                ->setParameter('lang', $fieldLangs, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
+        }
+
+        if (!empty($fieldQueryArgs['datatype'])) {
+            $fieldDataTypes = is_array($fieldQueryArgs['datatype']) ? $fieldQueryArgs['datatype'] : [$fieldQueryArgs['datatype']];
+            $qb
+                ->andWhere($expr->in('value.type', ':datatype'))
+                ->setParameter('datatype', $fieldDataTypes, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
         }
 
         $siteId = $this->query->getSiteId();
@@ -549,6 +567,12 @@ class InternalQuerier extends AbstractQuerier
                 ->setParameter('site_id', $siteId);
             // TODO Manage settigns site_attachements_only. See ItemAdapter.
         }
+
+        $qb
+            ->andWhere($expr->in('value.property', ':properties'))
+            ->setParameter('properties', $propertyIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
+            ->groupBy('val')
+            ->orderBy('val', 'asc');
 
         $list = array_column($qb->getQuery()->getScalarResult(), 'val', 'val');
 

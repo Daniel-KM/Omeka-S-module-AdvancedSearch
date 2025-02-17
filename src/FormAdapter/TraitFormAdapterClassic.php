@@ -511,6 +511,7 @@ trait TraitFormAdapterClassic
          * @var \Laminas\ServiceManager\ServiceLocatorInterface $services
          * @var \Laminas\Log\Logger $logger
          * @var \Laminas\I18n\Translator\Translator $translator
+         * @var \Omeka\Settings\SiteSettings $siteSettings
          * @var \Omeka\Settings\FallbackSettings $fallbackSettings
          * @var \Omeka\Mvc\Controller\Plugin\UserIsAllowed $userIsAllowed
          * @var \AdvancedSearch\FormAdapter\FormAdapterInterface $formAdapter
@@ -522,6 +523,7 @@ trait TraitFormAdapterClassic
         $translator = $services->get('MvcTranslator');
         $userIsAllowed = $plugins->get('userIsAllowed');
         $fallbackSettings = $services->get('Omeka\Settings\Fallback');
+        $siteSettings = $site ? $services->get('Omeka\Settings\Site') : null;
 
         $response = new Response();
 
@@ -715,6 +717,18 @@ trait TraitFormAdapterClassic
                 'display_count' => false,
             ];
             foreach ($searchConfigSettings['facet']['facets'] as &$facetConfig) {
+                if ($site && !empty($facetConfig['language_site'])) {
+                    $locale = $siteSettings->get('locale', null, $site->id());
+                    if ($locale) {
+                        $locales = [
+                            $locale,
+                            substr($locale, 0, 2),
+                            // TODO It should be a null, but $resource->value() requires a string.
+                            '',
+                        ];
+                        $facetConfig['languages'] = array_unique(array_merge($locales, array_values($facetConfig['languages'] ?? [])));
+                    }
+                }
                 $facetConfig += $facetConfigDefault;
             }
             unset($facetConfig);

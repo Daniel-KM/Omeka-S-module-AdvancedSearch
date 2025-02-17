@@ -48,6 +48,17 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
             ])
 
             ->add([
+                'name' => 'language_site',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Limit facets to site language or empty language', // @ŧranslate
+                ],
+                'attributes' => [
+                    'id' => 'facet_language_site',
+                    'required' => false,
+                ],
+            ])
+            ->add([
                 'name' => 'languages',
                 'type' => CommonElement\ArrayText::class,
                 'options' => [
@@ -94,7 +105,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 'attributes' => [
                     'id' => 'facet_limit',
                     'required' => false,
-                    'value' => '10',
+                    'value' => '100',
                 ],
             ])
 

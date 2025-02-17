@@ -225,7 +225,7 @@ class SearchConfigConfigureForm extends Form
                     'required' => false,
                     'placeholder' => <<<'STRING'
                         [title]
-                        type = list
+                        type = in
                         
                         [author]
                         type = res

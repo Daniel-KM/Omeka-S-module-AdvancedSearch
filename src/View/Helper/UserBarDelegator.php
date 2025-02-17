@@ -18,7 +18,7 @@ use Omeka\View\Helper\UserBar;
  * Copy:
  * @see \AdvancedSearch\View\Helper\UserBarDelegator
  * @see \Guest\View\Helper\UserBarDelegator
- * @see \GuestPrivateRole\View\Helper\UserBarDelegator
+ * @see \GuestPrivate\View\Helper\UserBarDelegator
  */
 class UserBarDelegator extends UserBar
 {

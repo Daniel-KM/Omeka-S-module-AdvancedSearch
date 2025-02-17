@@ -226,7 +226,7 @@ class MainSearchForm extends Form
 
             // Append options and attributes early to simplify process.
             // Options and attributes don't override the ones set here in form.
-            // Use a fake emtpy string in case to avoid issue with formLabel().
+            // Use a fake empty string in case to avoid issue with formLabel().
             $filter['label'] = ($filter['label'] ?? '') === '' ? ' ' : (string) $filter['label'];
             $filter['options'] ??= [];
             $filter['attributes'] = array_key_exists('attributes', $filter)

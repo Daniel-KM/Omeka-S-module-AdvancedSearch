@@ -14,6 +14,7 @@ class MvcListeners extends AbstractListenerAggregate
         $this->listeners[] = $events->attach(
             MvcEvent::EVENT_ROUTE,
             [$this, 'redirectItemSetToSearch'],
+            // More prioritary than Block Plus.
             -10
         );
     }
@@ -21,6 +22,12 @@ class MvcListeners extends AbstractListenerAggregate
     /**
      * Redirect item-set/show to the search page with item set set as url query,
      * when wanted.
+     *
+     * Furthermore, the items are reordered according to the option of module blockplus.
+     *
+     * Adapted:
+     * @see \AdvancedSearch\Mvc\MvcListeners::redirectItemSetToSearch()
+     * @see \BlockPlus\Mvc\MvcListeners::handleItemSetShow()
      */
     public function redirectItemSetToSearch(MvcEvent $event): void
     {
@@ -130,15 +137,17 @@ class MvcListeners extends AbstractListenerAggregate
         /** @see \Laminas\Stdlib\Parameters */
         $query = $event->getRequest()->getQuery();
         $query
-            ->set('item_set', ['id' => [$itemSetId]]);
+            ->set('item_set_id', $itemSetId);
 
-        // Manage order of items in item set for module Next.
-        // TODO Move the feature from module Next to here.
-        if (!empty($query['sort'])) {
+        // Don't process if an order is set.
+        // Check for module Advanced Search and Block Plus.
+        if (!empty($query['sort_by'])
+            || !empty($query['sort'])
+        ) {
             return;
         }
 
-        $orders = $siteSettings->get('next_items_order_for_itemsets');
+        $orders = $siteSettings->get('blockplus_items_order_for_itemsets');
         if (!$orders) {
             return;
         }

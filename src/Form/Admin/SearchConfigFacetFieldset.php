@@ -46,6 +46,58 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                     'required' => false,
                 ],
             ])
+
+            ->add([
+                'name' => 'languages',
+                'type' => CommonElement\ArrayText::class,
+                'options' => [
+                    'label' => 'Limit facets to specific languages', // @translate
+                    'info' => <<<'TXT'
+                        Generally, facets are translated in the view, but in some cases, facet values may be translated directly in a multivalued property. Use "|" to separate multiple languages. Use a trailing "|" for values without language. When fields with languages (like subjects) and fields without language (like date) are facets, the empty language must be set to get results.
+                        TXT, // @translate
+                    'value_separator' => '|',
+                ],
+                'attributes' => [
+                    'id' => 'facet_languages',
+                    'placeholder' => 'fra|way|apy|',
+                ],
+            ])
+
+            ->add([
+                'name' => 'order',
+                'type' => CommonElement\OptionalSelect::class,
+                'options' => [
+                    'label' => 'Order', // @translate
+                    'value_options' => [
+                        'alphabetic asc' => 'Alphabetic (default)', // @ŧranslate
+                        'alphabetic desc' => 'Alphabetic descendant', // @ŧranslate
+                        'total desc' => 'Total', // @ŧranslate
+                        'total asc' => 'Total ascendant', // @ŧranslate
+                        'values asc' => 'Values (listed below)', // @ŧranslate
+                        'values desc' => 'Values descendant', // @ŧranslate
+                    ],
+                    'empty_option' => '',
+                ],
+                'attributes' => [
+                    'id' => 'facet_order',
+                    'multiple' => false,
+                    'class' => 'chosen-select',
+                    'data-placeholder' => 'Select order…', // @translate
+                ],
+            ])
+            ->add([
+                'name' => 'limit',
+                'type' => Element\Number::class,
+                'options' => [
+                    'label' => 'Maximum number of facets', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'facet_limit',
+                    'required' => false,
+                    'value' => '10',
+                ],
+            ])
+
             ->add([
                 'name' => 'type',
                 'type' => Element\Select::class,
@@ -90,28 +142,6 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
             ])
 
             ->add([
-                'name' => 'order',
-                'type' => CommonElement\OptionalSelect::class,
-                'options' => [
-                    'label' => 'Order', // @translate
-                    'value_options' => [
-                        'alphabetic asc' => 'Alphabetic (default)', // @ŧranslate
-                        'alphabetic desc' => 'Alphabetic descendant', // @ŧranslate
-                        'total desc' => 'Total', // @ŧranslate
-                        'total asc' => 'Total ascendant', // @ŧranslate
-                        'values asc' => 'Values (listed below)', // @ŧranslate
-                        'values desc' => 'Values descendant', // @ŧranslate
-                    ],
-                    'empty_option' => '',
-                ],
-                'attributes' => [
-                    'id' => 'facet_order',
-                    'multiple' => false,
-                    'class' => 'chosen-select',
-                    'data-placeholder' => 'Select order…', // @translate
-                ],
-            ])
-            ->add([
                 'name' => 'state',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [
@@ -137,18 +167,6 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
                 'attributes' => [
                     'id' => 'facet_more',
-                    'required' => false,
-                    'value' => '10',
-                ],
-            ])
-            ->add([
-                'name' => 'limit',
-                'type' => Element\Number::class,
-                'options' => [
-                    'label' => 'Maximum number of facets', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'facet_limit',
                     'required' => false,
                     'value' => '10',
                 ],

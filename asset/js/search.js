@@ -492,6 +492,9 @@ var Search = (function() {
      * Keep hidden values.
      */
     self.smartClearForm = function(form) {
+        if (!form) {
+            return;
+        }
         // TODO Function reset() does not work on search form, only on facets form.
         typeof form.reset === 'function' ? form.reset() : $(form).trigger('reset');
         const elements = form.elements;
@@ -675,7 +678,8 @@ $(document).ready(function() {
      */
 
     $('#search-reset, #facets-reset').on('click', function () {
-        const form = $(this).closest('form')[0];
+        // The button may be outside the form.
+        const form = $(this)[0].form;
         Search.smartClearForm(form);
     });
 

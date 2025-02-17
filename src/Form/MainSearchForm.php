@@ -152,11 +152,13 @@ class MainSearchForm extends Form
         $hasVariant = in_array($this->variant, ['quick', 'simple', 'csrf']);
         $hasFormVariant = in_array($this->variant, ['quick', 'simple']);
 
+        $formId = 'form-search' . ($hasFormVariant ? '-' . $this->variant : '');
+
         // The id is different from the Omeka search to avoid issues in js. The
         // css should be adapted.
         $this
             ->setAttributes([
-                'id' => 'form-search',
+                'id' => $formId,
                 'class' => 'search-form form-search'
                     . ($hasFormVariant ? ' form-search-' . $this->variant : ''),
             ]);
@@ -182,7 +184,7 @@ class MainSearchForm extends Form
         // themes.
         $this->elementAttributes = empty($this->formSettings['form']['attribute_form'])
             ? []
-            : ['form' => 'form-search'];
+            : ['form' => $formId];
 
         // The main query is always the first element and submit the last one.
 

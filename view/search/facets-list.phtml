@@ -27,12 +27,12 @@ $facets = array_filter($facets);
 $isFacetModeButton = !in_array($searchConfig->subSetting('facet', 'mode'), ['link', 'js']);
 $displayActive = (bool) $searchConfig->subSetting('facet', 'display_active', true);
 $displayRefine = (bool) $searchConfig->subSetting('facet', 'display_refine', true);
-$labelRefine = $displayRefine ? $searchConfig->subSetting('facet', 'label_refine', $translate('Refine search')) : null;
+$labelRefine = $displayRefine ? $searchConfig->subSetting('facet', 'label_refine', 'Refine search') : null;
 $displayFacetButton = $isFacetModeButton && ($displayActive || !empty($facets));
 $displaySubmit = $displayFacetButton ? $searchConfig->subSetting('facet', 'display_submit', 'above') : 'none';
-$labelSubmit = $displaySubmit ? $searchConfig->subSetting('facet', 'label_submit', $translate('Apply facets')) : null;
+$labelSubmit = $displaySubmit ? $searchConfig->subSetting('facet', 'label_submit', 'Apply facets') : null;
 $displayReset = $searchConfig->subSetting('facet', 'display_reset', 'above');
-$labelReset = $displayReset ? $searchConfig->subSetting('facet', 'label_reset', $translate('Reset facets')) : null;
+$labelReset = $displayReset ? $searchConfig->subSetting('facet', 'label_reset', 'Reset facets') : null;
 
 $facetActives = $plugins->get('facetActives');
 $facetElements = $plugins->get('facetElements');
@@ -47,13 +47,13 @@ if (!empty($itemSet)) {
 
 <div id="search-facets" class="facets">
 
-    <?php if ($label = $searchConfig->subSetting('facet', 'label', $translate('Facets'))): ?>
-    <h3><?= $escape($label) ?></h3>
+    <?php if ($label = $searchConfig->subSetting('facet', 'label', 'Facets')): ?>
+    <h3><?= $escape($translate($label)) ?></h3>
     <?php endif; ?>
 
     <?php if ($displayActive && count($activeFacets)): ?>
-    <?php if ($label = $searchConfig->subSetting('facet', 'label_active_facets', $translate('Active facets'))): ?>
-    <h4><?= $escape($label) ?></h4>
+    <?php if ($label = $searchConfig->subSetting('facet', 'label_active_facets', 'Active facets')): ?>
+    <h4><?= $escape($translate($label)) ?></h4>
     <?php endif; ?>
     <?= $facetActives(null, $activeFacets, $searchConfig->setting('facet')) ?>
     <?php endif; ?>
@@ -69,10 +69,10 @@ if (!empty($itemSet)) {
         <?php if ($displayButtonReset || $displayButtonSubmit): ?>
         <div class="facets-actions facets-actions-top">
             <?php if ($displayButtonSubmit): ?>
-            <button id="facets-apply" class="button facets-apply" type="submit"><?= $escape($labelSubmit) ?></button>
+            <button id="facets-apply" class="button facets-apply" type="submit"><?= $escape($translate($labelSubmit)) ?></button>
             <?php endif; ?>
             <?php if ($displayButtonReset): ?>
-            <button id="facets-reset" class="button facets-reset" type="reset"><?= $escape($labelReset) ?></button>
+            <button id="facets-reset" class="button facets-reset" type="reset"><?= $escape($translate($labelReset)) ?></button>
             <?php endif; ?>
         </div>
         <?php endif; ?>
@@ -80,9 +80,9 @@ if (!empty($itemSet)) {
         <?php if ($displayRefine): ?>
         <div class="facets-refine">
             <?php if ($labelRefine): ?>
-            <h4><label for="search-refine"><?= $escape($labelRefine) ?></label></h4>
+            <h4><label for="search-refine"><?= $escape($translate($labelRefine)) ?></label></h4>
             <?php endif; ?>
-            <input id="search-refine" name="refine" class="search-refine" value="<?= $escape($query->getQueryRefine()) ?>"<?= $labelRefine ? ' data-placeholder="' . $escapeAttr($labelRefine) . '"' : '' ?>/>
+            <input id="search-refine" name="refine" class="search-refine" value="<?= $escape($query->getQueryRefine()) ?>"<?= $labelRefine ? ' data-placeholder="' . $escapeAttr($translate($labelRefine)) . '"' : '' ?>/>
             <?php if (!$displayButtonSubmit): ?>
             <button id="search-refine-submit" class="button search-refine" type="submit"><?= $escape($translate('Submit')) ?></button>
             <?php endif; ?>
@@ -90,8 +90,8 @@ if (!empty($itemSet)) {
         <?php endif; ?>
 
         <?php if (empty($facets) && empty($activeFacets)): ?>
-        <?php if ($label = $searchConfig->subSetting('facet', 'label_no_facets', $translate('No facets'))): ?>
-        <p><?= $escape($label) ?></p>
+        <?php if ($label = $searchConfig->subSetting('facet', 'label_no_facets', 'No facets')): ?>
+        <p><?= $escape($translate($label)) ?></p>
         <?php endif; ?>
         <?php else: ?>
         <ul class="facets-list">
@@ -123,10 +123,10 @@ if (!empty($itemSet)) {
         <?php if ($displayButtonReset || $displayButtonSubmit): ?>
         <div class="facets-actions facets-actions-bottom">
             <?php if ($displayButtonSubmit): ?>
-            <button id="facets-apply" class="button facets-apply" type="submit"><?= $escape($labelSubmit) ?></button>
+            <button id="facets-apply" class="button facets-apply" type="submit"><?= $escape($translate($labelSubmit)) ?></button>
             <?php endif; ?>
             <?php if ($displayButtonReset): ?>
-            <button id="facets-reset" class="button facets-reset" type="reset"><?= $escape($labelReset) ?></button>
+            <button id="facets-reset" class="button facets-reset" type="reset"><?= $escape($translate($labelReset)) ?></button>
             <?php endif; ?>
         </div>
         <?php endif; ?>

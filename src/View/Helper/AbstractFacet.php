@@ -117,7 +117,9 @@ class AbstractFacet extends AbstractHelper
             $this->siteLocales = array_unique([
                 $locale,
                 substr($locale, 0, 2),
-                null,
+                // It should be null, but it is deprecated in resource->value().
+                // null,
+                '',
             ]);
         }
 

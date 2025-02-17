@@ -157,7 +157,7 @@ $this->headScript()
 
         <div class="search-results-part search-results-list">
             <?php foreach (array_filter($response->getResourceTotalResults()) as $resourceType => $count): ?>
-            <h3><?= $escape(sprintf($translate('%1$d %2$s'), $count, $easyMeta->resourceLabelCount($resourceType, $count))) ?></h3>
+            <h3><?= $escape(sprintf($translate('%1$d %2$s'), $count, $translate($easyMeta->resourceLabelCount($resourceType, $count)))) ?></h3>
             <?= $partial('search/results', $variables + ['resourceType' => $resourceType]) ?>
             <?php endforeach; ?>
         </div>

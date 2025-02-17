@@ -514,6 +514,7 @@ var Search = (function() {
                     element.checked = false;
                     // Fix reset issue with some config.
                     $(element).prop('checked', false);
+                    $(element).removeAttr('checked');
                     break;
                 case 'select-one':
                 case 'select-multiple':

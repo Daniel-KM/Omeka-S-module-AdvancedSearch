@@ -11,7 +11,6 @@
 
 $plugins = $this->getHelperPluginManager();
 $translate = $plugins->get('translate');
-$translatePlural = $plugins->get('translatePlural');
 
 // Default values of the module.
 $displayParts = [
@@ -53,7 +52,7 @@ $multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['lis
 <?php if (isset($displayParts['total_results'])): ?>
 <div class="search-results-count-total">
     <?php $totalResults = $response->getTotalResults(); ?>
-    <?= sprintf($translatePlural('%s resource', '%s resources', $totalResults), $totalResults) ?>
+    <?= sprintf($totalResults <= 1 ? $translate('%s resource') : $translate('%s resources'), $totalResults) ?>
 </div>
 <?php endif; ?>
 

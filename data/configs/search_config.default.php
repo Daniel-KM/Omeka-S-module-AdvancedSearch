@@ -614,7 +614,7 @@ return [
             'facets' => [
                 'item_set_id' => [
                     'field' => 'item_set_id',
-                    'language_site' => false,
+                    'language_site' => '',
                     'languages' => [],
                     'order' => 'default',
                     'limit' => 100,
@@ -627,7 +627,7 @@ return [
                 ],
                 'resource_class_id' => [
                     'field' => 'resource_class_id',
-                    'language_site' => false,
+                    'language_site' => '',
                     'languages' => [],
                     'order' => 'default',
                     'limit' => 100,
@@ -640,7 +640,7 @@ return [
                 ],
                 'date' => [
                     'field' => 'date',
-                    'language_site' => false,
+                    'language_site' => '',
                     'languages' => [],
                     'order' => 'default',
                     'limit' => 100,
@@ -653,7 +653,7 @@ return [
                 ],
                 'dcterms:subject' => [
                     'field' => 'dcterms:subject',
-                    'language_site' => false,
+                    'language_site' => '',
                     'languages' => [],
                     'order' => 'default',
                     'limit' => 100,
@@ -666,7 +666,7 @@ return [
                 ],
                 'dcterms:type' => [
                     'field' => 'dcterms:type',
-                    'language_site' => false,
+                    'language_site' => '',
                     'languages' => [],
                     'order' => 'default',
                     'limit' => 100,
@@ -679,7 +679,7 @@ return [
                 ],
                 'author' => [
                     'field' => 'author',
-                    'language_site' => false,
+                    'language_site' => '',
                     'languages' => [],
                     'order' => 'default',
                     'limit' => 100,
@@ -692,7 +692,7 @@ return [
                 ],
                 'dcterms:language' => [
                     'field' => 'dcterms:language',
-                    'language_site' => false,
+                    'language_site' => '',
                     'languages' => [],
                     'order' => 'default',
                     'limit' => 100,

@@ -717,7 +717,12 @@ trait TraitFormAdapterClassic
                 'display_count' => false,
             ];
             foreach ($searchConfigSettings['facet']['facets'] as &$facetConfig) {
-                if ($site && !empty($facetConfig['language_site'])) {
+                if ($site
+                    && !empty($facetConfig['language_site'])
+                    && ($facetConfig['language_site'] === 'site'
+                        || ($facetConfig['language_site'] === 'site_setting' && $siteSettings->get('filter_locale_values', false, $site->id()))
+                    )
+                ) {
                     $locale = $siteSettings->get('locale', null, $site->id());
                     if ($locale) {
                         $locales = [

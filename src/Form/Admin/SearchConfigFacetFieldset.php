@@ -35,27 +35,22 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                     'data-placeholder' => 'Set field or index…', // @translate
                 ],
             ])
-            ->add([
-                'name' => 'label',
-                'type' => Element\Text::class,
-                'options' => [
-                    'label' => 'Label', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'form_facet_label',
-                    'required' => false,
-                ],
-            ])
 
             ->add([
                 'name' => 'language_site',
-                'type' => Element\Checkbox::class,
+                'type' => CommonElement\OptionalRadio::class,
                 'options' => [
-                    'label' => 'Limit facets to site language or empty language', // @ŧranslate
+                    'label' => 'Limit languages of facets', // @ŧranslate
+                    'value_options' => [
+                        '' => 'No limit', // @translate
+                        'site' => 'Limit facets to site language or empty language', // @ŧranslate
+                        'site_setting' => 'Use site setting "Filter values based on site locale"', // @translate
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'facet_language_site',
                     'required' => false,
+                    'value' => '',
                 ],
             ])
             ->add([
@@ -109,6 +104,17 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
             ])
 
+            ->add([
+                'name' => 'label',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Label', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'form_facet_label',
+                    'required' => false,
+                ],
+            ])
             ->add([
                 'name' => 'type',
                 'type' => Element\Select::class,
@@ -298,6 +304,9 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
     {
         return [
             'field' => [
+                'required' => false,
+            ],
+            'language_site' => [
                 'required' => false,
             ],
             'type' => [

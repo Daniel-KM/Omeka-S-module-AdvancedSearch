@@ -950,6 +950,7 @@ class SearchResources
                     . '/' . $queryRowProperty
                     . '/' . (empty($queryRow['except']) ? '' : serialize($queryRow['except']))
                     . '/' . (in_array($queryRow['type'], ['neq', 'nlist']) ? 'nlist' : 'list')
+                    . '/' . (empty($queryRow['lang']) ? '' : serialize($queryRow['lang']))
                     . '/' . (empty($queryRow['datatype']) ? '' : serialize($queryRow['datatype']))
                     . '/';
                 if (isset($shortProperties[$short])) {
@@ -965,6 +966,7 @@ class SearchResources
                     $shortProperties[$short]['except'] = $queryRow['except'] ?? '';
                     $shortProperties[$short]['type'] = $queryRow['type'];
                     $shortProperties[$short]['texts'] = is_array($queryRow['text']) ? array_values($queryRow['text']) : [$queryRow['text']];
+                    $shortProperties[$short]['lang'] = $queryRow['lang'] ?? '';
                     $shortProperties[$short]['datatype'] = $queryRow['datatype'] ?? '';
                     $shortProperties[$short]['total'] = 1;
                 }
@@ -996,6 +998,7 @@ class SearchResources
                 'except' => $shortProperty['except'],
                 'type' => $shortProperty['type'],
                 'text' => $shortProperty['texts'],
+                'lang' => $shortProperty['lang'],
                 'datatype' => $shortProperty['datatype'],
             ];
             $query['property'][$shortPropertyKey] = array_filter($propertyFilter, fn ($v) => $v !== null);
@@ -1127,6 +1130,7 @@ class SearchResources
                     . '/' . $queryRowFieldString
                     . '/' . (empty($queryRow['except']) ? '' : serialize($queryRow['except']))
                     . '/' . $queryRow['type']
+                    . '/' . (empty($queryRow['lang']) ? '' : serialize($queryRow['lang']))
                     . '/' . (empty($queryRow['datatype']) ? '' : serialize($queryRow['datatype']))
                     . '/';
                 if (isset($shortFilters[$short])) {
@@ -1142,6 +1146,7 @@ class SearchResources
                     $shortFilters[$short]['except'] = $queryRow['except'] ?? '';
                     $shortFilters[$short]['type'] = $queryRow['type'];
                     $shortFilters[$short]['vals'] = is_array($queryRow['val']) ? array_values($queryRow['val']) : [$queryRow['val']];
+                    $shortFilters[$short]['lang'] = $queryRow['lang'] ?? '';
                     $shortFilters[$short]['datatype'] = $queryRow['datatype'] ?? '';
                     $shortFilters[$short]['total'] = 1;
                 }
@@ -1170,6 +1175,7 @@ class SearchResources
                 'except' => $shortFilter['except'],
                 'type' => $shortFilter['type'],
                 'val' => $shortFilter['vals'],
+                'lang' => $shortFilter['lang'],
                 'datatype' => $shortFilter['datatype'],
             ];
             $query['filter'][$shortFilterKey] = array_filter($filter, fn ($v) => $v !== null);
@@ -1215,6 +1221,7 @@ class SearchResources
                     'except' => $this->searchIndex['query_args'][$field]['except'] ?? null,
                     'type' => $this->searchIndex['query_args'][$field]['type'] ?? $typeDefault,
                     'val' => $query['filter'][$key]['val'] ?? null,
+                    'lang' => $this->searchIndex['query_args'][$field]['lang'] ?? null,
                     'datatype' => $this->searchIndex['query_args'][$field]['datatype'] ?? null,
                     'label' => $this->searchIndex['form_filters_fields'][$field]
                         ?? $this->searchIndex['aliases'][$field]['label']
@@ -1240,6 +1247,7 @@ class SearchResources
                     'except' => $this->searchIndex['query_args'][$field]['except'] ?? null,
                     'type' => $this->searchIndex['query_args'][$field]['type'] ?? $typeDefault,
                     'val' => $value,
+                    'lang' => $this->searchIndex['query_args'][$field]['lang'] ?? null,
                     'datatype' => $this->searchIndex['query_args'][$field]['datatype'] ?? null,
                     // Label and next data  are kept for search filters.
                     'label' => $this->searchIndex['form_filters_fields'][$field]
@@ -1661,6 +1669,7 @@ class SearchResources
      * - property[{index}][except]: list of property IsD or terms to exclude
      * - property[{index}][type]: search type
      * - property[{index}][text]: search text or array of texts or values
+     * - property[{index}][lang]: filter on language(s)
      * - property[{index}][datatype]: filter on data type(s)
      *
      * @see self::buildQueryForRow() for details.
@@ -1694,6 +1703,7 @@ class SearchResources
             $except = $queryRow['except'] ?? null;
             $queryType = $queryRow['type'];
             $value = $queryRow['text'] ?? '';
+            $lang = $queryRow['lang'] ?? '';
             $dataType = $queryRow['datatype'] ?? '';
 
             $result = $this->buildQueryForRow(
@@ -1711,6 +1721,7 @@ class SearchResources
                     'except',
                     'queryType',
                     'value',
+                    'lang',
                     'dataType',
                     'isFilter'
                 ),
@@ -1757,6 +1768,7 @@ class SearchResources
      * - filter[{index}][except]: list of property IsD or terms to exclude
      * - filter[{index}][type]: search type
      * - filter[{index}][val]: search text or array of texts or values
+     * - filter[{index}][lang]: filter on language(s)
      * - filter[{index}][datatype]: filter on data type(s)
      *
      * @see self::buildQueryForRow() for details.
@@ -1790,6 +1802,7 @@ class SearchResources
             $except = $queryRow['except'] ?? null;
             $queryType = $queryRow['type'];
             $value = $queryRow['val'] ?? '';
+            $lang = $queryRow['lang'] ?? '';
             $dataType = $queryRow['datatype'] ?? '';
 
             $result = $this->buildQueryForRow(
@@ -1807,6 +1820,7 @@ class SearchResources
                     'except',
                     'queryType',
                     'value',
+                    'lang',
                     'dataType',
                     'isFilter'
                 ),
@@ -1970,7 +1984,8 @@ class SearchResources
          * @var array|string $except
          * @var string $queryType
          * @var mixed $value
-         * @var string $dataType
+         * @var array|string $lang
+         * @var array|string $dataType
          * @var bool $isFilter
          */
         extract($vars);
@@ -2694,6 +2709,23 @@ class SearchResources
         // Finalize predicate expression on subject values.
         if (in_array($queryType, self::FIELD_QUERY['value_subject'])) {
             $predicateExpr = $expr->in("$valuesAlias.resource", $subQb->getDQL());
+        }
+
+        if ($lang) {
+            if (!is_array($lang) || count($lang) <= 1) {
+                $langAlias = $this->adapter->createNamedParameter($qb, is_array($lang) ? reset($lang) : $lang);
+                $predicateExpr = $expr->andX(
+                    $predicateExpr,
+                    $expr->eq("$valuesAlias.lang", $langAlias)
+                );
+            } else {
+                $langAlias = $this->adapter->createAlias();
+                $qb->setParameter($langAlias, array_values($lang), Connection::PARAM_STR_ARRAY);
+                $predicateExpr = $expr->andX(
+                    $predicateExpr,
+                    $expr->in("$valuesAlias.lang", ':' . $langAlias)
+                );
+            }
         }
 
         if ($dataType) {

@@ -948,6 +948,7 @@ class InternalQuerier extends AbstractQuerier
                             'except' => $fieldQueryArgs['except'] ?? null,
                             'type' => $fieldQueryArgs['type'] ?? 'eq',
                             'val' => $flatArray($values),
+                            'lang' => $fieldQueryArgs['lang'] ?? null,
                             'datatype' => $fieldQueryArgs['datatype'] ?? null,
                         ];
                     } else {
@@ -1024,6 +1025,7 @@ class InternalQuerier extends AbstractQuerier
                                 'except' => $fieldQueryArgs['except'] ?? null,
                                 'type' => $fieldQueryArgs['type'] ?? 'eq',
                                 'val' => $value,
+                                'lang' => $fieldQueryArgs['lang'] ?? null,
                                 'datatype' => $fieldQueryArgs['datatype'] ?? null,
                             ];
                         } else {
@@ -1042,6 +1044,7 @@ class InternalQuerier extends AbstractQuerier
                                 'except' => $fieldQueryArgs['except'] ?? null,
                                 'type' => $fieldQueryArgs['type'] ?? 'eq',
                                 'val' => $value,
+                                'lang' => $fieldQueryArgs['lang'] ?? null,
                                 'datatype' => $fieldQueryArgs['datatype'] ?? null,
                             ];
                         } else {

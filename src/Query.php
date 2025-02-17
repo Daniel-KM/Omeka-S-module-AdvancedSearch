@@ -44,6 +44,11 @@ class Query implements JsonSerializable
     /**
      * @var string
      */
+    protected $queryDefaultField = '';
+
+    /**
+     * @var string
+     */
     protected $queryRefine = '';
 
     /**
@@ -169,6 +174,20 @@ class Query implements JsonSerializable
     public function getQuery(): string
     {
         return $this->query;
+    }
+
+    /**
+     * The query default field should be a string and is always trimmed.
+     */
+    public function setQueryDefaultField($queryDefaultField): self
+    {
+        $this->queryDefaultField = trim((string) $queryDefaultField);
+        return $this;
+    }
+
+    public function getQueryDefaultField(): string
+    {
+        return $this->queryDefaultField;
     }
 
     /**

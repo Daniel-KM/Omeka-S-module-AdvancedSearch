@@ -65,6 +65,7 @@ class SearchSuggesterForm extends Form
                     'id' => 'search_engine',
                     'readonly' => true,
                     'disabled' => true,
+                    'info' => 'For Solr, the suggester can be set in the config.', // @translate
                 ],
             ]);
 

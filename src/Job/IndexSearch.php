@@ -36,6 +36,14 @@ use Omeka\Job\AbstractJob;
 
 class IndexSearch extends AbstractJob
 {
+    /**
+     * The number of resources to index by step.
+     *
+     * Use a small number to avoid memory issues.
+     * In practice, a number of 1 reduces memory usage of 1% or 2%.
+     *
+     * @var int
+     */
     const BATCH_SIZE = 100;
 
     /**
@@ -58,7 +66,6 @@ class IndexSearch extends AbstractJob
         // the imported resources but only on the indexed resources.
         $entityManager = $this->getNewEntityManager($services->get('Omeka\EntityManager'));
 
-        $apiAdapters = $services->get('Omeka\ApiAdapterManager');
         $api = $services->get('Omeka\ApiManager');
         $this->logger = $services->get('Omeka\Logger');
         $translator = $services->get('MvcTranslator');
@@ -167,8 +174,6 @@ class IndexSearch extends AbstractJob
             );
         }
 
-        /** @var \Omeka\Entity\Resource[] $resources */
-        $resources = [];
         $totals = [];
         foreach ($resourceTypes as $resourceType) {
             if ($clearIndex) {
@@ -185,23 +190,31 @@ class IndexSearch extends AbstractJob
             }
 
             $totals[$resourceType] = 0;
-            $searchConfig = 1;
-            $entityClass = $apiAdapters->get($resourceType)->getEntityClass();
-            $dql = "SELECT resource FROM $entityClass resource";
-            $parameter = null;
+            $loop = 1;
+
+            $args = [
+                'sort_by' => 'id',
+                'sort_order' => 'asc',
+            ];
+
             if (count($resourceIds)) {
                 // The list of ids is cleaned above.
-                $dql .= ' WHERE resource.id IN (:resource_ids)';
-                $parameter = ['name' => 'resource_ids', 'bind' => $resourceIds, 'type' => \Doctrine\DBAL\Connection::PARAM_INT_ARRAY];
+                $args['id'] = $resourceIds;
             } elseif ($startResourceId) {
-                $dql .= ' WHERE resource.id >= :start_resource_id';
-                $parameter = ['name' => 'start_resource_id', 'bind' => $startResourceId, 'type' => \Doctrine\DBAL\ParameterType::INTEGER];
+                $ids = $api->search($resourceType, ['sort_by' => 'id', 'sort_order' => 'asc'], ['returnScalar' => 'id'])->getContent();
+                $ids = array_values(array_filter(array_keys($ids), fn ($id) => $id >= $startResourceId));
+                if (!$ids) {
+                    continue;
+                }
+                $args['id'] = $ids;
             }
             if ($visibility) {
-                $joiner = strpos($dql, ' WHERE ') ? ' AND' : ' WHERE';
-                $dql .= $joiner . ' resource.isPublic = ' . ($visibility === 'private' ? 0 : 1);
+                $args['is_public'] = $visibility === 'private' ? 0 : 1;
             }
-            $dql .= " ORDER BY resource.id ASC";
+
+            /** @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation[] $resources */
+            $resources = [];
+            $countResources = 0;
 
             do {
                 if ($this->shouldStop()) {
@@ -225,8 +238,8 @@ class IndexSearch extends AbstractJob
                             [
                                 'search_engine_id' => $searchEngine->id(),
                                 'name' => $searchEngine->name(),
-                                'resource_type' => $resource->getResourceName(),
-                                'resource_id' => $resource->getId(),
+                                'resource_type' => $resource->resourceName(),
+                                'resource_id' => $resource->id(),
                                 'results' => implode('; ', $totalResults),
                                 'duration' => (int) (microtime(true) - $timeStart),
                             ]
@@ -235,31 +248,35 @@ class IndexSearch extends AbstractJob
                     return;
                 }
 
-                // TODO Use doctrine large iterable data-processing? See https://www.doctrine-project.org/projects/doctrine-orm/en/latest/reference/batch-processing.html#iterating-large-results-for-data-processing
-                $offset = $batchSize * ($searchConfig - 1);
-                $qb = $entityManager
-                    ->createQuery($dql)
-                    ->setFirstResult($offset)
-                    ->setMaxResults($batchSize);
-                if ($parameter) {
-                    $qb
-                        ->setParameter($parameter['name'], $parameter['bind'], $parameter['type']);
-                }
-                /** @var \Omeka\Entity\Resource[] $resources */
-                $resources = $qb->getResult();
+                $offset = $batchSize * ($loop - 1);
+                $args['offset'] = $offset;
+                $args['limit'] = $batchSize;
+                $resources = $api->search($resourceType, $args)->getContent();
 
+                $countResources = count($resources);
                 $indexer->indexResources($resources);
 
-                ++$searchConfig;
-                $totals[$resourceType] += count($resources);
+                // Clear resources for memory usage.
+                // TODO Remove any part of the representation, in particular the values (25% of memory issue).
+                foreach ($resources as &$resource) {
+                    $resource = null;
+                }
+                unset($resources);
+
+                ++$loop;
+                $totals[$resourceType] += $countResources;
+
                 $entityManager->clear();
+
+                // Useless in practice and need some seconds.
+                // gc_collect_cycles();
 
                 // May avoid issue with some firewall/proxy limit with Solr.
                 if ($sleepAfterLoop) {
                     sleep($sleepAfterLoop);
                 }
 
-            } while (count($resources) === $batchSize);
+            } while ($countResources === $batchSize);
         }
 
         $totalResults = [];

@@ -777,9 +777,6 @@ trait TraitFormAdapterClassic
             $response->setFacetCounts($facetCounts);
         }
 
-        $totalResults = array_map(fn ($resource) => $response->getResourceTotalResults($resource), $searchEngineSettings['resource_types']);
-        $plugins->get('paginator')(max($totalResults), $query->getPage() ?: 1, $query->getPerPage());
-
         return $response
             ->setIsSuccess(true)
             ->setQuery($query);

@@ -25,6 +25,8 @@ class PaginationSearch extends Pagination
 
         $query = $view->params()->fromQuery();
 
+        // On an item set page, only one item set can be used.
+        // With the module Advanced Search, the name of the arg is "item_set".
         unset($query['item_set']);
 
         // Copy of parent method, except url.
@@ -49,7 +51,7 @@ class PaginationSearch extends Pagination
     }
 
     /**
-     * Unlike pagination, take care of pagination for item set.
+     * Unlike main helper pagination, take care of pagination for item set.
      *
      * {@inheritDoc}
      * @see \Omeka\View\Helper\Pagination::getPagelessUrl()
@@ -64,6 +66,8 @@ class PaginationSearch extends Pagination
 
         $query = $view->params()->fromQuery();
 
+        // On an item set page, only one item set can be used.
+        // With the module Advanced Search, the name of the arg is "item_set".
         unset($query['item_set']);
 
         // Copy of parent method, except url.

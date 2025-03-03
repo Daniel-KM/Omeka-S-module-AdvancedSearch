@@ -71,8 +71,8 @@ $displayFacets = $displayParts ? $displayParts['facets'] ?? 'before' : 'none';
 
 if ($itemSet && $site) {
     $redirectItemSets = $this->siteSetting('advancedsearch_redirect_itemsets', ['default' => 'browse']);
-    $redirectItemSet = $redirectItemSets[$itemSet ? $itemSet->id() : null] ?? $redirectItemSets['default'] ?? 'browse';
-    $displayItemSet = $redirectItemSet === 'all' || ($redirectItemSet === 'first' && $response->getCurrentPage() === 1);
+    $redirectItemSet = $redirectItemSets[$itemSet->id()] ?? $redirectItemSets['default'] ?? 'browse';
+    $displayItemSet = $redirectItemSet !== 'first' || $response->getCurrentPage() <= 1;
 } else {
     $displayItemSet = false;
 }

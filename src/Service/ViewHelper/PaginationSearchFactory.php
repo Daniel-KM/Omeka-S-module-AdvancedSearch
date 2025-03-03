@@ -18,8 +18,20 @@ class PaginationSearchFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
     {
+        // Warning: The service Paginator is not a shared service: each instance
+        // is a new one. Furthermore, the delegator SitePaginatorFactory is not
+        // declared in the main config and only used in Omeka MvcListeners().
+
+        // Here, the Paginator used in helper Pagination() is needed, not a new
+        // one.
+
+        /** @var \Omeka\View\Helper\Pagination $pagination */
+        $pagination = $services->get('ViewHelperManager')->get('pagination');
+        $paginator = $pagination->getPaginator();
+
         return new PaginationSearch(
-            $services->get('Omeka\Paginator')
+            // $services->get('Omeka\Paginator')
+            $paginator
         );
     }
 }

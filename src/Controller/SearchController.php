@@ -179,6 +179,10 @@ class SearchController extends AbstractActionController
             return $view;
         }
 
+        // Warning: The service Paginator is not a shared service: each instance
+        // is a new one. Furthermore, the delegator SitePaginatorFactory is not
+        // declared in the main config and only used in Omeka MvcListeners().
+
         /** @see \Omeka\Mvc\Controller\Plugin\Paginator */
         $this->paginator(
             $response->getTotalResults(),

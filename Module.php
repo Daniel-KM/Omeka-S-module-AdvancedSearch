@@ -313,6 +313,13 @@ class Module extends AbstractModule
             [$this, 'filterSearchFilters']
         );
 
+        // Append json-ld when enabled.
+        $sharedEventManager->attach(
+            \AdvancedSearch\Controller\SearchController::class,
+            'view.browse.after',
+            [$this, 'appendBrowseAfter']
+        );
+
         // Listeners for the indexing of items, item sets and media.
         // Let other modules to update data before indexing.
 
@@ -1130,6 +1137,31 @@ class Module extends AbstractModule
         }
 
         $this->isBatchUpdate = false;
+    }
+
+    /**
+     * @see \Omeka\Module::attachListeners().
+     */
+    public function appendBrowseAfter(Event $event): void
+    {
+        /**
+         * @var \Omeka\Mvc\Status $status
+         */
+        $services = $this->getServiceLocator();
+        $status = $services->get('Omeka\Status');
+        if (($status->isAdminRequest() && !$services->get('Omeka\Settings')->get('disable_jsonld_embed'))
+            || ($status->isSiteRequest() && !$services->get('Omeka\Settings\Site')->get('disable_jsonld_embed'))
+        ) {
+            /**
+             * @var \AdvancedSearch\Response $respoonse
+             * @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource
+             */
+            $view = $event->getTarget();
+            $response = $view->response;
+            foreach ($response->getResources() as $resource) {
+                echo $resource->embeddedJsonLd();
+            }
+        }
     }
 
     /**

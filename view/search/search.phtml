@@ -153,6 +153,8 @@ $this->headScript()
         </div>
         <?php endif; ?>
 
+        <?php $this->trigger('view.browse.before'); ?>
+
         <?php if ($documentCount): ?>
 
         <div class="search-results-part search-results-list">
@@ -180,6 +182,8 @@ $this->headScript()
         </div>
 
         <?php endif; ?>
+
+        <?php $this->trigger('view.browse.after'); ?>
 
         <?php if ($displayPartsFooter): ?>
         <div class="search-results-part search-results-footer">

@@ -679,7 +679,11 @@ class Module extends AbstractModule
     public function handleSiteSettings(Event $event): void
     {
         $this->handleAnySettings($event, 'site_settings');
+        $this->finalizeSiteSettings();
+    }
 
+    protected function finalizeSiteSettings()
+    {
         // Prepare a single setting with all values to simplify next checks.
         // Most of the time, the array contains only the default value and
         // sometime a few item sets.
@@ -687,10 +691,11 @@ class Module extends AbstractModule
         $services = $this->getServiceLocator();
         $siteSettings = $services->get('Omeka\Settings\Site');
 
-        $redirectBrowse = $siteSettings->get('advancedsearch_redirect_itemset_browse', ['all']) ?: [];
-        $redirectSearch = $siteSettings->get('advancedsearch_redirect_itemset_search', []) ?: [];
-        $redirectSearchFirst = $siteSettings->get('advancedsearch_redirect_itemset_search_first', []) ?: [];
-        $redirectPageUrl = $siteSettings->get('advancedsearch_redirect_itemset_page_url', []) ?: [];
+        // Don't set default early.
+        $redirectBrowse = $siteSettings->get('advancedsearch_redirect_itemset_browse') ?: [];
+        $redirectSearch = $siteSettings->get('advancedsearch_redirect_itemset_search') ?: [];
+        $redirectSearchFirst = $siteSettings->get('advancedsearch_redirect_itemset_search_first') ?: [];
+        $redirectPageUrl = $siteSettings->get('advancedsearch_redirect_itemset_page_url') ?: [];
         $redirectBrowse = array_fill_keys($redirectBrowse, 'browse');
         $redirectSearch = array_fill_keys($redirectSearch, 'search');
         $redirectSearchFirst = array_fill_keys($redirectSearchFirst, 'first');

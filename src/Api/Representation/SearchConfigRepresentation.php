@@ -135,6 +135,32 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         return null;
     }
 
+    /**
+     * @return \AdvancedSearch\Indexer\IndexerInterface|null Return null when
+     * there is no search engine, NoopIndexer when there is no indexer, or the
+     * real indexer.
+     */
+    public function indexer(): ?\AdvancedSearch\Indexer\IndexerInterface
+    {
+        $searchEngine = $this->searchEngine();
+        return $searchEngine
+            ? $searchEngine->indexer()
+            : null;
+    }
+
+    /**
+     * @return \AdvancedSearch\Querier\QuerierInterface|null Return null when
+     * there is no search engine, NoopQuerier when there is no querier, or the
+     * real querier.
+     */
+    public function querier(): ?\AdvancedSearch\Querier\QuerierInterface
+    {
+        $searchEngine = $this->searchEngine();
+        return $searchEngine
+            ? $searchEngine->querier()
+            : null;
+    }
+
     public function formAdapterName(): ?string
     {
         return $this->resource->getFormAdapter();

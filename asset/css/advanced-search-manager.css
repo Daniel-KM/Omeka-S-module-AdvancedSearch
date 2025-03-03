@@ -58,4 +58,8 @@
     .field-description.no-link + a {
         display: none;
     }
+
+    .setting-info {
+        font-size: smaller;
+    }
 }

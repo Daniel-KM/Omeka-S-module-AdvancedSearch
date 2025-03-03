@@ -72,7 +72,8 @@ class IndexSearch extends AbstractJob
         $clearIndex = (bool) $this->getArg('clear_index');
         $startResourceId = (int) $this->getArg('start_resource_id');
         $resourceIds = $this->getArg('resource_ids', []) ?: [];
-        $batchSize = abs((int) $this->getArg('resources_by_step')) ?: self::BATCH_SIZE;
+        $batchSize = abs((int) $this->getArg('resources_by_batch')) ?: self::BATCH_SIZE;
+        $sleepAfterLoop = abs((int) $this->getArg('sleep_after_loop')) ?: 0;
 
         /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation $searchEngine */
         $searchEngine = $api->read('search_engines', $searchEngineId)->getContent();
@@ -252,6 +253,12 @@ class IndexSearch extends AbstractJob
                 ++$searchConfig;
                 $totals[$resourceType] += count($resources);
                 $entityManager->clear();
+
+                // May avoid issue with some firewall/proxy limit with Solr.
+                if ($sleepAfterLoop) {
+                    sleep($sleepAfterLoop);
+                }
+
             } while (count($resources) === $batchSize);
         }
 

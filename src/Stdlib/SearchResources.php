@@ -3495,7 +3495,7 @@ class SearchResources
         if (in_array($month, [4, 6, 9, 11], true)) {
             return 30;
         } elseif ($month === 2) {
-            return date('L', mktime(0, 0, 0, 1, 1, $year)) ? 29 : 28;
+            return date('L', mktime(0, 0, 0, 1, 1, (int) $year)) ? 29 : 28;
         } else {
             return 31;
         }

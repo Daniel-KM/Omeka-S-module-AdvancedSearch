@@ -328,7 +328,7 @@ class SearchConfigConfigureForm extends Form
                     'type' => Element\Checkbox::class,
                     'options' => [
                         'label' => 'Partial word search for main field (instead of standard full text search)', // @translate
-                        'infos' => 'Currently, this mode does not allow to exclude properties for the main search field.', // @translate
+                        'info' => 'Currently, this mode does not allow to exclude properties for the main search field.', // @translate
                     ],
                     'attributes' => [
                         'id' => 'q_default_search_partial_word',
@@ -1042,7 +1042,7 @@ class SearchConfigConfigureForm extends Form
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [
                     'label' => 'List of facets', // @translate
-                    'infos' => 'With the internal search engine, the option "all facets" may be slow when there are facets and filters for item sets or sites.', // @translate
+                    'info' => 'With the internal search engine, the option "all facets" may be slow when there are facets and filters for item sets or sites.', // @translate
                     'value_options' => [
                         'available' => 'Available facets only', // @translate
                         'all' => 'All facets, even with 0 results (see info)', // @translate

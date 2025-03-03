@@ -155,8 +155,8 @@ class InternalQuerier extends AbstractQuerier
             $this->response->setTotalResults($totalResults);
         }
 
-        $this->response->setCurrentPage($limit ? 1 + (int) floor($offset / $limit) : 1);
-        $this->response->setPerPage($limit);
+        $this->response->setCurrentPage($this->query->getPage());
+        $this->response->setPerPage($this->query->getPerPage());
 
         // Remove specific results when settings are not by resource type.
         // TODO The order may be different when "resources" is not used.
@@ -670,6 +670,7 @@ class InternalQuerier extends AbstractQuerier
             $this->args['sort_order'] = $sortOrder === 'desc' ? 'desc' : 'asc';
         }
 
+        // Limit is per page and offset is page x limit.
         $limit = $this->query->getLimit();
         if ($limit) {
             $this->args['limit'] = $limit;

@@ -60,7 +60,8 @@ $this->htmlElement('body')->appendAttribute('class', 'search-admin resource brow
     <?php endif; ?>
 </div>
 
-<h2 id="table-caption-engines"><?= $translate('Search engines') ?></h2>
+<h3 id="table-caption-engines"><?= $translate('Search engines') ?></h3>
+
 <?php if (count($searchEngines) > 0): ?>
     <table aria-labelledby="table-caption-engines" class="tablesaw" data-tablesaw-mode="stack">
         <thead>
@@ -119,7 +120,8 @@ $this->htmlElement('body')->appendAttribute('class', 'search-admin resource brow
     <p><?= $translate('No search engines created yet.') ?></p>
 <?php endif; ?>
 
-<h2 id="table-caption-configs"><?= $translate('Page configs') ?></h2>
+<h3 id="table-caption-configs"><?= $translate('Page configs') ?></h3>
+
 <?php if (count($searchConfigs) > 0): ?>
     <table aria-labelledby="table-caption-configs" class="tablesaw" data-tablesaw-mode="stack">
         <thead>
@@ -179,7 +181,8 @@ $this->htmlElement('body')->appendAttribute('class', 'search-admin resource brow
     <p><?= $translate('No search page configs created yet.') ?></p>
 <?php endif; ?>
 
-<h2 id="table-caption-suggesters"><?= $translate('Suggesters') ?></h2>
+<h3 id="table-caption-suggesters"><?= $translate('Suggesters') ?></h3>
+
 <?php if (count($suggesters) > 0): ?>
     <table aria-labelledby="table-caption-suggesters" class="tablesaw" data-tablesaw-mode="stack">
         <thead>

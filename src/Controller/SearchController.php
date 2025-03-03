@@ -92,7 +92,7 @@ class SearchController extends AbstractActionController
         ]);
 
         $template = $isSiteRequest ? $searchConfig->subSetting('results', 'template') : null;
-        if ($template && $template !== 'search/search') {
+        if ($template) {
             $view->setTemplate($template);
         }
 

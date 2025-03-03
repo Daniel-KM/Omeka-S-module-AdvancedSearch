@@ -38,7 +38,7 @@ class MvcListeners extends AbstractListenerAggregate
 
         $routeMatch = $event->getRouteMatch();
         $matchedRouteName = $routeMatch->getMatchedRouteName();
-        if ('site/item-set' !== $matchedRouteName) {
+        if ($matchedRouteName !== 'site/item-set') {
             return;
         }
 

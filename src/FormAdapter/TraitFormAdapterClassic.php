@@ -621,9 +621,10 @@ trait TraitFormAdapterClassic
 
         // TODO Add a max per_page.
         $searchConfigSettings['results']['pagination_per_page'] = !empty($searchConfigSettings['results']['pagination_per_page'])
-            ? $searchConfigSettings['results']['pagination_per_page']
-            : $fallbackSettings->get('pagination_per_page', $site ? ['site', 'global'] : ['global'], Paginator::PER_PAGE);
+            ? (int) $searchConfigSettings['results']['pagination_per_page']
+            : (int) $fallbackSettings->get('pagination_per_page', $site ? ['site', 'global'] : ['global'], Paginator::PER_PAGE);
 
+        // TODO Clarify.
         $searchFormSettings['request']['per_page'] = $searchConfigSettings['results']['pagination_per_page'];
 
         // This is the main process done by this method.

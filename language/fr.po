@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-17 00:00+0000\n"
+"POT-Creation-Date: 2025-03-03 00:00+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
@@ -727,61 +727,61 @@ msgstr "Ajouter un suggéreur"
 msgid "Search engines"
 msgstr "Moteurs de recherche"
 
-#: view/advanced-search/admin/index/browse.phtml:69
+#: view/advanced-search/admin/index/browse.phtml:70
 msgid "Engine adapter"
 msgstr "Adaptateur du moteur"
 
-#: view/advanced-search/admin/index/browse.phtml:93
 #: view/advanced-search/admin/index/browse.phtml:94
+#: view/advanced-search/admin/index/browse.phtml:95
 msgid "No reindex for internal engine"
 msgstr "Pas de réindexation du moteur interne"
 
-#: view/advanced-search/admin/index/browse.phtml:99
 #: view/advanced-search/admin/index/browse.phtml:100
-#: view/advanced-search/admin/index/browse.phtml:218
-#: view/advanced-search/admin/index/browse.phtml:219
+#: view/advanced-search/admin/index/browse.phtml:101
+#: view/advanced-search/admin/index/browse.phtml:221
+#: view/advanced-search/admin/index/browse.phtml:222
 msgid "Reindex"
 msgstr "Réindexer"
 
-#: view/advanced-search/admin/index/browse.phtml:119
+#: view/advanced-search/admin/index/browse.phtml:120
 msgid "No search engines created yet."
 msgstr "Aucun moteur de recherche créé."
 
-#: view/advanced-search/admin/index/browse.phtml:122
+#: view/advanced-search/admin/index/browse.phtml:123
 msgid "Page configs"
 msgstr "Configuration des pages"
 
-#: view/advanced-search/admin/index/browse.phtml:129
-#: view/advanced-search/admin/index/browse.phtml:188
+#: view/advanced-search/admin/index/browse.phtml:131
+#: view/advanced-search/admin/index/browse.phtml:191
 msgid "Search engine"
 msgstr "Moteur de recherche"
 
-#: view/advanced-search/admin/index/browse.phtml:130
+#: view/advanced-search/admin/index/browse.phtml:132
 msgid "Form"
 msgstr "Formulaire"
 
-#: view/advanced-search/admin/index/browse.phtml:149
+#: view/advanced-search/admin/index/browse.phtml:151
 msgid "Configure facets and sort fields"
 msgstr "Configurer les facettes et les champs de tri"
 
-#: view/advanced-search/admin/index/browse.phtml:179
+#: view/advanced-search/admin/index/browse.phtml:181
 msgid "No search page configs created yet."
 msgstr "Aucune page de recherche n’a encore été configurée."
 
-#: view/advanced-search/admin/index/browse.phtml:182
+#: view/advanced-search/admin/index/browse.phtml:184
 msgid "Suggesters"
 msgstr "Suggéreurs"
 
-#: view/advanced-search/admin/index/browse.phtml:209
+#: view/advanced-search/admin/index/browse.phtml:212
 msgid "Edit disabled: search adapter not available"
 msgstr ""
 "Modification désactivée : l’adaptateur de recherche n’est pas disponible"
 
-#: view/advanced-search/admin/index/browse.phtml:222
+#: view/advanced-search/admin/index/browse.phtml:225
 msgid "Reindex disabled: search adapter does not support it."
 msgstr "Réindexation désactivée : l’adapteur ne le supporte pas."
 
-#: view/advanced-search/admin/index/browse.phtml:241
+#: view/advanced-search/admin/index/browse.phtml:244
 msgid "No search suggesters created yet."
 msgstr "Aucun suggéreur créé."
 
@@ -807,18 +807,22 @@ msgstr "Gérer la page de recherche"
 msgid "Edit search engine"
 msgstr "Modifier le moteur de recherche"
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:17
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:18
 #: view/advanced-search/admin/search-suggester/index-confirm.phtml:16
 msgid "Confirm reindex"
 msgstr "Confirmer la réindexation"
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:29
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:33
 #: view/advanced-search/admin/search-suggester/index-confirm.phtml:25
 #, php-format
 msgid "Reindex \"%s\""
 msgstr "Réindexer \"%s\""
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:31
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:35
+msgid "Clear index"
+msgstr "Effacer l’index"
+
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:37
 msgid ""
 "Clearing index will make the search unavailable during reindexation, but it "
 "avoids the rare cases where indexes of deleted resources were not removed."
@@ -827,68 +831,80 @@ msgstr ""
 "cela évite les rares cas où les ressources supprimées n’ont pas été "
 "supprimées dans l’index."
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:32
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:38
 msgid "You may redirect the users to a clone of the current index temporary."
 msgstr ""
 "Vous pouvez rediriger les utilisateurs sur un clone de l’index actuel "
 "temporairement."
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:34
-msgid "Clear index"
-msgstr "Effacer l’index"
-
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:37
-msgid "Set the first resource id to reindex."
-msgstr "Indiquer la première ressource à réindexer."
-
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:41
-msgid "Number of resources processed by loop."
-msgstr "Nombre de ressources à traiter par étape."
-
 #: view/advanced-search/admin/search-engine/index-confirm.phtml:42
+msgid "First resource id to reindex"
+msgstr "Première ressource à réindexer."
+
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:46
+msgid "Number of resources processed by batch"
+msgstr "Nombre de ressources à traiter par lot"
+
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:49
 msgid ""
 "This option slows reindexing and may avoid overload when records are big."
 msgstr ""
 "Cette option ralentit la réindexation et peut éviter une surcharge quand les "
 "notices sont grandes."
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:46
-msgid "You may want to limit the reindexing to a resource type."
-msgstr "Vous pouvez limiter l’indexation à un type de ressource."
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:53
+msgid "Sleep between batchs"
+msgstr "Pause entre les lots"
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:54
-msgid "You may want to limit the reindexing to a visibility."
-msgstr "Vous pouvez limiter l’indexation à une visibilité."
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:55
+msgid "seconds"
+msgstr "secondes"
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:56
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:57
+msgid ""
+"When there are many errors \"HTTP request failed\", increase this limit to "
+"10, 30, 60 seconds or check server."
+msgstr ""
+"Quand il y a plusieurs erreurs « HTTP request failed », augmentez cette "
+"limite à 10, 30 ou 60 secondes ou vérifiez le serveur."
+
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:61
+msgid "Limit indexing to a resource type"
+msgstr "Limiter l’indexation à un type de ressource"
+
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:69
+msgid "Limit indexing to a visibility"
+msgstr "Limiter l’indexation à une visibilité"
+
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:71
 msgid "Public and private"
 msgstr "Public et privé"
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:57
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:72
 msgid "Public only"
 msgstr "Public seulement"
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:58
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:73
 msgid "Private only"
 msgstr "Privé seulement"
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:64
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:79
 #: view/advanced-search/admin/search-suggester/index-confirm.phtml:41
 #, php-format
 msgid "%1$d running indexings: #%2$s."
 msgstr "%1$d indexations en cours : #%2$s."
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:65
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:80
 #: view/advanced-search/admin/search-suggester/index-confirm.phtml:42
 msgid "Force indexing"
 msgstr "Forcer la réindexation"
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:67
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:82
 #: view/advanced-search/admin/search-suggester/index-confirm.phtml:44
 msgid "No running indexing: process can be launched."
 msgstr "Pas d’indexation en cours : la tâche peut être lancée."
 
-#: view/advanced-search/admin/search-engine/index-confirm.phtml:73
+#: view/advanced-search/admin/search-engine/index-confirm.phtml:88
 #: view/advanced-search/admin/search-suggester/index-confirm.phtml:53
 msgid "This index has no resource type to index."
 msgstr "L’index n’a pas de type de ressource à indexer."
@@ -1117,20 +1133,20 @@ msgstr "Fil d’Ariane"
 msgid "Collections"
 msgstr "Collections"
 
-#: view/search/search.phtml:160
+#: view/search/search.phtml:162
 #, php-format
 msgid "%1$d %2$s"
 msgstr "%1$d %2$s"
 
-#: view/search/search.phtml:169
+#: view/search/search.phtml:171
 msgid "Fill a query and get results."
 msgstr "Faîtes une requête pour obtenir des résultats."
 
-#: view/search/search.phtml:171
+#: view/search/search.phtml:173
 msgid "This item set has no items."
 msgstr "Cette collection n’a pas de contenus."
 
-#: view/search/search.phtml:178
+#: view/search/search.phtml:180
 msgid "The query returned no results"
 msgstr "Votre recherche n'a retourné aucun résultat"
 
@@ -1838,6 +1854,15 @@ msgstr ""
 "Il est désormais possible de limiter les filtres et les facettes à la langue "
 "du site."
 
+#: data/scripts/upgrade.php:1972
+msgid ""
+"Json-ld data are appended to results when enabled. You may need to add "
+"triggers if the theme is customized."
+msgstr ""
+"Les métadonnées Json-ld sont désormais ajoutés aux résultats quand c’est "
+"activé. Des déclencheurs doivent être ajoutés dans le thème s’il a été "
+"personnalisé."
+
 #: Module.php:128
 msgid "The module {module} can be reenabled."
 msgstr "Le module {module} peut être réactivé."
@@ -1854,31 +1879,15 @@ msgstr ""
 "remplacée par l’élément « filter »{link_end}. Vérifier vos pages et "
 "paramètres. Sites identifiés : {json}"
 
-#: Module.php:1115
-msgid "Unable to batch index metadata for search engine \"{name}\": {message}"
-msgstr ""
-"Impossible d’indexer les métadonnées en lot pour le moteur de recherche "
-"« {name} » : {message}"
+#: Module.php:1175
+msgid "Unable to launch indexing metadata: {message}"
+msgstr "Impossible d’indexer les métadonnées : {message}"
 
-#: Module.php:1120
-msgid "Unable to batch update the search engine \"{name}\": see log."
-msgstr ""
-"Impossible de mettre à jour le moteur de recherche « {name} » : voir les "
-"journaux."
+#: Module.php:1179
+msgid "Unable to launch indexing metadata: see log."
+msgstr "Impossible d’indexer les métadonnées : voir les journaux."
 
-#: Module.php:1168
-msgid "Unable to launch index metadata for search engine \"{name}\": {message}"
-msgstr ""
-"Impossible d’indexer les métadonnées en lot pour le moteur de recherche "
-"« {name} » : {message}"
-
-#: Module.php:1172
-msgid "Unable to launch indexing for the search engine \"{name}\": see log."
-msgstr ""
-"Impossible de mettre à jour le moteur de recherche « {name} » : voir les "
-"journaux."
-
-#: Module.php:1270
+#: Module.php:1279
 msgid ""
 "Unable to delete the search index for resource #{resource_id} in search "
 "engine \"{name}\": {message}"
@@ -1886,7 +1895,7 @@ msgstr ""
 "Impossible de supprimer l’index de recherche pour la ressource "
 "#{resource_id} dans le moteur « {name} » : {message}"
 
-#: Module.php:1275
+#: Module.php:1284
 msgid ""
 "Unable to delete the search index for the deleted resource #{resource_id} in "
 "search engine \"{name}\": see log."
@@ -1894,7 +1903,7 @@ msgstr ""
 "Impossible de supprimer l’index de recherche pour la ressource supprimée "
 "#{resource_id} dans le moteur « {name} » : voir les journaux."
 
-#: Module.php:1301
+#: Module.php:1310
 msgid ""
 "Unable to index metadata of resource #{resource_id} for search in search "
 "engine \"{name}\": {message}"
@@ -1902,7 +1911,7 @@ msgstr ""
 "Impossible d’indexer les métadonnées de la ressource #{resource_id} dans le "
 "moteur « {name} » : {message}"
 
-#: Module.php:1306
+#: Module.php:1315
 msgid ""
 "Unable to update the search index for resource #{resource_id} in search "
 "engine \"{name}\": see log."
@@ -1910,7 +1919,7 @@ msgstr ""
 "Impossible de mettre à jour l’index pour la ressource #{resource_id} dans le "
 "moteur « {name} » : voir les journaux."
 
-#: Module.php:1542
+#: Module.php:1553
 msgid ""
 "The internal search engine (sql) can be edited in the {link_url}search "
 "manager{link_end}."
@@ -1918,11 +1927,11 @@ msgstr ""
 "Le moteur de recherche interne (sql) peut être configuré dans le menu "
 "{link_url}Moteurs de recherche{link_end}."
 
-#: Module.php:1564
+#: Module.php:1575
 msgid "Main index"
 msgstr "Index principal"
 
-#: Module.php:1578
+#: Module.php:1589
 msgid ""
 "The {link_url}internal suggester{link_end} (sql) will be available after "
 "indexation."
@@ -1930,7 +1939,7 @@ msgstr ""
 "Le {link_url}suggéreur interne{link_end} (sql) sera disponible après "
 "indexation."
 
-#: Module.php:1615
+#: Module.php:1626
 msgid ""
 "The default search config can be {link_1}edited{link_end}, {link_2}"
 "configured{link_end} and defined in the {link_3}main settings{link_end} for "
@@ -1974,7 +1983,7 @@ msgid "Presence of original file"
 msgstr "Présence d’un fichier original"
 
 #: view/common/advanced-search/has-original.phtml:16
-#: config/module.config.php:600
+#: config/module.config.php:598
 msgid "Has original file"
 msgstr "A un fichier original"
 
@@ -2069,7 +2078,7 @@ msgstr ""
 "La configuration de recherche « {search_config} » a un formulaire associé "
 "{form_adapter} indisponible."
 
-#: src/FormAdapter/TraitFormAdapterClassic.php:764
+#: src/FormAdapter/TraitFormAdapterClassic.php:765
 msgid ""
 "Query error: {message}\n"
 "Query: {json_query}"
@@ -2177,7 +2186,17 @@ msgstr "{count}/{total} valeurs traitées."
 msgid "End of process: {count}/{total} processed (index mode: {mode})."
 msgstr "Fin du process : {count}/{total} traitées (mode d’indexation : {mode})"
 
-#: src/Job/IndexSearch.php:85
+#: src/Job/IndexSearch.php:118
+msgid "No search engine is defined to be indexed."
+msgstr "Aucun moteur de recherche créé."
+
+#: src/Job/IndexSearch.php:140
+msgid "No search engine is defined to index the specified resource types."
+msgstr ""
+"Aucun moteur de recherche n’est défini pour indexer les types de ressources "
+"spécifiés."
+
+#: src/Job/IndexSearch.php:151
 msgid ""
 "Search index #{search_engine_id} (\"{name}\"): the list of resource ids "
 "contains invalid ids."
@@ -2185,15 +2204,7 @@ msgstr ""
 "Index de recherche #{search_engine_id} (« {name} ») : la liste des ids des "
 "ressources contient des ids incorrects."
 
-#: src/Job/IndexSearch.php:104
-msgid ""
-"Search index #{search_engine_id} (\"{name}\"): there is no resource type to "
-"index or the indexation is not needed."
-msgstr ""
-"Index de recherche #{search_engine_id} (« {name} ») : il n’y a aucun type de "
-"ressource à indexer ou l’indexation est inutile."
-
-#: src/Job/IndexSearch.php:116
+#: src/Job/IndexSearch.php:162
 msgid ""
 "Search index #{search_engine_id} (\"{name}\"): There are already {total} "
 "other jobs \"Index Search\" (#{list}) and the current one is not forced."
@@ -2201,7 +2212,7 @@ msgstr ""
 "Index de recherche #{search_engine_id} (« {name} ») : il y a déjà {total} "
 "autres tâches d’indexation (#{list}) et la tâche en cours n’a pas été forcée."
 
-#: src/Job/IndexSearch.php:127
+#: src/Job/IndexSearch.php:173
 msgid ""
 "There are already {total} other jobs \"Index Search\". Slowdowns may occur "
 "on the site."
@@ -2209,7 +2220,35 @@ msgstr ""
 "Il y a déjà {total} autres tâches « Indexation Recherche ». Cela peut "
 "ralentir le site."
 
-#: src/Job/IndexSearch.php:143
+#: src/Job/IndexSearch.php:185
+msgid "Reindexing starts at resource #{resource_id}."
+msgstr "La réindexation commence à partir de la ressource #{resource_id}."
+
+#: src/Job/IndexSearch.php:199
+msgid "Process done with the main entity manager"
+msgstr "Traitement réalisé avec le gestionnaire d’entités principal"
+
+#: src/Job/IndexSearch.php:204
+msgid "Process done with a new entity manager"
+msgstr "Traitement réalisé avec un gestionnaire d’entités spécifique"
+
+#: src/Job/IndexSearch.php:217
+msgid ""
+"End of indexing. Execution time: {duration} seconds. Failed indexed "
+"resources should be checked manually."
+msgstr ""
+"Fin de l’indexation. {results}. Temps d’exécution : {duration} secondes. Les "
+"problèmes d’indexation doivent être vérifiés manuellement."
+
+#: src/Job/IndexSearch.php:234
+msgid ""
+"Search index #{search_engine_id} (\"{name}\"): there is no resource type to "
+"index or the indexation is not needed."
+msgstr ""
+"Index de recherche #{search_engine_id} (« {name} ») : il n’y a aucun type de "
+"ressource à indexer ou l’indexation est inutile."
+
+#: src/Job/IndexSearch.php:251
 msgid ""
 "Search index #{search_engine_id} (\"{name}\"): Only {visibility} resources "
 "will be indexed."
@@ -2217,20 +2256,16 @@ msgstr ""
 "Index de recherche #{search_engine_id} (« {name} ») : seules les ressources "
 "« {visibility} » seront indexées."
 
-#: src/Job/IndexSearch.php:151
+#: src/Job/IndexSearch.php:259
 msgid "Search index #{search_engine_id} (\"{name}\"): start of indexing"
 msgstr ""
 "Index de recherche #{search_engine_id} (« {name} ») : début de l’indexation"
 
-#: src/Job/IndexSearch.php:157
+#: src/Job/IndexSearch.php:265
 msgid "Search index is fully cleared."
 msgstr "L’index de recherche a été entièrement supprimé."
 
-#: src/Job/IndexSearch.php:164
-msgid "Reindexing starts at resource #{resource_id}."
-msgstr "La réindexation commence à partir de la ressource #{resource_id}."
-
-#: src/Job/IndexSearch.php:209
+#: src/Job/IndexSearch.php:320
 msgid ""
 "Search index #{search_engine_id} (\"{name}\"): the indexing was stopped. "
 "Nothing was indexed."
@@ -2238,11 +2273,11 @@ msgstr ""
 "Index de recherche #{search_engine_id} (« {name} ») : l’indexation a été "
 "arrétée. Rien n’a été indexé."
 
-#: src/Job/IndexSearch.php:216 src/Job/IndexSearch.php:261
+#: src/Job/IndexSearch.php:327 src/Job/IndexSearch.php:378
 msgid "{resource_type}: {count} indexed"
 msgstr "{resource_type} : {count} indexées"
 
-#: src/Job/IndexSearch.php:223
+#: src/Job/IndexSearch.php:334
 msgid ""
 "Search index #{search_engine_id} (\"{name}\"): the indexing was stopped. "
 "Last indexed resource: {resource_type} #{resource_id}; {results}. Execution "
@@ -2252,7 +2287,7 @@ msgstr ""
 "arrêtée. Dernière ressource indexée : {resource_type} #{resource_id} ; "
 "{results}. Temps d’exécution : {duration} secondes."
 
-#: src/Job/IndexSearch.php:269
+#: src/Job/IndexSearch.php:386
 msgid ""
 "Search index #{search_engine_id} (\"{name}\"): end of indexing. {results}. "
 "Execution time: {duration} seconds. Failed indexed resources should be "
@@ -2355,30 +2390,6 @@ msgstr ""
 #: src/Form/SettingsFieldset.php:71
 msgid "Select the config for quick api search…"
 msgstr "Choisir la configuration pour la recherche api rapide…"
-
-#: src/Form/SettingsFieldset.php:83
-msgid "Indexing after a batch edit process"
-msgstr "Indexation après traitement en lot"
-
-#: src/Form/SettingsFieldset.php:84
-msgid "On some complex databases, an issue may occur after a batch process."
-msgstr "Certaines bases complexes crée un problème après un traitement en lot."
-
-#: src/Form/SettingsFieldset.php:85
-msgid "value_options"
-msgstr "value_options"
-
-#: src/Form/SettingsFieldset.php:88
-msgid "Synchronous"
-msgstr "Synchrone"
-
-#: src/Form/SettingsFieldset.php:89
-msgid "Asynchronous"
-msgstr "Asynchrone"
-
-#: src/Form/SettingsFieldset.php:90
-msgid "Integrated"
-msgstr "Intégré"
 
 #: src/Form/SearchFilter/Advanced.php:63
 msgid "or"
@@ -2578,21 +2589,10 @@ msgid "Limit facets to specific languages"
 msgstr "Limiter les filtres à certaines langues"
 
 #: src/Form/Admin/SearchConfigFacetFieldset.php:61
-msgid ""
-"Generally, facets are translated in the view, but in some cases, facet "
-"values may be translated directly in a multivalued property. Use \"|\" to "
-"separate multiple languages. Use a trailing \"|\" for values without "
-"language. When fields with languages (like subjects) and fields without "
-"language (like date) are facets, the empty language must be set to get "
-"results."
-msgstr ""
-"Généralement, les facettes sont traduites dans la vues, mais dans certains "
-"cas, les valeurs des facettes doivent être traduites directement dans une "
-"propriété multi-valeur. Utiliser \"|\" pour séparer plusieurs langues. "
-"Utiliser un \"|\" final pour les valeurs sans langue. Quand des champs avec "
-"langue (comme les sujets) et des facettes sans langues (comme les dates) "
-"sont des facettes, la langue vide doit être indiquée pour avoir des "
-"résultats."
+#: src/Form/Admin/SearchConfigFacetFieldset.php:207
+#: src/Form/Admin/SearchConfigFilterFieldset.php:148
+msgid "info"
+msgstr "info"
 
 #: src/Form/Admin/SearchConfigFacetFieldset.php:76
 #: src/Form/Admin/SearchConfigFilterFieldset.php:162
@@ -2618,29 +2618,9 @@ msgid "The type of facet that will be displayed in the search page."
 msgstr "Le type de facette qui sera affichée dans la page de recherche."
 
 #: src/Form/Admin/SearchConfigFacetFieldset.php:125
-msgid ""
-"#\"></a><div class=\"field-description no-link\">\n"
-"- Input types may be Checkbox (default), RangeDouble, Select, SelectRange, "
-"Thesaurus, Tree and specific templates for mode \"direct\" if wanted.\n"
-"- For \"RangeDouble\" and \"SelectRange\", the minimum and maximum should be "
-"set as \"min\" and \"max\", and \"step\" too.\n"
-"- With type \"Thesaurus\", the option \"thesaurus\" should be set with the "
-"id. It requires the module Thesaurus.\n"
-"- \"Tree\" can be used for item sets when module Item Sets Tree is enabled "
-"and data indexed recursively.\n"
-"</div><a href=\"#"
-msgstr ""
-"#\"></a><div class=\"field-description no-link\">\n"
-"- Les types d’entrée peuvent être Checkbox (par défaut), RangeDouble , "
-"Select, SelectRange, Thesaurus, Tree et des modèles spécifiques pour le mode "
-"« direct » si vous le souhaitez.\n"
-"- Pour « RangeDouble » et « SelectRange », le minimum et le maximum doivent "
-"être définis sur « min » et « max », ainsi que « step ».\n"
-"- Avec le type « Thesaurus », l’option « thesaurus » doit être définie avec "
-"l'’identifiant. Il nécessite le module Thésaurus.\n"
-"- « Tree » peut être utilisé pour les collections lorsque le module Item "
-"Sets Tree est activé et les données indexées de manière récursive.\n"
-"</div><a href=\"#"
+#: src/Form/Admin/SearchConfigFilterFieldset.php:71
+msgid "documentation"
+msgstr "documentation"
 
 #: src/Form/Admin/SearchConfigFacetFieldset.php:135
 msgid "Checkbox (default)"
@@ -2696,24 +2676,6 @@ msgstr "Afficher le total"
 #: src/Form/Admin/SearchConfigFacetFieldset.php:206
 msgid "Specific options"
 msgstr "Options spécifiques"
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:207
-msgid ""
-"List of specific options, in ini format, for example:\n"
-"`min = 1454`,\n"
-"`thesaurus =  151`,\n"
-"`languages = \"fra|way|apa|\"`,\n"
-"`data_types[] = \"valuesuggest:idref:person\"`,\n"
-"`main_types = \"resource\",\n"
-"`values[] = \"Alpha\"`."
-msgstr ""
-"Liste des options spécifiques, au format ini, par exemple :\n"
-"`min = 1454`,\n"
-"`thesaurus =  151`,\n"
-"`languages = \"fra|way|apa|\"`,\n"
-"`data_types[] = \"valuesuggest:idref:person\"`,\n"
-"`main_types = \"resource\",\n"
-"`values[] = \"Alpha\"`."
 
 #: src/Form/Admin/SearchConfigFacetFieldset.php:227
 msgid "List of specific attributes, in ini format."
@@ -3095,16 +3057,8 @@ msgstr ""
 "l’opérateur de jonction « sauf » est utilisé."
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:588
-msgid ""
-"eq = is exactly\n"
-"in = contains\n"
-"sw = starts with\n"
-"ew = ends with"
-msgstr ""
-"eq = est exactement\n"
-"in = contient\n"
-"sw = commence avec\n"
-"ew = finit par"
+msgid "placeholder"
+msgstr "joker"
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:601
 msgid ""
@@ -3388,78 +3342,6 @@ msgstr "Filtre avancé"
 msgid "The type of filter that will be displayed in the search form."
 msgstr "Le type de filtre qui sera affiché dans la page de recherche."
 
-#: src/Form/Admin/SearchConfigFilterFieldset.php:71
-msgid ""
-"#\"></a><div class=\"field-description no-link\">\n"
-"- The types are html input types: Text (default), Advanced (list of advanced "
-"filters), Checkbox, Hidden, Number, Radio, Range, RangeDouble, Select, "
-"SelectFlat, SelectGroup, MultiCheckbox, MultiSelect, MultiSelectFlat, "
-"MultiSelectGroup, MultiText, and, for modules, Access, Thesaurus, and Tree "
-"(item sets tree).\n"
-"- Text: the default html input field may be improved with an autosuggester. "
-"Enable it with option \"autosuggest\" and value \"true\". An external url "
-"can be set via attribute \"'data-autosuggest-url'.\"\n"
-"- Checkbox: the keys \"unchecked_value\" and \"checked_value\" allow to "
-"define a specific value to be returned.\n"
-"- Hidden: the value can be passed with key \"value\". If the value is not a "
-"scalar, it is serialized as json.\n"
-"- Number: the keys \"min\", \"max\" and \"step\" can be set as attributes, "
-"else they will be extracted from data. Of course, data should be numbers.\n"
-"- Range and RangeDouble allows to display a slider with one or two values. "
-"Min and max are extracted from data if not set as attributes.\n"
-"- For Number, Range and RangeDouble, \"first_digits\" can be set as option "
-"to extract the years from dates, but it is recommended to use an index with "
-"the year in that case to avoid strange results when casting and sorting non-"
-"normalized data.\n"
-"- MultiSelectFlat and SelectFlat may be used to be sure that values are "
-"flatten.\n"
-"- MultiSelectGroup and SelectGroup may be used for some specific fields that "
-"group options by default (resource classes, resource templates), in which "
-"case the options labels are removed.\n"
-"- Tree can be used for item sets when module ItemSetsTree is enabled and "
-"data indexed recursively.\n"
-"- For the types MultiCheckbox, Radio, Select, and derivatives, the values "
-"can be passed with the option \"value_options\", else the ones of the field "
-"will be used.\n"
-"</div><a href=\"#"
-msgstr ""
-"#\"></a><div class=\"field-description no-link\">\n"
-"- Les types sont des types d'entrée HTML : Text (par défaut), Advanced "
-"(liste des filtres avancés), Checkbox, Hidden, Number, Radio, Range, "
-"RangeDouble, Select, SelectFlat, SelectGroup, MultiCheckbox, MultiSelect, "
-"MultiSelectFlat, MultiSelectGroup, MultiText et , pour les modules Access, "
-"Thesaurus et Tree (arborescence des collections).\n"
-"- Text : le champ de saisie html par défaut peut être amélioré avec une "
-"suggestion automatique. Activez-le avec l’option « autosuggest » et la "
-"valeur « true ». Une URL externe peut être définie via l’attribut « data-"
-"autosuggest-url ».\n"
-"- Checkbox : les clés « unchecked_value » et « checked_value » permettent de "
-"définir une valeur spécifique à retourner.\n"
-"- Hidden : la valeur peut être passée avec la clé « value ». Si la valeur "
-"n’'est pas scalaire, elle est sérialisée au format json.\n"
-"- Number : les clés « min » et « max » et « step » peuvent être définies "
-"comme attributs, sinon elles seront extraites des données. Bien entendu, les "
-"données doivent être des chiffres.\n"
-"- Range et RangeDouble permettent d’afficher un curseur avec une ou deux "
-"valeurs. Min et max sont extraits des données s’ils ne sont pas définis "
-"comme attributs.\n"
-"- Pour Number, Range et RangeDouble, « first_digits » peut être défini comme "
-"option pour extraire les années des dates, mais il est recommandé d’utiliser "
-"un index avec l’année dans ce cas pour éviter des résultats étranges lors de "
-"la conversion et du tri de données non normalisées.\n"
-"- MultiSelectFlat et SelectFlat peuvent être utilisés pour s’assurer que les "
-"valeurs sont une liste plate.\n"
-"- MultiSelectGroup et SelectGroup peuvent être utilisés pour certains champs "
-"spécifiques qui regroupent les options par défaut (classes de ressources, "
-"modèles de ressources), auquel cas les étiquettes d’options sont "
-"supprimées.\n"
-"- L’arbre peut être utilisé pour les ensembles d’éléments lorsque le module "
-"ItemSetsTree est activé et les données indexées de manière récursive.\n"
-"- Pour les types MultiCheckbox, Radio, Select et dérivés, les valeurs "
-"peuvent être passées avec l’option « value_options », sinon celles du champ "
-"seront utilisées.\n"
-"</div><a href=\"#"
-
 #: src/Form/Admin/SearchConfigFilterFieldset.php:89
 msgid "Advanced filter (configured below)"
 msgstr "Filtre avancé (configuré ci-dessous)"
@@ -3527,18 +3409,6 @@ msgstr "Choisir un type de filtre…"
 #: src/Form/Admin/SearchConfigFilterFieldset.php:147
 msgid "Limit filters to specific languages (internal querier)"
 msgstr "Limiter les filtres à des langues spécifiques (moteur interne)"
-
-#: src/Form/Admin/SearchConfigFilterFieldset.php:148
-msgid ""
-"Use \"|\" to separate multiple languages. Use a trailing \"|\" for values "
-"without language. When fields with languages (like subjects) and fields "
-"without language (like date) are facets, the empty language must be set to "
-"get results."
-msgstr ""
-"Utiliser \"|\" pour séparer plusieurs langues. Utiliser un \"|\" final pour "
-"les valeurs sans langue. Quand des champs avec langue (comme les sujets) et "
-"des facettes sans langues (comme les dates) sont des facettes, la langue "
-"vide doit être indiquée pour avoir des résultats."
 
 #: src/Form/Admin/SearchConfigFilterFieldset.php:184
 msgid "Maximum number of filters"
@@ -3690,7 +3560,7 @@ msgid "The slug \"{search_slug}\" is already taken."
 msgstr "Le chemin « {search_slug} » est déjà utilisé."
 
 #: src/Api/Representation/SearchSuggesterRepresentation.php:175
-#: src/Api/Representation/SearchConfigRepresentation.php:511
+#: src/Api/Representation/SearchConfigRepresentation.php:537
 msgid ""
 "Query error: {message}\n"
 "Query:{query}"
@@ -3698,11 +3568,11 @@ msgstr ""
 "Erreur dans la requête : {message}\n"
 "Requête : {query}"
 
-#: src/Api/Representation/SearchConfigRepresentation.php:193
-#: src/Api/Representation/SearchConfigRepresentation.php:202
-#: src/Api/Representation/SearchConfigRepresentation.php:218
-#: src/Api/Representation/SearchConfigRepresentation.php:227
-#: src/Api/Representation/SearchConfigRepresentation.php:241
+#: src/Api/Representation/SearchConfigRepresentation.php:219
+#: src/Api/Representation/SearchConfigRepresentation.php:228
+#: src/Api/Representation/SearchConfigRepresentation.php:244
+#: src/Api/Representation/SearchConfigRepresentation.php:253
+#: src/Api/Representation/SearchConfigRepresentation.php:267
 msgid ""
 "The search config setting \"{old}\" was renamed \"{new}\". You should update "
 "your theme."
@@ -3710,15 +3580,15 @@ msgstr ""
 "Le paramètre de configuration de la recherche « {old} » a été renommé "
 "« {new} ». Vous devez mettre à jour votre thème."
 
-#: src/Api/Representation/SearchConfigRepresentation.php:401
+#: src/Api/Representation/SearchConfigRepresentation.php:427
 msgid "The search page \"{search_page}\" has no suggester."
 msgstr "La page de recherche « {search_page} » n’a pas de suggéreur."
 
-#: src/Api/Representation/SearchConfigRepresentation.php:414
+#: src/Api/Representation/SearchConfigRepresentation.php:440
 msgid "The search page \"{search_page}\" has no more suggester."
 msgstr "La page de recherche « {search_page} » n’a plus de suggéreur."
 
-#: src/Api/Representation/SearchConfigRepresentation.php:431
+#: src/Api/Representation/SearchConfigRepresentation.php:457
 msgid "The search page \"{search_page}\" has no search engine."
 msgstr ""
 "La page de recherche « {search_page} » n’a pas de moteur de recherche "
@@ -3789,7 +3659,11 @@ msgstr "L’index de recherche « {name} » a été configuré avec succès."
 msgid "Don’t forget to run the indexation of the search engine."
 msgstr "N’oubliez pas de lancer l’indexation du moteur de recherche."
 
-#: src/Controller/Admin/SearchEngineController.php:205
+#: src/Controller/Admin/SearchEngineController.php:204
+msgid "The search engine \"{name}\" has nothing to index."
+msgstr "Le moteur de recherche « {name} » n’a rien à indexer."
+
+#: src/Controller/Admin/SearchEngineController.php:227
 msgid ""
 "Indexing of \"{name}\" started in job {link_job}#{job_id}{link_end} "
 "({link_log}logs{link_end})."
@@ -3797,11 +3671,11 @@ msgstr ""
 "Indexation de « {name} » lancée dans la tâche {link_job}#{job_id}{link_end} "
 "({link_log}journaux{link_end})."
 
-#: src/Controller/Admin/SearchEngineController.php:249
+#: src/Controller/Admin/SearchEngineController.php:271
 msgid "Search index \"{name}\" successfully deleted"
 msgstr "L’index de recherche « {name} » a été supprimé"
 
-#: src/Controller/Admin/SearchEngineController.php:254
+#: src/Controller/Admin/SearchEngineController.php:276
 msgid "Search index \"{name}\" could not be deleted"
 msgstr "L’index de recherche « {name} » ne peut pas être supprimé"
 
@@ -3940,7 +3814,7 @@ msgstr ""
 "La configuration de recherche « {search_slug} » n’a pas de formulaire "
 "associé."
 
-#: src/Stdlib/SearchResources.php:620
+#: src/Stdlib/SearchResources.php:637
 msgid ""
 "The query arg \"property\" won’t support multiple properties in a future "
 "version, because it’s overriding the default behavior. Use arg \"filter\" "
@@ -3951,7 +3825,7 @@ msgstr ""
 "défaut. Utilisez l’argument « filter » à la place. Vérifiez vos requêtes : "
 "{url}"
 
-#: src/Stdlib/SearchResources.php:626
+#: src/Stdlib/SearchResources.php:643
 msgid ""
 "The query arg \"property\" won’t support type {type} in a future version, "
 "because it’s overriding the default behavior. Use arg \"filter\" instead. "
@@ -3961,7 +3835,7 @@ msgstr ""
 "dans une version future, car cela contourne le comportement par défaut. "
 "Utilisez l’argument « filter » à la place. Vérifiez vos requêtes : {url}"
 
-#: src/Stdlib/SearchResources.php:632
+#: src/Stdlib/SearchResources.php:649
 msgid ""
 "The query arg \"property\" won’t support multiple values in a future "
 "version, because it’s overriding the default behavior. Use arg \"filter\" "
@@ -4010,7 +3884,7 @@ msgstr ""
 "configuration ou le thème doivent être vérifiés pour l’interdire en amont. "
 "Requête : {query}"
 
-#: src/Querier/InternalQuerier.php:1351
+#: src/Querier/InternalQuerier.php:1352
 msgid "The field for the facet \"{name}\" is not set."
 msgstr "Le champ pour la facette « {name} » n’est pas défini."
 
@@ -4046,85 +3920,268 @@ msgstr ""
 "Essaie d’aligner les métadonnées et les propriétés qui ne le sont pas déjà "
 "avec les champs de l’'index"
 
-#: config/module.config.php:471
+#: config/module.config.php:469
 msgid "Properties *"
 msgstr "Propriétés *"
 
-#: config/module.config.php:485
+#: config/module.config.php:483
 msgid "Classes *"
 msgstr "Classes *"
 
-#: config/module.config.php:496
+#: config/module.config.php:494
 msgid "Templates *"
 msgstr "Modèles *"
 
-#: config/module.config.php:503
+#: config/module.config.php:501
 msgid "Templates (specific option \"restricted\")"
 msgstr "Modèles (option spécifique « restreint »)"
 
-#: config/module.config.php:515
+#: config/module.config.php:513
 msgid "Item sets *"
 msgstr "Collections *"
 
-#: config/module.config.php:521
+#: config/module.config.php:519
 msgid "default_site"
 msgstr "default_site"
 
-#: config/module.config.php:527
+#: config/module.config.php:525
 msgid "Site *"
 msgstr "Site *"
 
-#: config/module.config.php:534
+#: config/module.config.php:532
 msgid "Has media (select)"
 msgstr "A un média (sélecteur)"
 
-#: config/module.config.php:541
+#: config/module.config.php:539
 msgid "Has media (radio)"
 msgstr "A un média (radio)"
 
-#: config/module.config.php:551
+#: config/module.config.php:549
 msgid "Media type (single)"
 msgstr "Types de média (unique)"
 
-#: config/module.config.php:556
+#: config/module.config.php:554
 msgid "Media types *"
 msgstr "Types de média *"
 
-#: config/module.config.php:572
+#: config/module.config.php:570
 msgid "Owner *"
 msgstr "Propriétaire *"
 
-#: config/module.config.php:579
+#: config/module.config.php:577
 msgid "Visibility (select)"
 msgstr "Visibilité (sélecteur)"
 
-#: config/module.config.php:585
+#: config/module.config.php:583
 msgid "Visibility (radio)"
 msgstr "Visibilité (radio)"
 
-#: config/module.config.php:589
+#: config/module.config.php:587
 msgid "Id"
 msgstr "Id"
 
-#: config/module.config.php:595
+#: config/module.config.php:593
 msgid "Date time"
 msgstr "Date / heure"
 
-#: config/module.config.php:615
+#: config/module.config.php:613
 msgid "Has a specific asset"
 msgstr "A un fichier spécifique"
 
-#: config/module.config.php:622
+#: config/module.config.php:620
 msgid "Geography"
 msgstr "Géographie"
 
-#: config/module.config.php:628
+#: config/module.config.php:626
 msgid "Is dynamic item set"
 msgstr "Est une collection dynamique"
 
-#: config/module.config.php:638
+#: config/module.config.php:636
 msgid "Numeric"
 msgstr "Numérique"
+
+#~ msgid ""
+#~ "Unable to batch index metadata for search engine \"{name}\": {message}"
+#~ msgstr ""
+#~ "Impossible d’indexer les métadonnées en lot pour le moteur de recherche "
+#~ "« {name} » : {message}"
+
+#~ msgid "Unable to batch update the search engine \"{name}\": see log."
+#~ msgstr ""
+#~ "Impossible de mettre à jour le moteur de recherche « {name} » : voir les "
+#~ "journaux."
+
+#~ msgid "Indexing after a batch edit process"
+#~ msgstr "Indexation après traitement en lot"
+
+#~ msgid "On some complex databases, an issue may occur after a batch process."
+#~ msgstr ""
+#~ "Certaines bases complexes crée un problème après un traitement en lot."
+
+#~ msgid "value_options"
+#~ msgstr "value_options"
+
+#~ msgid "Synchronous"
+#~ msgstr "Synchrone"
+
+#~ msgid "Asynchronous"
+#~ msgstr "Asynchrone"
+
+#~ msgid "Integrated"
+#~ msgstr "Intégré"
+
+#~ msgid ""
+#~ "Generally, facets are translated in the view, but in some cases, facet "
+#~ "values may be translated directly in a multivalued property. Use \"|\" to "
+#~ "separate multiple languages. Use a trailing \"|\" for values without "
+#~ "language. When fields with languages (like subjects) and fields without "
+#~ "language (like date) are facets, the empty language must be set to get "
+#~ "results."
+#~ msgstr ""
+#~ "Généralement, les facettes sont traduites dans la vues, mais dans "
+#~ "certains cas, les valeurs des facettes doivent être traduites directement "
+#~ "dans une propriété multi-valeur. Utiliser \"|\" pour séparer plusieurs "
+#~ "langues. Utiliser un \"|\" final pour les valeurs sans langue. Quand des "
+#~ "champs avec langue (comme les sujets) et des facettes sans langues (comme "
+#~ "les dates) sont des facettes, la langue vide doit être indiquée pour "
+#~ "avoir des résultats."
+
+#~ msgid ""
+#~ "#\"></a><div class=\"field-description no-link\">\n"
+#~ "- Input types may be Checkbox (default), RangeDouble, Select, "
+#~ "SelectRange, Thesaurus, Tree and specific templates for mode \"direct\" "
+#~ "if wanted.\n"
+#~ "- For \"RangeDouble\" and \"SelectRange\", the minimum and maximum should "
+#~ "be set as \"min\" and \"max\", and \"step\" too.\n"
+#~ "- With type \"Thesaurus\", the option \"thesaurus\" should be set with "
+#~ "the id. It requires the module Thesaurus.\n"
+#~ "- \"Tree\" can be used for item sets when module Item Sets Tree is "
+#~ "enabled and data indexed recursively.\n"
+#~ "</div><a href=\"#"
+#~ msgstr ""
+#~ "#\"></a><div class=\"field-description no-link\">\n"
+#~ "- Les types d’entrée peuvent être Checkbox (par défaut), RangeDouble , "
+#~ "Select, SelectRange, Thesaurus, Tree et des modèles spécifiques pour le "
+#~ "mode « direct » si vous le souhaitez.\n"
+#~ "- Pour « RangeDouble » et « SelectRange », le minimum et le maximum "
+#~ "doivent être définis sur « min » et « max », ainsi que « step ».\n"
+#~ "- Avec le type « Thesaurus », l’option « thesaurus » doit être définie "
+#~ "avec l'’identifiant. Il nécessite le module Thésaurus.\n"
+#~ "- « Tree » peut être utilisé pour les collections lorsque le module Item "
+#~ "Sets Tree est activé et les données indexées de manière récursive.\n"
+#~ "</div><a href=\"#"
+
+#~ msgid ""
+#~ "List of specific options, in ini format, for example:\n"
+#~ "`min = 1454`,\n"
+#~ "`thesaurus =  151`,\n"
+#~ "`languages = \"fra|way|apa|\"`,\n"
+#~ "`data_types[] = \"valuesuggest:idref:person\"`,\n"
+#~ "`main_types = \"resource\",\n"
+#~ "`values[] = \"Alpha\"`."
+#~ msgstr ""
+#~ "Liste des options spécifiques, au format ini, par exemple :\n"
+#~ "`min = 1454`,\n"
+#~ "`thesaurus =  151`,\n"
+#~ "`languages = \"fra|way|apa|\"`,\n"
+#~ "`data_types[] = \"valuesuggest:idref:person\"`,\n"
+#~ "`main_types = \"resource\",\n"
+#~ "`values[] = \"Alpha\"`."
+
+#~ msgid ""
+#~ "eq = is exactly\n"
+#~ "in = contains\n"
+#~ "sw = starts with\n"
+#~ "ew = ends with"
+#~ msgstr ""
+#~ "eq = est exactement\n"
+#~ "in = contient\n"
+#~ "sw = commence avec\n"
+#~ "ew = finit par"
+
+#~ msgid ""
+#~ "#\"></a><div class=\"field-description no-link\">\n"
+#~ "- The types are html input types: Text (default), Advanced (list of "
+#~ "advanced filters), Checkbox, Hidden, Number, Radio, Range, RangeDouble, "
+#~ "Select, SelectFlat, SelectGroup, MultiCheckbox, MultiSelect, "
+#~ "MultiSelectFlat, MultiSelectGroup, MultiText, and, for modules, Access, "
+#~ "Thesaurus, and Tree (item sets tree).\n"
+#~ "- Text: the default html input field may be improved with an "
+#~ "autosuggester. Enable it with option \"autosuggest\" and value \"true\". "
+#~ "An external url can be set via attribute \"'data-autosuggest-url'.\"\n"
+#~ "- Checkbox: the keys \"unchecked_value\" and \"checked_value\" allow to "
+#~ "define a specific value to be returned.\n"
+#~ "- Hidden: the value can be passed with key \"value\". If the value is not "
+#~ "a scalar, it is serialized as json.\n"
+#~ "- Number: the keys \"min\", \"max\" and \"step\" can be set as "
+#~ "attributes, else they will be extracted from data. Of course, data should "
+#~ "be numbers.\n"
+#~ "- Range and RangeDouble allows to display a slider with one or two "
+#~ "values. Min and max are extracted from data if not set as attributes.\n"
+#~ "- For Number, Range and RangeDouble, \"first_digits\" can be set as "
+#~ "option to extract the years from dates, but it is recommended to use an "
+#~ "index with the year in that case to avoid strange results when casting "
+#~ "and sorting non-normalized data.\n"
+#~ "- MultiSelectFlat and SelectFlat may be used to be sure that values are "
+#~ "flatten.\n"
+#~ "- MultiSelectGroup and SelectGroup may be used for some specific fields "
+#~ "that group options by default (resource classes, resource templates), in "
+#~ "which case the options labels are removed.\n"
+#~ "- Tree can be used for item sets when module ItemSetsTree is enabled and "
+#~ "data indexed recursively.\n"
+#~ "- For the types MultiCheckbox, Radio, Select, and derivatives, the values "
+#~ "can be passed with the option \"value_options\", else the ones of the "
+#~ "field will be used.\n"
+#~ "</div><a href=\"#"
+#~ msgstr ""
+#~ "#\"></a><div class=\"field-description no-link\">\n"
+#~ "- Les types sont des types d'entrée HTML : Text (par défaut), Advanced "
+#~ "(liste des filtres avancés), Checkbox, Hidden, Number, Radio, Range, "
+#~ "RangeDouble, Select, SelectFlat, SelectGroup, MultiCheckbox, MultiSelect, "
+#~ "MultiSelectFlat, MultiSelectGroup, MultiText et , pour les modules "
+#~ "Access, Thesaurus et Tree (arborescence des collections).\n"
+#~ "- Text : le champ de saisie html par défaut peut être amélioré avec une "
+#~ "suggestion automatique. Activez-le avec l’option « autosuggest » et la "
+#~ "valeur « true ». Une URL externe peut être définie via l’attribut « data-"
+#~ "autosuggest-url ».\n"
+#~ "- Checkbox : les clés « unchecked_value » et « checked_value » permettent "
+#~ "de définir une valeur spécifique à retourner.\n"
+#~ "- Hidden : la valeur peut être passée avec la clé « value ». Si la valeur "
+#~ "n’'est pas scalaire, elle est sérialisée au format json.\n"
+#~ "- Number : les clés « min » et « max » et « step » peuvent être définies "
+#~ "comme attributs, sinon elles seront extraites des données. Bien entendu, "
+#~ "les données doivent être des chiffres.\n"
+#~ "- Range et RangeDouble permettent d’afficher un curseur avec une ou deux "
+#~ "valeurs. Min et max sont extraits des données s’ils ne sont pas définis "
+#~ "comme attributs.\n"
+#~ "- Pour Number, Range et RangeDouble, « first_digits » peut être défini "
+#~ "comme option pour extraire les années des dates, mais il est recommandé "
+#~ "d’utiliser un index avec l’année dans ce cas pour éviter des résultats "
+#~ "étranges lors de la conversion et du tri de données non normalisées.\n"
+#~ "- MultiSelectFlat et SelectFlat peuvent être utilisés pour s’assurer que "
+#~ "les valeurs sont une liste plate.\n"
+#~ "- MultiSelectGroup et SelectGroup peuvent être utilisés pour certains "
+#~ "champs spécifiques qui regroupent les options par défaut (classes de "
+#~ "ressources, modèles de ressources), auquel cas les étiquettes d’options "
+#~ "sont supprimées.\n"
+#~ "- L’arbre peut être utilisé pour les ensembles d’éléments lorsque le "
+#~ "module ItemSetsTree est activé et les données indexées de manière "
+#~ "récursive.\n"
+#~ "- Pour les types MultiCheckbox, Radio, Select et dérivés, les valeurs "
+#~ "peuvent être passées avec l’option « value_options », sinon celles du "
+#~ "champ seront utilisées.\n"
+#~ "</div><a href=\"#"
+
+#~ msgid ""
+#~ "Use \"|\" to separate multiple languages. Use a trailing \"|\" for values "
+#~ "without language. When fields with languages (like subjects) and fields "
+#~ "without language (like date) are facets, the empty language must be set "
+#~ "to get results."
+#~ msgstr ""
+#~ "Utiliser \"|\" pour séparer plusieurs langues. Utiliser un \"|\" final "
+#~ "pour les valeurs sans langue. Quand des champs avec langue (comme les "
+#~ "sujets) et des facettes sans langues (comme les dates) sont des facettes, "
+#~ "la langue vide doit être indiquée pour avoir des résultats."
 
 #~ msgid "Clear index before reindexation."
 #~ msgstr "Effacer l’index avant réindexation."

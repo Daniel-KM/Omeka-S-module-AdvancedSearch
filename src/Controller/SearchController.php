@@ -98,6 +98,13 @@ class SearchController extends AbstractActionController
 
         $request = $this->params()->fromQuery();
 
+        // On an item set page, only one item set can be used and the page
+        // should limit results to it.
+        // With the module Advanced Search, the name of the arg is "item_set".
+        if ($itemSet) {
+            $request['item_set'] = $itemSet->id();
+        }
+
         // The form may be empty for a direct query.
         $formAdapter = $searchConfig->formAdapter();
         $hasForm = $formAdapter ? (bool) $formAdapter->getFormClass() : false;

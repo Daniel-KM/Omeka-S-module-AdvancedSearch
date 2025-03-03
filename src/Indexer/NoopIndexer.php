@@ -6,7 +6,7 @@ use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
 use AdvancedSearch\Query;
 use Laminas\Log\LoggerAwareTrait;
 use Laminas\ServiceManager\ServiceLocatorInterface;
-use Omeka\Entity\Resource;
+use Omeka\Api\Representation\AbstractResourceRepresentation;
 
 class NoopIndexer implements IndexerInterface
 {
@@ -32,7 +32,7 @@ class NoopIndexer implements IndexerInterface
         return $this;
     }
 
-    public function indexResource(Resource $resource): self
+    public function indexResource(AbstractResourceRepresentation $resource): self
     {
         return $this;
     }

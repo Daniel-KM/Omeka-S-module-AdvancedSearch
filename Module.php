@@ -44,7 +44,7 @@ use Common\TraitModule;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
 use Laminas\Mvc\MvcEvent;
-use Omeka\Entity\Resource;
+use Omeka\Api\Representation\AbstractResourceRepresentation;
 use Omeka\Module\AbstractModule;
 
 class Module extends AbstractModule
@@ -1095,13 +1095,19 @@ class Module extends AbstractModule
             return;
         }
 
+        /**
+         * @var \Omeka\Api\Request $request
+         * @var \Omeka\Api\Response $response
+         * @var string $resourceType
+         */
+        $request = $event->getParam('request');
         $response = $event->getParam('response');
-        $resources = $response->getContent();
+        $resourceIds = $request->getIds();
         $resourceType = $request->getResource();
 
         // TODO Use async indexation when short batch edit and sync when background batch edit?
         if ($indexBatchEdit === 'sync' || $indexBatchEdit === 'async') {
-            $this->runJobIndexSearch($resourceType, $request->getIds(), $indexBatchEdit === 'sync');
+            $this->runJobIndexSearch($resourceType, $resourceIds, $indexBatchEdit === 'sync');
             return;
         }
 
@@ -1112,6 +1118,8 @@ class Module extends AbstractModule
         $api = $services->get('Omeka\ApiManager');
         $logger = $services->get('Omeka\Logger');
 
+        $resources = null;
+
         /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
         $searchEngines = $api->search('search_engines')->getContent();
         foreach ($searchEngines as $searchEngine) {
@@ -1119,7 +1127,11 @@ class Module extends AbstractModule
             if ($indexer->canIndex($resourceType)
                 && in_array($resourceType, $searchEngine->setting('resource_types', []))
             ) {
-                $resourcesToIndex = $this->filterVisibility($resources);
+                $resources ??= $api->search($resourceType, ['id' => $resourceIds])->getContent();
+                $resourcesToIndex = $this->filterVisibility($searchEngine, $resources);
+                if (!count($resourcesToIndex)) {
+                    continue;
+                }
                 try {
                     $indexer->indexResources($resourcesToIndex);
                 } catch (\Exception $e) {
@@ -1192,6 +1204,7 @@ class Module extends AbstractModule
             ) {
                 $jobArgs = [];
                 $jobArgs['search_engine_id'] = $searchEngine->id();
+                $jobArgs['clear_index'] = false;
                 $jobArgs['resource_ids'] = $ids;
                 $jobArgs['resource_types'] = [$resourceType];
                 // Most of the time, there is only one solr index.
@@ -1236,23 +1249,29 @@ class Module extends AbstractModule
         $services = $this->getServiceLocator();
         $api = $services->get('Omeka\ApiManager');
 
-        /** @var \Omeka\Api\Request $request */
+        /**
+         * @var \Omeka\Api\Request $request
+         * @var \Omeka\Api\Response $response
+         * @var string $resourceType
+         */
         $request = $event->getParam('request');
         $response = $event->getParam('response');
-        $requestResource = $request->getResource();
+        $resourceType = $request->getResource();
+
+        $resourceId = (int) $request->getId();
+        $representation = null;
 
         /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
         $searchEngines = $api->search('search_engines')->getContent();
         foreach ($searchEngines as $searchEngine) {
-            if ($searchEngine->indexer()->canIndex($requestResource)
-                && in_array($requestResource, $searchEngine->setting('resource_types', []))
+            if ($searchEngine->indexer()->canIndex($resourceType)
+                && in_array($resourceType, $searchEngine->setting('resource_types', []))
             ) {
                 if ($request->getOperation() === 'delete') {
-                    $id = $request->getId();
-                    $this->deleteIndexResource($searchEngine, $requestResource, $id);
+                    $this->deleteIndexResource($searchEngine, $resourceType, $resourceId);
                 } else {
-                    $resource = $response->getContent();
-                    $this->updateIndexResource($searchEngine, $resource);
+                    $representation ??= $api->read($resourceType, ['id' => $resourceId])->getContent();
+                    $this->updateIndexResource($searchEngine, $representation);
                 }
             }
         }
@@ -1272,10 +1291,9 @@ class Module extends AbstractModule
 
         $request = $event->getParam('request');
         $response = $event->getParam('response');
-        $itemId = $request->getValue('itemId');
-        $item = $itemId
-            ? $api->read('items', $itemId, [], ['responseContent' => 'resource'])->getContent()
-            : $response->getContent()->getItem();
+        $itemId = $request->getValue('itemId')
+            ?: $response->getContent()->getItem()->getId();
+        $item = $api->read('items', $itemId)->getContent();
 
         /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
         $searchEngines = $api->search('search_engines')->getContent();
@@ -1295,7 +1313,7 @@ class Module extends AbstractModule
      * @param string $resourceType
      * @param int $id
      */
-    protected function deleteIndexResource(SearchEngineRepresentation $searchEngine, $resourceType, $id): void
+    protected function deleteIndexResource(SearchEngineRepresentation $searchEngine, string $resourceType, int $id): void
     {
         $indexer = $searchEngine->indexer();
         try {
@@ -1319,9 +1337,9 @@ class Module extends AbstractModule
      * Update the index in search engine for a resource.
      *
      * @param SearchEngineRepresentation $searchEngine
-     * @param Resource $resource
+     * @param AbstractResourceRepresentation $resource
      */
-    protected function updateIndexResource(SearchEngineRepresentation $searchEngine, Resource $resource): void
+    protected function updateIndexResource(SearchEngineRepresentation $searchEngine, AbstractResourceRepresentation $resource): void
     {
         $resourceToIndex = $this->filterVisibility($searchEngine, [$resource]);
         if (!count($resourceToIndex)) {
@@ -1346,13 +1364,18 @@ class Module extends AbstractModule
         }
     }
 
+    /**
+     * @param SearchEngineRepresentation $searchEngine
+     * @param AbstractResourceRepresentation[] $resources
+     * @return array
+     */
     protected function filterVisibility(SearchEngineRepresentation $searchEngine, array $resources): array
     {
         $visibility = $searchEngine->setting('visibility');
         if (!in_array($visibility, ['public', 'private'])) {
             return $resources;
         }
-        /** @var \Omeka\Entity\Resource $resource */
+        /** @var \Omeka\Api\Representation\AbstractResourceRepresentation $resource */
         if ($visibility === 'private') {
             foreach ($resources as $key => $resource) {
                 if ($resource->isPublic()) {
@@ -1406,9 +1429,6 @@ class Module extends AbstractModule
             /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
             $searchConfig = $plugins->get('api')->read('search_configs', [is_numeric($searchConfig) ? 'id' : 'slug' => $searchConfig])->getContent();
         } catch (\Exception $e) {
-            return;
-        }
-        if (!$searchConfig) {
             return;
         }
 

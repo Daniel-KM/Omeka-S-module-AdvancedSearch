@@ -34,7 +34,7 @@ use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
 use AdvancedSearch\Query;
 use Laminas\Log\LoggerAwareInterface;
 use Laminas\ServiceManager\ServiceLocatorInterface;
-use Omeka\Entity\Resource;
+use Omeka\Api\Representation\AbstractResourceRepresentation;
 
 interface IndexerInterface extends LoggerAwareInterface
 {
@@ -63,12 +63,12 @@ interface IndexerInterface extends LoggerAwareInterface
     /**
      * Index a resource.
      */
-    public function indexResource(Resource $resource): self;
+    public function indexResource(AbstractResourceRepresentation $resource): self;
 
     /**
      * Index multiple resources.
      *
-     * @param Resource[] $resources
+     * @param AbstractResourceRepresentation[] $resources
      */
     public function indexResources(array $resources): self;
 

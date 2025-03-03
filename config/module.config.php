@@ -401,8 +401,6 @@ return [
             'advancedsearch_fulltextsearch_alto' => false,
             'advancedsearch_main_config' => 1,
             'advancedsearch_api_config' => '',
-            // TODO Remove this option if there is no issue with sync or async (except multiple search engines).
-            'advancedsearch_index_batch_edit' => 'sync',
             // Hidden value.
             'advancedsearch_all_configs' => [1 => 'find'],
         ],

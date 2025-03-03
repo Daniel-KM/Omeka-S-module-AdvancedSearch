@@ -1073,12 +1073,6 @@ class Module extends AbstractModule
             return;
         }
 
-        $settings = $this->getServiceLocator()->get('Omeka\Settings');
-        $indexBatchEdit = $settings->get('advancedsearch_index_batch_edit', 'sync');
-        if ($indexBatchEdit === 'none') {
-            return;
-        }
-
         /**
          * @var \Omeka\Api\Request $request
          * @var \Omeka\Api\Response $response
@@ -1105,47 +1099,9 @@ class Module extends AbstractModule
         $resourceIds = $request->getIds();
         $resourceType = $request->getResource();
 
-        // TODO Use async indexation when short batch edit and sync when background batch edit?
-        if ($indexBatchEdit === 'sync' || $indexBatchEdit === 'async') {
-            $this->runJobIndexSearch($resourceType, $resourceIds, $indexBatchEdit === 'sync');
-            return;
-        }
-
-        // Integrated indexation.
-        // TODO A doctrine issue "new entity was found" may occur when there are multiple linked resources.
-
-        $services = $this->getServiceLocator();
-        $api = $services->get('Omeka\ApiManager');
-        $logger = $services->get('Omeka\Logger');
-
-        $resources = null;
-
-        /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
-        $searchEngines = $api->search('search_engines')->getContent();
-        foreach ($searchEngines as $searchEngine) {
-            $indexer = $searchEngine->indexer();
-            if ($indexer->canIndex($resourceType)
-                && in_array($resourceType, $searchEngine->setting('resource_types', []))
-            ) {
-                $resources ??= $api->search($resourceType, ['id' => $resourceIds])->getContent();
-                $resourcesToIndex = $this->filterVisibility($searchEngine, $resources);
-                if (!count($resourcesToIndex)) {
-                    continue;
-                }
-                try {
-                    $indexer->indexResources($resourcesToIndex);
-                } catch (\Exception $e) {
-                    $logger->err(
-                        'Unable to batch index metadata for search engine "{name}": {message}', // @translate
-                        ['name' => $searchEngine->name(), 'message' => $e->getMessage()]
-                    );
-                    $messenger = $services->get('ControllerPluginManager')->get('messenger');
-                    $messenger->addWarning(new PsrMessage(
-                        'Unable to batch update the search engine "{name}": see log.', // @translate
-                        ['name' => $searchEngine->name()]
-                    ));
-                }
-            }
+        $resourceIds = array_values(array_filter(array_map('intval', $resourceIds)));
+        if ($resourceIds) {
+            $this->runJobIndexSearch($resourceType, $resourceIds);
         }
 
         $this->isBatchUpdate = false;
@@ -1179,51 +1135,54 @@ class Module extends AbstractModule
     /**
      * Adapted:
      * @see \AdvancedSearch\Controller\Admin\SearchEngineController::indexAction()
+     * @see \AdvancedSearch\Module::runJobIndexSearch()
      */
-    protected function runJobIndexSearch(string $resourceType, array $ids, bool $sync): void
+    protected function runJobIndexSearch(string $resourceType, array $ids): void
     {
-        $ids = array_filter(array_map('intval', $ids));
-        if (!$ids) {
-            return;
-        }
-
         $services = $this->getServiceLocator();
         $api = $services->get('Omeka\ApiManager');
-        $logger = $services->get('Omeka\Logger');
-        $messenger = $services->get('ControllerPluginManager')->get('messenger');
-        $jobDispatcher = $services->get('Omeka\Job\Dispatcher');
-        $strategy = $sync ? $services->get('Omeka\Job\DispatchStrategy\Synchronous') : null;
+
+        // There is a single job for all engines, so quick check if needed.
 
         /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
         $searchEngines = $api->search('search_engines')->getContent();
-        $first = true;
+        $searchEngineIds = [];
         foreach ($searchEngines as $searchEngine) {
             $indexer = $searchEngine->indexer();
             if ($indexer->canIndex($resourceType)
                 && in_array($resourceType, $searchEngine->setting('resource_types', []))
             ) {
-                $jobArgs = [];
-                $jobArgs['search_engine_id'] = $searchEngine->id();
-                $jobArgs['clear_index'] = false;
-                $jobArgs['resource_ids'] = $ids;
-                $jobArgs['resource_types'] = [$resourceType];
-                // Most of the time, there is only one solr index.
-                // TODO Improve indexing of multiple search engines after batch process.
-                $jobArgs['force'] = !$first;
-                try {
-                    $jobDispatcher->dispatch(\AdvancedSearch\Job\IndexSearch::class, $jobArgs, $strategy);
-                    $first = false;
-                } catch (\Exception $e) {
-                    $logger->err(
-                        'Unable to launch index metadata for search engine "{name}": {message}', // @translate
-                        ['name' => $searchEngine->name(), 'message' => $e->getMessage()]
-                    );
-                    $messenger->addWarning(new PsrMessage(
-                        'Unable to launch indexing for the search engine "{name}": see log.', // @translate
-                        ['name' => $searchEngine->name()]
-                    ));
-                }
+                $searchEngineIds[] = $searchEngine->id();
             }
+        }
+
+        if (!count($searchEngineIds)) {
+            return;
+        }
+
+        $logger = $services->get('Omeka\Logger');
+        $messenger = $services->get('ControllerPluginManager')->get('messenger');
+        $jobDispatcher = $services->get('Omeka\Job\Dispatcher');
+        // For testing purpose.
+        $sync = false;
+        $strategy = empty($sync) ? null : $services->get('Omeka\Job\DispatchStrategy\Synchronous');
+
+        $jobArgs = [];
+        $jobArgs['search_engine_ids'] = array_values(array_unique($searchEngineIds));
+        $jobArgs['clear_index'] = false;
+        $jobArgs['resource_ids'] = $ids;
+        $jobArgs['resource_types'] = [$resourceType];
+        $jobArgs['force'] = true;
+        try {
+            $jobDispatcher->dispatch(\AdvancedSearch\Job\IndexSearch::class, $jobArgs, $strategy);
+        } catch (\Exception $e) {
+            $logger->err(
+                'Unable to launch indexing metadata: {message}', // @translate
+                ['message' => $e->getMessage()]
+            );
+            $messenger->addWarning(new PsrMessage(
+                'Unable to launch indexing metadata: see log.' // @translate
+            ));
         }
     }
 

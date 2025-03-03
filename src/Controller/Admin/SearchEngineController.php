@@ -169,6 +169,7 @@ class SearchEngineController extends AbstractActionController
 
     /**
      * Adapted:
+     * @see \AdvancedSearch\Controller\Admin\SearchEngineController::indexAction()
      * @see \AdvancedSearch\Module::runJobIndexSearch()
      *
      * {@inheritDoc}
@@ -183,13 +184,32 @@ class SearchEngineController extends AbstractActionController
         $startResourceId = (int) $this->params()->fromPost('start_resource_id');
         $resourcesByBatch = (int) $this->params()->fromPost('resources_by_batch');
         $sleepAfterLoop = (int) $this->params()->fromPost('sleep_after_loop');
-        $resourceTypes = $this->params()->fromPost('resource_types') ?: [];
+        $resourceTypes = $this->params()->fromPost('resource_types')
+            ?: $searchEngine->setting('resource_types', []);
         $visibility = $this->params()->fromPost('visibility');
         $visibility = in_array($visibility, ['public', 'private']) ? $visibility : null;
         $force = (bool) $this->params()->fromPost('force');
 
+        // Do a quick check if the engine can index at least one resource type.
+        $canIndex = false;
+        $indexer = $searchEngine->indexer();
+        foreach ($resourceTypes as $resourceType) {
+            if ($indexer->canIndex($resourceType)) {
+                $canIndex = true;
+                break;
+            }
+        }
+        if (!$canIndex) {
+            $message = new PsrMessage(
+                'The search engine "{name}" has nothing to index.', // @translate
+                ['name' => $searchEngine->name()]
+            );
+            $this->messenger()->addWarning($message);
+            return $this->redirect()->toRoute('admin/search-manager', ['action' => 'browse'], true);
+        }
+
         $jobArgs = [];
-        $jobArgs['search_engine_id'] = $searchEngine->id();
+        $jobArgs['search_engine_ids'] = [$searchEngine->id()];
         $jobArgs['clear_index'] = $clearIndex;
         $jobArgs['start_resource_id'] = $startResourceId;
         $jobArgs['resources_by_batch'] = $resourcesByBatch;

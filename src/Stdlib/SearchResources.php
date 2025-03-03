@@ -613,6 +613,23 @@ class SearchResources
 
         $query = $this->expandFieldQueryArgs($query);
 
+        // Quick clean for most of the cases.
+        // TODO Check if the quick clean is enough.
+        // "0" is a valid value.
+        $arrayFilterRecursiveEmpty = null;
+        $arrayFilterRecursiveEmpty = function (array &$array) use (&$arrayFilterRecursiveEmpty): array {
+            foreach ($array as $key => $value) {
+                if (is_array($value)) {
+                    $array[$key] = $arrayFilterRecursiveEmpty($value);
+                }
+                if ($array[$key] === '' || $array[$key] === [] || $array[$key] === null) {
+                    unset($array[$key]);
+                }
+            }
+            return $array;
+        };
+        $arrayFilterRecursiveEmpty($query);
+
         // Add warning before cleaning. The right queries are still processed.
         foreach ($query['property'] ?? [] as $queryRow) {
             if (isset($queryRow['property']) && is_array($queryRow['property'])) {

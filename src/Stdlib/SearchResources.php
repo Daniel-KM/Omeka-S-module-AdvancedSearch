@@ -2192,7 +2192,7 @@ class SearchResources
                     ->from('Omeka\Entity\Resource', $subqueryAlias);
                 $sub = [];
                 foreach ($value as $val) {
-                    $param = $this->adapter->createNamedParameter($qb, $escapeSqlLike($value) . '%');
+                    $param = $this->adapter->createNamedParameter($qb, $escapeSqlLike($val) . '%');
                     $subquery
                         ->where($expr->like("$subqueryAlias.title", $param));
                     $sub[] = $expr->orX(
@@ -2214,7 +2214,7 @@ class SearchResources
                     ->from('Omeka\Entity\Resource', $subqueryAlias);
                 $sub = [];
                 foreach ($value as $val) {
-                    $param = $this->adapter->createNamedParameter($qb, '%' . $escapeSqlLike($value));
+                    $param = $this->adapter->createNamedParameter($qb, '%' . $escapeSqlLike($val));
                     $subquery
                         ->where($expr->like("$subqueryAlias.title", $param));
                     $sub[]= $expr->orX(
@@ -2239,7 +2239,7 @@ class SearchResources
                     ->from('Omeka\Entity\Resource', $subqueryAlias);
                 $sub = [];
                 foreach ($value as $val) {
-                    $param = $this->adapter->createNamedParameter($qb, $value);
+                    $param = $this->adapter->createNamedParameter($qb, $val);
                     $subquery
                         ->where($expr->eq("SOUNDEX($subqueryAlias.title)", "SOUNDEX($param)"));
                     $sub[] = $expr->orX(
@@ -2265,9 +2265,9 @@ class SearchResources
                     ->from('Omeka\Entity\Resource', $subqueryAlias);
                 $sub = [];
                 foreach ($value as $val) {
+                    $param = $this->adapter->createNamedParameter($qb, $val);
                     $subquery
                         ->where("REGEXP($subqueryAlias.title, $param) = TRUE");
-                    $param = $this->adapter->createNamedParameter($qb, $value);
                     $sub[] = $expr->orX(
                         $expr->in("$valuesAlias.valueResource", $subquery->getDQL()),
                         "REGEXP($valuesAlias.value, $param) = TRUE",

@@ -80,6 +80,17 @@ class IndexSearch extends AbstractJob
     /**
      * @var int
      */
+    protected $resourcesOffset = 0;
+
+    /**
+     * @var array
+     */
+    protected $resourcesLimit = 0;
+
+
+    /**
+     * @var int
+     */
     protected $sleepAfterLoop = 0;
 
     /**
@@ -104,6 +115,9 @@ class IndexSearch extends AbstractJob
 
         $this->resourceIds = $this->getArg('resource_ids', []) ?: [];
         $this->startResourceId = (int) $this->getArg('start_resource_id');
+
+        $this->resourcesLimit = $this->getArg('resources_limit');
+        $this->resourcesOffset = $this->getArg('resources_offset');
 
         $this->batchSize = abs((int) $this->getArg('resources_by_batch')) ?: self::BATCH_SIZE;
         $this->sleepAfterLoop = abs((int) $this->getArg('sleep_after_loop')) ?: 0;
@@ -293,7 +307,15 @@ class IndexSearch extends AbstractJob
                 // The list of ids is cleaned above.
                 $args['id'] = $this->resourceIds;
             } else {
-                $ids = $this->api->search($resourceType, ['sort_by' => 'id', 'sort_order' => 'asc'], ['returnScalar' => 'id'])->getContent();
+                $resourceQueryArgs = ['sort_by' => 'id', 'sort_order' => 'asc'];
+                if ($this->resourcesLimit) {
+                    $resourceQueryArgs['limit'] = $this->resourcesLimit;
+                }
+                if ($this->resourcesOffset) {
+                    $resourceQueryArgs['offset'] = $this->resourcesOffset;
+                }
+
+                $ids = $this->api->search($resourceType, $resourceQueryArgs, ['returnScalar' => 'id'])->getContent();
                 if ($this->startResourceId) {
                     $ids = array_keys(array_filter($ids, fn ($id) => $id >= $this->startResourceId, ARRAY_FILTER_USE_KEY));
                 }
@@ -312,6 +334,8 @@ class IndexSearch extends AbstractJob
             $resources = [];
             $countResources = 0;
             $totalToProcessForCurrentResourceType = count($args['id']);
+
+            $lastMemUsage = memory_get_usage();
 
             do {
                 if ($this->shouldStop()) {

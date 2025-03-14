@@ -186,6 +186,8 @@ class SearchEngineController extends AbstractActionController
         $sleepAfterLoop = (int) $this->params()->fromPost('sleep_after_loop');
         $resourceTypes = $this->params()->fromPost('resource_types')
             ?: $searchEngine->setting('resource_types', []);
+        $resourcesLimit = (int) $this->params()->fromPost('resources_limit');
+        $resourcesOffset = (int) $this->params()->fromPost('resources_offset');
         $visibility = $this->params()->fromPost('visibility');
         $visibility = in_array($visibility, ['public', 'private']) ? $visibility : null;
         $force = (bool) $this->params()->fromPost('force');
@@ -215,6 +217,8 @@ class SearchEngineController extends AbstractActionController
         $jobArgs['resources_by_batch'] = $resourcesByBatch;
         $jobArgs['sleep_after_loop'] = $sleepAfterLoop;
         $jobArgs['resource_types'] = $resourceTypes;
+        $jobArgs['resources_limit'] = $resourcesLimit;
+        $jobArgs['resources_offset'] = $resourcesOffset;
         $jobArgs['visibility'] = $visibility;
         $jobArgs['force'] = $force;
 

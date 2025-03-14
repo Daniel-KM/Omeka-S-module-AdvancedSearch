@@ -30,18 +30,27 @@ $this->headLink()
 <?php endif; ?>
 <?php if (count($resourceTypes)): ?>
     <div id="sidebar-confirm">
-        <h3><?= sprintf($translate('Reindex "%s"'), $resource->name()) ?></h3>
+        <h3><?= sprintf($translate('Reindex "%s"'), $resource->name()) ?></h3>       
+
         <p>
-            <input name="clear_index" value="1" type="checkbox" form="confirmform" /><?= $translate('Clear index') ?>
+            <input name="clear_index" value="1" type="checkbox" form="confirmform" /> <?= $translate('Clear index') ?>
             <div class="setting-info">
                 <?= $translate('Clearing index will make the search unavailable during reindexation, but it avoids the rare cases where indexes of deleted resources were not removed.') ?>
                 <?= $translate('You may redirect the users to a clone of the current index temporary.') ?>
             </div>
         </p>
-        <p>
-            <?= $translate('First resource id to reindex') ?>
-            <input name="start_resource_id" placeholder="0" value="1" min="0" type="number" form="confirmform" />
+
         </p>
+        <?php if ($listJobStatusesByIds): ?>
+            <input form="<?= $form->getName() ?>" name="force" type="checkbox" /> <?= $translate('Force indexing') ?><br />
+            <?= sprintf($translate('%1$d running indexings: #%2$s.'), count($listJobStatusesByIds), implode(', #', array_keys($listJobStatusesByIds))) ?><br />
+        <?php else: ?>
+            <?= $translate('No running indexing: process can be launched.') ?>
+        <?php endif; ?>
+        </p>
+
+        <h3><?= $translate('Batch processing') ?></h3>
+
         <p>
             <?= $translate('Number of resources processed by batch') ?>
             <input name="resources_by_batch" placeholder="0" value="100" min="0" type="number" form="confirmform" />
@@ -49,14 +58,17 @@ $this->headLink()
 	            <?= $translate('This option slows reindexing and may avoid overload when records are big.') ?>
             </div>
         </p>
+
         <p>
-            <?= $translate('Sleep between batchs') ?>
+            <?= $translate('Sleep between batchs') ?> (<?= $translate('seconds') ?>)
             <input name="sleep_after_loop" placeholder="0" value="0" min="0" type="number" form="confirmform" />
-            <?= $translate('seconds') ?>
             <div class="setting-info">
 	            <?= $translate('When there are many errors "HTTP request failed", increase this limit to 10, 30, 60 seconds or check server.') ?>
             </div>
         </p>
+
+        <h3><?= $translate('Limit indexing') ?></h3>
+
         <p>
             <?= $translate('First resource id to reindex') ?>
             <input name="start_resource_id" placeholder="0" value="1" min="0" type="number" form="confirmform" />
@@ -66,31 +78,31 @@ $this->headLink()
             <?= $translate('Maximum number of resources to index') ?>
             <input name="resources_limit" placeholder="" value="" min="1" type="number" form="confirmform" />
         </p>
+
+        <p>
+            <?= $translate('Start offset') ?>
+            <input name="resources_offset" placeholder="0" value="0" min="0" type="number" form="confirmform" />
+        </p>
+
         <p>
             <?= $translate('Limit indexing to a resource type') ?>
-            <br/>
-            <?php foreach ($resourceTypes as $resourceType): ?>
-            <input name="resource_types[]" value="<?= $resourceType ?>" type="checkbox" checked="checked" form="confirmform" /><?= $translate($resourceType) ?>
-            <?php endforeach; ?>
+            <span class="inputs">
+                <?php foreach ($resourceTypes as $resourceType): ?>
+                    <label><input name="resource_types[]" value="<?= $resourceType ?>" type="checkbox" checked="checked" form="confirmform" /> <?= $translate($resourceType) ?></label>
+                <?php endforeach; ?>
+            </span>
         </p>
         <?php if (!$visibility): ?>
         <p>
             <?= $translate('Limit indexing to a visibility') ?>
             <span class="inputs">
-                <label><input type="radio" name="visibility" form="confirmform" value="all" checked="checked"><?= $translate('Public and private') ?></label>
-                <label><input type="radio" name="visibility" form="confirmform" value="public"><?= $translate('Public only') ?></label>
-                <label><input type="radio" name="visibility" form="confirmform" value="private"><?= $translate('Private only') ?></label>
+                <label><input type="radio" name="visibility" form="confirmform" value="all" checked="checked"> <?= $translate('Public and private') ?></label>
+                <label><input type="radio" name="visibility" form="confirmform" value="public"> <?= $translate('Public only') ?></label>
+                <label><input type="radio" name="visibility" form="confirmform" value="private"> <?= $translate('Private only') ?></label>
             </span>
         </p>
         <?php endif; ?>
-        <p>
-        <?php if ($listJobStatusesByIds): ?>
-            <?= sprintf($translate('%1$d running indexings: #%2$s.'), count($listJobStatusesByIds), implode(', #', array_keys($listJobStatusesByIds))) ?><br />
-            <input form="<?= $form->getName() ?>" name="force" type="checkbox" /><?= $translate('Force indexing') ?><br />
-        <?php else: ?>
-            <?= $translate('No running indexing: process can be launched.') ?>
-        <?php endif; ?>
-        </p>
+
         <?= $this->form($form) ?>
     </div>
 <?php else: ?>

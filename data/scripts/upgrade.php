@@ -1964,3 +1964,15 @@ if (version_compare($oldVersion, '3.4.42', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.43', '<')) {
+    // Fix item set pages.
+    $this->finalizeSiteSettings();
+
+    $settings->delete('advancedsearch_index_batch_edit');
+
+    $message = new PsrMessage(
+        'Json-ld data are appended to results when enabled. You may need to add triggers if the theme is customized.' // @translate
+    );
+    $messenger->addSuccess($message);
+}

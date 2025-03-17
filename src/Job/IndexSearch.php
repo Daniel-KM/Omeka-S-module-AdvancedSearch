@@ -87,7 +87,6 @@ class IndexSearch extends AbstractJob
      */
     protected $resourcesLimit = 0;
 
-
     /**
      * @var int
      */

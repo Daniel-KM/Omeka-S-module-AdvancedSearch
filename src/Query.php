@@ -350,7 +350,7 @@ class Query implements JsonSerializable
 
     /**
      * @return array
-     * @deprecated Use getFilters().
+     * @deprecated Use getFiltersQuery().
      */
     public function getFilters(): array
     {

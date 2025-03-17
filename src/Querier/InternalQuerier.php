@@ -835,11 +835,26 @@ class InternalQuerier extends AbstractQuerier
     {
         $flatArray = function ($values): array {
             if (!is_array($values)) {
+                // Scalar value.
                 return [$values];
-            } elseif (is_array(reset($values))) {
+            } elseif (!is_array(reset($values))) {
+                // Simple level array.
+                return $values;
+            }
+            // Manage sub arrays.
+            if (array_key_exists('val', $values)) {
+                // The array may be a simple filter.
+                return is_array($values['val']) ? $values['val'] : [$values['val']];
+            }
+            // The array may be an array of values or an array of filters.
+            $firstValue = reset($values);
+            if (array_key_exists('val', $firstValue)) {
+                $values = array_column($values, 'val');
+                $values = array_map(fn ($v) => is_array($v) ? $v : [$v], $values);
                 return array_merge(...array_values($values));
             }
-            return $values;
+            // Else it is an unknown array of arrays to extract.
+            return array_merge(...array_values($values));
         };
 
         // Empty values are already filtered by the form adapter.

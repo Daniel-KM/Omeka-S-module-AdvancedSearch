@@ -1217,7 +1217,10 @@ class Module extends AbstractModule
         $response = $event->getParam('response');
         $resourceType = $request->getResource();
 
-        $resourceId = (int) $request->getId();
+        /** @var \Omeka\Entity\Resource $resource */
+        $resource = $response->getContent();
+        $resourceId = method_exists($resource, 'id') ? (int) $resource->id() : (int) $resource->getId();
+        $resourceId = $resourceId ?: (int) $request->getId();
         $representation = null;
 
         /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
@@ -1313,12 +1316,12 @@ class Module extends AbstractModule
             $logger = $services->get('Omeka\Logger');
             $logger->err(
                 'Unable to index metadata of resource #{resource_id} for search in search engine "{name}": {message}', // @translate
-                ['resource_id' => $resource->getId(), 'name' => $searchEngine->name(), 'message' => $e->getMessage()]
+                ['resource_id' => $resource->id(), 'name' => $searchEngine->name(), 'message' => $e->getMessage()]
             );
             $messenger = $services->get('ControllerPluginManager')->get('messenger');
             $messenger->addWarning(new PsrMessage(
                 'Unable to update the search index for resource #{resource_id} in search engine "{name}": see log.', // @translate
-                ['resource_id' => $resource->getId(), 'name' => $searchEngine->name()]
+                ['resource_id' => $resource->id(), 'name' => $searchEngine->name()]
             ));
         }
     }

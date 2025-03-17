@@ -422,7 +422,7 @@ trait TraitFormAdapterClassic
                         continue 2;
                     }
 
-                    if (is_string($value)
+                    if (is_scalar($value)
                         || $isSimpleList($value)
                     ) {
                         // Manage simple field "Text", that should not be

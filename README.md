@@ -515,6 +515,24 @@ example for the block Browse Preview. You can do it directly in the user
 interface. There will be an automatic upgrade when the feature will be removed.
 
 
+Upgrade from module Search
+--------------------------
+
+When the modules are too much old, it may be simpler to uninstall Search and to
+recreate the config with module Advanced Search.
+
+- Php should be 7.4 to 8.1.
+- Upgrade to Omeka S v3.2.
+- Install Search 3.5.25.3.
+- Upgrade Search.
+- Install Advanced Search version 3.3.6.6.
+- Upgrade Advanced Search.
+- Upgrade Omeka S to last version.
+- Upgrade Advanced Search to the last version.
+- Remove or upgrade Search to the last version.
+- With last versions, the two modules can be used at the same time.
+
+
 TODO
 ----
 

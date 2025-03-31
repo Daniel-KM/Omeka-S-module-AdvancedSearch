@@ -645,8 +645,12 @@ class SearchConfigController extends AbstractActionController
                 continue;
             }
             $field = $facet['field'];
-            $name = is_numeric($name) ? $field : $name;
-            $name = $this->slugify($name);
+            // Check the name: it should be the field name, except in case of a
+            // duplicate, normally never in real use cases.
+            // Use field as name: the standard form does not allow to set a
+            // specific name, unlike filters.
+            // TODO Manage use of duplicated facets with a name suffixed with an index.
+            $name = $this->slugify($field);
             if (isset($facets[$name])) {
                 $name .= '_' . ++$i;
             }

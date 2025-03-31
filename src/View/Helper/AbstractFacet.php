@@ -287,6 +287,7 @@ class AbstractFacet extends AbstractHelper
             // Manage Solr quickly.
             case 'resource_class_id_is':
             case 'resource_class_is':
+            case 'resource_class_s':
                 if (is_numeric($value)) {
                     try {
                         /** @var \Omeka\Api\Representation\ResourceClassRepresentation $resource */
@@ -308,6 +309,7 @@ class AbstractFacet extends AbstractHelper
             // Manage Solr quickly.
             case 'resource_template_id_is':
             case 'resource_template_is':
+            case 'resource_template_s':
                 if (is_numeric($value)) {
                     try {
                         /** @var \Omeka\Api\Representation\ResourceTemplateRepresentation $resource */

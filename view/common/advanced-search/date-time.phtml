@@ -8,8 +8,8 @@ $translate = $this->plugin('translate');
 $escape = $this->plugin('escapeHtml');
 
 // Prepare the datetime queries.
-$datetimes = isset($query['datetime']) ? (is_array($query['datetime']) ? $query['datetime'] : [['value' => $query['datetime']]]) : [];
-$datetimes = array_filter($datetimes, fn ($v) => isset($v['value']) ? trim($v['value']) !== '' : (isset($v['type']) && in_array($v['type'], ['ex', 'nex'])));
+$datetimes = isset($query['datetime']) ? (is_array($query['datetime']) ? $query['datetime'] : [['val' => $query['datetime']]]) : [];
+$datetimes = array_filter($datetimes, fn ($v) => isset($v['val']) ? trim($v['val']) !== '' : (isset($v['type']) && in_array($v['type'], ['ex', 'nex'])));
 // Allows to display one empty field.
 if (empty($datetimes)) $datetimes = [[]];
 
@@ -24,7 +24,7 @@ $querySelectOption = function ($value, array $search, $key, $text) {
 // TODO Use a widget or a validator (but allow partial date/time: year only, date only, etc.).
 $queryInputText = function (array $search, $engine) use ($translate, $escape) {
     $value = $search['val'] ?? null;
-    return sprintf('<input type="text" class="query-datetime query-text" name="%s" value="%s" aria-label="%s" placeholder="2017-11-07 17:21:17">',
+    return sprintf('<input type="text" class="query-datetime query-text" name="%1$s" value="%2$s" aria-label="%3$s" placeholder="2017-11-07 17:21:17">',
         $escape("datetime[$engine][val]"),
         $escape($value),
         $escape($translate('Date / time'))); // @translate

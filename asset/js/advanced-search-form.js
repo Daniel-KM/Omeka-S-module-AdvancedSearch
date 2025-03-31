@@ -190,13 +190,15 @@ $(document).ready(function() {
                         form.find(`[name="filter[${subIndex}][val]"]`).prop('name', '');
                         fieldType.prop('name', '');
                     }
-                }
-                else if (match = inputName.match(/datetime\[(\d+)\]\[(field|type|value)\]/)) {
+                } else if (match = inputName.match(/datetime\[(\d+)\]\[val\]/)) {
                     const subIndex = match[1];
-                    form.find(`[name="datetime[${subIndex}][joiner]"]`).prop('name', '');
-                    form.find(`[name="datetime[${subIndex}][field]"]`).prop('name', '');
-                    form.find(`[name="datetime[${subIndex}][type]"]`).prop('name', '');
-                    form.find(`[name="datetime[${subIndex}][value]"]`).prop('name', '');
+                    const datetimeType = form.find(`[name="datetime[${subIndex}][type]"]`);
+                    if (!['ex', 'nex'].includes(datetimeType.val())) {
+                        form.find(`[name="datetime[${subIndex}][join]"]`).prop('name', '');
+                        form.find(`[name="datetime[${subIndex}][field]"]`).prop('name', '');
+                        form.find(`[name="datetime[${subIndex}][val]"]`).prop('name', '');
+                        datetimeType.prop('name', '');
+                    }
                 }
                 // Module Mapping.
                 else if (['mapping_address', 'mapping_radius', 'mapping_radius_unit'].includes(inputName)) {

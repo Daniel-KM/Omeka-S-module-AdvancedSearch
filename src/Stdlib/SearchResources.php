@@ -1473,7 +1473,7 @@ class SearchResources
                     $join->getIndexBy()
                 );
                 if ($hasResourceType) {
-                    $resourceTypes = is_array($query['resource_type']) ? $query['resource_type'] : [$query['resource_type']];
+                    $resourceTypes = is_array($query['resource_type']) ? array_values($query['resource_type']) : [$query['resource_type']];
                     $qb
                         ->setParameter($parameterName, $resourceTypes, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
                 } else {
@@ -3000,7 +3000,7 @@ class SearchResources
                 $ids = [];
             }
             $ids = array_map('trim', $ids);
-            $ids = array_filter($ids, 'strlen');
+            $ids = array_values(array_filter($ids, 'strlen'));
             if ($ids) {
                 $idsAlias = $this->adapter->createAlias();
                 $idsPlaceholder = ':' . $idsAlias;

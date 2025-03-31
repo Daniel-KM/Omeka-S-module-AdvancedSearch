@@ -214,7 +214,7 @@ class IndexSuggestions extends AbstractJob
 
         if ($excludedFields) {
             $sqlFields .= ' AND `value`.`property_id` NOT IN (:excluded_property_ids)';
-            $bind['excluded_property_ids'] = $excludedFields;
+            $bind['excluded_property_ids'] = array_values($excludedFields);
             $types['excluded_property_ids'] = $this->connection::PARAM_INT_ARRAY;
         }
 
@@ -339,7 +339,7 @@ class IndexSuggestions extends AbstractJob
 
         if ($fields) {
             $sqlFields = 'AND `value`.`property_id` IN (:properties)';
-            $bind['properties'] = $fields;
+            $bind['properties'] = array_values($fields);
             $types['properties'] = $this->connection::PARAM_INT_ARRAY;
         } else {
             $sqlFields = '';
@@ -347,7 +347,7 @@ class IndexSuggestions extends AbstractJob
 
         if ($excludedFields) {
             $sqlFields .= ' AND `value`.`property_id` NOT IN (:excluded_property_ids)';
-            $bind['excluded_property_ids'] = $excludedFields;
+            $bind['excluded_property_ids'] = array_values($excludedFields);
             $types['excluded_property_ids'] = $this->connection::PARAM_INT_ARRAY;
         }
 

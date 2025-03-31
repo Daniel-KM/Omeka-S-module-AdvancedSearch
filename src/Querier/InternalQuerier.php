@@ -549,14 +549,14 @@ class InternalQuerier extends AbstractQuerier
                     ->andWhere($expr->in('value.lang', ':lang'));
             }
             $qb
-                ->setParameter('lang', $fieldLangs, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
+                ->setParameter('lang', array_values($fieldLangs), \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
         }
 
         if (!empty($fieldQueryArgs['datatype'])) {
             $fieldDataTypes = is_array($fieldQueryArgs['datatype']) ? $fieldQueryArgs['datatype'] : [$fieldQueryArgs['datatype']];
             $qb
                 ->andWhere($expr->in('value.type', ':datatype'))
-                ->setParameter('datatype', $fieldDataTypes, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
+                ->setParameter('datatype', array_values($fieldDataTypes), \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
         }
 
         $siteId = $this->query->getSiteId();
@@ -570,7 +570,7 @@ class InternalQuerier extends AbstractQuerier
 
         $qb
             ->andWhere($expr->in('value.property', ':properties'))
-            ->setParameter('properties', $propertyIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
+            ->setParameter('properties', array_values($propertyIds), \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
             ->groupBy('val')
             ->orderBy('val', 'asc');
 

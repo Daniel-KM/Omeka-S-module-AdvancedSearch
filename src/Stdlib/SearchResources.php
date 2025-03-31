@@ -635,19 +635,19 @@ class SearchResources
             if (isset($queryRow['property']) && is_array($queryRow['property'])) {
                 $this->logger->warn(
                     'The query arg "property" won’t support multiple properties in a future version, because it’s overriding the default behavior. Use arg "filter" instead. Check your queries: {url}', // @translate
-                    ['url' => $_SERVER['REQUEST_URI']]
+                    ['url' => $_SERVER['REQUEST_URI'] ?? '[internal]']
                 );
             }
             if (isset($queryRow['type']) && !in_array($queryRow['type'], self::FIELD_QUERY['core'])) {
                 $this->logger->warn(
                     'The query arg "property" won’t support type {type} in a future version, because it’s overriding the default behavior. Use arg "filter" instead. Check your queries: {url}', // @translate
-                    ['type' => $queryRow['type'], 'url' => $_SERVER['REQUEST_URI']]
+                    ['type' => $queryRow['type'], 'url' => $_SERVER['REQUEST_URI'] ?? '[internal]']
                 );
             }
             if (isset($queryRow['text']) && is_array($queryRow['text'])) {
                 $this->logger->warn(
                     'The query arg "property" won’t support multiple values in a future version, because it’s overriding the default behavior. Use arg "filter" instead. Check your queries: {url}', // @translate
-                    ['url' => $_SERVER['REQUEST_URI']]
+                    ['url' => $_SERVER['REQUEST_URI'] ?? '[internal]']
                 );
             }
         }

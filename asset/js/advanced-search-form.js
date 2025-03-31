@@ -97,6 +97,8 @@ $(document).ready(function() {
             'geo[zone]',
             'geo[mapbox]',
             'geo[area]',
+            // Dynamic item sets.
+            'is_dynamic',
             // Mapping.
             'has_markers',
             'has_features',

@@ -245,6 +245,9 @@ class AbstractFacet extends AbstractHelper
 
             case 'owner':
             case 'owner_id':
+            // Manage Solr quickly.
+            case 'owner_id_is':
+            case 'owner_is':
                 /** @var \Omeka\Api\Representation\UserRepresentation $resource */
                 // Only allowed users can read and search users.
                 if (is_numeric($value)) {
@@ -260,6 +263,9 @@ class AbstractFacet extends AbstractHelper
 
             case 'site':
             case 'site_id':
+            // Manage Solr quickly.
+            case 'site_id_is':
+            case 'site_is':
                 /** @var \Omeka\Api\Representation\SiteRepresentation $resource */
                 if (is_numeric($value)) {
                     try {
@@ -278,6 +284,9 @@ class AbstractFacet extends AbstractHelper
             case 'class':
             case 'resource_class_id':
             case 'resource_class':
+            // Manage Solr quickly.
+            case 'resource_class_id_is':
+            case 'resource_class_is':
                 if (is_numeric($value)) {
                     try {
                         /** @var \Omeka\Api\Representation\ResourceClassRepresentation $resource */
@@ -296,6 +305,9 @@ class AbstractFacet extends AbstractHelper
             case 'template':
             case 'resource_template_id':
             case 'resource_template':
+            // Manage Solr quickly.
+            case 'resource_template_id_is':
+            case 'resource_template_is':
                 if (is_numeric($value)) {
                     try {
                         /** @var \Omeka\Api\Representation\ResourceTemplateRepresentation $resource */
@@ -312,6 +324,7 @@ class AbstractFacet extends AbstractHelper
                     : null;
 
             case 'item_sets_tree':
+            // Manage Solr quickly.
             case 'item_sets_tree_is':
                 if (!is_numeric($value)) {
                     return $value;
@@ -333,6 +346,9 @@ class AbstractFacet extends AbstractHelper
 
             case 'item_set':
             case 'item_set_id':
+            // Manage Solr quickly.
+            case 'item_set_id_is':
+            case 'item_set_is':
                 $data = ['id' => $value];
                 // The site id is required in public.
                 if ($this->siteId) {

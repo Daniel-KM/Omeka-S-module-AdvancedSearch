@@ -123,20 +123,6 @@ trait TraitFormAdapterClassic
             ->setOption('remove_diacritics', !empty($formSettings['remove_diacritics']))
             ->setOption('default_search_partial_word', !empty($formSettings['default_search_partial_word']));
 
-        // Solr doesn't allow unavailable args anymore (invalid or unknown).
-        // Furthermore, fields are case sensitive.
-        $onlyAvailableFields = !empty($formSettings['only_available_fields']);
-        if ($onlyAvailableFields) {
-            $availableFields = $formSettings['available_fields'] ?? [];
-            if ($availableFields) {
-                $checkAvailableField = fn ($field) => isset($availableFields[$field]);
-            } else {
-                $checkAvailableField = fn ($field) => false;
-            }
-        } else {
-            $checkAvailableField = fn ($field) => true;
-        }
-
         // TODO Manage the "browse_attached_items" / "site_attachments_only".
 
         // This function fixes some forms that add an array level.
@@ -276,14 +262,13 @@ trait TraitFormAdapterClassic
                                     && isset($filter['val'])
                                     && !is_array($filter['val'])
                                     && trim($filter['val']) !== ''
-                                    && $checkAvailableField($filter['field'])
                                 ) {
                                     $query->addFilterQuery($filter['field'], $filter['val'], $filter['type'] ?? $typeDefault, $filter['join'] ?? null);
                                 }
                             }
                         } else {
                             foreach ($value as $filter) {
-                                if (isset($filter['field']) && $checkAvailableField($filter['field'])) {
+                                if (isset($filter['field'])) {
                                     $type = empty($filter['type']) ? $typeDefault : $filter['type'];
                                     if (in_array($type, SearchResources::FIELD_QUERY['value_none'])) {
                                         $query->addFilterQuery($filter['field'], null, $type);
@@ -296,7 +281,7 @@ trait TraitFormAdapterClassic
                     } else {
                         if (empty($operator)) {
                             foreach ($value as $filter) {
-                                if (isset($filter['field']) && isset($filter['val']) && trim($filter['val']) !== '' && $checkAvailableField($filter['field'])) {
+                                if (isset($filter['field']) && isset($filter['val']) && trim($filter['val']) !== '') {
                                     $type = empty($filter['type']) ? $typeDefault : $filter['type'];
                                     $join = isset($filter['join']) && in_array($filter['join'], ['or', 'not']) ? $filter['join'] : 'and';
                                     $query->addFilterQuery($filter['field'], $filter['val'], $type, $join);
@@ -304,7 +289,7 @@ trait TraitFormAdapterClassic
                             }
                         } else {
                             foreach ($value as $filter) {
-                                if (isset($filter['field']) && $checkAvailableField($filter['field'])) {
+                                if (isset($filter['field'])) {
                                     $type = empty($filter['type']) ? $typeDefault : $filter['type'];
                                     if (in_array($type, SearchResources::FIELD_QUERY['value_none'])) {
                                         $join = isset($filter['join']) && in_array($filter['join'], ['or', 'not']) ? $filter['join'] : 'and';
@@ -394,10 +379,6 @@ trait TraitFormAdapterClassic
                     break;
 
                 case 'thesaurus':
-                    if (!$checkAvailableField($name)) {
-                        continue 2;
-                    }
-
                     if (is_string($value)
                         || $isSimpleList($value)
                     ) {
@@ -405,9 +386,6 @@ trait TraitFormAdapterClassic
                     }
 
                     foreach ($value as $field => $vals) {
-                        if (!$checkAvailableField($field)) {
-                            continue;
-                        }
                         if (!is_string($vals) && !$isSimpleList($vals)) {
                             continue;
                         }
@@ -418,10 +396,6 @@ trait TraitFormAdapterClassic
                     break;
 
                 default:
-                    if (!$checkAvailableField($name)) {
-                        continue 2;
-                    }
-
                     if (is_scalar($value)
                         || $isSimpleList($value)
                     ) {
@@ -599,10 +573,6 @@ trait TraitFormAdapterClassic
         } else {
             $searchFormSettings['available_fields'] = [];
         }
-
-        // Solr doesn't allow unavailable args anymore (invalid or unknown).
-        $searchFormSettings['only_available_fields'] = $engineAdapter
-            && $engineAdapter instanceof \SearchSolr\EngineAdapter\Solarium;
 
         // TODO Copy the option for per page in the search config form (keeping the default).
 

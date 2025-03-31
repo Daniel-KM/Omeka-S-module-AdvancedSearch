@@ -294,10 +294,6 @@ class ApiSearch extends AbstractPlugin
             $searchFormSettings['available_fields'] = [];
         }
 
-        // Solr doesn't allow unavailable args anymore (invalid or unknown).
-        $searchFormSettings['only_available_fields'] = $engineAdapter
-            && $engineAdapter instanceof \SearchSolr\EngineAdapter\Solarium;
-
         $searchFormSettings['aliases'] = $this->searchConfig->subSetting('index', 'aliases', []);
         $searchFormSettings['fields_query_args'] = $this->searchConfig->subSetting('index', 'query_args', []);
         $searchFormSettings['remove_diacritics'] = (bool) $this->searchConfig->subSetting('q', 'remove_diacritics', false);

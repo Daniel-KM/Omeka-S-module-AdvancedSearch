@@ -69,7 +69,7 @@ class Query implements JsonSerializable
     /**
      * @var array
      */
-    protected $fieldsQueryArgs;
+    protected $fieldsQueryArgs = [];
 
     /**
      * @var bool

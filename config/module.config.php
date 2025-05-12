@@ -636,6 +636,15 @@ return [
                 'label' => 'Numeric', // @translate
                 'resource_type' => ['items'],
             ],
+
+            // From module oai-pmh harvester.
+            'common/advanced-search/harvests' => [
+                'module' => 'OaiPmhHarvester',
+                'label' => 'OAI-PMH harvests', // @translate
+                'resource_type' => ['items'],
+                'default_admin' => true,
+                'default_site' => false,
+            ],
         ],
     ],
 ];

@@ -217,9 +217,11 @@ class SearchSuggesterController extends AbstractActionController
                 ));
                 return false;
             }
-            $suggesterId = (int) $this->api()
-                ->searchOne('search_suggesters', ['name' => $name], ['returnScalar' => 'id'])
-                ->getContent();
+            try {
+                $suggesterId = (int) $this->api()->read('search_suggesters', ['name' => $name])->getContent()->id();
+            } catch (\Exception $e) {
+                $suggesterId = null;
+            }
             if ($id !== $suggesterId) {
                 $this->messenger()->addError(new PsrMessage(
                     'The name should be unique.' // @translate

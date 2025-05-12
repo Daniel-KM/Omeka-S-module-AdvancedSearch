@@ -285,9 +285,11 @@ class SearchConfigController extends AbstractActionController
                 $this->messenger()->addError('The slug should be unique.'); // @translate
                 return false;
             }
-            $searchConfigId = (int) $this->api()
-                ->searchOne('search_configs', ['slug' => $slug], ['returnScalar' => 'id'])
-                ->getContent();
+            try {
+                $searchConfigId = (int) $this->api()->read('search_configs', ['slug' => $slug])->getContent()->id();
+            } catch (\Exception $e) {
+                $searchConfigId = null;
+            }
             if ($id !== $searchConfigId) {
                 $this->messenger()->addError('The slug should be unique.'); // @translate
                 return false;

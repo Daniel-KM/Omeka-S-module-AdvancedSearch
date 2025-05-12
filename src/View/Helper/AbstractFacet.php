@@ -257,11 +257,10 @@ class AbstractFacet extends AbstractHelper
                 // Only allowed users can read and search users.
                 if (is_numeric($value)) {
                     try {
-                        $resource = $this->api->read('users', ['id' => $value])->getContent();
+                        return $this->api->read('users', ['id' => $value])->getContent()->name();
                     } catch (\Exception $e) {
                         return null;
                     }
-                    return $resource->name();
                 }
                 // No more check: email is not reference, so it always the name.
                 return $value;
@@ -272,19 +271,12 @@ class AbstractFacet extends AbstractHelper
             case 'site_id_is':
             case 'site_is':
                 /** @var \Omeka\Api\Representation\SiteRepresentation $resource */
-                if (is_numeric($value)) {
-                    try {
-                        $resource = $this->api->read('sites', ['id' => $value])->getContent();
-                    } catch (\Exception $e) {
-                        return null;
-                    }
-                    return $resource->title();
+                // Manage the case where a resource was indexed but removed.
+                try {
+                    return $this->api->read('sites', [is_numeric($value) ? 'id' : 'slug' => $value])->getContent()->title();
+                } catch (\Exception $e) {
+                    return null;
                 }
-                $resource = $this->api->searchOne('sites', ['slug' => $value])->getContent();
-                return $resource
-                    ? $resource->title()
-                    // Manage the case where a resource was indexed but removed.
-                    : null;
 
             case 'class':
             case 'resource_class_id':
@@ -293,20 +285,25 @@ class AbstractFacet extends AbstractHelper
             case 'resource_class_id_is':
             case 'resource_class_is':
             case 'resource_class_s':
+                /** @var \Omeka\Api\Representation\ResourceClassRepresentation $resource */
+                // Manage the case where a resource was indexed but removed.
                 if (is_numeric($value)) {
                     try {
-                        /** @var \Omeka\Api\Representation\ResourceClassRepresentation $resource */
                         $resource = $this->api->read('resource_classes', ['id' => $value])->getContent();
                     } catch (\Exception $e) {
                         return null;
                     }
-                    return $this->translate->__invoke($resource->label());
+                } elseif (!strpos($value, ':')) {
+                    return null;
+                } else {
+                    try {
+                        $vocabularyId = $this->api->read('vocabularies', ['prefix' => strtok($value, ':')])->getContent()->id();
+                        $resource = $this->api->read('resource_classes', ['vocabulary' => $vocabularyId, 'localName' => strtok(':')])->getContent();
+                    } catch (\Exception $e) {
+                        return null;
+                    }
                 }
-                $resource = $this->api->searchOne('resource_classes', ['term' => $value])->getContent();
-                return $resource
-                    ? $this->translate->__invoke($resource->label())
-                    // Manage the case where a resource was indexed but removed.
-                    : null;
+                return $this->translate->__invoke($resource->label());
 
             case 'template':
             case 'resource_template_id':
@@ -315,6 +312,7 @@ class AbstractFacet extends AbstractHelper
             case 'resource_template_id_is':
             case 'resource_template_is':
             case 'resource_template_s':
+                // Manage the case where a resource was indexed but removed.
                 if (is_numeric($value)) {
                     try {
                         /** @var \Omeka\Api\Representation\ResourceTemplateRepresentation $resource */
@@ -322,13 +320,14 @@ class AbstractFacet extends AbstractHelper
                     } catch (\Exception $e) {
                         return null;
                     }
-                    return $resource->label();
+                } else {
+                    try {
+                        $resource = $this->api->read('resource_templates', ['label' => $value])->getContent();
+                    } catch (\Exception $e) {
+                        return null;
+                    }
                 }
-                $resource = $this->api->searchOne('resource_templates', ['label' => $value])->getContent();
-                return $resource
-                    ? $this->translate->__invoke($resource->label())
-                    // Manage the case where a resource was indexed but removed.
-                    : null;
+                return $this->translate->__invoke($resource->label());
 
             case 'item_sets_tree':
             // Manage Solr quickly.
@@ -358,11 +357,19 @@ class AbstractFacet extends AbstractHelper
             case 'item_set_is':
                 $data = ['id' => $value];
                 // The site id is required in public.
+                // TODO Avoid to use searchOne(), but required for now with item set and site.
                 if ($this->siteId) {
                     $data['site_id'] = $this->siteId;
+                    /** @var \Omeka\Api\Representation\ItemSetRepresentation $resource */
+                    $resource = $this->api->searchOne('item_sets', $data)->getContent();
+                } else {
+                    /** @var \Omeka\Api\Representation\ItemSetRepresentation $resource */
+                    try {
+                        $resource = $this->api->read('item_sets', $data)->getContent();
+                    } catch (\Exception $e) {
+                        return null;
+                    }
                 }
-                /** @var \Omeka\Api\Representation\ItemSetRepresentation $resource */
-                $resource = $this->api->searchOne('item_sets', $data)->getContent();
                 return $resource
                     ? (string) $resource->displayTitle(null, $this->siteLocales)
                     // Manage the case where a resource was indexed but removed.

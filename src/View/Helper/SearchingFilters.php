@@ -199,8 +199,13 @@ class SearchingFilters extends AbstractHelper
                                 $filterValue = $translate('Unknown class'); // @translate
                             }
                         } else {
-                            $filterValue = $translate($api->searchOne('resource_classes', ['term' => $subValue])->getContent());
-                            $filterValue = $filterValue ? $filterValue->label() : $translate('Unknown class');
+                            try {
+                                $vocabularyId = $api->read('vocabularies', ['prefix' => strtok($subValue, ':')])->getContent()->id();
+                                $resourceClass = $this->read('resource_classes', ['vocabulary' => $vocabularyId, 'localName' => strtok(':')])->getContent();
+                                $filterValue = $translate($resourceClass->label());
+                            } catch (NotFoundException $e) {
+                                $filterValue = $translate('Unknown class'); // @translate
+                            }
                         }
                         $urlQuery = $isId ? $this->urlQueryId($key, $subKey) : $this->urlQuery($key, $subKey);
                         $filters[$filterLabel][$urlQuery] = $filterValue;
@@ -218,8 +223,11 @@ class SearchingFilters extends AbstractHelper
                                 $filterValue = $translate('Unknown template'); // @translate
                             }
                         } else {
-                            $filterValue = $translate($api->searchOne('resource_templates', ['label' => $subValue])->getContent());
-                            $filterValue = $filterValue ? $filterValue->label() : $translate('Unknown template');
+                            try {
+                                $filterValue = $api->read('resource_templates', ['label' => $subValue])->getContent()->label();
+                            } catch (NotFoundException $e) {
+                                $filterValue = $translate('Unknown template');
+                            }
                         }
                         $urlQuery = $isId ? $this->urlQueryId($key, $subKey) : $this->urlQuery($key, $subKey);
                         $filters[$filterLabel][$urlQuery] = $filterValue;

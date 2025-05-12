@@ -602,6 +602,7 @@ class SearchConfigController extends AbstractActionController
             }
 
             $name = is_numeric($name) ? $field : $name;
+            // Name is no more forcet to lower case, only slugified.
             $name = $this->slugify($name);
             if ($name !== 'advanced' && isset($filters[$name])) {
                 $name .= '_' . ++$i;
@@ -652,6 +653,7 @@ class SearchConfigController extends AbstractActionController
             // Use field as name: the standard form does not allow to set a
             // specific name, unlike filters.
             // TODO Manage use of duplicated facets with a name suffixed with an index.
+            // Name is no more forcet to lower case, only slugified.
             $name = $this->slugify($field);
             if (isset($facets[$name])) {
                 $name .= '_' . ++$i;
@@ -784,6 +786,7 @@ class SearchConfigController extends AbstractActionController
      * Transform the given string into a valid URL slug.
      *
      * Unlike site slug slugify, replace with "_" and don't start with a number.
+     * Furthermore, the slug case is kept.
      *
      * @see \Omeka\Api\Adapter\SiteSlugTrait::slugify()
      * @see \AdvancedSearch\Controller\Admin\SearchConfigController::slugify()
@@ -793,14 +796,15 @@ class SearchConfigController extends AbstractActionController
     {
         if (extension_loaded('intl')) {
             $transliterator = \Transliterator::createFromRules(':: NFD; :: [:Nonspacing Mark:] Remove; :: NFC;');
-            $slug = $transliterator->transliterate((string) $input);
+            $slug = (string) $transliterator->transliterate((string) $input);
         } elseif (extension_loaded('iconv')) {
-            $slug = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', (string) $input);
+            $slug = (string) iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', (string) $input);
         } else {
             $slug = (string) $input;
         }
-        $slug = mb_strtolower((string) $slug, 'UTF-8');
-        $slug = preg_replace('/[^a-z0-9_]+/u', '_', $slug);
+        // Don't lowercase string here.
+        // $slug = mb_strtolower($slug, 'UTF-8');
+        $slug = preg_replace('/[^a-zA-Z0-9_]+/u', '_', $slug);
         $slug = preg_replace('/^\d+$/', '_', $slug);
         $slug = preg_replace('/_{2,}/', '_', $slug);
         $slug = preg_replace('/_*$/', '', $slug);

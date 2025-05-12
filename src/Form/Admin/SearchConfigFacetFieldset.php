@@ -15,7 +15,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
         $availableFields = $this->getAvailableFacetFields();
 
         $this
-            ->setAttribute('id', 'form-search-config-facet')
+            ->setAttribute('id', 'search-config-facet-form')
             ->setAttribute('class', 'form-fieldset-element form-search-config-facet')
             ->setName('facet')
 

@@ -15,7 +15,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
         $availableFields = $this->getAvailableFields();
 
         $this
-            ->setAttribute('id', 'form-search-config-filter')
+            ->setAttribute('id', 'search-config-filter-form')
             ->setAttribute('class', 'form-fieldset-element form-search-config-filter')
             ->setName('filter')
 

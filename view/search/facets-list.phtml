@@ -58,7 +58,7 @@ if (!empty($itemSet)) {
     <?= $facetActives(null, $activeFacets, $searchConfig->setting('facet')) ?>
     <?php endif; ?>
 
-    <form id="form-facets">
+    <form id="facets-form">
 
         <?php if ($displayFacetButton): ?>
         <?= $this->hiddenInputsFromFilteredQuery(null, ['facet', 'refine', 'page', 'limit', 'offset', 'per_page']) ?>

@@ -51,7 +51,7 @@ class SearchConfigForm extends Form
     public function init(): void
     {
         $this
-            ->setAttribute('id', 'form-search-config-edit')
+            ->setAttribute('id', 'search-config-edit-form')
             ->add([
                 'name' => 'o:name',
                 'type' => Element\Text::class,

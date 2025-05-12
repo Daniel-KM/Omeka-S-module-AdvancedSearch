@@ -79,7 +79,7 @@ class SearchConfigConfigureForm extends Form
         // TODO See UserProfile and https://docs.laminas.dev/laminas-form/v3/form-creation/creation-via-factory/
 
         $this
-            ->setAttribute('id', 'form-search-config-configure');
+            ->setAttribute('id', 'search-config-configure-form');
 
         // Settings for the search engine. Can be overwritten by a specific form.
 

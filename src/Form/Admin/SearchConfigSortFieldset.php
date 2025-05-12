@@ -69,7 +69,7 @@ class SearchConfigSortFieldset extends Fieldset implements InputFilterProviderIn
         }
 
         $this
-            ->setAttribute('id', 'form-search-config-sort')
+            ->setAttribute('id', 'search-config-sort-form')
             ->setAttribute('class', 'form-fieldset-element form-search-config-sort')
             ->setName('sort')
 

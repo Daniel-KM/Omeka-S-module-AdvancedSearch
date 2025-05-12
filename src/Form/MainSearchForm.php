@@ -152,10 +152,10 @@ class MainSearchForm extends Form
         $hasVariant = in_array($this->variant, ['quick', 'simple', 'csrf']);
         $hasFormVariant = in_array($this->variant, ['quick', 'simple']);
 
-        $formId = 'form-search' . ($hasFormVariant ? '-' . $this->variant : '');
-
         // The id is different from the Omeka search to avoid issues in js. The
         // css should be adapted.
+        $formId = 'form-search' . ($hasFormVariant ? '-' . $this->variant : '');
+
         $this
             ->setAttributes([
                 'id' => $formId,

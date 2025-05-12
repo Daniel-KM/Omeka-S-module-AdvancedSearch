@@ -11,7 +11,7 @@ $(document).ready(function() {
      * @see module SingleSignOn asset/js/single-sign-on-admin.js
      */
 
-    const $formConfig = $('#form-search-config-configure');
+    const $formConfig = $('#search-config-configure-form');
 
     var SearchConfig = (function() {
 
@@ -42,7 +42,7 @@ $(document).ready(function() {
             $formConfig.on('click', '.config-fieldset-up', self.fieldsetMoveUp);
             $formConfig.on('click', '.config-fieldset-down', self.fieldsetMoveDown);
 
-            $formConfig.on('change', '#form-search-config-sort select', function() {
+            $formConfig.on('change', '#search-config-sort-form select', function() {
                 const select = $(this);
                 const fieldset = select.closest('fieldset');
                 const optionSelected = $('option:selected', select);

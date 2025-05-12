@@ -98,6 +98,11 @@ class IndexSearch extends AbstractJob
      */
     protected $startResourceId = 0;
 
+    /**
+     * @var array
+     */
+    protected $staticEntityIds = [];
+
     public function perform(): void
     {
         // TODO Paralelize independant search engines. Useless for now.
@@ -218,6 +223,12 @@ class IndexSearch extends AbstractJob
                 'Process done with a new entity manager' // @translate
             );
         }
+
+        // Prepare data to refresh entity manager.
+        $this->staticEntityIds = [
+            'job_id' => $this->job->getId(),
+            'user_id' => $this->job->getOwner() ? $this->job->getOwner()->getId() : null,
+        ];
 
         $timeStart = microtime(true);
 
@@ -383,8 +394,8 @@ class IndexSearch extends AbstractJob
                 ++$loop;
                 $totals[$resourceType] += $countResources;
 
-                // FIXME Find why all resources are not cleared each loop.
-                $this->entityManager->clear();
+                // FIXME Find why all resources are not cleared each loop when there is one or two entity manager.
+                $this->refreshEntityManager();
 
                 // Useless in practice and need some seconds.
                 // gc_collect_cycles();
@@ -416,6 +427,24 @@ class IndexSearch extends AbstractJob
                 'duration' => $timeTotal,
             ]
         );
+    }
+
+    protected function refreshEntityManager(): void
+    {
+        $this->entityManager->flush();
+        $this->entityManager->clear();
+
+        $user = $this->staticEntityIds['user_id'] ? $this->entityManager->find(\Omeka\Entity\User::class, $this->staticEntityIds['user_id']) : null;
+        if ($user && !$this->entityManager->contains($user)) {
+            $this->entityManager->persist($user);
+            // $this->getServiceLocator()->get('Omeka\AuthenticationService')->setIdentity($user);
+        }
+
+        $this->job = $this->entityManager->find(\Omeka\Entity\Job::class, $this->staticEntityIds['job_id']);
+        if (!$this->entityManager->contains($this->job)) {
+            $this->job->setOwner($user);
+            $this->entityManager->persist($this->job);
+        }
     }
 
     /**

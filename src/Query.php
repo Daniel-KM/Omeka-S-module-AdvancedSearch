@@ -661,6 +661,8 @@ class Query implements JsonSerializable
     {
         return [
             'query' => $this->getQuery(),
+            'query_refine' => $this->getQueryRefine(),
+            'query_default_field' => $this->getQueryDefaultField(),
             'resource_types' => $this->getResourceTypes(),
             'by_resource_type' => $this->getByResourceType(),
             'aliases' => $this->getAliases(),

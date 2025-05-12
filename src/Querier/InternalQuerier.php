@@ -577,7 +577,7 @@ class InternalQuerier extends AbstractQuerier
         $list = array_column($qb->getQuery()->getScalarResult(), 'val', 'val');
 
         // Fix false empty duplicate or values without title.
-        $list = array_keys(array_flip($list));
+        $list = array_keys(array_flip(array_map('strval', $list)));
         unset($list['']);
 
         return array_combine($list, $list);

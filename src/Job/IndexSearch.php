@@ -40,12 +40,13 @@ class IndexSearch extends AbstractJob
     /**
      * The number of resources to index by step.
      *
-     * Use a small number to avoid memory issues when resources are big,
-     * included linked resources, medias, item sets, etc.
+     * A lower batch size does not mean lower memory usage. It may depends on
+     * resources and number of linked resources.
+     * @see https://gitlab.com/Daniel-KM/Omeka-S-module-SearchSolr/-/issues/13
      *
      * @var int
      */
-    const BATCH_SIZE = 100;
+    const BATCH_SIZE = 500;
 
     /**
      * @var \Omeka\Api\Manager
@@ -225,10 +226,11 @@ class IndexSearch extends AbstractJob
         }
 
         $timeTotal = (int) (microtime(true) - $timeStart);
+        $maxMemory = memory_get_peak_usage(true);
 
         $this->logger->info(
-            'End of indexing. Execution time: {duration} seconds. Failed indexed resources should be checked manually.', // @translate
-            ['duration' => $timeTotal]
+            'End of indexing. Execution time: {duration} seconds. Max memory: {memory}. Failed indexed resources should be checked manually.', // @translate
+            ['duration' => $timeTotal, 'memory' => $maxMemory]
         );
     }
 

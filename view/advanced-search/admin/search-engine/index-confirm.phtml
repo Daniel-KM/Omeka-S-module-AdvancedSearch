@@ -53,9 +53,9 @@ $this->headLink()
 
         <p>
             <?= $translate('Number of resources processed by batch') ?>
-            <input name="resources_by_batch" placeholder="0" value="100" min="0" type="number" form="confirmform" />
+            <input name="resources_by_batch" placeholder="0" value="500" min="0" type="number" form="confirmform" />
             <div class="setting-info">
-	            <?= $translate('This option slows reindexing and may avoid overload when records are big.') ?>
+	            <?= $translate('This option may avoid overload when records are big or with many linked resources. Note: A greater value may reduce memory in some cases.') ?>
             </div>
         </p>
 

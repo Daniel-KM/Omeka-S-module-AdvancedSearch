@@ -151,7 +151,7 @@ class AbstractFacet extends AbstractHelper
     {
         $isFacetModeDirect = in_array($options['mode'] ?? null, ['link', 'js']);
 
-        foreach ($facetValues as /* $facetIndex => */ &$facetValue) {
+        foreach ($facetValues as $facetIndex => &$facetValue) {
             $facetValueValue = (string) $facetValue['value'];
 
             // The facet value is compared against a string (the query args).
@@ -159,8 +159,13 @@ class AbstractFacet extends AbstractHelper
             if (strlen($facetValueLabel)) {
                 [$active, $url] = $this->prepareActiveAndUrl($facetField, $facetValueValue, $isFacetModeDirect);
             } else {
-                $active = false;
-                $url = '';
+                // TODO Check item sets facets that are not filtered by site with module Search Solr.
+                // The facet value is not a real value; or not in the current
+                // site and there is a bad index.
+                // $active = false;
+                // $url = '';
+                unset($facetValues[$facetIndex]);
+                continue;
             }
 
             $facetValue['value'] = $facetValueValue;

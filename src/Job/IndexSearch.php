@@ -127,8 +127,7 @@ class IndexSearch extends AbstractJob
         $this->batchSize = abs((int) $this->getArg('resources_by_batch')) ?: self::BATCH_SIZE;
         $this->sleepAfterLoop = abs((int) $this->getArg('sleep_after_loop')) ?: 0;
 
-        $this->resourceTypes = $this->getArg('resource_types', [])
-            ?: $searchEngine->setting('resource_types', []);
+        $this->resourceTypes = $this->getArg('resource_types') ?: [];
 
         $force = $this->getArg('force');
 
@@ -146,7 +145,8 @@ class IndexSearch extends AbstractJob
         $searchEnginesToProcess = [];
         foreach ($searchEngines as $searchEngine) {
             $indexer = $searchEngine->indexer();
-            foreach ($this->resourceTypes as $resourceType) {
+            $searchEngineResourceTypes = $this->resourceTypes ?: $searchEngine->setting('resource_types', []);
+            foreach ($searchEngineResourceTypes as $resourceType) {
                 if ($indexer->canIndex($resourceType)
                     && in_array($resourceType, $searchEngine->setting('resource_types', []))
                 ) {
@@ -252,7 +252,9 @@ class IndexSearch extends AbstractJob
         $clearIndex = (bool) $this->getArg('clear_index');
 
         $engineResourceTypes = $searchEngine->setting('resource_types', []);
-        $resourceTypes = array_intersect($engineResourceTypes, $this->resourceTypes);
+        $resourceTypes = $this->resourceTypes
+            ? array_intersect($engineResourceTypes, $this->resourceTypes)
+            : $engineResourceTypes;
         $resourceTypes = array_filter($resourceTypes, fn ($resourceType) => $indexer->canIndex($resourceType));
 
         if (empty($resourceTypes)) {

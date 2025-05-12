@@ -785,7 +785,8 @@ class SearchConfigController extends AbstractActionController
     /**
      * Transform the given string into a valid URL slug.
      *
-     * Unlike site slug slugify, replace with "_" and don't start with a number.
+     * Unlike site slug slugify, replace forbidden characters with "_", and
+     * don't start with a number. The ":" is allowed too (like terms).
      * Furthermore, the slug case is kept.
      *
      * @see \Omeka\Api\Adapter\SiteSlugTrait::slugify()
@@ -804,7 +805,7 @@ class SearchConfigController extends AbstractActionController
         }
         // Don't lowercase string here.
         // $slug = mb_strtolower($slug, 'UTF-8');
-        $slug = preg_replace('/[^a-zA-Z0-9_]+/u', '_', $slug);
+        $slug = preg_replace('/[^a-zA-Z0-9_:]+/u', '_', $slug);
         $slug = preg_replace('/^\d+$/', '_', $slug);
         $slug = preg_replace('/_{2,}/', '_', $slug);
         $slug = preg_replace('/_*$/', '', $slug);

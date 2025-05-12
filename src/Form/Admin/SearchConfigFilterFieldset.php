@@ -28,7 +28,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 'attributes' => [
                     'id' => 'form_filter_name',
                     'required' => true,
-                    'pattern' => '[a-zA-Z0-9_\-]+',
+                    'pattern' => '[a-zA-Z0-9_:\-]+',
                 ],
             ])
             ->add([

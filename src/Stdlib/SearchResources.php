@@ -434,10 +434,7 @@ class SearchResources
 
         $override = [];
         $query = $this->startOverrideQuery($query, $override);
-        if (!empty($override)) {
-            $request->setOption('override', $override);
-        }
-
+        $request->setOption('override', $override);
         $request->setContent($query);
 
         return $this;

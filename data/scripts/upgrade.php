@@ -740,6 +740,18 @@ if (version_compare($oldVersion, '3.4.26', '<')) {
     $connection->executeStatement($sql);
 }
 
+// Normalize name of a column early.
+/** @see https://forum.omeka.org/t/problem-from-failed-update-from-advanced-search-3-4-27-to-3-4-44/27400/2 */
+$sql = <<<'SQL'
+        ALTER TABLE `search_config`
+        CHANGE `path` `slug` varchar(190) NOT NULL AFTER `name`;
+        SQL;
+try {
+    $connection->executeStatement($sql);
+} catch (\Exception $e) {
+    // Already done.
+}
+
 if (version_compare($oldVersion, '3.4.28', '<')) {
     // TODO Move this in module Common in a new class "UpgradeTheme".
     // The previous version used shell commands, but they may be forbidden by some servers.
@@ -945,6 +957,9 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
             $results[$key][] = $result;
             continue;
         }
+        // Process upgrade of files.
+        // This feature is not documented in readme and not officialy supported,
+        // so at your own risk!
         $total = count($stringsAndMessage['commands']);
         $i = 0;
         foreach ($stringsAndMessage['commands'] as $commandName => $commandArgs) switch ($commandName) {
@@ -1017,36 +1032,16 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
     }
     if ($results) {
         $messages = [];
-        if (empty($config['advancedsearch_skip_exception'])) {
-            $message = new PsrMessage(
-                'The module may break the theme to manage new features, in particular for facets.
-To avoid this check, add temporarily the key "advancedsearch_skip_exception" with value "true" in the file config/local.config.php.
-To process **some** of them automatically, you should backup themes and files, then add temporarily the key "advancedsearch_upgrade_3.4.28" with value "true" in the file config/local.config.php.
-The list of issues is available in logs too.' // @translate
-            );
-            $messages[] = $message;
-        }
+        $message = new PsrMessage(
+            'The module may break the theme to manage new features, in particular for facets.' // @translate
+        );
+        $messages[] = $message;
         foreach ($results as $key => $result) {
             $message = new PsrMessage($stringsAndMessages[$key]['message'], ['json' => json_encode($result, 448)]);
             $logger->err($message->getMessage(), $message->getContext());
             $messages[] = $message;
         }
-        if (empty($config['advancedsearch_skip_exception'])) {
-            throw new \Omeka\Module\Exception\ModuleCannotInstallException(implode("\n\n", array_map(fn ($message) => (string) $message->setTranslator($translator), $messages)));
-        }
         $messenger->addErrors($messages);
-        $message = new PsrMessage(
-            'The key "{key}" can be removed from the file config/local.config.php.', // @translate
-            ['key' => 'advancedsearch_skip_exception']
-        );
-        $messenger->addNotice($message);
-        if (array_key_exists('advancedsearch_upgrade_3.4.28', $config)) {
-            $message = new PsrMessage(
-                'The key "{key}" can be removed from the file config/local.config.php.', // @translate
-                ['key' => 'advancedsearch_upgrade_3.4.28']
-            );
-            $messenger->addNotice($message);
-        }
     }
 
     $stringsAndMessages = [
@@ -1146,6 +1141,21 @@ The list of issues is available in logs too.' // @translate
         'The default template for the list of results was updated to use css flex. Check your theme.' // @translate
     );
     $messenger->addWarning($message);
+
+    if (array_key_exists('advancedsearch_skip_exception', $config)) {
+        $message = new PsrMessage(
+            'The key "{key}" can be removed from the file config/local.config.php.', // @translate
+            ['key' => 'advancedsearch_skip_exception']
+        );
+        $messenger->addNotice($message);
+    }
+    if (array_key_exists('advancedsearch_upgrade_3.4.28', $config)) {
+        $message = new PsrMessage(
+            'The key "{key}" can be removed from the file config/local.config.php.', // @translate
+            ['key' => 'advancedsearch_upgrade_3.4.28']
+        );
+        $messenger->addNotice($message);
+    }
 }
 
 if (version_compare($oldVersion, '3.4.29', '<')) {
@@ -1766,7 +1776,7 @@ if (version_compare($oldVersion, '3.4.36', '<')) {
             ['json' => json_encode($result, 448)]
         );
         $logger->err($message->getMessage(), $message->getContext());
-        throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message->setTranslator($translator));
+        // throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message->setTranslator($translator));
     }
 
     $settings->delete('advancedsearch_configs');
@@ -1975,4 +1985,38 @@ if (version_compare($oldVersion, '3.4.43', '<')) {
         'Json-ld data are appended to results when enabled. You may need to add triggers if the theme is customized.' // @translate
     );
     $messenger->addSuccess($message);
+}
+
+if (version_compare($oldVersion, '3.4.45', '<')) {
+    $qb = $connection->createQueryBuilder();
+    $qb
+        ->select('id', 'settings')
+        ->from('search_config', 'search_config')
+        ->orderBy('id', 'asc');
+    $searchConfigsSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    foreach ($searchConfigsSettings as $id => $searchConfigSettings) {
+        $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
+        $k = 0;
+        $filters = [];
+        foreach ($searchConfigSettings['form']['filters'] ?? [] as $filter) {
+            $field = $filter['field'];
+            if (isset($filters[$field])) {
+                $field = $field . '_' . ++$k;
+            }
+            $filters[$field] = $filter;
+        }
+        $searchConfigSettings['form']['filters'] = $filters;
+        $k = 0;
+        $facets = [];
+        foreach ($searchConfigSettings['facet']['facets'] ?? [] as $facet) {
+            $field = $facet['field'];
+            if (isset($facets[$field])) {
+                $field = $field . '_' . ++$k;
+            }
+            $facets[$field] = $facet;
+        }
+        $searchConfigSettings['facet']['facets'] = $facets;
+        $sql = 'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?;';
+        $connection->executeStatement($sql, [json_encode($searchConfigSettings, 320), $id]);
+    }
 }

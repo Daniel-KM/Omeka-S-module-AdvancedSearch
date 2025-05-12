@@ -134,6 +134,10 @@ class SearchConfigAdapter extends AbstractEntityAdapter
     public function hydrate(Request $request, EntityInterface $entity,
         ErrorStore $errorStore
     ): void {
+        /** @var \AdvancedSearch\Entity\SearchConfig $entity */
+
+        $entityManager = $this->getEntityManager();
+
         if ($this->shouldHydrate($request, 'o:name')) {
             $entity->setName($request->getValue('o:name'));
         }
@@ -143,9 +147,11 @@ class SearchConfigAdapter extends AbstractEntityAdapter
         if ($this->shouldHydrate($request, 'o:search_engine')) {
             $searchEngine = $request->getValue('o:search_engine');
             if (is_array($searchEngine)) {
-                $searchEngine = $this->getAdapter('search_engines')->findEntity($searchEngine['o:id'] ?? 0);
+                $searchEngine = empty($searchEngine['o:id']) ? null : $entityManager->find(\AdvancedSearch\Entity\SearchEngine::class, $searchEngine['o:id']);
             } elseif (is_numeric($searchEngine)) {
-                $searchEngine = $this->getAdapter('search_engines')->findEntity((int) $searchEngine);
+                $searchEngine = $entityManager->find(\AdvancedSearch\Entity\SearchEngine::class, (int) $searchEngine);
+            } else {
+                $searchEngine = null;
             }
             $entity->setEngine($searchEngine);
         }

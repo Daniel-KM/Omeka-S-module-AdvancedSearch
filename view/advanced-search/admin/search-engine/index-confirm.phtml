@@ -30,19 +30,21 @@ $this->headLink()
 <?php endif; ?>
 <?php if (count($resourceTypes)): ?>
     <div id="sidebar-confirm">
-        <h3><?= sprintf($translate('Reindex "%s"'), $resource->name()) ?></h3>       
+        <h3><?= sprintf($translate('Reindex "%s"'), $resource->name()) ?></h3>
 
         <p>
-            <input name="clear_index" value="1" type="checkbox" form="confirmform" /> <?= $translate('Clear index') ?>
+            <input name="clear_index" value="1" type="checkbox" form="confirmform" />
+            <?= $translate('Clear index') ?>
             <div class="setting-info">
                 <?= $translate('Clearing index will make the search unavailable during reindexation, but it avoids the rare cases where indexes of deleted resources were not removed.') ?>
                 <?= $translate('You may redirect the users to a clone of the current index temporary.') ?>
             </div>
         </p>
 
-        </p>
+        <p>
         <?php if ($listJobStatusesByIds): ?>
-            <input form="<?= $form->getName() ?>" name="force" type="checkbox" /> <?= $translate('Force indexing') ?><br />
+            <input form="<?= $form->getName() ?>" name="force" type="checkbox" />
+            <?= $translate('Force indexing') ?><br />
             <?= sprintf($translate('%1$d running indexings: #%2$s.'), count($listJobStatusesByIds), implode(', #', array_keys($listJobStatusesByIds))) ?><br />
         <?php else: ?>
             <?= $translate('No running indexing: process can be launched.') ?>
@@ -55,7 +57,7 @@ $this->headLink()
             <?= $translate('Number of resources processed by batch') ?>
             <input name="resources_by_batch" placeholder="0" value="500" min="0" type="number" form="confirmform" />
             <div class="setting-info">
-	            <?= $translate('This option may avoid overload when records are big or with many linked resources. Note: A greater value may reduce memory in some cases.') ?>
+                <?= $translate('This option may avoid overload when records are big or with many linked resources. Note: A greater value may reduce memory in some cases.') ?>
             </div>
         </p>
 
@@ -63,7 +65,7 @@ $this->headLink()
             <?= $translate('Sleep between batchs') ?> (<?= $translate('seconds') ?>)
             <input name="sleep_after_loop" placeholder="0" value="0" min="0" type="number" form="confirmform" />
             <div class="setting-info">
-	            <?= $translate('When there are many errors "HTTP request failed", increase this limit to 10, 30, 60 seconds or check server.') ?>
+                <?= $translate('When there are many errors "HTTP request failed", increase this limit to 10, 30, 60 seconds or check server.') ?>
             </div>
         </p>
 

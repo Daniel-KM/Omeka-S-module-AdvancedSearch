@@ -108,6 +108,12 @@ class FulltextSearchDelegator extends FulltextSearch
         $stmt->executeStatement();
     }
 
+    /**
+     * Copy:
+     * @see \AdvancedSearch\Stdlib\FulltextSearchDelegator::extractText()
+     * @see \SearchSolr\ValueExtractor\AbstractResourceEntityValueExtractor::extractContentAlto()
+     * @see \IiifServer\View\Helper\IiifAnnotationPageLine2::__invoke()
+     */
     protected function extractText(Media $media): string
     {
         if ($media->getMediaType() !== 'application/alto+xml') {

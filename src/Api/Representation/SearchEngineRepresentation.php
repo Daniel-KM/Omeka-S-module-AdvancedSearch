@@ -73,6 +73,9 @@ class SearchEngineRepresentation extends AbstractEntityRepresentation
         return $this->resource->getName();
     }
 
+    /**
+     * Slugify and lower case the search engine name.
+     */
     public function cleanName(): string
     {
         return strtolower(str_replace('__', '_',

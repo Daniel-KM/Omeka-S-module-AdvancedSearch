@@ -119,10 +119,10 @@ class IndexSearch extends AbstractJob
         $searchEngineIds = $this->getArg('search_engine_ids');
 
         $this->resourceIds = $this->getArg('resource_ids', []) ?: [];
-        $this->startResourceId = (int) $this->getArg('start_resource_id');
+        $this->startResourceId = abs((int) $this->getArg('start_resource_id'));
 
-        $this->resourcesLimit = $this->getArg('resources_limit');
-        $this->resourcesOffset = $this->getArg('resources_offset');
+        $this->resourcesLimit = abs((int) $this->getArg('resources_limit'));
+        $this->resourcesOffset = abs((int) $this->getArg('resources_offset'));
 
         $this->batchSize = abs((int) $this->getArg('resources_by_batch')) ?: self::BATCH_SIZE;
         $this->sleepAfterLoop = abs((int) $this->getArg('sleep_after_loop')) ?: 0;
@@ -172,6 +172,8 @@ class IndexSearch extends AbstractJob
             );
             return;
         }
+        $this->resourceIds = $ids;
+        unset($ids);
 
         $listJobStatusesByIds = $services->get('ControllerPluginManager')->get('listJobStatusesByIds');
         $listJobStatusesByIds = $listJobStatusesByIds(self::class, true, null, $this->job->getId());
@@ -194,8 +196,6 @@ class IndexSearch extends AbstractJob
             );
         }
 
-        $this->resourceIds = $ids;
-        unset($ids);
         if ($this->resourceIds) {
             $this->startResourceId = 1;
         }
@@ -349,7 +349,7 @@ class IndexSearch extends AbstractJob
             $countResources = 0;
             $totalToProcessForCurrentResourceType = count($args['id']);
 
-            $lastMemUsage = memory_get_usage();
+            // $lastMemUsage = memory_get_usage();
 
             do {
                 if ($this->shouldStop()) {
@@ -377,6 +377,7 @@ class IndexSearch extends AbstractJob
                                 'resource_id' => $resource->id(),
                                 'results' => implode('; ', $totalResults),
                                 'duration' => (int) (microtime(true) - $timeStart),
+                                // 'memory_usage' => memory_get_usage(),
                             ]
                         );
                     }
@@ -427,6 +428,7 @@ class IndexSearch extends AbstractJob
                 'name' => $searchEngine->name(),
                 'results' => implode('; ', $totalResults),
                 'duration' => $timeTotal,
+                // 'memory_usage' => memory_get_usage(),
             ]
         );
     }

@@ -527,6 +527,11 @@ class Module extends AbstractModule
             return;
         }
 
+        // Avoid issue when upgrading Common.
+        if (!$services->has('Common\EasyMeta')) {
+            return;
+        }
+
         $settings = $services->get('Omeka\Settings');
         $searchConfigs = $settings->get('advancedsearch_all_configs', []);
 

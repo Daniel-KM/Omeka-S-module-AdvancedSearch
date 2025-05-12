@@ -459,6 +459,8 @@ When ready, the api search is available via multiple means.
 - Do a standard search in the theme with the view helpers `$this->apiSearch()`,
   and `$this->apiSearchOne()`, that have the same arguments than `$this->api()->search()`
   and `$this->api()->searchOne()`. The result is an Omeka Response.
+  Note that it is preferable to use `$this->api()->read()` when possible for
+  performance and simplicity of the processes.
 - Use the controller plugins `$this->apiSearch()` and `$this->apiSearchOne()`.
 - The main api manager understand these arguments too.
 - If the api config is made available on a site, it will be a quick access to

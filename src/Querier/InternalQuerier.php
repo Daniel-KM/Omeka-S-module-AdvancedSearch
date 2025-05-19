@@ -521,19 +521,25 @@ class InternalQuerier extends AbstractQuerier
 
         if ($isResourceQuery) {
             $qb
-                ->select('valueResource.title AS val')
+                ->select('valueResource.title AS v')
                 ->from(\Omeka\Entity\Value::class, 'value')
                 // This join allow to check visibility automatically too.
                 ->innerJoin(\Omeka\Entity\Item::class, 'resource', Join::WITH, $expr->eq('value.resource', 'resource'))
-                ->innerJoin(\Omeka\Entity\Item::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'));
+                ->innerJoin(\Omeka\Entity\Item::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'))
+                // Always return a non-empty string, not null.
+                ->where('valueResource.title IS NOT NULL')
+                ->andWhere('valueResource.title != ""');
         } else {
             $qb
-                ->select('COALESCE(value.value, valueResource.title, value.uri) AS val')
+                // Always return a string, not null.
+                // Doctrine rejects empty string withy double quote.
+                ->select("COALESCE(value.value, valueResource.title, value.uri, '') AS v")
                 ->from(\Omeka\Entity\Value::class, 'value')
                 // This join allow to check visibility automatically too.
                 ->innerJoin(\Omeka\Entity\Item::class, 'resource', Join::WITH, $expr->eq('value.resource', 'resource'))
                 // The values should be distinct for each type.
-                ->leftJoin(\Omeka\Entity\Item::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'));
+                ->leftJoin(\Omeka\Entity\Item::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'))
+                ->where("COALESCE(value.value, valueResource.title, value.uri, '') != ''");
         }
 
         if (!empty($fieldQueryArgs['lang'])) {
@@ -560,26 +566,22 @@ class InternalQuerier extends AbstractQuerier
         }
 
         $siteId = $this->query->getSiteId();
-        $siteAlias = 'site';
         if ($siteId) {
+            $siteAlias = 'site';
             $qb
                 ->innerJoin('resource.sites', $siteAlias, 'WITH', $expr->eq("$siteAlias.id", ':site_id'))
                 ->setParameter('site_id', $siteId);
-            // TODO Manage settigns site_attachements_only. See ItemAdapter.
+            // TODO Manage settings site_attachements_only. See ItemAdapter.
         }
 
         $qb
             ->andWhere($expr->in('value.property', ':properties'))
             ->setParameter('properties', array_values($propertyIds), \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
-            ->groupBy('val')
-            ->orderBy('val', 'asc');
+            ->groupBy('v')
+            ->orderBy('v', 'asc');
 
-        $list = array_column($qb->getQuery()->getScalarResult(), 'val', 'val');
-
-        // Fix false empty duplicate or values without title.
-        $list = array_keys(array_flip(array_map('strval', $list)));
-        unset($list['']);
-
+        // Empty values (null and "") and duplicates are removed earlier.
+        $list = $qb->getQuery()->getSingleColumnResult();
         return array_combine($list, $list);
     }
 

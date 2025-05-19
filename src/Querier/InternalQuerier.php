@@ -1237,8 +1237,8 @@ class InternalQuerier extends AbstractQuerier
      */
     protected function fieldToIndex(string $field)
     {
-        return $this->easyMeta->propertyTerm($field)
-            ?? $this->query->getAliases()[$field]['fields']
+        return $this->query->getAliases()[$field]['fields']
+            ?? $this->easyMeta->propertyTerm($field)
             ?? $this->underscoredNameToTerm($field)
             ?? null;
     }

@@ -118,10 +118,10 @@ class Module extends AbstractModule
             \Omeka\Module\Manager::STATE_NEEDS_UPGRADE,
         ])) {
             $version = $module->getIni('version');
-            if (version_compare($version, '3.5.56', '<')) {
+            if (version_compare($version, '3.5.57', '<')) {
                 $messenger->addWarning(new PsrMessage(
                     'The module {module} should be upgraded to version {version} or later.', // @translate
-                    ['module' => 'SearchSolr', 'version' => '3.5.56']
+                    ['module' => 'SearchSolr', 'version' => '3.5.57']
                 ));
             } elseif ($module->getState() !== \Omeka\Module\Manager::STATE_ACTIVE) {
                 $messenger->addNotice(new PsrMessage(

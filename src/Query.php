@@ -264,6 +264,15 @@ class Query implements JsonSerializable
         return $this;
     }
 
+    /**
+     * Set an alias, overriding the existing alias with the same name.
+     */
+    public function setAlias(string $alias, array $data): self
+    {
+        $this->aliases[$alias] = $data;
+        return $this;
+    }
+
     public function getAliases(): array
     {
         return $this->aliases;

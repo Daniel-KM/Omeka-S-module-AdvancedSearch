@@ -71,6 +71,7 @@ class SearchController extends AbstractActionController
         } else {
             $site = null;
             $itemSet = null;
+            $itemSetId = null;
         }
 
         // The config is required, else there is no form.
@@ -100,9 +101,14 @@ class SearchController extends AbstractActionController
 
         // On an item set page, only one item set can be used and the page
         // should limit results to it.
-        // With the module Advanced Search, the name of the arg is "item_set".
-        if ($itemSet) {
-            $request['item_set'] = $itemSet->id();
+        // With the module Advanced Search, the name of the arg was "item_set".
+        if ($itemSet
+            // Avoid to duplicate arg for item set, that has a default alias.
+            && (empty($request['item_set_id'])
+                || (is_numeric($request['item_set_id']) && (int) $request['item_set_id'] !== $itemSetId)
+            )
+        ) {
+            $request['item_set'] = $itemSetId;
         }
 
         // The form may be empty for a direct query.

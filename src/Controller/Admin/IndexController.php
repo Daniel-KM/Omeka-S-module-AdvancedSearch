@@ -108,8 +108,7 @@ class IndexController extends AbstractActionController
 
         $siteSlugs = $api->search('sites', [], ['returnScalar' => 'slug'])->getContent();
         foreach ($siteSlugs as $siteId => $siteSlug) {
-            $siteSettings->setTargetId($siteId);
-            $searchFields = $siteSettings->get('advancedsearch_search_fields') ?: [];
+            $searchFields = $siteSettings->get('advancedsearch_search_fields', null, $siteId) ?: [];
             // foreach ($searchFields as $searchField) {
             //     if (substr($searchField, -9) === '-improved') {
             //         $results[$siteId] = $siteSlug;

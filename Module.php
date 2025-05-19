@@ -181,8 +181,7 @@ class Module extends AbstractModule
 
         $siteSlugs = $api->search('sites', [], ['returnScalar' => 'slug'])->getContent();
         foreach ($siteSlugs as $siteId => $siteSlug) {
-            $siteSettings->setTargetId($siteId);
-            $searchFields = $siteSettings->get('advancedsearch_search_fields') ?: [];
+            $searchFields = $siteSettings->get('advancedsearch_search_fields', null, $siteId) ?: [];
             // foreach ($searchFields as $searchField) {
             //     if (substr($searchField, -9) === '-improved') {
             //         $results[$siteId] = $siteSlug;
@@ -612,7 +611,9 @@ class Module extends AbstractModule
             return;
         }
 
+        /** @var \Omeka\Settings\SiteSettings $siteSettings */
         $siteSettings = $services->get('Omeka\Settings\Site');
+        // The site settings is not set yet, so set it.
         $siteSettings->setTargetId($site->getId());
         $siteSearchConfigs = $siteSettings->get('advancedsearch_configs', []);
         $siteSearchConfigs = array_intersect_key($searchConfigs, array_flip($siteSearchConfigs));
@@ -1476,8 +1477,7 @@ class Module extends AbstractModule
             }
         }
         if ($site) {
-            $siteSettings->setTargetId($site->id());
-            $searchConfigId = (int) $siteSettings->get('advancedsearch_main_config');
+            $searchConfigId = (int) $siteSettings->get('advancedsearch_main_config', 0, $site->id());
         } else {
             $searchConfigId = (int) $settings->get('advancedsearch_main_config');
         }
@@ -1503,15 +1503,15 @@ class Module extends AbstractModule
         /** @var \Omeka\Entity\Site $site */
         $site = $event->getParam('response')->getContent();
 
-        $siteSettings->setTargetId($site->getId());
-        $siteSettings->set('advancedsearch_main_config', $searchConfig->id());
-        $siteSettings->set('advancedsearch_configs', [$searchConfig->id()]);
-        $siteSettings->set('advancedsearch_redirect_itemset_browse', ['all']);
-        $siteSettings->set('advancedsearch_redirect_itemset_search', []);
-        $siteSettings->set('advancedsearch_redirect_itemset_search_first', []);
-        $siteSettings->set('advancedsearch_redirect_itemset_page_url', []);
-        $siteSettings->set('advancedsearch_redirect_itemsets', ['default' => 'browse']);
-        $siteSettings->set('advancedsearch_redirect_itemset', 'browse');
+        $siteId = $site->getId();
+        $siteSettings->set('advancedsearch_main_config', $searchConfig->id(), $siteId);
+        $siteSettings->set('advancedsearch_configs', [$searchConfig->id()], $siteId);
+        $siteSettings->set('advancedsearch_redirect_itemset_browse', ['all'], $siteId);
+        $siteSettings->set('advancedsearch_redirect_itemset_search', [], $siteId);
+        $siteSettings->set('advancedsearch_redirect_itemset_search_first', [], $siteId);
+        $siteSettings->set('advancedsearch_redirect_itemset_page_url', [], $siteId);
+        $siteSettings->set('advancedsearch_redirect_itemsets', ['default' => 'browse'], $siteId);
+        $siteSettings->set('advancedsearch_redirect_itemset', 'browse', $siteId);
     }
 
     protected function installResources(): void

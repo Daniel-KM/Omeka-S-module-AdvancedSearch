@@ -340,10 +340,10 @@ class SearchConfigController extends AbstractActionController
         $siteSettings = $this->siteSettings();
         $sites = $this->api()->search('sites')->getContent();
         foreach ($sites as $site) {
-            $siteSettings->setTargetId($site->id());
-            $siteSearchId = (int) $siteSettings->get('advancedsearch_main_config');
+            $siteId = $site->id();
+            $siteSearchId = (int) $siteSettings->get('advancedsearch_main_config', null, $siteId);
             if ($siteSearchId && $siteSearchId === $searchConfigId) {
-                $result[] = $site->id();
+                $result[] = $siteId;
             }
         }
 
@@ -358,10 +358,10 @@ class SearchConfigController extends AbstractActionController
         $siteSettings = $this->siteSettings();
         $sites = $this->api()->search('sites')->getContent();
         foreach ($sites as $site) {
-            $siteSettings->setTargetId($site->id());
-            $searchConfigIdsForSite = $siteSettings->get('advancedsearch_configs', []);
+            $siteId = $site->id();
+            $searchConfigIdsForSite = $siteSettings->get('advancedsearch_configs', [], $siteId);
             if (in_array($searchConfigId, $searchConfigIdsForSite)) {
-                $result[] = $site->id();
+                $result[] = $siteId;
             }
         }
 
@@ -398,6 +398,7 @@ class SearchConfigController extends AbstractActionController
         }
 
         // Manage site settings.
+        /** @var \Omeka\Settings\SiteSettings $siteSettings */
         $siteSettings = $this->siteSettings();
 
         $allDefaults = [];
@@ -411,21 +412,19 @@ class SearchConfigController extends AbstractActionController
         $sites = $this->api()->search('sites')->getContent();
         foreach ($sites as $site) {
             $siteId = $site->id();
-            $siteSettings->setTargetId($siteId);
-
-            $prevDefaultForSite = (int) $siteSettings->get('advancedsearch_main_config');
+            $prevDefaultForSite = (int) $siteSettings->get('advancedsearch_main_config', null, $siteId);
             $setDefaultForSite = $defaultForAllSitesAdded
                 || in_array($siteId, $searchConfigSiteDefaults);
             if ($setDefaultForSite) {
-                $siteSettings->set('advancedsearch_main_config', $searchConfigId);
+                $siteSettings->set('advancedsearch_main_config', $searchConfigId, $siteId);
             } elseif ($defaultForAllSitesRemoved || $prevDefaultForSite === $searchConfigId) {
-                $siteSettings->set('advancedsearch_main_config', null);
+                $siteSettings->set('advancedsearch_main_config', null, $siteId);
             }
-            if ($siteSettings->get('advancedsearch_main_config') === $searchConfigId) {
+            if ($siteSettings->get('advancedsearch_main_config', null, $siteId) === $searchConfigId) {
                 $allDefaults[] = $site->slug();
             }
 
-            $searchConfigIdsForSite = $siteSettings->get('advancedsearch_configs', []);
+            $searchConfigIdsForSite = $siteSettings->get('advancedsearch_configs', [], $siteId);
             $prevAvailableForSite = in_array($searchConfigId, $searchConfigIdsForSite);
             $setAvailableForSite = $setDefaultForSite
                 || $availabilityForAllSitesEnabled
@@ -437,7 +436,7 @@ class SearchConfigController extends AbstractActionController
             }
             $searchConfigIdsForSite = array_unique(array_filter(array_map('intval', $searchConfigIdsForSite)));
             sort($searchConfigIdsForSite);
-            $siteSettings->set('advancedsearch_configs', $searchConfigIdsForSite);
+            $siteSettings->set('advancedsearch_configs', $searchConfigIdsForSite, $siteId);
             if (in_array($searchConfigId, $searchConfigIdsForSite)) {
                 $allAvailables[] = $site->slug();
             }

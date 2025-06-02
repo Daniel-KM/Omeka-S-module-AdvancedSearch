@@ -682,6 +682,18 @@ $(document).ready(function() {
         // The button may be outside the form.
         const form = $(this)[0].form;
         Search.smartClearForm(form);
+        // Reload page only when there is no button to apply.
+        if (!Search.facets.useApplyFacets) {
+            const url = new URL(window.location.href);
+            const params = new URLSearchParams(url.search);
+            for (const key of params.keys()) {
+                if (key.startsWith('facet[') || key.startsWith('facet%5B')) {
+                    params.delete(key);
+                }
+            }
+            url.search = params.toString();
+            window.location.href = url.toString();
+        }
     });
 
     /**

@@ -79,6 +79,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                         'alphabetic desc' => 'Alphabetic descendant', // @ŧranslate
                         'total desc' => 'Total', // @ŧranslate
                         'total asc' => 'Total ascendant', // @ŧranslate
+                        'total_alpha desc ' => 'Total then alphabetic for hidden values', // @ŧranslate
                         'values asc' => 'Values (listed below)', // @ŧranslate
                         'values desc' => 'Values descendant', // @ŧranslate
                     ],

@@ -1333,6 +1333,15 @@ class InternalQuerier extends AbstractQuerier
                 'sort_by' => 'total',
                 'sort_order' => 'DESC',
             ],
+            // Default total alpha order is desc.
+            'total_alpha' => [
+                'sort_by' => 'total',
+                'sort_order' => 'DESC',
+            ],
+            'total_alpha desc' => [
+                'sort_by' => 'total',
+                'sort_order' => 'DESC',
+            ],
             // Default values order is asc.
             'values' => [
                 'sort_by' => 'values',

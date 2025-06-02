@@ -1977,7 +1977,11 @@ if (version_compare($oldVersion, '3.4.42', '<')) {
 
 if (version_compare($oldVersion, '3.4.43', '<')) {
     // Fix item set pages.
-    $this->finalizeSiteSettings();
+    $siteIds = $api->search('sites', [], ['returnScalar' => 'id'])->getContent();
+    foreach ($siteIds as $siteId) {
+        $siteSettings->setTargetId($siteId);
+        $this->finalizeSiteSettings();
+    }
 
     $settings->delete('advancedsearch_index_batch_edit');
 

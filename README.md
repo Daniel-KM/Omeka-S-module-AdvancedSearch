@@ -581,7 +581,7 @@ TODO
 - [ ] Manage aliases and labels of properties for each resource template with FilterSelect.
 - [ ] Use aliases to manage standard search with solr.
 - [ ] Make all filter types usable with multiple values.
-- [ ] Replace search config form by the styles of the navigation form or the advanced resource template form.
+- [ ] Replace search config form by the styles of the navigation form or the advanced resource template form.
 - [ ] Do not include indexes in form so get multiple form with an index.
 - [ ] Autmatic min/max for facet range double.
 

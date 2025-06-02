@@ -331,7 +331,7 @@ class Query implements JsonSerializable
     }
 
     /**
-     * @deprecated Will be removed in a future version.
+     * @deprecated Will be removed in a future version: use a standard filter or excluded fields.
      */
     public function setRecordOrFullText(?string $recordOrFullText): self
     {
@@ -340,7 +340,7 @@ class Query implements JsonSerializable
     }
 
     /**
-     * @deprecated Will be removed in a future version.
+     * @deprecated Will be removed in a future version: use a standard filter or excluded fields.
      */
     public function getRecordOrFullText(): string
     {

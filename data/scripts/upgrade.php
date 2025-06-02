@@ -2020,3 +2020,10 @@ if (version_compare($oldVersion, '3.4.45', '<')) {
         $connection->executeStatement($sql, [json_encode($searchConfigSettings, 320), $id]);
     }
 }
+
+if (version_compare($oldVersion, '3.4.47', '<')) {
+    $message = new PsrMessage(
+        'A new order for facets was added: order by total descendant, then alphabetically for hidden values.' // @translate
+    );
+    $messenger->addSuccess($message);
+}

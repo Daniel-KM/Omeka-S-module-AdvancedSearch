@@ -130,8 +130,19 @@ $this->headScript()
 
 <?php else: ?>
 
-    <?php $this->htmlElement('body')->appendAttribute('class', 'search-page resource browse'); ?>
-    <?= $this->pageTitle($translate('Search'), 2) ?>
+	<?php
+	if ($query->isBrowse()) {
+	    // No search query.
+	    $mainTitle = $searchConfig->subSetting('results', 'label_default') ?: $translate('Search');
+	} else {
+	    $mainTitle = $response->getTotalResults()
+	       ? $searchConfig->subSetting('results', 'label_results', $translate('Search results'))
+	       : $searchConfig->subSetting('results', 'label_no_results', $translate('No results'));
+    }
+
+    $this->htmlElement('body')->appendAttribute('class', 'search-page resource browse');
+    ?>
+	<?= $this->pageTitle($mainTitle, 2) ?>
 
 <?php endif; ?>
 

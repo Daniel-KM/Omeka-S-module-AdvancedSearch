@@ -541,6 +541,9 @@ return [
         ],
 
         'results' => [
+            'label_default' => $translate('Search'), // @translate
+            'label_results' => $translate('Search results'), // @translate
+            'label_no_results' => $translate('No results'), // @translate
             'by_resource_type' => false,
             'template' => null,
             'breadcrumbs' => false,

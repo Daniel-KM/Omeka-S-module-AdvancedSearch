@@ -632,6 +632,42 @@ class SearchConfigConfigureForm extends Form
             ])
             ->get('results')
             ->add([
+                'name' => 'label_default',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Label without query', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'results_label_default',
+                    'value' => 'Search', // @translate
+                    'required' => false,
+                ],
+            ])
+            ->add([
+                'name' => 'label_results',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Label for results', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'results_label_results',
+                    'value' => 'Search results', // @translate
+                    'required' => false,
+                ],
+            ])
+            ->add([
+                'name' => 'label_no_results',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Label for no results', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'results_label_no_results',
+                    'value' => 'No results', // @translate
+                    'required' => false,
+                ],
+            ])
+            ->add([
                 'name' => 'by_resource_type',
                 'type' => Element\Checkbox::class,
                 'options' => [

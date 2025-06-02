@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-05-12 00:00+0000\n"
+"POT-Creation-Date: 2025-06-02 00:00+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
@@ -31,57 +31,65 @@ msgstr "Intervalle de date"
 msgid "Filters"
 msgstr "Filtres"
 
-#: data/configs/search_config.default.php:564
+#: data/configs/search_config.default.php:545 view/search/search.phtml:139
+msgid "Search results"
+msgstr "Résultats de recherche"
+
+#: data/configs/search_config.default.php:546 view/search/search.phtml:140
+msgid "No results"
+msgstr "Pas de résultats"
+
+#: data/configs/search_config.default.php:567
 #, php-format
 msgid "Results by %d"
 msgstr "Par %d résultats"
 
-#: data/configs/search_config.default.php:565
+#: data/configs/search_config.default.php:568
 msgid "Results by 10"
 msgstr "Par 10 résultats"
 
-#: data/configs/search_config.default.php:567
+#: data/configs/search_config.default.php:570
 msgid "Results by 25"
 msgstr "Par 25 résultats"
 
-#: data/configs/search_config.default.php:568
+#: data/configs/search_config.default.php:571
 msgid "Results by 50"
 msgstr "Par 50 résultats"
 
-#: data/configs/search_config.default.php:569
+#: data/configs/search_config.default.php:572
 msgid "Results by 100"
 msgstr "Par 100 résultats"
 
-#: data/configs/search_config.default.php:579 src/EngineAdapter/Internal.php:91
+#: data/configs/search_config.default.php:582 src/EngineAdapter/Internal.php:91
 #: src/EngineAdapter/Internal.php:194
 msgid "Relevance (inversed)"
 msgstr "Pertinence (inversé)"
 
-#: data/configs/search_config.default.php:587
+#: data/configs/search_config.default.php:590
 msgid "Title (from z to a)"
 msgstr "Titre (de z à a)"
 
-#: data/configs/search_config.default.php:595
+#: data/configs/search_config.default.php:598
 msgid "Date (most recent first)"
 msgstr "Date (du plus récent)"
 
-#: data/configs/search_config.default.php:602
+#: data/configs/search_config.default.php:605
 msgid "No facets"
 msgstr "Pas de facettes"
 
-#: data/configs/search_config.default.php:606
+#: data/configs/search_config.default.php:609
 msgid "Active facets"
 msgstr "Facettes actives"
 
-#: data/configs/search_config.default.php:608
+#: data/configs/search_config.default.php:611
 msgid "Apply facets"
 msgstr "Appliquer les facettes"
 
-#: data/configs/search_config.default.php:610
+#: data/configs/search_config.default.php:613
 msgid "Reset facets"
 msgstr "Effacer les facettes"
 
-#: data/configs/search_config.default.php:612
+#: data/configs/search_config.default.php:615
 msgid "Refine search"
 msgstr "Affiner la recherche"
 
@@ -97,28 +105,28 @@ msgstr ""
 msgid "[Missing engine adapter \"%s\"]"
 msgstr "[Adaptateur « %s » manquant]"
 
-#: src/Controller/SearchController.php:145
+#: src/Controller/SearchController.php:151
 msgid "No query."
 msgstr "Pas de requête."
 
-#: src/Controller/SearchController.php:173
-#: src/Controller/SearchController.php:273
+#: src/Controller/SearchController.php:179
+#: src/Controller/SearchController.php:279
 msgid "An error occurred."
 msgstr "Une erreur est survenue."
 
-#: src/Controller/SearchController.php:219
+#: src/Controller/SearchController.php:225
 msgid "This action requires an ajax request."
 msgstr "Cette action nécessite une requête ajax."
 
-#: src/Controller/SearchController.php:247
+#: src/Controller/SearchController.php:253
 msgid "Not a search page for this site."
 msgstr "Page de recherche indisponible dans ce site."
 
-#: src/Controller/SearchController.php:261
+#: src/Controller/SearchController.php:267
 msgid "The seach engine is not available."
 msgstr "Le moteur de recherche et indisponible."
 
-#: src/Controller/SearchController.php:386
+#: src/Controller/SearchController.php:392
 msgid "Logo"
 msgstr "Logo"
 
@@ -1151,20 +1159,20 @@ msgstr "Fil d’Ariane"
 msgid "Collections"
 msgstr "Collections"
 
-#: view/search/search.phtml:162
+#: view/search/search.phtml:173
 #, php-format
 msgid "%1$d %2$s"
 msgstr "%1$d %2$s"
 
-#: view/search/search.phtml:171
+#: view/search/search.phtml:182
 msgid "Fill a query and get results."
 msgstr "Faîtes une requête pour obtenir des résultats."
 
-#: view/search/search.phtml:173
+#: view/search/search.phtml:184
 msgid "This item set has no items."
 msgstr "Cette collection n’a pas de contenus."
 
-#: view/search/search.phtml:180
+#: view/search/search.phtml:191
 msgid "The query returned no results"
 msgstr "Votre recherche n'a retourné aucun résultat"
 
@@ -1865,7 +1873,7 @@ msgstr ""
 msgid "The module {module} can be reenabled."
 msgstr "Le module {module} peut être réactivé."
 
-#: Module.php:202 src/Controller/Admin/IndexController.php:129
+#: Module.php:201 src/Controller/Admin/IndexController.php:128
 msgid ""
 "The setting to override search element \"property\" is enabled. This feature "
 "will be removed in a future version and should be {link}replaced by the "
@@ -1877,15 +1885,15 @@ msgstr ""
 "remplacée par l’élément « filter »{link_end}. Vérifier vos pages et "
 "paramètres. Sites identifiés : {json}"
 
-#: Module.php:1185
+#: Module.php:1186
 msgid "Unable to launch indexing metadata: {message}"
 msgstr "Impossible d’indexer les métadonnées : {message}"
 
-#: Module.php:1189
+#: Module.php:1190
 msgid "Unable to launch indexing metadata: see log."
 msgstr "Impossible d’indexer les métadonnées : voir les journaux."
 
-#: Module.php:1292
+#: Module.php:1293
 msgid ""
 "Unable to delete the search index for resource #{resource_id} in search "
 "engine \"{name}\": {message}"
@@ -1893,7 +1901,7 @@ msgstr ""
 "Impossible de supprimer l’index de recherche pour la ressource "
 "#{resource_id} dans le moteur « {name} » : {message}"
 
-#: Module.php:1297
+#: Module.php:1298
 msgid ""
 "Unable to delete the search index for the deleted resource #{resource_id} in "
 "search engine \"{name}\": see log."
@@ -1901,7 +1909,7 @@ msgstr ""
 "Impossible de supprimer l’index de recherche pour la ressource supprimée "
 "#{resource_id} dans le moteur « {name} » : voir les journaux."
 
-#: Module.php:1323
+#: Module.php:1324
 msgid ""
 "Unable to index metadata of resource #{resource_id} for search in search "
 "engine \"{name}\": {message}"
@@ -1909,7 +1917,7 @@ msgstr ""
 "Impossible d’indexer les métadonnées de la ressource #{resource_id} dans le "
 "moteur « {name} » : {message}"
 
-#: Module.php:1328
+#: Module.php:1329
 msgid ""
 "Unable to update the search index for resource #{resource_id} in search "
 "engine \"{name}\": see log."
@@ -1917,7 +1925,7 @@ msgstr ""
 "Impossible de mettre à jour l’index pour la ressource #{resource_id} dans le "
 "moteur « {name} » : voir les journaux."
 
-#: Module.php:1566
+#: Module.php:1572
 msgid ""
 "The internal search engine (sql) can be edited in the {link_url}search "
 "manager{link_end}."
@@ -1925,11 +1933,11 @@ msgstr ""
 "Le moteur de recherche interne (sql) peut être configuré dans le menu "
 "{link_url}Moteurs de recherche{link_end}."
 
-#: Module.php:1588
+#: Module.php:1594
 msgid "Main index"
 msgstr "Index principal"
 
-#: Module.php:1602
+#: Module.php:1608
 msgid ""
 "The {link_url}internal suggester{link_end} (sql) will be available after "
 "indexation."
@@ -1937,7 +1945,7 @@ msgstr ""
 "Le {link_url}suggéreur interne{link_end} (sql) sera disponible après "
 "indexation."
 
-#: Module.php:1639
+#: Module.php:1645
 msgid ""
 "The default search config can be {link_1}edited{link_end}, {link_2}"
 "configured{link_end} and defined in the {link_3}main settings{link_end} for "
@@ -2398,7 +2406,7 @@ msgid "not"
 msgstr "sauf"
 
 #: src/Form/SearchFilter/Advanced.php:148
-#: src/Form/Admin/SearchConfigFacetFieldset.php:254
+#: src/Form/Admin/SearchConfigFacetFieldset.php:255
 #: src/Form/Admin/SearchConfigFilterFieldset.php:236
 msgid "Remove this filter"
 msgstr "Supprimer ce filtre"
@@ -2587,109 +2595,158 @@ msgid "Limit facets to specific languages"
 msgstr "Limiter les filtres à certaines langues"
 
 #: src/Form/Admin/SearchConfigFacetFieldset.php:61
-#: src/Form/Admin/SearchConfigFacetFieldset.php:207
-#: src/Form/Admin/SearchConfigFilterFieldset.php:148
-msgid "info"
-msgstr "info"
+msgid ""
+"Generally, facets are translated in the view, but in some cases, facet "
+"values may be translated directly in a multivalued property. Use \"|\" to "
+"separate multiple languages. Use a trailing \"|\" for values without "
+"language. When fields with languages (like subjects) and fields without "
+"language (like date) are facets, the empty language must be set to get "
+"results."
+msgstr ""
+"Généralement, les facettes sont traduites dans la vues, mais dans certains "
+"cas, les valeurs des facettes doivent être traduites directement dans une "
+"propriété multi-valeur. Utiliser \"|\" pour séparer plusieurs langues. "
+"Utiliser un \"|\" final pour les valeurs sans langue. Quand des champs avec "
+"langue (comme les sujets) et des facettes sans langues (comme les dates) "
+"sont des facettes, la langue vide doit être indiquée pour avoir des "
+"résultats."
 
 #: src/Form/Admin/SearchConfigFacetFieldset.php:76
 #: src/Form/Admin/SearchConfigFilterFieldset.php:162
 msgid "Order"
 msgstr "Tri"
 
-#: src/Form/Admin/SearchConfigFacetFieldset.php:91
+#: src/Form/Admin/SearchConfigFacetFieldset.php:92
 #: src/Form/Admin/SearchConfigFilterFieldset.php:177
 msgid "Select order…"
 msgstr "Choisir le tri…"
 
-#: src/Form/Admin/SearchConfigFacetFieldset.php:98
+#: src/Form/Admin/SearchConfigFacetFieldset.php:99
 msgid "Maximum number of facets"
 msgstr "Nombre maximum de facettes"
 
-#: src/Form/Admin/SearchConfigFacetFieldset.php:122
+#: src/Form/Admin/SearchConfigFacetFieldset.php:123
 #: src/Form/Admin/SearchConfigFilterFieldset.php:68
 msgid "Input type"
 msgstr "Champ de saisie"
 
-#: src/Form/Admin/SearchConfigFacetFieldset.php:123
+#: src/Form/Admin/SearchConfigFacetFieldset.php:124
 msgid "The type of facet that will be displayed in the search page."
 msgstr "Le type de facette qui sera affichée dans la page de recherche."
 
-#: src/Form/Admin/SearchConfigFacetFieldset.php:125
-#: src/Form/Admin/SearchConfigFilterFieldset.php:71
-msgid "documentation"
-msgstr "documentation"
+#: src/Form/Admin/SearchConfigFacetFieldset.php:126
+msgid ""
+"#\"></a><div class=\"field-description no-link\">\n"
+"- Input types may be Checkbox (default), RangeDouble, Select, SelectRange, "
+"Thesaurus, Tree and specific templates for mode \"direct\" if wanted.\n"
+"- For \"RangeDouble\" and \"SelectRange\", the minimum and maximum should be "
+"set as \"min\" and \"max\", and \"step\" too.\n"
+"- With type \"Thesaurus\", the option \"thesaurus\" should be set with the "
+"id. It requires the module Thesaurus.\n"
+"- \"Tree\" can be used for item sets when module Item Sets Tree is enabled "
+"and data indexed recursively.\n"
+"</div><a href=\"#"
+msgstr ""
+"#\"></a><div class=\"field-description no-link\">\n"
+"- Les types d’entrée peuvent être Checkbox (par défaut), RangeDouble , "
+"Select, SelectRange, Thesaurus, Tree et des modèles spécifiques pour le mode "
+"« direct » si vous le souhaitez.\n"
+"- Pour « RangeDouble » et « SelectRange », le minimum et le maximum doivent "
+"être définis sur « min » et « max », ainsi que « step ».\n"
+"- Avec le type « Thesaurus », l’option « thesaurus » doit être définie avec "
+"l'’identifiant. Il nécessite le module Thésaurus.\n"
+"- « Tree » peut être utilisé pour les collections lorsque le module Item "
+"Sets Tree est activé et les données indexées de manière récursive.\n"
+"</div><a href=\"#"
 
-#: src/Form/Admin/SearchConfigFacetFieldset.php:135
+#: src/Form/Admin/SearchConfigFacetFieldset.php:136
 msgid "Checkbox (default)"
 msgstr "Case à cocher (défaut)"
 
-#: src/Form/Admin/SearchConfigFacetFieldset.php:136
+#: src/Form/Admin/SearchConfigFacetFieldset.php:137
 msgid "Link (fake checkbox for mode \"direct\")"
 msgstr "Lien (fausse case à cocher pour le mode « direct »)"
 
-#: src/Form/Admin/SearchConfigFacetFieldset.php:137
+#: src/Form/Admin/SearchConfigFacetFieldset.php:138
 #: src/Form/Admin/SearchConfigFilterFieldset.php:98
 msgid "Slider for a range of values"
 msgstr "Curseur pour une plage de valeurs"
 
-#: src/Form/Admin/SearchConfigFacetFieldset.php:139
+#: src/Form/Admin/SearchConfigFacetFieldset.php:140
 #: src/Form/Admin/SearchConfigFilterFieldset.php:100
 msgid "Select "
 msgstr "Menu déroulant "
 
-#: src/Form/Admin/SearchConfigFacetFieldset.php:140
+#: src/Form/Admin/SearchConfigFacetFieldset.php:141
 msgid "Select range"
 msgstr "Menu déroulant avec plage"
 
-#: src/Form/Admin/SearchConfigFacetFieldset.php:145
+#: src/Form/Admin/SearchConfigFacetFieldset.php:146
 msgid "Item sets tree link (fake checkbox)"
 msgstr "Lien dans la hiérarchie des collections (fausse case à cocher)"
 
-#: src/Form/Admin/SearchConfigFacetFieldset.php:146
+#: src/Form/Admin/SearchConfigFacetFieldset.php:147
 #: src/Form/Admin/SearchConfigFilterFieldset.php:113
 msgid "Thesaurus"
 msgstr "Thésaurus"
 
-#: src/Form/Admin/SearchConfigFacetFieldset.php:147
+#: src/Form/Admin/SearchConfigFacetFieldset.php:148
 msgid "Thesaurus link (fake checkbox)"
 msgstr "Lien dans le thésaurus (fausse case à cocher)"
 
-#: src/Form/Admin/SearchConfigFacetFieldset.php:157
+#: src/Form/Admin/SearchConfigFacetFieldset.php:158
 msgid "Set facet type…"
 msgstr "Choisir un type de facette…"
 
-#: src/Form/Admin/SearchConfigFacetFieldset.php:165
+#: src/Form/Admin/SearchConfigFacetFieldset.php:166
 msgid "Display of facets"
 msgstr "Affichage des facettes"
 
-#: src/Form/Admin/SearchConfigFacetFieldset.php:183
+#: src/Form/Admin/SearchConfigFacetFieldset.php:184
 msgid "Number of facets to display on load"
 msgstr "Nombre de facettes à afficher au chargement"
 
-#: src/Form/Admin/SearchConfigFacetFieldset.php:195
+#: src/Form/Admin/SearchConfigFacetFieldset.php:196
 msgid "Display count"
 msgstr "Afficher le total"
 
-#: src/Form/Admin/SearchConfigFacetFieldset.php:206
+#: src/Form/Admin/SearchConfigFacetFieldset.php:207
 msgid "Specific options"
 msgstr "Options spécifiques"
 
-#: src/Form/Admin/SearchConfigFacetFieldset.php:227
+#: src/Form/Admin/SearchConfigFacetFieldset.php:208
+msgid ""
+"List of specific options, in ini format, for example:\n"
+"`min = 1454`,\n"
+"`thesaurus =  151`,\n"
+"`languages = \"fra|way|apa|\"`,\n"
+"`data_types[] = \"valuesuggest:idref:person\"`,\n"
+"`main_types = \"resource\",\n"
+"`values[] = \"Alpha\"`."
+msgstr ""
+"Liste des options spécifiques, au format ini, par exemple :\n"
+"`min = 1454`,\n"
+"`thesaurus =  151`,\n"
+"`languages = \"fra|way|apa|\"`,\n"
+"`data_types[] = \"valuesuggest:idref:person\"`,\n"
+"`main_types = \"resource\",\n"
+"`values[] = \"Alpha\"`."
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:228
 msgid "List of specific attributes, in ini format."
 msgstr "Liste des attributs spécifiques au format ini."
 
-#: src/Form/Admin/SearchConfigFacetFieldset.php:229
+#: src/Form/Admin/SearchConfigFacetFieldset.php:230
 #: src/Form/Admin/SearchConfigConfigureForm.php:360
 #: src/Form/Admin/SearchConfigFilterFieldset.php:210
 msgid "Html attributes"
 msgstr "Attributs Html"
 
-#: src/Form/Admin/SearchConfigFacetFieldset.php:272
+#: src/Form/Admin/SearchConfigFacetFieldset.php:273
 msgid "Move this facet up"
 msgstr "Déplacer cette facette vers le haut"
 
-#: src/Form/Admin/SearchConfigFacetFieldset.php:290
+#: src/Form/Admin/SearchConfigFacetFieldset.php:291
 msgid "Move this facet down"
 msgstr "Déplacer cette facette vers le bas"
 
@@ -2958,7 +3015,7 @@ msgid "Add a button \"submit\""
 msgstr "Ajouter un bouton « Soumettre »"
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:402
-#: src/Form/Admin/SearchConfigConfigureForm.php:1102
+#: src/Form/Admin/SearchConfigConfigureForm.php:1138
 msgid "Label for submit"
 msgstr "Libellé pour « Soumettre »"
 
@@ -2967,7 +3024,7 @@ msgid "Add a button \"reset\""
 msgstr "Ajouter un bouton « Effacer les champs »"
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:425
-#: src/Form/Admin/SearchConfigConfigureForm.php:1133
+#: src/Form/Admin/SearchConfigConfigureForm.php:1169
 msgid "Label for reset"
 msgstr "Libellé pour « Effacer »"
 
@@ -3055,8 +3112,16 @@ msgstr ""
 "l’opérateur de jonction « sauf » est utilisé."
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:588
-msgid "placeholder"
-msgstr "joker"
+msgid ""
+"eq = is exactly\n"
+"in = contains\n"
+"sw = starts with\n"
+"ew = ends with"
+msgstr ""
+"eq = est exactement\n"
+"in = contient\n"
+"sw = commence avec\n"
+"ew = finit par"
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:601
 msgid ""
@@ -3074,43 +3139,29 @@ msgid "Results"
 msgstr "Résultats"
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:638
+msgid "Label without query"
+msgstr "Libellé sans requête"
+
+#: src/Form/Admin/SearchConfigConfigureForm.php:650
+msgid "Label for results"
+msgstr "Libellé pour les résultats"
+
+#: src/Form/Admin/SearchConfigConfigureForm.php:662
+msgid "Label for no results"
+msgstr "Libellé pour pas de résultats"
+
+#: src/Form/Admin/SearchConfigConfigureForm.php:674
 msgid "Separate resources by type (item set, items, etc.)"
 msgstr "Séparer les ressources par type (collections, contenus, etc.)"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:649
+#: src/Form/Admin/SearchConfigConfigureForm.php:685
 msgid "The template to use in your theme. Default is search/search."
 msgstr "Le gabarit à utiliser dans le thème, par défaut search/search."
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:669
+#: src/Form/Admin/SearchConfigConfigureForm.php:705
 msgid "List of query filters"
 msgstr "Liste des filtres de recherche"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:672
-#: src/Form/Admin/SearchConfigConfigureForm.php:689
-#: src/Form/Admin/SearchConfigConfigureForm.php:706
-#: src/Form/Admin/SearchConfigConfigureForm.php:723
-#: src/Form/Admin/SearchConfigConfigureForm.php:740
-#: src/Form/Admin/SearchConfigConfigureForm.php:757
-#: src/Form/Admin/SearchConfigConfigureForm.php:774
-#: src/Form/Admin/SearchConfigConfigureForm.php:791
-#: src/Form/Admin/SearchConfigConfigureForm.php:808
-msgid "Results header"
-msgstr "Avant les résultats"
-
-#: src/Form/Admin/SearchConfigConfigureForm.php:673
-#: src/Form/Admin/SearchConfigConfigureForm.php:690
-#: src/Form/Admin/SearchConfigConfigureForm.php:707
-#: src/Form/Admin/SearchConfigConfigureForm.php:724
-#: src/Form/Admin/SearchConfigConfigureForm.php:741
-#: src/Form/Admin/SearchConfigConfigureForm.php:758
-#: src/Form/Admin/SearchConfigConfigureForm.php:775
-#: src/Form/Admin/SearchConfigConfigureForm.php:792
-#: src/Form/Admin/SearchConfigConfigureForm.php:809
-msgid "Results footer"
-msgstr "Après les résultats"
-
-#: src/Form/Admin/SearchConfigConfigureForm.php:674
-#: src/Form/Admin/SearchConfigConfigureForm.php:691
 #: src/Form/Admin/SearchConfigConfigureForm.php:708
 #: src/Form/Admin/SearchConfigConfigureForm.php:725
 #: src/Form/Admin/SearchConfigConfigureForm.php:742
@@ -3118,142 +3169,168 @@ msgstr "Après les résultats"
 #: src/Form/Admin/SearchConfigConfigureForm.php:776
 #: src/Form/Admin/SearchConfigConfigureForm.php:793
 #: src/Form/Admin/SearchConfigConfigureForm.php:810
-#: src/Form/Admin/SearchConfigConfigureForm.php:1089
-#: src/Form/Admin/SearchConfigConfigureForm.php:1120
+#: src/Form/Admin/SearchConfigConfigureForm.php:827
+#: src/Form/Admin/SearchConfigConfigureForm.php:844
+msgid "Results header"
+msgstr "Avant les résultats"
+
+#: src/Form/Admin/SearchConfigConfigureForm.php:709
+#: src/Form/Admin/SearchConfigConfigureForm.php:726
+#: src/Form/Admin/SearchConfigConfigureForm.php:743
+#: src/Form/Admin/SearchConfigConfigureForm.php:760
+#: src/Form/Admin/SearchConfigConfigureForm.php:777
+#: src/Form/Admin/SearchConfigConfigureForm.php:794
+#: src/Form/Admin/SearchConfigConfigureForm.php:811
+#: src/Form/Admin/SearchConfigConfigureForm.php:828
+#: src/Form/Admin/SearchConfigConfigureForm.php:845
+msgid "Results footer"
+msgstr "Après les résultats"
+
+#: src/Form/Admin/SearchConfigConfigureForm.php:710
+#: src/Form/Admin/SearchConfigConfigureForm.php:727
+#: src/Form/Admin/SearchConfigConfigureForm.php:744
+#: src/Form/Admin/SearchConfigConfigureForm.php:761
+#: src/Form/Admin/SearchConfigConfigureForm.php:778
+#: src/Form/Admin/SearchConfigConfigureForm.php:795
+#: src/Form/Admin/SearchConfigConfigureForm.php:812
+#: src/Form/Admin/SearchConfigConfigureForm.php:829
+#: src/Form/Admin/SearchConfigConfigureForm.php:846
+#: src/Form/Admin/SearchConfigConfigureForm.php:1125
+#: src/Form/Admin/SearchConfigConfigureForm.php:1156
 msgid "Both"
 msgstr "Les deux"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:686
+#: src/Form/Admin/SearchConfigConfigureForm.php:722
 msgid "List of active facets"
 msgstr "Liste des facettes actives"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:703
+#: src/Form/Admin/SearchConfigConfigureForm.php:739
 msgid "Total results"
 msgstr "Total des résultats"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:720
+#: src/Form/Admin/SearchConfigConfigureForm.php:756
 msgid "Search form simple"
 msgstr "Champs de recherche simple"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:737
+#: src/Form/Admin/SearchConfigConfigureForm.php:773
 msgid "Search form quick"
 msgstr "Champs de recherche rapide"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:754
+#: src/Form/Admin/SearchConfigConfigureForm.php:790
 msgid "Paginator"
 msgstr "Paginateur"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:771
+#: src/Form/Admin/SearchConfigConfigureForm.php:807
 msgid "Pagination per page"
 msgstr "Pagination par page"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:805
+#: src/Form/Admin/SearchConfigConfigureForm.php:841
 msgid "Grid / list"
 msgstr "Grille / liste"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:822
+#: src/Form/Admin/SearchConfigConfigureForm.php:858
 msgid "Grid / list default mode"
 msgstr "Mode grille / liste par défaut"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:824
+#: src/Form/Admin/SearchConfigConfigureForm.php:860
 msgid "Auto (previous user choice)"
 msgstr "Automatique (précédent choix de l’utilisateur)"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:826
+#: src/Form/Admin/SearchConfigConfigureForm.php:862
 msgid "List"
 msgstr "Liste"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:827
+#: src/Form/Admin/SearchConfigConfigureForm.php:863
 msgid "Only grid"
 msgstr "Uniquement en grille"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:828
+#: src/Form/Admin/SearchConfigConfigureForm.php:864
 msgid "Only list"
 msgstr "Uniquement en liste"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:840
+#: src/Form/Admin/SearchConfigConfigureForm.php:876
 msgid "Resource thumbnail"
 msgstr "Vignette de la ressource"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:842
+#: src/Form/Admin/SearchConfigConfigureForm.php:878
 msgid "Default resource thumbnail"
 msgstr "Vignette de ressource par défaut"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:856
+#: src/Form/Admin/SearchConfigConfigureForm.php:892
 msgid "Thumbnail type"
 msgstr "Type de vignette"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:868
+#: src/Form/Admin/SearchConfigConfigureForm.php:904
 msgid "Allow html in result values"
 msgstr "Autoriser le html dans les résultats"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:878
+#: src/Form/Admin/SearchConfigConfigureForm.php:914
 msgid "Block of facets"
 msgstr "Bloc des facettes"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:881
+#: src/Form/Admin/SearchConfigConfigureForm.php:917
 msgid "Before results"
 msgstr "Avant les résultats"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:882
+#: src/Form/Admin/SearchConfigConfigureForm.php:918
 msgid "After results"
 msgstr "Après les résultats"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:895
+#: src/Form/Admin/SearchConfigConfigureForm.php:931
 msgid "Pagination per page (use site settings by default)"
 msgstr "Pagination par page (utilisation des paramètres du site par défaut)"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:913
+#: src/Form/Admin/SearchConfigConfigureForm.php:949
 msgid "Labels for results per page"
 msgstr "Libellé pour les résultats par page"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:934
+#: src/Form/Admin/SearchConfigConfigureForm.php:970
 msgid "Sort label"
 msgstr "Libellé du tri"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:946
+#: src/Form/Admin/SearchConfigConfigureForm.php:982
 msgid "List of sort field that will be displayed in the results."
 msgstr "Liste des champs de tri qui seront affichés dans les résultats."
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:977
+#: src/Form/Admin/SearchConfigConfigureForm.php:1013
 msgid "Add a sort option"
 msgstr "Ajouter une option de tri"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:995
+#: src/Form/Admin/SearchConfigConfigureForm.php:1031
 msgid "Facets"
 msgstr "Facettes"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1003
+#: src/Form/Admin/SearchConfigConfigureForm.php:1039
 msgid "Label above the list of facets"
 msgstr "Afficher le libellé au dessus de la liste des facettes"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1015
+#: src/Form/Admin/SearchConfigConfigureForm.php:1051
 msgid "Label \"No facets\""
 msgstr "Label « Pas de facettes »"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1027
+#: src/Form/Admin/SearchConfigConfigureForm.php:1063
 msgid "Facet mode"
 msgstr "Mode des facettes"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1029
+#: src/Form/Admin/SearchConfigConfigureForm.php:1065
 msgid "Send request with a button"
 msgstr "Utiliser un bouton pour envoyer la requête"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1030
+#: src/Form/Admin/SearchConfigConfigureForm.php:1066
 msgid "Send request directly (use checkbox and js)"
 msgstr "Envoyer la requête directement (utilise une case à cocher et du js)"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1031
+#: src/Form/Admin/SearchConfigConfigureForm.php:1067
 msgid "Send request directly (use a link looking like a checkbox)"
 msgstr ""
 "Envoyer la requête directement (utilise un lien affiché avec une case à "
 "cocher)"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1044
+#: src/Form/Admin/SearchConfigConfigureForm.php:1080
 msgid "List of facets"
 msgstr "Liste des facettes"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1045
+#: src/Form/Admin/SearchConfigConfigureForm.php:1081
 msgid ""
 "With the internal search engine, the option \"all facets\" may be slow when "
 "there are facets and filters for item sets or sites."
@@ -3262,49 +3339,49 @@ msgstr ""
 "être lente lorsqu’il y a des facettes et des filtres pour des collections ou "
 "des sites."
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1047
+#: src/Form/Admin/SearchConfigConfigureForm.php:1083
 msgid "Available facets only"
 msgstr "Facettes disponibles"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1048
+#: src/Form/Admin/SearchConfigConfigureForm.php:1084
 msgid "All facets, even with 0 results (see info)"
 msgstr "Toutes les facettes, même avec 0 résultat (voir info)"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1061
+#: src/Form/Admin/SearchConfigConfigureForm.php:1097
 msgid "Display the list of active facets"
 msgstr "Afficher la liste des facettes actives"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1073
+#: src/Form/Admin/SearchConfigConfigureForm.php:1109
 msgid "Label \"Active facets\""
 msgstr "Label « Facettes actives »"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1084
+#: src/Form/Admin/SearchConfigConfigureForm.php:1120
 msgid "Position of the button \"Apply facets\""
 msgstr "Position du bouton « Appliquer les facettes »"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1087
-#: src/Form/Admin/SearchConfigConfigureForm.php:1118
+#: src/Form/Admin/SearchConfigConfigureForm.php:1123
+#: src/Form/Admin/SearchConfigConfigureForm.php:1154
 msgid "Above facets"
 msgstr "Au-dessus des facettes"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1088
-#: src/Form/Admin/SearchConfigConfigureForm.php:1119
+#: src/Form/Admin/SearchConfigConfigureForm.php:1124
+#: src/Form/Admin/SearchConfigConfigureForm.php:1155
 msgid "Below facets"
 msgstr "En dessous des facettes"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1115
+#: src/Form/Admin/SearchConfigConfigureForm.php:1151
 msgid "Position of the button \"Reset facets\""
 msgstr "Position du bouton « Effacer les facettes »"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1146
+#: src/Form/Admin/SearchConfigConfigureForm.php:1182
 msgid "Display the input field to refine search"
 msgstr "Afficher le champ pour affiner la recherche"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1158
+#: src/Form/Admin/SearchConfigConfigureForm.php:1194
 msgid "Label for refine"
 msgstr "Libellé pour affiner"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1172
+#: src/Form/Admin/SearchConfigConfigureForm.php:1208
 msgid ""
 "List of facets that will be displayed in the search page, formatted as ini. "
 "The section is a unique name. Keys are: field, label, type, order, limit, "
@@ -3316,7 +3393,7 @@ msgstr ""
 "state, more, languages, data_types, main_types, values, display_count, et "
 "des options spécifiques, comme thesaurus, min et max."
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:1203
+#: src/Form/Admin/SearchConfigConfigureForm.php:1239
 msgid "Add a facet"
 msgstr "Ajouter une facette"
 
@@ -3339,6 +3416,78 @@ msgstr "Filtre avancé"
 #: src/Form/Admin/SearchConfigFilterFieldset.php:69
 msgid "The type of filter that will be displayed in the search form."
 msgstr "Le type de filtre qui sera affiché dans la page de recherche."
+
+#: src/Form/Admin/SearchConfigFilterFieldset.php:71
+msgid ""
+"#\"></a><div class=\"field-description no-link\">\n"
+"- The types are html input types: Text (default), Advanced (list of advanced "
+"filters), Checkbox, Hidden, Number, Radio, Range, RangeDouble, Select, "
+"SelectFlat, SelectGroup, MultiCheckbox, MultiSelect, MultiSelectFlat, "
+"MultiSelectGroup, MultiText, and, for modules, Access, Thesaurus, and Tree "
+"(item sets tree).\n"
+"- Text: the default html input field may be improved with an autosuggester. "
+"Enable it with option \"autosuggest\" and value \"true\". An external url "
+"can be set via attribute \"'data-autosuggest-url'.\"\n"
+"- Checkbox: the keys \"unchecked_value\" and \"checked_value\" allow to "
+"define a specific value to be returned.\n"
+"- Hidden: the value can be passed with key \"value\". If the value is not a "
+"scalar, it is serialized as json.\n"
+"- Number: the keys \"min\", \"max\" and \"step\" can be set as attributes, "
+"else they will be extracted from data. Of course, data should be numbers.\n"
+"- Range and RangeDouble allows to display a slider with one or two values. "
+"Min and max are extracted from data if not set as attributes.\n"
+"- For Number, Range and RangeDouble, \"first_digits\" can be set as option "
+"to extract the years from dates, but it is recommended to use an index with "
+"the year in that case to avoid strange results when casting and sorting non-"
+"normalized data.\n"
+"- MultiSelectFlat and SelectFlat may be used to be sure that values are "
+"flatten.\n"
+"- MultiSelectGroup and SelectGroup may be used for some specific fields that "
+"group options by default (resource classes, resource templates), in which "
+"case the options labels are removed.\n"
+"- Tree can be used for item sets when module ItemSetsTree is enabled and "
+"data indexed recursively.\n"
+"- For the types MultiCheckbox, Radio, Select, and derivatives, the values "
+"can be passed with the option \"value_options\", else the ones of the field "
+"will be used.\n"
+"</div><a href=\"#"
+msgstr ""
+"#\"></a><div class=\"field-description no-link\">\n"
+"- Les types sont des types d'entrée HTML : Text (par défaut), Advanced "
+"(liste des filtres avancés), Checkbox, Hidden, Number, Radio, Range, "
+"RangeDouble, Select, SelectFlat, SelectGroup, MultiCheckbox, MultiSelect, "
+"MultiSelectFlat, MultiSelectGroup, MultiText et , pour les modules Access, "
+"Thesaurus et Tree (arborescence des collections).\n"
+"- Text : le champ de saisie html par défaut peut être amélioré avec une "
+"suggestion automatique. Activez-le avec l’option « autosuggest » et la "
+"valeur « true ». Une URL externe peut être définie via l’attribut « data-"
+"autosuggest-url ».\n"
+"- Checkbox : les clés « unchecked_value » et « checked_value » permettent de "
+"définir une valeur spécifique à retourner.\n"
+"- Hidden : la valeur peut être passée avec la clé « value ». Si la valeur "
+"n’'est pas scalaire, elle est sérialisée au format json.\n"
+"- Number : les clés « min » et « max » et « step » peuvent être définies "
+"comme attributs, sinon elles seront extraites des données. Bien entendu, les "
+"données doivent être des chiffres.\n"
+"- Range et RangeDouble permettent d’afficher un curseur avec une ou deux "
+"valeurs. Min et max sont extraits des données s’ils ne sont pas définis "
+"comme attributs.\n"
+"- Pour Number, Range et RangeDouble, « first_digits » peut être défini comme "
+"option pour extraire les années des dates, mais il est recommandé d’utiliser "
+"un index avec l’année dans ce cas pour éviter des résultats étranges lors de "
+"la conversion et du tri de données non normalisées.\n"
+"- MultiSelectFlat et SelectFlat peuvent être utilisés pour s’assurer que les "
+"valeurs sont une liste plate.\n"
+"- MultiSelectGroup et SelectGroup peuvent être utilisés pour certains champs "
+"spécifiques qui regroupent les options par défaut (classes de ressources, "
+"modèles de ressources), auquel cas les étiquettes d’options sont "
+"supprimées.\n"
+"- L’arbre peut être utilisé pour les ensembles d’éléments lorsque le module "
+"ItemSetsTree est activé et les données indexées de manière récursive.\n"
+"- Pour les types MultiCheckbox, Radio, Select et dérivés, les valeurs "
+"peuvent être passées avec l’option « value_options », sinon celles du champ "
+"seront utilisées.\n"
+"</div><a href=\"#"
 
 #: src/Form/Admin/SearchConfigFilterFieldset.php:89
 msgid "Advanced filter (configured below)"
@@ -3407,6 +3556,18 @@ msgstr "Choisir un type de filtre…"
 #: src/Form/Admin/SearchConfigFilterFieldset.php:147
 msgid "Limit filters to specific languages (internal querier)"
 msgstr "Limiter les filtres à des langues spécifiques (moteur interne)"
+
+#: src/Form/Admin/SearchConfigFilterFieldset.php:148
+msgid ""
+"Use \"|\" to separate multiple languages. Use a trailing \"|\" for values "
+"without language. When fields with languages (like subjects) and fields "
+"without language (like date) are facets, the empty language must be set to "
+"get results."
+msgstr ""
+"Utiliser \"|\" pour séparer plusieurs langues. Utiliser un \"|\" final pour "
+"les valeurs sans langue. Quand des champs avec langue (comme les sujets) et "
+"des facettes sans langues (comme les dates) sont des facettes, la langue "
+"vide doit être indiquée pour avoir des résultats."
 
 #: src/Form/Admin/SearchConfigFilterFieldset.php:184
 msgid "Maximum number of filters"
@@ -3747,24 +3908,24 @@ msgstr "La page est désormais la page par défaut en admin."
 msgid "The page has been unset in admin board."
 msgstr "La page n’est plus la page par défaut en admin."
 
-#: src/Controller/Admin/SearchConfigController.php:448
+#: src/Controller/Admin/SearchConfigController.php:447
 msgid "This search config is the default one in sites: {site_slugs}."
 msgstr ""
 "Cette page de recherche est la page par défaut dans les sites : {site_slugs}."
 
-#: src/Controller/Admin/SearchConfigController.php:453
+#: src/Controller/Admin/SearchConfigController.php:452
 msgid "This search config is not used as default in any site."
 msgstr "Cette page de recherche n’est utilisée dans aucun site."
 
-#: src/Controller/Admin/SearchConfigController.php:459
+#: src/Controller/Admin/SearchConfigController.php:458
 msgid "This search config is available in sites: {site_slugs}."
 msgstr "Cette page de recherche est disponible sur les sites : {site_slugs}."
 
-#: src/Controller/Admin/SearchConfigController.php:464
+#: src/Controller/Admin/SearchConfigController.php:463
 msgid "This search config is not available in any site."
 msgstr "Cette page de recherche n’est disponible sur aucun site."
 
-#: src/Controller/Admin/SearchConfigController.php:710
+#: src/Controller/Admin/SearchConfigController.php:709
 msgid ""
 "Note that you didn’t set an empty language for some facets, so all values "
 "without language will be skipped in the facet."
@@ -3781,7 +3942,7 @@ msgstr ""
 "{site_slug}. Vérifiez les paramètres du site ou la configuration de la page "
 "de recherche."
 
-#: src/Controller/SearchController.php:324
+#: src/Controller/SearchController.php:330
 msgid "Rss are available only via public interface."
 msgstr "Les fils rss sont disponibles seulement sur l’interface publique."
 
@@ -3865,7 +4026,7 @@ msgstr ""
 msgid "An internal issue occurred."
 msgstr "Un problème interne est survenu."
 
-#: src/Querier/InternalQuerier.php:655
+#: src/Querier/InternalQuerier.php:657
 msgid ""
 "The query \"{query}\" uses {count} properties or filters, that is more than "
 "the {total} supported currently. The query should be simplified."
@@ -3873,7 +4034,7 @@ msgstr ""
 "La requête « {query} » utilise {count} propriétés ou filtres, ce qui est "
 "plus que la limite de {total} champs. La requête doit être simplifiée."
 
-#: src/Querier/InternalQuerier.php:660
+#: src/Querier/InternalQuerier.php:662
 msgid ""
 "A user tried a query with {count} arguments. The config or theme should be "
 "checked to forbid them earlier. Query: {query}"
@@ -3882,7 +4043,7 @@ msgstr ""
 "configuration ou le thème doivent être vérifiés pour l’interdire en amont. "
 "Requête : {query}"
 
-#: src/Querier/InternalQuerier.php:1367
+#: src/Querier/InternalQuerier.php:1378
 msgid "The field for the facet \"{name}\" is not set."
 msgstr "Le champ pour la facette « {name} » n’est pas défini."
 
@@ -4002,6 +4163,15 @@ msgstr "Numérique"
 msgid "OAI-PMH harvests"
 msgstr "Moissons OAI-PMH"
 
+#~ msgid "info"
+#~ msgstr "info"
+
+#~ msgid "documentation"
+#~ msgstr "documentation"
+
+#~ msgid "placeholder"
+#~ msgstr "joker"
+
 #~ msgid ""
 #~ "This option slows reindexing and may avoid overload when records are big."
 #~ msgstr ""
@@ -4059,159 +4229,6 @@ msgstr "Moissons OAI-PMH"
 
 #~ msgid "Integrated"
 #~ msgstr "Intégré"
-
-#~ msgid ""
-#~ "Generally, facets are translated in the view, but in some cases, facet "
-#~ "values may be translated directly in a multivalued property. Use \"|\" to "
-#~ "separate multiple languages. Use a trailing \"|\" for values without "
-#~ "language. When fields with languages (like subjects) and fields without "
-#~ "language (like date) are facets, the empty language must be set to get "
-#~ "results."
-#~ msgstr ""
-#~ "Généralement, les facettes sont traduites dans la vues, mais dans "
-#~ "certains cas, les valeurs des facettes doivent être traduites directement "
-#~ "dans une propriété multi-valeur. Utiliser \"|\" pour séparer plusieurs "
-#~ "langues. Utiliser un \"|\" final pour les valeurs sans langue. Quand des "
-#~ "champs avec langue (comme les sujets) et des facettes sans langues (comme "
-#~ "les dates) sont des facettes, la langue vide doit être indiquée pour "
-#~ "avoir des résultats."
-
-#~ msgid ""
-#~ "#\"></a><div class=\"field-description no-link\">\n"
-#~ "- Input types may be Checkbox (default), RangeDouble, Select, "
-#~ "SelectRange, Thesaurus, Tree and specific templates for mode \"direct\" "
-#~ "if wanted.\n"
-#~ "- For \"RangeDouble\" and \"SelectRange\", the minimum and maximum should "
-#~ "be set as \"min\" and \"max\", and \"step\" too.\n"
-#~ "- With type \"Thesaurus\", the option \"thesaurus\" should be set with "
-#~ "the id. It requires the module Thesaurus.\n"
-#~ "- \"Tree\" can be used for item sets when module Item Sets Tree is "
-#~ "enabled and data indexed recursively.\n"
-#~ "</div><a href=\"#"
-#~ msgstr ""
-#~ "#\"></a><div class=\"field-description no-link\">\n"
-#~ "- Les types d’entrée peuvent être Checkbox (par défaut), RangeDouble , "
-#~ "Select, SelectRange, Thesaurus, Tree et des modèles spécifiques pour le "
-#~ "mode « direct » si vous le souhaitez.\n"
-#~ "- Pour « RangeDouble » et « SelectRange », le minimum et le maximum "
-#~ "doivent être définis sur « min » et « max », ainsi que « step ».\n"
-#~ "- Avec le type « Thesaurus », l’option « thesaurus » doit être définie "
-#~ "avec l'’identifiant. Il nécessite le module Thésaurus.\n"
-#~ "- « Tree » peut être utilisé pour les collections lorsque le module Item "
-#~ "Sets Tree est activé et les données indexées de manière récursive.\n"
-#~ "</div><a href=\"#"
-
-#~ msgid ""
-#~ "List of specific options, in ini format, for example:\n"
-#~ "`min = 1454`,\n"
-#~ "`thesaurus =  151`,\n"
-#~ "`languages = \"fra|way|apa|\"`,\n"
-#~ "`data_types[] = \"valuesuggest:idref:person\"`,\n"
-#~ "`main_types = \"resource\",\n"
-#~ "`values[] = \"Alpha\"`."
-#~ msgstr ""
-#~ "Liste des options spécifiques, au format ini, par exemple :\n"
-#~ "`min = 1454`,\n"
-#~ "`thesaurus =  151`,\n"
-#~ "`languages = \"fra|way|apa|\"`,\n"
-#~ "`data_types[] = \"valuesuggest:idref:person\"`,\n"
-#~ "`main_types = \"resource\",\n"
-#~ "`values[] = \"Alpha\"`."
-
-#~ msgid ""
-#~ "eq = is exactly\n"
-#~ "in = contains\n"
-#~ "sw = starts with\n"
-#~ "ew = ends with"
-#~ msgstr ""
-#~ "eq = est exactement\n"
-#~ "in = contient\n"
-#~ "sw = commence avec\n"
-#~ "ew = finit par"
-
-#~ msgid ""
-#~ "#\"></a><div class=\"field-description no-link\">\n"
-#~ "- The types are html input types: Text (default), Advanced (list of "
-#~ "advanced filters), Checkbox, Hidden, Number, Radio, Range, RangeDouble, "
-#~ "Select, SelectFlat, SelectGroup, MultiCheckbox, MultiSelect, "
-#~ "MultiSelectFlat, MultiSelectGroup, MultiText, and, for modules, Access, "
-#~ "Thesaurus, and Tree (item sets tree).\n"
-#~ "- Text: the default html input field may be improved with an "
-#~ "autosuggester. Enable it with option \"autosuggest\" and value \"true\". "
-#~ "An external url can be set via attribute \"'data-autosuggest-url'.\"\n"
-#~ "- Checkbox: the keys \"unchecked_value\" and \"checked_value\" allow to "
-#~ "define a specific value to be returned.\n"
-#~ "- Hidden: the value can be passed with key \"value\". If the value is not "
-#~ "a scalar, it is serialized as json.\n"
-#~ "- Number: the keys \"min\", \"max\" and \"step\" can be set as "
-#~ "attributes, else they will be extracted from data. Of course, data should "
-#~ "be numbers.\n"
-#~ "- Range and RangeDouble allows to display a slider with one or two "
-#~ "values. Min and max are extracted from data if not set as attributes.\n"
-#~ "- For Number, Range and RangeDouble, \"first_digits\" can be set as "
-#~ "option to extract the years from dates, but it is recommended to use an "
-#~ "index with the year in that case to avoid strange results when casting "
-#~ "and sorting non-normalized data.\n"
-#~ "- MultiSelectFlat and SelectFlat may be used to be sure that values are "
-#~ "flatten.\n"
-#~ "- MultiSelectGroup and SelectGroup may be used for some specific fields "
-#~ "that group options by default (resource classes, resource templates), in "
-#~ "which case the options labels are removed.\n"
-#~ "- Tree can be used for item sets when module ItemSetsTree is enabled and "
-#~ "data indexed recursively.\n"
-#~ "- For the types MultiCheckbox, Radio, Select, and derivatives, the values "
-#~ "can be passed with the option \"value_options\", else the ones of the "
-#~ "field will be used.\n"
-#~ "</div><a href=\"#"
-#~ msgstr ""
-#~ "#\"></a><div class=\"field-description no-link\">\n"
-#~ "- Les types sont des types d'entrée HTML : Text (par défaut), Advanced "
-#~ "(liste des filtres avancés), Checkbox, Hidden, Number, Radio, Range, "
-#~ "RangeDouble, Select, SelectFlat, SelectGroup, MultiCheckbox, MultiSelect, "
-#~ "MultiSelectFlat, MultiSelectGroup, MultiText et , pour les modules "
-#~ "Access, Thesaurus et Tree (arborescence des collections).\n"
-#~ "- Text : le champ de saisie html par défaut peut être amélioré avec une "
-#~ "suggestion automatique. Activez-le avec l’option « autosuggest » et la "
-#~ "valeur « true ». Une URL externe peut être définie via l’attribut « data-"
-#~ "autosuggest-url ».\n"
-#~ "- Checkbox : les clés « unchecked_value » et « checked_value » permettent "
-#~ "de définir une valeur spécifique à retourner.\n"
-#~ "- Hidden : la valeur peut être passée avec la clé « value ». Si la valeur "
-#~ "n’'est pas scalaire, elle est sérialisée au format json.\n"
-#~ "- Number : les clés « min » et « max » et « step » peuvent être définies "
-#~ "comme attributs, sinon elles seront extraites des données. Bien entendu, "
-#~ "les données doivent être des chiffres.\n"
-#~ "- Range et RangeDouble permettent d’afficher un curseur avec une ou deux "
-#~ "valeurs. Min et max sont extraits des données s’ils ne sont pas définis "
-#~ "comme attributs.\n"
-#~ "- Pour Number, Range et RangeDouble, « first_digits » peut être défini "
-#~ "comme option pour extraire les années des dates, mais il est recommandé "
-#~ "d’utiliser un index avec l’année dans ce cas pour éviter des résultats "
-#~ "étranges lors de la conversion et du tri de données non normalisées.\n"
-#~ "- MultiSelectFlat et SelectFlat peuvent être utilisés pour s’assurer que "
-#~ "les valeurs sont une liste plate.\n"
-#~ "- MultiSelectGroup et SelectGroup peuvent être utilisés pour certains "
-#~ "champs spécifiques qui regroupent les options par défaut (classes de "
-#~ "ressources, modèles de ressources), auquel cas les étiquettes d’options "
-#~ "sont supprimées.\n"
-#~ "- L’arbre peut être utilisé pour les ensembles d’éléments lorsque le "
-#~ "module ItemSetsTree est activé et les données indexées de manière "
-#~ "récursive.\n"
-#~ "- Pour les types MultiCheckbox, Radio, Select et dérivés, les valeurs "
-#~ "peuvent être passées avec l’option « value_options », sinon celles du "
-#~ "champ seront utilisées.\n"
-#~ "</div><a href=\"#"
-
-#~ msgid ""
-#~ "Use \"|\" to separate multiple languages. Use a trailing \"|\" for values "
-#~ "without language. When fields with languages (like subjects) and fields "
-#~ "without language (like date) are facets, the empty language must be set "
-#~ "to get results."
-#~ msgstr ""
-#~ "Utiliser \"|\" pour séparer plusieurs langues. Utiliser un \"|\" final "
-#~ "pour les valeurs sans langue. Quand des champs avec langue (comme les "
-#~ "sujets) et des facettes sans langues (comme les dates) sont des facettes, "
-#~ "la langue vide doit être indiquée pour avoir des résultats."
 
 #~ msgid "Clear index before reindexation."
 #~ msgstr "Effacer l’index avant réindexation."

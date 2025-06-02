@@ -127,6 +127,7 @@ class AbstractFacet extends AbstractHelper
 
         // For active facets, there is no facet field.
         if ($facetField === null) {
+            /** @see \AdvancedSearch\View\Helper\FacetActives::prepareActiveFacetData() */
             $facetsData[$facetField] = $this->prepareActiveFacetData($facetValues, $options);
         } elseif (!isset($facetsData[$facetField])) {
             $facetsData[$facetField] = $this->prepareFacetData($facetField, $facetValues, $options);

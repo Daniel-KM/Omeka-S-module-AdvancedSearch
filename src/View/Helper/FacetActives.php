@@ -17,7 +17,7 @@ class FacetActives extends AbstractFacet
      */
     protected function prepareActiveFacetData(array $activeFacets, array $options): array
     {
-        $isFacetModeDirect = in_array($options['mode'] ?? null, ['link', 'js']);
+        // $isFacetModeDirect = in_array($options['mode'] ?? null, ['link', 'js']);
 
         foreach ($activeFacets as $facetName => &$facetValues) {
             $facetFieldLabel = $options['facets'][$facetName]['label'] ?? $facetName;
@@ -34,6 +34,7 @@ class FacetActives extends AbstractFacet
                 if (!isset($query['facet'][$facetName])
                     || array_search($facetValueValue, $query['facet'][$facetName]) === false
                 ) {
+                    unset($activeFacets[$facetName][$facetKey]);
                     continue;
                 }
 

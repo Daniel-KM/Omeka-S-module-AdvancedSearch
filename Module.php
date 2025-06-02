@@ -946,10 +946,10 @@ class Module extends AbstractModule
         $isSite = $status->isSiteRequest();
         if ($isSite) {
             $siteSettings = $services->get('Omeka\Settings\Site');
-            $selectedSearchFields = $siteSettings->get('advancedsearch_search_fields', array_filter($searchFields, fn ($v) => !isset($v['site']) || $v['site']));
+            $selectedSearchFields = $siteSettings->get('advancedsearch_search_fields', array_keys(array_filter($searchFields, fn ($v) => !isset($v['site']) || $v['site']))) ?: [];
         } else {
             $settings = $services->get('Omeka\Settings');
-            $selectedSearchFields = $settings->get('advancedsearch_search_fields', $searchFields);
+            $selectedSearchFields = $settings->get('advancedsearch_search_fields', array_keys($searchFields)) ?: [];
         }
 
         // Manage core option to restrict list of resource templates.

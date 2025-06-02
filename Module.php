@@ -1370,6 +1370,12 @@ class Module extends AbstractModule
         // The admin search field is added via a js hack, because the admin
         // layout doesn't use a partial or a trigger for the sidebar.
 
+        // Avoid issues when the module Common is unavailable.
+        $services = $this->getServiceLocator();
+        if (!$services->has('Common\EasyMeta')) {
+            return;
+        }
+
         $view = $event->getTarget();
 
         $plugins = $view->getHelperPluginManager();

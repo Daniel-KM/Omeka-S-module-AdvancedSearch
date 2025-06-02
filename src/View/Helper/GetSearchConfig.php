@@ -21,7 +21,10 @@ class GetSearchConfig extends AbstractHelper
             return $searchConfigs[$searchConfigIdOrSlug];
         }
 
-        $plugins = $this->getView()->getHelperPluginManager();
+        // If the site settings are not ready, get the default site one.
+
+        $view = $this->getView();
+        $plugins = $view->getHelperPluginManager();
         $isSiteRequest = $plugins->get('status')->isSiteRequest();
         $setting = $plugins->get('setting');
         $siteSetting = $plugins->get('siteSetting');
@@ -29,9 +32,16 @@ class GetSearchConfig extends AbstractHelper
         $originalSearchConfigIdOrSlug = $searchConfigIdOrSlug;
 
         if (empty($searchConfigIdOrSlug)) {
-            $searchConfigIdOrSlug = $isSiteRequest
-                ? $siteSetting('advancedsearch_main_config')
-                : $setting('advancedsearch_main_config');
+            if ($isSiteRequest) {
+                try {
+                    $searchConfigIdOrSlug = $siteSetting('advancedsearch_main_config');
+                } catch (\Exception $e) {
+                    $defaultSiteId = $plugins->get('defaultSite')('id');
+                    $searchConfigIdOrSlug = $siteSetting('advancedsearch_main_config', null, $defaultSiteId);
+                }
+            } else {
+                $searchConfigIdOrSlug = $setting('advancedsearch_main_config');
+            }
             $searchConfigs[$originalSearchConfigIdOrSlug] = null;
             if (!$searchConfigIdOrSlug) {
                 return null;
@@ -45,7 +55,12 @@ class GetSearchConfig extends AbstractHelper
 
         // All configs are available in admin, not in sites.
         if ($isSiteRequest) {
-            $availables = $siteSetting('advancedsearch_configs', []);
+            try {
+                $availables = $siteSetting('advancedsearch_configs', []);
+            } catch (\Exception $e) {
+                $defaultSiteId = $plugins->get('defaultSite')('id');
+                $availables = $siteSetting('advancedsearch_configs', [], $defaultSiteId);
+            }
             $allConfigs = array_intersect_key($allConfigs, array_flip($availables));
         }
         if (($isNumeric && !isset($allConfigs[$searchConfigIdOrSlug]))
@@ -58,7 +73,7 @@ class GetSearchConfig extends AbstractHelper
         $api = $plugins->get('api');
         try {
             $searchConfigs[$originalSearchConfigIdOrSlug] = $api
-                ->read('search_configs', [$isNumeric ? 'id' : 'slug' => $searchConfigIdOrSlug])
+                ->read('search_configs', $isNumeric ? ['id' => $searchConfigIdOrSlug] : ['slug' => $searchConfigIdOrSlug])
                 ->getContent();
         } catch (\Omeka\Api\Exception\NotFoundException $e) {
             $searchConfigs[$originalSearchConfigIdOrSlug] = null;

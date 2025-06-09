@@ -2542,16 +2542,18 @@ class SearchResources
                         $expr->isNull("$valuesAlias.valueResource"),
                         $expr->orX(
                             $expr->isNull("$valuesAlias.uri"),
-                            $expr->eq("$valuesAlias.uri", '')
+                            $expr->eq("$valuesAlias.uri", ':str_empty')
                         )
                     );
+                    $qb->setParameter('str_empty', '', ParameterType::STRING);
                 } elseif ($value === 'resource') {
                     $predicateExpr = $expr->isNotNull("$valuesAlias.valueResource");
                 } elseif ($value === 'uri') {
                     $predicateExpr = $expr->andX(
                         $expr->isNotNull("$valuesAlias.uri"),
-                        $expr->neq("$valuesAlias.uri", '')
+                        $expr->neq("$valuesAlias.uri", ':str_empty')
                     );
+                    $qb->setParameter('str_empty', '', ParameterType::STRING);
                 } else {
                     $predicateExpr = $expr->eq(1, 0);
                 }
@@ -2565,9 +2567,10 @@ class SearchResources
                     $expr->isNull("$valuesAlias.valueResource"),
                     $expr->orX(
                         $expr->isNull("$valuesAlias.uri"),
-                        $expr->eq("$valuesAlias.uri", '')
+                        $expr->eq("$valuesAlias.uri", ':str_empty')
                     )
                 );
+                $qb->setParameter('str_empty', '', ParameterType::STRING);
                 break;
 
             case 'tpr':
@@ -2577,8 +2580,9 @@ class SearchResources
             case 'tpu':
                 $predicateExpr = $expr->andX(
                     $expr->isNotNull("$valuesAlias.uri"),
-                    $expr->neq("$valuesAlias.uri", '')
+                    $expr->neq("$valuesAlias.uri", ':str_empty')
                 );
+                $qb->setParameter('str_empty', '', ParameterType::STRING);
                 break;
 
             case 'dt':

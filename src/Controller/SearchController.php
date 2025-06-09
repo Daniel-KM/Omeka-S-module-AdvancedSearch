@@ -547,6 +547,7 @@ class SearchController extends AbstractActionController
             $content = strip_tags($resource->displayDescription(), $allowedTags);
             if ($content) {
                 if ($maxLength) {
+                    // Recursive replacement.
                     $clean = trim(str_replace('  ', ' ', strip_tags($content)));
                     $content = mb_substr($clean, 0, $maxLength) . '…';
                 } else {

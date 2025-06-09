@@ -230,7 +230,7 @@ class InternalQuerier extends AbstractQuerier
             'suggester' => $suggester,
             'limit' => $this->query->getLimit(),
             'value_like' => ($modeSearch === 'contain' ? '%' : '')
-                . str_replace(['%', '_'], ['\%', '\_'], $q) . '%',
+                . strtr($q, ['%' => '\%', '_' => '\_']) . '%',
         ];
         $types = [
             'suggester' => \PDO::PARAM_INT,
@@ -370,7 +370,7 @@ class InternalQuerier extends AbstractQuerier
                 LIMIT :limit
                 ;
                 SQL;
-            $bind['value_like'] = '%' . str_replace(['%', '_'], ['\%', '\_'], $q) . '%';
+            $bind['value_like'] = '%' . strtr($q, ['%' => '\%', '_' => '\_']) . '%';
             $types['value_like'] = \PDO::PARAM_STR;
         } elseif ($mode === 'start') {
             /*
@@ -442,7 +442,7 @@ class InternalQuerier extends AbstractQuerier
                 LIMIT :limit
                 ;
                 SQL;
-            $bind['value_like'] = str_replace(['%', '_'], ['\%', '\_'], $q) . '%';
+            $bind['value_like'] = strtr($q, ['%' => '\%', '_' => '\_']) . '%';
             $types['value_like'] = \PDO::PARAM_STR;
         } else {
             return $this->response
@@ -1641,7 +1641,7 @@ class InternalQuerier extends AbstractQuerier
             $usedPropertyByTerms = $this->easyMeta->propertyIdsUsed();
             $properties = [];
             foreach (array_keys($usedPropertyByTerms) as $term) {
-                $properties[str_replace(':', '_', $term)] = $term;
+                $properties[strtr($term, [':' => '_'])] = $term;
             }
         }
 

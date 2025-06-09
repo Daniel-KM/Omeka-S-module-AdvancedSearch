@@ -241,7 +241,7 @@ class MainSearchForm extends Form
             switch ($type) {
                 default:
                     // Check for deprecated types.
-                    $method = 'search' . str_replace(['Omeka\\', 'Omeka/', 'omeka\\', 'omeka/'], '', $filter['type']);
+                    $method = 'search' . strtr($filter['type'], ['Omeka\\' => '', 'Omeka/' => '', 'omeka\\' => '', 'omeka/' => '']);
                     $element = method_exists($this, $method)
                         ? $this->$method($filter)
                         : $this->searchElement($filter);

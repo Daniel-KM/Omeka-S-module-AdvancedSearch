@@ -587,7 +587,7 @@ if (version_compare($oldVersion, '3.4.24', '<')) {
             unset($data['heading']);
 
             $html = $data['html'] ?? '';
-            $hasHtml = !in_array(str_replace([' ', "\n", "\r", "\t"], '', $html), ['', '<div></div>', '<p></p>']);
+            $hasHtml = !in_array(strtr($html, [' ' => '', "\n" => '', "\r" => '', "\t" => '']), ['', '<div></div>', '<p></p>']);
             if ($hasHtml) {
                 $b = new \Omeka\Entity\SitePageBlock();
                 $b->setLayout('html');
@@ -766,30 +766,45 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
             'message' => 'The template for facets was simplified. See view/search/facets-list.phtml. Matching templates: {json}', // @translate
             'commands' => [
                 // TODO Missing replacements: facetsOptions.
-                'str_replace' => [
-                    'from' => [
+                'strtr' => [
+                    'from_to' => [
                         <<<'PHP'
                         $facetActives(null, $activeFacets, $options)
-                        PHP,
+                        PHP => <<<'PHP'
+                            $facetActives(null, $activeFacets, $searchConfig->setting('facet'))
+                            PHP,
+
                         <<<'PHP'
                         $facetElements = $isFacetModeButton ? $plugins->get('facetCheckboxes') : $plugins->get('facetLinks');
-                        PHP,
-                        '// Facet checkbox can be used in any case anyway, the js checks it.' . "\n",
+                        PHP => <<<'PHP'
+                            $facetElements = $plugins->get('facetElements');
+                            PHP,
+
+                        '// Facet checkbox can be used in any case anyway, the js checks it.' . "\n" => '',
+
                         <<<'PHP'
                         $facetSelect = $plugins->get('facetSelect');
-                        PHP . "\n",
+                        PHP . "\n" => '',
+
                         <<<'PHP'
                         $facetSelectRange = $plugins->get('facetSelectRange');
-                        PHP . "\n",
+                        PHP . "\n" => '',
+
                         <<<'PHP'
                         $facetElementsTree = $isFacetModeButton ? $plugins->get('facetCheckboxesTree') : $plugins->get('facetLinksTree');
-                        PHP . "\n",
+                        PHP . "\n" => '',
+
                         <<<'PHP'
                         <?php $facetType = empty($options['facets'][$name]['type']) ? 'Checkbox' : $options['facets'][$name]['type']; ?>
-                        PHP . "\n",
+                        PHP . "\n" => '',
+
                         <<<'PHP'
                         <?php foreach ($facets as $name => $facetValues): ?>
-                        PHP . "\n",
+                        PHP . "\n" => <<<'PHP'
+                            <?php foreach ($facets as $name => $facetValues): ?>
+                                            <?php $facetOptions = $searchFacets[$name]; ?>
+                            PHP . "\n",
+
                         <<<'PHP'
                                         <?php if ($facetType === 'Select'): ?>
                                         <?= $facetSelect($name, $facetValues, $options) ?>
@@ -800,7 +815,10 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
                                         <?php else: ?>
                                         <?= $facetElements($name, $facetValues, $options) ?>
                                         <?php endif; ?>
-                        PHP,
+                        PHP => <<<'PHP'
+                                            <?= $facetElements($name, $facetValues, $facetOptions) ?>
+                            PHP,
+
                         <<<'PHP'
                                     <?php if ($facetType === 'Select'): ?>
                                     <?= $facetSelect($name, $facetValues, $options) ?>
@@ -811,30 +829,10 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
                                     <?php else: ?>
                                     <?= $facetElements($name, $facetValues, $options) ?>
                                     <?php endif; ?>
-                        PHP,
-                    ],
-                    'to' => [
-                        <<<'PHP'
-                        $facetActives(null, $activeFacets, $searchConfig->setting('facet'))
-                        PHP,
-                        <<<'PHP'
-                        $facetElements = $plugins->get('facetElements');
-                        PHP,
-                        '',
-                        '',
-                        '',
-                        '',
-                        '',
-                        <<<'PHP'
-                        <?php foreach ($facets as $name => $facetValues): ?>
-                                        <?php $facetOptions = $searchFacets[$name]; ?>
-                        PHP . "\n",
-                        <<<'PHP'
+                        PHP => <<<'PHP'
                                         <?= $facetElements($name, $facetValues, $facetOptions) ?>
-                        PHP,
-                        <<<'PHP'
-                                    <?= $facetElements($name, $facetValues, $facetOptions) ?>
-                        PHP,
+                            PHP,
+
                     ],
                     'message' => 'Command "{name}" #{index}/{total} for {key}: file #{count}/{count_total} {file} partially updated.', // @translate
                 ],
@@ -857,20 +855,16 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
             'message' => 'The view helper "facetLabel()" was removed. Update the theme and get the label directly from the each facet config: replace `$facetLabel($name)` by `$facetOptions[\'label\'] ?: $name)`. Matching templates: {json}', // @translate
             'commands' => [
                 // TODO Missing replacements: to get facetsOptions.
-                'str_replace' => [
-                    'from' => [
+                'strtr' => [
+                    'from_to' => [
                         <<<'PHP'
-                        $facetLabel = $plugins->get('facetLabel');
-                        PHP . "\n",
+                            $facetLabel = $plugins->get('facetLabel');
+                            PHP . "\n" => '',
                         <<<'PHP'
-                        $facetLabel($name)
-                        PHP,
-                    ],
-                    'to' => [
-                        '',
-                        <<<'PHP'
-                        $facetOptions['label'] ?? $name)
-                        PHP,
+                            $facetLabel($name)
+                            PHP => <<<'PHP'
+                                $facetOptions['label'] ?? $name)
+                                PHP,
                     ],
                     'message' => 'Command "{name}" #{index}/{total} for {key}: file #{count}/{count_total} {file} partially updated.', // @translate
                 ],
@@ -895,13 +889,15 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
             ],
             'message' => 'The template "search/facets" was renamed "search/facets-list". Update it in your theme. Matching templates: {json}', // @translate
             'commands' => [
-                'str_replace' => [
-                    'from' => "search/facets'",
-                    'to' => "search/facets-list'",
+                'strtr' => [
+                    'from_to' => [
+                        "search/facets'" => "search/facets-list'",
+                    ],
                 ],
                 'rename' => [
-                    'from' => 'search/facets.phtml',
-                    'to' => 'search/facets-list.phtml',
+                    'from_to' => [
+                        'search/facets.phtml' => 'search/facets-list.phtml',
+                    ],
                 ],
             ],
         ],
@@ -913,13 +909,15 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
             ],
             'message' => 'The template "search/resource-list" was renamed "search/results". Update your theme. Matching templates: {json}', // @translate
             'commands' => [
-                'str_replace' => [
-                    'from' => "search/resource-list'",
-                    'to' => "search/results'",
+                'strtr' => [
+                    'from_to' => [
+                        "search/resource-list'" => "search/results'",
+                    ],
                 ],
                 'rename' => [
-                    'from' => 'search/resource-list.phtml',
-                    'to' => 'search/results.phtml',
+                    'from_to' => [
+                        'search/resource-list.phtml' => 'search/results.phtml',
+                    ],
                 ],
             ],
         ],
@@ -940,9 +938,10 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
             ],
             'message' => 'The key "per_pages" was renamed "per_page". Update your theme. Matching templates: {json}', // @translate
             'commands' => [
-                'str_replace' => [
-                    'from' => "'per_pages'",
-                    'to' => "'per_page'",
+                'strtr' => [
+                    'from_to' => [
+                        "'per_pages'" => "'per_page'",
+                    ],
                 ],
             ],
         ],
@@ -972,7 +971,7 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
                 $j = 0;
                 foreach ($result as $filename) {
                     $from = OMEKA_PATH . '/' . $filename;
-                    $newFilename = str_replace($commandArgs['from'], $commandArgs['to'], $filename);
+                    $newFilename = strtr($filename, $commandArgs['from_to']);
                     $to = OMEKA_PATH . '/' . $newFilename;
                     if ($from !== $to) {
                         $written = rename($from, $to);
@@ -994,14 +993,14 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
                     }
                 }
                 break;
-            case 'str_replace':
+            case 'strtr':
                 ++$i;
                 $j = 0;
                 foreach ($result as $filename) {
                     $filepath = OMEKA_PATH . '/' . $filename;
                     $content = file_get_contents($filepath);
                     if ($content) {
-                        $content = str_replace($commandArgs['from'], $commandArgs['to'], $content);
+                        $content = strtr($content, $commandArgs['from_to']);
                         $written = file_put_contents($filepath, $content);
                         if ($written === false) {
                             $message = new PsrMessage(
@@ -1473,7 +1472,7 @@ if (version_compare($oldVersion, '3.4.31', '<')) {
                 // Normally, there is no name.
                 // The key is numeric, except when the upgrade is done twice,
                 $name = $filter['name'] ?? (is_numeric($key) ? $field : $key);
-                $name = mb_strtolower(str_replace(['-', ':'], '_', $name));
+                $name = mb_strtolower(strtr($name, ['-' => '_',  ':' => '_']));
                 if (isset($filters[$name])) {
                     $name .= '_' . $key;
                 }

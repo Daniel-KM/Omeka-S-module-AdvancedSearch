@@ -678,7 +678,7 @@ class IndexSuggestions extends AbstractJob
                 // TODO Skip words without meaning like "the".
                 $list = [];
                 if ($modeIndex === 'start' || $modeIndex === 'start_full') {
-                    $string = str_replace(array_keys($replacements), array_values($replacements), strip_tags($stringValue));
+                    $string = strtr(strip_tags($stringValue), $replacements);
                     $prevPart = '';
                     foreach (array_filter(explode(' ', $string), 'strlen') as $part) {
                         $part = trim($part, ".: \t\n\r\0\x0B");
@@ -692,7 +692,7 @@ class IndexSuggestions extends AbstractJob
                         }
                     }
                 } elseif ($modeIndex === 'contain' || $modeIndex === 'contain_full') {
-                    $string = str_replace(array_keys($replacements), array_values($replacements), strip_tags($stringValue));
+                    $string = strtr(strip_tags($stringValue), $replacements);
                     foreach (array_filter(explode(' ', $string), 'strlen') as $part) {
                         $part = trim($part, ".: \t\n\r\0\x0B");
                         if (strlen($part) > 1) {
@@ -702,7 +702,7 @@ class IndexSuggestions extends AbstractJob
                 }
 
                 if (strpos($modeIndex, 'full') !== false) {
-                    $list[] = str_replace(array_keys($replacementsFull), array_values($replacementsFull), strip_tags($stringValue));
+                    $list[] = strtr(strip_tags($stringValue), $replacementsFull);
                 }
 
                 if (!count($list)) {

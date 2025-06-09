@@ -244,7 +244,7 @@ class ApiFormConfigFieldset extends Fieldset
                 $prefill[$sourceField] = $sourceField;
                 continue;
             }
-            $sourceFieldU = str_replace(':', '_', $sourceField);
+            $sourceFieldU = strtr($sourceField, [':' => '_']);
             if (isset($availableFields[$sourceFieldU])) {
                 $prefill[$sourceField] = $sourceFieldU;
                 continue;

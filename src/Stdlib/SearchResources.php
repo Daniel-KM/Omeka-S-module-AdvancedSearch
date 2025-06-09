@@ -2013,7 +2013,7 @@ class SearchResources
         $expr = $qb->expr();
         $entityManager = $this->adapter->getEntityManager();
 
-        $escapeSqlLike = fn ($string) => str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], (string) $string);
+        $escapeSqlLike = fn ($string) => strtr((string) $string, ['\\' => '\\\\', '%' => '\\%', '_' => '\\_']);
 
         // Adapted in SearchSolr.
         // Quick check of value.

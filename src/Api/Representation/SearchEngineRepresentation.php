@@ -78,8 +78,9 @@ class SearchEngineRepresentation extends AbstractEntityRepresentation
      */
     public function cleanName(): string
     {
-        return strtolower(str_replace('__', '_',
-            preg_replace('/[^a-zA-Z0-9]/', '_', $this->resource->getName())
+        return strtolower(strtr(
+            preg_replace('/[^a-zA-Z0-9]/', '_', $this->resource->getName()),
+            ['__' => '_']
         ));
     }
 

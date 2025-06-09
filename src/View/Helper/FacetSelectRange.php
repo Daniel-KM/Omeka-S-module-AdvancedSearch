@@ -103,8 +103,8 @@ class FacetSelectRange extends AbstractFacet
                     } else {
                         $query['facet'][$facetField]['__from_or_to__'] = $facetValueValue;
                         $urls['url'] = $this->urlHelper->__invoke($this->route, $this->params, ['query' => $query]);
-                        $urls['from'] = str_replace('__from_or_to__', 'from', $urls['url']);
-                        $urls['to'] = str_replace('__from_or_to__', 'to', $urls['url']);
+                        $urls['from'] = strtr($urls['url'], ['__from_or_to__' => 'from']);
+                        $urls['to'] = strtr($urls['url'], ['__from_or_to__' => 'to']);
                     }
                 }
             }

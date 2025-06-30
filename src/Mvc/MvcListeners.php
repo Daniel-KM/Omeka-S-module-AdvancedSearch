@@ -49,7 +49,7 @@ class MvcListeners extends AbstractListenerAggregate
 
         // The other options are managed in templates search/search and
         // search/results-header-footer.
-        $redirectItemSets = $siteSettings->get('advancedsearch_redirect_itemsets', ['default' => 'browse']);
+        $redirectItemSets = $siteSettings->get('advancedsearch_item_sets_redirects', ['default' => 'browse']);
         $redirectItemSetTo = ($redirectItemSets[$itemSetId] ?? $redirectItemSets['default'] ?? 'browse') ?: 'browse';
         if ($redirectItemSetTo === 'browse') {
             return;

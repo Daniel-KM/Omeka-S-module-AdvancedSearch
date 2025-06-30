@@ -705,10 +705,10 @@ class Module extends AbstractModule
         $siteSettings = $services->get('Omeka\Settings\Site');
 
         // Don't set default early.
-        $redirectBrowse = $siteSettings->get('advancedsearch_redirect_itemset_browse') ?: [];
-        $redirectSearch = $siteSettings->get('advancedsearch_redirect_itemset_search') ?: [];
-        $redirectSearchFirst = $siteSettings->get('advancedsearch_redirect_itemset_search_first') ?: [];
-        $redirectPageUrl = $siteSettings->get('advancedsearch_redirect_itemset_page_url') ?: [];
+        $redirectBrowse = $siteSettings->get('advancedsearch_item_sets_redirect_browse') ?: [];
+        $redirectSearch = $siteSettings->get('advancedsearch_item_sets_redirect_search') ?: [];
+        $redirectSearchFirst = $siteSettings->get('advancedsearch_item_sets_redirect_search_first') ?: [];
+        $redirectPageUrl = $siteSettings->get('advancedsearch_item_sets_redirect_page_url') ?: [];
         $redirectBrowse = array_fill_keys($redirectBrowse, 'browse');
         $redirectSearch = array_fill_keys($redirectSearch, 'search');
         $redirectSearchFirst = array_fill_keys($redirectSearchFirst, 'first');
@@ -734,8 +734,9 @@ class Module extends AbstractModule
             + $redirectSearchFirst
             + $redirectPageUrl;
 
-        $siteSettings->set('advancedsearch_redirect_itemsets', $merged);
+        $siteSettings->set('advancedsearch_item_sets_redirects', $merged);
         // Kept for compatibility with old themes.
+        $siteSettings->set('advancedsearch_redirect_itemsets', $merged);
         $siteSettings->set('advancedsearch_redirect_itemset', $merged['default']);
     }
 
@@ -1512,10 +1513,12 @@ class Module extends AbstractModule
         $siteId = $site->getId();
         $siteSettings->set('advancedsearch_main_config', $searchConfig->id(), $siteId);
         $siteSettings->set('advancedsearch_configs', [$searchConfig->id()], $siteId);
-        $siteSettings->set('advancedsearch_redirect_itemset_browse', ['all'], $siteId);
-        $siteSettings->set('advancedsearch_redirect_itemset_search', [], $siteId);
-        $siteSettings->set('advancedsearch_redirect_itemset_search_first', [], $siteId);
-        $siteSettings->set('advancedsearch_redirect_itemset_page_url', [], $siteId);
+        $siteSettings->set('advancedsearch_item_sets_redirect_browse', ['all'], $siteId);
+        $siteSettings->set('advancedsearch_item_sets_redirect_search', [], $siteId);
+        $siteSettings->set('advancedsearch_item_sets_redirect_search_first', [], $siteId);
+        $siteSettings->set('advancedsearch_item_sets_redirect_page_url', [], $siteId);
+        $siteSettings->set('advancedsearch_item_sets_redirects', ['default' => 'browse'], $siteId);
+        // Compatibility for old themes.
         $siteSettings->set('advancedsearch_redirect_itemsets', ['default' => 'browse'], $siteId);
         $siteSettings->set('advancedsearch_redirect_itemset', 'browse', $siteId);
     }

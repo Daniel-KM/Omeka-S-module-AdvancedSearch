@@ -2030,3 +2030,14 @@ if (version_compare($oldVersion, '3.4.47', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.49', '<')) {
+    $message = new PsrMessage(
+        'A resource page block has been added, in particular to search inside an item set.' // @translate
+    );
+    $messenger->addSuccess($message);
+    $message = new PsrMessage(
+        'The css of the sidebar for facets and the css for structure of a thesaurus or a a hierarchy of item sets were simplified. You may check the search page.' // @translate
+    );
+    $messenger->addWarning($message);
+}

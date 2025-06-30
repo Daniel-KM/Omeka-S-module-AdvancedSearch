@@ -62,7 +62,7 @@ class SiteSettingsFieldset extends Fieldset
             ])
             // TODO Move these options to redirect item set to search page or a search page setting?
             ->add([
-                'name' => 'advancedsearch_redirect_itemset_browse',
+                'name' => 'advancedsearch_item_sets_redirect_browse',
                 'type' => CommonElement\OptionalItemSetSelect::class,
                 'options' => [
                     'element_group' => 'advanced_search',
@@ -73,14 +73,14 @@ class SiteSettingsFieldset extends Fieldset
                     ],
                 ],
                 'attributes' => [
-                    'id' => 'advancedsearch_redirect_itemset_browse',
+                    'id' => 'advancedsearch_item_sets_redirect_browse',
                     'multiple' => true,
                     'class' => 'chosen-select',
                     'data-placeholder' => 'Select item sets…', // @translate
                 ],
             ])
             ->add([
-                'name' => 'advancedsearch_redirect_itemset_search',
+                'name' => 'advancedsearch_item_sets_redirect_search',
                 'type' => CommonElement\OptionalItemSetSelect::class,
                 'options' => [
                     'element_group' => 'advanced_search',
@@ -91,14 +91,14 @@ class SiteSettingsFieldset extends Fieldset
                     ],
                 ],
                 'attributes' => [
-                    'id' => 'advancedsearch_redirect_itemset_search',
+                    'id' => 'advancedsearch_item_sets_redirect_search',
                     'multiple' => true,
                     'class' => 'chosen-select',
                     'data-placeholder' => 'Select item sets…', // @translate
                 ],
             ])
             ->add([
-                'name' => 'advancedsearch_redirect_itemset_search_first',
+                'name' => 'advancedsearch_item_sets_redirect_search_first',
                 'type' => CommonElement\OptionalItemSetSelect::class,
                 'options' => [
                     'element_group' => 'advanced_search',
@@ -109,14 +109,14 @@ class SiteSettingsFieldset extends Fieldset
                     ],
                 ],
                 'attributes' => [
-                    'id' => 'advancedsearch_redirect_itemset_search_first',
+                    'id' => 'advancedsearch_item_sets_redirect_search_first',
                     'multiple' => true,
                     'class' => 'chosen-select',
                     'data-placeholder' => 'Select item sets…', // @translate
                 ],
             ])
             ->add([
-                'name' => 'advancedsearch_redirect_itemset_page_url',
+                'name' => 'advancedsearch_item_sets_redirect_page_url',
                 'type' => OmekaElement\ArrayTextarea::class,
                 'options' => [
                     'element_group' => 'advanced_search',
@@ -125,7 +125,7 @@ class SiteSettingsFieldset extends Fieldset
                     'as_key_value' => true,
                 ],
                 'attributes' => [
-                    'id' => 'advancedsearch_redirect_itemset_page_url',
+                    'id' => 'advancedsearch_item_sets_redirect_page_url',
                     'placeholder' => '151 = events', // @translate
                 ],
             ])

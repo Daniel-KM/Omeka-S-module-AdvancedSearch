@@ -25,6 +25,8 @@ $step = (string) ($options['step'] ?? '');
 $minMaxStep = ($min === '' ? '' : ' min="' . $escapeAttr($min) . '"')
     . ($max === '' ? '' : ' max="' . $escapeAttr($max) . '"')
     . ($step === '' ? '' : ' step="' . $escapeAttr($step) . '"');
+
+$appendButton = $options['mode'] !== 'button';
 ?>
 
 <div class="facet-items facet-range-double range-double">
@@ -32,7 +34,7 @@ $minMaxStep = ($min === '' ? '' : ' min="' . $escapeAttr($min) . '"')
         <input class="range-slider-from" type="range" name="facet[<?= $name ?>][from]" value="<?= $escapeAttr($from ?? $min) ?>"<?= $minMaxStep ?><?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($fromUrl ?? '') . '"' : '' ?>/>
         <input class="range-slider-to" type="range" name="facet[<?= $name ?>][to]" value="<?= $escapeAttr($to ?? $max) ?>"<?= $minMaxStep ?><?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($toUrl ?? '') . '"' : '' ?>/>
     </div>
-    <div class="range-numerics">
+    <div class="range-numerics<?= $appendButton ? ' range-numerics-button' : '' ?>">
         <div class="range-numeric">
             <?php /*
             <span class="range-numeric-label range-numeric-from-label"><?= $escape($translate('from')) ?></span>
@@ -45,5 +47,8 @@ $minMaxStep = ($min === '' ? '' : ' min="' . $escapeAttr($min) . '"')
             */ ?>
             <input class="range-numeric-to" aria-label="<?= $escapeAttr($translate('to')) ?>" type="number" value="<?= $escapeAttr($to ?? $max) ?>"<?= $minMaxStep ?><?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($toUrl ?? '') . '"' : '' ?>/>
         </div>
+        <?php if ($options['mode'] !== 'button'): ?>
+        <button type="submit" class="button-submit range-double-submit"><?= $translate('Ok') ?></button>
+        <?php endif; ?>
     </div>
 </div>

@@ -483,7 +483,7 @@ class MainSearchForm extends Form
         } else {
             $label = sprintf(<<<'HTML'
                 %1$s</legend>
-                <button type="button" name="plus" class="search-filter-action search-filter-plus fa fa-plus add-value button" aria-label="%2$s" value=""></button>
+                <button type="button" name="plus" class="search-filter-action search-filter-plus add-value button" aria-label="%2$s" value=""></button>
                 <legend hidden="hidden">
                 HTML,
                 $this->escapeHtml->__invoke($filter['label']),

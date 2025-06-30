@@ -43,15 +43,13 @@ class SearchingPage implements LinkInterface
 
     public function getLabel(array $data, SiteRepresentation $site)
     {
-        return $data['label'] ? $data['label'] : 'Search'; // @translate
+        return isset($data['label']) && trim($data['label']) !== ''
+            ? $data['label']
+            : 'Search'; // @translate
     }
 
     public function isValid(array $data, ErrorStore $errorStore)
     {
-        if (!isset($data['label'])) {
-            $errorStore->addError('o:navigation', 'Invalid navigation: browse link missing label'); // @translate
-            return false;
-        }
         if (!isset($data['advancedsearch_config_id'])) {
             $errorStore->addError('o:navigation', 'Invalid navigation: browse link missing search page id'); // @translate
             return false;

@@ -29,6 +29,7 @@
  */
 namespace AdvancedSearch;
 
+use AdvancedSearch\Querier\QuerierInterface;
 use JsonSerializable;
 
 /**
@@ -36,6 +37,11 @@ use JsonSerializable;
  */
 class Query implements JsonSerializable
 {
+    /**
+     * @var \AdvancedSearch\Querier\QuerierInterface
+     */
+    protected $querier;
+
     /**
      * @var string
      */
@@ -55,11 +61,6 @@ class Query implements JsonSerializable
      * @var string[]
      */
     protected $resourceTypes = [];
-
-    /**
-     * @var bool
-     */
-    protected $byResourceType = false;
 
     /**
      * @var array
@@ -163,6 +164,25 @@ class Query implements JsonSerializable
     protected $options = [];
 
     /**
+     * The querier allows to do some requests directly, lately or on demand.
+     *
+     * The querier should be the prepared one, with the prepared query stored.
+     */
+    public function setQuerier(?QuerierInterface $querier): self
+    {
+        $this->querier = $querier;
+        return $this;
+    }
+
+    /**
+     * Get the querier used to prepare this query, with prepared data stored.
+     */
+    public function getQuerier(): ?QuerierInterface
+    {
+        return $this->querier;
+    }
+
+    /**
      * The query should be stringable and is always trimmed.
      */
     public function setQuery($query): self
@@ -225,22 +245,24 @@ class Query implements JsonSerializable
     }
 
     /**
-     * @return string[]
+     * @return string[] May be empty when resource types are mixed.
      */
     public function getResourceTypes(): array
     {
         return $this->resourceTypes;
     }
 
+    /**
+     * @deprecated Determined from the list of resource types.
+     */
     public function setByResourceType(bool $byResourceType): self
     {
-        $this->byResourceType = $byResourceType;
         return $this;
     }
 
     public function getByResourceType(): bool
     {
-        return $this->byResourceType;
+        return count($this->resourceTypes) > 1;
     }
 
     /**

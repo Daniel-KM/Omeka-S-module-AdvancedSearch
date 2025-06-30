@@ -639,8 +639,6 @@ trait TraitFormAdapterClassic
             $query->setSiteId($site->id());
         }
 
-        $query->setByResourceType(!empty($searchConfigSettings['results']['by_resource_type']));
-
         // Check resources.
         $resourceTypes = $query->getResourceTypes();
         // TODO Check why resources may not be filled.

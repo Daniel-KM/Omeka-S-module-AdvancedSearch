@@ -29,20 +29,26 @@ class NoopQuerier implements QuerierInterface
 
     public function setQuery(Query $query): QuerierInterface
     {
+        $query->setQuerier($this);
         return $this;
     }
 
     public function query(): Response
     {
-        return new Response;
+        return new Response();
     }
 
     public function querySuggestions(): Response
     {
-        return new Response;
+        return new Response();
     }
 
     public function queryValues(string $field): array
+    {
+        return [];
+    }
+
+    public function queryAllResourceIds(?string $resourceType = null, bool $byResourceType = false): array
     {
         return [];
     }

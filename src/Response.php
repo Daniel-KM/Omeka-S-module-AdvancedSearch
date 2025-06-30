@@ -35,6 +35,8 @@ use Omeka\Api\Manager as ApiManager;
 
 /**
  * @todo Manage resources as a whole with a global order.
+ *
+ * @todo Finalize restructuration with late binding: this is the response that calls the querier on demand, not the querier that fill everything early.
  */
 class Response implements JsonSerializable
 {
@@ -74,9 +76,9 @@ class Response implements JsonSerializable
     protected $totalResults = \Omeka\Stdlib\Paginator::TOTAL_COUNT;
 
     /**
-     * @var bool
+     * @var string[]
      */
-    protected $byResourceType = false;
+    protected $resourceTypes = [];
 
     /**
      * @var array
@@ -84,17 +86,42 @@ class Response implements JsonSerializable
     protected $resourceTotalResults = [];
 
     /**
-     * @var array
+     * The value is null if not filled early.
+     *
+     * @var array|null
      */
-    protected $results = [];
+    protected $results = null;
 
     /**
-     * List of result ids for all pages, if stored by the querier.
-     * @todo Inverse process: manage output as a whole and if needed, order it by type.
+     * The value is null if not filled early.
      *
-     * @var array
+     * @var array|null
      */
-    protected $allResourceIdsByResourceType = [];
+    protected $resources = null;
+
+    /**
+     * The value is null if not filled early.
+     *
+     * @var array|null
+     */
+    protected $resourcesByType = null;
+
+    /**
+     * List of result ids for all pages, if stored by the querier, else computed
+     * on request.
+     *
+     * The value is null if not filled early.
+     *
+     * @todo Inverse process: manage output as a whole as id => type and if needed, order it by type.
+     * But:
+     * Because the search engine may be able to search resources and pages that
+     * use a different series of ids, the key includes the resource name: items/51 = 51.
+     *
+     * @var array|null
+     *
+     * @deprecated The list may be too much big for big bases or overflow.
+     */
+    protected $allResourceIdsByResourceType = null;
 
     /**
      * Active facets are a list of selected facet values by facet.
@@ -195,15 +222,36 @@ class Response implements JsonSerializable
         return $this->totalResults;
     }
 
+    /**
+     * @param string[] $resourceTypes The types are generally "items" and
+     *   "item_sets". Empty array means no resource type, so any searchable
+     *   resources.
+     */
+    public function setResourceTypes(array $resourceTypes): self
+    {
+        $this->resourceTypes = $resourceTypes;
+        return $this;
+    }
+
+    /**
+     * @return string[] May be empty when resource types are mixed.
+     */
+    public function getResourceTypes(): array
+    {
+        return $this->resourceTypes;
+    }
+
+    /**
+     * @deprecated Determined from the list of resource types.
+     */
     public function setByResourceType(bool $byResourceType): self
     {
-        $this->byResourceType = $byResourceType;
         return $this;
     }
 
     public function getByResourceType(): bool
     {
-        return $this->byResourceType;
+        return count($this->resourceTypes) > 1;
     }
 
     /**
@@ -237,14 +285,6 @@ class Response implements JsonSerializable
     }
 
     /**
-     * Get the list of resource types from results.
-     */
-    public function getResourceTypes(): array
-    {
-        return array_keys($this->resourceTotalResults);
-    }
-
-    /**
      * Store all results for all resources.
      *
      * @param array $results Results by resource type ("items", "item_sets"…).
@@ -263,6 +303,7 @@ class Response implements JsonSerializable
      */
     public function addResults(string $resourceType, array $results): self
     {
+        $this->results ??= [];
         $this->results[$resourceType] = isset($this->results[$resourceType])
             ? array_merge($this->results[$resourceType], array_values($results))
             : array_values($results);
@@ -276,6 +317,7 @@ class Response implements JsonSerializable
      */
     public function addResult(string $resourceType, array $result): self
     {
+        $this->results ??= [];
         $this->results[$resourceType][] = $result;
         return $this;
     }
@@ -283,19 +325,49 @@ class Response implements JsonSerializable
     /**
      * Get stored results for a resource type or all resource types.
      *
+     * The results may be prepared lately from the list of resources.
+     *
      * @param string|null $resourceType The resource type ("items", "item_sets"…).
      */
     public function getResults(?string $resourceType = null): array
     {
-        return is_null($resourceType)
+        if ($this->results === null) {
+            $this->prepareResults();
+        }
+
+        return $resourceType === null
             ? $this->results
             : $this->results[$resourceType] ?? [];
+    }
+
+    protected function prepareResults(): self
+    {
+        $this->results = [];
+
+        if ($this->resources !== null) {
+            /** @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource */
+            foreach ($this->resources as $resource) {
+                $this->results[$resource->resourceName()][] = ['id' => $resource->id()];
+            }
+            return $this;
+        } elseif ($this->resourcesByType !== null) {
+            foreach ($this->resourcesByType as $resourceType => $resources) foreach ($resources as $resource) {
+                $this->results[$resourceType][] = ['id' => $resource->id()];
+            }
+            return $this;
+        }
+
+        // TODO Prepare results with querier if useful (so the querier does nothing early).
+
+        return $this;
     }
 
     /**
      * Store all results ids for all resources, by type.
      *
      * @internal Currently experimental.
+     *
+     * @deprecated The list may be too much big for big bases or overflow. Get query with searchQuery() and process.
      */
     public function setAllResourceIdsByResourceType(array $idsByResourceType): self
     {
@@ -311,10 +383,14 @@ class Response implements JsonSerializable
      *
      * @param string|null $resourceType The resource type ("items", "item_sets"…).
      * @param int[] $ids
+     *
      * @internal Currently experimental.
+     *
+     * @deprecated The list may be too much big for big bases or overflow. Get query with searchQuery() and process.
      */
     public function setAllResourceIdsForResourceType(string $resourceType, array $ids): self
     {
+        $this->allResourceIdsByResourceType ??= [];
         $this->allResourceIdsByResourceType[$resourceType] = array_values($ids);
         return $this;
     }
@@ -325,17 +401,27 @@ class Response implements JsonSerializable
      * @param string|null $resourceType The resource type ("items", "item_sets"…).
      * @param bool $byResourceType Merge ids or not.
      * @return int[]
-     * @internal Currently experimental.
+     *
      * @todo Return ids directly with array_column() in the response or include it by default.
+     *
+     * @internal Currently experimental.
+     *
+     * @deprecated The list may be too much big for big bases or overflow.
+     * Instead, get the query with $response->getQuery()->getQuerier()->getPreparedQuery()
+     * and process it.
      */
     public function getAllResourceIds(?string $resourceType = null, bool $byResourceType = false): array
     {
-        // When the data are not filled early, use results.
-        if (!count($this->allResourceIdsByResourceType)) {
-            // TODO Add a logger when the resource ids by resource type are not filled early.
-            foreach (array_keys($this->results) as $resourceType) {
-                $this->allResourceIdsByResourceType[$resourceType] = array_column($this->getResults($resourceType), 'id');
+        if ($this->allResourceIdsByResourceType === null) {
+            $this->allResourceIdsByResourceType = [];
+            if (!$this->query) {
+                return [];
             }
+            $querier = $this->query->getQuerier();
+            if (!$querier) {
+                return [];
+            }
+            $this->allResourceIdsByResourceType = $querier->queryAllResourceIds(null, true);
         }
 
         if ($byResourceType && !$resourceType) {
@@ -348,20 +434,77 @@ class Response implements JsonSerializable
     }
 
     /**
+     * Store mixed resources.
+     */
+    public function setResources(array $resources): self
+    {
+        $this->resources = $resources;
+        return $this;
+    }
+
+    /**
+     * Store resources by type.
+     *
+     * Use resources null to unset and null/null to reset.
+     */
+    public function setResourcesForType(?string $resourceType, ?array $resources): self
+    {
+        if ($resourceType === null) {
+            if ($resources === null) {
+                $this->resourcesByType = [];
+            } else {
+                unset($this->resourcesByType[$resourceType]);
+            }
+        } else {
+            $this->resourcesByType[$resourceType] = $resources;
+        }
+        return $this;
+    }
+
+    /**
      * Get resources for a resource type or all resource types.
      *
-     *When the indexation is not up to date, some resources may be removed or
-     *privated, so the result may be different from getResults().
+     * The resources can be prepared early by the querier.
      *
-     * @todo Create api search for mixed resources in order to keep global order.
-     *
-     * @param string|null $resourceType The resource type ("items", "item_sets"…).
-     * @return \Omeka\Api\Representation\AbstractResourceEntityRepresentation[]
-     * When resources types are set and unique, the key is the id (that is the
-     * case with item and item set, not pages).
+     * @todo The results may not have the id as key.
      */
-    public function getResources(?string $resourceType = null): array
+    public function getResources(?string $resourceType = null, bool $flat = false): array
     {
+        /** @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource */
+        if ($resourceType) {
+            if (isset($this->resourcesByType[$resourceType])) {
+                return $this->resourcesByType[$resourceType];
+            } elseif (isset($this->resources)) {
+                $result = [];
+                foreach ($this->resources as $resource) {
+                    if ($resource->resourceName() === $resourceType) {
+                        $result[$resource->id()] = $resource;
+                    }
+                }
+                return $result;
+            }
+        } elseif ($flat) {
+            if (isset($this->resources)) {
+                return $this->resources;
+            } elseif (isset($this->resourcesByType)) {
+                $results = [];
+                foreach ($this->resourcesByType as $resources) foreach ($resources as $resource) {
+                    $results[$resource->id()] = $resource;
+                }
+                return $results;
+            }
+        } else {
+            if (isset($this->resourcesByType)) {
+                return $this->resourcesByType;
+            } elseif (isset($this->resources)) {
+                $result = [];
+                foreach ($this->resources as $resource) {
+                    $result[$resource->resourceName()][$resource->id()] = $resource;
+                }
+                return $result;
+            }
+        }
+
         if (!$this->api) {
             return [];
         }

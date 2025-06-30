@@ -227,7 +227,9 @@ class Query implements JsonSerializable
     }
 
     /**
-     * @param string[] $resourceTypes The types are generally "items" and "item_sets".
+     * @param string[] $resourceTypes The types are generally "items" and
+     *   "item_sets". Empty array means no resource type, so any searchable
+     *   resources.
      */
     public function setResourceTypes(array $resourceTypes): self
     {

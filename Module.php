@@ -1065,7 +1065,7 @@ class Module extends AbstractModule
             || ($status->isSiteRequest() && !$services->get('Omeka\Settings\Site')->get('disable_jsonld_embed'))
         ) {
             /**
-             * @var \AdvancedSearch\Response $respoonse
+             * @var \AdvancedSearch\Response $response
              * @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource
              */
             $view = $event->getTarget();

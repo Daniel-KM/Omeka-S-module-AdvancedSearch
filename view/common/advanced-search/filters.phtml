@@ -22,6 +22,7 @@ $escape = $plugins->get('escapeHtml');
 $translate = $plugins->get('translate');
 $siteSetting = $plugins->get('siteSetting');
 $formQuery = $plugins->get('formQuery');
+$escapeAttr = $plugins->get('escapeHtmlAttr');
 $formSelect = $plugins->get('formSelect');
 $queryInput = $plugins->get('queryInput');
 $fieldSelect = $plugins->get('fieldSelect');
@@ -72,19 +73,19 @@ if (isset($query['search'])) {
     ]);
 }
 
-$queryOption = function ($value, array $search, $key, $text) {
+$queryOption = function ($value, array $search, $key, $text) use($escapeAttr, $escape) {
     $selected = null;
     if (isset($search[$key]) && $value === $search[$key]) {
-        $selected = ' selected';
+        $selected = ' selected="selected"';
     }
-    return sprintf('<option value="%s"%s>%s</option>', $value, $selected, $text);
+    return sprintf('<option value="%s"%s>%s</option>' . "\n", $escapeAttr($value), $selected, $escape($text));
 };
-$queryText = function (array $search, $index) use ($escape, $translate) {
+$queryText = function (array $search, $index) use ($escapeAttr, $translate) {
     $val = $search['val'] ?? null;
-    return sprintf('<input type="text" class="query-text" name="%s" value="%s" aria-label="%s">',
-        $escape("filter[$index][val]"),
-        $escape($val),
-        $escape($translate('Query text')));
+    return sprintf('<input type="text" class="query-text" name="%s" value="%s" aria-label="%s"/>' . "\n",
+        $escapeAttr("filter[$index][val]"),
+        $escapeAttr($val),
+        $escapeAttr($translate('Query text')));
 };
 
 $optionsQuery = [];
@@ -238,8 +239,8 @@ if ($isSiteRequest) {
                     </optgroup>
                 </select>
                 <?= $queryText($isSubQuery ? [] : $filter, $index) ?>
-                <?= $dataTypeHelper->getSelect($stem . '[val]', "filter[$index][val]" ?? null, ['multiple' => false, 'class' => 'query-text query-data-type chosen-select', 'aria-label' => 'Data types', 'data-placeholder' => $translate('Select data type…')]) // TODO Manage search on property for multiple data types. ?>
-                <?= $formSelect($selectMainDataType->setName($stem . '[val]')->setValue("filter[$index][val]" ?? null)) ?>
+                <?= $dataTypeHelper->getSelect($stem . '[val]', $query['filter'][$index]['val'] ?? null, ['multiple' => false, 'class' => 'query-text query-data-type chosen-select', 'aria-label' => 'Data types', 'data-placeholder' => $translate('Select data type…')]) // TODO Manage search on property for multiple data types. ?>
+                <?= $formSelect($selectMainDataType->setName($stem . '[val]')->setValue($query['filter'][$index]['val'] ?? null)) ?>
                 <button type="button" class="button o-icon-delete remove-value" aria-label="<?= $translate('Remove value') ?>" title="<?= $translate('Remove value') ?>"></button>
             </div>
             <div class="value-common sub-query">

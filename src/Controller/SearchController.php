@@ -53,21 +53,21 @@ class SearchController extends AbstractActionController
          * @see \AdvancedSearch\View\Helper\GetSearchConfig
          */
 
-        $searchConfigId = (int) $this->params('id');
+        $params = $this->params();
         $isSiteRequest = $this->status()->isSiteRequest();
         $site = $isSiteRequest ? $this->currentSite() : null;
-
+        $searchConfigId = (int) $params->fromRoute('id');
         $searchConfig = $this->viewHelpers()->get('getSearchConfig')($searchConfigId);
-        if (!$searchConfig) {
+        if ($searchConfig === null) {
             if ($isSiteRequest) {
                 $this->logger()->err(
                     'The search engine {search_slug} is not available in site {site_slug}. Check site settings or search config.', // @translate
-                    ['search_slug' => $this->params('search-slug'), 'site_slug' => $site->slug()]
+                    ['search_slug' => $params->fromRoute('search-slug'), 'site_slug' => $site->slug()]
                 );
             } else {
                 $this->logger()->err(
                     'The search engine {search_slug} is not available for admin. Check main settings or search config.', // @translate
-                    ['search_slug' => $this->params('search-slug')]
+                    ['search_slug' => $params->fromRoute('search-slug')]
                 );
             }
             return $this->notFoundAction();
@@ -75,7 +75,7 @@ class SearchController extends AbstractActionController
 
         if ($isSiteRequest) {
             // Check if it is an item set redirection.
-            $itemSetId = (int) $this->params()->fromRoute('item-set-id');
+            $itemSetId = (int) $params->fromRoute('item-set-id');
             // This is just a check: if set, mvc listeners add item_set['id'][].
             // @see \AdvancedSearch\Mvc\MvcListeners::redirectItemSetToSearch()
             // May throw a not found exception.
@@ -106,7 +106,7 @@ class SearchController extends AbstractActionController
             $view->setTemplate($template);
         }
 
-        $request = $this->params()->fromQuery();
+        $request = $params->fromQuery();
 
         // On an item set page, only one item set can be used and the page
         // should limit results to it.

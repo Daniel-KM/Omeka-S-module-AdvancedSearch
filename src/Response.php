@@ -279,7 +279,7 @@ class Response implements JsonSerializable
      */
     public function getResourceTotalResults(?string $resourceType = null)
     {
-        return is_null($resourceType)
+        return $resourceType === null
             ? $this->resourceTotalResults
             : $this->resourceTotalResults[$resourceType] ?? 0;
     }
@@ -328,6 +328,8 @@ class Response implements JsonSerializable
      * The results may be prepared lately from the list of resources.
      *
      * @param string|null $resourceType The resource type ("items", "item_sets"…).
+     * @return array Array by resource type containing the list of values.
+     *   Each value is an array with at least the key id.
      */
     public function getResults(?string $resourceType = null): array
     {
@@ -374,6 +376,7 @@ class Response implements JsonSerializable
         foreach ($idsByResourceType as &$values) {
             $values = array_values($values);
         }
+        unset($values);
         $this->allResourceIdsByResourceType = $idsByResourceType;
         return $this;
     }
@@ -527,7 +530,7 @@ class Response implements JsonSerializable
         // the id as key and use array_replace(). This process avoids to do a
         // single read() for each result.
         $resources = [];
-        foreach ($this->api->search($resourceType, ['id' => $ids])->getContent() as $resource) {
+        foreach ($this->api->search($resourceType, ['id' => array_keys($ids)])->getContent() as $resource) {
             $resources[$resource->id()] = $resource;
         }
         return count($resources)
@@ -589,7 +592,7 @@ class Response implements JsonSerializable
      */
     public function addActiveFacetRange(string $name, ?string $from, ?string $to): self
     {
-        if (!is_null($from) && !is_null($to)) {
+        if ($from !== null && $to !== null) {
             $this->activeFacets[$name] = [
                 'from' => $from,
                 'to' => $to,
@@ -603,7 +606,7 @@ class Response implements JsonSerializable
      */
     public function getActiveFacets(?string $name = null): array
     {
-        return is_null($name)
+        return $name === null
             ? $this->activeFacets
             : $this->activeFacets[$name] ?? [];
     }
@@ -651,7 +654,7 @@ class Response implements JsonSerializable
      */
     public function getFacetCounts(?string $name = null): array
     {
-        return is_null($name)
+        return $name === null
             ? $this->facetCounts
             : $this->facetCounts[$name] ?? [];
     }

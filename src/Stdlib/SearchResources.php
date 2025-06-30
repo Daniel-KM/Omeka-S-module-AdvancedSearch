@@ -1887,7 +1887,7 @@ class SearchResources
      *   - lte: lower than or equal
      *   - gte: greater than or equal
      *   - gt: greater than
-     *   Comparisons (numerical, with casting to integer for numbers):
+     *   Comparisons (numerical, with casting to integer for numbers; don't use for float):
      *   - <: lower than
      *   - ≤: lower than or equal
      *   - ≥: greater than or equal

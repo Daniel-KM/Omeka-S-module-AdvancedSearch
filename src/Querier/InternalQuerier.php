@@ -1442,8 +1442,8 @@ class InternalQuerier extends AbstractQuerier
             // Like Solr, get only available useful values or all existing values.
             /** @see https://solr.apache.org/guide/solr/latest/query-guide/faceting.html */
             if ($isAllFacets) {
-                // Do the query one time for all facets, for each resource types.
-                // Itis not possible when there are facets for item set or site
+                // Do the query one time for all facets, for each resource type.
+                // It is not possible when there are facets for item set or site
                 // because they are removed from the query.
                 // FIXME Where the item sets and facets are removed from the query?
                 // TODO Check if item sets and sites are still an exception for references.

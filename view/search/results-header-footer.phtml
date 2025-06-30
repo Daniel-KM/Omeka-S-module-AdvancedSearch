@@ -88,7 +88,7 @@ $multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['lis
 <?= $this->searchSortSelector($query, $sortFields, ['as_url' => true, 'label' => $searchConfig->subSetting('results', 'label_sort')]) ?>
 <?php endif; ?>
 
-<?php // Grid/list. ?>
+<?php // Grid/list. // TODO Ideally, list/grid should be buttons but with a light design, like a link. Or a switch. ?>
 
 <?php if ($multiMode): ?>
 <div class="search-results-display">

@@ -2030,3 +2030,36 @@ if (version_compare($oldVersion, '3.4.47', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.49', '<')) {
+    // Rename site settings for redirects.
+    $siteIds = $api->search('sites', [], ['returnScalar' => 'id'])->getContent();
+    $oldToNews = [
+        'advancedsearch_redirect_itemset_browse' => 'advancedsearch_item_sets_redirect_browse',
+        'advancedsearch_redirect_itemset_search' => 'advancedsearch_item_sets_redirect_search',
+        'advancedsearch_redirect_itemset_search_first' => 'advancedsearch_item_sets_redirect_search_first',
+        'advancedsearch_redirect_itemset_page_url' => 'advancedsearch_item_sets_redirect_page_url',
+        'advancedsearch_redirect_itemsets' => 'advancedsearch_item_sets_redirects',
+    ];
+    foreach ($siteIds as $siteId) {
+        $siteSettings->setTargetId($siteId);
+        foreach ($oldToNews as $old => $new) {
+            $val = $siteSettings->get($old);
+            if ($val !== null) {
+                $siteSettings->set($new, $val);
+            }
+            if ($old !== 'advancedsearch_redirect_itemsets') {
+                $siteSettings->delete($old);
+            }
+        }
+    }
+
+    $message = new PsrMessage(
+        'A resource page block has been added, in particular to search inside an item set.' // @translate
+    );
+    $messenger->addSuccess($message);
+    $message = new PsrMessage(
+        'The css of the sidebar for facets and the css for structure of a thesaurus or a a hierarchy of item sets were simplified. You may check the search page.' // @translate
+    );
+    $messenger->addWarning($message);
+}

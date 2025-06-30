@@ -60,6 +60,11 @@
         width: fit-content;
         margin: 6px 6px 0 0;
     }
+    #search-filters > .search-filter-action::before {
+        content: "+";
+        font-size: larger;
+        font-size: bolder;
+    }
     #search-filters .filter {
         display: flex;
         justify-content: space-between;
@@ -71,11 +76,11 @@
         */
         padding: 6px;
     }
-    #search-filters .filter[hidden=hidden] {
+    #search-filters .filter[hidden] {
         display: none;
     }
     #search-filters .filter:first-of-type {
-        padding-top: 6px;
+        padding-top: 0.4em;
     }
     #search-filters .filter select,
     #search-filters .filter input {
@@ -114,14 +119,21 @@
     #search-filters .filter .field .inputs button {
         margin: 0;
     }
+    #search-filters .filter .field .inputs button::before {
+        content: "−";
+        font-size: larger;
+        font-size: bolder;
+    }
 
     /* Search results */
 
-    /* The wrapper divides main results and aside for facets. */
+    /* The wrapper divides main results and aside (see below) for facets. */
     .search-results-wrapper {
         display: flex;
+        gap: 2em;
     }
 
+    /* Search result part */
     .search-results {
         flex-grow: 1;
         display: flex;
@@ -143,9 +155,13 @@
         flex: 0 0 100%;
         padding-left: 0;
     }
+    .search-results .search-filters .filter a {
+        color: inherit;
+    }
     .search-results .search-filters .filter a::after {
-        content: "×";
-        color: initial;
+        content: "🗙";
+        color: inherit;
+        font-weight: bold;
         margin: -3px 6px auto;
     }
 
@@ -157,6 +173,7 @@
 
     .search-results .resource-list {
         display: flex;
+        padding-left: 0;
     }
     .search-results-count.no-total-results .row-count {
         display: none;
@@ -171,12 +188,22 @@
     .search-results .resource-list.list .resource {
         display: flex;
         flex-flow: row wrap;
+        align-items: flex-start;
+        padding: 6px 0 5px;
     }
     .search-results .resource-list.list .resource-thumbnail {
-        flex-basis: 120px;
+        margin-left: auto;
+    }
+    .search-results .resource-list.list .resource-thumbnail .resource-link img {
+        max-width: 60px;
+        max-height: 60px;
+        width: auto;
+        height: auto;
+        margin: 0 0 0 auto;
+        padding: 0;
     }
     .search-results .resource-list.list .resource-heading {
-        flex-basis: calc(100% - 120px);
+        flex-basis: calc(100% - 66px);
     }
     .search-results .resource-list.list .resource-metadata,
     .search-results .resource-list.list .resource-body {
@@ -209,10 +236,10 @@
         justify-content: center;
     }
     .search-results .resource-list.grid .resource-thumbnail img {
-        height: auto;
-        max-height: 200px;
-        width: 100%;
         max-width: 200px;
+        max-height: 200px;
+        width: auto;
+        height: auto;
         margin: 0;
         padding: 0;
     }
@@ -252,30 +279,33 @@
     }
     .facets-active .facet-active .facet-active-value {
         padding: 0 6px;
+        color: inherit;
     }
     .facets-active .facet-active .facet-active-value::after {
-        content: "x";
-        color: initial;
+        content: "🗙";
+        color: inherit;
+        font-weight: bold;
         margin: -3px 6px auto;
     }
 
     /* Search facets */
 
     .search-facets {
-        flex-basis: 18.75%;
-        order: -1;
-        padding: 0 0.5em;
+        flex: 0 0 18.75%;
         min-width: 240px;
         max-width: 400px;
+        order: -1;
     }
 
     .facets .facets-list {
         padding-left: 0;
     }
+
     .facet {
         display: block;
         margin-bottom: 1em;
     }
+
     .facets h3,
     .facets h4,
     .facet h3,
@@ -300,75 +330,73 @@
         border-bottom: 1px inset;
         border-radius: 0;
     }
-    /* Don't use font-awasome glyph, that may be unavailable in public site. */
     .facets .facet-button::after {
         float: right;
-        content: '';
+        content: '🞃';
         position: unset;
-        width: 12px;
-        height: 12px;
-        background: url(../img/caret-down-solid.svg) top left no-repeat;
-        padding: 3px;
+        width: auto;
+        height: auto;
+        padding: 0;
         border: none;
+        background: none;
     }
     .facets .facet-button.collapse::after {
-        background-image: url(../img/caret-down-solid.svg);
+        content: '🞃';
     }
+    /* Fix for the default public theme. */
+    /*
+    .facets .facet-button.collapse + .collapsible {
+        padding: 7.5px 0 7.5px 16px;
+    }
+    */
     .facets .facet-button.expand::after {
-        background-image: url(../img/caret-right-solid.svg);
+        content: '🞂';
     }
 
     .facet-items {
         padding-left: 0;
         list-style: none;
     }
-    .facet-items li[data-level="1"] a,
-    .facet-items li[data-level="1"] input {
-        margin-left: 12px;
+    .facet-items li:not([hidden]) {
+        display: flex;
+        align-items: baseline;
+        gap: 0.4em;
     }
-    .facet-items li[data-level="2"] a,
-    .facet-items li[data-level="2"] input {
-        margin-left: 24px;
+    .facet-items li[data-level="1"] {
+        margin-left: 1.4em;
     }
-    .facet-items li[data-level="3"] a,
-    .facet-items li[data-level="3"] input {
-        margin-left: 36px;
+    .facet-items li[data-level="2"] {
+        margin-left: 2.8em;
     }
-    .facet-items li[data-level="4"] a,
-    .facet-items li[data-level="4"] input {
-        margin-left: 48px;
+    .facet-items li[data-level="3"] {
+        margin-left: 4.2em;
     }
-    .facet-items li[data-level="5"] a,
-    .facet-items li[data-level="5"] input {
-        margin-left: 60px;
+    .facet-items li[data-level="4"] {
+        margin-left: 5.6em;
     }
-    .facet-items li[data-level="6"] a,
-    .facet-items li[data-level="6"] input {
-        margin-left: 72px;
+    .facet-items li[data-level="5"] {
+        margin-left: 7em;
     }
-    .facet-items li[data-level="7"] a,
-    .facet-items li[data-level="7"] input {
-        margin-left: 84px;
+    .facet-items li[data-level="6"] {
+        margin-left: 8.4em;
     }
-    .facet-items li[data-level="8"] a,
-    .facet-items li[data-level="8"] input {
-        margin-left: 96px;
+    .facet-items li[data-level="7"] {
+        margin-left: 9.8em;
     }
-    .facet-items li[data-level="9"] a,
-    .facet-items li[data-level="9"] input {
-        margin-left: 108px;
+    .facet-items li[data-level="8"] {
+        margin-left: 11.2em;
     }
-    .facet-items li[data-level="10"] a,
-    .facet-items li[data-level="10"] input {
-        margin-left: 120px;
+    .facet-items li[data-level="9"] {
+        margin-left: 12.6em;
     }
-    .facet-items li[data-level="11"] a,
-    .facet-items li[data-level="11"] input {
-        margin-left: 132px;
+    .facet-items li[data-level="10"] {
+        margin-left: 14em;
     }
-    .facet-items li[data-level="12"] a,
-    .facet-items li[data-level="12"] input {
-        margin-left: 144px;
+    .facet-items li[data-level="11"] {
+        margin-left: 15.4em;
+    }
+    .facet-items li[data-level="12"] {
+        margin-left: 16.8em;
     }
     .facet-item input[type=checkbox] {
         vertical-align: initial;
@@ -384,6 +412,12 @@
     }
     .facet-item.active a::before {
         content: "\f14a";
+    }
+    .facet-item label {
+        white-space: normal;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        word-break: break-word;
     }
 
     .facet-see-more {
@@ -401,7 +435,7 @@
         margin: 0;
     }
     .facet-see-more-or-less::after {
-        margin-left: 6px;
+        margin-left: 0.4em;
     }
     .facet-see-more-or-less.expand::after {
         content: "🞃";
@@ -425,7 +459,7 @@
     .range-double input[type=range] {
         -webkit-appearance: none;
         appearance: none;
-        height: 6px;
+        height: 0.2em;
         width: 100%;
         position: absolute;
         pointer-events: none;
@@ -446,15 +480,16 @@
         display: flex;
         justify-content: space-between;
         flex-wrap: wrap;
+        gap: 1em;
+    }
+    .range-double .range-numerics-button {
+        gap: 0.4em;
     }
     .range-double input[type=number] {
         border: none;
     }
     #search-facets .range-double .range-numerics {
         flex-wrap: nowrap;
-    }
-    #search-facets .range-double .range-numeric {
-        width: 50%;
     }
     #search-facets .range-double .range-numeric input {
         width:  100%;

@@ -2992,6 +2992,7 @@ class SearchResources
             /** @see \Omeka\Api\Adapter\AbstractEntityAdapter::buildBaseQuery() */
             // Avoid a strict type issue, so convert ids as string.
             // Normally, the query is cleaned before.
+            // Take care of sort order, that is "desc" by default!
             $ids = empty($query['sort_ids']) ? $query['id'] : $query['sort_ids'];
             if (is_int($ids)) {
                 $ids = [(string) $ids];

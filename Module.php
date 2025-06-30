@@ -251,17 +251,6 @@ class Module extends AbstractModule
                 // Process before any other module in order to reset query.
                 +200
             );
-
-            // Omeka S v4.1 does not allow to search fulltext and return scalar.
-            // And event "api.search.query.finalize" isn't available for scalar.
-            // @see https://github.com/omeka/omeka-s/pull/2224
-            $sharedEventManager->attach(
-                $adapter,
-                'api.search.query',
-                [$this, 'fixSearchFullTextScalar'],
-                // Process after Omeka\Module and last.
-                -200
-            );
         }
 
         // Manage exception for full text search with resource adapter.
@@ -816,58 +805,6 @@ class Module extends AbstractModule
             ->searchResourcesFullText($qb, $request->getContent());
     }
 
-    /**
-     * Process fix when searching fulltext and returning scalar ids.
-     *
-     * The option "require_fix_2224" is set when a scalar search with full text
-     * sort is prepared in query builder.
-     *
-     * The fix is set only for the internal querier.
-     *
-     * @see https://github.com/omeka/omeka-s/pull/2224
-     */
-    public function fixSearchFullTextScalar(Event $event): void
-    {
-        /** @var \Omeka\Api\Request $request */
-        $request = $event->getParam('request');
-        if (!$request->getOption('require_fix_2224')) {
-            return;
-        }
-
-        /** @var \Doctrine\ORM\QueryBuilder $qb */
-        $qb = $event->getParam('queryBuilder');
-        $query = $request->getContent();
-
-        // A full text search cannot be "*" alone. Anyway it has no meaning.
-        $qValue = $qb->getParameter('omeka_fulltext_search');
-        if (in_array($qValue, [null, '', '*'], true)) {
-            return;
-        }
-
-        $scalarField = $request->getOption('returnScalar') ?? $query['return_scalar'] ?? 'id';
-        $matchOrder = 'MATCH(omeka_fulltext_search.title, omeka_fulltext_search.text) AGAINST (:omeka_fulltext_search)';
-
-        $fixQb = clone $qb;
-        $fixQb
-            ->select(['omeka_root.id' => 'omeka_root.' . $scalarField])
-            ->addSelect($matchOrder . ' AS HIDDEN orderMatch')
-            ->addGroupBy('orderMatch');
-        $content = array_column($fixQb->getQuery()->getScalarResult(), $scalarField, 'id');
-
-        // The response is not yet available, so store results as options of
-        // the request.
-        $request
-            ->setOption('results', $content)
-            ->setOption('total_results', count($content));
-
-        // Remove the order from main query and limit results and return a fake
-        // result that is detected early by mariadb/mysql.
-        $qb
-            ->resetDQLPart('orderBy')
-            ->setMaxResults(0)
-            ->andWhere('1 = 0');
-    }
-
     public function onFormVocabMemberSelectQuery(Event $event): void
     {
         $selectElement = $event->getTarget();
@@ -1133,8 +1070,8 @@ class Module extends AbstractModule
              */
             $view = $event->getTarget();
             $response = $view->response;
-            foreach ($response->getResources() as $resource) {
-                echo $resource->embeddedJsonLd();
+            foreach ($response->getResources(null, true) as $resource) {
+               echo $resource->embeddedJsonLd();
             }
         }
     }

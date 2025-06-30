@@ -67,6 +67,24 @@ interface QuerierInterface extends LoggerAwareInterface
     public function queryValues(string $field): array;
 
     /**
+     * Process a search query to get all ids of a type, without pagination.
+     *
+     * This method should be avoided when the total resources is too big for the
+     * server, else a memory overflow can occur.
+     *
+     * It is used in the rare cases where a whole list of ids is needed, in
+     * particular to get Mapping features for an item set, and old versions of
+     * Bulk Export and Reference.
+     *
+     * @param string|null $resourceType May be "items", "resources", etc.
+     * @param bool $byResourceType Return ids by type when set.
+     * @return array List of ids for the resource type. If the resource type is
+     * not set, all resources (items, item sets, media) will be mixed, unless
+     * the second argument is true.
+     */
+    public function queryAllResourceIds(?string $resourceType = null, bool $byResourceType = false): array;
+
+    /**
      * Prepare a search query.
      *
      * @return mixed|null The query formatted for this specific search engine.

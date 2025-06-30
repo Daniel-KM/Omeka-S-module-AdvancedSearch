@@ -75,6 +75,7 @@ abstract class AbstractQuerier implements QuerierInterface
 
     public function setQuery(Query $query): self
     {
+        $query->setQuerier($this);
         $this->query = $query;
         return $this;
     }
@@ -84,6 +85,14 @@ abstract class AbstractQuerier implements QuerierInterface
     abstract public function querySuggestions(): Response;
 
     abstract public function queryValues(string $field): array;
+
+    /**
+     * @todo Remove when SearchSolr will be upgraded.
+     */
+    public function queryAllResourceIds(?string $resourceType = null, bool $byResourceType = false): array
+    {
+        return [];
+    }
 
     abstract public function getPreparedQuery();
 }

@@ -47,13 +47,21 @@ class InternalQuerier extends AbstractQuerier
         $api = $this->services->get('Omeka\ApiManager');
 
         // The response is failed by default until filled.
-        $this->response = new Response;
-        $this->response->setApi($api);
+        $this->response = new Response();
+        $this->response
+            ->setApi($api)
+            ->setQuery($this->query);
 
-        $this->byResourceType = $this->query ? $this->query->getByResourceType() : false;
-        $this->response->setByResourceType($this->byResourceType);
+        $this->byResourceType = $this->query
+            ? $this->query->getByResourceType()
+            : false;
 
         $this->args = $this->getPreparedQuery();
+
+        $this->response
+            // Here, the resource types are the ones supported by the querier.
+            ->setResourceTypes($this->resourceTypes)
+        ;
 
         // When no query or resource types are set.
         if ($this->args === null) {
@@ -64,120 +72,81 @@ class InternalQuerier extends AbstractQuerier
         $plugins = $this->services->get('ControllerPluginManager');
         $hasReferences = $plugins->has('references');
 
-        // Omeka S v4.1 does not allow to search fulltext and return scalar ids.
-        /** @see https://github.com/omeka/omeka-s/pull/2224 */
-        $requireFix2224 = isset($this->args['fulltext_search'])
-            // A full text search cannot be "*" alone. Anyway it has no meaning.
-            && in_array($this->args['fulltext_search'], ['', '*'], true)
-            && substr((string) $this->query->getSort(), 0, 9) === 'relevance';
+        // Versions < 3.4.49 required to get all ids early, but this need was
+        // only used to create the link for bulk export (but it can use a query)
+        // and to prepare the mapping features when a map is displayed on an
+        // item set in some theme. Furthermore, to get all ids created an issue
+        // when there was a fulltext_search, so a fix was done (/** @link https://github.com/omeka/omeka-s/pull/2224 */).
+        // Important: the full list of ids is used for the facets too.
 
-        // The standard api way implies a double query, because scalar doesn't
-        // set the full total and doesn't use paginator, but return all values.
-        // So get all ids, then slice it here.
-        // TODO Check if this fix is still needed.
-        $dataQuery = $this->args;
-        $limit = empty($dataQuery['limit']) ? null : (int) $dataQuery['limit'];
-        $offset = empty($dataQuery['offset']) ? 0 : (int) $dataQuery['offset'];
-        unset($dataQuery['limit'], $dataQuery['offset']);
+        // The new way is to get the full resources, like omeka browse, and to
+        // get the ids on request only, so checked and limited, via a yield.
 
         // Some query arguments and facets are not manageable via resource type
-        // "resources".
+        // "resources" in Omeka v4.1 (no search on mixed "resources").
         $isSpecificQuery = $this->isSpecificQuery(true);
-
-        // Return scalar doesn't allow to get the total of results.
-        // So skip offset and limit, then apply them in order to avoid the
-        // double query.
-        // Important: the full list of ids is used for the facets too.
-        // TODO Check if this internal api paginator is quicker in all cases (small/long results) than previous double query.
 
         // Resources types are filtered from the query or from the indexes.
         if ($this->byResourceType || $isSpecificQuery) {
             foreach ($this->resourceTypes as $resourceType) {
                 try {
-                    if ($requireFix2224) {
-                        $apiResponse = $api->search($resourceType, $dataQuery, ['returnScalar' => 'id', 'require_fix_2224' => true]);
-                        $totalResults = $apiResponse->getRequest()->getOption('total_results', 0);
-                        $result = $apiResponse->getRequest()->getOption('results', []);
-                    } else {
-                        $apiResponse = $api->search($resourceType, $dataQuery, ['returnScalar' => 'id']);
-                        $totalResults = $apiResponse->getTotalResults();
-                        $result = $apiResponse->getContent();
-                    }
+                    $apiResponse = $api->search($resourceType, $this->args);
+                    $totalResults = $apiResponse->getTotalResults();
+                    $result = $apiResponse->getContent();
                 } catch (\Omeka\Api\Exception\ExceptionInterface $e) {
                     throw new QuerierException($e->getMessage(), $e->getCode(), $e);
                 }
-                // TODO Currently experimental. To replace by a query + arg "querier=internal".
-                $this->response->setAllResourceIdsForResourceType($resourceType, array_keys($result) ?: []);
-                if ($result && ($offset || $limit)) {
-                    $result = array_slice($result, $offset, $limit ?: null);
-                    // $apiResponse->setContent($result);
-                }
                 $this->response->setResourceTotalResults($resourceType, $totalResults);
-                if ($totalResults) {
-                    $result = array_map(fn ($v) => ['id' => $v], $result);
-                } else {
-                    $result = [];
-                }
-                $this->response->addResults($resourceType, $result);
+                $this->response->setResourcesForType($resourceType, $result);
             }
             $totalResults = array_sum($this->response->getResourceTotalResults());
             $this->response->setTotalResults($totalResults);
         } else {
+            // It is not possible to return the resource type for now with
+            // doctrine, but it is useless.
+            $mainResourceType = count($this->resourceTypes) === 1
+                ? reset($this->resourceTypes)
+                : 'resources';
             try {
-                // It is not possible to return the resource type for now with
-                // doctrine, but it is useless.
-                $mainResourceType = count($this->resourceTypes) === 1 ? reset($this->resourceTypes) : 'resources';
-                if ($requireFix2224) {
-                    $apiResponse = $api->search($mainResourceType, $dataQuery, ['returnScalar' => 'id', 'require_fix_2224' => true]);
-                    $totalResults = $apiResponse->getRequest()->getOption('total_results', 0);
-                    $result = $apiResponse->getRequest()->getOption('results', []);
-                } else {
-                    $apiResponse = $api->search($mainResourceType, $dataQuery, ['returnScalar' => 'id']);
-                    $totalResults = $apiResponse->getTotalResults();
-                    $result = $apiResponse->getContent();
-                }
+                $apiResponse = $api->search($mainResourceType, $this->args);
+                $totalResults = $apiResponse->getTotalResults();
+                $result = $apiResponse->getContent();
             } catch (\Omeka\Api\Exception\ExceptionInterface $e) {
                 throw new QuerierException($e->getMessage(), $e->getCode(), $e);
             }
-            // TODO Currently experimental. To replace by a query + arg "querier=internal".
-            $this->response->setAllResourceIdsForResourceType('resources', array_keys($result) ?: []);
-            if ($result && ($offset || $limit)) {
-                $result = array_slice($result, $offset, $limit ?: null);
-                // $apiResponse->setContent($result);
-            }
-            $this->response->setResourceTotalResults('resources', $totalResults);
-            if ($totalResults) {
-                $result = array_map(fn ($v) => ['id' => $v], $result);
-            } else {
-                $result = [];
-            }
-            $this->response->addResults('resources', $result);
+            $this->response->setResourceTotalResults($mainResourceType, $totalResults);
+            $this->response->setResources($result);
             $this->response->setTotalResults($totalResults);
         }
 
         $this->response->setCurrentPage($this->query->getPage());
         $this->response->setPerPage($this->query->getPerPage());
 
-        // Remove specific results when settings are not by resource type.
+        // Remove specific results when settings are not by resource type, so
+        // merge all results and keep only "resources".
         // TODO The order may be different when "resources" is not used.
         // Facets are always grouped.
-        // This is the same in SolariumQuerier.
+        // TODO Clarify: if there is "resources", why reprocess?
         if ($isSpecificQuery && !$this->byResourceType && count($this->resourceTypes) > 1) {
-            $allResourceIdsByType = $this->response->getAllResourceIds(null, true);
-            if (isset($allResourceIdsByType['resources'])) {
-                $this->response->setAllResourceIdsByResourceType(['resources' => $allResourceIdsByType['resources']]);
+            // Here, the resources were stored by type above.
+            $resourcesByType = $this->response->getResources(null, false);
+            $this->response->setResourcesForType(null, null);
+            $total = $this->response->getTotalResults();
+            if ($total) {
+                if (isset($resourcesByType['resources'])) {
+                    $this->response->setResourcesForType('resources', $resourcesByType['resources']);
+                } else {
+                    $this->response->setResourcesForType('resources', array_merge(...array_values($resourcesByType)));
+                }
             } else {
-                $this->response->setAllResourceIdsByResourceType(['resources' => array_merge(...array_values($allResourceIdsByType))]);
+                $this->response->setResourcesForType('resources', []);
             }
-            $resultsByType = $this->response->getResults();
-            if (isset($resultsByType['resources'])) {
-                $this->response->setResults(['resources' => $resultsByType['resources']]);
-            } else {
-                $this->response->setResults(['resources' => array_replace(...array_values($resultsByType))]);
-            }
+            // Total may be different for resources?
             $totalResultsByType = $this->response->getResourceTotalResults();
-            $total = isset($totalResultsByType['resources']) ? $totalResultsByType['resources'] : array_sum($totalResultsByType);
-            $this->response->setResourceTotalResults('resources', $total);
+            $total = isset($totalResultsByType['resources'])
+                ? $totalResultsByType['resources']
+                : array_sum($totalResultsByType);
+            $this->response->setAllResourceTotalResults(['resources' => $total]);
             $this->response->setTotalResults($total);
         }
 
@@ -583,6 +552,37 @@ class InternalQuerier extends AbstractQuerier
         // Empty values (null and "") and duplicates are removed earlier.
         $list = $qb->getQuery()->getSingleColumnResult();
         return array_combine($list, $list);
+    }
+
+    /**
+     * With internal querier, this method should be avoided when the total
+     * resources is too big for the server, else a memory overflow can occur.
+     *
+     * {@inheritDoc}
+     * @see \AdvancedSearch\Querier\AbstractQuerier::allResourceIdsByResourceType()
+     */
+    public function queryAllResourceIds(?string $resourceType = null, bool $byResourceType = false): array
+    {
+        $result = [];
+
+        // One-level recursivity.
+        if (!$resourceType) {
+            foreach ($this->resourceTypes as $resourceType) {
+                $result[$resourceType] = $this->queryAllResourceIds($resourceType);
+            }
+            return $result;
+        }
+
+        $dataQuery = $this->args;
+        unset($dataQuery['page'], $dataQuery['per_page'], $dataQuery['limit'], $dataQuery['offset']);
+
+        try {
+            /** @var \Omeka\Api\Manager $api */
+            $api = $this->services->get('Omeka\ApiManager');
+            return $api->search($resourceType, $dataQuery, ['returnScalar' => 'id'])->getContent();
+        } catch (\Omeka\Api\Exception\ExceptionInterface $e) {
+            throw new QuerierException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     /**
@@ -1167,6 +1167,9 @@ class InternalQuerier extends AbstractQuerier
      */
     protected function isSpecificQuery(bool $useArgsWithFacets = false): bool
     {
+        // TODO Manage search "resources".
+        // No resource types mean "resources". "resources" is not fully managed:
+        // only a query without keys specific to a resource are managed.
         $singleResourceType = count($this->resourceTypes) === 1;
         if ($singleResourceType && reset($this->resourceTypes) !== 'resources') {
             return false;
@@ -1435,36 +1438,25 @@ class InternalQuerier extends AbstractQuerier
 
         if (!$isSpecificQuery) {
             $mainResourceType = count($this->resourceTypes) === 1 ? reset($this->resourceTypes) : 'resources';
+            $totalRess = $this->response->getTotalResults();
             // Like Solr, get only available useful values or all existing values.
             /** @see https://solr.apache.org/guide/solr/latest/query-guide/faceting.html */
             if ($isAllFacets) {
                 // Do the query one time for all facets, for each resource types.
                 // Itis not possible when there are facets for item set or site
                 // because they are removed from the query.
+                // FIXME Where the item sets and facets are removed from the query?
                 // TODO Check if item sets and sites are still an exception for references.
                 /** @see \Reference\Mvc\Controller\Plugin\References::searchQuery() */
-                if ((in_array('o:item_set', $referenceMetadata) && (isset($this->argsWithoutActiveFacets['item_set_id']) || isset($this->argsWithoutActiveFacets['item_set']) || isset($this->argsWithoutActiveFacets['itemset'])))
-                    || (in_array('o:site', $referenceMetadata) && (isset($this->argsWithoutActiveFacets['site_id']) || isset($this->argsWithoutActiveFacets['site'])))
-                ) {
-                    $referenceQuery = $this->argsWithoutActiveFacets;
-                } else {
-                    /** @var \Omeka\Api\Manager $api */
-                    $api = $this->services->get('Omeka\ApiManager');
-                    $ids = $api->search($mainResourceType, $this->argsWithoutActiveFacets, ['returnScalar' => 'id'])->getContent();
-                    if (!$ids) {
-                        return;
-                    }
-                    $referenceQuery = ['id' => array_keys($ids)];
-                }
+                $referenceQuery = $this->argsWithoutActiveFacets;
+            } elseif (!$totalRess) {
+                return;
             } else {
                 // For performance, use the full list of resource ids when possible,
-                // instead of the original query.
-                // $referenceQuery = $this->args;
-                $ids = $this->response->getAllResourceIds();
-                if (!$ids) {
-                    return;
-                }
-                $referenceQuery = ['id' => array_values($ids)];
+                // instead of the original query, that implies to run query twice.
+                // This is no more possible, because the full list of ids is no
+                // more filled early.
+                $referenceQuery = $this->args;
             }
 
             $referenceOptions['resource_name'] = $mainResourceType;
@@ -1488,37 +1480,15 @@ class InternalQuerier extends AbstractQuerier
 
         // The query already contains the arg "resource_type".
         foreach ($this->byResourceType ? $this->resourceTypes : ['resources'] as $resourceType) {
-            // Like Solr, get only available useful values or all existing values.
-            /** @see https://solr.apache.org/guide/solr/latest/query-guide/faceting.html */
+            $totalRess = $this->response->getTotalResults();
             if ($isAllFacets) {
-                // Do the query one time for all facets, for each resource types.
-                // Itis not possible when there are facets for item set or site
-                // because they are removed from the query.
-                // TODO Check if item sets and sites are still an exception for references.
-                /** @see \Reference\Mvc\Controller\Plugin\References::searchQuery() */
-                if ((in_array('o:item_set', $referenceMetadata) && (isset($this->argsWithoutActiveFacets['item_set_id']) || isset($this->argsWithoutActiveFacets['item_set']) || isset($this->argsWithoutActiveFacets['itemset'])))
-                    || (in_array('o:site', $referenceMetadata) && (isset($this->argsWithoutActiveFacets['site_id']) || isset($this->argsWithoutActiveFacets['site'])))
-                ) {
-                    $referenceQuery = $this->argsWithoutActiveFacets;
-                } else {
-                    /** @var \Omeka\Api\Manager $api */
-                    $api = $this->services->get('Omeka\ApiManager');
-                    $ids = $api->search($resourceType, $this->argsWithoutActiveFacets, ['returnScalar' => 'id'])->getContent();
-                    if (!$ids) {
-                        continue;
-                    }
-                    $referenceQuery = ['id' => array_values($ids)];
-                }
+                $referenceQuery = $this->argsWithoutActiveFacets;
+            } elseif (!$totalRess) {
+                continue;
             } else {
-                // For performance, use the full list of resource ids when possible,
-                // instead of the original query.
-                // $referenceQuery = $this->args;
-                $ids = $this->response->getAllResourceIds($resourceType, false);
-                if (!$ids) {
-                    continue;
-                }
-                $referenceQuery = ['id' => array_values($ids)];
+                $referenceQuery = $this->args;
             }
+
             $referenceOptions['resource_name'] = $resourceType;
             $values = $references
                 ->setMetadata($referenceMetadata)

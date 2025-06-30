@@ -16,9 +16,28 @@ class FacetRangeDouble extends AbstractFacet
     {
         $isFacetModeDirect = in_array($options['mode'] ?? null, ['link', 'js']);
 
+        // Get the min/max from the facet values if not set in options.
+        // Like any facets: they can be filtered or they can be all.
+
         $options['min'] = ($options['min'] ?? '') === '' ? null : (string) $options['min'];
         $options['max'] = ($options['max'] ?? '') === '' ? null : (string) $options['max'];
         $options['step'] = empty($options['step']) ? null : (string) $options['step'];
+
+        $formatInteger = !empty($options['integer']);
+
+        if ($formatInteger) {
+            $options['min'] = isset($options['min']) ? (int) $options['min'] : null;
+            $options['max'] = isset($options['max']) ? (int) $options['max'] : null;
+        }
+
+        if (!isset($options['min']) || !isset($options['max'])) {
+            $vals = array_column($facetValues, 'value');
+            if ($formatInteger) {
+                $vals = array_map('intval', $vals);
+            }
+            $options['min'] ??= min($vals);
+            $options['max'] ??= max($vals);
+        }
 
         // TODO Compute total of a numerical range when empty.
         $total = count($facetValues);

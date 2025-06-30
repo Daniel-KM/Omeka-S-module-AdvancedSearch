@@ -106,6 +106,11 @@ return [
             'searchingForm' => Site\BlockLayout\SearchingForm::class,
         ],
     ],
+    'resource_page_block_layouts' => [
+        'invokables' => [
+            'searchingForm' => Site\ResourcePageBlockLayout\SearchingForm::class,
+        ],
+    ],
     'form_elements' => [
         'invokables' => [
             Form\Element\MultiText::class => Form\Element\MultiText::class,
@@ -427,8 +432,15 @@ return [
                 'common/advanced-search/data-type-geography',
                 'common/numeric-data-types-advanced-search',
             ],
-            'advancedsearch_main_config' => 1,
             'advancedsearch_configs' => [1],
+            'advancedsearch_main_config' => 1,
+            'advancedsearch_items_config' => 1,
+            'advancedsearch_items_template_form' => null,
+            'advancedsearch_media_config' => 1,
+            'advancedsearch_media_template_form' => null,
+            'advancedsearch_item_sets_config' => 1,
+            'advancedsearch_item_sets_template_form' => null,
+            'advancedsearch_item_sets_scope' => 0,
             'advancedsearch_item_sets_redirect_browse' => ['all'],
             'advancedsearch_item_sets_redirect_search' => [],
             'advancedsearch_item_sets_redirect_search_first' => [],

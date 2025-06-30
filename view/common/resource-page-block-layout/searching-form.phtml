@@ -1,0 +1,15 @@
+<?php
+/**
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource
+ * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
+ * @var array $options
+ */
+
+// The search config form can be defined in site settings.
+
+?>
+
+<div class="block resource-block block-search block-searching-form">
+    <?= $searchConfig->renderForm($options) ?>
+</div>

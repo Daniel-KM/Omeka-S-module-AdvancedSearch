@@ -45,20 +45,35 @@ class SearchController extends AbstractActionController
      */
     public function searchAction()
     {
-        $searchConfigId = (int) $this->params('id');
+        /**
+         * The config is required, else there is no form.
+         * @todo Make the config and  the form independant (or noop form).
+         *
+         * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
+         * @see \AdvancedSearch\View\Helper\GetSearchConfig
+         */
 
+        $searchConfigId = (int) $this->params('id');
         $isSiteRequest = $this->status()->isSiteRequest();
-        if ($isSiteRequest) {
-            $site = $this->currentSite();
-            $siteSettings = $this->siteSettings();
-            $siteSearchConfigs = $siteSettings->get('advancedsearch_configs', []);
-            if (!in_array($searchConfigId, $siteSearchConfigs)) {
+        $site = $isSiteRequest ? $this->currentSite() : null;
+
+        $searchConfig = $this->viewHelpers()->get('getSearchConfig')($searchConfigId);
+        if (!$searchConfig) {
+            if ($isSiteRequest) {
                 $this->logger()->err(
                     'The search engine {search_slug} is not available in site {site_slug}. Check site settings or search config.', // @translate
                     ['search_slug' => $this->params('search-slug'), 'site_slug' => $site->slug()]
                 );
-                return $this->notFoundAction();
+            } else {
+                $this->logger()->err(
+                    'The search engine {search_slug} is not available for admin. Check main settings or search config.', // @translate
+                    ['search_slug' => $this->params('search-slug')]
+                );
             }
+            return $this->notFoundAction();
+        }
+
+        if ($isSiteRequest) {
             // Check if it is an item set redirection.
             $itemSetId = (int) $this->params()->fromRoute('item-set-id');
             // This is just a check: if set, mvc listeners add item_set['id'][].
@@ -69,15 +84,9 @@ class SearchController extends AbstractActionController
                 ? $this->api()->read('item_sets', ['id' => $itemSetId])->getContent()
                 : null;
         } else {
-            $site = null;
             $itemSet = null;
             $itemSetId = null;
         }
-
-        // The config is required, else there is no form.
-        // TODO Make the config and  the form independant (or noop form).
-        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
-        $searchConfig = $this->api()->read('search_configs', $searchConfigId)->getContent();
 
         // TODO Factorize with rss output below.
         /** @see \AdvancedSearch\FormAdapter\AbstractFormAdapter::renderForm() */

@@ -78,15 +78,22 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
 
     public function render(PhpRenderer $view, SitePageBlockRepresentation $block, $templateViewScript = self::PARTIAL_NAME)
     {
-        $data = $block->data();
+        /**
+         * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
+         *
+         * @see \AdvancedSearch\View\Helper\GetSearchConfig
+         */
 
-        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
+        $data = $block->data();
+        $site = $block->page()->site();
+
         $searchConfig = $data['search_config'] ?? null;
         $searchConfigId = empty($searchConfig) || $searchConfig === 'default' ? null : (int) $searchConfig;
         $searchConfig = $view->getSearchConfig($searchConfigId);
         if (!$searchConfig) {
             $view->logger()->err(
-                'No search config specified for this block or not available for this site.' // @translate
+                'No search config "{value}" specified for this block or not available for site {site_slug}.', // @translate
+                ['value' => $searchConfigId, 'site_slug' => $site->slug()]
             );
             return '';
         }
@@ -99,8 +106,6 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
             );
             return '';
         }
-
-        $site = $block->page()->site();
 
         // Check if it is an item set redirection.
         $itemSetId = (int) $view->params()->fromRoute('item-set-id');

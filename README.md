@@ -126,7 +126,10 @@ Furthermore:
 - search no item set, no class, no template, no owner or no site. To search
   missing value, use `0`, for example `item_set_id=0`.
 - sort by a list of ids with `sort_by=ids`. The list of ids can be set in keys
-  `id` or `sort_ids` as an array or as a comma-separated list.
+  `id` or `sort_ids` as an array or as a comma-separated list. Furthermore, take
+  care of the sort order, that may be "desc" when not set in front-end, or "asc"
+  when used with api. So it is recommenced to force it by adding `sort_order=asc`
+  to avoid issues.
 
 Finally, an option allows to display only the used properties and classes in the
 advanced search form, with chosen-select.
@@ -328,6 +331,7 @@ type = Range
 label = Year
 min = 1789
 max = 1804
+integer = true
 ```
 
 The section is a unique name.
@@ -342,11 +346,13 @@ Only the key "field" is required.
 
 - Input types may be Checkbox (default), RangeDouble, Select, SelectRange, Thesaurus, Tree.
   - "RangeDouble" and "SelectRange" are used to specify an interval of numbers
-    or dates. The options "min" and "max" should be set to limit it, for example
-    `min = 1789` and `max = 1804`. For Range, the option "step" can be set too.
-    With Solr, it works only with date and numbers.
-  - "Thesaurus" requires the module Thesaurus and a specific option `thesaurus`,
-    with the id.
+    or dates. The options "min" and "max" may be set to limit it, for example
+    `min = 1789` and `max = 1804`. You can force conversion to integer with
+    option `integer = 1`, for example to keep only the year from dates.
+    For Range, the option "step" can be set too, for example `step = 10`.
+    With Solr, such a field works only with date and numbers.
+  - "Thesaurus" requires the module Thesaurus and a specific option "thesaurus",
+    with the id, for example `thesaurus = 51`.
   - "Tree" can be used for item sets when module ItemSetsTree is enabled and
     data indexed recursively.
 - "languages", "data_types" and "main_types" are filters to limit results from
@@ -370,6 +376,8 @@ Only the key "field" is required.
   facets. Of course, "more" cannot be greater than "limit".
 - "state" defines the state of a facet and may be "static" (default), "opened"
   or "closed".
+- "options" are useful for some types (see above).
+- "attributes" are appended as html attributes to fields.
 
 
 Internal engine (mysql)
@@ -583,7 +591,8 @@ TODO
 - [ ] Make all filter types usable with multiple values.
 - [ ] Replace search config form by the styles of the navigation form or the advanced resource template form.
 - [ ] Do not include indexes in form so get multiple form with an index.
-- [ ] Autmatic min/max for facet range double.
+- [x] Automatic min/max for facet range double.
+- [ ] Restructure with late binding: the response calls the querier when needed, so the querier does not need to fill all data early.
 
 No more todo:
 

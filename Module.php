@@ -62,10 +62,30 @@ class Module extends AbstractModule
      */
     protected $isBatchUpdate;
 
+    public function getServiceConfig(): array
+    {
+        // During upgrade of Common, the service EasyMeta is not available.
+        // So load it in any case, else the module AdvancedSearch should be
+        // disabled directly in datablase or filesystem to fix upgrade.
+        // It allows to finish the upgrade.
+        if (class_exists('Common\Stdlib\EasyMeta', false)) {
+            return [];
+        }
+
+        require_once dirname(__DIR__) . '/Common/src/Stdlib/EasyMeta.php';
+        require_once dirname(__DIR__) . '/Common/src/Service/Stdlib/EasyMetaFactory.php';
+
+        return [
+            'factories' => [
+                'Common\EasyMeta' => \Common\Service\Stdlib\EasyMetaFactory::class,
+            ],
+        ];
+    }
+
     public function onBootstrap(MvcEvent $event): void
     {
-
         parent::onBootstrap($event);
+
         $this->addAclRules();
         $this->addRoutes();
     }
@@ -525,8 +545,14 @@ class Module extends AbstractModule
 
         // A specific check to manage site admin or public site.
         // The site slug is required to build public routes in background job.
-        $siteSlug = $status->getRouteParam('site-slug')
-            ?: $services->get('ViewHelperManager')->get('defaultSite')('slug');
+        // The default site is not available when module Common is upgrading.
+        $siteSlug = $status->getRouteParam('site-slug');
+        if (!$siteSlug) {
+            $helpers = $services->get('ViewHelperManager');
+            $siteSlug = $helpers->has('defaultSite')
+                ? $helpers->get('defaultSite')('slug')
+                : null;
+        }
 
         // The search routes are all literal an contains all data.
         // They are all built early. Check is done in controller.

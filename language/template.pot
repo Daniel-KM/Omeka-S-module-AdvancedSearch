@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-09 00:00+0000\n"
+"POT-Creation-Date: 2025-07-28 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -93,12 +93,12 @@ msgstr ""
 msgid "Refine search"
 msgstr ""
 
-#: data/scripts/upgrade.php:37 Module.php:81
+#: data/scripts/upgrade.php:37 Module.php:101
 #, php-format
 msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr ""
 
-#: src/Api/Representation/SearchEngineRepresentation.php:153
+#: src/Api/Representation/SearchEngineRepresentation.php:160
 #, php-format
 msgid "[Missing engine adapter \"%s\"]"
 msgstr ""
@@ -1636,13 +1636,13 @@ msgid ""
 "\"full_text\" to define properties with full text."
 msgstr ""
 
-#: data/scripts/upgrade.php:1945 Module.php:88 Module.php:105
+#: data/scripts/upgrade.php:1945 Module.php:108 Module.php:125
 msgid ""
 "The module Reference is required to use the facets with the default internal "
 "adapter, but not for the Solr adapter."
 msgstr ""
 
-#: data/scripts/upgrade.php:1948 Module.php:91 Module.php:108 Module.php:123
+#: data/scripts/upgrade.php:1948 Module.php:111 Module.php:128 Module.php:143
 msgid "The module {module} should be upgraded to version {version} or later."
 msgstr ""
 
@@ -1663,23 +1663,23 @@ msgid ""
 "alphabetically for hidden values."
 msgstr ""
 
-#: data/scripts/upgrade.php:2036
+#: data/scripts/upgrade.php:2058
 msgid ""
 "A resource page block has been added, in particular to search inside an item "
 "set."
 msgstr ""
 
-#: data/scripts/upgrade.php:2040
+#: data/scripts/upgrade.php:2062
 msgid ""
 "The css of the sidebar for facets and the css for structure of a thesaurus "
 "or a a hierarchy of item sets were simplified. You may check the search page."
 msgstr ""
 
-#: Module.php:128
+#: Module.php:148
 msgid "The module {module} can be reenabled."
 msgstr ""
 
-#: Module.php:201 src/Controller/Admin/IndexController.php:128
+#: Module.php:221 src/Controller/Admin/IndexController.php:128
 msgid ""
 "The setting to override search element \"property\" is enabled. This feature "
 "will be removed in a future version and should be {link}replaced by the "
@@ -1687,55 +1687,55 @@ msgid ""
 "sites: {json}"
 msgstr ""
 
-#: Module.php:1124
+#: Module.php:1150
 msgid "Unable to launch indexing metadata: {message}"
 msgstr ""
 
-#: Module.php:1128
+#: Module.php:1154
 msgid "Unable to launch indexing metadata: see log."
 msgstr ""
 
-#: Module.php:1231
+#: Module.php:1257
 msgid ""
 "Unable to delete the search index for resource #{resource_id} in search "
 "engine \"{name}\": {message}"
 msgstr ""
 
-#: Module.php:1236
+#: Module.php:1262
 msgid ""
 "Unable to delete the search index for the deleted resource #{resource_id} in "
 "search engine \"{name}\": see log."
 msgstr ""
 
-#: Module.php:1262
+#: Module.php:1288
 msgid ""
 "Unable to index metadata of resource #{resource_id} for search in search "
 "engine \"{name}\": {message}"
 msgstr ""
 
-#: Module.php:1267
+#: Module.php:1293
 msgid ""
 "Unable to update the search index for resource #{resource_id} in search "
 "engine \"{name}\": see log."
 msgstr ""
 
-#: Module.php:1512
+#: Module.php:1538
 msgid ""
 "The internal search engine (sql) can be edited in the {link_url}search "
 "manager{link_end}."
 msgstr ""
 
-#: Module.php:1534
+#: Module.php:1560
 msgid "Main index"
 msgstr ""
 
-#: Module.php:1548
+#: Module.php:1574
 msgid ""
 "The {link_url}internal suggester{link_end} (sql) will be available after "
 "indexation."
 msgstr ""
 
-#: Module.php:1585
+#: Module.php:1611
 msgid ""
 "The default search config can be {link_1}edited{link_end}, {link_2}"
 "configured{link_end} and defined in the {link_3}main settings{link_end} for "
@@ -3273,32 +3273,32 @@ msgstr ""
 msgid "The slug \"{search_slug}\" is already taken."
 msgstr ""
 
-#: src/Api/Representation/SearchSuggesterRepresentation.php:175
-#: src/Api/Representation/SearchConfigRepresentation.php:537
+#: src/Api/Representation/SearchSuggesterRepresentation.php:182
+#: src/Api/Representation/SearchConfigRepresentation.php:545
 msgid ""
 "Query error: {message}\n"
 "Query:{query}"
 msgstr ""
 
-#: src/Api/Representation/SearchConfigRepresentation.php:219
-#: src/Api/Representation/SearchConfigRepresentation.php:228
-#: src/Api/Representation/SearchConfigRepresentation.php:244
-#: src/Api/Representation/SearchConfigRepresentation.php:253
-#: src/Api/Representation/SearchConfigRepresentation.php:267
+#: src/Api/Representation/SearchConfigRepresentation.php:227
+#: src/Api/Representation/SearchConfigRepresentation.php:236
+#: src/Api/Representation/SearchConfigRepresentation.php:252
+#: src/Api/Representation/SearchConfigRepresentation.php:261
+#: src/Api/Representation/SearchConfigRepresentation.php:275
 msgid ""
 "The search config setting \"{old}\" was renamed \"{new}\". You should update "
 "your theme."
 msgstr ""
 
-#: src/Api/Representation/SearchConfigRepresentation.php:427
+#: src/Api/Representation/SearchConfigRepresentation.php:435
 msgid "The search page \"{search_page}\" has no suggester."
 msgstr ""
 
-#: src/Api/Representation/SearchConfigRepresentation.php:440
+#: src/Api/Representation/SearchConfigRepresentation.php:448
 msgid "The search page \"{search_page}\" has no more suggester."
 msgstr ""
 
-#: src/Api/Representation/SearchConfigRepresentation.php:457
+#: src/Api/Representation/SearchConfigRepresentation.php:465
 msgid "The search page \"{search_page}\" has no search engine."
 msgstr ""
 
@@ -3340,8 +3340,8 @@ msgstr ""
 #: src/Controller/Admin/SearchSuggesterController.php:242
 #: src/Controller/Admin/SearchEngineController.php:72
 #: src/Controller/Admin/SearchEngineController.php:131
-#: src/Controller/Admin/SearchConfigController.php:204
-#: src/Controller/Admin/SearchConfigController.php:313
+#: src/Controller/Admin/SearchConfigController.php:205
+#: src/Controller/Admin/SearchConfigController.php:314
 msgid "There was an error during validation"
 msgstr ""
 
@@ -3395,75 +3395,75 @@ msgstr ""
 msgid "The api adapter should be selected in the main settings."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:134
+#: src/Controller/Admin/SearchConfigController.php:135
 msgid "Search page \"{name}\" saved."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:165
+#: src/Controller/Admin/SearchConfigController.php:166
 msgid "The engine adapter \"{label}\" is unavailable."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:166
-#: src/Controller/Admin/SearchConfigController.php:177
+#: src/Controller/Admin/SearchConfigController.php:167
+#: src/Controller/Admin/SearchConfigController.php:178
 msgid "label"
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:176
+#: src/Controller/Admin/SearchConfigController.php:177
 msgid "This engine adapter \"{label}\" has no config form."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:216
+#: src/Controller/Admin/SearchConfigController.php:217
 msgid ""
 "The mode for facets is \"Button\", but the button \"Apply facets\" is "
 "hidden, so it should be added in the theme."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:225
+#: src/Controller/Admin/SearchConfigController.php:226
 msgid "Configuration \"{name}\" saved."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:256
+#: src/Controller/Admin/SearchConfigController.php:257
 msgid "Search page \"{name}\" successfully deleted"
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:261
+#: src/Controller/Admin/SearchConfigController.php:262
 msgid "Search page \"{name}\" could not be deleted"
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:285
-#: src/Controller/Admin/SearchConfigController.php:294
+#: src/Controller/Admin/SearchConfigController.php:286
+#: src/Controller/Admin/SearchConfigController.php:295
 msgid "The slug should be unique."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:300
+#: src/Controller/Admin/SearchConfigController.php:301
 msgid "The slug should be relative to the root of the site, like \"search\"."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:392
+#: src/Controller/Admin/SearchConfigController.php:393
 msgid "The page has been set by default in admin board."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:395
+#: src/Controller/Admin/SearchConfigController.php:396
 msgid "The page has been unset in admin board."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:447
+#: src/Controller/Admin/SearchConfigController.php:448
 msgid "This search config is the default one in sites: {site_slugs}."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:452
+#: src/Controller/Admin/SearchConfigController.php:453
 msgid "This search config is not used as default in any site."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:458
+#: src/Controller/Admin/SearchConfigController.php:459
 msgid "This search config is available in sites: {site_slugs}."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:463
+#: src/Controller/Admin/SearchConfigController.php:464
 msgid "This search config is not available in any site."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:709
+#: src/Controller/Admin/SearchConfigController.php:710
 msgid ""
 "Note that you didn’t set an empty language for some facets, so all values "
 "without language will be skipped in the facet."
@@ -3485,11 +3485,7 @@ msgstr ""
 msgid "Rss are available only via public interface."
 msgstr ""
 
-#: src/Site/Navigation/Link/SearchingPage.php:52
-msgid "Invalid navigation: browse link missing label"
-msgstr ""
-
-#: src/Site/Navigation/Link/SearchingPage.php:56
+#: src/Site/Navigation/Link/SearchingPage.php:54
 msgid "Invalid navigation: browse link missing search page id"
 msgstr ""
 

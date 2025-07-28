@@ -46,15 +46,23 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
 
     public function getJsonLd()
     {
-        $modified = $this->resource->getModified();
+        $getDateTimeJsonLd = function (?\DateTime $dateTime): ?array {
+            return $dateTime
+                ? [
+                    '@value' => $dateTime->format('c'),
+                    '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
+                ]
+                : null;
+        };
+
         return [
             'o:name' => $this->resource->getName(),
             'o:slug' => $this->resource->getSlug(),
-            'o:search_engine' => $this->searchEngine()->getReference(),
+            'o:search_engine' => $this->searchEngine()->getReference()->jsonSerialize(),
             'o:form_adapter' => $this->resource->getFormAdapter(),
             'o:settings' => $this->resource->getSettings(),
-            'o:created' => $this->getDateTime($this->resource->getCreated()),
-            'o:modified' => $modified ? $this->getDateTime($modified) : null,
+            'o:created' => $getDateTimeJsonLd($this->resource->getCreated()),
+            'o:modified' => $getDateTimeJsonLd($this->resource->getModified()),
         ];
     }
 

@@ -16,7 +16,7 @@ trait SearchFiltersTrait
     {
         static $queryTypesLabels;
 
-        if (is_null($queryTypesLabels)) {
+        if ($queryTypesLabels === null) {
             $this->translator ??= $this->getView()->getHelperPluginManager()->get('translate')->getTranslator();
             $queryTypesLabels = [
                 // Value.

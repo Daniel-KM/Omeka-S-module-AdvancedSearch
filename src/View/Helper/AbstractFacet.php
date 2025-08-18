@@ -233,7 +233,7 @@ class AbstractFacet extends AbstractHelper
      */
     protected function facetValueLabel(string $facetField, $value): ?string
     {
-        if (is_null($value) || !strlen((string) $value)) {
+        if ($value === null || !strlen((string) $value)) {
             return null;
         }
 

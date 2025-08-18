@@ -164,7 +164,7 @@ class InternalQuerier extends AbstractQuerier
         $this->response->setApi($this->services->get('Omeka\ApiManager'));
 
         $this->args = $this->getPreparedQuery();
-        if (is_null($this->args)) {
+        if ($this->args === null) {
             return $this->response
                 ->setMessage('An issue occurred.'); // @translate
         }
@@ -1536,7 +1536,7 @@ class InternalQuerier extends AbstractQuerier
     {
         static $sites;
 
-        if (is_null($sites)) {
+        if ($sites === null) {
             /** @var \Doctrine\DBAL\Connection $connection */
             $connection = $this->services->get('Omeka\Connection');
             $qb = $connection->createQueryBuilder();
@@ -1577,7 +1577,7 @@ class InternalQuerier extends AbstractQuerier
     {
         static $users;
 
-        if (is_null($users)) {
+        if ($users === null) {
             /** @var \Doctrine\DBAL\Connection $connection */
             $connection = $this->services->get('Omeka\Connection');
             $qb = $connection->createQueryBuilder();
@@ -1607,7 +1607,7 @@ class InternalQuerier extends AbstractQuerier
     {
         static $properties;
 
-        if (is_null($properties)) {
+        if ($properties === null) {
             $usedPropertyByTerms = $this->easyMeta->propertyIdsUsed();
             $properties = [];
             foreach (array_keys($usedPropertyByTerms) as $term) {

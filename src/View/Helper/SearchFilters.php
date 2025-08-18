@@ -811,7 +811,7 @@ class SearchFilters extends AbstractHelper
         $newQuery = $this->queryForUrl;
         if ($isFilterShortcut) {
             unset($newQuery[$this->query['filter'][$subKey]['replaced_field']]);
-        } elseif (is_null($subKey) || !is_array($newQuery[$key]) || count($newQuery[$key]) <= 1) {
+        } elseif ($subKey === null || !is_array($newQuery[$key]) || count($newQuery[$key]) <= 1) {
             unset($newQuery[$key]);
         } else {
             unset($newQuery[$key][$subKey]);

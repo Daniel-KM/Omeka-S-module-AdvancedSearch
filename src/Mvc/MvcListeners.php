@@ -163,7 +163,7 @@ class MvcListeners extends AbstractListenerAggregate
         }
 
         // Check the default order, if any.
-        if (is_null($specificOrder)) {
+        if ($specificOrder === null) {
             if (!isset($orders[0])) {
                 return;
             }

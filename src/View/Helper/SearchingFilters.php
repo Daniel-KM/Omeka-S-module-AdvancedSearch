@@ -388,7 +388,7 @@ class SearchingFilters extends AbstractHelper
     protected function urlQuery($key, $subKey = null): string
     {
         $newQuery = $this->queryForUrl;
-        if (is_null($subKey) || !is_array($newQuery[$key]) || count($newQuery[$key]) <= 1) {
+        if ($subKey === null || !is_array($newQuery[$key]) || count($newQuery[$key]) <= 1) {
             unset($newQuery[$key]);
         } else {
             unset($newQuery[$key][$subKey]);

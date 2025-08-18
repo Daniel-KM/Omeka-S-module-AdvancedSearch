@@ -116,8 +116,9 @@ class AbstractFacet extends AbstractHelper
             $locale = $plugins->get('siteSetting')('locale');
             $this->siteLocales = array_unique([
                 $locale,
-                substr($locale, 0, 2),
-                // It should be null, but it is deprecated in resource->value().
+                $locale ? substr($locale, 0, 2) : '',
+                // It should be null, but it is deprecated in resource->value()
+                // so use empty string for now.
                 // null,
                 '',
             ]);

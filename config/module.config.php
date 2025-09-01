@@ -445,6 +445,8 @@ return [
             'advancedsearch_item_sets_redirect_search' => [],
             'advancedsearch_item_sets_redirect_search_first' => [],
             'advancedsearch_item_sets_redirect_page_url' => [],
+            'advancedsearch_item_sets_browse_config' => 0,
+            'advancedsearch_item_sets_browse_page' => '',
             // Hidden options.
             // This option is a merge of the previous ones for simplicity.
             'advancedsearch_item_sets_redirects' => [],

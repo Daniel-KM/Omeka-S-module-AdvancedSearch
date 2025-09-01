@@ -2063,3 +2063,10 @@ if (version_compare($oldVersion, '3.4.49', '<')) {
     );
     $messenger->addWarning($message);
 }
+
+if (version_compare($oldVersion, '3.4.51', '<')) {
+    $message = new PsrMessage(
+        'It is now possible to redirect the page to browse item sets to a search page.' // @translate
+    );
+    $messenger->addSuccess($message);
+}

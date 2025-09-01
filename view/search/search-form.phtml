@@ -1,9 +1,11 @@
 <?php
 /**
  * @var \Laminas\View\Renderer\PhpRenderer $this
- * @var \Laminas\Form\Form $form
+ * @var \AdvancedSearch\Form\MainSearchForm $form
  * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
  */
+
+// Scripts are loaded via an event on view.layout and can be managed in search-form-main-header.phtml.
 
 $params = $this->params()->fromQuery() ?: [];
 $form

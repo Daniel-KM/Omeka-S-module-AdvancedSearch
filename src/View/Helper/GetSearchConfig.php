@@ -47,7 +47,7 @@ class GetSearchConfig extends AbstractHelper
 
         if (empty($searchConfigIdOrSlug)) {
             if ($isSiteRequest) {
-                $configKey = $configKeys[$searchConfigIdOrSlug] ?? 'advancedsearch_main_config';
+                $configKey = $configKeys[$resourceName] ?? 'advancedsearch_main_config';
                 try {
                     $searchConfigIdOrSlug = $siteSetting($configKey);
                 } catch (\Exception $e) {

@@ -24,6 +24,10 @@ class SearchingForm implements ResourcePageBlockLayoutInterface
 
     public function render(PhpRenderer $view, AbstractResourceEntityRepresentation $resource) : string
     {
+        /**
+         * @var \AdvancedSearch\View\Helper\GetSearchConfig $getSearchConfig
+         * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
+         */
         $plugins = $view->getHelperPluginManager();
         $getSearchConfig = $plugins->get('getSearchConfig');
 

@@ -115,6 +115,7 @@ class SiteSettingsFieldset extends Fieldset
                 ],
             ])
 
+            // This config is used for item set/show too.
             ->add([
                 'name' => 'advancedsearch_item_sets_config',
                 'type' => CommonElement\OptionalSelect::class,

@@ -873,7 +873,7 @@ class InternalQuerier extends AbstractQuerier
                 }
                 // Only managed resource types are searchable.
                 // The arg is already set above.
-                $this->args['resource_type'] = array_unique(array_intersect($this->resourceType, array_merge($this->args['resource_type'], $values)));
+                $this->args['resource_type'] = array_unique(array_intersect($this->resourceTypes, array_merge($this->args['resource_type'] ?? [], $values)));
                 continue 2;
 
             // "is_public" is automatically managed by this internal adapter

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-28 00:00+0000\n"
+"POT-Creation-Date: 2025-09-01 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -93,7 +93,7 @@ msgstr ""
 msgid "Refine search"
 msgstr ""
 
-#: data/scripts/upgrade.php:37 Module.php:101
+#: data/scripts/upgrade.php:37 Module.php:100
 #, php-format
 msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr ""
@@ -1636,13 +1636,13 @@ msgid ""
 "\"full_text\" to define properties with full text."
 msgstr ""
 
-#: data/scripts/upgrade.php:1945 Module.php:108 Module.php:125
+#: data/scripts/upgrade.php:1945 Module.php:115
 msgid ""
 "The module Reference is required to use the facets with the default internal "
 "adapter, but not for the Solr adapter."
 msgstr ""
 
-#: data/scripts/upgrade.php:1948 Module.php:111 Module.php:128 Module.php:143
+#: data/scripts/upgrade.php:1948 Module.php:118 Module.php:133
 msgid "The module {module} should be upgraded to version {version} or later."
 msgstr ""
 
@@ -1675,11 +1675,16 @@ msgid ""
 "or a a hierarchy of item sets were simplified. You may check the search page."
 msgstr ""
 
-#: Module.php:148
+#: data/scripts/upgrade.php:2069
+msgid ""
+"It is now possible to redirect the page to browse item sets to a search page."
+msgstr ""
+
+#: Module.php:138
 msgid "The module {module} can be reenabled."
 msgstr ""
 
-#: Module.php:221 src/Controller/Admin/IndexController.php:128
+#: Module.php:211 src/Controller/Admin/IndexController.php:128
 msgid ""
 "The setting to override search element \"property\" is enabled. This feature "
 "will be removed in a future version and should be {link}replaced by the "
@@ -1687,55 +1692,55 @@ msgid ""
 "sites: {json}"
 msgstr ""
 
-#: Module.php:1150
+#: Module.php:1140
 msgid "Unable to launch indexing metadata: {message}"
 msgstr ""
 
-#: Module.php:1154
+#: Module.php:1144
 msgid "Unable to launch indexing metadata: see log."
 msgstr ""
 
-#: Module.php:1257
+#: Module.php:1247
 msgid ""
 "Unable to delete the search index for resource #{resource_id} in search "
 "engine \"{name}\": {message}"
 msgstr ""
 
-#: Module.php:1262
+#: Module.php:1252
 msgid ""
 "Unable to delete the search index for the deleted resource #{resource_id} in "
 "search engine \"{name}\": see log."
 msgstr ""
 
-#: Module.php:1288
+#: Module.php:1278
 msgid ""
 "Unable to index metadata of resource #{resource_id} for search in search "
 "engine \"{name}\": {message}"
 msgstr ""
 
-#: Module.php:1293
+#: Module.php:1283
 msgid ""
 "Unable to update the search index for resource #{resource_id} in search "
 "engine \"{name}\": see log."
 msgstr ""
 
-#: Module.php:1538
+#: Module.php:1528
 msgid ""
 "The internal search engine (sql) can be edited in the {link_url}search "
 "manager{link_end}."
 msgstr ""
 
-#: Module.php:1560
+#: Module.php:1550
 msgid "Main index"
 msgstr ""
 
-#: Module.php:1574
+#: Module.php:1564
 msgid ""
 "The {link_url}internal suggester{link_end} (sql) will be available after "
 "indexation."
 msgstr ""
 
-#: Module.php:1611
+#: Module.php:1601
 msgid ""
 "The default search config can be {link_1}edited{link_end}, {link_2}"
 "configured{link_end} and defined in the {link_3}main settings{link_end} for "
@@ -1775,7 +1780,7 @@ msgid "Presence of original file"
 msgstr ""
 
 #: view/common/advanced-search/has-original.phtml:16
-#: config/module.config.php:611
+#: config/module.config.php:613
 msgid "Has original file"
 msgstr ""
 
@@ -2108,7 +2113,7 @@ msgid "Search in all resources"
 msgstr ""
 
 #: src/Form/SiteSettingsFieldset.php:165
-msgid "Redirect item sets to item/browse"
+msgid "Item sets to redirect to item/browse"
 msgstr ""
 
 #: src/Form/SiteSettingsFieldset.php:168 src/Form/SiteSettingsFieldset.php:186
@@ -2117,17 +2122,17 @@ msgid "All item sets"
 msgstr ""
 
 #: src/Form/SiteSettingsFieldset.php:183
-msgid "Redirect item sets to search"
+msgid "Item sets to redirect to search"
 msgstr ""
 
 #: src/Form/SiteSettingsFieldset.php:201
 msgid ""
-"Redirect item sets to search (display record only on first page, old default "
-"Omeka)"
+"Item sets to redirect to search (display record only on first page, old "
+"default Omeka)"
 msgstr ""
 
 #: src/Form/SiteSettingsFieldset.php:219
-msgid "Redirect any item set to a page or a url"
+msgid "Item sets to redirect to a page or a url"
 msgstr ""
 
 #: src/Form/SiteSettingsFieldset.php:220
@@ -2138,6 +2143,14 @@ msgstr ""
 
 #: src/Form/SiteSettingsFieldset.php:225
 msgid "151 = events"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:235
+msgid "Redirect page \"browse item sets\" to a search page"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:248
+msgid "Redirect page \"browse item sets\" to a site page or a url"
 msgstr ""
 
 #: src/Form/SettingsFieldset.php:23
@@ -2365,9 +2378,13 @@ msgid "Limit facets to specific languages"
 msgstr ""
 
 #: src/Form/Admin/SearchConfigFacetFieldset.php:61
-#: src/Form/Admin/SearchConfigFacetFieldset.php:208
-#: src/Form/Admin/SearchConfigFilterFieldset.php:148
-msgid "info"
+msgid ""
+"Generally, facets are translated in the view, but in some cases, facet "
+"values may be translated directly in a multivalued property. Use \"|\" to "
+"separate multiple languages. Use a trailing \"|\" for values without "
+"language. When fields with languages (like subjects) and fields without "
+"language (like date) are facets, the empty language must be set to get "
+"results."
 msgstr ""
 
 #: src/Form/Admin/SearchConfigFacetFieldset.php:76
@@ -2394,8 +2411,18 @@ msgid "The type of facet that will be displayed in the search page."
 msgstr ""
 
 #: src/Form/Admin/SearchConfigFacetFieldset.php:126
-#: src/Form/Admin/SearchConfigFilterFieldset.php:71
-msgid "documentation"
+msgid ""
+"#\"></a><div class=\"field-description no-link\">\n"
+"- Input types may be Checkbox (default), RangeDouble, Select, SelectRange, "
+"Thesaurus, Tree and specific templates for mode \"direct\" if wanted.\n"
+"- For \"RangeDouble\" and \"SelectRange\", the minimum and maximum may be "
+"set as \"min\" and \"max\", and \"step\" too. Use \"integer = 1\" to keep "
+"only the first part, for example the year for dates.\n"
+"- With type \"Thesaurus\", the option \"thesaurus\" should be set with the "
+"id. It requires the module Thesaurus.\n"
+"- \"Tree\" can be used for item sets when module Item Sets Tree is enabled "
+"and data indexed recursively.\n"
+"</div><a href=\"#"
 msgstr ""
 
 #: src/Form/Admin/SearchConfigFacetFieldset.php:136
@@ -2451,6 +2478,17 @@ msgstr ""
 
 #: src/Form/Admin/SearchConfigFacetFieldset.php:207
 msgid "Specific options"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:208
+msgid ""
+"List of specific options, in ini format, for example:\n"
+"`min = 1454`,\n"
+"`thesaurus =  151`,\n"
+"`languages = \"fra|way|apa|\"`,\n"
+"`data_types[] = \"valuesuggest:idref:person\"`,\n"
+"`main_types = \"resource\",\n"
+"`values[] = \"Alpha\"`."
 msgstr ""
 
 #: src/Form/Admin/SearchConfigFacetFieldset.php:228
@@ -2789,7 +2827,11 @@ msgid ""
 msgstr ""
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:588
-msgid "placeholder"
+msgid ""
+"eq = is exactly\n"
+"in = contains\n"
+"sw = starts with\n"
+"ew = ends with"
 msgstr ""
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:601
@@ -3073,6 +3115,42 @@ msgstr ""
 msgid "The type of filter that will be displayed in the search form."
 msgstr ""
 
+#: src/Form/Admin/SearchConfigFilterFieldset.php:71
+msgid ""
+"#\"></a><div class=\"field-description no-link\">\n"
+"- The types are html input types: Text (default), Advanced (list of advanced "
+"filters), Checkbox, Hidden, Number, Radio, Range, RangeDouble, Select, "
+"SelectFlat, SelectGroup, MultiCheckbox, MultiSelect, MultiSelectFlat, "
+"MultiSelectGroup, MultiText, and, for modules, Access, Thesaurus, and Tree "
+"(item sets tree).\n"
+"- Text: the default html input field may be improved with an autosuggester. "
+"Enable it with option \"autosuggest\" and value \"true\". An external url "
+"can be set via attribute \"'data-autosuggest-url'.\"\n"
+"- Checkbox: the keys \"unchecked_value\" and \"checked_value\" allow to "
+"define a specific value to be returned.\n"
+"- Hidden: the value can be passed with key \"value\". If the value is not a "
+"scalar, it is serialized as json.\n"
+"- Number: the keys \"min\", \"max\" and \"step\" can be set as attributes, "
+"else they will be extracted from data. Of course, data should be numbers.\n"
+"- Range and RangeDouble allows to display a slider with one or two values. "
+"Min and max are extracted from data if not set as attributes.\n"
+"- For Number, Range and RangeDouble, \"first_digits\" can be set as option "
+"to extract the years from dates, but it is recommended to use an index with "
+"the year in that case to avoid strange results when casting and sorting non-"
+"normalized data.\n"
+"- MultiSelectFlat and SelectFlat may be used to be sure that values are "
+"flatten.\n"
+"- MultiSelectGroup and SelectGroup may be used for some specific fields that "
+"group options by default (resource classes, resource templates), in which "
+"case the options labels are removed.\n"
+"- Tree can be used for item sets when module ItemSetsTree is enabled and "
+"data indexed recursively.\n"
+"- For the types MultiCheckbox, Radio, Select, and derivatives, the values "
+"can be passed with the option \"value_options\", else the ones of the field "
+"will be used.\n"
+"</div><a href=\"#"
+msgstr ""
+
 #: src/Form/Admin/SearchConfigFilterFieldset.php:89
 msgid "Advanced filter (configured below)"
 msgstr ""
@@ -3139,6 +3217,14 @@ msgstr ""
 
 #: src/Form/Admin/SearchConfigFilterFieldset.php:147
 msgid "Limit filters to specific languages (internal querier)"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFilterFieldset.php:148
+msgid ""
+"Use \"|\" to separate multiple languages. Use a trailing \"|\" for values "
+"without language. When fields with languages (like subjects) and fields "
+"without language (like date) are facets, the empty language must be set to "
+"get results."
 msgstr ""
 
 #: src/Form/Admin/SearchConfigFilterFieldset.php:184
@@ -3274,7 +3360,7 @@ msgid "The slug \"{search_slug}\" is already taken."
 msgstr ""
 
 #: src/Api/Representation/SearchSuggesterRepresentation.php:182
-#: src/Api/Representation/SearchConfigRepresentation.php:545
+#: src/Api/Representation/SearchConfigRepresentation.php:558
 msgid ""
 "Query error: {message}\n"
 "Query:{query}"
@@ -3290,15 +3376,15 @@ msgid ""
 "your theme."
 msgstr ""
 
-#: src/Api/Representation/SearchConfigRepresentation.php:435
+#: src/Api/Representation/SearchConfigRepresentation.php:448
 msgid "The search page \"{search_page}\" has no suggester."
 msgstr ""
 
-#: src/Api/Representation/SearchConfigRepresentation.php:448
+#: src/Api/Representation/SearchConfigRepresentation.php:461
 msgid "The search page \"{search_page}\" has no more suggester."
 msgstr ""
 
-#: src/Api/Representation/SearchConfigRepresentation.php:465
+#: src/Api/Representation/SearchConfigRepresentation.php:478
 msgid "The search page \"{search_page}\" has no search engine."
 msgstr ""
 
@@ -3503,25 +3589,46 @@ msgstr ""
 msgid "The search config \"{search_slug}\" has no form associated."
 msgstr ""
 
-#: src/Stdlib/SearchResources.php:634
+#: src/Stdlib/SearchResources.php:640
 msgid ""
 "The query arg \"property\" won’t support multiple properties in a future "
 "version, because it’s overriding the default behavior. Use arg \"filter\" "
-"instead. Check your queries: {url}"
+"instead. Check your queries: {url}: {query}"
 msgstr ""
 
-#: src/Stdlib/SearchResources.php:640
+#: src/Stdlib/SearchResources.php:647
 msgid ""
 "The query arg \"property\" won’t support type {type} in a future version, "
 "because it’s overriding the default behavior. Use arg \"filter\" instead. "
-"Check your queries: {url}"
+"Check your queries: {url}: {query}"
 msgstr ""
 
-#: src/Stdlib/SearchResources.php:646
+#: src/Stdlib/SearchResources.php:654
 msgid ""
 "The query arg \"property\" won’t support multiple values in a future "
 "version, because it’s overriding the default behavior. Use arg \"filter\" "
-"instead. Check your queries: {url}"
+"instead. Check your queries: {url}: {query}"
+msgstr ""
+
+#: src/Stdlib/SearchResources.php:668
+msgid ""
+"The query arg \"property\" won’t support multiple properties in a future "
+"version, because it’s overriding the default behavior. Use arg \"filter\" "
+"instead. Check your queries: {query}"
+msgstr ""
+
+#: src/Stdlib/SearchResources.php:675
+msgid ""
+"The query arg \"property\" won’t support type {type} in a future version, "
+"because it’s overriding the default behavior. Use arg \"filter\" instead. "
+"Check your queries: {query}"
+msgstr ""
+
+#: src/Stdlib/SearchResources.php:682
+msgid ""
+"The query arg \"property\" won’t support multiple values in a future "
+"version, because it’s overriding the default behavior. Use arg \"filter\" "
+"instead. Check your queries: {query}"
 msgstr ""
 
 #: src/Querier/InternalQuerier.php:69 src/Querier/InternalQuerier.php:169
@@ -3590,86 +3697,86 @@ msgid ""
 "yet with the fields of the index"
 msgstr ""
 
-#: config/module.config.php:482
+#: config/module.config.php:484
 msgid "Properties *"
 msgstr ""
 
-#: config/module.config.php:496
+#: config/module.config.php:498
 msgid "Classes *"
 msgstr ""
 
-#: config/module.config.php:507
+#: config/module.config.php:509
 msgid "Templates *"
 msgstr ""
 
-#: config/module.config.php:514
+#: config/module.config.php:516
 msgid "Templates (specific option \"restricted\")"
 msgstr ""
 
-#: config/module.config.php:526
+#: config/module.config.php:528
 msgid "Item sets *"
 msgstr ""
 
-#: config/module.config.php:532
+#: config/module.config.php:534
 msgid "default_site"
 msgstr ""
 
-#: config/module.config.php:538
+#: config/module.config.php:540
 msgid "Site *"
 msgstr ""
 
-#: config/module.config.php:545
+#: config/module.config.php:547
 msgid "Has media (select)"
 msgstr ""
 
-#: config/module.config.php:552
+#: config/module.config.php:554
 msgid "Has media (radio)"
 msgstr ""
 
-#: config/module.config.php:562
+#: config/module.config.php:564
 msgid "Media type (single)"
 msgstr ""
 
-#: config/module.config.php:567
+#: config/module.config.php:569
 msgid "Media types *"
 msgstr ""
 
-#: config/module.config.php:583
+#: config/module.config.php:585
 msgid "Owner *"
 msgstr ""
 
-#: config/module.config.php:590
+#: config/module.config.php:592
 msgid "Visibility (select)"
 msgstr ""
 
-#: config/module.config.php:596
+#: config/module.config.php:598
 msgid "Visibility (radio)"
 msgstr ""
 
-#: config/module.config.php:600
+#: config/module.config.php:602
 msgid "Id"
 msgstr ""
 
-#: config/module.config.php:606
+#: config/module.config.php:608
 msgid "Date time"
 msgstr ""
 
-#: config/module.config.php:626
+#: config/module.config.php:628
 msgid "Has a specific asset"
 msgstr ""
 
-#: config/module.config.php:633
+#: config/module.config.php:635
 msgid "Geography"
 msgstr ""
 
-#: config/module.config.php:639
+#: config/module.config.php:641
 msgid "Is dynamic item set"
 msgstr ""
 
-#: config/module.config.php:649
+#: config/module.config.php:651
 msgid "Numeric"
 msgstr ""
 
-#: config/module.config.php:656
+#: config/module.config.php:658
 msgid "OAI-PMH harvests"
 msgstr ""

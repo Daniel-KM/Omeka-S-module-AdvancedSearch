@@ -117,7 +117,7 @@ $this->headScript()
 
     <?php
     $vars->offsetSet('resourceType', 'item_sets'); // TODO Check if really needed.
-    $this->htmlElement('body')->appendAttribute('class', 'search-page item-set resource browse');
+    $this->htmlElement('body')->appendAttribute('class', 'search-page item-set resource browse item-set-show');
     ?>
     <?= $this->pageTitle($itemSet->displayTitle(null, $langValue), 2) ?>
     <h3><?= $translate('Item set') ?></h3>

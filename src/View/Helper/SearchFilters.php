@@ -583,15 +583,30 @@ class SearchFilters extends AbstractHelper
         $availableFieldLabels = array_combine(array_keys($availableFields), array_column($availableFields ?? [], 'label'));
         $fieldLabels = array_replace($availableFieldLabels, array_filter($formFieldLabels));
 
-        // Get resources titles of all filters with one query.
-        $vrTitles = [];
+        // Get resources label or linked resource title for filter eq/neq/res/nres.
+        // It allows to manage automatic bounce links from module Advanced Resource Template
+        // and manual links with uri or resource id, while displaying a
+        // meaningful value.
+        $linkIds = [];
+        $linkUris = [];
+
+        // The same for value subjects: get resources titles of all filters with
+        // one query.
         $vrIds = [];
+
         foreach ($filterFilters as $queryRow) {
-            if (is_array($queryRow)
-                && isset($queryRow['type'])
-                && !empty($queryRow['val'])
-                && in_array($queryRow['type'], SearchResources::FIELD_QUERY['value_subject'])
-            ) {
+            if (!is_array($queryRow) || empty($queryRow['val']) || empty($queryRow['type'])) {
+                continue;
+            }
+            if (in_array($queryRow['type'], ['eq', 'neq', 'res', 'nres'], true)) {
+                foreach (is_array($queryRow['val']) ? $queryRow['val'] : [$queryRow['val']] as $val) {
+                    if (is_numeric($val)) {
+                        $linkIds[] = (int) $val;
+                    } elseif (is_string($val) && strpos($val, 'http') === 0) {
+                        $linkUris[] = $val;
+                    }
+                }
+            } elseif (in_array($queryRow['type'], SearchResources::FIELD_QUERY['value_subject'])) {
                 is_array($queryRow['val'])
                     ? $vrIds = array_merge($vrIds, array_values($queryRow['val']))
                     : $vrIds[] = $queryRow['val'];
@@ -599,7 +614,10 @@ class SearchFilters extends AbstractHelper
         }
 
         $vrIds = array_unique(array_filter(array_map('intval', $vrIds)));
-        if ($vrIds) {
+        $linkIds = array_unique(array_filter(array_map('intval', $linkIds)));
+        $linkUris = array_unique(array_filter($linkUris));
+
+        if ($linkIds) {
             // Currently, "resources" cannot be searched, so use adapter
             // directly. Rights are managed.
             /** @var \Doctrine\ORM\EntityManager $entityManager */
@@ -612,8 +630,45 @@ class SearchFilters extends AbstractHelper
                 ->select('omeka_root.id', 'omeka_root.title')
                 ->from(\Omeka\Entity\Resource::class, 'omeka_root')
                 ->where($qb->expr()->in('omeka_root.id', ':ids'))
+                ->setParameter('ids', $linkIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
+            // Do not store unknown ids (may be removed or private).
+            $linkIds = array_filter(array_column($qb->getQuery()->getScalarResult(), 'title', 'id'));
+        }
+
+        if ($linkUris) {
+            // Currently, "resources" cannot be searched, so use adapter
+            // directly. Rights are managed.
+            /** @var \Doctrine\ORM\EntityManager $entityManager */
+            $services ??= $this->searchConfig
+                ? $this->searchConfig->getServiceLocator()
+                : $view->api()->read('vocabularies', 1)->getContent()->getServiceLocator();
+            $entityManager = $services->get('Omeka\EntityManager');
+            $qb = $entityManager->createQueryBuilder();
+            $qb
+                ->select('omeka_root.uri', 'omeka_root.value')
+                ->from(\Omeka\Entity\Value::class, 'omeka_root')
+                ->where($qb->expr()->in('omeka_root.uri', ':uris'))
+                ->setParameter('uris', $linkUris, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
+            // Do not store uris without label (may be removed or private too).
+            $linkUris = array_filter(array_column($qb->getQuery()->getScalarResult(), 'value', 'uri'));
+        }
+
+        if ($vrIds) {
+            // Currently, "resources" cannot be searched, so use adapter
+            // directly. Rights are managed.
+            /** @var \Doctrine\ORM\EntityManager $entityManager */
+            $services ??= $this->searchConfig
+                ? $this->searchConfig->getServiceLocator()
+                : $view->api()->read('vocabularies', 1)->getContent()->getServiceLocator();
+            $entityManager = $services->get('Omeka\EntityManager');
+            $qb = $entityManager->createQueryBuilder();
+            $qb
+                ->select('omeka_root.id', 'omeka_root.title')
+                ->from(\Omeka\Entity\Resource::class, 'omeka_root')
+                ->where($qb->expr()->in('omeka_root.id', ':ids'))
                 ->setParameter('ids', $vrIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
-            $vrTitles = array_column($qb->getQuery()->getScalarResult(), 'title', 'id');
+            // Do not store unknown ids (may be removed or private).
+            $vrIds = array_filter(array_column($qb->getQuery()->getScalarResult(), 'title', 'id'));
         }
 
         $queryTypesLabels = $this->getQueryTypesLabels();
@@ -693,12 +748,17 @@ class SearchFilters extends AbstractHelper
             }
 
             if (in_array($queryType, SearchResources::FIELD_QUERY['value_subject'])) {
-                $vals = $this->checkAndFlatArrayValueResourceIds($val, $vrTitles);
+                $vals = $this->checkAndFlatArrayValueResourceIds($val, $vrIds);
             } else {
                 $vals = $this->checkAndFlatArray($val);
-                // If this is a data type query, convert the value
-                // to the data type's label.
-                if (in_array($queryType, ['dt', 'ndt', 'dtp', 'ndtp'])) {
+                // Manage special display: uri, linked resource, data type…
+                if (in_array($queryType, ['eq', 'neq'], true)) {
+                    $vals = array_replace(array_combine($vals, $vals), $linkUris);
+                } elseif (in_array($queryType, ['res', 'nres'], true)) {
+                    $vals = array_replace(array_combine($vals, $vals), $linkIds);
+                } elseif (in_array($queryType, ['dt', 'ndt', 'dtp', 'ndtp'])) {
+                    // If this is a data type query, convert the value to the
+                    // data type's label.
                     $vals = array_map(fn ($v) => $dataTypeHelper->getLabel($v), $vals);
                 } elseif (in_array($queryType, SearchResources::FIELD_QUERY['value_single_array_or_string'])) {
                     $vals = array_map(fn ($v) => urldecode($v), $vals);

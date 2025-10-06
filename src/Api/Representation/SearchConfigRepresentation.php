@@ -357,6 +357,21 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         $params = $this->getViewHelper('params');
         $request = $params->fromQuery();
 
+        // Quick clean query.
+        $arrayFilterRecursiveEmpty = null;
+        $arrayFilterRecursiveEmpty = function (array &$array) use (&$arrayFilterRecursiveEmpty): array {
+            foreach ($array as $key => $value) {
+                if (is_array($value) && $value) {
+                    $array[$key] = $arrayFilterRecursiveEmpty($value);
+                }
+                if (in_array($array[$key], ['', null, []], true)) {
+                    unset($array[$key]);
+                }
+            }
+            return $array;
+        };
+        $arrayFilterRecursiveEmpty($request);
+
         // Manage exceptions.
 
         // Don't display the resource type if the search engine support only one

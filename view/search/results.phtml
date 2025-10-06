@@ -60,7 +60,7 @@ $thumbnailType = $searchConfig->subSetting('results', 'thumbnail_type', 'medium'
         $heading = $headingTerm ? $resource->value($headingTerm, ['default' => $untitled, 'lang' => $langValue]) : $resource->displayTitle($untitled, $langValue);
         $body = $bodyTerm ? $resource->value($bodyTerm, ['lang' => $langValue, 'default' => '']) : $resource->displayDescription(null, $langValue);
         ?>
-    <li class="resource <?= $resourceType ?>">
+    <li class="resource <?= $resourceType ?>" data-id="<?= $resource->id() ?>">
         <div class="resource-heading">
             <?= $hyperlink->raw($escapeValueOrGetHtml($heading), $resourceUrl, ['class' => 'resource-link']) ?>
         </div>

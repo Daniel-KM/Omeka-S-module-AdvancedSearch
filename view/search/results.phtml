@@ -52,7 +52,7 @@ $defaultThumbnail = $allThumbnail
 $thumbnailType = $searchConfig->subSetting('results', 'thumbnail_type', 'medium');
 ?>
 
-<ul class="resource-list search-results-list<?= $gridListMode === 'list_only' ? ' list' : ($gridListMode === 'grid_only' ? ' grid' : '') ?>">
+<ul class="resource-list search-result-list<?= $gridListMode === 'list_only' ? ' list' : ($gridListMode === 'grid_only' ? ' grid' : '') ?>">
     <?php /** @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource */
     foreach ($resources as $resource):
         $resourceUrl = isset($site) ? $resource->siteUrl($siteSlug) : $resource->adminUrl();

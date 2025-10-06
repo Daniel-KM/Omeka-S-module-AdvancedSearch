@@ -11,6 +11,7 @@ use Omeka\Api\Exception\NotFoundException;
  * View helper for rendering search filters for the advanced search response.
  *
  * @deprecated Use $searchConfig->renderSearchFilters() instead.
+ * @see \AdvancedSearch\Api\Representation\SearchConfigRepresentation::renderSearchFilters()
  * @todo Once the main standard form will support any index cleanly, all this class will be moved to SearchFilters.
  */
 class SearchingFilters extends AbstractHelper

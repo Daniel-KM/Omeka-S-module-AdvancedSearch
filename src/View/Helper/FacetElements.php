@@ -24,8 +24,9 @@ class FacetElements extends AbstractHelper
         $plugins = $view->getHelperPluginManager();
 
         // The type may be missing: the default is to use a checkbox.
+        // The mode was used by facet types Link and facetLinksTree.
         // Facet checkbox can be used in any case anyway, the js checks it.
-        $isFacetModeLink = ($options['mode'] ?? null) === 'link';
+        // $isFacetModeLink = ($options['mode'] ?? null) === 'link';
         $facetType = $options['type'] ?? null;
 
         // TODO Use match when Omeka will force php 8.

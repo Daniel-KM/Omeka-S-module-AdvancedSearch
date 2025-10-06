@@ -54,7 +54,6 @@ if (version_compare($oldVersion, '3.3.6.2', '<')) {
             INDEX IDX_F64D915AE78C9C0A (`engine_id`),
             PRIMARY KEY(`id`)
         ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
-        
         CREATE TABLE `search_suggestion` (
             `id` INT AUTO_INCREMENT NOT NULL,
             `suggester_id` INT NOT NULL,
@@ -66,9 +65,7 @@ if (version_compare($oldVersion, '3.3.6.2', '<')) {
             FULLTEXT INDEX IDX_536C3D13B8BA7C7 (`text`),
             PRIMARY KEY(`id`)
         ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
-        
         ALTER TABLE `search_suggester` ADD CONSTRAINT FK_F64D915AE78C9C0A FOREIGN KEY (`engine_id`) REFERENCES `search_engine` (`id`) ON DELETE CASCADE;
-        
         ALTER TABLE `search_suggestion` ADD CONSTRAINT FK_536C3D170913F08 FOREIGN KEY (`suggester_id`) REFERENCES `search_suggester` (`id`) ON DELETE CASCADE;
         SQL;
     foreach (array_filter(explode(";\n", $sqls)) as $sql) {

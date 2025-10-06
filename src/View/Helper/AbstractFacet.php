@@ -166,6 +166,10 @@ class AbstractFacet extends AbstractHelper
                 // site and there is a bad index.
                 // $active = false;
                 // $url = '';
+                $this->logger->__invoke()->warn(
+                    '[AdvancedSearch] The facet value "{value}" for field "{field}" is skipped because it has no label or it is not in the current site.', // @translate
+                    ['value' => $facetValueValue, 'field' => $facetField]
+                );
                 unset($facetValues[$facetIndex]);
                 continue;
             }

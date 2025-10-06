@@ -178,7 +178,9 @@ class SearchController extends AbstractActionController
             $request = $parsedQuery + $request + $parsedQueryPost;
         }
 
+        // Get the response.
         $response = $formAdapter->toResponse($request, $site);
+
         if (!$response->isSuccess()) {
             $this->getResponse()->setStatusCode(\Laminas\Http\Response::STATUS_CODE_500);
             $msg = $response->getMessage();

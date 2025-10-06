@@ -302,6 +302,10 @@ class AbstractFacetTree extends AbstractFacet
                 $tree[$k] = $t;
             }
         }
+
+        // TODO Check why the tree is no more ordered by default.
+        $tree = $this->reorderTree($tree, 'title');
+
         return $tree;
     }
 
@@ -373,6 +377,45 @@ class AbstractFacetTree extends AbstractFacet
         $this->tree = $treeByLabels;
 
         return array_values($result);
+    }
+
+    /**
+     * @todo Check why the tree is not ordrered by default.
+     */
+    protected function reorderTree(array $tree, string $orderBy = 'title'): array
+    {
+        // Build a map of nodes by parent.
+        $childrenMap = [];
+        foreach ($tree as $id => $node) {
+            $parentId = $node['parent'] ?? null;
+            $childrenMap[$parentId][] = $id;
+        }
+
+        // Sort children for each parent.
+        foreach ($childrenMap as &$children) {
+            usort($children, function ($a, $b) use ($tree, $orderBy) {
+                if ($orderBy === 'rank') {
+                    return ($tree[$a]['rank'] ?? 0) <=> ($tree[$b]['rank'] ?? 0);
+                }
+                return strcmp($tree[$a]['title'], $tree[$b]['title']);
+            });
+        }
+        unset($children);
+
+        // Recursive function to flatten tree.
+        $ordered = [];
+        $addNodes = null;
+        $addNodes = function ($parentId) use (&$addNodes, &$childrenMap, $tree, &$ordered) {
+            foreach ($childrenMap[$parentId] ?? [] as $id) {
+                $ordered[$id] = $tree[$id];
+                $addNodes($id);
+            }
+        };
+
+        // Start from root nodes (parent == null).
+        $addNodes(null);
+
+        return $ordered;
     }
 
     /**

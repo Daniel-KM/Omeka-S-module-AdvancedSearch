@@ -302,6 +302,9 @@ class ApiSearch extends AbstractPlugin
         $searchQuery = $this->apiFormAdapter->toQuery($query, $searchFormSettings);
         $searchQuery->setResourceTypes([$resourceType]);
 
+        $fieldBoosts = $this->searchConfig->subSetting('index', 'field_boosts', []);
+        $searchQuery->setFieldBoosts($fieldBoosts);
+
         // Note: the event search.query is not triggered.
 
         // Nevertheless, the "is public" is automatically forced for visitors.

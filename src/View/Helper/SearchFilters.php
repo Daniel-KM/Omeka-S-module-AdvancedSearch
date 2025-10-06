@@ -594,6 +594,10 @@ class SearchFilters extends AbstractHelper
         // one query.
         $vrIds = [];
 
+        // Do not output labels for private data (even if most of the time, for
+        // a bounce link, the data is already seen).
+        $isAnonymous = $view->identity() === null;
+
         foreach ($filterFilters as $queryRow) {
             if (!is_array($queryRow) || empty($queryRow['val']) || empty($queryRow['type'])) {
                 continue;
@@ -631,6 +635,10 @@ class SearchFilters extends AbstractHelper
                 ->from(\Omeka\Entity\Resource::class, 'omeka_root')
                 ->where($qb->expr()->in('omeka_root.id', ':ids'))
                 ->setParameter('ids', $linkIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
+            if ($isAnonymous) {
+                $qb
+                    ->andWhere($qb->expr()->eq('omeka_root.isPublic', ':is_public'))->setParameter('is_public', 1);
+            }
             // Do not store unknown ids (may be removed or private).
             $linkIds = array_filter(array_column($qb->getQuery()->getScalarResult(), 'title', 'id'));
         }
@@ -649,6 +657,10 @@ class SearchFilters extends AbstractHelper
                 ->from(\Omeka\Entity\Value::class, 'omeka_root')
                 ->where($qb->expr()->in('omeka_root.uri', ':uris'))
                 ->setParameter('uris', $linkUris, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY);
+            if ($isAnonymous) {
+                $qb
+                    ->andWhere($qb->expr()->eq('omeka_root.isPublic', ':is_public'))->setParameter('is_public', 1);
+            }
             // Do not store uris without label (may be removed or private too).
             $linkUris = array_filter(array_column($qb->getQuery()->getScalarResult(), 'value', 'uri'));
         }
@@ -667,6 +679,10 @@ class SearchFilters extends AbstractHelper
                 ->from(\Omeka\Entity\Resource::class, 'omeka_root')
                 ->where($qb->expr()->in('omeka_root.id', ':ids'))
                 ->setParameter('ids', $vrIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
+            if ($isAnonymous) {
+                $qb
+                   ->andWhere($qb->expr()->eq('omeka_root.isPublic', ':is_public'))->setParameter('is_public', 1);
+            }
             // Do not store unknown ids (may be removed or private).
             $vrIds = array_filter(array_column($qb->getQuery()->getScalarResult(), 'title', 'id'));
         }

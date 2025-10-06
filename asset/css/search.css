@@ -90,14 +90,14 @@
         min-width: 0;
     }
     #search-filters .filter select:nth-of-type(1) {
-        min-width: 36px;
+        min-width: 3.5em;
         margin-left: 0;
     }
     #search-filters .filter select:nth-of-type(2) {
-        min-width: 72px;
+        min-width: 8em;
     }
     #search-filters .filter select:nth-of-type(3) {
-        min-width: 48px;
+        min-width: 8em;
     }
     #search-filters .filter input {
         width: calc( 100% - 200px );

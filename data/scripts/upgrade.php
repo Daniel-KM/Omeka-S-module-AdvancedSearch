@@ -2067,3 +2067,15 @@ if (version_compare($oldVersion, '3.4.51', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.53', '<')) {
+    $message = new PsrMessage(
+        'The class `search-results-list` was renamed `search-result-list` in view template `search/results`. Check it if the theme is customized.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new PsrMessage(
+        'It is now possible to add boost multiplier for specific index (Solr only).' // @translate
+    );
+    $messenger->addSuccess($message);
+}

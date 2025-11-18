@@ -47,7 +47,7 @@ class GetSearchConfig extends AbstractHelper
 
         if (empty($searchConfigIdOrSlug)) {
             if ($isSiteRequest) {
-                $configKey = $configKeys[$searchConfigIdOrSlug] ?? 'advancedsearch_main_config';
+                $configKey = $configKeys[$resourceName] ?? 'advancedsearch_main_config';
                 try {
                     $searchConfigIdOrSlug = $siteSetting($configKey);
                 } catch (\Exception $e) {
@@ -78,8 +78,18 @@ class GetSearchConfig extends AbstractHelper
             try {
                 $availables = $siteSetting('advancedsearch_configs', []);
             } catch (\Exception $e) {
+                // When Common is upgrading, DefaultSite is not available, and
+                // many features of the module anyway.
+                if (!$plugins->has('defaultSite')) {
+                    return null;
+                }
                 $defaultSiteId = $plugins->get('defaultSite')('id');
+                if (!$defaultSiteId) {
+                    return null;
+                }
                 $availables = $siteSetting('advancedsearch_configs', [], $defaultSiteId);
+            } catch (\Exception $e) {
+                return null;
             }
             $allConfigs = array_intersect_key($allConfigs, array_flip($availables));
         }

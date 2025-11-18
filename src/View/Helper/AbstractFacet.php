@@ -116,8 +116,9 @@ class AbstractFacet extends AbstractHelper
             $locale = $plugins->get('siteSetting')('locale');
             $this->siteLocales = array_unique([
                 $locale,
-                substr($locale, 0, 2),
-                // It should be null, but it is deprecated in resource->value().
+                $locale ? substr($locale, 0, 2) : '',
+                // It should be null, but it is deprecated in resource->value()
+                // so use empty string for now.
                 // null,
                 '',
             ]);
@@ -165,6 +166,10 @@ class AbstractFacet extends AbstractHelper
                 // site and there is a bad index.
                 // $active = false;
                 // $url = '';
+                $this->logger->__invoke()->warn(
+                    '[AdvancedSearch] The facet value "{value}" for field "{field}" is skipped because it has no label or it is not in the current site.', // @translate
+                    ['value' => $facetValueValue, 'field' => $facetField]
+                );
                 unset($facetValues[$facetIndex]);
                 continue;
             }
@@ -232,7 +237,7 @@ class AbstractFacet extends AbstractHelper
      */
     protected function facetValueLabel(string $facetField, $value): ?string
     {
-        if (is_null($value) || !strlen((string) $value)) {
+        if ($value === null || !strlen((string) $value)) {
             return null;
         }
 

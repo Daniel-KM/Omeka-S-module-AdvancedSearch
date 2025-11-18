@@ -19,17 +19,17 @@ class FacetSelectRange extends AbstractFacet
 
         $firstValue = count($facetValues) ? reset($facetValues) : null;
 
-        if (is_null($rangeFrom) && is_null($rangeTo)) {
+        if ($rangeFrom === null && $rangeTo === null) {
             $hasRangeFromOnly = false;
             $hasRangeToOnly = false;
             $hasRangeFull = false;
             $isNumericRange = is_numeric($firstValue);
-        } elseif (is_null($rangeTo)) {
+        } elseif ($rangeTo === null) {
             $hasRangeFromOnly = true;
             $hasRangeToOnly = false;
             $hasRangeFull = false;
             $isNumericRange = is_numeric($rangeFrom);
-        } elseif (is_null($rangeFrom)) {
+        } elseif ($rangeFrom === null) {
             $hasRangeFromOnly = false;
             $hasRangeToOnly = true;
             $hasRangeFull = false;

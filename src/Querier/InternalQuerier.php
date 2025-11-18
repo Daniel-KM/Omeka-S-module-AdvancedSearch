@@ -164,7 +164,7 @@ class InternalQuerier extends AbstractQuerier
         $this->response->setApi($this->services->get('Omeka\ApiManager'));
 
         $this->args = $this->getPreparedQuery();
-        if (is_null($this->args)) {
+        if ($this->args === null) {
             return $this->response
                 ->setMessage('An issue occurred.'); // @translate
         }
@@ -720,11 +720,12 @@ class InternalQuerier extends AbstractQuerier
         }
 
         // TODO Try to support the exact search and the full text search (removed in version 3.5.17.3).
-        if (mb_substr($q, 0, 1) === '"' && mb_substr($q, -1) === '"') {
+        $isWrappedWithQuote = mb_substr($q, 0, 1) === '"' && mb_substr($q, -1) === '"';
+        if ($isWrappedWithQuote) {
             $q = trim($q, '" ');
         }
 
-        if ($this->query->getOption('default_search_partial_word', false)) {
+        if ($isWrappedWithQuote || $this->query->getOption('default_search_partial_word', false)) {
             $this->args['filter'][] = [
                 'join' => 'and',
                 'field' => '',
@@ -777,11 +778,12 @@ class InternalQuerier extends AbstractQuerier
         }
 
         // TODO Try to support the exact search and the full text search (removed in previous version).
-        if (mb_substr($q, 0, 1) === '"' && mb_substr($q, -1) === '"') {
+        $isWrappedWithQuote = mb_substr($q, 0, 1) === '"' && mb_substr($q, -1) === '"';
+        if ($isWrappedWithQuote) {
             $q = trim($q, '" ');
         }
 
-        if ($this->query->getOption('default_search_partial_word', false)) {
+        if ($isWrappedWithQuote || $this->query->getOption('default_search_partial_word', false)) {
             $this->args['filter'][] = [
                 'join' => 'and',
                 'field' => '',
@@ -873,7 +875,7 @@ class InternalQuerier extends AbstractQuerier
                 }
                 // Only managed resource types are searchable.
                 // The arg is already set above.
-                $this->args['resource_type'] = array_unique(array_intersect($this->resourceType, array_merge($this->args['resource_type'], $values)));
+                $this->args['resource_type'] = array_unique(array_intersect($this->resourceTypes, array_merge($this->args['resource_type'] ?? [], $values)));
                 continue 2;
 
             // "is_public" is automatically managed by this internal adapter
@@ -1536,7 +1538,7 @@ class InternalQuerier extends AbstractQuerier
     {
         static $sites;
 
-        if (is_null($sites)) {
+        if ($sites === null) {
             /** @var \Doctrine\DBAL\Connection $connection */
             $connection = $this->services->get('Omeka\Connection');
             $qb = $connection->createQueryBuilder();
@@ -1577,7 +1579,7 @@ class InternalQuerier extends AbstractQuerier
     {
         static $users;
 
-        if (is_null($users)) {
+        if ($users === null) {
             /** @var \Doctrine\DBAL\Connection $connection */
             $connection = $this->services->get('Omeka\Connection');
             $qb = $connection->createQueryBuilder();
@@ -1607,7 +1609,7 @@ class InternalQuerier extends AbstractQuerier
     {
         static $properties;
 
-        if (is_null($properties)) {
+        if ($properties === null) {
             $usedPropertyByTerms = $this->easyMeta->propertyIdsUsed();
             $properties = [];
             foreach (array_keys($usedPropertyByTerms) as $term) {

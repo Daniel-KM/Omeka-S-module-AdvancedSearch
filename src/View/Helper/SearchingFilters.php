@@ -11,6 +11,7 @@ use Omeka\Api\Exception\NotFoundException;
  * View helper for rendering search filters for the advanced search response.
  *
  * @deprecated Use $searchConfig->renderSearchFilters() instead.
+ * @see \AdvancedSearch\Api\Representation\SearchConfigRepresentation::renderSearchFilters()
  * @todo Once the main standard form will support any index cleanly, all this class will be moved to SearchFilters.
  */
 class SearchingFilters extends AbstractHelper
@@ -388,7 +389,7 @@ class SearchingFilters extends AbstractHelper
     protected function urlQuery($key, $subKey = null): string
     {
         $newQuery = $this->queryForUrl;
-        if (is_null($subKey) || !is_array($newQuery[$key]) || count($newQuery[$key]) <= 1) {
+        if ($subKey === null || !is_array($newQuery[$key]) || count($newQuery[$key]) <= 1) {
             unset($newQuery[$key]);
         } else {
             unset($newQuery[$key][$subKey]);

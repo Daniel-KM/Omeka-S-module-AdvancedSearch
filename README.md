@@ -283,8 +283,8 @@ different.
 
 ### Configuration of the search engine
 
-Currently, two search engines are supported: the default sql and [Solr] through
-the module [Search Solr].
+Currently, two search engines are supported: the default sql one and [Solr]
+through the module [Search Solr].
 
 ### Before the query
 
@@ -301,6 +301,14 @@ options, separated with a `=`.
 
 For advanced filters, similar to the Omeka ones, use "advanced" as field name
 and type.
+
+#### Index
+
+The index can be aggregated, for example to search "Person" will search in
+fields dcterms:creator and dcterms:contributor. This is mainly useful for the
+internal search engine, because there are indexes with Solr.
+
+For Solr, it is possible to define boost multiplier for each index.
 
 ### After the query
 

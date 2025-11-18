@@ -54,11 +54,11 @@ if ($filters) {
 <div id="advanced-search-form-wrapper">
     <div id="advanced-search-form">
         <?= $this->form()->openTag($form) ?>
-        <?= $this->formCollection($form) ?>
-        <div class="search-form-buttons">
-            <?= $reset ? $this->formButton($reset) : null ?>
-            <?= $submit ? $this->formButton($submit) : null ?>
-        </div>
+            <?= $this->formCollection($form) ?>
+            <div class="search-form-buttons">
+                <?= $reset ? $this->formButton($reset) : null ?>
+                <?= $submit ? $this->formButton($submit) : null ?>
+            </div>
         <?= $this->form()->closeTag() ?>
     </div>
 </div>

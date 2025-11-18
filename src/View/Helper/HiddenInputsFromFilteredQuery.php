@@ -26,7 +26,7 @@ class HiddenInputsFromFilteredQuery extends AbstractHtmlElement
     {
         $html = '';
 
-        if (is_null($query)) {
+        if ($query === null) {
             $query = $this->getView()->params()->fromQuery();
         }
 
@@ -40,7 +40,7 @@ class HiddenInputsFromFilteredQuery extends AbstractHtmlElement
             }
             [$name, $value] = mb_strpos($nameValue, '=') === false ? [$nameValue, ''] : explode('=', $nameValue, 2);
             $name = urldecode($name);
-            if (is_null($value) || in_array($name, $skipNames)) {
+            if ($value === null || in_array($name, $skipNames)) {
                 continue;
             }
             $name = htmlspecialchars($name, ENT_COMPAT | ENT_HTML5);

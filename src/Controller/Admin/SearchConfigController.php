@@ -109,6 +109,7 @@ class SearchConfigController extends AbstractActionController
         $searchConfig = $this->api()->read('search_configs', ['id' => $id])->getContent();
 
         // $data = $searchConfig->jsonSerialize();
+        // TODO Don't use json_decode(json_encode()).
         $data = json_decode(json_encode($searchConfig), true);
         $data['manage_config_default'] = $this->sitesWithSearchConfigAsDefault($searchConfig);
         $data['manage_config_availability'] = $this->sitesWithSearchConfigAsAvailable($searchConfig);

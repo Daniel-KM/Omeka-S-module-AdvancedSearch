@@ -38,7 +38,7 @@ class FormRangeDouble extends FormInput
         }
 
         $value = $element->getValue();
-        if (!is_array($value) && !is_null($value)) {
+        if (!is_array($value) && $value !== null) {
             throw new Exception\InvalidArgumentException(sprintf(
                 'Method %s requires that the value be an associative array', // @translate
                 __METHOD__

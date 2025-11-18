@@ -45,11 +45,17 @@ use Laminas\View\Helper\EscapeHtml;
 use Omeka\Api\Manager as ApiManager;
 use Omeka\Api\Representation\SiteRepresentation;
 use Omeka\Form\Element as OmekaElement;
+use Omeka\Permissions\Acl;
 use Omeka\Settings\Settings;
 use Omeka\Settings\SiteSettings;
 
 class MainSearchForm extends Form
 {
+    /**
+     * @var \Omeka\Permissions\Acl
+     */
+    protected $acl;
+
     /**
      * @var \Omeka\Api\Manager
      */
@@ -1217,10 +1223,18 @@ class MainSearchForm extends Form
             $fieldQueryArgs[$field]['lang'] = $locales;
         }
 
+        // Default is public only, so set allow when needed.
+        $isAllowed = $this->acl->userIsAllowed('Omeka\Controller\Admin\Index', 'browse')
+            || $this->acl->userIsAllowed('Omeka\Controller\Site\Index', 'browse');
+        if ($isAllowed) {
+            $query->setIsPublic(false);
+        }
+
         $query
             ->setAliases($aliases)
             ->setFieldsQueryArgs($fieldQueryArgs)
-            ->setSiteId($this->siteId);
+            ->setSiteId($this->siteId)
+        ;
 
         if (!empty($filter['order'])) {
             $query
@@ -1520,6 +1534,12 @@ class MainSearchForm extends Form
     {
         $this->site = $site;
         $this->siteId = $site ? $site->id() : null;
+        return $this;
+    }
+
+    public function setAcl(Acl $acl): self
+    {
+        $this->acl = $acl;
         return $this;
     }
 

@@ -70,6 +70,11 @@ class Query implements JsonSerializable
     /**
      * @var array
      */
+    protected $fieldBoosts = [];
+
+    /**
+     * @var array
+     */
     protected $fieldsQueryArgs = [];
 
     /**
@@ -307,7 +312,23 @@ class Query implements JsonSerializable
         return $this->aliases[$alias] ?? null;
     }
 
-/**
+    /**
+     * Increase or decrease the importance of fields
+     *
+     * @param array $fieldBoosts Boost is a positive float multiplier, by index.
+     */
+    public function setFieldBoosts(array $fieldBoosts): self
+    {
+        $this->fieldBoosts = $fieldBoosts;
+        return $this;
+    }
+
+    public function getFieldBoosts(): array
+    {
+        return $this->fieldBoosts;
+    }
+
+    /**
      * Allow to manage a list of simple query arguments with a specific query.
      *
      * For example "author[]=Bossuet&author[]=Rabelais" can be expanded to:

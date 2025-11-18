@@ -194,6 +194,8 @@ class SearchConfigConfigureForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'index_aliases',
+                    'required' => false,
+                    'rows' => 12,
                     'placeholder' => <<<'STRING'
                         author = Author
                         dcterms:creator
@@ -208,7 +210,6 @@ class SearchConfigConfigureForm extends Form
                         dcterms:created
                         dcterms:issued
                         STRING,
-                    'rows' => 30,
                 ],
             ])
             ->add([
@@ -223,6 +224,7 @@ class SearchConfigConfigureForm extends Form
                 'attributes' => [
                     'id' => 'index_query_args',
                     'required' => false,
+                    'rows' => 12,
                     'placeholder' => <<<'STRING'
                         [title]
                         type = in
@@ -230,7 +232,27 @@ class SearchConfigConfigureForm extends Form
                         [author]
                         type = res
                         STRING,
-                    'rows' => 30,
+                ],
+            ])
+            ->add([
+                'name' => 'field_boosts',
+                'type' => OmekaElement\ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Boost multipliers by index (Solr only)', // @translate
+                    'as_key_value' => true,
+                ],
+                'attributes' => [
+                    'id' => 'field_boosts',
+                    'required' => false,
+                    'rows' => 12,
+                    'placeholder' => <<<'STRING'
+                        dcterms_creator_ss = 100
+                        dcterms_creator_txt = 50
+                        dcterms_subject_ss = 10
+                        dcterms_subject_txt = 5
+                        dcterms_description_txt = 0.01
+                        bibo_content_txt = 0.001
+                        STRING,
                 ],
             ])
         ;

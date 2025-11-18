@@ -49,7 +49,7 @@ class FormMultiText extends FormText
         $rendered = '';
         foreach ($value as $val) {
             $attribs = $attributes;
-            if (is_null($val)) {
+            if ($val === null) {
                 unset($attribs['value']);
             } else {
                 $attribs['value'] = $val;

@@ -46,15 +46,23 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
 
     public function getJsonLd()
     {
-        $modified = $this->resource->getModified();
+        $getDateTimeJsonLd = function (?\DateTime $dateTime): ?array {
+            return $dateTime
+                ? [
+                    '@value' => $dateTime->format('c'),
+                    '@type' => 'http://www.w3.org/2001/XMLSchema#dateTime',
+                ]
+                : null;
+        };
+
         return [
             'o:name' => $this->resource->getName(),
             'o:slug' => $this->resource->getSlug(),
-            'o:search_engine' => $this->searchEngine()->getReference(),
+            'o:search_engine' => $this->searchEngine()->getReference()->jsonSerialize(),
             'o:form_adapter' => $this->resource->getFormAdapter(),
             'o:settings' => $this->resource->getSettings(),
-            'o:created' => $this->getDateTime($this->resource->getCreated()),
-            'o:modified' => $modified ? $this->getDateTime($modified) : null,
+            'o:created' => $getDateTimeJsonLd($this->resource->getCreated()),
+            'o:modified' => $getDateTimeJsonLd($this->resource->getModified()),
         ];
     }
 
@@ -349,14 +357,43 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         $params = $this->getViewHelper('params');
         $request = $params->fromQuery();
 
-        // Manage exception.
+        // Quick clean query.
+        $arrayFilterRecursiveEmpty = null;
+        $arrayFilterRecursiveEmpty = function (array &$array) use (&$arrayFilterRecursiveEmpty): array {
+            foreach ($array as $key => $value) {
+                if (is_array($value) && $value) {
+                    $array[$key] = $arrayFilterRecursiveEmpty($value);
+                }
+                if (in_array($array[$key], ['', null, []], true)) {
+                    unset($array[$key]);
+                }
+            }
+            return $array;
+        };
+        $arrayFilterRecursiveEmpty($request);
+
+        // Manage exceptions.
+
+        // Don't display the resource type if the search engine support only one
+        // resource type and if it is the one set in the query.
+        // It is used especially for the search engine for item-set/browse.
+        $resourceTypes = $query->getResourceTypes();
+        if (count($resourceTypes) === 1) {
+            $searchEngine = $this->searchEngine();
+            $searchEngineResourceTypes = $searchEngine ? $searchEngine->setting('resource_types', []) : [];
+            if (count($searchEngineResourceTypes) === 1
+                && reset($resourceTypes) === reset($searchEngineResourceTypes)
+            ) {
+                unset($request['resource_type']);
+            }
+        }
 
         // Don't display the current item set argument on item set page.
         $currentItemSet = (int) $params->fromRoute('item-set-id');
         if ($currentItemSet) {
-            foreach ($request as $key => $value) {
-                // TODO Use the form adapter to get the real arg for the item set.
-                if ($value && $key === 'item_set_id' || $key === 'item_set') {
+            foreach (['item_set_id', 'item_set'] as $key) {
+                if (!empty($request[$key])) {
+                    $value = $request[$key];
                     if (is_array($value)) {
                         // Check if this is not a sub array (item_set[id][]).
                         $first = reset($value);
@@ -374,7 +411,6 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
                     } elseif ((int) $value === $currentItemSet) {
                         unset($request[$key]);
                     }
-                    break;
                 }
             }
         }

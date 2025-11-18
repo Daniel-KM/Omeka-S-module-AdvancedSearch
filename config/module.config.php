@@ -445,6 +445,8 @@ return [
             'advancedsearch_item_sets_redirect_search' => [],
             'advancedsearch_item_sets_redirect_search_first' => [],
             'advancedsearch_item_sets_redirect_page_url' => [],
+            'advancedsearch_item_sets_browse_config' => 0,
+            'advancedsearch_item_sets_browse_page' => '',
             // Hidden options.
             // This option is a merge of the previous ones for simplicity.
             'advancedsearch_item_sets_redirects' => [],
@@ -655,6 +657,15 @@ return [
                 'module' => 'OaiPmhHarvester',
                 'label' => 'OAI-PMH harvests', // @translate
                 'resource_type' => ['items'],
+                'default_admin' => true,
+                'default_site' => false,
+            ],
+
+            // From module selection.
+            'common/advanced-search/selections' => [
+                'module' => 'Selection',
+                'label' => 'Selections', // @translate
+                'resource_type' => ['item_sets', 'items', 'media'],
                 'default_admin' => true,
                 'default_site' => false,
             ],

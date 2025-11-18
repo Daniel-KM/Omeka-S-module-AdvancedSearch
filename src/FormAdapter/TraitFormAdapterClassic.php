@@ -610,6 +610,9 @@ trait TraitFormAdapterClassic
             $query->setFiltersQueryHidden($hiddenFilters);
         }
 
+        $fieldBoosts = $this->searchConfig->subSetting('index', 'field_boosts', []);
+        $query->setFieldBoosts($fieldBoosts);
+
         // Set query default field if provided
         // $searchConfigSettings['request']['query_default_field'] = 'public_property_values_txt'; // Fake retrieval
         if (!empty($searchConfigSettings['request']['query_default_field'])) {
@@ -629,9 +632,9 @@ trait TraitFormAdapterClassic
 
         // FIXME Researcher and author may not access all private resources. So index resource owners and roles?
         // Default is public only.
-        $accessToAdmin = $userIsAllowed('Omeka\Controller\Admin\Index', 'browse');
-        $accessToPrivate = $userIsAllowed(\Omeka\Entity\Resource::class, 'view-all');
-        if ($accessToAdmin || $accessToPrivate) {
+        if ($userIsAllowed('Omeka\Controller\Admin\Index', 'browse')
+            || $userIsAllowed(\Omeka\Entity\Resource::class, 'view-all')
+        ) {
             $query->setIsPublic(false);
         }
 

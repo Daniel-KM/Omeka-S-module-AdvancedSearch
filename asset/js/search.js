@@ -814,7 +814,7 @@ $(document).ready(function() {
      * Init chosen select.
      */
     if (hasChosenSelect) {
-        $('.chosen-select').chosen(Search.chosenOptions);
+        $('select.chosen-select').chosen(Search.chosenOptions);
     }
 
     /**

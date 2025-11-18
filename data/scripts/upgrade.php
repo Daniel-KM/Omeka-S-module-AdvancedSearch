@@ -32,10 +32,10 @@ $entityManager = $services->get('Omeka\EntityManager');
 $config = $services->get('Config');
 $localConfig = require dirname(__DIR__, 2) . '/config/module.config.php';
 
-if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.70')) {
+if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.73')) {
     $message = new \Omeka\Stdlib\Message(
         $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
-        'Common', '3.4.70'
+        'Common', '3.4.73'
     );
     throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
 }
@@ -54,7 +54,6 @@ if (version_compare($oldVersion, '3.3.6.2', '<')) {
             INDEX IDX_F64D915AE78C9C0A (`engine_id`),
             PRIMARY KEY(`id`)
         ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
-        
         CREATE TABLE `search_suggestion` (
             `id` INT AUTO_INCREMENT NOT NULL,
             `suggester_id` INT NOT NULL,
@@ -66,9 +65,7 @@ if (version_compare($oldVersion, '3.3.6.2', '<')) {
             FULLTEXT INDEX IDX_536C3D13B8BA7C7 (`text`),
             PRIMARY KEY(`id`)
         ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
-        
         ALTER TABLE `search_suggester` ADD CONSTRAINT FK_F64D915AE78C9C0A FOREIGN KEY (`engine_id`) REFERENCES `search_engine` (`id`) ON DELETE CASCADE;
-        
         ALTER TABLE `search_suggestion` ADD CONSTRAINT FK_536C3D170913F08 FOREIGN KEY (`suggester_id`) REFERENCES `search_suggester` (`id`) ON DELETE CASCADE;
         SQL;
     foreach (array_filter(explode(";\n", $sqls)) as $sql) {
@@ -2032,6 +2029,28 @@ if (version_compare($oldVersion, '3.4.47', '<')) {
 }
 
 if (version_compare($oldVersion, '3.4.49', '<')) {
+    // Rename site settings for redirects.
+    $siteIds = $api->search('sites', [], ['returnScalar' => 'id'])->getContent();
+    $oldToNews = [
+        'advancedsearch_redirect_itemset_browse' => 'advancedsearch_item_sets_redirect_browse',
+        'advancedsearch_redirect_itemset_search' => 'advancedsearch_item_sets_redirect_search',
+        'advancedsearch_redirect_itemset_search_first' => 'advancedsearch_item_sets_redirect_search_first',
+        'advancedsearch_redirect_itemset_page_url' => 'advancedsearch_item_sets_redirect_page_url',
+        'advancedsearch_redirect_itemsets' => 'advancedsearch_item_sets_redirects',
+    ];
+    foreach ($siteIds as $siteId) {
+        $siteSettings->setTargetId($siteId);
+        foreach ($oldToNews as $old => $new) {
+            $val = $siteSettings->get($old);
+            if ($val !== null) {
+                $siteSettings->set($new, $val);
+            }
+            if ($old !== 'advancedsearch_redirect_itemsets') {
+                $siteSettings->delete($old);
+            }
+        }
+    }
+
     $message = new PsrMessage(
         'A resource page block has been added, in particular to search inside an item set.' // @translate
     );
@@ -2040,4 +2059,23 @@ if (version_compare($oldVersion, '3.4.49', '<')) {
         'The css of the sidebar for facets and the css for structure of a thesaurus or a a hierarchy of item sets were simplified. You may check the search page.' // @translate
     );
     $messenger->addWarning($message);
+}
+
+if (version_compare($oldVersion, '3.4.51', '<')) {
+    $message = new PsrMessage(
+        'It is now possible to redirect the page to browse item sets to a search page.' // @translate
+    );
+    $messenger->addSuccess($message);
+}
+
+if (version_compare($oldVersion, '3.4.53', '<')) {
+    $message = new PsrMessage(
+        'The class `search-results-list` was renamed `search-result-list` in view template `search/results`. Check it if the theme is customized.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    $message = new PsrMessage(
+        'It is now possible to add boost multiplier for specific index (Solr only).' // @translate
+    );
+    $messenger->addSuccess($message);
 }

@@ -62,10 +62,30 @@ class Module extends AbstractModule
      */
     protected $isBatchUpdate;
 
+    public function getServiceConfig(): array
+    {
+        // During upgrade of Common, the service EasyMeta is not available.
+        // So load it in any case, else the module AdvancedSearch should be
+        // disabled directly in datablase or filesystem to fix upgrade.
+        // It allows to finish the upgrade.
+        if (class_exists('Common\Stdlib\EasyMeta', false)) {
+            return [];
+        }
+
+        require_once dirname(__DIR__) . '/Common/src/Stdlib/EasyMeta.php';
+        require_once dirname(__DIR__) . '/Common/src/Service/Stdlib/EasyMetaFactory.php';
+
+        return [
+            'factories' => [
+                'Common\EasyMeta' => \Common\Service\Stdlib\EasyMetaFactory::class,
+            ],
+        ];
+    }
+
     public function onBootstrap(MvcEvent $event): void
     {
-
         parent::onBootstrap($event);
+
         $this->addAclRules();
         $this->addRoutes();
     }
@@ -74,23 +94,13 @@ class Module extends AbstractModule
     {
         $services = $this->getServiceLocator();
         $translate = $services->get('ControllerPluginManager')->get('translate');
-        $messenger = $services->get('ControllerPluginManager')->get('messenger');
 
-        if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.70')) {
+        if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.73')) {
             $message = new \Omeka\Stdlib\Message(
                 $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
-                'Common', '3.4.70'
+                'Common', '3.4.73'
             );
             throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
-        }
-
-        if (!$this->isModuleActive('Reference')) {
-            $messenger->addWarning('The module Reference is required to use the facets with the default internal adapter, but not for the Solr adapter.'); // @translate
-        } elseif (!$this->isModuleVersionAtLeast('Reference', '3.4.52')) {
-            $messenger->addWarning(new PsrMessage(
-                'The module {module} should be upgraded to version {version} or later.', // @translate
-                ['module' => 'Reference', 'version' => '3.4.52']
-            ));
         }
     }
 
@@ -469,6 +479,23 @@ class Module extends AbstractModule
     {
         /** @var \Omeka\Permissions\Acl $acl */
         $acl = $this->getServiceLocator()->get('Omeka\Acl');
+
+        // Since Omeka 1.4, modules are ordered, so Guest comes after Access.
+        // See \Guest\Module::onBootstrap(). Manage other roles too: contributor, etc.
+        if (class_exists('Guest\Module', false)) {
+            if (!$acl->hasRole('guest')) {
+                $acl->addRole('guest');
+            }
+        }
+        if (class_exists('GuestPrivate\Module', false)) {
+            if (!$acl->hasRole('guest_private')) {
+                $acl->addRole('guest_private');
+            }
+            if (!$acl->hasRole('guest_private_site')) {
+                $acl->addRole('guest_private_site');
+            }
+        }
+
         $acl
             // All can search and suggest, only admins can admin.
             ->allow(
@@ -525,8 +552,14 @@ class Module extends AbstractModule
 
         // A specific check to manage site admin or public site.
         // The site slug is required to build public routes in background job.
-        $siteSlug = $status->getRouteParam('site-slug')
-            ?: $services->get('ViewHelperManager')->get('defaultSite')('slug');
+        // The default site is not available when module Common is upgrading.
+        $siteSlug = $status->getRouteParam('site-slug');
+        if (!$siteSlug) {
+            $helpers = $services->get('ViewHelperManager');
+            $siteSlug = $helpers->has('defaultSite')
+                ? $helpers->get('defaultSite')('slug')
+                : null;
+        }
 
         // The search routes are all literal an contains all data.
         // They are all built early. Check is done in controller.

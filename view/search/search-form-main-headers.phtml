@@ -22,7 +22,7 @@ if ($searchConfig->subSetting('q', 'suggester')
     || $searchConfig->subSetting('q', 'suggest_url')
 ) {
     $headScript
-        ->appendFile($assetUrl('vendor/jquery-autocomplete/jquery.autocomplete.min.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
+        ->appendFile($assetUrl('vendor/jquery-autocomplete/jquery.autocomplete.min.js', 'Common'), 'text/javascript', ['defer' => 'defer']);
 }
 
 if (!$status->isAdminRequest()) {

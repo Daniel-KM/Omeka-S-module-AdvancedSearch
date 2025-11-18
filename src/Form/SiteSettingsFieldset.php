@@ -115,6 +115,7 @@ class SiteSettingsFieldset extends Fieldset
                 ],
             ])
 
+            // This config is used for item set/show too.
             ->add([
                 'name' => 'advancedsearch_item_sets_config',
                 'type' => CommonElement\OptionalSelect::class,
@@ -158,71 +159,97 @@ class SiteSettingsFieldset extends Fieldset
 
             // TODO Move these options to redirect item set to search page or a search page setting?
             ->add([
-                'name' => 'advancedsearch_redirect_itemset_browse',
+                'name' => 'advancedsearch_item_sets_redirect_browse',
                 'type' => CommonElement\OptionalItemSetSelect::class,
                 'options' => [
                     'element_group' => 'advanced_search',
-                    'label' => 'Redirect item sets to item/browse', // @translate
+                    'label' => 'Item sets to redirect to item/browse', // @translate
                     'empty_option' => '',
                     'prepend_value_options' => [
                         'all' => 'All item sets', // @translate
                     ],
                 ],
                 'attributes' => [
-                    'id' => 'advancedsearch_redirect_itemset_browse',
+                    'id' => 'advancedsearch_item_sets_redirect_browse',
                     'multiple' => true,
                     'class' => 'chosen-select',
                     'data-placeholder' => 'Select item sets…', // @translate
                 ],
             ])
             ->add([
-                'name' => 'advancedsearch_redirect_itemset_search',
+                'name' => 'advancedsearch_item_sets_redirect_search',
                 'type' => CommonElement\OptionalItemSetSelect::class,
                 'options' => [
                     'element_group' => 'advanced_search',
-                    'label' => 'Redirect item sets to search', // @translate
+                    'label' => 'Item sets to redirect to search', // @translate
                     'empty_option' => '',
                     'prepend_value_options' => [
                         'all' => 'All item sets', // @translate
                     ],
                 ],
                 'attributes' => [
-                    'id' => 'advancedsearch_redirect_itemset_search',
+                    'id' => 'advancedsearch_item_sets_redirect_search',
                     'multiple' => true,
                     'class' => 'chosen-select',
                     'data-placeholder' => 'Select item sets…', // @translate
                 ],
             ])
             ->add([
-                'name' => 'advancedsearch_redirect_itemset_search_first',
+                'name' => 'advancedsearch_item_sets_redirect_search_first',
                 'type' => CommonElement\OptionalItemSetSelect::class,
                 'options' => [
                     'element_group' => 'advanced_search',
-                    'label' => 'Redirect item sets to search (display record only on first page, old default Omeka)', // @translate
+                    'label' => 'Item sets to redirect to search (display record only on first page, old default Omeka)', // @translate
                     'empty_option' => '',
                     'prepend_value_options' => [
                         'all' => 'All item sets', // @translate
                     ],
                 ],
                 'attributes' => [
-                    'id' => 'advancedsearch_redirect_itemset_search_first',
+                    'id' => 'advancedsearch_item_sets_redirect_search_first',
                     'multiple' => true,
                     'class' => 'chosen-select',
                     'data-placeholder' => 'Select item sets…', // @translate
                 ],
             ])
             ->add([
-                'name' => 'advancedsearch_redirect_itemset_page_url',
+                'name' => 'advancedsearch_item_sets_redirect_page_url',
                 'type' => OmekaElement\ArrayTextarea::class,
                 'options' => [
                     'element_group' => 'advanced_search',
-                    'label' => 'Redirect any item set to a page or a url', // @translate
+                    'label' => 'Item sets to redirect to a page or a url', // @translate
                     'info' => 'Set the item set id, then the sign "=", then a page slug or a url, relative or absolute.', // @translate
                     'as_key_value' => true,
                 ],
                 'attributes' => [
-                    'id' => 'advancedsearch_redirect_itemset_page_url',
+                    'id' => 'advancedsearch_item_sets_redirect_page_url',
                     'placeholder' => '151 = events', // @translate
+                ],
+            ])
+
+            // Specific to sites.
+            ->add([
+                'name' => 'advancedsearch_item_sets_browse_config',
+                'type' => CommonElement\OptionalSelect::class,
+                'options' => [
+                    'element_group' => 'advanced_search',
+                    'label' => 'Redirect page "browse item sets" to a search page', // @translate
+                    'value_options' => $this->searchConfigs,
+                    'empty_option' => '',
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearch_item_sets_browse_config',
+                ],
+            ])
+            ->add([
+                'name' => 'advancedsearch_item_sets_browse_page',
+                'type' => Element\Text::class,
+                'options' => [
+                    'element_group' => 'advanced_search',
+                    'label' => 'Redirect page "browse item sets" to a site page or a url', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearch_item_sets_browse_page',
                 ],
             ])
         ;

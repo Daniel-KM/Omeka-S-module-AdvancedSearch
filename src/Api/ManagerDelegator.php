@@ -74,7 +74,7 @@ class ManagerDelegator extends \Omeka\Api\Manager
             return parent::search($resource, $data, $options);
         }
 
-        if (is_null($apiSearch)) {
+        if ($apiSearch === null) {
             $apiSearch = $this->controllerPlugins->get('apiSearch');
         }
 

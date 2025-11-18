@@ -80,6 +80,19 @@ class SearchEngineConfigureForm extends Form
                     'value' => 'all',
                 ],
             ])
+            ->add([
+                'name' => 'is_indexing_enabled',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Indexing enabled', // @translate
+                    'checked_value' => '1',
+                    'unchecked_value' => '0',
+                ],
+                'attributes' => [
+                    'id' => 'is_indexing_enabled',
+                    'value' => '1',
+                ],
+            ])
         ;
     }
 

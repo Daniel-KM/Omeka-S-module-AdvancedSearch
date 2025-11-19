@@ -104,8 +104,13 @@ class SearchEngineController extends AbstractActionController
 
         // Passing option requires a factory to avoids the error in laminas.
         $adapter = $this->engineAdapterManager->get($engineAdapterName);
+        $isAdapterInternal = $adapter instanceof \AdvancedSearch\EngineAdapter\Internal;
+
+        $this->logger()->debug('SearchEngineController::editAction. $isInternal : ' . var_export($isInternal, true));
+
         $form = $this->getForm(SearchEngineConfigureForm::class, [
             'search_engine_id' => $id,
+            'is_adapter_internal' => $isAdapterInternal
         ]);
 
         $adapterFieldset = $adapter->getConfigFieldset();

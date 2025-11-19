@@ -37,6 +37,10 @@ class SearchEngineConfigureForm extends Form
 {
     public function init(): void
     {
+
+        $isAdapterInternal = $this->getOption('is_adapter_internal');
+
+
         $this
             ->add([
                 'name' => 'o:name',
@@ -85,12 +89,13 @@ class SearchEngineConfigureForm extends Form
                 'type' => Element\Checkbox::class,
                 'options' => [
                     'label' => 'Indexing enabled', // @translate
-                    'checked_value' => '1',
-                    'unchecked_value' => '0',
+                    'checked_value' => 'indexing_enabled',
+                    'unchecked_value' => 'indexing_disabled',
                 ],
                 'attributes' => [
                     'id' => 'is_indexing_enabled',
-                    'value' => '1',
+                    'value' => 'indexing_enabled',
+                    'disabled' => $isAdapterInternal
                 ],
             ])
         ;

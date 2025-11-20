@@ -32,6 +32,7 @@ namespace AdvancedSearch\Form\Admin;
 
 use Laminas\Form\Element;
 use Laminas\Form\Form;
+use Laminas\Filter\Callback;
 
 class SearchEngineConfigureForm extends Form
 {
@@ -84,21 +85,54 @@ class SearchEngineConfigureForm extends Form
                     'value' => 'all',
                 ],
             ])
+        ;
+
+
+        if ($isAdapterInternal) {
+
+            $this->add([
+                'name' => 'is_indexing_enabled_display_checkbox',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Indexing enabled', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'is_indexing_enabled_display_checkbox',
+                    'value' => 'true',
+                    'checked' => true,
+                    'disabled' => true
+                ],
+            ])
             ->add([
+                'name' => 'is_indexing_enabled',
+                'type' => Element\Hidden::class,
+                'options' => [
+                    'label' => 'Indexing enabled', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'is_indexing_enabled',
+                    'value' => 'true',
+                ]
+            ]);
+
+            $this->getInputFilter()->get('is_indexing_enabled_display_checkbox')->setRequired(false);
+
+        } else {
+
+            $this->add([
                 'name' => 'is_indexing_enabled',
                 'type' => Element\Checkbox::class,
                 'options' => [
                     'label' => 'Indexing enabled', // @translate
-                    'checked_value' => 'indexing_enabled',
-                    'unchecked_value' => 'indexing_disabled',
+                    'checked_value' => 'true',
+                    'unchecked_value' => 'false',
                 ],
                 'attributes' => [
                     'id' => 'is_indexing_enabled',
-                    'value' => 'indexing_enabled',
-                    'disabled' => $isAdapterInternal
+                    'value' => 'true'
                 ],
-            ])
-        ;
+            ]);
+        }
     }
 
     /**

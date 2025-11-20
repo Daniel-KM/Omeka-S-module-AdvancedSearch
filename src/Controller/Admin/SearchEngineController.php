@@ -106,7 +106,6 @@ class SearchEngineController extends AbstractActionController
         $adapter = $this->engineAdapterManager->get($engineAdapterName);
         $isAdapterInternal = $adapter instanceof \AdvancedSearch\EngineAdapter\Internal;
 
-        $this->logger()->debug('SearchEngineController::editAction. $isInternal : ' . var_export($isInternal, true));
 
         $form = $this->getForm(SearchEngineConfigureForm::class, [
             'search_engine_id' => $id,
@@ -131,7 +130,14 @@ class SearchEngineController extends AbstractActionController
         ]);
 
         if ($this->getRequest()->isPost()) {
+
             $form->setData($this->params()->fromPost());
+
+            if ($isAdapterInternal) {
+                $form->getInputFilter()->remove('is_indexing_enabled_display_checkbox');
+                $form->getInputFilter()->get('is_indexing_enabled')->setValue('true');
+            }
+
             if (!$form->isValid()) {
                 $this->messenger()->addError('There was an error during validation'); // @translate
                 return $view;

@@ -87,7 +87,9 @@ class SearchEngineConfigureForm extends Form
             ])
         ;
 
-
+        /**
+         * In the case of the internal search engine, the checkbox is always checked
+         */
         if ($isAdapterInternal) {
 
             $this->add([
@@ -106,9 +108,6 @@ class SearchEngineConfigureForm extends Form
             ->add([
                 'name' => 'is_indexing_enabled',
                 'type' => Element\Hidden::class,
-                'options' => [
-                    'label' => 'Indexing enabled', // @translate
-                ],
                 'attributes' => [
                     'id' => 'is_indexing_enabled',
                     'value' => 'true',

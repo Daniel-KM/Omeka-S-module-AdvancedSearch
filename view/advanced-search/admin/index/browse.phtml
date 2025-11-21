@@ -68,12 +68,14 @@ $this->htmlElement('body')->appendAttribute('class', 'search-admin resource brow
             <tr>
                 <th><?= $translate('Name') ?></th>
                 <th><?= $translate('Engine adapter') ?></th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($searchEngines as $searchEngine): ?>
                 <?php $engineAdapter = $searchEngine->engineAdapter();
-                $isInternal = $engineAdapter && $engineAdapter instanceof \AdvancedSearch\EngineAdapter\Internal;
+                    $isInternal = $engineAdapter && $engineAdapter instanceof \AdvancedSearch\EngineAdapter\Internal;
+                    $isIndexingEnabled = filter_var($searchEngine->setting('is_indexing_enabled', true), FILTER_VALIDATE_BOOLEAN);
                 ?>
                 <tr>
                     <td>
@@ -94,7 +96,6 @@ $this->htmlElement('body')->appendAttribute('class', 'search-admin resource brow
                                     aria-label="<?= $escape($translate('No reindex for internal engine')) ?>"
                                     title="<?= $escape($translate('No reindex for internal engine')) ?>"></span>
                                 <?php else: ?>
-                                    <?php $isIndexingEnabled = filter_var($searchEngine->setting('is_indexing_enabled', true), FILTER_VALIDATE_BOOLEAN); ?>
                                     <?php if ($isIndexingEnabled): ?>
                                         <a href="#"
                                         data-sidebar-content-url="<?= $escape($searchEngine->url('index-confirm')) ?>"
@@ -120,6 +121,16 @@ $this->htmlElement('body')->appendAttribute('class', 'search-admin resource brow
                         </ul>
                     </td>
                     <td><?= $escape($searchEngine->engineAdapterLabel()) ?></td>
+                    <td>
+                        <?php if (!$isIndexingEnabled): ?>
+                            <span
+                                class="o-icon- fa fa-exclamation-triangle warning-notice"
+                                aria-label="<?= $escape($translate('Indexing is disabled for this search engine')) ?>"
+                                title="<?= $escape($translate('Indexing is disabled for this search engine')) ?>">
+                                <?= $escape($translate('Indexing is disabled for this search engine')) ?>
+                            </span>
+                        <?php endif; ?>          
+                    </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

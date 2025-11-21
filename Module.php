@@ -1206,12 +1206,7 @@ class Module extends AbstractModule
         /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
         $searchEngines = $api->search('search_engines')->getContent();
         foreach ($searchEngines as $searchEngine) {
-            $logger->debug(
-                $searchEngine->name() . 
-                ' | $searchEngine->setting(\'is_indexing_enabled\', [true]) : '
-                . var_export($searchEngine->setting('is_indexing_enabled', [true]), true)
-            );
-
+            
             $isIndexingEnabled = filter_var($searchEngine->setting('is_indexing_enabled', true), FILTER_VALIDATE_BOOLEAN);
             if (!$isIndexingEnabled) continue;
 

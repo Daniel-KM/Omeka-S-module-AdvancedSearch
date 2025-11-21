@@ -154,4 +154,21 @@ class SearchEngineConfigureForm extends Form
             // 'site_pages' => 'Site pages',
         ];
     }
+
+    public function setData($data)
+    {
+        // Si l'adapter est interne, on force la valeur et on enlève le champ d'affichage du filtre
+        if ($this->getOption('is_adapter_internal')) {
+            $inputFilter = $this->getInputFilter();
+
+            if ($inputFilter->has('is_indexing_enabled_display_checkbox')) {
+                $inputFilter->remove('is_indexing_enabled_display_checkbox');
+            }
+
+            // On force la valeur interne, même si le champ n'est pas posté
+            $data['is_indexing_enabled'] = 'true';
+        }
+
+        return parent::setData($data);
+    }
 }

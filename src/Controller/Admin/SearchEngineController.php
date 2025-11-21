@@ -134,11 +134,6 @@ class SearchEngineController extends AbstractActionController
 
             $form->setData($this->params()->fromPost());
 
-            if ($isAdapterInternal) {
-                $form->getInputFilter()->remove('is_indexing_enabled_display_checkbox');
-                $form->getInputFilter()->get('is_indexing_enabled')->setValue('true');
-            }
-
             if (!$form->isValid()) {
                 $this->messenger()->addError('There was an error during validation'); // @translate
                 return $view;

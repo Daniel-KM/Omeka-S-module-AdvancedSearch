@@ -482,7 +482,8 @@ class Module extends AbstractModule
 
         // Since Omeka 1.4, modules are ordered, so Guest comes after Access.
         // See \Guest\Module::onBootstrap(). Manage other roles too: contributor, etc.
-        if (class_exists('Guest\Module', false)) {
+        /** @see https://github.com/omeka/omeka-s/pull/2241 */
+        if (class_exists('Guest\Module', false) || class_exists('GuestRole\Module', false)) {
             if (!$acl->hasRole('guest')) {
                 $acl->addRole('guest');
             }

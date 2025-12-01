@@ -77,10 +77,10 @@ class SearchConfigController extends AbstractActionController
         $response = $this->api()->create('search_configs', $formData);
         $searchConfig = $response->getContent();
 
-        $this->messenger()->addSuccess(new PsrMessage(
-            'Search page "{name}" created.', // @translate
-            ['name' => $searchConfig->name()]
-        ));
+        $this->messenger()->addSuccess((new PsrMessage(
+            'Search page {name} created.', // @translate
+            ['name' => $searchConfig->link($searchConfig->name(), 'edit')]
+        ))->setEscapeHtml(false));
         $this->manageSearchConfigSettings(
             $searchConfig,
             $formData['manage_config_availability'] ?: [],
@@ -131,10 +131,10 @@ class SearchConfigController extends AbstractActionController
             ->update('search_configs', $id, $formData, [], ['isPartial' => true])
             ->getContent();
 
-        $this->messenger()->addSuccess(new PsrMessage(
-            'Search page "{name}" saved.', // @translate
-            ['name' => $searchConfig->name()]
-        ));
+        $this->messenger()->addSuccess((new PsrMessage(
+            'Search page {name} saved.', // @translate
+            ['name' => $searchConfig->link($searchConfig->name(), 'edit')]
+        ))->setEscapeHtml(false));
 
         $this->manageSearchConfigSettings(
             $searchConfig,
@@ -210,6 +210,10 @@ class SearchConfigController extends AbstractActionController
         $params = $form->getData();
 
         $params = $this->prepareDataToSave($params);
+
+        $this->validateFilters($searchConfig, $params);
+
+        // Validate facets.
         if (($params['facet']['mode'] ?? 'button') === 'button'
             && ($params['facet']['display_submit'] ?? 'none') === 'none'
         ) {
@@ -218,14 +222,14 @@ class SearchConfigController extends AbstractActionController
             ));
         }
 
-        $searchConfig = $searchConfig->getEntity();
-        $searchConfig->setSettings($params);
+        $searchConfigEntity = $searchConfig->getEntity();
+        $searchConfigEntity->setSettings($params);
         $this->entityManager->flush();
 
-        $this->messenger()->addSuccess(new PsrMessage(
-            'Configuration "{name}" saved.', // @translate
-            ['name' => $searchConfig->getName()]
-        ));
+        $this->messenger()->addSuccess((new PsrMessage(
+            'Search page {name} saved.', // @translate
+            ['name' => $searchConfig->link($searchConfig->name(), 'configure')]
+        ))->setEscapeHtml(false));
 
         return $this->redirect()->toRoute('admin/search-manager');
     }
@@ -712,6 +716,84 @@ class SearchConfigController extends AbstractActionController
         }
 
         return $params;
+    }
+
+    /**
+     * Warn if filters and advanced fields match existing engine index.
+     */
+    protected function validateFilters(SearchConfigRepresentation $searchConfig, array $params): void
+    {
+        $engine = $searchConfig->searchEngine();
+        if (!$engine) {
+            return;
+        }
+
+        $engineAdapter = $engine->engineAdapter();
+        if (!$engineAdapter) {
+            return;
+        }
+
+        $availableFields = $engineAdapter->getAvailableFields();
+
+        // Check standard filters.
+
+        $fields = $params['form']['filters'] ?? [];
+        if (empty($fields)) {
+            return;
+        }
+
+        // Manage the exception for "advanced".
+        $advanced = $fields['advanced'] ?? null;
+        unset($fields['advanced']);
+
+        if (count($fields)) {
+            // Don't use the key, but the key field in each value, because the key
+            // may not be an index.
+            $fields = array_column($fields, 'field', 'field');
+            $result = array_intersect_key($fields, $availableFields);
+
+            if (!count($result)) {
+                $this->messenger()->addError(
+                    'The indexes of the filters are not present in the search engine.' // @translate
+                );
+                return;
+            } elseif (count($result) !== count($fields)) {
+                $this->messenger()->addError(new PsrMessage(
+                    'Some indexes of the filters are not present in the search engine: {list}', // @translate
+                    ['list' => implode(', ', array_keys(array_diff_key($fields, $availableFields)))]
+                ));
+                return;
+            }
+        }
+
+        // Check advanced filters too.
+
+        if (empty($advanced)) {
+            return;
+        }
+
+        $fieldsAdvanced = $params['form']['advanced']['fields'] ?? [];
+        if (!$fieldsAdvanced) {
+            $this->messenger()->addError(
+                'The list of fields of the advanced filters is not configured.' // @translate
+            );
+            return;
+        }
+
+        $result = array_intersect_key($fieldsAdvanced, $availableFields);
+
+        if (!count($result)) {
+            $this->messenger()->addError(
+                'The indexes of the advanced filters are not present in the search engine.' // @translate
+            );
+            return;
+        } elseif (count($result) !== count($fieldsAdvanced)) {
+            $this->messenger()->addError(new PsrMessage(
+                'Some indexes of the advanced filters are not present in the search engine: {list}', // @translate
+                ['list' => implode(', ', array_keys(array_diff_key($fieldsAdvanced, $availableFields)))]
+            ));
+            return;
+        }
     }
 
     /**

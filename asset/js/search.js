@@ -581,7 +581,7 @@ var Search = (function() {
 
         self.controlNumericFrom = function(element) {
             const [inputFrom, inputTo, sliderFrom, sliderTo] = self.getRangeDoubleElements(element);
-            const [from, to] = self.parseTwoElementsToInt(inputFrom, inputTo);
+            const [from, to] = self.parseTwoElementsToNumber(inputFrom, inputTo);
             [inputFrom.value, sliderFrom.value] = from > to ? [to, to] : [from, from];
             self.fillSlider(inputFrom, inputTo, sliderTo);
             return self;
@@ -589,7 +589,7 @@ var Search = (function() {
 
         self.controlNumericTo = function(element) {
             const [inputFrom, inputTo, sliderFrom, sliderTo] = self.getRangeDoubleElements(element);
-            const [from, to] = self.parseTwoElementsToInt(inputFrom, inputTo);
+            const [from, to] = self.parseTwoElementsToNumber(inputFrom, inputTo);
             [inputTo.value, sliderTo.value] = from <= to ? [to, to] : [from, from];
             self.fillSlider(inputFrom, inputTo, sliderTo);
             self.toggleRangeSliderAccessible(sliderTo);
@@ -598,7 +598,7 @@ var Search = (function() {
 
         self.controlSliderFrom = function(element) {
             const [inputFrom, inputTo, sliderFrom, sliderTo] = self.getRangeDoubleElements(element);
-            const [from, to] = self.parseTwoElementsToInt(sliderFrom, sliderTo);
+            const [from, to] = self.parseTwoElementsToNumber(sliderFrom, sliderTo);
             [inputFrom.value, sliderFrom.value] = from > to ? [to, to] : [from, from];
             self.fillSlider(sliderFrom, sliderTo, sliderTo);
             return self;
@@ -606,7 +606,7 @@ var Search = (function() {
 
         self.controlSliderTo = function(element) {
             const [inputFrom, inputTo, sliderFrom, sliderTo] = self.getRangeDoubleElements(element);
-            const [from, to] = self.parseTwoElementsToInt(sliderFrom, sliderTo);
+            const [from, to] = self.parseTwoElementsToNumber(sliderFrom, sliderTo);
             [inputTo.value, sliderTo.value] = from <= to ? [to, to] : [from, from];
             self.fillSlider(sliderFrom, sliderTo, sliderTo);
             self.toggleRangeSliderAccessible(sliderTo);
@@ -614,40 +614,167 @@ var Search = (function() {
         }
 
         self.fillSlider = function(from, to, controlSlider, colorSlider, colorRange) {
-            const minValue = to.min === '' ? self.minDefault : to.min;
-            const maxValue = to.max === '' ? self.maxDefault : to.max;
-            const fromValue = from.value === '' ? minValue : from.value;
-            const toValue = to.value === '' ? maxValue : to.value;
+            // Here, from and to may be the input or the slider.
+            // This is the main point to manage the double slider simply.
+
+            // Parse and validate min/max values.
+            let minValue = self.minDefault;
+            let maxValue = self.maxDefault;
+            if (to.min !== '') {
+                const parsedMin = parseFloat(to.min);
+                minValue = isNaN(parsedMin) ? self.minDefault : parsedMin;
+            }
+            if (to.max !== '') {
+                const parsedMax = parseFloat(to.max);
+                maxValue = isNaN(parsedMax) ? self.maxDefault : parsedMax;
+            }
+
+            // Parse and validate current values.
+            let fromValue = minValue;
+            let toValue = maxValue;
+            if (from.value !== '') {
+                const parsedFrom = parseFloat(from.value);
+                fromValue = isNaN(parsedFrom) ? minValue : parsedFrom;
+            }
+            if (to.value !== '') {
+                const parsedTo = parseFloat(to.value);
+                toValue = isNaN(parsedTo) ? maxValue : parsedTo;
+            }
+
+            // Update the color of the slider, darker between the two dots.
             const rangeDistance = maxValue - minValue;
             const fromPosition = fromValue - minValue;
             const toPosition = toValue - minValue;
             colorSlider = colorSlider ? colorSlider : self.colorSliderDefault;
             colorRange = colorRange ? colorRange : self.colorRangeDefault;
-            controlSlider.style.background = `linear-gradient(
+            const gradientStyle = `linear-gradient(
                 to right,
                 ${colorSlider} 0%,
-                ${colorSlider} ${fromPosition / rangeDistance * 100}%,
-                ${colorRange} ${fromPosition / rangeDistance * 100}%,
-                ${colorRange} ${toPosition / rangeDistance * 100}%,
-                ${colorSlider} ${toPosition / rangeDistance * 100}%,
+                ${colorSlider} ${(fromPosition / rangeDistance * 100)}%,
+                ${colorRange} ${(fromPosition / rangeDistance * 100)}%,
+                ${colorRange} ${(toPosition / rangeDistance * 100)}%,
+                ${colorSlider} ${(toPosition / rangeDistance * 100)}%,
                 ${colorSlider} 100%)`;
+            controlSlider.style.background = gradientStyle;
+
             return self;
         }
 
         self.toggleRangeSliderAccessible = function(sliderCurrent) {
             const [inputFrom, inputTo, sliderFrom, sliderTo] = self.getRangeDoubleElements(sliderCurrent);
-            sliderTo.style.zIndex = (Number(sliderFrom.value) === Number(sliderTo.value))
-                || (Number(sliderTo.value) <= 0)
-                ? 2
-                : 0;
+            // Parse and validate values, else use min/max.
+            let fromMin = self.minDefault;
+            if (sliderFrom.min !== '') {
+                const parsedMin = parseFloat(sliderFrom.min);
+                fromMin = isNaN(parsedMin) ? self.minDefault : parsedMin;
+            }
+            let toMax = self.maxDefault;
+            if (sliderTo.max !== '') {
+                const parsedMax = parseFloat(sliderTo.max);
+                toMax = isNaN(parsedMax) ? self.maxDefault : parsedMax;
+            }
+            const fromValue = isNaN(parseFloat(sliderFrom.value)) ? fromMin : parseFloat(sliderFrom.value);
+            const toValue = isNaN(parseFloat(sliderTo.value)) ? toMax : parseFloat(sliderTo.value);
+            // Make the two sliders accessible.
+            sliderTo.style.zIndex = fromValue === toValue ? 2 : 0;
             return self;
         }
 
-        self.parseTwoElementsToInt = function (currentFrom, currentTo) {
-            const from = parseInt(currentFrom.value, 10);
-            const to = parseInt(currentTo.value, 10);
+        self.parseTwoElementsToNumber = function (currentFrom, currentTo) {
+            const from = parseFloat(currentFrom.value, 10);
+            const to = parseFloat(currentTo.value, 10);
             return [from, to];
         }
+
+        self.ensureValidBounds = function(el) {
+            if (!el) {
+                return self;
+            }
+
+            const minDefault = self.minDefault;
+            const maxDefault = self.maxDefault;
+
+            // Validate min and max. Swap if needed.
+            let min = el.min !== '' ? parseFloat(el.min) : NaN;
+            let max = el.max !== '' ? parseFloat(el.max) : NaN;
+            if (isNaN(min)) {
+                min = minDefault;
+            }
+            if (isNaN(max)) {
+                max = maxDefault;
+            }
+            if (min > max) {
+                const tmp = min;
+                min = max;
+                max = tmp;
+            }
+            el.min = String(min);
+            el.max = String(max);
+
+            // Clamp current value into bounds when present.
+            if (el.value !== '') {
+                const val = parseFloat(el.value);
+                el.value = isNaN(val) ? String(min) : String(Math.min(Math.max(val, min), max));
+            } else {
+                // Default to lower bound for "from", upper for "to" if class hints exist.
+                if (el.classList.contains('range-slider-to') || el.classList.contains('range-numeric-to')) {
+                    el.value = String(max);
+                } else {
+                    el.value = String(min);
+                }
+            }
+
+            return self;
+        }
+
+        self.normalizeRangeDouble = function(rangeDouble) {
+            if (!rangeDouble) {
+                return self;
+            }
+
+            const inputFrom = rangeDouble.querySelector('.range-numeric-from');
+            const inputTo = rangeDouble.querySelector('.range-numeric-to');
+            const sliderFrom = rangeDouble.querySelector('.range-slider-from');
+            const sliderTo = rangeDouble.querySelector('.range-slider-to');
+
+            // Ensure valid bounds on all parts.
+            [inputFrom, inputTo, sliderFrom, sliderTo].forEach(self.ensureValidBounds);
+
+            // Sync values: prefer the slider values if present; keep order from <= to.
+            const fromVal = parseFloat(sliderFrom && sliderFrom.value || inputFrom && inputFrom.value || self.minDefault);
+            const toVal = parseFloat(sliderTo && sliderTo.value || inputTo && inputTo.value || self.maxDefault);
+            const min = parseFloat(sliderTo ? sliderTo.min : self.minDefault);
+            const max = parseFloat(sliderTo ? sliderTo.max : self.maxDefault);
+
+            const from = isNaN(fromVal) ? min : Math.min(Math.max(fromVal, min), max);
+            const to = isNaN(toVal) ? max : Math.min(Math.max(toVal, min), max);
+            const fromClamped = Math.min(from, to);
+            const toClamped = Math.max(from, to);
+
+            if (inputFrom) {
+                inputFrom.value = String(fromClamped);
+            }
+            if (sliderFrom) {
+                sliderFrom.value = String(fromClamped);
+            }
+            if (inputTo) {
+                inputTo.value = String(toClamped);
+            }
+            if (sliderTo) {
+                sliderTo.value = String(toClamped);
+            }
+
+            // Render and adjust accessibility.
+            if (sliderFrom && sliderTo) {
+                self.fillSlider(sliderFrom, sliderTo, sliderTo);
+                self.toggleRangeSliderAccessible(sliderTo);
+            } else if (inputFrom && inputTo && sliderTo) {
+                self.fillSlider(inputFrom, inputTo, sliderTo);
+                self.toggleRangeSliderAccessible(sliderTo);
+            }
+
+            return self;
+        };
 
         return self;
     })();
@@ -773,14 +900,8 @@ $(document).ready(function() {
     // Init ranges only when present.
     if (rangeDoubles.length) {
         rangeDoubles.forEach((rangeDouble) => {
-            const rangeSliderFrom = rangeDouble.querySelector('.range-slider-from');
-            const rangeSliderTo = rangeDouble.querySelector('.range-slider-to');
-            if (rangeSliderFrom && rangeSliderTo) {
-                Search.rangeSliderDouble.fillSlider(rangeSliderFrom, rangeSliderTo, rangeSliderTo);
-                Search.rangeSliderDouble.toggleRangeSliderAccessible(rangeSliderTo);
-            }
+            Search.rangeSliderDouble.normalizeRangeDouble(rangeDouble);
         });
-
         $('.range-numeric-from').on('input', (event) => Search.rangeSliderDouble.controlNumericFrom(event.target));
         $('.range-numeric-to').on('input', (event) => Search.rangeSliderDouble.controlNumericTo(event.target));
         $('.range-slider-from').on('input', (event) => Search.rangeSliderDouble.controlSliderFrom(event.target));

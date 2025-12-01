@@ -455,6 +455,9 @@
     }
     .range-double .range-sliders {
         position: relative;
+        height: 1em;
+        display: flex;
+        align-items: center;
     }
     .range-double input[type=range] {
         -webkit-appearance: none;
@@ -462,16 +465,44 @@
         height: 0.2em;
         width: 100%;
         position: absolute;
+        background: transparent;
         pointer-events: none;
     }
-    .range-double input[type=range]::-moz-range-thumb,
-    .range-double input[type=range]::-webkit-slider-thumb {
+    /* Fix Chrome: allow pointer events on track. */
+    /* Important: do not merge these two rules and keep order. */
+    .range-double input[type=range]::-moz-range-track {
         pointer-events: all;
         cursor: pointer;
     }
+    .range-double input[type=range]::-webkit-slider-runnable-track {
+        pointer-events: all;
+        cursor: pointer;
+    }
+    /* Important: do not merge these two rules and keep order to fix chrome. */
+    .range-double input[type=range]::-moz-range-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        pointer-events: all;
+        cursor: pointer;
+        height: 1em;
+        width: 1em;
+        border-radius: 50%;
+        background: #666;
+        border: 2px solid #fff;
+    }
+    .range-double input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        pointer-events: all;
+        cursor: pointer;
+        height: 1em;
+        width: 1em;
+        border-radius: 50%;
+        background: #666;
+        border: 2px solid #fff;
+    }
     .range-double input.range-slider-from[type=range] {
         z-index: 1;
-        background-color: rgba(0,0,0,0);
     }
     .range-double input.range-slider-to[type=range] {
         background-color: #e9e9ed;

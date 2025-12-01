@@ -415,25 +415,31 @@ class Response implements JsonSerializable
      */
     public function getAllResourceIds(?string $resourceType = null, bool $byResourceType = false): array
     {
-        if ($this->allResourceIdsByResourceType === null) {
-            $this->allResourceIdsByResourceType = [];
-            if (!$this->query) {
-                return [];
-            }
-            $querier = $this->query->getQuerier();
-            if (!$querier) {
-                return [];
-            }
-            $this->allResourceIdsByResourceType = $querier->queryAllResourceIds(null, true);
+        if ($this->allResourceIdsByResourceType !== null) {
+            return $byResourceType && $resourceType === null
+                ? $this->allResourceIdsByResourceType
+                : ($resourceType
+                    ? ($this->allResourceIdsByResourceType[$resourceType] ?? [])
+                    : (count($this->allResourceIdsByResourceType)
+                        ? array_merge(...array_values($this->allResourceIdsByResourceType))
+                        : []));
         }
 
-        if ($byResourceType && !$resourceType) {
-            return $this->allResourceIdsByResourceType;
+        $query = $this->getQuery();
+        $querier = $query ? $query->getQuerier() : null;
+        if (!$querier) {
+            return [];
+        }
+
+        $idsByType = $querier->queryAllResourceIds(null, true);
+
+        if ($byResourceType && $resourceType === null) {
+            return $idsByType;
         }
 
         return $resourceType
-            ? $this->allResourceIdsByResourceType[$resourceType] ?? []
-            : array_merge(...array_values($this->allResourceIdsByResourceType));
+            ? ($idsByType[$resourceType] ?? [])
+            : (count($idsByType) ? array_merge(...array_values($idsByType)) : []);
     }
 
     /**

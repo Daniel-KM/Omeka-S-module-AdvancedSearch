@@ -86,13 +86,7 @@ abstract class AbstractQuerier implements QuerierInterface
 
     abstract public function queryValues(string $field): array;
 
-    /**
-     * @todo Remove when SearchSolr will be upgraded.
-     */
-    public function queryAllResourceIds(?string $resourceType = null, bool $byResourceType = false): array
-    {
-        return [];
-    }
+    abstract public function queryAllResourceIds(?string $resourceType = null, bool $byResourceType = false): array;
 
     abstract public function getPreparedQuery();
 }

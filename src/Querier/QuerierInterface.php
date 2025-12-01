@@ -71,6 +71,8 @@ interface QuerierInterface extends LoggerAwareInterface
      *
      * This method should be avoided when the total resources is too big for the
      * server, else a memory overflow can occur.
+     * Instead, get the query with $response->getQuery()->getQuerier()->getPreparedQuery()
+     * and process it.
      *
      * It is used in the rare cases where a whole list of ids is needed, in
      * particular to get Mapping features for an item set, and old versions of

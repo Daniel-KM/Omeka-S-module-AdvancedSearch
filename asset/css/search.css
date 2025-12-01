@@ -445,7 +445,7 @@
     }
 
     /* Search range */
-    /* The color of the slider is managed via js with linear-gradient. */
+    /* Render gradient on .range-progress; native tracks are invisible to fix Chrome. */
 
     .range-double {
         display: flex;
@@ -459,25 +459,39 @@
         display: flex;
         align-items: center;
     }
+    /* Invisible track to keep thumbs interactive. Events are re-enabled below. */
     .range-double input[type=range] {
         -webkit-appearance: none;
         appearance: none;
-        height: 0.2em;
+        height: 0;
         width: 100%;
         position: absolute;
         background: transparent;
         pointer-events: none;
     }
-    /* Fix Chrome: allow pointer events on track. */
+    /* Chrome/WebKit-only: lift thumbs over the progress bar. */
+    @supports selector(input::-webkit-slider-thumb) {
+        .range-double .range-sliders input[type="range"] {
+            margin-top: -1em;
+        }
+    }
+    /* Allow pointer events on tracks for both engines. */
     /* Important: do not merge these two rules and keep order. */
     .range-double input[type=range]::-moz-range-track {
         pointer-events: all;
         cursor: pointer;
+        background: transparent;
+        height: 0;
+        border: 0;
     }
     .range-double input[type=range]::-webkit-slider-runnable-track {
         pointer-events: all;
         cursor: pointer;
+        background: transparent;
+        height: 0;
+        border: 0;
     }
+    /* Thumbs remain clickable */
     /* Important: do not merge these two rules and keep order to fix chrome. */
     .range-double input[type=range]::-moz-range-thumb {
         -webkit-appearance: none;
@@ -505,8 +519,27 @@
         z-index: 1;
     }
     .range-double input.range-slider-to[type=range] {
-        background-color: #e9e9ed;
+        z-index: 0;
     }
+    /* Visible progress bar with base track and active segment overlay */
+    .range-double .range-progress {
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 0.2em;
+        border-radius: 0.1em;
+        background: #e9e9ed;
+        overflow: hidden;
+    }
+    .range-double .range-progress::before {
+        content: '';
+        position: absolute;
+        height: 100%;
+        left: var(--from, 0%);
+        right: calc(100% - var(--to, 100%));
+        background: linear-gradient(90deg, #3b82f6, #3b82f6);
+    }
+
     .range-double .range-numerics {
         display: flex;
         justify-content: space-between;

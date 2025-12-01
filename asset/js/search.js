@@ -613,70 +613,51 @@ var Search = (function() {
             return self;
         }
 
-        self.fillSlider = function(from, to, controlSlider, colorSlider, colorRange) {
+        self.fillSlider = function(fromEl, toEl, controlSlider, colorSlider, colorRange) {
             // Here, from and to may be the input or the slider.
             // This is the main point to manage the double slider simply.
 
-            // Parse and validate min/max values.
-            let minValue = self.minDefault;
-            let maxValue = self.maxDefault;
-            if (to.min !== '') {
-                const parsedMin = parseFloat(to.min);
-                minValue = isNaN(parsedMin) ? self.minDefault : parsedMin;
+            const rangeDouble = controlSlider.closest('.range-double');
+            if (!rangeDouble) {
+                return self;
             }
-            if (to.max !== '') {
-                const parsedMax = parseFloat(to.max);
-                maxValue = isNaN(parsedMax) ? self.maxDefault : parsedMax;
+            const prog = rangeDouble.querySelector('.range-progress');
+            if (!prog) {
+                return self;
             }
 
-            // Parse and validate current values.
-            let fromValue = minValue;
-            let toValue = maxValue;
-            if (from.value !== '') {
-                const parsedFrom = parseFloat(from.value);
-                fromValue = isNaN(parsedFrom) ? minValue : parsedFrom;
-            }
-            if (to.value !== '') {
-                const parsedTo = parseFloat(to.value);
-                toValue = isNaN(parsedTo) ? maxValue : parsedTo;
-            }
+            // Validate bounds.
+            const min = toEl.min !== '' && !isNaN(parseFloat(toEl.min)) ? parseFloat(toEl.min) : self.minDefault;
+            const max = toEl.max !== '' && !isNaN(parseFloat(toEl.max)) ? parseFloat(toEl.max) : self.maxDefault;
 
-            // Update the color of the slider, darker between the two dots.
-            const rangeDistance = maxValue - minValue;
-            const fromPosition = fromValue - minValue;
-            const toPosition = toValue - minValue;
-            colorSlider = colorSlider ? colorSlider : self.colorSliderDefault;
-            colorRange = colorRange ? colorRange : self.colorRangeDefault;
-            const gradientStyle = `linear-gradient(
-                to right,
-                ${colorSlider} 0%,
-                ${colorSlider} ${(fromPosition / rangeDistance * 100)}%,
-                ${colorRange} ${(fromPosition / rangeDistance * 100)}%,
-                ${colorRange} ${(toPosition / rangeDistance * 100)}%,
-                ${colorSlider} ${(toPosition / rangeDistance * 100)}%,
-                ${colorSlider} 100%)`;
-            controlSlider.style.background = gradientStyle;
+            // Parse current values.
+            const fromVal = fromEl.value !== '' && !isNaN(parseFloat(fromEl.value)) ? parseFloat(fromEl.value) : min;
+            const toVal = toEl.value !== '' && !isNaN(parseFloat(toEl.value)) ? parseFloat(toEl.value) : max;
+
+            const fromPct = ((Math.min(Math.max(fromVal, min), max) - min) / (max - min)) * 100;
+            const toPct = ((Math.min(Math.max(toVal, min), max) - min) / (max - min)) * 100;
+
+            const fromProgress= Math.min(fromPct, toPct);
+            const toProgress = Math.max(fromPct, toPct);
+
+            // Drive CSS variables on the visible progress bar.
+            // Previous version used a linear-gradient on main range.
+            prog.style.setProperty('--from', fromProgress + '%');
+            prog.style.setProperty('--to', toProgress + '%');
 
             return self;
         }
 
         self.toggleRangeSliderAccessible = function(sliderCurrent) {
             const [inputFrom, inputTo, sliderFrom, sliderTo] = self.getRangeDoubleElements(sliderCurrent);
-            // Parse and validate values, else use min/max.
-            let fromMin = self.minDefault;
-            if (sliderFrom.min !== '') {
-                const parsedMin = parseFloat(sliderFrom.min);
-                fromMin = isNaN(parsedMin) ? self.minDefault : parsedMin;
-            }
-            let toMax = self.maxDefault;
-            if (sliderTo.max !== '') {
-                const parsedMax = parseFloat(sliderTo.max);
-                toMax = isNaN(parsedMax) ? self.maxDefault : parsedMax;
-            }
-            const fromValue = isNaN(parseFloat(sliderFrom.value)) ? fromMin : parseFloat(sliderFrom.value);
-            const toValue = isNaN(parseFloat(sliderTo.value)) ? toMax : parseFloat(sliderTo.value);
-            // Make the two sliders accessible.
-            sliderTo.style.zIndex = fromValue === toValue ? 2 : 0;
+            if (!sliderFrom || !sliderTo) return self;
+            const min = sliderFrom.min !== '' && !isNaN(parseFloat(sliderFrom.min)) ? parseFloat(sliderFrom.min) : self.minDefault;
+            const max = sliderTo.max !== '' && !isNaN(parseFloat(sliderTo.max)) ? parseFloat(sliderTo.max) : self.maxDefault;
+            const fromValue = sliderFrom.value !== '' && !isNaN(parseFloat(sliderFrom.value)) ? parseFloat(sliderFrom.value) : min;
+            const toValue = sliderTo.value !== '' && !isNaN(parseFloat(sliderTo.value)) ? parseFloat(sliderTo.value) : max;
+
+            // Allow right slider to capture events when overlap.
+            sliderTo.style.zIndex = (fromValue === toValue) ? '2' : '0';
             return self;
         }
 

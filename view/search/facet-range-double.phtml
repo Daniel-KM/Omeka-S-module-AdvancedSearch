@@ -13,6 +13,8 @@
  * @see https://medium.com/@predragdavidovic10/native-dual-range-slider-html-css-javascript-91e778134816
  */
 
+// The div.range-progress allows to highlight gradient in any browser, chrome included.
+
 $plugins = $this->getHelperPluginManager();
 $translate = $plugins->get('translate');
 $escapeAttr = $plugins->get('escapeHtmlAttr');
@@ -31,6 +33,7 @@ $appendButton = $options['mode'] !== 'button';
 
 <div class="facet-items facet-range-double range-double">
     <div class="range-sliders">
+        <div class="range-progress"></div>
         <input class="range-slider-from" type="range" name="facet[<?= $name ?>][from]" value="<?= $escapeAttr($from ?? $min) ?>"<?= $minMaxStep ?><?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($fromUrl ?? '') . '"' : '' ?>/>
         <input class="range-slider-to" type="range" name="facet[<?= $name ?>][to]" value="<?= $escapeAttr($to ?? $max) ?>"<?= $minMaxStep ?><?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($toUrl ?? '') . '"' : '' ?>/>
     </div>

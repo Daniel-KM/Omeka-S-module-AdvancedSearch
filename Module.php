@@ -718,7 +718,7 @@ class Module extends AbstractModule
         $this->finalizeSiteSettings();
     }
 
-    protected function finalizeSiteSettings()
+    protected function finalizeSiteSettings(): void
     {
         // Prepare a single setting with all values to simplify next checks.
         // Most of the time, the array contains only the default value and
@@ -1105,7 +1105,7 @@ class Module extends AbstractModule
             $view = $event->getTarget();
             $response = $view->response;
             foreach ($response->getResources(null, true) as $resource) {
-               echo $resource->embeddedJsonLd();
+                echo $resource->embeddedJsonLd();
             }
         }
     }

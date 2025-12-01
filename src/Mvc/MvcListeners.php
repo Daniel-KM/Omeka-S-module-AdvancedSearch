@@ -28,6 +28,7 @@ class MvcListeners extends AbstractListenerAggregate
      * Adapted:
      * @see \AdvancedSearch\Mvc\MvcListeners::redirectItemSet()
      * @see \BlockPlus\Mvc\MvcListeners::handleItemSetShow()
+     * @see \Selection\Mvc\MvcListeners::redirectSelection()
      */
     public function redirectItemSet(MvcEvent $event): void
     {

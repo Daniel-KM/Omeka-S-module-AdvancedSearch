@@ -405,7 +405,7 @@ class AbstractFacetTree extends AbstractFacet
         // Recursive function to flatten tree.
         $ordered = [];
         $addNodes = null;
-        $addNodes = function ($parentId) use (&$addNodes, &$childrenMap, $tree, &$ordered) {
+        $addNodes = function ($parentId) use (&$addNodes, &$childrenMap, $tree, &$ordered): void {
             foreach ($childrenMap[$parentId] ?? [] as $id) {
                 $ordered[$id] = $tree[$id];
                 $addNodes($id);

@@ -2271,7 +2271,7 @@ class SearchResources
                     $param = $this->adapter->createNamedParameter($qb, '%' . $escapeSqlLike($val));
                     $subquery
                         ->where($expr->like("$subqueryAlias.title", $param));
-                    $sub[]= $expr->orX(
+                    $sub[] = $expr->orX(
                         $expr->in("$valuesAlias.valueResource", $subquery->getDQL()),
                         $expr->like("$valuesAlias.value", $param),
                         $expr->like("$valuesAlias.uri", $param)

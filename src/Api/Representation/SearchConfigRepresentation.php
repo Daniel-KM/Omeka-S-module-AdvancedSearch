@@ -268,7 +268,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
             }
             $logger->err($message->getMessage(), $message->getContext());
             return ['results', $name, $subName];
-        } elseif ($mainName === 'q' && $name ==='fulltext_search') {
+        } elseif ($mainName === 'q' && $name === 'fulltext_search') {
             $services = $this->getServiceLocator();
             $logger = $services->get('Omeka\Logger');
             $message = new PsrMessage(

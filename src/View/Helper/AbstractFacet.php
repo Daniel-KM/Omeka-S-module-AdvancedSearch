@@ -189,7 +189,7 @@ class AbstractFacet extends AbstractHelper
             // This sort is normally useless since it's done earlier, but may
             // avoid issues, in particular when the search engine does not
             // manage it.
-            usort($facetValues, fn($a, $b) => $b['count'] <=> $a['count']);
+            usort($facetValues, fn ($a, $b) => $b['count'] <=> $a['count']);
             $firsts = array_slice($facetValues, 0, $options['more']);
             $lasts = array_slice($facetValues, $options['more']);
             usort($lasts, fn ($a, $b) => strnatcasecmp($a['value'], $b['value']));

@@ -394,14 +394,15 @@ class IndexSearch extends AbstractJob
                 $countResources = count($resources);
                 $indexer->indexResources($resources);
 
+                // FIXME Find why all resources are not cleared each loop when there is one or two entity manager.
+                // Explicitly unset resources to free memory before refreshing.
+                unset($resources);
+
                 ++$loop;
                 $totals[$resourceType] += $countResources;
 
-                // FIXME Find why all resources are not cleared each loop when there is one or two entity manager.
+                $resources = null;
                 $this->refreshEntityManager();
-
-                // Useless in practice and need some seconds.
-                // gc_collect_cycles();
 
                 // May avoid issue with some badly configured firewall/proxy
                 // that limits access to Solr even internally.
@@ -435,15 +436,37 @@ class IndexSearch extends AbstractJob
 
     protected function refreshEntityManager(): void
     {
+        // Clear query result cache to prevent memory build new entities.
+        // Useless.
+        // $this->entityManager->getConfiguration()->getResultCacheImpl()?->deleteAll();
+
+        // Try to flush and clear all managed entities.
         $this->entityManager->flush();
         $this->entityManager->clear();
 
-        $user = $this->staticEntityIds['user_id'] ? $this->entityManager->find(\Omeka\Entity\User::class, $this->staticEntityIds['user_id']) : null;
+        // Try to clear identity map more explicitly.
+        // Useless with clear().
+        /*
+        $unitOfWork = $this->entityManager->getUnitOfWork();
+        $reflectionProperty = new \ReflectionProperty(get_class($unitOfWork), 'identityMap');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($unitOfWork, []);
+        */
+
+        // Force garbage collection after clearing.
+        // Useless in practice and need some seconds.
+        // gc_collect_cycles();
+
+        // Keep user.
+        $user = $this->staticEntityIds['user_id']
+            ? $this->entityManager->find(\Omeka\Entity\User::class, $this->staticEntityIds['user_id'])
+            : null;
         if ($user && !$this->entityManager->contains($user)) {
             $this->entityManager->persist($user);
             // $this->getServiceLocator()->get('Omeka\AuthenticationService')->setIdentity($user);
         }
 
+        // Keep job.
         $this->job = $this->entityManager->find(\Omeka\Entity\Job::class, $this->staticEntityIds['job_id']);
         if (!$this->entityManager->contains($this->job)) {
             $this->job->setOwner($user);

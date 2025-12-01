@@ -257,6 +257,14 @@ class IndexSearch extends AbstractJob
             'user_id' => $this->job->getOwner() ? $this->job->getOwner()->getId() : null,
         ];
 
+        // Set READ_UNCOMMITTED for performance during read-heavy indexing.
+        // WARNING: May read uncommitted changes from concurrent transactions.
+        // Only use when indexing can tolerate temporary inconsistencies that will
+        // be corrected on next full reindex.
+        $this->entityManager->getConnection()->setTransactionIsolation(
+            \Doctrine\DBAL\TransactionIsolationLevel::READ_UNCOMMITTED
+        );
+
         $timeStart = microtime(true);
 
         foreach ($searchEngines as $searchEngine) {
@@ -344,6 +352,10 @@ class IndexSearch extends AbstractJob
                 'sort_order' => 'asc',
             ];
 
+            if ($visibility) {
+                $args['is_public'] = $visibility === 'private' ? 0 : 1;
+            }
+
             if (count($this->resourceIds)) {
                 // The list of ids is cleaned above.
                 $args['id'] = $this->resourceIds;
@@ -364,18 +376,15 @@ class IndexSearch extends AbstractJob
                     continue;
                 }
                 $args['id'] = $ids;
-                unset($ids);
             }
 
-            if ($visibility) {
-                $args['is_public'] = $visibility === 'private' ? 0 : 1;
-            }
+            $ids = $args['id'];
 
             $loop = 1;
             $resources = [];
             $totalToProcessForCurrentResourceType = count($args['id']);
 
-            // $lastMemUsage = memory_get_usage();
+            // $lastMemUsage = round(memory_get_usage(true) / 1024 / 1024, 2);
 
             do {
                 if ($this->shouldStop()) {
@@ -384,48 +393,56 @@ class IndexSearch extends AbstractJob
                 }
 
                 $offset = $this->batchSize * ($loop - 1);
-
-                // Process resources one at a time with immediate detachment.
-                $resourceIdsSlice = array_slice($args['id'], $offset, $this->batchSize);
-
-                foreach ($resourceIdsSlice as $resourceId) {
-                    try {
-                        /**
-                         * @var \Omeka\Entity\Resource $entity
-                         * @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource
-                         */
-                        $entity = $this->api->read($resourceType, $resourceId, [], ['responseContent' => 'resource'])->getContent();
-                        $resource = $this->adapterManager->get($resourceType)->getRepresentation($entity);
-
-                        // Index single resource.
-                        $indexer->indexResources([$resource]);
-
-                        // Immediately detach to free memory.
-                        $this->entityManager->detach($entity);
-                        unset($resource, $entity);
-
-                        ++$totals[$resourceType];
-                    } catch (\Exception $e) {
-                        $this->logger->err(
-                            'Error indexing {resource_type} #{resource_id}: {message}', // @translate
-                            [
-                                'resource_type' => $resourceType,
-                                'resource_id' => $resourceId,
-                                'message' => $e->getMessage(),
-                            ]
-                        );
-                    }
+                $resourceIdsSlice = array_slice($ids, $offset, $this->batchSize);
+                if (!count($resourceIdsSlice)) {
+                    break;
                 }
 
-                unset($resourceIdsSlice);
+                $args['id'] = $resourceIdsSlice;
+
+                /**
+                 * @var \Omeka\Entity\Resource $entity
+                 * @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource
+                 */
+                $entities = $this->api->search($resourceType, $args, ['responseContent' => 'resource'])->getContent();
+                $resources = array_map(fn ($entity) => $this->adapterManager->get($resourceType)->getRepresentation($entity), $entities);
+                if (count($resources) !== count($resourceIdsSlice)) {
+                    $this->logger->err('Error retrieving batch #{number} of {resource_type}: some resources are missing.', // @translate
+                    ['number' => $loop, 'resource_type' => $resourceType]);
+                }
+
+                // Index entire batch at once.
+                if (count($resources)) {
+                    try {
+                        $indexer->indexResources($resources);
+                        $totals[$resourceType] += count($resources);
+                    } catch (\Exception $e) {
+                        $this->logger->err(
+                            'Error indexing batch #{number} of {resource_type}: {message}', // @translate
+                            ['number' => $loop, 'resource_type' => $resourceType, 'message' => $e->getMessage()]
+                        );
+                    }
+
+                    // Immediately detach all entities from this batch.
+                    foreach ($entities as $entity) {
+                        $this->entityManager->detach($entity);
+                    }
+                    unset($resources, $resource, $resourceIdsSlice);
+                    unset($entities, $entity);
+                }
+
+                /*
+                $this->logger->info(
+                    'Memory usage after batch #{number}: {memory} MB', // @translate
+                    ['number' => $loop, 'memory' => round(memory_get_usage(true) / 1024 / 1024, 2)]
+                );
+                */
 
                 ++$loop;
                 $this->refreshEntityManager();
 
-                if ($this->sleepAfterLoop) {
-                    sleep($this->sleepAfterLoop);
-                }
-            } while (($this->batchSize * ($loop - 1)) < $totalToProcessForCurrentResourceType);
+                sleep($this->sleepAfterLoop);
+            } while ($offset <= $totalToProcessForCurrentResourceType);
         }
 
         $totalResults = [];
@@ -445,7 +462,7 @@ class IndexSearch extends AbstractJob
                 'name' => $searchEngine->name(),
                 'results' => implode('; ', $totalResults),
                 'duration' => $timeTotal,
-                // 'memory_usage' => memory_get_usage(),
+                // 'memory_usage' => round(memory_get_usage(true) / 1024 / 1024, 2),
             ]
         );
     }
@@ -485,7 +502,7 @@ class IndexSearch extends AbstractJob
                 'resource_id' => $resource->id(),
                 'results' => implode('; ', $totalResults),
                 'duration' => (int) (microtime(true) - $timeStart),
-                // 'memory_usage' => memory_get_usage(),
+                // 'memory_usage' => round(memory_get_usage(true) / 1024 / 1024, 2),
             ]
         );
     }
@@ -532,6 +549,8 @@ class IndexSearch extends AbstractJob
 
     /**
      * Create a new EntityManager with the same config.
+     *
+     * It is used only for foreground jobs to avoid conflicts with the main one.
      */
     private function getNewEntityManager(EntityManager $entityManager): EntityManager
     {

@@ -73,8 +73,10 @@ if ($itemSet && $site) {
     $redirectItemSets = $this->siteSetting('advancedsearch_item_sets_redirects', ['default' => 'browse']);
     $redirectItemSet = $redirectItemSets[$itemSet->id()] ?? $redirectItemSets['default'] ?? 'browse';
     $displayItemSet = $redirectItemSet !== 'first' || $response->getCurrentPage() <= 1;
+    $displayItemSets = false;
 } else {
     $displayItemSet = false;
+    $displayItemSets = $this->params()->fromRoute('redirected') === 'item-sets';
 }
 
 $this->headLink()
@@ -113,7 +115,7 @@ $this->headScript()
 <div id="search-page">
 <?php endif; // End NOT partial. ?>
 
-<?php if ($displayItemSet): ?>
+<?php if ($displayItemSet): // Redirected from an item set. ?>
 
     <?php
     $vars->offsetSet('resourceType', 'item_sets'); // TODO Check if really needed.
@@ -128,7 +130,23 @@ $this->headScript()
         <h3><?= $translate('Items') ?></h3>
     </div>
 
-<?php else: ?>
+<?php elseif ($displayItemSets): // Redirected from item sets. ?>
+
+    <?php
+    if ($query->isBrowse()) {
+        // No search query.
+        $mainTitle = $translate($searchConfig->subSetting('results', 'label_default') ?: 'Browse item sets');
+    } else {
+        $mainTitle = $response->getTotalResults()
+            ? $translate($searchConfig->subSetting('results', 'label_results') ?: 'Search results')
+            : $translate($searchConfig->subSetting('results', 'label_no_results') ?: 'No results');
+    }
+
+    $this->htmlElement('body')->appendAttribute('class', 'search-page resource item-set browse item-set-browse');
+    ?>
+    <?= $this->pageTitle($mainTitle, 2) ?>
+
+<?php else: // Normal search. ?>
 
     <?php
     if ($query->isBrowse()) {

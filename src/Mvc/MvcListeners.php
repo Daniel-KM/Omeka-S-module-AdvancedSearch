@@ -99,6 +99,7 @@ class MvcListeners extends AbstractListenerAggregate
                     'action' => 'show',
                     'site-slug' => $siteSlug,
                     'page-slug' => $redirectTo,
+                    'redirected' => 'item-sets',
                 ];
                 $routeMatch = new RouteMatch($params);
                 $routeMatch->setMatchedRouteName('site/page');
@@ -129,6 +130,7 @@ class MvcListeners extends AbstractListenerAggregate
                     'id' => $searchConfigId,
                     'page-slug' => $searchConfigSlug,
                     'search-slug' => $searchConfigSlug,
+                    'redirected' => 'item-sets',
                 ];
                 $routeMatch = new RouteMatch($params);
                 $routeMatch->setMatchedRouteName('search-page-' . $searchConfigSlug);
@@ -204,6 +206,8 @@ class MvcListeners extends AbstractListenerAggregate
                 'action' => 'show',
                 'site-slug' => $siteSlug,
                 'page-slug' => $redirectTo,
+                'redirected' => 'item-set',
+                'item-set-id' => $itemSetId,
             ];
             $routeMatch = new RouteMatch($params);
             $routeMatch->setMatchedRouteName('site/page');
@@ -240,6 +244,7 @@ class MvcListeners extends AbstractListenerAggregate
             'item-set-id' => $itemSetId,
             'page-slug' => $searchConfigSlug,
             'search-slug' => $searchConfigSlug,
+            'redirected' => 'item-set',
         ];
         $routeMatch = new RouteMatch($params);
         $routeMatch->setMatchedRouteName('search-page-' . $searchConfigSlug);

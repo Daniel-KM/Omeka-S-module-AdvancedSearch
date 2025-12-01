@@ -49,6 +49,11 @@ class IndexSearch extends AbstractJob
     const BATCH_SIZE = 500;
 
     /**
+     * @var \Omeka\Api\Adapter\Manager
+     */
+    protected $adapterManager;
+
+    /**
      * @var \Omeka\Api\Manager
      */
     protected $api;
@@ -110,6 +115,7 @@ class IndexSearch extends AbstractJob
         $services = $this->getServiceLocator();
         $this->api = $services->get('Omeka\ApiManager');
         $this->logger = $services->get('Omeka\Logger');
+        $this->adapterManager = $services->get('Omeka\ApiAdapterManager');
 
         // The reference id is the job id for now.
         $referenceIdProcessor = new \Laminas\Log\Processor\ReferenceId();
@@ -222,6 +228,27 @@ class IndexSearch extends AbstractJob
             $this->logger->debug(
                 'Process done with a new entity manager' // @translate
             );
+        }
+
+        // Disable query caching to reduce memory overhead.
+        $configuration = $this->entityManager->getConfiguration();
+        /* TODO Null cannot be passed and ArrayAdapter is not yet available in omeka 4.1.
+        $arrayAdapterQuery = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
+        $configuration->setQueryCache($arrayAdapterQuery);
+        $arrayAdapterResult = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
+        $configuration->setResultCache($arrayAdapterResult);
+        */
+        $arrayCacheQuery = new \Doctrine\Common\Cache\ArrayCache();
+        $configuration->setQueryCacheImpl($arrayCacheQuery);
+        $arrayCacheResult = new \Doctrine\Common\Cache\ArrayCache();
+        $configuration->setResultCacheImpl($arrayCacheResult);
+
+        // Disable second-level cache if enabled.
+        if ($configuration->isSecondLevelCacheEnabled()) {
+            $cacheFactory = $configuration->getSecondLevelCacheConfiguration()->getCacheFactory();
+            if (method_exists($cacheFactory, 'getRegion')) {
+                $cacheFactory->getRegion('default_query_region')->evictAll();
+            }
         }
 
         // Prepare data to refresh entity manager.
@@ -346,70 +373,59 @@ class IndexSearch extends AbstractJob
 
             $loop = 1;
             $resources = [];
-            $countResources = 0;
             $totalToProcessForCurrentResourceType = count($args['id']);
 
             // $lastMemUsage = memory_get_usage();
 
             do {
                 if ($this->shouldStop()) {
-                    if (empty($resources)) {
-                        $this->logger->warn(
-                            'Search index #{search_engine_id} ("{name}"): the indexing was stopped. Nothing was indexed.', // @translate
-                            ['search_engine_id' => $searchEngine->id(), 'name' => $searchEngine->name()]
-                        );
-                    } else {
-                        $totalResults = [];
-                        foreach ($resourceTypes as $resourceType) {
-                            $totalResults[] = new PsrMessage(
-                                '{resource_type}: {count} indexed', // @translate
-                                ['resource_type' => $resourceType, 'count' => $totals[$resourceType]]
-                            );
-                        }
-                        /** @var \Omeka\Entity\Resource $resource */
-                        $resource = array_pop($resources);
-                        $this->logger->warn(
-                            'Search index #{search_engine_id} ("{name}"): the indexing was stopped. Last indexed resource: {resource_type} #{resource_id}; {results}. Execution time: {duration} seconds.', // @translate
-                            [
-                                'search_engine_id' => $searchEngine->id(),
-                                'name' => $searchEngine->name(),
-                                'resource_type' => $resource->resourceName(),
-                                'resource_id' => $resource->id(),
-                                'results' => implode('; ', $totalResults),
-                                'duration' => (int) (microtime(true) - $timeStart),
-                                // 'memory_usage' => memory_get_usage(),
-                            ]
-                        );
-                    }
+                    $this->logStopMessage($searchEngine, $resources, $resourceTypes, $totals, $timeStart);
                     return;
                 }
 
                 $offset = $this->batchSize * ($loop - 1);
-                $args['offset'] = $offset;
-                $args['limit'] = $this->batchSize;
 
-                /** @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation[] $resources */
-                $resources = $this->api->search($resourceType, $args)->getContent();
+                // Process resources one at a time with immediate detachment.
+                $resourceIdsSlice = array_slice($args['id'], $offset, $this->batchSize);
 
-                $countResources = count($resources);
-                $indexer->indexResources($resources);
+                foreach ($resourceIdsSlice as $resourceId) {
+                    try {
+                        /**
+                         * @var \Omeka\Entity\Resource $entity
+                         * @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource
+                         */
+                        $entity = $this->api->read($resourceType, $resourceId, [], ['responseContent' => 'resource'])->getContent();
+                        $resource = $this->adapterManager->get($resourceType)->getRepresentation($entity);
 
-                // FIXME Find why all resources are not cleared each loop when there is one or two entity manager.
-                // Explicitly unset resources to free memory before refreshing.
-                unset($resources);
+                        // Index single resource.
+                        $indexer->indexResources([$resource]);
+
+                        // Immediately detach to free memory.
+                        $this->entityManager->detach($entity);
+                        unset($resource, $entity);
+
+                        ++$totals[$resourceType];
+                    } catch (\Exception $e) {
+                        $this->logger->err(
+                            'Error indexing {resource_type} #{resource_id}: {message}', // @translate
+                            [
+                                'resource_type' => $resourceType,
+                                'resource_id' => $resourceId,
+                                'message' => $e->getMessage(),
+                            ]
+                        );
+                    }
+                }
+
+                unset($resourceIdsSlice);
 
                 ++$loop;
-                $totals[$resourceType] += $countResources;
-
-                $resources = null;
                 $this->refreshEntityManager();
 
-                // May avoid issue with some badly configured firewall/proxy
-                // that limits access to Solr even internally.
                 if ($this->sleepAfterLoop) {
                     sleep($this->sleepAfterLoop);
                 }
-            } while (($this->batchSize * ($loop - 1)) <= $totalToProcessForCurrentResourceType);
+            } while (($this->batchSize * ($loop - 1)) < $totalToProcessForCurrentResourceType);
         }
 
         $totalResults = [];
@@ -429,6 +445,46 @@ class IndexSearch extends AbstractJob
                 'name' => $searchEngine->name(),
                 'results' => implode('; ', $totalResults),
                 'duration' => $timeTotal,
+                // 'memory_usage' => memory_get_usage(),
+            ]
+        );
+    }
+
+    protected function logStopMessage(
+        SearchEngineRepresentation $searchEngine,
+        ?array $resources,
+        array $resourceTypes,
+        array $totals,
+        float $timeStart
+    ): void {
+        if (empty($resources)) {
+            $this->logger->warn(
+                'Search index #{search_engine_id} ("{name}"): the indexing was stopped. Nothing was indexed.', // @translate
+                ['search_engine_id' => $searchEngine->id(), 'name' => $searchEngine->name()]
+            );
+            return;
+        }
+
+        $totalResults = [];
+        foreach ($resourceTypes as $resourceType) {
+            $totalResults[] = new PsrMessage(
+                '{resource_type}: {count} indexed', // @translate
+                ['resource_type' => $resourceType, 'count' => $totals[$resourceType]]
+            );
+        }
+
+        /** @var \Omeka\Entity\Resource $resource */
+        $resource = array_pop($resources);
+
+        $this->logger->warn(
+            'Search index #{search_engine_id} ("{name}"): the indexing was stopped. Last indexed resource: {resource_type} #{resource_id}; {results}. Execution time: {duration} seconds.', // @translate
+            [
+                'search_engine_id' => $searchEngine->id(),
+                'name' => $searchEngine->name(),
+                'resource_type' => $resource->resourceName(),
+                'resource_id' => $resource->id(),
+                'results' => implode('; ', $totalResults),
+                'duration' => (int) (microtime(true) - $timeStart),
                 // 'memory_usage' => memory_get_usage(),
             ]
         );

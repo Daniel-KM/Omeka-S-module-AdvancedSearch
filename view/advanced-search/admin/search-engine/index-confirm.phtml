@@ -9,6 +9,7 @@
  */
 
 $plugins = $this->getHelperPluginManager();
+$url = $plugins->get('url');
 $assetUrl = $plugins->get('assetUrl');
 $translate = $plugins->get('translate');
 
@@ -22,6 +23,8 @@ $visibility = in_array($visibility, ['public', 'private']) ? $visibility : null;
 
 $this->headLink()
     ->appendStylesheet($assetUrl('css/advanced-search-manager.css', 'SearchSolr'));
+
+$baseUrlJob = $url('admin/default', ['controller' => 'job']);
 ?>
 
 <?php if ($this->wrapSidebar): ?>
@@ -45,7 +48,7 @@ $this->headLink()
         <?php if ($listJobStatusesByIds): ?>
             <input form="<?= $form->getName() ?>" name="force" type="checkbox" />
             <?= $translate('Force indexing') ?><br />
-            <?= sprintf($translate('%1$d running indexings: #%2$s.'), count($listJobStatusesByIds), implode(', #', array_keys($listJobStatusesByIds))) ?><br />
+            <?= sprintf($translate('%1$d running indexings: #%2$s.'), count($listJobStatusesByIds), implode(', ', array_map(fn ($v) => sprintf('<a href="%1$s/%2$s">%2$s</a>', $baseUrlJob, $v), array_keys($listJobStatusesByIds)))) ?><br />
         <?php else: ?>
             <?= $translate('No running indexing: process can be launched.') ?>
         <?php endif; ?>

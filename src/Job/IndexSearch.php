@@ -198,7 +198,7 @@ class IndexSearch extends AbstractJob
             }
             $this->logger->warn(
                 'There are already {total} other jobs "Index Search". Slowdowns may occur on the site.', // @translate
-                ['total' => $listJobStatusesByIds]
+                ['total' => count($listJobStatusesByIds)]
             );
         }
 

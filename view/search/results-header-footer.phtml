@@ -7,13 +7,20 @@
  * @var \AdvancedSearch\Response $response
  * @var \Omeka\Api\Representation\ItemSetRepresentation|null $itemSet
  * @var string $resultPart "header" or "footer"
+ *
+ * From themes:
+ * @var array $displayParts
+ * @var array $paginationPerPages
+ * @var string $sortFields
+ * @var string $gridListMode
+ * @var string $multiMode
  */
 
 $plugins = $this->getHelperPluginManager();
 $translate = $plugins->get('translate');
 
 // Default values of the module.
-$displayParts = [
+$defaultDisplayParts = [
     'search_filters' => 'header',
     'active_facets' => 'none',
     'total_results' => 'header',
@@ -25,13 +32,13 @@ $displayParts = [
     'grid_list' => 'header',
     'grid_list_mode' => 'auto',
 ];
-$displayParts = $searchConfig ? $searchConfig->setting('results', $displayParts) : $displayParts;
+$displayParts ??= $searchConfig ? $searchConfig->setting('results', $defaultDisplayParts) : $defaultDisplayParts;
 $displayParts = array_filter($displayParts, fn ($v) => in_array($v, [$resultPart, 'both']));
 
-$paginationPerPages = isset($displayParts['per_page']) ? ($searchConfig->subSetting('results', 'per_page_list') ?: []) : [];
-$sortFields = isset($displayParts['sort']) ? $searchConfig->subSetting('results', 'sort_list') : [];
-$gridListMode = $searchConfig->subSetting('results', 'grid_list_mode', 'auto');
-$multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['list_only', 'grid_only']);
+$paginationPerPages ??= isset($displayParts['per_page']) ? ($searchConfig->subSetting('results', 'per_page_list') ?: []) : [];
+$sortFields ??= isset($displayParts['sort']) ? $searchConfig->subSetting('results', 'sort_list') : [];
+$gridListMode ??= isset($displayParts['grid_list_mode']) ? $searchConfig->subSetting('results', 'grid_list_mode', 'auto') : 'auto';
+$multiMode ??= isset($displayParts['grid_list']) && !in_array($gridListMode, ['list_only', 'grid_only']);
 ?>
 
 <?php // Search filters. ?>
@@ -71,7 +78,7 @@ $multiMode = isset($displayParts['grid_list']) && !in_array($gridListMode, ['lis
 <?php // Pagination. ?>
 
 <?php if (isset($displayParts['paginator'])): ?>
-<div class="search-results-count <?= isset($displayParts['total_results']) ? 'no-total-results' : '' ?>">
+<div class="search-results-count <?= isset($displayParts['total_results']) ? '' : 'no-total-results' ?>">
     <?= $this->paginationSearch() ?>
 </div>
 <?php endif; ?>

@@ -9,6 +9,7 @@
  * @var \Omeka\Api\Representation\ItemSetRepresentation|null $itemSet
  *
  * From themes:
+ * @var string $gridListMode
  * @var array $properties
  */
 
@@ -43,7 +44,7 @@ $untitled = $translate('[Untitled]');
 $headingTerm = $setting('browse_heading_property_term');
 $bodyTerm = $setting('browse_body_property_term');
 
-$gridListMode = $searchConfig->subSetting('results', 'grid_list_mode', 'auto');
+$gridListMode ??= $searchConfig->subSetting('results', 'grid_list_mode', 'auto');
 
 // A list does not have html-code in a consistant user interface.
 $allowHtml = (bool) $searchConfig->subSetting('results', 'allow_html');
@@ -63,7 +64,7 @@ $showProperties = !empty($properties);
 $showLocale = (bool) $setting('show_locale_label');
 ?>
 
-<ul class="resource-list search-result-list<?= $gridListMode === 'list_only' ? ' list' : ($gridListMode === 'grid_only' ? ' grid' : '') ?>">
+<ul class="resource-list search-result-list<?= $gridListMode === 'list_only' ? ' list only-mode' : ($gridListMode === 'grid_only' ? ' grid only-mode' : '') ?>">
     <?php /** @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource */
     foreach ($resources as $resource):
         $resourceUrl = isset($site) ? $resource->siteUrl($siteSlug) : $resource->adminUrl();

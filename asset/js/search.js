@@ -340,7 +340,16 @@ var Search = (function() {
 
     self.setViewType = function(viewType) {
         // In some themes, the mode for resource list is set with a different class.
+        // Or different search engines are used, some with grid, some with list.
         var resourceLists = document.querySelectorAll('.search-results .resource-list, .search-results .resources-list-content');
+
+        var hasOnlyMode = Array.prototype.some.call(resourceLists, function(el) {
+            return el.classList.contains('only-mode');
+        });
+        if (hasOnlyMode) {
+            return;
+        }
+
         for (var i = 0; i < resourceLists.length; i++) {
             var resourceItem = resourceLists[i];
             resourceItem.className = resourceItem.className.replace(' grid', '').replace(' list', '')

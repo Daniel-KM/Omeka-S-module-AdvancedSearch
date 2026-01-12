@@ -33,7 +33,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "AdvancedSearchTest\\": "test/AdvancedSearchTest/"
+            "AdvancedSearchTest\\": "tests/AdvancedSearchTest/"
         }
     },
     "config": {

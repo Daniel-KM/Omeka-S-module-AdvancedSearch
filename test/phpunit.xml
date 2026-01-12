@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE phpunit>
-<phpunit bootstrap="./bootstrap.php" colors="true" backupGlobals="false">
-    <testsuites>
-        <testsuite name="AdvancedSearch">
-            <directory>./AdvancedSearchTest</directory>
-        </testsuite>
-    </testsuites>
-</phpunit>

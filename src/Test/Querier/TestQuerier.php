@@ -8,12 +8,12 @@ use AdvancedSearch\Response;
 
 class TestQuerier extends AbstractQuerier
 {
-    public function query(Query $query)
+    public function query(): Response
     {
         $response = new Response;
 
         $response->setTotalResults(0);
-        foreach ($query->getResourceTypes() as $resourceType) {
+        foreach ($this->query->getResourceTypes() as $resourceType) {
             $response->setResourceTotalResults($resourceType, 0);
         }
 
@@ -30,6 +30,11 @@ class TestQuerier extends AbstractQuerier
         return [];
     }
     public function queryValues(string $field): array
+    {
+        return [];
+    }
+
+    public function queryAllResourceIds(?string $resourceType = null, bool $byResourceType = false): array
     {
         return [];
     }

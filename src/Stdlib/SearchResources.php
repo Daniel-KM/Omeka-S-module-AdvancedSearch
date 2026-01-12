@@ -386,6 +386,11 @@ class SearchResources
     protected $logger;
 
     /**
+     * @var bool
+     */
+    protected $isOldOmeka;
+
+    /**
      * Contains two keys: aliases and query_args.
      *
      * @var array
@@ -2189,8 +2194,7 @@ class SearchResources
             case 'eq':
             case 'list':
                 $subqueryAlias = $this->adapter->createAlias();
-                $subquery = $entityManager
-                    ->createQueryBuilder()
+                $subquery = $this->createSubQueryBuilder()
                     ->select("$subqueryAlias.id")
                     ->from('Omeka\Entity\Resource', $subqueryAlias);
                 if (count($value) <= 1) {
@@ -2218,8 +2222,7 @@ class SearchResources
 
             case 'in':
                 $subqueryAlias = $this->adapter->createAlias();
-                $subquery = $entityManager
-                    ->createQueryBuilder()
+                $subquery = $this->createSubQueryBuilder()
                     ->select("$subqueryAlias.id")
                     ->from('Omeka\Entity\Resource', $subqueryAlias);
                 $sub = [];
@@ -2240,8 +2243,7 @@ class SearchResources
 
             case 'sw':
                 $subqueryAlias = $this->adapter->createAlias();
-                $subquery = $entityManager
-                    ->createQueryBuilder()
+                $subquery = $this->createSubQueryBuilder()
                     ->select("$subqueryAlias.id")
                     ->from('Omeka\Entity\Resource', $subqueryAlias);
                 $sub = [];
@@ -2262,8 +2264,7 @@ class SearchResources
 
             case 'ew':
                 $subqueryAlias = $this->adapter->createAlias();
-                $subquery = $entityManager
-                    ->createQueryBuilder()
+                $subquery = $this->createSubQueryBuilder()
                     ->select("$subqueryAlias.id")
                     ->from('Omeka\Entity\Resource', $subqueryAlias);
                 $sub = [];
@@ -2287,8 +2288,7 @@ class SearchResources
                 // than four characters, so the comparaison cannot be done with
                 // a static value from the php soundex() function.
                 $subqueryAlias = $this->adapter->createAlias();
-                $subquery = $entityManager
-                    ->createQueryBuilder()
+                $subquery = $this->createSubQueryBuilder()
                     ->select("$subqueryAlias.id")
                     ->from('Omeka\Entity\Resource', $subqueryAlias);
                 $sub = [];
@@ -2313,8 +2313,7 @@ class SearchResources
                 // The doctrine dql requires "TRUE" and will be converted to a
                 // standard mysql query.
                 $subqueryAlias = $this->adapter->createAlias();
-                $subquery = $entityManager
-                    ->createQueryBuilder()
+                $subquery = $this->createSubQueryBuilder()
                     ->select("$subqueryAlias.id")
                     ->from('Omeka\Entity\Resource', $subqueryAlias);
                 $sub = [];
@@ -2525,8 +2524,7 @@ class SearchResources
                 $subValuesAlias = $this->adapter->createAlias();
                 $subResourceAlias = $this->adapter->createAlias();
                 // Use a subquery so rights are automatically managed.
-                $subQb = $entityManager
-                    ->createQueryBuilder()
+                $subQb = $this->createSubQueryBuilder()
                     ->select("IDENTITY($subValuesAlias.valueResource)")
                     ->from(\Omeka\Entity\Value::class, $subValuesAlias)
                     ->innerJoin("$subValuesAlias.resource", $subResourceAlias)
@@ -2682,8 +2680,7 @@ class SearchResources
                     $groupBy[] = "$subqueryAlias.type";
                     $groupBy[] = "$subqueryAlias.lang";
                 }
-                $subquery = $entityManager
-                    ->createQueryBuilder()
+                $subquery = $this->createSubQueryBuilder()
                     ->select("IDENTITY($subqueryAlias.resource)")
                     ->from(\Omeka\Entity\Value::class, $subqueryAlias)
                     ->groupBy(...$groupBy)
@@ -3546,5 +3543,21 @@ class SearchResources
         } else {
             return 31;
         }
+    }
+
+    /**
+     * Create a subquery builder compatible with Omeka S 4.2+.
+     *
+     * In Omeka S 4.2+, the adapter has its own createQueryBuilder() that should
+     * be used instead of entityManager->createQueryBuilder().
+     */
+    protected function createSubQueryBuilder(): QueryBuilder
+    {
+        if ($this->isOldOmeka === null) {
+            $this->isOldOmeka = version_compare(\Omeka\Module::VERSION, '4.2.0', '<');
+        }
+        return $this->isOldOmeka
+            ? $this->adapter->getEntityManager()->createQueryBuilder()
+            : $this->adapter->createQueryBuilder();
     }
 }

@@ -69,6 +69,7 @@ $displayParts = $searchConfig->setting('results', []);
 $displayPartsHeader = array_filter($displayParts, fn ($v) => in_array($v, ['header', 'both']));
 $displayPartsFooter = array_filter($displayParts, fn ($v) => in_array($v, ['footer', 'both']));
 $displayFacets = $displayParts ? $displayParts['facets'] ?? 'before' : 'none';
+$autoscroll = !empty($searchConfig->subSetting('results', 'autoscroll'));
 
 if ($itemSet && $site) {
     $redirectItemSets = $this->siteSetting('advancedsearch_item_sets_redirects', ['default' => 'browse']);
@@ -175,7 +176,7 @@ $this->headScript()
     </aside>
     <?php endif; ?>
 
-    <div class="search-results">
+    <div id="search-results" class="search-results"<?php if ($autoscroll && !empty($query)): ?> data-autoscroll="1"<?php endif; ?>>
 
         <?php if ($displayPartsHeader): ?>
         <div class="search-results-part search-results-header">

@@ -904,6 +904,14 @@ $(document).ready(function() {
     }
 
     /**
+     * Auto-scroll to results when enabled.
+     */
+    var searchResults = document.getElementById('search-results');
+    if (searchResults && searchResults.dataset.autoscroll) {
+        searchResults.scrollIntoView({behavior: 'smooth', block: 'start'});
+    }
+
+    /**
      * Init display of results list or grid.
      */
     var view_type = localStorage.getItem('search_view_type');

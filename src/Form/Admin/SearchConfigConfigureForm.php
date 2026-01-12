@@ -711,6 +711,17 @@ class SearchConfigConfigureForm extends Form
                 ],
             ])
             ->add([
+                'name' => 'autoscroll',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Auto-scroll to results', // @translate
+                    'info' => 'When enabled, the page will scroll to the results section after form submission. Useful when the search form is not at the top of the page.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'autoscroll',
+                ],
+            ])
+            ->add([
                 'name' => 'breadcrumbs',
                 'type' => Element\Checkbox::class,
                 'options' => [

@@ -144,9 +144,6 @@ Installation
 
 This module is dependant of module [Common], that should be installed first.
 
-The module uses an external library [jQuery-Autocomplete], so use the release
-zip to install it, or use and init the source.
-
 * From the zip
 
 Download the last release [AdvancedSearch.zip] from the list of releases (the
@@ -163,6 +160,16 @@ composer install --no-dev
 ```
 
 See general end user documentation for [installing a module].
+
+
+- For test
+
+The module includes a comprehensive test suite with unit and functional tests.
+Run them from the root of Omeka:
+
+```sh
+vendor/bin/phpunit -c modules/AdvancedSearch/phpunit.xml --testdox
+```
 
 ### Optional dependencies
 
@@ -653,10 +660,6 @@ conditions as regards security.
 The fact that you are presently reading this means that you have had knowledge
 of the CeCILL license and that you accept its terms.
 
-### Libraries
-
-- jQuery-Autocomplete : [MIT]
-
 
 Copyright
 ---------
@@ -664,8 +667,7 @@ Copyright
 See commits for full list of contributors.
 
 * Copyright BibLibre, 2016-2017 (see [BibLibre])
-* Copyright Daniel Berthereau, 2017-2025 (see [Daniel-KM])
-* Copyright Tomas Kirda 2017 (library jQuery-Autocomplete)
+* Copyright Daniel Berthereau, 2017-2026 (see [Daniel-KM])
 
 This module is a merge of features from the deprecated modules [Advanced Search Plus],
 [Search] and [Psl Search Form] and derivative ones.
@@ -686,7 +688,6 @@ for the digital library [Corpus du Louvre].
 [installing a module]: https://omeka.org/s/docs/user-manual/modules/#installing-modules
 [this patch]: https://github.com/omeka/omeka-s/pull/1519/files
 [Common]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common
-[jQuery-Autocomplete]: https://github.com/devbridge/jQuery-Autocomplete
 [Reference]: https://gitlab.com/Daniel-KM/Omeka-S-module-Reference
 [Advanced Search Plus]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearchPlus
 [Psl Search Form]: https://gitlab.com/Daniel-KM/Omeka-S-module-PslSearchForm
@@ -697,7 +698,6 @@ for the digital library [Corpus du Louvre].
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org
 [OSI]: http://opensource.org
-[MIT]: https://github.com/devbridge/jQuery-Autocomplete/blob/master/license.txt
 [Search]: https://gitlab.com/Daniel-KM/Omeka-S-module-Search
 [BibLibre]: https://github.com/biblibre
 [GitLab]: https://gitlab.com/Daniel-KM

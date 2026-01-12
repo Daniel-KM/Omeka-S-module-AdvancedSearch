@@ -267,14 +267,14 @@ var Search = (function() {
                 // The fields may be select or radio or checkboxes.
                 const field = $(filterFieldset).find('[name^="filter["][name$="][field]"]');
                 const type = $(filterFieldset).find('[name^="filter["][name$="][type]"]');
-                const value = $(filterFieldset).find('[name^="filter["][name$="][value]"]');
-                // const matchField = field.prop('name').match(/filter\[(\d+)\]\[field\]/);
-                // const matchType = type.prop('name').match(/filter\[(\d+)\]\[type\]/);
-                // const matchValue = value.prop('name').match(/filter\[(\d+)\]\[value\]/);
-                if (field.length
-                    && type.length
-                    && (Search.filterTypes.withoutValue.includes(type.val()) ? true : (value.length && value.val()))
-                ) {
+                const val = $(filterFieldset).find('[name^="filter["][name$="][val]"]');
+                // A filter is filled when there is a field and either:
+                // - a type that requires no value (like "is empty")
+                // - or a value in the val field
+                const hasField = field.length && field.val();
+                const typeRequiresNoValue = type.length && Search.filterTypes.withoutValue.includes(type.val());
+                const hasValue = val.length && val.val();
+                if (hasField && (typeRequiresNoValue || hasValue)) {
                     ++countFilled;
                 }
             });

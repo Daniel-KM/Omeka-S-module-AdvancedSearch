@@ -458,6 +458,7 @@ return [
             'searchingForm' => [
                 'search_config' => null,
                 'display_results' => true,
+                'properties' => [],
                 'query' => [],
                 'query_filter' => [],
                 'link' => '',

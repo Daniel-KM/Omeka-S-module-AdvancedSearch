@@ -137,6 +137,8 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
             $link = ['url' => trim($link[0]), 'label' => trim($link[1] ?? '')];
         }
 
+        $properties = $data['properties'] ?? [];
+
         $vars = [
             'block' => $block,
             'site' => $site,
@@ -147,6 +149,7 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
             // Returns results on the same page.
             'skipFormAction' => $displayResults,
             'displayResults' => $displayResults,
+            'properties' => $properties,
         ];
 
         $formAdapter = $searchConfig->formAdapter();

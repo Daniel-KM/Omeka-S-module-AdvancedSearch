@@ -6,7 +6,7 @@
     "authors": [
         {
             "name": "Daniel Berthereau",
-            "email": "Daniel.git@Berthereau.net"
+            "email": "Daniel.packagist@Berthereau.net"
         }
     ],
     "homepage": "https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch",
@@ -16,7 +16,7 @@
     },
     "keywords": [
         "Omeka S",
-        "Omeka S module",
+        "module",
         "search",
         "auto-suggestion",
         "filter",
@@ -31,16 +31,15 @@
         "laminas/laminas-servicemanager": "3.14",
         "laminas/laminas-stdlib": "*"
     },
-    "require-dev": {
-        "biblibre/omeka-s-test-helper": "dev-master"
-    },
     "autoload-dev": {
         "psr-4": {
             "AdvancedSearchTest\\": "test/AdvancedSearchTest/"
         }
     },
     "config": {
-        "platform": {"php": "7.4"},
+        "platform": {
+            "php": "7.4"
+        },
         "allow-plugins": {
             "composer/installers": true
         }

@@ -345,7 +345,6 @@ class Response implements JsonSerializable
     protected function prepareResults(): self
     {
         $this->results = [];
-
         if ($this->resources !== null) {
             /** @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource */
             foreach ($this->resources as $resource) {

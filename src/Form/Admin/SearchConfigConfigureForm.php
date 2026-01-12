@@ -415,6 +415,7 @@ class SearchConfigConfigureForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'button_submit',
+                    'value' => true,
                 ],
             ])
             ->add([

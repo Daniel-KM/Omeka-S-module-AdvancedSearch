@@ -514,7 +514,33 @@ class IndexSearch extends AbstractJob
         // $this->entityManager->getConfiguration()->getResultCacheImpl()?->deleteAll();
 
         // Try to flush and clear all managed entities.
-        $this->entityManager->flush();
+        // Wrap in try-catch to handle invalid datetime format errors
+        // (e.g., `-0001-11-30 00:00:00`) that would stop the entire indexing.
+        try {
+            $this->entityManager->flush();
+        } catch (\PDOException $e) {
+            // Log the error but continue indexing.
+            $this->logger->warn(
+                'Error flushing entity manager: {message}. Continuing.', // @translate
+                ['message' => $e->getMessage()]
+            );
+            // Close and recreate connection if needed.
+            if (!$this->entityManager->isOpen()) {
+                $this->entityManager = $this->getNewEntityManager(
+                    $this->getServiceLocator()->get('Omeka\EntityManager')
+                );
+            }
+        } catch (\Doctrine\DBAL\Exception $e) {
+            $this->logger->warn(
+                'Database error in entity manager: {message}. Continuing.', // @translate
+                ['message' => $e->getMessage()]
+            );
+            if (!$this->entityManager->isOpen()) {
+                $this->entityManager = $this->getNewEntityManager(
+                    $this->getServiceLocator()->get('Omeka\EntityManager')
+                );
+            }
+        }
         $this->entityManager->clear();
 
         // Try to clear identity map more explicitly.

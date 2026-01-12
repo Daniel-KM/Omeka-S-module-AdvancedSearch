@@ -631,13 +631,22 @@ return [
                 'default_site' => false,
             ],
 
-            // From module data type geometry.
+            // From module Access.
+            'common/advanced-search/access' => [
+                'module' => 'Access',
+                'label' => 'Access', // @translate
+                'resource_type' => ['item_sets', 'items', 'media'],
+                'default_admin' => true,
+                'default_site' => false,
+            ],
+
+            // From module Data Type Geometry.
             'common/advanced-search/data-type-geography' => [
                 'module' => 'DataTypeGeometry',
                 'label' => 'Geography', // @translate
             ],
 
-            // From module dynamic item sets.
+            // From module Dynamic Item Sets.
             'common/advanced-search/item-set-is-dynamic' => [
                 'module' => 'Dynamic Item Sets',
                 'label' => 'Is dynamic item set', // @translate
@@ -645,7 +654,7 @@ return [
                 'resource_type' => ['item_sets'],
             ],
 
-            // From module numeric data type.
+            // From module Numeric Data Type.
             // The partial is used only in search items, but data are available
             // anywhere.
             'common/numeric-data-types-advanced-search' => [
@@ -654,7 +663,7 @@ return [
                 'resource_type' => ['items'],
             ],
 
-            // From module oai-pmh harvester.
+            // From module Oai-Pmh Harvester.
             'common/advanced-search/harvests' => [
                 'module' => 'OaiPmhHarvester',
                 'label' => 'OAI-PMH harvests', // @translate
@@ -663,13 +672,22 @@ return [
                 'default_site' => false,
             ],
 
-            // From module selection.
+            // From module Selection.
             'common/advanced-search/selections' => [
                 'module' => 'Selection',
                 'label' => 'Selections', // @translate
                 'resource_type' => ['item_sets', 'items', 'media'],
                 'default_admin' => true,
                 'default_site' => false,
+            ],
+
+            // From module 🖒.
+            'common/advanced-search/🖒' => [
+                'module' => '🖒',
+                'label' => '🖒', // @translate
+                'resource_type' => ['item_sets', 'items', 'media'],
+                'default_admin' => true,
+                'default_site' => true,
             ],
         ],
     ],

@@ -3072,7 +3072,12 @@ class SearchResources
             // with the same score are sorted by id desc and not randomly.
             // Don't use "`" here for doctrine.
             $matchOrder = 'MATCH(omeka_fulltext_search.title, omeka_fulltext_search.text) AGAINST (:omeka_fulltext_search)';
-            $sortOrder = $query['sort_by'] === 'relevance asc' ? 'ASC' : 'DESC';
+            // Support both formats: 'relevance asc' (combined) and separate
+            // sort_by/sort_order.
+            $sortOrder = $query['sort_by'] === 'relevance asc'
+                || (($query['sort_order'] ?? '') === 'asc')
+                ? 'ASC'
+                : 'DESC';
             $qb
                 // The hidden select and "group by" avoids issue with mysql mode "only_full_group_by".
                 // But the select is not available when returning scalar ids.

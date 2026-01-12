@@ -322,7 +322,9 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
      *   - template (string): Use a specific template instead of the default one.
      *     This is the template of the form, not the main template of the search
      *     config.
-     *   - skip_form_action (bool): Don't set form action, so use the current page.
+     *   - skip_form_action (bool): Don't set form action, so use current page.
+     *   - form_action (string|null): Custom form action url. If set, this url
+     *     is used instead of the default.
      *   - skip_partial_headers (bool): Skip partial headers.
      *   - skip_values: Does not init form element values (quicker results).
      *   - variant: Name of a variant of the form;

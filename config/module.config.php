@@ -459,6 +459,7 @@ return [
                 'search_config' => null,
                 'display_results' => true,
                 'properties' => [],
+                'autoscroll' => false,
                 'query' => [],
                 'query_filter' => [],
                 'link' => '',

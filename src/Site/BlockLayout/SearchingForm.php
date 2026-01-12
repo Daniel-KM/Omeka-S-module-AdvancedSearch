@@ -125,9 +125,24 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
             : null;
 
         $displayResults = !empty($data['display_results']);
+        $autoscroll = !empty($data['autoscroll']);
 
+        // Determine the form action URL.
+        // When displaying results on the same page with autoscroll enabled,
+        // include the fragment so the page scrolls to this block after
+        // submission.
+        // Use just the fragment (not "?#") so the browser properly handles
+        // repeated form submissions with the same parameters.
+        $formAction = null;
         if (!$displayResults) {
-            $form->setAttribute('action', $searchConfig->siteUrl($site->slug()));
+            $formAction = $searchConfig->siteUrl($site->slug());
+        } elseif ($autoscroll) {
+            $formAction = '#block-' . $block->id();
+        }
+
+        // Generally, the form is rebuild later, but not in all cases.
+        if ($formAction) {
+            $form->setAttribute('action', $formAction);
         }
 
         if (empty($data['link'])) {
@@ -148,6 +163,7 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
             'link' => $link,
             // Returns results on the same page.
             'skipFormAction' => $displayResults,
+            'formAction' => $formAction,
             'displayResults' => $displayResults,
             'properties' => $properties,
         ];

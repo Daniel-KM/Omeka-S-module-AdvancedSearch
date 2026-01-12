@@ -79,7 +79,13 @@ trait TraitFormAdapterClassic
         }
 
         $vars['skipFormAction'] = !empty($options['skip_form_action']);
-        if (!$vars['skipFormAction']) {
+        $vars['formAction'] = $options['form_action'] ?? null;
+        // If form_action is explicitly provided, always use it.
+        // Otherwise, if skip_form_action is true, don't set any action (use current page).
+        // Otherwise, use the default search page URL.
+        if (!empty($options['form_action'])) {
+            $form->setAttribute('action', $options['form_action']);
+        } elseif (!$vars['skipFormAction']) {
             $status = $services->get('Omeka\Status');
             $isAdmin = $status->isAdminRequest();
             $formActionUrl = $isAdmin

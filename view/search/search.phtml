@@ -37,6 +37,7 @@
  *
  * For block layout:
  * @var bool $skipFormAction Remove action of the form, so it uses current page.
+ * @var bool $formAction Specific url for form action.
  */
 
 $plugins = $this->getHelperPluginManager();
@@ -164,7 +165,7 @@ $this->headScript()
 
 <?php endif; ?>
 
-<?= $searchConfig->renderForm(['template' => null, 'skip_form_action' => $skipFormAction]) ?>
+<?= $searchConfig->renderForm(['template' => null, 'skip_form_action' => $skipFormAction, 'form_action' => $formAction ?? null]) ?>
 
 <div class="search-results-wrapper">
 

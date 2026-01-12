@@ -8,6 +8,7 @@
  * @var array|null $request The user request completed with the hidden one.
  * @var array $link
  * @var bool $skipFormAction Allow to display results on same form.
+ * @var bool $formAction Specific url for form action.
  * @var bool $displayResults Display results in the same block.
  */
 
@@ -15,12 +16,13 @@ $plugins = $this->getHelperPluginManager();
 $hyperlink = $plugins->get('hyperlink');
 ?>
 
-<div class="block block-search">
+<div id="block-<?= $block->id() ?>" class="block block-search">
     <?= $searchConfig->renderForm([
         'site' => $site,
         'itemSet' => $itemSet,
         'template' => $displayResults ? 'search/search' :  null,
         'skip_form_action' => $skipFormAction,
+        'form_action' => $formAction,
         'request' => $request,
         'properties' => $properties ?? [],
     ]) ?>

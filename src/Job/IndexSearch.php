@@ -49,6 +49,13 @@ class IndexSearch extends AbstractJob
     const BATCH_SIZE = 500;
 
     /**
+     * Log progress every N resources.
+     *
+     * @var int
+     */
+    const PROGRESS_LOG_INTERVAL = 1000;
+
+    /**
      * @var \Omeka\Api\Adapter\Manager
      */
     protected $adapterManager;
@@ -67,6 +74,11 @@ class IndexSearch extends AbstractJob
      * @var \Laminas\Log\Logger
      */
     protected $logger;
+
+    /**
+     * @var \Doctrine\DBAL\Connection
+     */
+    protected $connection;
 
     /**
      * @var int
@@ -107,6 +119,11 @@ class IndexSearch extends AbstractJob
      * @var array
      */
     protected $staticEntityIds = [];
+
+    /**
+     * @var int
+     */
+    protected $lastProgressLog = 0;
 
     public function perform(): void
     {
@@ -251,6 +268,9 @@ class IndexSearch extends AbstractJob
             }
         }
 
+        // Get direct database connection for optimized ID queries.
+        $this->connection = $this->entityManager->getConnection();
+
         // Prepare data to refresh entity manager.
         $this->staticEntityIds = [
             'job_id' => $this->job->getId(),
@@ -360,18 +380,14 @@ class IndexSearch extends AbstractJob
                 // The list of ids is cleaned above.
                 $args['id'] = $this->resourceIds;
             } else {
-                $resourceQueryArgs = ['sort_by' => 'id', 'sort_order' => 'asc'];
-                if ($this->resourcesLimit) {
-                    $resourceQueryArgs['limit'] = $this->resourcesLimit;
-                }
-                if ($this->resourcesOffset) {
-                    $resourceQueryArgs['offset'] = $this->resourcesOffset;
-                }
-
-                $ids = $this->api->search($resourceType, $resourceQueryArgs, ['returnScalar' => 'id'])->getContent();
-                if ($this->startResourceId) {
-                    $ids = array_keys(array_filter($ids, fn ($id) => $id >= $this->startResourceId, ARRAY_FILTER_USE_KEY));
-                }
+                // Use direct SQL for faster ID retrieval.
+                $ids = $this->fetchResourceIds(
+                    $resourceType,
+                    $this->startResourceId,
+                    $this->resourcesLimit,
+                    $this->resourcesOffset,
+                    $visibility
+                );
                 if (!count($ids)) {
                     continue;
                 }
@@ -379,6 +395,7 @@ class IndexSearch extends AbstractJob
             }
 
             $ids = $args['id'];
+            $this->lastProgressLog = 0;
 
             $loop = 1;
             $resources = [];
@@ -404,11 +421,37 @@ class IndexSearch extends AbstractJob
                  * @var \Omeka\Entity\Resource $entity
                  * @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource
                  */
-                $entities = $this->api->search($resourceType, $args, ['responseContent' => 'resource'])->getContent();
-                $resources = array_map(fn ($entity) => $this->adapterManager->get($resourceType)->getRepresentation($entity), $entities);
-                if (count($resources) !== count($resourceIdsSlice)) {
-                    $this->logger->err('Error retrieving batch #{number} of {resource_type}: some resources are missing.', // @translate
-                    ['number' => $loop, 'resource_type' => $resourceType]);
+                // Wrap entity loading in try-catch to continue on invalid data.
+                try {
+                    $entities = $this->api->search($resourceType, $args, ['responseContent' => 'resource'])->getContent();
+                    $resources = array_map(
+                        fn ($entity) => $this->adapterManager
+                            ->get($resourceType)
+                            ->getRepresentation($entity),
+                        $entities
+                    );
+                } catch (\Exception $e) {
+                    $this->logger->err(
+                        'Error loading batch #{number} of {resource_type}: {message}. Skipping.', // @translate
+                        [
+                            'number' => $loop,
+                            'resource_type' => $resourceType,
+                            'message' => $e->getMessage(),
+                        ]
+                    );
+                    $entities = [];
+                    $resources = [];
+                }
+
+                if (count($resources) && count($resources) !== count($resourceIdsSlice)) {
+                    $this->logger->warn(
+                        'Batch #{number} of {resource_type}: {count} resources missing.', // @translate
+                        [
+                            'number' => $loop,
+                            'resource_type' => $resourceType,
+                            'count' => count($resourceIdsSlice) - count($resources),
+                        ]
+                    );
                 }
 
                 // Index entire batch at once.
@@ -419,17 +462,32 @@ class IndexSearch extends AbstractJob
                     } catch (\Exception $e) {
                         $this->logger->err(
                             'Error indexing batch #{number} of {resource_type}: {message}', // @translate
-                            ['number' => $loop, 'resource_type' => $resourceType, 'message' => $e->getMessage()]
+                            [
+                                'number' => $loop,
+                                'resource_type' => $resourceType,
+                                'message' => $e->getMessage(),
+                            ]
                         );
                     }
 
-                    // Immediately detach all entities from this batch.
+                    // Log progress periodically.
+                    $this->logProgress(
+                        $totals[$resourceType],
+                        $totalToProcessForCurrentResourceType,
+                        $resourceType
+                    );
+                }
+
+                // Immediately detach all entities from this batch.
+                if ($entities) {
                     foreach ($entities as $entity) {
                         $this->entityManager->detach($entity);
                     }
-                    unset($resources, $resource, $resourceIdsSlice);
-                    unset($entities, $entity);
                 }
+                unset($resources, $resource, $resourceIdsSlice);
+                unset($entities, $entity);
+                // Needed when loop is stopped.
+                $resources = [];
 
                 /*
                 $this->logger->info(
@@ -443,6 +501,18 @@ class IndexSearch extends AbstractJob
 
                 sleep($this->sleepAfterLoop);
             } while ($offset <= $totalToProcessForCurrentResourceType);
+
+            // Force final commit for this resource type.
+            if (method_exists($indexer, 'commit')) {
+                try {
+                    $indexer->commit();
+                } catch (\Exception $e) {
+                    $this->logger->warn(
+                        'Final commit failed for {resource_type}: {message}', // @translate
+                        ['resource_type' => $resourceType, 'message' => $e->getMessage()]
+                    );
+                }
+            }
         }
 
         $totalResults = [];
@@ -513,64 +583,16 @@ class IndexSearch extends AbstractJob
         // Useless.
         // $this->entityManager->getConfiguration()->getResultCacheImpl()?->deleteAll();
 
-        // Try to flush and clear all managed entities.
-        // Wrap in try-catch to handle invalid datetime format errors
-        // (e.g., `-0001-11-30 00:00:00`) that would stop the entire indexing.
-        try {
-            $this->entityManager->flush();
-        } catch (\PDOException $e) {
-            // Log the error but continue indexing.
-            $this->logger->warn(
-                'Error flushing entity manager: {message}. Continuing.', // @translate
-                ['message' => $e->getMessage()]
-            );
-            // Close and recreate connection if needed.
-            if (!$this->entityManager->isOpen()) {
-                $this->entityManager = $this->getNewEntityManager(
-                    $this->getServiceLocator()->get('Omeka\EntityManager')
-                );
-            }
-        } catch (\Doctrine\DBAL\Exception $e) {
-            $this->logger->warn(
-                'Database error in entity manager: {message}. Continuing.', // @translate
-                ['message' => $e->getMessage()]
-            );
-            if (!$this->entityManager->isOpen()) {
-                $this->entityManager = $this->getNewEntityManager(
-                    $this->getServiceLocator()->get('Omeka\EntityManager')
-                );
-            }
-        }
+        // Don't flush - indexing is read-only, no need to persist anything.
+        // Just clear managed entities to free memory.
         $this->entityManager->clear();
 
-        // Try to clear identity map more explicitly.
-        // Useless with clear().
-        /*
-        $unitOfWork = $this->entityManager->getUnitOfWork();
-        $reflectionProperty = new \ReflectionProperty(get_class($unitOfWork), 'identityMap');
-        $reflectionProperty->setAccessible(true);
-        $reflectionProperty->setValue($unitOfWork, []);
-        */
-
-        // Force garbage collection after clearing.
-        // Useless in practice and need some seconds.
-        // gc_collect_cycles();
-
-        // Keep user.
-        $user = $this->staticEntityIds['user_id']
-            ? $this->entityManager->find(\Omeka\Entity\User::class, $this->staticEntityIds['user_id'])
-            : null;
-        if ($user && !$this->entityManager->contains($user)) {
-            $this->entityManager->persist($user);
-            // $this->getServiceLocator()->get('Omeka\AuthenticationService')->setIdentity($user);
-        }
-
-        // Keep job.
-        $this->job = $this->entityManager->find(\Omeka\Entity\Job::class, $this->staticEntityIds['job_id']);
-        if (!$this->entityManager->contains($this->job)) {
-            $this->job->setOwner($user);
-            $this->entityManager->persist($this->job);
-        }
+        // Re-fetch job entity (needed for shouldStop() check).
+        // No persist needed since we won't flush.
+        $this->job = $this->entityManager->find(
+            \Omeka\Entity\Job::class,
+            $this->staticEntityIds['job_id']
+        );
     }
 
     /**
@@ -584,6 +606,105 @@ class IndexSearch extends AbstractJob
             $entityManager->getConnection(),
             $entityManager->getConfiguration(),
             $entityManager->getEventManager()
+        );
+    }
+
+    /**
+     * Fetch resource IDs using direct SQL for better performance.
+     *
+     * @return int[]
+     */
+    protected function fetchResourceIds(
+        string $resourceType,
+        int $startResourceId = 0,
+        int $limit = 0,
+        int $offset = 0,
+        ?string $visibility = null
+    ): array {
+        $resourceTypeToTable = [
+            'items' => 'item',
+            'item_sets' => 'item_set',
+            'media' => 'media',
+        ];
+
+        $table = $resourceTypeToTable[$resourceType] ?? null;
+        if (!$table) {
+            // Fallback to API for unknown resource types.
+            $args = ['sort_by' => 'id', 'sort_order' => 'asc'];
+            if ($limit) {
+                $args['limit'] = $limit;
+            }
+            if ($offset) {
+                $args['offset'] = $offset;
+            }
+            $ids = $this->api
+                ->search($resourceType, $args, ['returnScalar' => 'id'])
+                ->getContent();
+            if ($startResourceId) {
+                $ids = array_filter($ids, fn ($id) => $id >= $startResourceId);
+            }
+            return array_values($ids);
+        }
+
+        // Build optimized SQL query.
+        $sql = "SELECT r.id FROM resource r "
+            . "INNER JOIN $table t ON r.id = t.id WHERE 1=1";
+        $params = [];
+        $types = [];
+
+        if ($startResourceId > 0) {
+            $sql .= " AND r.id >= ?";
+            $params[] = $startResourceId;
+            $types[] = \Doctrine\DBAL\ParameterType::INTEGER;
+        }
+
+        if ($visibility === 'public') {
+            $sql .= " AND r.is_public = 1";
+        } elseif ($visibility === 'private') {
+            $sql .= " AND r.is_public = 0";
+        }
+
+        $sql .= " ORDER BY r.id ASC";
+
+        if ($limit > 0) {
+            $sql .= " LIMIT " . (int) $limit;
+        }
+        if ($offset > 0) {
+            $sql .= " OFFSET " . (int) $offset;
+        }
+
+        $result = $this->connection->executeQuery($sql, $params, $types);
+        return array_column($result->fetchAllAssociative(), 'id');
+    }
+
+    /**
+     * Log progress at regular intervals.
+     */
+    protected function logProgress(
+        int $indexed,
+        int $total,
+        string $resourceType
+    ): void {
+        // Only log every PROGRESS_LOG_INTERVAL resources.
+        $intervalCount = (int) ($indexed / self::PROGRESS_LOG_INTERVAL);
+        if ($intervalCount <= $this->lastProgressLog) {
+            return;
+        }
+        $this->lastProgressLog = $intervalCount;
+
+        $percent = $total > 0 ? round(($indexed / $total) * 100, 1) : 0;
+        $memory = round(memory_get_usage(true) / 1024 / 1024, 1);
+
+        $this->logger->info(
+            'Indexing {resource_type}: {indexed}/{total} ({percent}%). ' // @translate
+                . 'Memory: {memory} MB.',
+            [
+                'resource_type' => $resourceType,
+                'indexed' => $indexed,
+                'total' => $total,
+                'percent' => $percent,
+                'memory' => $memory,
+            ]
         );
     }
 }

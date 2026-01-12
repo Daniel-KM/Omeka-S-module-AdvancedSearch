@@ -14,10 +14,13 @@ $resources = $response->getResources($resourceType);
 if (!$resources) return;
 
 $plugins = $this->getHelperPluginManager();
+$escape = $plugins->get('escapeHtml');
 $assetUrl = $plugins->get('assetUrl');
 $translate = $plugins->get('translate');
 $hyperlink = $plugins->get('hyperlink');
+$easyMeta = $plugins->get('easyMeta');
 $thumbnail = $plugins->get('thumbnail');
+$escapeAttr = $plugins->get('escapeHtmlAttr');
 $escapeValueOrGetHtml = $plugins->get('escapeValueOrGetHtml');
 
 $selectionButton = $site && $plugins->has('selectionButton') && $this->siteSetting('selection_append_items_browse_individual') ? $plugins->get('selectionButton') : null;
@@ -50,6 +53,10 @@ $defaultThumbnail = $allThumbnail
     : '';
 
 $thumbnailType = $searchConfig->subSetting('results', 'thumbnail_type', 'medium');
+
+$properties = $searchConfig->subSetting('results', 'properties', []);
+$showProperties = !empty($properties);
+$showLocale = (bool) $setting('show_locale_label');
 ?>
 
 <ul class="resource-list search-result-list<?= $gridListMode === 'list_only' ? ' list' : ($gridListMode === 'grid_only' ? ' grid' : '') ?>">
@@ -77,6 +84,39 @@ $thumbnailType = $searchConfig->subSetting('results', 'thumbnail_type', 'medium'
             <div class="description">
                 <?= $escapeValueOrGetHtml($body, $allowHtml) ?>
             </div>
+            <?php endif; ?>
+            <?php if ($showProperties): ?>
+            <dl class="properties">
+                <?php foreach ($properties as $property):
+                    $values = $resource->value($property, ['all' => true, 'lang' => $langValue]);
+                    if ($values): ?>
+                <div class="property">
+                    <dt><?= $escape($translate($easyMeta->propertyLabel($property))) ?></dt>
+                    <?php foreach ($values as $value):
+                        $valueType = $value->type();
+                        $valueLang = $value->lang();
+                        $class = ['value'];
+                        if ('resource' === $valueType || strpos($valueType, 'resource') !== false) {
+                            $class[] = 'resource';
+                            $class[] = $escape($value->valueResource()->resourceName());
+                        } elseif ('uri' === $valueType) {
+                            $class[] = 'uri';
+                        }
+                    ?>
+                    <dd class="<?= implode(' ', $class) ?>"<?= $valueLang ? ' lang="' . $escapeAttr($valueLang) . '"' : '' ?>>
+                        <?php if ($showLocale && $valueLang): ?>
+                        <span class="language"><?= $escape($valueLang) ?></span>
+                        <?php endif; ?>
+                        <span class="value-content"><?= $value->asHtml() ?></span>
+                        <?php if (!$value->isPublic()): ?>
+                        <span class="o-icon-private" role="img" title="<?= $escapeAttr($translate('Private')) ?>" aria-label="<?= $escapeAttr($translate('Private')) ?>"></span>
+                        <?php endif; ?>
+                    </dd>
+                    <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
+                <?php endforeach; ?>
+            </dl>
             <?php endif; ?>
         </div>
         <?php if ($selectionButton): ?>

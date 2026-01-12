@@ -43,6 +43,13 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
             $data['query_filter'] = array_filter($query, fn ($v) => $v !== '' && $v !== [] && $v !== null);
         }
 
+        // Convert properties string to array.
+        if (empty($data['properties'])) {
+            $data['properties'] = [];
+        } elseif (!is_array($data['properties'])) {
+            $data['properties'] = array_filter(array_map('trim', explode("\n", str_replace(["\r\n", "\r"], "\n", $data['properties']))));
+        }
+
         $block->setData($data);
     }
 

@@ -930,6 +930,23 @@ class SearchConfigConfigureForm extends Form
                 ],
             ])
             ->add([
+                'name' => 'properties',
+                'type' => OmekaElement\ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Properties to display for each result', // @translate
+                    'info' => 'List of property terms to display below each result, one by line.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'properties',
+                    'rows' => 5,
+                    'placeholder' => <<<'TXT'
+                        dcterms:creator
+                        dcterms:date
+                        dcterms:subject
+                        TXT,
+                ],
+            ])
+            ->add([
                 'name' => 'facets',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [

@@ -22,6 +22,7 @@ $hyperlink = $plugins->get('hyperlink');
         'template' => $displayResults ? 'search/search' :  null,
         'skip_form_action' => $skipFormAction,
         'request' => $request,
+        'properties' => $properties ?? [],
     ]) ?>
     <?php if ($link): ?>
     <div class="block-search-link">

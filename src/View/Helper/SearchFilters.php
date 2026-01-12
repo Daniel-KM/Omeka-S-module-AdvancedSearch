@@ -738,7 +738,8 @@ class SearchFilters extends AbstractHelper
                         if ($propertyLabel) {
                             $fieldLabel[] = $translate($propertyLabel);
                         } else {
-                            $fieldLabel[] = $translate('Unknown field'); // @translate
+                            // Use field name as fallback instead of "Unknown field".
+                            $fieldLabel[] = $queryField;
                         }
                     }
                 }

@@ -23,25 +23,8 @@
         "facet",
         "solr"
     ],
-    "repositories": [
-        {
-            "type": "package",
-            "package": {
-                "name": "devbridge/jquery-autocomplete",
-                "version": "1.4.11",
-                "type": "omeka-addon-asset",
-                "dist": {
-                    "type": "file",
-                    "url": "https://github.com/Daniel-KM/Omeka-S-module-AdvancedSearch/releases/download/3.4.30/jquery.autocomplete.min.js",
-                    "reference": ""
-                }
-            }
-        }
-    ],
     "require": {
-        "devbridge/jquery-autocomplete": "^1.4.11",
-        "laminas/laminas-feed": "^2.18",
-        "oomphinc/composer-installers-extender": "^2.0"
+        "laminas/laminas-feed": "^2.18"
     },
     "replace": {
         "laminas/laminas-escaper": "*",
@@ -59,17 +42,10 @@
     "config": {
         "platform": {"php": "7.4"},
         "allow-plugins": {
-            "composer/installers": true,
-            "oomphinc/composer-installers-extender": true
+            "composer/installers": true
         }
     },
     "extra": {
-        "installer-types": ["omeka-addon-asset"],
-        "installer-paths": {
-            "asset/vendor/{$name}/": [
-                "type:omeka-addon-asset"
-            ]
-        },
-        "installer-name" : "AdvancedSearch"
+        "installer-name": "AdvancedSearch"
     }
 }

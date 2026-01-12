@@ -33,6 +33,7 @@ $useInputNumber = $element->getUseInputNumber();
         $attributesTo = ['name' => sprintf('%s[%s]', $name, $keyTo), 'type' => 'range', 'value' => $value[$keyTo] ?? $attributes['max'] ?? '', 'class' => 'range-slider-to'] + $attributes;
         ?>
     <div class="range-sliders">
+        <div class="range-progress"></div>
         <input <?= $formInput->createAttributesString($attributesFrom) ?>/>
         <input <?= $formInput->createAttributesString($attributesTo) ?>/>
     </div>

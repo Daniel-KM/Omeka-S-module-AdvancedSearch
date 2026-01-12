@@ -46,6 +46,19 @@
         height: 36px;
     }
 
+    /* Quick filter next to main search field */
+    .form-search select.quick-filter {
+        max-width: 100%;
+    }
+    .form-search .quick-filter,
+    .form-search .quick-filter + .chosen-container {
+        min-width: 120px;
+        max-width: 200px;
+    }
+    .form-search .quick-filter + .chosen-container .chosen-single {
+        height: 36px;
+    }
+
     /* Search form filters */
 
     #search-filters {

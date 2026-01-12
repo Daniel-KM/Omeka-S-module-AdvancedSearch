@@ -166,7 +166,8 @@ class MainSearchForm extends Form
             ->setAttributes([
                 'id' => $formId,
                 'class' => 'search-form form-search'
-                    . ($hasFormVariant ? ' form-search-' . $this->variant : ''),
+                    . ($hasFormVariant ? ' form-search-' . $this->variant : '')
+                    . ' ' . $this->getAttribute('class'),
             ]);
 
         // Omeka adds a csrf automatically in \Omeka\Form\Initializer\Csrf.
@@ -438,6 +439,50 @@ class MainSearchForm extends Form
     }
 
     /**
+     * Add a quick filter select next to the main search field.
+     */
+    protected function appendQuickFilter(string $field, ?string $label = null, ?array $predefinedValues = null): self
+    {
+        // Use predefined values or fetch from search engine.
+        if ($predefinedValues) {
+            $values = $predefinedValues;
+        } else {
+            $filter = [
+                'field' => $field,
+                'label' => $label ?: ' ',
+                'type' => 'Select',
+                'options' => [],
+                'attributes' => $this->elementAttributes,
+            ];
+            $values = $this->listValues($filter);
+        }
+
+        if (!$values) {
+            return $this;
+        }
+
+        $element = new CommonElement\OptionalSelect($field);
+        $element
+            ->setLabel($label ?: ' ')
+            ->setOptions([
+                'value_options' => $values + ['' => ''],
+                'empty_option' => $values[''] ?? '',
+            ])
+            ->setAttributes([
+                'id' => 'quick-filter',
+                // No chosen select here: it should be a short filter.
+                'class' => 'quick-filter',
+                'data-placeholder' => $label ?: ' ',
+            ] + $this->elementAttributes)
+        ;
+
+        // Simplify css.
+        $this->setAttribute('class', trim($this->getAttribute('class') . ' with-quick-filter'));
+
+        return $this->add($element);
+    }
+
+    /**
      * Add a default input element, represented as a text input.
      */
     protected function searchElement(array $filter): ?ElementInterface
@@ -693,6 +738,23 @@ class MainSearchForm extends Form
             // Key "fulltext_search" is normally removed.
             : ($filter['rft'] ?? $filter['fulltext_search'] ?? null);
         $this->appendRecordOrFullText($recordOrFullText);
+
+        // Add the quick filter select next to the main search field.
+        // Include quick filter in 'simple' variant, but not 'csrf'.
+        // For advanced form, check the option 'quick_filter_advanced'.
+        $quickFilter = $this->variant === 'csrf'
+            ? null
+            : ($filter['quick_filter'] ?? $this->formSettings['form']['quick_filter'] ?? null);
+        if ($quickFilter) {
+            // On advanced form (no variant), only show if option is enabled.
+            $skipOnAdvanced = !$this->variant
+                && empty($this->formSettings['form']['quick_filter_advanced']);
+            if (!$skipOnAdvanced) {
+                $quickFilterLabel = $filter['quick_filter_label'] ?? $this->formSettings['form']['quick_filter_label'] ?? null;
+                $quickFilterValues = $filter['quick_filter_values'] ?? $this->formSettings['form']['quick_filter_values'] ?? null;
+                $this->appendQuickFilter($quickFilter, $quickFilterLabel, $quickFilterValues);
+            }
+        }
 
         $element = new Element\Search('q');
         $element
@@ -1091,13 +1153,13 @@ class MainSearchForm extends Form
             return array_combine($valueOptions, $valueOptions);
         }
 
+        // For speed, don't get available fields with variants "simple" and "csrf".
         $availableFields = in_array($this->variant, ['simple', 'csrf']) ? [] : $this->getAvailableFields();
         if (!$availableFields) {
             return [];
         }
 
         // Check specific fields against all available fields.
-        // For speed, don't get available fields with variants "simple" and "csrf".
         // TODO Check the required options for variant "quick" to skip available fields early.
         $field = $filter['field'];
         $nativeField = $availableFields[$field]['from'] ?? null;

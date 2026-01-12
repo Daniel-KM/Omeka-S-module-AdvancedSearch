@@ -483,6 +483,61 @@ class SearchConfigConfigureForm extends Form
                 ],
             ])
             ->add([
+                'name' => 'quick_filter',
+                'type' => CommonElement\OptionalSelect::class,
+                'options' => [
+                    'label' => 'Quick filter next to main search field', // @translate
+                    'value_options' => $engineAdapter
+                        ? $engineAdapter->getAvailableFieldsForSelect()
+                        : [],
+                    'empty_option' => '',
+                ],
+                'attributes' => [
+                    'id' => 'form_quick_filter',
+                    'class' => 'chosen-select',
+                    'data-placeholder' => 'Set field or index…', // @translate
+                ],
+            ])
+            ->add([
+                'name' => 'quick_filter_label',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Quick filter label', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'form_quick_filter_label',
+                ],
+            ])
+            ->add([
+                'name' => 'quick_filter_values',
+                'type' => OmekaElement\ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Quick filter predefined values', // @translate
+                    'info' => 'If empty, all values are fetched from the index.', // @translate
+                    'as_key_value' => true,
+                ],
+                'attributes' => [
+                    'id' => 'form_quick_filter_values',
+                    'rows' => 5,
+                    'placeholder' => <<<TXT
+                        = All
+                        Object = Objects
+                        Person = Persons
+                        Place = Places
+                        TXT,
+                ],
+            ])
+            ->add([
+                'name' => 'quick_filter_advanced',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Display quick filter on advanced form', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'form_quick_filter_advanced',
+                ],
+            ])
+            ->add([
                 'name' => 'filters',
                 'type' => Element\Collection::class,
                 'options' => [

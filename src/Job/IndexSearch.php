@@ -544,14 +544,6 @@ class IndexSearch extends AbstractJob
         array $totals,
         float $timeStart
     ): void {
-        if (empty($resources)) {
-            $this->logger->warn(
-                'Search index #{search_engine_id} ("{name}"): the indexing was stopped. Nothing was indexed.', // @translate
-                ['search_engine_id' => $searchEngine->id(), 'name' => $searchEngine->name()]
-            );
-            return;
-        }
-
         $totalResults = [];
         foreach ($resourceTypes as $resourceType) {
             $totalResults[] = new PsrMessage(
@@ -561,15 +553,23 @@ class IndexSearch extends AbstractJob
         }
 
         /** @var \Omeka\Entity\Resource $resource */
-        $resource = array_pop($resources);
+        $resource = $resources ? array_pop($resources) : null;
+
+        if ($resource) {
+            $this->logger->warn(
+                'Last indexed resource: {resource_type} #{resource_id}.', // @translate
+                [
+                    'resource_type' => $resource->resourceName(),
+                    'resource_id' => $resource->id(),
+                ]
+            );
+        }
 
         $this->logger->warn(
-            'Search index #{search_engine_id} ("{name}"): the indexing was stopped. Last indexed resource: {resource_type} #{resource_id}; {results}. Execution time: {duration} seconds.', // @translate
+            'Search index #{search_engine_id} ("{name}"): the indexing was stopped. {results}. Execution time: {duration} seconds.', // @translate
             [
                 'search_engine_id' => $searchEngine->id(),
                 'name' => $searchEngine->name(),
-                'resource_type' => $resource->resourceName(),
-                'resource_id' => $resource->id(),
                 'results' => implode('; ', $totalResults),
                 'duration' => (int) (microtime(true) - $timeStart),
                 // 'memory_usage' => round(memory_get_usage(true) / 1024 / 1024, 2),

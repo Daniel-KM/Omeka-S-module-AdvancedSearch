@@ -346,7 +346,7 @@ class MainSearchForm extends Form
                     'name' => 'form-reset',
                     'type' => Element\Button::class,
                     'options' => [
-                        'label' => $this->formSettings['form']['label_reset'] ?? 'Reset fields', // @translate
+                        'label' => $this->formSettings['form']['label_reset'] ?? 'Reset', // @translate
                         'label_attributes' => [
                             'class' => 'search-reset',
                         ],
@@ -537,7 +537,7 @@ class MainSearchForm extends Form
                 <button type="button" name="plus" class="search-filter-action search-filter-plus add-value button" aria-label="%2$s" value=""></button>
                 <legend hidden="hidden">
                 HTML,
-                $this->escapeHtml->__invoke($filter['label']),
+                $this->escapeHtml->__invoke($this->translator->translate($filter['label'])),
                 $this->translator->translate('Add a filter') // @translate
             );
             $element

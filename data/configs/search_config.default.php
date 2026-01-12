@@ -338,7 +338,7 @@ return [
             'button_submit' => true,
             'label_submit' => $translate('Search'),
             'button_reset' => false,
-            'label_reset' => $translate('Reset fields'),
+            'label_reset' => $translate('Reset'),
             'attribute_form' => false,
 
             'rft' => null,

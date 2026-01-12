@@ -6,7 +6,7 @@
  * Improve search with new fields, auto-suggest, filters, facets, specific pages, etc.
  *
  * @copyright BibLibre, 2016-2017
- * @copyright Daniel Berthereau, 2017-2025
+ * @copyright Daniel Berthereau, 2017-2026
  * @license http://www.cecill.info/licences/Licence_CeCILL_V2.1-en.txt
  *
  * This software is governed by the CeCILL license under French law and abiding
@@ -66,20 +66,19 @@ class Module extends AbstractModule
     {
         // During upgrade of Common, the service EasyMeta is not available.
         // So load it in any case, else the module AdvancedSearch should be
-        // disabled directly in datablase or filesystem to fix upgrade.
+        // disabled directly in database or filesystem to fix upgrade.
         // It allows to finish the upgrade.
-        if (class_exists('Common\Stdlib\EasyMeta', false)) {
-            return [];
+        // Similarly, protect navigation against missing routes during upgrade.
+        $config = $this->getNavigationProtectionServiceConfig();
+
+        if (!class_exists('Common\Stdlib\EasyMeta', false)) {
+            require_once dirname(__DIR__) . '/Common/src/Stdlib/EasyMeta.php';
+            require_once dirname(__DIR__) . '/Common/src/Service/Stdlib/EasyMetaFactory.php';
+
+            $config['factories']['Common\EasyMeta'] = \Common\Service\Stdlib\EasyMetaFactory::class;
         }
 
-        require_once dirname(__DIR__) . '/Common/src/Stdlib/EasyMeta.php';
-        require_once dirname(__DIR__) . '/Common/src/Service/Stdlib/EasyMetaFactory.php';
-
-        return [
-            'factories' => [
-                'Common\EasyMeta' => \Common\Service\Stdlib\EasyMetaFactory::class,
-            ],
-        ];
+        return $config;
     }
 
     public function onBootstrap(MvcEvent $event): void

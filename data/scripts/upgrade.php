@@ -2079,3 +2079,10 @@ if (version_compare($oldVersion, '3.4.53', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.55', '<')) {
+    $message = new PsrMessage(
+        'New options were added: quick filter on advanced form, specific properties in results, and auto-scroll to results.' // @translate
+    );
+    $messenger->addSuccess($message);
+}

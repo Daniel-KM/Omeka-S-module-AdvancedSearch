@@ -718,6 +718,11 @@ trait TraitFormAdapterClassic
             $query->setFacets($searchConfigSettings['facet']['facets']);
         }
 
+        // Set form filters configuration for access in the querier.
+        if (!empty($searchConfigSettings['form']['filters'])) {
+            $query->setFormFilters($searchConfigSettings['form']['filters']);
+        }
+
         $query->setOption('facet_list', $searchConfigSettings['facet']['list'] ?? 'available');
 
         $eventManager = $services->get('Application')->getEventManager();

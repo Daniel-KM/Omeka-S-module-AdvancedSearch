@@ -1044,6 +1044,23 @@ class InternalQuerier extends AbstractQuerier
                 if (!$field) {
                     break;
                 }
+
+                // Check if first_digits is enabled for this form filter.
+                // When enabled, use range filter (>= value AND < value+1).
+                $formFilterData = $this->query->getFormFilter($fieldName);
+                $useFirstDigits = false;
+                if ($formFilterData) {
+                    $filterType = $formFilterData['type'] ?? 'Text';
+                    $isRangeType = in_array($filterType, ['RangeDouble', 'Range', 'Number']);
+                    $firstDigitsDefault = $isRangeType;
+                    $useFirstDigits = ($formFilterData['first_digits']
+                        ?? $formFilterData['options']['first_digits']
+                        ?? $firstDigitsDefault) === true
+                        || in_array($formFilterData['first_digits']
+                            ?? $formFilterData['options']['first_digits']
+                            ?? ($firstDigitsDefault ? 'true' : 'false'), [1, '1', 'true'], true);
+                }
+
                 $fieldQueryArgs = $this->query->getFieldQueryArgs($fieldName);
                 foreach ($values as $value) {
                     if (is_array($value)) {
@@ -1081,7 +1098,21 @@ class InternalQuerier extends AbstractQuerier
                             ];
                         }
                     } else {
-                        if ($fieldQueryArgs) {
+                        // Use range filter for first_digits numeric values.
+                        if ($useFirstDigits && is_numeric($value)) {
+                            $this->args['filter'][] = [
+                                'join' => 'and',
+                                'field' => $field,
+                                'type' => '≥',
+                                'val' => (string) $value,
+                            ];
+                            $this->args['filter'][] = [
+                                'join' => 'and',
+                                'field' => $field,
+                                'type' => '<',
+                                'val' => (string) ((int) $value + 1),
+                            ];
+                        } elseif ($fieldQueryArgs) {
                             $this->args['filter'][] = [
                                 'join' => $fieldQueryArgs['join'] ?? 'and',
                                 'field' => $field,

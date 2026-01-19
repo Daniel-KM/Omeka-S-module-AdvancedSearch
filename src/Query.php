@@ -140,6 +140,11 @@ class Query implements JsonSerializable
     /**
      * @var array
      */
+    protected $formFilters = [];
+
+    /**
+     * @var array
+     */
     protected $suggestOptions = [
         'suggester' => 0,
         'direct' => false,
@@ -577,6 +582,25 @@ class Query implements JsonSerializable
     public function getFacet(string $facetName): ?array
     {
         return $this->facets[$facetName] ?? null;
+    }
+
+    /**
+     * Set the list of form filters with their configuration.
+     *
+     * Used to access filter options like "first_digits" in the querier.
+     */
+    public function setFormFilters(array $formFilters): self
+    {
+        $this->formFilters = $formFilters;
+        return $this;
+    }
+
+    /**
+     * Get configuration for a form filter.
+     */
+    public function getFormFilter(string $filterName): ?array
+    {
+        return $this->formFilters[$filterName] ?? null;
     }
 
     public function setActiveFacets(array $activeFacets): self

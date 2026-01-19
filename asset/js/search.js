@@ -766,6 +766,57 @@ var Search = (function() {
             return self;
         };
 
+        /**
+         * Clear range values at extremes before form submission.
+         *
+         * When the slider is at the minimum, don't filter by "from" (any start).
+         * When the slider is at the maximum, don't filter by "to" (any end).
+         * This provides better UX: user hasn't moved the slider = no filter.
+         *
+         * Note: For <input type="range">, setting value='' resets to min,
+         * so we remove the name attribute to exclude from form submission.
+         *
+         * @todo Backend: sort items without date values last when no filter is active.
+         * @todo Backend: exclude items without date when filter is active, include when not.
+         * @todo Add admin option to enable/disable this behavior per field.
+         */
+        self.clearExtremesBeforeSubmit = function(rangeDouble) {
+            if (!rangeDouble) {
+                return self;
+            }
+
+            const inputFrom = rangeDouble.querySelector('.range-numeric-from');
+            const inputTo = rangeDouble.querySelector('.range-numeric-to');
+            const sliderFrom = rangeDouble.querySelector('.range-slider-from');
+            const sliderTo = rangeDouble.querySelector('.range-slider-to');
+
+            // Get min/max from slider or input attributes.
+            const refElement = sliderFrom || inputFrom;
+            if (!refElement) {
+                return self;
+            }
+
+            const min = parseFloat(refElement.min);
+            const max = parseFloat(refElement.max);
+
+            // Remove "from" from submission if it equals min.
+            // For range inputs, we remove the name attribute (value='' doesn't work).
+            const fromValue = parseFloat(sliderFrom ? sliderFrom.value : (inputFrom ? inputFrom.value : NaN));
+            if (!isNaN(fromValue) && !isNaN(min) && fromValue === min) {
+                if (sliderFrom) sliderFrom.removeAttribute('name');
+                if (inputFrom && inputFrom.name) inputFrom.removeAttribute('name');
+            }
+
+            // Remove "to" from submission if it equals max.
+            const toValue = parseFloat(sliderTo ? sliderTo.value : (inputTo ? inputTo.value : NaN));
+            if (!isNaN(toValue) && !isNaN(max) && toValue === max) {
+                if (sliderTo) sliderTo.removeAttribute('name');
+                if (inputTo && inputTo.name) inputTo.removeAttribute('name');
+            }
+
+            return self;
+        };
+
         return self;
     })();
 
@@ -896,6 +947,63 @@ $(document).ready(function() {
         $('.range-numeric-to').on('input', (event) => Search.rangeSliderDouble.controlNumericTo(event.target));
         $('.range-slider-from').on('input', (event) => Search.rangeSliderDouble.controlSliderFrom(event.target));
         $('.range-slider-to').on('input', (event) => Search.rangeSliderDouble.controlSliderTo(event.target));
+
+        // Clear extreme values before form submission (filters and facets).
+        // When slider is at min, don't filter by "from"; at max, don't filter by "to".
+        $('#search-form, #search-filters-form, #facets-form, .search-facets form').on('submit', function() {
+            $(this).find('.range-double').each(function() {
+                Search.rangeSliderDouble.clearExtremesBeforeSubmit(this);
+            });
+        });
+
+        // Handle range-double submit button click (for link/js mode with Ok button).
+        $('.range-double-submit').on('click', function(e) {
+            const rangeDouble = $(this).closest('.range-double');
+            if (!rangeDouble.length) return;
+
+            // Check if using direct link mode (data-url on inputs).
+            const inputFrom = rangeDouble.find('.range-numeric-from, .range-slider-from').filter('[data-url]').first();
+            const inputTo = rangeDouble.find('.range-numeric-to, .range-slider-to').filter('[data-url]').first();
+
+            if (!inputFrom.length && !inputTo.length) {
+                // Not direct link mode, let form submission handle it.
+                return;
+            }
+
+            e.preventDefault();
+
+            // Get min/max from attributes.
+            const refEl = rangeDouble.find('.range-slider-from, .range-numeric-from')[0];
+            const min = parseFloat(refEl?.min);
+            const max = parseFloat(refEl?.max);
+            const fromVal = parseFloat(rangeDouble.find('.range-numeric-from').val() || rangeDouble.find('.range-slider-from').val());
+            const toVal = parseFloat(rangeDouble.find('.range-numeric-to').val() || rangeDouble.find('.range-slider-to').val());
+
+            // Build URL: use "to" input URL as base, modify from/to params.
+            let url = inputTo.data('url') || inputFrom.data('url');
+            if (!url) return;
+
+            // Parse URL to modify query parameters.
+            const urlObj = new URL(url, window.location.origin);
+            const facetName = inputFrom.attr('name')?.match(/facet\[([^\]]+)\]/)?.[1]
+                || inputTo.attr('name')?.match(/facet\[([^\]]+)\]/)?.[1];
+
+            if (facetName) {
+                // Only add from/to if not at extremes.
+                if (!isNaN(fromVal) && !isNaN(min) && fromVal !== min) {
+                    urlObj.searchParams.set(`facet[${facetName}][from]`, fromVal);
+                } else {
+                    urlObj.searchParams.delete(`facet[${facetName}][from]`);
+                }
+                if (!isNaN(toVal) && !isNaN(max) && toVal !== max) {
+                    urlObj.searchParams.set(`facet[${facetName}][to]`, toVal);
+                } else {
+                    urlObj.searchParams.delete(`facet[${facetName}][to]`);
+                }
+            }
+
+            window.location.href = urlObj.toString();
+        });
     }
 
     /**********

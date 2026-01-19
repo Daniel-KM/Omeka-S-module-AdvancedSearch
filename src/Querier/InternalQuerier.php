@@ -1544,22 +1544,14 @@ class InternalQuerier extends AbstractQuerier
                 ->setQuery($referenceQuery)
                 ->setOptions($referenceOptions)
                 ->list();
+            // When first_digits is enabled, Reference already returns aggregated
+            // year values at the SQL level, so no PHP aggregation is needed.
             foreach (array_keys($referenceMetadata) as $facetName) {
-                $firstDigits = $referenceOptions['meta_options'][$facetName]['first_digits'] ?? false;
                 foreach ($values[$facetName]['o:references'] ?? [] as $value => $count) {
-                    // Aggregate by first digits (year) when option is enabled.
-                    $aggregatedValue = $firstDigits ? $this->extractFirstDigits($value) : $value;
-                    if ($aggregatedValue === null) {
-                        continue;
-                    }
-                    if (empty($facetCountsByField[$facetName][$aggregatedValue])) {
-                        $facetCountsByField[$facetName][$aggregatedValue] = [
-                            'value' => $aggregatedValue,
-                            'count' => $count,
-                        ];
-                    } else {
-                        $facetCountsByField[$facetName][$aggregatedValue]['count'] += $count;
-                    }
+                    $facetCountsByField[$facetName][$value] = [
+                        'value' => $value,
+                        'count' => $count,
+                    ];
                 }
             }
             $this->response->setFacetCounts(array_map('array_values', $facetCountsByField));
@@ -1586,49 +1578,25 @@ class InternalQuerier extends AbstractQuerier
                 ->setQuery($referenceQuery)
                 ->setOptions($referenceOptions)
                 ->list();
+            // When first_digits is enabled, Reference already returns aggregated
+            // year values at the SQL level. Here we merge counts across resource
+            // types when querying multiple types separately.
             foreach (array_keys($referenceMetadata) as $facetName) {
-                $firstDigits = $referenceOptions['meta_options'][$facetName]['first_digits'] ?? false;
                 foreach ($values[$facetName]['o:references'] ?? [] as $value => $count) {
-                    // Aggregate by first digits (year) when option is enabled.
-                    $aggregatedValue = $firstDigits ? $this->extractFirstDigits($value) : $value;
-                    if ($aggregatedValue === null) {
-                        continue;
-                    }
-                    if (empty($facetCountsByField[$facetName][$aggregatedValue])) {
-                        $facetCountsByField[$facetName][$aggregatedValue] = [
-                            'value' => $aggregatedValue,
+                    if (empty($facetCountsByField[$facetName][$value])) {
+                        $facetCountsByField[$facetName][$value] = [
+                            'value' => $value,
                             'count' => $count,
                         ];
                     } else {
-                        $facetCountsByField[$facetName][$aggregatedValue]['count'] += $count;
+                        // Merge counts from multiple resource types.
+                        $facetCountsByField[$facetName][$value]['count'] += $count;
                     }
                 }
             }
         }
 
         $this->response->setFacetCounts(array_map('array_values', $facetCountsByField));
-    }
-
-    /**
-     * Extract first digits from a value (typically a year from a date).
-     *
-     * Handles formats like "2014-10-12", "-500", "2014", etc.
-     * Returns null if the value doesn't start with digits or a minus sign.
-     *
-     * @param string|int|float $value
-     * @return string|null The extracted digits (e.g., "2014" from "2014-10-12") or null.
-     */
-    protected function extractFirstDigits($value): ?string
-    {
-        $value = (string) $value;
-        if ($value === '') {
-            return null;
-        }
-        // Match optional minus sign followed by digits at the start.
-        if (preg_match('/^(-?\d+)/', $value, $matches)) {
-            return $matches[1];
-        }
-        return null;
     }
 
     /**

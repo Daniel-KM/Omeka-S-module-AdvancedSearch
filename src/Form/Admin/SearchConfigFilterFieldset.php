@@ -14,6 +14,8 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
         // These fields may be overridden by the available fields.
         $availableFields = $this->getAvailableFields();
 
+        // Field order is aligned with SearchConfigFacetFieldset:
+
         $this
             ->setAttribute('id', 'search-config-filter-form')
             ->setAttribute('class', 'form-fieldset-element form-search-config-filter')
@@ -195,7 +197,16 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 'name' => 'options',
                 'options' => [
                     'label' => 'Options', // @translate
-                    'info' => 'List of specific options according to types. Omeka and Laminas options are accepted, for example `empty_option = ""`, `checked_value = "yes"`, `autosuggest = true`, `value_options.first = "First"`, `first_digits = false`.', // @translate
+                    'info' => <<<'HTML'
+                        List of specific options, in ini format, for example:
+                        `empty_option = ""`,
+                        `checked_value = "yes"`,
+                        `autosuggest = true`,
+                        `value_options.first = "First"`,
+                        `first_digits = false`.
+                        Omeka and Laminas options are accepted.
+                        Note: "min", "max", "step" should be set in "Html attributes".
+                        HTML, // @translate
                     'ini_typed_mode' => true,
                 ],
                 'attributes' => [
@@ -209,7 +220,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 'name' => 'attributes',
                 'options' => [
                     'label' => 'Html attributes', // @translate
-                    'info' => 'Attributes to add to the input field, for example `class = "my-specific-class"`, or `min = 1454` for an input Number, or max, step, placeholder, data, etc.', // @translate
+                    'info' => 'Attributes to add to the input field, for example `class = "my-specific-class"`, or `min = 1454` for Number/Range/RangeDouble, or max, step, placeholder, data, etc.', // @translate
                     'ini_typed_mode' => true,
                 ],
                 'attributes' => [

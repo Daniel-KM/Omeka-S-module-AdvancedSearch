@@ -12,7 +12,9 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
     public function init(): void
     {
         // These fields may be overridden by the available fields.
-        $availableFields = $this->getAvailableFacetFields();
+        $availableFacetFields = $this->getAvailableFacetFields();
+
+        // Field order is aligned with SearchConfigFilterFieldset:
 
         $this
             ->setAttribute('id', 'search-config-facet-form')
@@ -25,7 +27,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 'options' => [
                     'label' => 'Field', // @translate
                     'info' => 'The field is an index available in the search engine. The internal search engine supports property terms and aggregated fields (date, author, etc).', // @translate
-                    'value_options' => $availableFields,
+                    'value_options' => $availableFacetFields,
                     'empty_option' => '',
                 ],
                 'attributes' => [
@@ -35,76 +37,6 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                     'data-placeholder' => 'Set field or index…', // @translate
                 ],
             ])
-
-            ->add([
-                'name' => 'language_site',
-                'type' => CommonElement\OptionalRadio::class,
-                'options' => [
-                    'label' => 'Limit languages of facets (internal querier)', // @ŧranslate
-                    'value_options' => [
-                        '' => 'No limit', // @translate
-                        'site' => 'Limit facets to site language or empty language', // @ŧranslate
-                        'site_setting' => 'Use site setting "Filter values based on site locale"', // @translate
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'facet_language_site',
-                    'required' => false,
-                    'value' => '',
-                ],
-            ])
-            ->add([
-                'name' => 'languages',
-                'type' => CommonElement\ArrayText::class,
-                'options' => [
-                    'label' => 'Limit facets to specific languages (internal querier)', // @translate
-                    'info' => <<<'TXT'
-                        Generally, facets are translated in the view, but in some cases, facet values may be translated directly in a multivalued property. Use "|" to separate multiple languages. Use a trailing "|" for values without language. When fields with languages (like subjects) and fields without language (like date) are facets, the empty language must be set to get results.
-                        TXT, // @translate
-                    'value_separator' => '|',
-                ],
-                'attributes' => [
-                    'id' => 'facet_languages',
-                    'placeholder' => 'fra|way|apy|',
-                ],
-            ])
-
-            ->add([
-                'name' => 'order',
-                'type' => CommonElement\OptionalSelect::class,
-                'options' => [
-                    'label' => 'Order', // @translate
-                    'value_options' => [
-                        'alphabetic asc' => 'Alphabetic (default)', // @ŧranslate
-                        'alphabetic desc' => 'Alphabetic descendant', // @ŧranslate
-                        'total desc' => 'Total', // @ŧranslate
-                        'total asc' => 'Total ascendant', // @ŧranslate
-                        'total_alpha desc' => 'Total then alphabetic for hidden values', // @ŧranslate
-                        'values asc' => 'Values (listed below)', // @ŧranslate
-                        'values desc' => 'Values descendant', // @ŧranslate
-                    ],
-                    'empty_option' => '',
-                ],
-                'attributes' => [
-                    'id' => 'facet_order',
-                    'multiple' => false,
-                    'class' => 'chosen-select',
-                    'data-placeholder' => 'Select order…', // @translate
-                ],
-            ])
-            ->add([
-                'name' => 'limit',
-                'type' => Element\Number::class,
-                'options' => [
-                    'label' => 'Maximum number of facets', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'facet_limit',
-                    'required' => false,
-                    'value' => '100',
-                ],
-            ])
-
             ->add([
                 'name' => 'label',
                 'type' => Element\Text::class,
@@ -160,15 +92,85 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
             ])
 
             ->add([
+                'name' => 'language_site',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Limit languages of facets (internal querier)', // @translate
+                    'value_options' => [
+                        '' => 'No limit', // @translate
+                        'site' => 'Limit facets to site language or empty language', // @translate
+                        'site_setting' => 'Use site setting "Filter values based on site locale"', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'facet_language_site',
+                    'required' => false,
+                    'value' => '',
+                ],
+            ])
+            ->add([
+                'name' => 'languages',
+                'type' => CommonElement\ArrayText::class,
+                'options' => [
+                    'label' => 'Limit facets to specific languages (internal querier)', // @translate
+                    'info' => <<<'TXT'
+                        Use "|" to separate multiple languages. Use a trailing "|" for values without language. When fields with languages (like subjects) and fields without language (like date) are facets, the empty language must be set to get results.
+                        TXT, // @translate
+                    'value_separator' => '|',
+                ],
+                'attributes' => [
+                    'id' => 'facet_languages',
+                    'placeholder' => 'fra|way|apy|',
+                ],
+            ])
+            ->add([
+                'name' => 'order',
+                'type' => CommonElement\OptionalSelect::class,
+                'options' => [
+                    'label' => 'Order', // @translate
+                    'value_options' => [
+                        'alphabetic asc' => 'Alphabetic (default)', // @translate
+                        'alphabetic desc' => 'Alphabetic descendant', // @translate
+                        'total desc' => 'Total', // @translate
+                        'total asc' => 'Total ascendant', // @translate
+                        'total_alpha desc' => 'Total then alphabetic for hidden values', // @translate
+                        'values asc' => 'Values (listed below)', // @translate
+                        'values desc' => 'Values descendant', // @translate
+                    ],
+                    'empty_option' => '',
+                ],
+                'attributes' => [
+                    'id' => 'facet_order',
+                    'multiple' => false,
+                    'class' => 'chosen-select',
+                    'data-placeholder' => 'Select order…', // @translate
+                ],
+            ])
+            ->add([
+                'name' => 'limit',
+                'type' => Element\Number::class,
+                'options' => [
+                    'label' => 'Maximum number of facets', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'facet_limit',
+                    'required' => false,
+                    'value' => '100',
+                ],
+            ])
+
+            // Facet-specific fields.
+
+            ->add([
                 'name' => 'state',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [
                     'label' => 'Display of facets', // @translate
                     'value_options' => [
-                        'static' => 'Static', // @ŧranslate
-                        'expand' => 'Expanded', // @ŧranslate
-                        'collapse' => 'Collapsed', // @ŧranslate
-                        'collapse_unless_set' => 'Collapsed unless a facet is set', // @ŧranslate
+                        'static' => 'Static', // @translate
+                        'expand' => 'Expanded', // @translate
+                        'collapse' => 'Collapsed', // @translate
+                        'collapse_unless_set' => 'Collapsed unless a facet is set', // @translate
                     ],
                 ],
                 'attributes' => [
@@ -200,6 +202,9 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                     'required' => false,
                 ],
             ])
+
+            // Common fields continued (same order as filters).
+
             ->add([
                 'type' => CommonElement\IniTextarea::class,
                 'name' => 'options',
@@ -238,6 +243,8 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
             ])
 
+            // Action buttons.
+
             ->add([
                 'name' => 'minus',
                 'type' => Element\Button::class,
@@ -253,7 +260,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 'attributes' => [
                     // Don't use o-icon-delete.
                     'class' => 'config-fieldset-action config-fieldset-minus fa fa-minus remove-value button',
-                    'aria-label' => 'Remove this filter', // @translate
+                    'aria-label' => 'Remove this facet', // @translate
                 ],
             ])
             ->add([

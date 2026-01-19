@@ -608,6 +608,9 @@ TODO
 - [ ] Do not include indexes in form so get multiple form with an index.
 - [x] Automatic min/max for facet range double.
 - [ ] Restructure with late binding: the response calls the querier when needed, so the querier does not need to fill all data early.
+- [ ] RangeDouble: sort items without date values last when no filter is active.
+- [ ] RangeDouble: exclude items without date when filter is active, include when not.
+- [ ] RangeDouble: add admin option to enable/disable "ignore extremes" behavior per field.
 
 No more todo:
 

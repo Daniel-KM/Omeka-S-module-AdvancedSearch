@@ -984,24 +984,59 @@ class InternalQuerier extends AbstractQuerier
                         ];
                     }
                 } else {
-                    $fieldQueryArgs = $this->query->getFieldQueryArgs($fieldName);
-                    if ($fieldQueryArgs) {
-                        $this->args['filter'][] = [
-                            'join' => $fieldQueryArgs['join'] ?? 'and',
-                            'field' => $field,
-                            'except' => $fieldQueryArgs['except'] ?? null,
-                            'type' => $fieldQueryArgs['type'] ?? 'eq',
-                            'val' => $flatArray($values),
-                            'lang' => $fieldQueryArgs['lang'] ?? null,
-                            'datatype' => $fieldQueryArgs['datatype'] ?? null,
-                        ];
+                    // Check if first_digits is enabled for this facet.
+                    // When enabled, use range filter (>= value AND < value+1) instead of equals.
+                    // This is faster than "starts with" (LIKE) as it uses indexes.
+                    $facetType = $fieldData['type'] ?? 'Checkbox';
+                    $isRangeType = in_array($facetType, ['RangeDouble', 'SelectRange']);
+                    $firstDigitsDefault = $isRangeType;
+                    $useFirstDigits = ($fieldData['first_digits']
+                        ?? $fieldData['options']['first_digits']
+                        ?? $firstDigitsDefault) === true
+                        || in_array($fieldData['first_digits']
+                            ?? $fieldData['options']['first_digits']
+                            ?? ($firstDigitsDefault ? 'true' : 'false'), [1, '1', 'true'], true);
+
+                    if ($useFirstDigits) {
+                        // Use range filter for each value (e.g., >= 2014 AND < 2015).
+                        $flatValues = $flatArray($values);
+                        foreach ($flatValues as $val) {
+                            if (!is_numeric($val)) {
+                                continue;
+                            }
+                            $this->args['filter'][] = [
+                                'join' => 'and',
+                                'field' => $field,
+                                'type' => '≥',
+                                'val' => (string) $val,
+                            ];
+                            $this->args['filter'][] = [
+                                'join' => 'and',
+                                'field' => $field,
+                                'type' => '<',
+                                'val' => (string) ((int) $val + 1),
+                            ];
+                        }
                     } else {
-                        $this->args['filter'][] = [
-                            'join' => 'and',
-                            'field' => $field,
-                            'type' => 'eq',
-                            'val' => $flatArray($values),
-                        ];
+                        $fieldQueryArgs = $this->query->getFieldQueryArgs($fieldName);
+                        if ($fieldQueryArgs) {
+                            $this->args['filter'][] = [
+                                'join' => $fieldQueryArgs['join'] ?? 'and',
+                                'field' => $field,
+                                'except' => $fieldQueryArgs['except'] ?? null,
+                                'type' => $fieldQueryArgs['type'] ?? 'eq',
+                                'val' => $flatArray($values),
+                                'lang' => $fieldQueryArgs['lang'] ?? null,
+                                'datatype' => $fieldQueryArgs['datatype'] ?? null,
+                            ];
+                        } else {
+                            $this->args['filter'][] = [
+                                'join' => 'and',
+                                'field' => $field,
+                                'type' => 'eq',
+                                'val' => $flatArray($values),
+                            ];
+                        }
                     }
                 }
                 break;
@@ -1445,6 +1480,17 @@ class InternalQuerier extends AbstractQuerier
                 $facetOptions['per_page'] = 0;
                 $facetOptions['is_facet_range'] = true;
             }
+            // Option "first_digits" extracts year from dates and aggregates values.
+            // Enabled by default for RangeDouble and SelectRange, disabled for others.
+            $facetType = $facetData['type'] ?? 'Checkbox';
+            $isRangeType = in_array($facetType, ['RangeDouble', 'SelectRange']);
+            $firstDigitsDefault = $isRangeType;
+            $facetOptions['first_digits'] = ($facetData['first_digits']
+                ?? $facetData['options']['first_digits']
+                ?? $firstDigitsDefault) === true
+                || in_array($facetData['first_digits']
+                    ?? $facetData['options']['first_digits']
+                    ?? ($firstDigitsDefault ? 'true' : 'false'), [1, '1', 'true'], true);
             $referenceOptions['meta_options'][$facetName] = $facetOptions;
         }
 
@@ -1498,11 +1544,23 @@ class InternalQuerier extends AbstractQuerier
                 ->setQuery($referenceQuery)
                 ->setOptions($referenceOptions)
                 ->list();
-            foreach (array_keys($referenceMetadata) as $facetName) foreach ($values[$facetName]['o:references'] ?? [] as $value => $count) {
-                $facetCountsByField[$facetName][$value] = [
-                    'value' => $value,
-                    'count' => $count,
-                ];
+            foreach (array_keys($referenceMetadata) as $facetName) {
+                $firstDigits = $referenceOptions['meta_options'][$facetName]['first_digits'] ?? false;
+                foreach ($values[$facetName]['o:references'] ?? [] as $value => $count) {
+                    // Aggregate by first digits (year) when option is enabled.
+                    $aggregatedValue = $firstDigits ? $this->extractFirstDigits($value) : $value;
+                    if ($aggregatedValue === null) {
+                        continue;
+                    }
+                    if (empty($facetCountsByField[$facetName][$aggregatedValue])) {
+                        $facetCountsByField[$facetName][$aggregatedValue] = [
+                            'value' => $aggregatedValue,
+                            'count' => $count,
+                        ];
+                    } else {
+                        $facetCountsByField[$facetName][$aggregatedValue]['count'] += $count;
+                    }
+                }
             }
             $this->response->setFacetCounts(array_map('array_values', $facetCountsByField));
             return;
@@ -1528,22 +1586,49 @@ class InternalQuerier extends AbstractQuerier
                 ->setQuery($referenceQuery)
                 ->setOptions($referenceOptions)
                 ->list();
-            foreach (array_keys($referenceMetadata) as $facetName) foreach ($values[$facetName]['o:references'] ?? [] as $value => $count) {
-                if (empty($facetCountsByField[$facetName][$value])) {
-                    $facetCountsByField[$facetName][$value] = [
-                        'value' => $value,
-                        'count' => $count,
-                    ];
-                } else {
-                    $facetCountsByField[$facetName][$value] = [
-                        'value' => $value,
-                        'count' => $count + $facetCountsByField[$facetName][$value]['count'],
-                    ];
+            foreach (array_keys($referenceMetadata) as $facetName) {
+                $firstDigits = $referenceOptions['meta_options'][$facetName]['first_digits'] ?? false;
+                foreach ($values[$facetName]['o:references'] ?? [] as $value => $count) {
+                    // Aggregate by first digits (year) when option is enabled.
+                    $aggregatedValue = $firstDigits ? $this->extractFirstDigits($value) : $value;
+                    if ($aggregatedValue === null) {
+                        continue;
+                    }
+                    if (empty($facetCountsByField[$facetName][$aggregatedValue])) {
+                        $facetCountsByField[$facetName][$aggregatedValue] = [
+                            'value' => $aggregatedValue,
+                            'count' => $count,
+                        ];
+                    } else {
+                        $facetCountsByField[$facetName][$aggregatedValue]['count'] += $count;
+                    }
                 }
             }
         }
 
         $this->response->setFacetCounts(array_map('array_values', $facetCountsByField));
+    }
+
+    /**
+     * Extract first digits from a value (typically a year from a date).
+     *
+     * Handles formats like "2014-10-12", "-500", "2014", etc.
+     * Returns null if the value doesn't start with digits or a minus sign.
+     *
+     * @param string|int|float $value
+     * @return string|null The extracted digits (e.g., "2014" from "2014-10-12") or null.
+     */
+    protected function extractFirstDigits($value): ?string
+    {
+        $value = (string) $value;
+        if ($value === '') {
+            return null;
+        }
+        // Match optional minus sign followed by digits at the start.
+        if (preg_match('/^(-?\d+)/', $value, $matches)) {
+            return $matches[1];
+        }
+        return null;
     }
 
     /**

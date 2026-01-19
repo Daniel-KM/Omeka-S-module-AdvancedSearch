@@ -42,9 +42,11 @@ $assetUrl = $plugins->get('assetUrl');
 $escapeAttr = $plugins->get('escapeHtmlAttr');
 
 $this->headLink()
-    ->appendStylesheet($assetUrl('css/advanced-search-manager.css', 'AdvancedSearch'));
+    ->appendStylesheet($assetUrl('css/advanced-search-manager.css', 'AdvancedSearch'))
+    ->appendStylesheet($assetUrl('css/common-dialog.css', 'Common'));
 $this->headScript()
-    ->appendFile($assetUrl('js/advanced-search-manager.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
+    ->appendFile($assetUrl('js/advanced-search-manager.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer'])
+    ->appendFile($assetUrl('js/common-dialog.js', 'Common'), 'text/javascript', ['defer' => 'defer']);
 
 $this->htmlElement('body')->appendAttribute('class', 'search-admin resource browse');
 ?>
@@ -152,6 +154,14 @@ $this->htmlElement('body')->appendAttribute('class', 'search-admin resource brow
                                 ]) ?>
                             </li>
                             <?php endif; ?>
+                            <li>
+                                <?= $searchConfig->link('', 'copy', [
+                                    'class' => 'o-icon-add copy-search-config',
+                                    'aria-label' => $translate('Copy'),
+                                    'title' => $translate('Copy'),
+                                    'data-confirm-message' => $translate('Are you sure you want to copy this search page?'),
+                                ]) ?>
+                            </li>
                             <li>
                                 <a href="#"
                                 data-sidebar-content-url="<?= $escape($searchConfig->url('delete-confirm')) ?>"

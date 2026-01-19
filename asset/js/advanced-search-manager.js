@@ -2,6 +2,21 @@
 
 $(document).ready(function() {
 
+    /**
+     * Copy search config with confirmation dialog.
+     */
+    $('.copy-search-config').on('click', function(event) {
+        event.preventDefault();
+        const url = this.href;
+        const message = this.dataset.confirmMessage;
+        CommonDialog.dialogConfirm({ message: message })
+            .then(function(result) {
+                if (result) {
+                    window.location.href = url;
+                }
+            });
+    });
+
     const hasChosenSelect = typeof $.fn.chosen === 'function';
 
     /**

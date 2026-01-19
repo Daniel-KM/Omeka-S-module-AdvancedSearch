@@ -271,6 +271,70 @@ class SearchConfigController extends AbstractActionController
         return $this->redirect()->toRoute('admin/search-manager');
     }
 
+    public function copyAction()
+    {
+        $id = $this->params('id');
+
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
+        $searchConfig = $this->api()->read('search_configs', ['id' => $id])->getContent();
+
+        // Find a unique name and slug.
+        $baseName = $searchConfig->name();
+        $baseSlug = $searchConfig->slug();
+
+        // Get all existing slugs.
+        $slugs = $this->api()
+            ->search('search_configs', [], ['returnScalar' => 'slug'])
+            ->getContent();
+
+        // Generate unique name and slug with increment.
+        $newName = sprintf($this->translate('%s (copy)'), $baseName);
+        $newSlug = $this->generateUniqueSlug($baseSlug, $slugs);
+
+        // Prepare data for the new search config.
+        $data = [
+            'o:name' => $newName,
+            'o:slug' => $newSlug,
+            'o:search_engine' => $searchConfig->searchEngine() ? $searchConfig->searchEngine()->id() : null,
+            'o:form_adapter' => $searchConfig->formAdapterName(),
+            'o:settings' => $searchConfig->settings(),
+        ];
+
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $newSearchConfig */
+        $response = $this->api()->create('search_configs', $data);
+        $newSearchConfig = $response->getContent();
+
+        $this->messenger()->addSuccess((new PsrMessage(
+            'Search page "{name}" successfully copied as "{new_name}".', // @translate
+            ['name' => $searchConfig->name(), 'new_name' => $newSearchConfig->name()]
+        )));
+
+        return $this->redirect()->toUrl($newSearchConfig->url('edit'));
+    }
+
+    /**
+     * Generate a unique slug based on existing slugs.
+     *
+     * @param string $baseSlug The base slug to use.
+     * @param array $existingSlugs List of existing slugs.
+     * @return string A unique slug.
+     */
+    protected function generateUniqueSlug(string $baseSlug, array $existingSlugs): string
+    {
+        // Remove any existing numeric suffix like "_2", "_3", etc.
+        $cleanSlug = preg_replace('/_\d+$/', '', $baseSlug);
+
+        $counter = 2;
+        $newSlug = $cleanSlug . '_' . $counter;
+
+        while (in_array($newSlug, $existingSlugs)) {
+            $counter++;
+            $newSlug = $cleanSlug . '_' . $counter;
+        }
+
+        return $newSlug;
+    }
+
     protected function checkPostAndValidForm($form): bool
     {
         if (!$this->getRequest()->isPost()) {

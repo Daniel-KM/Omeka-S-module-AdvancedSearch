@@ -666,11 +666,15 @@ class IndexSearch extends AbstractJob
 
         $sql .= " ORDER BY r.id ASC";
 
+        // MySQL/MariaDB requires LIMIT when using OFFSET.
         if ($limit > 0) {
             $sql .= " LIMIT " . (int) $limit;
-        }
-        if ($offset > 0) {
-            $sql .= " OFFSET " . (int) $offset;
+            if ($offset > 0) {
+                $sql .= " OFFSET " . (int) $offset;
+            }
+        } elseif ($offset > 0) {
+            // Use a very large limit when only offset is specified.
+            $sql .= " LIMIT 18446744073709551615 OFFSET " . (int) $offset;
         }
 
         $result = $this->connection->executeQuery($sql, $params, $types);

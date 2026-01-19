@@ -165,6 +165,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                         'alphabetic desc' => 'Alphabetic descendant', // @ŧranslate
                         'total desc' => 'Total', // @ŧranslate
                         'total asc' => 'Total ascendant', // @ŧranslate
+                        'total_alpha desc' => 'Total then alphabetic for hidden values', // @ŧranslate
                         'values asc' => 'Values (listed below)', // @ŧranslate
                         'values desc' => 'Values descendant', // @ŧranslate
                     ],
@@ -194,7 +195,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 'name' => 'options',
                 'options' => [
                     'label' => 'Options', // @translate
-                    'info' => 'List of specific options according to types. Omeka and Laminas options are accepted, for example `empty_option = ""`, `checked_value = "yes"`, `autosuggest = true`, `value_options.first = "First"`, `first_digits = true`.', // @translate
+                    'info' => 'List of specific options according to types. Omeka and Laminas options are accepted, for example `empty_option = ""`, `checked_value = "yes"`, `autosuggest = true`, `value_options.first = "First"`, `first_digits = false`.', // @translate
                     'ini_typed_mode' => true,
                 ],
                 'attributes' => [

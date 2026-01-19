@@ -40,7 +40,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 'name' => 'language_site',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [
-                    'label' => 'Limit languages of facets', // @ŧranslate
+                    'label' => 'Limit languages of facets (internal querier)', // @ŧranslate
                     'value_options' => [
                         '' => 'No limit', // @translate
                         'site' => 'Limit facets to site language or empty language', // @ŧranslate
@@ -57,7 +57,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 'name' => 'languages',
                 'type' => CommonElement\ArrayText::class,
                 'options' => [
-                    'label' => 'Limit facets to specific languages', // @translate
+                    'label' => 'Limit facets to specific languages (internal querier)', // @translate
                     'info' => <<<'TXT'
                         Generally, facets are translated in the view, but in some cases, facet values may be translated directly in a multivalued property. Use "|" to separate multiple languages. Use a trailing "|" for values without language. When fields with languages (like subjects) and fields without language (like date) are facets, the empty language must be set to get results.
                         TXT, // @translate
@@ -79,7 +79,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                         'alphabetic desc' => 'Alphabetic descendant', // @ŧranslate
                         'total desc' => 'Total', // @ŧranslate
                         'total asc' => 'Total ascendant', // @ŧranslate
-                        'total_alpha desc ' => 'Total then alphabetic for hidden values', // @ŧranslate
+                        'total_alpha desc' => 'Total then alphabetic for hidden values', // @ŧranslate
                         'values asc' => 'Values (listed below)', // @ŧranslate
                         'values desc' => 'Values descendant', // @ŧranslate
                     ],
@@ -126,7 +126,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                     'documentation' => nl2br(<<<'MARKDOWN'
                         #"></a><div class="field-description no-link">
                         - Input types may be Checkbox (default), RangeDouble, Select, SelectRange, Thesaurus, Tree and specific templates for mode "direct" if wanted.
-                        - For "RangeDouble" and "SelectRange", the minimum and maximum may be set as "min" and "max", and "step" too. The option "first_digits" is enabled by default to extract the year from dates. Set "first_digits = false" to disable it.
+                        - For "RangeDouble" and "SelectRange", the minimum and maximum should be set as "min" and "max" in "Html attributes", and "step" too. The option "first_digits" is enabled by default to extract the year from dates. Set "first_digits = false" in "Options" to disable it.
                         - With type "Thesaurus", the option "thesaurus" should be set with the id. It requires the module Thesaurus.
                         - "Tree" can be used for item sets when module Item Sets Tree is enabled and data indexed recursively.
                         </div><a href="#
@@ -204,15 +204,16 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 'type' => CommonElement\IniTextarea::class,
                 'name' => 'options',
                 'options' => [
-                    'label' => 'Specific options', // @translate
+                    'label' => 'Options', // @translate
                     'info' => <<<'HTML'
                         List of specific options, in ini format, for example:
-                        `min = 1454`,
-                        `thesaurus =  151`,
+                        `thesaurus = 151`,
                         `languages = "fra|way|apa|"`,
                         `data_types[] = "valuesuggest:idref:person"`,
-                        `main_types = "resource",
-                        `values[] = "Alpha"`.
+                        `main_types = "resource"`,
+                        `values[] = "Alpha"`,
+                        `first_digits = false`.
+                        Note: "min", "max", "step" should be set in "Html attributes".
                         HTML, // @translate
                     'ini_typed_mode' => true,
                 ],
@@ -225,9 +226,9 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
             ->add([
                 'type' => CommonElement\IniTextarea::class,
                 'name' => 'attributes',
-                'info' => 'List of specific attributes, in ini format.', // @translate
                 'options' => [
                     'label' => 'Html attributes', // @translate
+                    'info' => 'Attributes to add to the input field, for example `class = "my-specific-class"`, or `min = 1454` for RangeDouble/SelectRange, or max, step, placeholder, data, etc.', // @translate
                     'ini_typed_mode' => true,
                 ],
                 'attributes' => [

@@ -650,8 +650,13 @@ return [
                     'label' => $translate('Date'),
                     'type' => 'RangeDouble',
                     'state' => 'static',
-                    'min' => 1454,
-                    'max' => 2025,
+                    'options' => [
+                        'first_digits' => true,
+                    ],
+                    'attributes' => [
+                        'min' => 1454,
+                        'max' => 2025,
+                    ],
                     'mode' => 'button',
                 ],
                 'dcterms:subject' => [

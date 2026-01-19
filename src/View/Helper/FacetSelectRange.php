@@ -10,6 +10,19 @@ class FacetSelectRange extends AbstractFacet
     {
         $isFacetModeDirect = in_array($options['mode'] ?? null, ['link', 'js']);
 
+        // Option "first_digits" (or legacy "integer") extracts year from dates.
+        // Enabled by default for SelectRange facets.
+        $formatInteger = ($options['first_digits'] ?? $options['integer'] ?? true) === true
+            || in_array($options['first_digits'] ?? $options['integer'] ?? null, [1, '1', 'true'], true);
+
+        // Convert facet values to integers (years) if first_digits is enabled.
+        if ($formatInteger) {
+            foreach ($facetValues as &$facetValue) {
+                $facetValue['value'] = (int) $facetValue['value'];
+            }
+            unset($facetValue);
+        }
+
         // It is simpler and better to get from/to from the query, because it
         // can manage discrete range.
         $rangeFrom = $this->queryBase['facet'][$facetField]['from'] ?? $options['min'] ?? null;

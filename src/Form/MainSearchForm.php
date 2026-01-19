@@ -1248,13 +1248,15 @@ class MainSearchForm extends Form
         $values = $this->listValues($filter);
 
         // Negative numbers are accepted in all cases (int parsing).
-        $firstDigits = isset($filter['options']['first_digits'])
-            && in_array($filter['options']['first_digits'], [1, true, '1', 'true'], true);
+        // Option "first_digits" extracts year from dates. Enabled by default.
+        $firstDigits = ($filter['options']['first_digits'] ?? true) === true
+            || in_array($filter['options']['first_digits'] ?? null, [1, '1', 'true'], true);
+        // Filter values that start with a digit or minus sign (dates, years, numbers).
+        // This keeps "2023-05-15", "-500", "0", "123" but removes "texte", "".
         $values = $firstDigits
-            // There is no year "0", so extract first digits except 0.
-            ? array_filter(array_map('intval', $values))
-            // Keep all numeric values.
-            : array_map('intval', array_filter($values, 'is_numeric'));
+            ? array_filter($values, fn ($v) => is_numeric($v) || preg_match('/^-?\d/', (string) $v))
+            : array_filter($values, 'is_numeric');
+        $values = array_map('intval', $values);
         if (!count($values)) {
             return [
                 'min' => is_numeric($min) ? $min : null,

@@ -23,7 +23,10 @@ class FacetRangeDouble extends AbstractFacet
         $options['max'] = ($options['max'] ?? '') === '' ? null : (string) $options['max'];
         $options['step'] = empty($options['step']) ? null : (string) $options['step'];
 
-        $formatInteger = !empty($options['integer']);
+        // Option "first_digits" (or legacy "integer") extracts year from dates.
+        // Enabled by default for RangeDouble facets.
+        $formatInteger = ($options['first_digits'] ?? $options['integer'] ?? true) === true
+            || in_array($options['first_digits'] ?? $options['integer'] ?? null, [1, '1', 'true'], true);
 
         if ($formatInteger) {
             $options['min'] = isset($options['min']) ? (int) $options['min'] : null;

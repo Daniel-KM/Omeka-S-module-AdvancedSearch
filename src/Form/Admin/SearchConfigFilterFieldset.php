@@ -76,7 +76,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                         - Hidden: the value can be passed with key "value". If the value is not a scalar, it is serialized as json.
                         - Number: the keys "min", "max" and "step" can be set as attributes, else they will be extracted from data. Of course, data should be numbers.
                         - Range and RangeDouble allows to display a slider with one or two values. Min and max are extracted from data if not set as attributes.
-                        - For Number, Range and RangeDouble, "first_digits" can be set as option to extract the years from dates, but it is recommended to use an index with the year in that case to avoid strange results when casting and sorting non-normalized data.
+                        - For Number, Range and RangeDouble, the option "first_digits" is enabled by default to extract the year from dates. Set "first_digits = false" to disable it. It is recommended to use an index with the year to avoid strange results when casting and sorting non-normalized data.
                         - MultiSelectFlat and SelectFlat may be used to be sure that values are flatten.
                         - MultiSelectGroup and SelectGroup may be used for some specific fields that group options by default (resource classes, resource templates), in which case the options labels are removed.
                         - Tree can be used for item sets when module ItemSetsTree is enabled and data indexed recursively.

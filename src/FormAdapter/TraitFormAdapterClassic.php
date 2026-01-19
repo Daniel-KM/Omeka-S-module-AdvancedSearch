@@ -261,13 +261,20 @@ trait TraitFormAdapterClassic
 
                     // TODO The filter field can be multiple (as array).
 
+                    // Helper to check if a filter value is non-empty (supports arrays).
+                    $hasValue = function ($val): bool {
+                        if (is_array($val)) {
+                            return (bool) array_filter($val, fn ($v) => is_string($v) && trim($v) !== '');
+                        }
+                        return is_string($val) && trim($val) !== '';
+                    };
+
                     if (empty($joiner)) {
                         if (empty($operator)) {
                             foreach ($value as $filter) {
                                 if (isset($filter['field'])
                                     && isset($filter['val'])
-                                    && !is_array($filter['val'])
-                                    && trim($filter['val']) !== ''
+                                    && $hasValue($filter['val'])
                                 ) {
                                     $query->addFilterQuery($filter['field'], $filter['val'], $filter['type'] ?? $typeDefault, $filter['join'] ?? null);
                                 }
@@ -278,7 +285,7 @@ trait TraitFormAdapterClassic
                                     $type = empty($filter['type']) ? $typeDefault : $filter['type'];
                                     if (in_array($type, SearchResources::FIELD_QUERY['value_none'])) {
                                         $query->addFilterQuery($filter['field'], null, $type);
-                                    } elseif (isset($filter['val']) && trim($filter['val']) !== '') {
+                                    } elseif (isset($filter['val']) && $hasValue($filter['val'])) {
                                         $query->addFilterQuery($filter['field'], $filter['val'], $type);
                                     }
                                 }
@@ -287,7 +294,7 @@ trait TraitFormAdapterClassic
                     } else {
                         if (empty($operator)) {
                             foreach ($value as $filter) {
-                                if (isset($filter['field']) && isset($filter['val']) && trim($filter['val']) !== '') {
+                                if (isset($filter['field']) && isset($filter['val']) && $hasValue($filter['val'])) {
                                     $type = empty($filter['type']) ? $typeDefault : $filter['type'];
                                     $join = isset($filter['join']) && in_array($filter['join'], ['or', 'not']) ? $filter['join'] : 'and';
                                     $query->addFilterQuery($filter['field'], $filter['val'], $type, $join);
@@ -300,7 +307,7 @@ trait TraitFormAdapterClassic
                                     if (in_array($type, SearchResources::FIELD_QUERY['value_none'])) {
                                         $join = isset($filter['join']) && in_array($filter['join'], ['or', 'not']) ? $filter['join'] : 'and';
                                         $query->addFilterQuery($filter['field'], null, $type, $join);
-                                    } elseif (isset($filter['val']) && trim($filter['val']) !== '') {
+                                    } elseif (isset($filter['val']) && $hasValue($filter['val'])) {
                                         $join = isset($filter['join']) && in_array($filter['join'], ['or', 'not']) ? $filter['join'] : 'and';
                                         $query->addFilterQuery($filter['field'], $filter['val'], $type, $join);
                                     }

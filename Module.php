@@ -112,10 +112,10 @@ class Module extends AbstractModule
 
         if (!$this->isModuleActive('Reference')) {
             $messenger->addWarning('The module Reference is required to use the facets with the default internal adapter, but not for the Solr adapter.'); // @translate
-        } elseif (!$this->isModuleVersionAtLeast('Reference', '3.4.52')) {
+        } elseif (!$this->isModuleVersionAtLeast('Reference', '3.4.57')) {
             $messenger->addWarning(new PsrMessage(
                 'The module {module} should be upgraded to version {version} or later.', // @translate
-                ['module' => 'Reference', 'version' => '3.4.52']
+                ['module' => 'Reference', 'version' => '3.4.57']
             ));
         }
 
@@ -127,10 +127,10 @@ class Module extends AbstractModule
             \Omeka\Module\Manager::STATE_NEEDS_UPGRADE,
         ])) {
             $version = $module->getIni('version');
-            if (version_compare($version, '3.5.57', '<')) {
+            if (version_compare($version, '3.5.62', '<')) {
                 $messenger->addWarning(new PsrMessage(
                     'The module {module} should be upgraded to version {version} or later.', // @translate
-                    ['module' => 'SearchSolr', 'version' => '3.5.57']
+                    ['module' => 'SearchSolr', 'version' => '3.5.62']
                 ));
             } elseif ($module->getState() !== \Omeka\Module\Manager::STATE_ACTIVE) {
                 $messenger->addNotice(new PsrMessage(

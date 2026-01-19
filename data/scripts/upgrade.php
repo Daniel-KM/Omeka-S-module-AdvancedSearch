@@ -2086,3 +2086,90 @@ if (version_compare($oldVersion, '3.4.55', '<')) {
     );
     $messenger->addSuccess($message);
 }
+
+if (version_compare($oldVersion, '3.4.56', '<')) {
+    /** @var \Omeka\Module\Manager $moduleManager */
+    $moduleManager = $services->get('Omeka\ModuleManager');
+    $module = $moduleManager->getModule('Reference');
+    $hasReference = $module
+        && version_compare($module->getIni('version'), '3.4.57', '<');
+    if ($hasReference) {
+        $message = new PsrMessage(
+            'It is recommended to upgrade the module "Reference" to improve performance.' // @translate
+        );
+        $messenger->addWarning($message);
+    }
+
+    // Rename facet option "integer" to "first_digits" for consistency with filters.
+    // The option is now enabled by default for RangeDouble and SelectRange facets.
+    $qb = $connection->createQueryBuilder();
+    $qb
+        ->select('id', 'settings')
+        ->from('search_config', 'search_config')
+        ->orderBy('id', 'asc');
+    $searchConfigsSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    foreach ($searchConfigsSettings as $id => $searchConfigSettings) {
+        $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
+        $hasChange = false;
+        foreach ($searchConfigSettings['facet']['facets'] ?? [] as $name => $facet) {
+            if (array_key_exists('integer', $facet)) {
+                $searchConfigSettings['facet']['facets'][$name]['first_digits'] = $facet['integer'];
+                unset($searchConfigSettings['facet']['facets'][$name]['integer']);
+                $hasChange = true;
+            }
+        }
+        if ($hasChange) {
+            $sql = 'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?;';
+            $connection->executeStatement($sql, [json_encode($searchConfigSettings, 320), $id]);
+        }
+    }
+
+    $message = new PsrMessage(
+        'The facet option "integer" was renamed "first_digits" for consistency with filters. It is now enabled by default for RangeDouble and SelectRange facets to extract years from dates.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    // Move min/max/step from root level of facet config to "attributes" for
+    // consistency with filters (where min/max/step are HTML input attributes).
+    // Also move them from "options" to "attributes" if they were there.
+    $qb = $connection->createQueryBuilder();
+    $qb
+        ->select('id', 'settings')
+        ->from('search_config', 'search_config')
+        ->orderBy('id', 'asc');
+    $searchConfigsSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    foreach ($searchConfigsSettings as $id => $searchConfigSettings) {
+        $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
+        $hasChange = false;
+        foreach ($searchConfigSettings['facet']['facets'] ?? [] as $name => $facet) {
+            $attributes = $facet['attributes'] ?? [];
+            $options = $facet['options'] ?? [];
+            // Move min/max/step from root level to attributes.
+            foreach (['min', 'max', 'step'] as $key) {
+                if (array_key_exists($key, $facet) && !array_key_exists($key, $attributes)) {
+                    $attributes[$key] = $facet[$key];
+                    unset($searchConfigSettings['facet']['facets'][$name][$key]);
+                    $hasChange = true;
+                }
+                // Also move from options to attributes if present.
+                if (array_key_exists($key, $options) && !array_key_exists($key, $attributes)) {
+                    $attributes[$key] = $options[$key];
+                    unset($searchConfigSettings['facet']['facets'][$name]['options'][$key]);
+                    $hasChange = true;
+                }
+            }
+            if ($hasChange && $attributes) {
+                $searchConfigSettings['facet']['facets'][$name]['attributes'] = $attributes;
+            }
+        }
+        if ($hasChange) {
+            $sql = 'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?;';
+            $connection->executeStatement($sql, [json_encode($searchConfigSettings, 320), $id]);
+        }
+    }
+
+    $message = new PsrMessage(
+        'The facet options "min", "max", and "step" were moved to "attributes" for consistency with filters. They are now HTML input attributes like for filters.' // @translate
+    );
+    $messenger->addSuccess($message);
+}

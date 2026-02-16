@@ -9,7 +9,11 @@ $(document).ready(function() {
         event.preventDefault();
         const url = this.href;
         const message = this.dataset.confirmMessage;
-        CommonDialog.dialogConfirm({ message: message })
+        CommonDialog
+            .dialogConfirm({
+                heading: Omeka.jsTranslate('Search'),
+                message: message,
+            })
             .then(function(result) {
                 if (result) {
                     window.location.href = url;

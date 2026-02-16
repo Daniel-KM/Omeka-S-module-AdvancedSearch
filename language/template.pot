@@ -178,10 +178,12 @@ msgid "Add a filter"
 msgstr ""
 
 #: src/Form/MainSearchForm.php:692
+#: view/common/form/range-double.phtml:49
 msgid "From"
 msgstr ""
 
 #: src/Form/MainSearchForm.php:693
+#: view/common/form/range-double.phtml:53
 msgid "To"
 msgstr ""
 
@@ -948,11 +950,10 @@ msgstr ""
 msgid "This index has no resource type to index."
 msgstr ""
 
-#: view/advanced-search/admin/search-suggester/add.phtml:33
-#: view/advanced-search/admin/search-suggester/edit.phtml:33
+#: view/advanced-search/admin/search-suggester/edit.phtml:34
 msgid ""
-"Only the internal adapter can have settings for now. For external "
-"suggesters, use the direct url in the search config."
+"This search engine adapter does not have specific suggester settings. For "
+"external suggesters, use the direct url in the search config."
 msgstr ""
 
 #: view/advanced-search/admin/search-suggester/edit.phtml:21
@@ -2644,7 +2645,7 @@ msgid "Move this facet down"
 msgstr ""
 
 #: src/Form/Admin/SearchSuggesterForm.php:68
-msgid "For Solr, the suggester can be set in the config."
+msgid "The search engine cannot be changed after creation."
 msgstr ""
 
 #: src/Form/Admin/SearchSuggesterForm.php:77

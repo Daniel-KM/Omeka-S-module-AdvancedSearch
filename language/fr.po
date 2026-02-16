@@ -956,14 +956,14 @@ msgstr "Privé seulement"
 msgid "This index has no resource type to index."
 msgstr "L’index n’a pas de type de ressource à indexer."
 
-#: view/advanced-search/admin/search-suggester/add.phtml:33
-#: view/advanced-search/admin/search-suggester/edit.phtml:33
+#: view/advanced-search/admin/search-suggester/edit.phtml:34
 msgid ""
-"Only the internal adapter can have settings for now. For external "
-"suggesters, use the direct url in the search config."
+"This search engine adapter does not have specific suggester settings. For "
+"external suggesters, use the direct url in the search config."
 msgstr ""
-"Seul l’adaptateur interne peut avoir des paramètres actuellement. Pour les "
-"suggéreurs externes, utiliser l’url directe dans la configuration de la page."
+"Cet adaptateur de moteur de recherche n'a pas de paramètres spécifiques pour "
+"le suggéreur. Pour les suggéreurs externes, utiliser l'url directe dans la "
+"configuration de la page."
 
 #: view/advanced-search/admin/search-suggester/edit.phtml:21
 msgid "Edit suggester"
@@ -2994,8 +2994,8 @@ msgid "Move this facet down"
 msgstr "Déplacer cette facette vers le bas"
 
 #: src/Form/Admin/SearchSuggesterForm.php:68
-msgid "For Solr, the suggester can be set in the config."
-msgstr "Pour Solr, le suggéreur peut être défini dans la configuration."
+msgid "The search engine cannot be changed after creation."
+msgstr "Le moteur de recherche ne peut pas être modifié après la création."
 
 #: src/Form/Admin/SearchSuggesterForm.php:77
 msgid "Suggester settings"

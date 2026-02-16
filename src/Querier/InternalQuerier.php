@@ -475,9 +475,10 @@ class InternalQuerier extends AbstractQuerier
             return [];
         }
 
-        /** @var \Doctrine\ORM\EntityManager $entityManager */
-        $entityManager = $this->services->get('Omeka\EntityManager');
-        $qb = $entityManager->createQueryBuilder();
+        $isOldOmeka = version_compare(\Omeka\Module::VERSION, '4.2.0', '<');
+        $qb = $isOldOmeka
+            ? $this->services->get('Omeka\EntityManager')->createQueryBuilder()
+            : $this->services->get('Omeka\ApiAdapterManager')->get('items')->createQueryBuilder();
         $expr = $qb->expr();
 
         // For example to list all authors that are a resource.

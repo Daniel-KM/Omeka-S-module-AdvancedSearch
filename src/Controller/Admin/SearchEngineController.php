@@ -78,7 +78,7 @@ class SearchEngineController extends AbstractActionController
                 'Search index "{name}" created.', // @translate
                 ['name' => $searchEngine->name()]
             ));
-            return $this->redirect()->toUrl($searchEngine->url('edit'));
+            return $this->redirect()->toUrl($searchEngine->adminUrl('edit'));
         }
         return $view;
     }

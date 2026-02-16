@@ -98,7 +98,7 @@ class SearchConfigController extends AbstractActionController
             );
         }
 
-        return $this->redirect()->toUrl($searchConfig->url('configure'));
+        return $this->redirect()->toUrl($searchConfig->adminUrl('configure'));
     }
 
     public function editAction()
@@ -309,7 +309,7 @@ class SearchConfigController extends AbstractActionController
             ['name' => $searchConfig->name(), 'new_name' => $newSearchConfig->name()]
         )));
 
-        return $this->redirect()->toUrl($newSearchConfig->url('edit'));
+        return $this->redirect()->toUrl($newSearchConfig->adminUrl('edit'));
     }
 
     /**

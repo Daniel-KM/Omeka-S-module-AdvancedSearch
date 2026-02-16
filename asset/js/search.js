@@ -342,6 +342,8 @@ var Search = (function() {
         // In some themes, the mode for resource list is set with a different class.
         // Or different search engines are used, some with grid, some with list.
         var resourceLists = document.querySelectorAll('.search-results .resource-list, .search-results .resources-list-content');
+        var searchResultsList = document.querySelector('.search-results-list');
+        var searchResultsMap = document.querySelector('.search-results-map');
 
         var hasOnlyMode = Array.prototype.some.call(resourceLists, function(el) {
             return el.classList.contains('only-mode');
@@ -350,12 +352,120 @@ var Search = (function() {
             return;
         }
 
-        for (var i = 0; i < resourceLists.length; i++) {
-            var resourceItem = resourceLists[i];
-            resourceItem.className = resourceItem.className.replace(' grid', '').replace(' list', '')
-                + ' ' + viewType;
+        // Handle map view type.
+        if (viewType === 'map') {
+            // Hide results list, show map.
+            if (searchResultsList) {
+                searchResultsList.style.display = 'none';
+            }
+            if (searchResultsMap) {
+                searchResultsMap.style.display = 'block';
+                // Initialize map if not already done.
+                self.initSearchMap();
+            }
+        } else {
+            // Show results list, hide map.
+            if (searchResultsList) {
+                searchResultsList.style.display = '';
+            }
+            if (searchResultsMap) {
+                searchResultsMap.style.display = 'none';
+            }
+            // Apply grid/list class to resource lists.
+            for (var i = 0; i < resourceLists.length; i++) {
+                var resourceItem = resourceLists[i];
+                resourceItem.className = resourceItem.className.replace(' grid', '').replace(' list', '')
+                    + ' ' + viewType;
+            }
         }
         localStorage.setItem('search_view_type', viewType);
+    };
+
+    /**
+     * Map state tracking.
+     */
+    self.mapInitialized = false;
+    self.map = null;
+    self.features = null;
+    self.featuresPoint = null;
+    self.featuresPoly = null;
+
+    /**
+     * Initialize the search results map.
+     * Uses the Mapping module's API to load features.
+     */
+    self.initSearchMap = function() {
+        if (self.mapInitialized) {
+            // Map already initialized, just invalidate size in case container was hidden.
+            if (self.map) {
+                self.map.invalidateSize();
+            }
+            return;
+        }
+
+        var searchMapDiv = document.getElementById('search-map');
+        if (!searchMapDiv) {
+            return;
+        }
+
+        // Check if MappingModule is available.
+        if (typeof MappingModule === 'undefined') {
+            console.warn('MappingModule not loaded. Map view requires the Mapping module.');
+            return;
+        }
+
+        var featuresUrl = searchMapDiv.dataset.featuresUrl;
+        var popupUrl = searchMapDiv.dataset.featurePopupContentUrl;
+        var basemapProvider = searchMapDiv.dataset.basemapProvider || 'OpenStreetMap.Mapnik';
+        var disableClustering = searchMapDiv.dataset.disableClustering === '1';
+
+        // Set map height.
+        searchMapDiv.style.height = '600px';
+
+        // Initialize map using MappingModule.
+        var mapResult = MappingModule.initializeMap(searchMapDiv, {}, {
+            disableClustering: disableClustering,
+            basemapProvider: basemapProvider
+        });
+
+        self.map = mapResult[0];
+        self.features = mapResult[1];
+        self.featuresPoint = mapResult[2];
+        self.featuresPoly = mapResult[3];
+
+        // Build items query from current URL search parameters.
+        // Remove pagination and view-related params, keep search filters.
+        var urlParams = new URLSearchParams(window.location.search);
+        var itemsQuery = {};
+        urlParams.forEach(function(value, key) {
+            // Skip pagination, sort, and display params.
+            if (!['page', 'per_page', 'limit', 'offset', 'sort', 'sort_by', 'sort_order'].includes(key)) {
+                itemsQuery[key] = value;
+            }
+        });
+
+        // Load features.
+        var onFeaturesLoad = function() {
+            if (!self.map.mapping_map_interaction) {
+                var bounds = self.features.getBounds();
+                if (bounds.isValid()) {
+                    self.map.fitBounds(bounds);
+                }
+            }
+        };
+
+        MappingModule.loadFeaturesAsync(
+            self.map,
+            self.featuresPoint,
+            self.featuresPoly,
+            featuresUrl,
+            popupUrl,
+            JSON.stringify(itemsQuery),
+            JSON.stringify({}),
+            onFeaturesLoad
+        );
+
+        self.mapInitialized = true;
     };
 
     /* Facets. */
@@ -971,6 +1081,17 @@ $(document).ready(function() {
         Search.setViewType('grid');
         $('.search-view-type').removeClass('active');
         $('.search-view-type-grid').addClass('active');
+    });
+
+    /**
+     * Map view handler.
+     * Requires the Mapping module to be installed.
+     */
+    $('.search-view-type-map').on('click', function(e) {
+        e.preventDefault();
+        Search.setViewType('map');
+        $('.search-view-type').removeClass('active');
+        $('.search-view-type-map').addClass('active');
     });
 
     $('.as-url select, select.as-url').on('change', function(e) {

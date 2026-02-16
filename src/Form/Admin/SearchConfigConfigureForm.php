@@ -959,6 +959,17 @@ class SearchConfigConfigureForm extends Form
                 ],
             ])
             ->add([
+                'name' => 'map_display',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Display map (module Mapping)', // @translate
+                    'info' => 'Add a map view to display search results on a map. Requires the Mapping module to be installed and active.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'map_display',
+                ],
+            ])
+            ->add([
                 'name' => 'thumbnail_mode',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [

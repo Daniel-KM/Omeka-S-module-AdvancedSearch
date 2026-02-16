@@ -85,6 +85,35 @@ $this->headLink()
     ->appendStylesheet($assetUrl('css/search.css', 'AdvancedSearch'));
 $this->headScript()
     ->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
+
+// Check if Mapping module is active and map display is enabled.
+$mapDisplayEnabled = (bool) $searchConfig->subSetting('results', 'map_display');
+$hasMappingModule = class_exists('Mapping\Module', false);
+$showMapView = $mapDisplayEnabled && $hasMappingModule && !$isAdmin;
+
+if ($showMapView) {
+    // Include Mapping module assets for map view.
+    $this->headLink()
+        ->appendStylesheet($assetUrl('node_modules/leaflet/dist/leaflet.css', 'Mapping'))
+        ->appendStylesheet($assetUrl('node_modules/leaflet.markercluster/dist/MarkerCluster.css', 'Mapping'))
+        ->appendStylesheet($assetUrl('node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css', 'Mapping'))
+        ->appendStylesheet($assetUrl('node_modules/leaflet.fullscreen/Control.FullScreen.css', 'Mapping'))
+        ->appendStylesheet($assetUrl('css/mapping.css', 'Mapping'));
+    $this->headScript()
+        ->appendFile($assetUrl('node_modules/leaflet/dist/leaflet.js', 'Mapping'))
+        ->appendFile($assetUrl('node_modules/leaflet.markercluster/dist/leaflet.markercluster-src.js', 'Mapping'))
+        ->appendFile($assetUrl('node_modules/leaflet-providers/leaflet-providers.js', 'Mapping'))
+        ->appendFile($assetUrl('node_modules/leaflet.fullscreen/Control.FullScreen.js', 'Mapping'))
+        ->appendFile($assetUrl('node_modules/Leaflet.Deflate/dist/L.Deflate.js', 'Mapping'))
+        ->appendFile($assetUrl('js/MappingModule.js', 'Mapping'))
+        ->appendFile($assetUrl('js/control.fit-bounds.js', 'Mapping'));
+
+    // Build URLs for Mapping API endpoints.
+    $mappingFeaturesUrl = $url('site/mapping', ['controller' => 'index', 'action' => 'get-features'], true);
+    $mappingPopupUrl = $url('site/mapping', ['controller' => 'index', 'action' => 'get-feature-popup-content'], true);
+    $mappingBasemapProvider = $this->siteSetting('mapping_basemap_provider') ?: 'OpenStreetMap.Mapnik';
+    $mappingDisableClustering = $this->siteSetting('mapping_disable_clustering') ? '1' : '0';
+}
 ?>
 
 <?php if (empty($isPartial)): ?>
@@ -194,6 +223,18 @@ $this->headScript()
             <?= $partial('search/results', $variables + ['resourceType' => $resourceType]) ?>
             <?php endforeach; ?>
         </div>
+
+        <?php // Map view container (hidden by default, shown when map view is selected). ?>
+        <?php if (!empty($showMapView)): ?>
+        <div class="search-results-part search-results-map" style="display: none;">
+            <div id="search-map"
+                data-basemap-provider="<?= $escape($mappingBasemapProvider) ?>"
+                data-disable-clustering="<?= $mappingDisableClustering ?>"
+                data-features-url="<?= $escape($mappingFeaturesUrl) ?>"
+                data-feature-popup-content-url="<?= $escape($mappingPopupUrl) ?>">
+            </div>
+        </div>
+        <?php endif; ?>
 
         <?php else: ?>
 

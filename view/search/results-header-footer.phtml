@@ -19,6 +19,11 @@
 $plugins = $this->getHelperPluginManager();
 $translate = $plugins->get('translate');
 
+// Check if Mapping module is active and map display is enabled.
+$mapDisplayEnabled = (bool) $searchConfig->subSetting('results', 'map_display');
+$hasMappingModule = class_exists('Mapping\Module', false);
+$showMapView = $mapDisplayEnabled && $hasMappingModule;
+
 // Default values of the module.
 $defaultDisplayParts = [
     'search_filters' => 'header',
@@ -95,12 +100,16 @@ $multiMode ??= isset($displayParts['grid_list']) && !in_array($gridListMode, ['l
 <?= $this->searchSortSelector($query, $sortFields, ['as_url' => true, 'label' => $searchConfig->subSetting('results', 'label_sort')]) ?>
 <?php endif; ?>
 
-<?php // Grid/list. // TODO Ideally, list/grid should be buttons but with a light design, like a link. Or a switch. ?>
+<?php // Grid/list/map. // TODO Ideally, list/grid should be buttons but with a light design, like a link. Or a switch. ?>
 
 <?php if ($multiMode): ?>
 <div class="search-results-display">
     <a class="search-view-type search-view-type-list<?= $gridListMode === 'list' ? ' active' : '' ?>" href="#"><?= $translate('list') ?></a>
     |
     <a class="search-view-type search-view-type-grid<?= $gridListMode === 'grid' ? ' active' : '' ?>" href="#"><?= $translate('grid') ?></a>
+    <?php if ($showMapView): ?>
+    |
+    <a class="search-view-type search-view-type-map<?= $gridListMode === 'map' ? ' active' : '' ?>" href="#"><?= $translate('map') ?></a>
+    <?php endif; ?>
 </div>
 <?php endif; ?>

@@ -355,14 +355,35 @@ class ApiSearch extends AbstractPlugin
             return $response;
         }
 
-        // Get entities from the database.
+        // Get entities from the database with eager loading to avoid N+1 queries.
+        // Without eager loading, each entity requires additional queries for
+        // values, resourceClass, resourceTemplate, owner, etc. during finalize().
         $entityClass = $this->easyMeta->entityClass($resourceType);
-        $repository = $this->entityManager->getRepository($entityClass);
-        $entities = $repository->findBy([
-            'id' => $ids,
-        ]);
 
-        // The original order of the ids must be kept.
+        if (empty($ids)) {
+            $entities = [];
+        } elseif (is_subclass_of($entityClass, \Omeka\Entity\Resource::class)) {
+            // Eager load associations for Resource entities to avoid N+1 queries.
+            // This significantly improves performance when finalizing results.
+            $qb = $this->entityManager->createQueryBuilder();
+            $qb->select('e', 'v', 'vp', 'rc', 'rt', 'o', 't')
+                ->from($entityClass, 'e')
+                ->leftJoin('e.values', 'v')
+                ->leftJoin('v.property', 'vp')
+                ->leftJoin('e.resourceClass', 'rc')
+                ->leftJoin('e.resourceTemplate', 'rt')
+                ->leftJoin('e.owner', 'o')
+                ->leftJoin('e.thumbnail', 't')
+                ->where($qb->expr()->in('e.id', ':ids'))
+                ->setParameter('ids', $ids);
+            $entities = $qb->getQuery()->getResult();
+        } else {
+            // Fallback for non-Resource entities (e.g., Site, User).
+            $repository = $this->entityManager->getRepository($entityClass);
+            $entities = $repository->findBy(['id' => $ids]);
+        }
+
+        // The original order of the ids must be kept (Solr relevance order).
         $orderedEntities = array_fill_keys($ids, null);
         foreach ($entities as $entity) {
             $orderedEntities[$entity->getId()] = $entity;

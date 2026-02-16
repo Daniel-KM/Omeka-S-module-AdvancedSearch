@@ -58,7 +58,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                     'documentation' => nl2br(<<<'MARKDOWN'
                         #"></a><div class="field-description no-link">
                         - Input types may be Checkbox (default), RangeDouble, Select, SelectRange, Thesaurus, Tree and specific templates for mode "direct" if wanted.
-                        - For "RangeDouble" and "SelectRange", the minimum and maximum should be set as "min" and "max" in "Html attributes", and "step" too. The option "first_digits" is enabled by default to extract the year from dates. Set "first_digits = false" in "Options" to disable it.
+                        - For "RangeDouble" and "SelectRange", the minimum and maximum should be set as "min" and "max" in "Html attributes", and "step" too. The option "first_digits" is enabled by default to extract the year from dates. Set "first_digits = false" in "Options" to disable it. Set "first_digits = 3" to group by decade (first 3 digits), "first_digits = 2" for century, "first_digits = 1" for millennium.
                         - With type "Thesaurus", the option "thesaurus" should be set with the id. It requires the module Thesaurus.
                         - "Tree" can be used for item sets when module Item Sets Tree is enabled and data indexed recursively.
                         </div><a href="#

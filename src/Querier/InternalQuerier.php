@@ -1486,12 +1486,18 @@ class InternalQuerier extends AbstractQuerier
             $facetType = $facetData['type'] ?? 'Checkbox';
             $isRangeType = in_array($facetType, ['RangeDouble', 'SelectRange']);
             $firstDigitsDefault = $isRangeType;
-            $facetOptions['first_digits'] = ($facetData['first_digits']
+            $rawFirstDigits = $facetData['first_digits']
                 ?? $facetData['options']['first_digits']
-                ?? $firstDigitsDefault) === true
-                || in_array($facetData['first_digits']
-                    ?? $facetData['options']['first_digits']
-                    ?? ($firstDigitsDefault ? 'true' : 'false'), [1, '1', 'true'], true);
+                ?? $firstDigitsDefault;
+            if ($rawFirstDigits === true || in_array($rawFirstDigits, [1, '1', 'true'], true)) {
+                $facetOptions['first_digits'] = true;
+            } elseif ($rawFirstDigits === false || in_array($rawFirstDigits, [0, '0', 'false'], true)) {
+                $facetOptions['first_digits'] = false;
+            } elseif (is_numeric($rawFirstDigits) && (int) $rawFirstDigits > 1) {
+                $facetOptions['first_digits'] = (int) $rawFirstDigits;
+            } else {
+                $facetOptions['first_digits'] = $firstDigitsDefault;
+            }
             $referenceOptions['meta_options'][$facetName] = $facetOptions;
         }
 

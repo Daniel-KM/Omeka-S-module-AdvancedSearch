@@ -786,7 +786,10 @@ class Module extends AbstractModule
     /**
      * Reset original fields and process search after core.
      *
-     * @see \AdvancedSearch\Api\ManagerDelegator::search()
+     * This method also handles the case when `initialize=false` is passed,
+     * which skips the `api.search.pre` event where `startOverrideQuery` runs.
+     * In that case, we apply the override here before processing.
+     *
      * @see \AdvancedSearch\Stdlib\SearchResources::endOverrideQuery()
      */
     public function endOverrideQuery(Event $event): void
@@ -802,9 +805,17 @@ class Module extends AbstractModule
         $qb = $event->getParam('queryBuilder');
         $adapter = $event->getTarget();
 
-        /** @see \AdvancedSearch\Stdlib\SearchResources::startOverrideRequest() */
-        /** @see \AdvancedSearch\Stdlib\SearchResources::buildInitialQuery() */
-        $this->getServiceLocator()->get('AdvancedSearch\SearchResources')
+        $searchResources = $this->getServiceLocator()->get('AdvancedSearch\SearchResources');
+
+        // Handle case when `initialize=false` was passed, which skips the
+        // `api.search.pre` event. In that case, startOverrideRequest was not
+        // called, so we need to do it here before endOverrideRequest.
+        // @see \AdvancedSearch\Stdlib\SearchResources::startOverrideRequest()
+        if ($request->getOption('override') === null) {
+            $searchResources->startOverrideRequest($request);
+        }
+
+        $searchResources
             ->endOverrideRequest($request)
             ->setAdapter($adapter)
             // Process the query for overridden keys.

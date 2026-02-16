@@ -32,7 +32,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
                 'attributes' => [
                     'id' => 'form_facet_field',
-                    'required' => true,
+                    'required' => false,
                     'class' => 'chosen-select',
                     'data-placeholder' => 'Set field or index…', // @translate
                 ],

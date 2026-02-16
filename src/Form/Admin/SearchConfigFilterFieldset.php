@@ -29,7 +29,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filter_name',
-                    'required' => true,
+                    'required' => false,
                     'pattern' => '[a-zA-Z0-9_:\-]+',
                 ],
             ])
@@ -46,7 +46,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filter_field',
-                    'required' => true,
+                    'required' => false,
                     'class' => 'chosen-select',
                     'data-placeholder' => 'Set field or index…', // @translate
                 ],

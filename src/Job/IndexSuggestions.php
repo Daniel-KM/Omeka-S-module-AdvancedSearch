@@ -317,42 +317,24 @@ class IndexSuggestions extends AbstractJob
         if ($this->modeIndex === 'start' || $this->modeIndex === 'start_full' || !$this->modeIndex) {
             for ($numberWords = 3; $numberWords >= 1; $numberWords--) {
                 // Don't "insert ignore and distinct", increment on duplicate.
+                // Use REGEXP_REPLACE to trim non-letter/non-number characters from start and end.
+                // Keep "/" for paths. Unicode classes: \pL = letters, \pN = numbers.
                 $sql = <<<SQL
                     INSERT INTO `_suggestions_temp` (`text`, `site_id`, `$column`)
                     SELECT
                         SUBSTRING(
-                            TRIM(
-                                # Security replacements.
-                                TRIM('"' FROM
-                                TRIM("'" FROM
-                                TRIM("\\\\" FROM
-                                TRIM("%" FROM
-                                TRIM("_" FROM
-                                TRIM("#" FROM
-                                TRIM("?" FROM
-                                # Cleaning replacements.
-                                TRIM("," FROM
-                                TRIM(";" FROM
-                                TRIM("!" FROM
-                                TRIM(":" FROM
-                                TRIM("." FROM
-                                TRIM("[" FROM
-                                TRIM("]" FROM
-                                TRIM("<" FROM
-                                TRIM(">" FROM
-                                TRIM("(" FROM
-                                TRIM(")" FROM
-                                TRIM("{" FROM
-                                TRIM("}" FROM
-                                TRIM("=" FROM
-                                TRIM("&" FROM
-                                TRIM(
-                                    SUBSTRING_INDEX(
-                                        CONCAT(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", ' '), "\r", ' ')), ' '),
-                                        ' ',
-                                        $numberWords
-                                    )
-                                )))))))))))))))))))))))
+                            REGEXP_REPLACE(
+                                REGEXP_REPLACE(
+                                    TRIM(
+                                        SUBSTRING_INDEX(
+                                            CONCAT(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", ' '), "\r", ' ')), ' '),
+                                            ' ',
+                                            $numberWords
+                                        )
+                                    ),
+                                    '^[^\\\\pL\\\\pN/]+', ''
+                                ),
+                                '[^\\\\pL\\\\pN/]+$', ''
                             ),
                             1, 190
                         ),
@@ -376,7 +358,13 @@ class IndexSuggestions extends AbstractJob
             $sql = <<<SQL
                 INSERT INTO `_suggestions_temp` (`text`, `site_id`, `$column`)
                 SELECT
-                    TRIM(SUBSTRING(REPLACE(REPLACE(`value`.`value`, "\n", ' '), "\r", ' '), 1, 190)),
+                    REGEXP_REPLACE(
+                        REGEXP_REPLACE(
+                            TRIM(SUBSTRING(REPLACE(REPLACE(`value`.`value`, "\n", ' '), "\r", ' '), 1, 190)),
+                            '^[^\\\\pL\\\\pN/]+', ''
+                        ),
+                        '[^\\\\pL\\\\pN/]+$', ''
+                    ),
                     $siteValue,
                     1
                 FROM `value`

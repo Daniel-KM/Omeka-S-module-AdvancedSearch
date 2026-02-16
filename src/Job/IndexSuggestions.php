@@ -204,16 +204,18 @@ class IndexSuggestions extends AbstractJob
         }
 
         // Create temporary table for suggestions with both total and total_public.
+        // Use binary collation for case-sensitive storage during indexing.
+        // Case normalization is done after indexing (keep majority case).
         // site_id = 0 means global (all sites).
         $sql = <<<'SQL'
             DROP TABLE IF EXISTS `_suggestions_temp`;
             CREATE TEMPORARY TABLE `_suggestions_temp` (
-                `text` VARCHAR(190) NOT NULL COLLATE utf8mb4_unicode_ci,
+                `text` VARCHAR(190) NOT NULL COLLATE utf8mb4_bin,
                 `site_id` INT NOT NULL DEFAULT 0,
                 `total` INT NOT NULL DEFAULT 0,
                 `total_public` INT NOT NULL DEFAULT 0,
                 PRIMARY KEY (`text`, `site_id`)
-            ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+            ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_bin` ENGINE = InnoDB;
             SQL;
         $this->connection->executeStatement($sql);
 
@@ -249,8 +251,9 @@ class IndexSuggestions extends AbstractJob
             $escapedStopwords = array_filter($escapedStopwords);
             if ($escapedStopwords) {
                 $stopwordsAlternation = implode('|', $escapedStopwords);
-                $sql = 'DELETE FROM `_suggestions_temp` WHERE `text` REGEXP :stopwords_pattern';
-                // MySQL REGEXP uses POSIX ERE: [[:space:]] for whitespace, not \s.
+                // MySQL REGEXP uses POSIX ERE: [[:space:]] for whitespace.
+                // Use LOWER() for case-insensitive matching (temp table uses binary collation).
+                $sql = 'DELETE FROM `_suggestions_temp` WHERE LOWER(`text`) REGEXP :stopwords_pattern';
                 // Pattern for stopword at start: ^(word1|word2)[[:space:]]
                 if ($stopwordsMode === 'start' || $stopwordsMode === 'start_end') {
                     $patternStart = '^(' . $stopwordsAlternation . ')[[:space:]]';
@@ -264,6 +267,12 @@ class IndexSuggestions extends AbstractJob
                 $this->logger->info('Suggester #{id}: removed suggestions with stopwords ({mode}).', ['id' => $suggesterId, 'mode' => $stopwordsMode]);
             }
         }
+
+        // Normalize case: merge case-insensitive duplicates, keep majority version.
+        // For each group of case variants (e.g., "Paris", "paris", "PARIS"):
+        // - Keep the text with the highest total (most frequent in source data)
+        // - Sum all totals together
+        $this->normalizeSuggestionCase($suggesterId);
 
         // Transfer from temporary table to final tables.
         $sql = <<<SQL
@@ -407,5 +416,59 @@ class IndexSuggestions extends AbstractJob
                 SQL;
             $this->connection->executeStatement($sql, $bind, $types);
         }
+    }
+
+    /**
+     * Normalize case: merge case-insensitive duplicates, keep majority version.
+     *
+     * For each group of case variants (e.g., "Paris", "paris", "PARIS"):
+     * - Keep the text with the highest total (most frequent in source data)
+     * - Sum all totals together
+     *
+     * This preserves proper nouns and acronyms when they are the majority,
+     * while normalizing to lowercase when lowercase is more common.
+     */
+    protected function normalizeSuggestionCase(int $suggesterId): void
+    {
+        // Create merged table with case-insensitive collation.
+        $sql = <<<'SQL'
+            DROP TABLE IF EXISTS `_suggestions_merged`;
+            CREATE TEMPORARY TABLE `_suggestions_merged` (
+                `text` VARCHAR(190) NOT NULL COLLATE utf8mb4_unicode_ci,
+                `site_id` INT NOT NULL DEFAULT 0,
+                `total` INT NOT NULL DEFAULT 0,
+                `total_public` INT NOT NULL DEFAULT 0,
+                PRIMARY KEY (`text`, `site_id`)
+            ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+            SQL;
+        $this->connection->executeStatement($sql);
+
+        // For each case-insensitive group, find the variant with highest total
+        // and insert it with summed totals.
+        // The subquery finds the "best" text (highest total) for each group.
+        $sql = <<<'SQL'
+            INSERT INTO `_suggestions_merged` (`text`, `site_id`, `total`, `total_public`)
+            SELECT
+                -- Pick text variant with highest total in this group
+                (
+                    SELECT t2.`text`
+                    FROM `_suggestions_temp` t2
+                    WHERE LOWER(t2.`text`) = LOWER(t.`text`) AND t2.`site_id` = t.`site_id`
+                    ORDER BY t2.`total` DESC, t2.`text`
+                    LIMIT 1
+                ) AS best_text,
+                t.`site_id`,
+                SUM(t.`total`) AS total,
+                SUM(t.`total_public`) AS total_public
+            FROM `_suggestions_temp` t
+            GROUP BY LOWER(t.`text`), t.`site_id`
+            SQL;
+        $this->connection->executeStatement($sql);
+
+        // Replace original with merged.
+        $this->connection->executeStatement('DROP TABLE `_suggestions_temp`');
+        $this->connection->executeStatement('ALTER TABLE `_suggestions_merged` RENAME TO `_suggestions_temp`');
+
+        $this->logger->info('Suggester #{id}: normalized case (kept majority version).', ['id' => $suggesterId]);
     }
 }

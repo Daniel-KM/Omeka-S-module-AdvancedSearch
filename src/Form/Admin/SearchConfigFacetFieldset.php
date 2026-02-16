@@ -193,6 +193,19 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
             ])
             ->add([
+                'name' => 'per_page',
+                'type' => Element\Number::class,
+                'options' => [
+                    'label' => 'Number of facets per page on "see more"', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'facet_per_page',
+                    'required' => false,
+                    'value' => '0',
+                    'min' => 0,
+                ],
+            ])
+            ->add([
                 'name' => 'display_count',
                 'type' => Element\Checkbox::class,
                 'options' => [

@@ -496,14 +496,132 @@ var Search = (function() {
         self.seeMoreOrLess = function(button) {
             button = $(button);
             if (button.hasClass('expand')) {
+                // Collapsing: remove pagination and show only default items.
+                self.removePagination(button);
                 button.text(button.attr('data-label-see-more') ? button.attr('data-label-see-more') : (hasOmekaTranslate ? Omeka.jsTranslate('See more') : 'See more'));
                 const defaultCount = Number(button.attr('data-default-count')) + 1;
                 button.closest('.facet').find('.facet-items .facet-item:nth-child(n+' + defaultCount + ')').attr('hidden', 'hidden');
             } else {
-                button.text(button.attr('data-label-see-less') ? button.attr('data-label-see-less') : (hasOmekaTranslate ? Omeka.jsTranslate('See less') : 'See less'));
-                button.closest('.facet').find('.facet-items .facet-item').removeAttr('hidden');
+                // Expanding: check if pagination is enabled.
+                const perPage = Number(button.attr('data-per-page')) || 0;
+                if (perPage > 0) {
+                    button.text(button.attr('data-label-see-less') ? button.attr('data-label-see-less') : (hasOmekaTranslate ? Omeka.jsTranslate('See less') : 'See less'));
+                    self.initPagination(button, perPage);
+                } else {
+                    button.text(button.attr('data-label-see-less') ? button.attr('data-label-see-less') : (hasOmekaTranslate ? Omeka.jsTranslate('See less') : 'See less'));
+                    button.closest('.facet').find('.facet-items .facet-item').removeAttr('hidden');
+                }
             }
             $searchFacets.trigger('o:advanced-search.facet.see-more-or-less');
+            return self;
+        };
+
+        /**
+         * Initialize pagination for a facet.
+         *
+         * @param {jQuery} button The "see more/less" button.
+         * @param {number} perPage Number of items per page.
+         */
+        self.initPagination = function(button, perPage) {
+            button = $(button);
+            var facet = button.closest('.facet');
+            var items = facet.find('.facet-items .facet-item');
+
+            // Count all non-active (unchecked) items for pagination.
+            var paginableItems = items.filter(function() {
+                var input = $(this).find('input[type=checkbox]');
+                return !input.length || !input.prop('checked');
+            });
+            var totalPages = Math.ceil(paginableItems.length / perPage);
+            if (totalPages <= 0) totalPages = 1;
+
+            // Remove any existing pagination.
+            facet.find('.facet-pagination').remove();
+
+            var labelPage = button.attr('data-label-page') || 'Page';
+            var paginationHtml = '<div class="facet-pagination">'
+                + '<button type="button" class="facet-page-first" title="' + labelPage + ' 1">&laquo;</button>'
+                + '<button type="button" class="facet-page-prev">&lsaquo;</button>'
+                + '<span class="facet-page-indicator">1/' + totalPages + '</span>'
+                + '<button type="button" class="facet-page-next">&rsaquo;</button>'
+                + '<button type="button" class="facet-page-last" title="' + labelPage + ' ' + totalPages + '">&raquo;</button>'
+                + '</div>';
+            button.closest('.facet-see-more').before(paginationHtml);
+
+            // Store pagination state on the facet element.
+            facet.data('facet-page', 1);
+            facet.data('facet-total-pages', totalPages);
+            facet.data('facet-per-page', perPage);
+
+            self.showPage(button, 1);
+            return self;
+        };
+
+        /**
+         * Show a specific page of facet items.
+         *
+         * Active/checked items always remain visible.
+         *
+         * @param {jQuery} button The "see more/less" button.
+         * @param {number} page The page number (1-based).
+         */
+        self.showPage = function(button, page) {
+            button = $(button);
+            var facet = button.closest('.facet');
+            var items = facet.find('.facet-items .facet-item');
+            var perPage = facet.data('facet-per-page') || Number(button.attr('data-per-page')) || 10;
+            var totalPages = facet.data('facet-total-pages') || 1;
+
+            if (page < 1) page = 1;
+            if (page > totalPages) page = totalPages;
+
+            facet.data('facet-page', page);
+
+            var paginableIndex = 0;
+            var startIndex = (page - 1) * perPage;
+            var endIndex = page * perPage;
+
+            items.each(function() {
+                var item = $(this);
+                var input = item.find('input[type=checkbox]');
+                var isActive = input.length && input.prop('checked');
+
+                if (isActive) {
+                    // Active/checked items: always visible, don't count.
+                    item.removeAttr('hidden');
+                } else {
+                    // All non-active items are paginated.
+                    if (paginableIndex >= startIndex && paginableIndex < endIndex) {
+                        item.removeAttr('hidden');
+                    } else {
+                        item.attr('hidden', 'hidden');
+                    }
+                    paginableIndex++;
+                }
+            });
+
+            // Update indicator.
+            facet.find('.facet-page-indicator').text(page + '/' + totalPages);
+
+            // Update button states.
+            facet.find('.facet-page-first, .facet-page-prev').prop('disabled', page <= 1);
+            facet.find('.facet-page-next, .facet-page-last').prop('disabled', page >= totalPages);
+
+            return self;
+        };
+
+        /**
+         * Remove pagination controls and reset state.
+         *
+         * @param {jQuery} button The "see more/less" button.
+         */
+        self.removePagination = function(button) {
+            button = $(button);
+            var facet = button.closest('.facet');
+            facet.find('.facet-pagination').remove();
+            facet.removeData('facet-page');
+            facet.removeData('facet-total-pages');
+            facet.removeData('facet-per-page');
             return self;
         };
 
@@ -1128,17 +1246,65 @@ $(document).ready(function() {
 
         $searchFacets.find('.facet-see-more-or-less').each((index, button) => Search.facets.seeMoreOrLess(button));
 
+        // Pagination navigation buttons.
+        $searchFacets.on('click', '.facet-page-first', function() {
+            var facet = $(this).closest('.facet');
+            var button = facet.find('.facet-see-more-or-less');
+            Search.facets.showPage(button, 1);
+        });
+        $searchFacets.on('click', '.facet-page-prev', function() {
+            var facet = $(this).closest('.facet');
+            var button = facet.find('.facet-see-more-or-less');
+            var page = facet.data('facet-page') || 1;
+            Search.facets.showPage(button, page - 1);
+        });
+        $searchFacets.on('click', '.facet-page-next', function() {
+            var facet = $(this).closest('.facet');
+            var button = facet.find('.facet-see-more-or-less');
+            var page = facet.data('facet-page') || 1;
+            Search.facets.showPage(button, page + 1);
+        });
+        $searchFacets.on('click', '.facet-page-last', function() {
+            var facet = $(this).closest('.facet');
+            var button = facet.find('.facet-see-more-or-less');
+            var totalPages = facet.data('facet-total-pages') || 1;
+            Search.facets.showPage(button, totalPages);
+        });
+
         // Filter facet values via the search input (CheckboxSearch type).
         $searchFacets.on('input', '.facet-search-input', function() {
             const input = $(this);
             const filter = input.val().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
             const facet = input.closest('.facet');
             const seeMore = facet.find('.facet-see-more-or-less');
-            // Expand all items while filtering so hidden items become searchable.
+            const pagination = facet.find('.facet-pagination');
             if (filter.length) {
+                // Hide pagination while filtering.
+                if (pagination.length) {
+                    pagination.hide();
+                }
+                // Show all items (remove hidden from pagination) so filter works on all.
+                facet.find('.facet-items .facet-item').removeAttr('hidden');
+                // Expand if collapsed.
                 if (seeMore.length && seeMore.hasClass('expand')) {
                     seeMore.removeClass('expand').addClass('collapse');
-                    Search.facets.seeMoreOrLess(seeMore);
+                    // Don't call seeMoreOrLess here to avoid re-pagination,
+                    // just update the label.
+                    seeMore.text(seeMore.attr('data-label-see-less') || 'See less');
+                }
+            } else {
+                // Restore pagination when filter is cleared.
+                if (pagination.length) {
+                    pagination.show();
+                    var page = facet.data('facet-page') || 1;
+                    Search.facets.showPage(seeMore, page);
+                } else if (seeMore.length && seeMore.hasClass('collapse')) {
+                    // No pagination: re-apply see-more state.
+                    var perPage = Number(seeMore.attr('data-per-page')) || 0;
+                    if (perPage > 0) {
+                        // Re-init pagination.
+                        Search.facets.initPagination(seeMore, perPage);
+                    }
                 }
             }
             facet.find('.facet-items .facet-item').each(function() {

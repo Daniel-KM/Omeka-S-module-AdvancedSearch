@@ -566,6 +566,7 @@ class SearchConfigController extends AbstractActionController
             'limit',
             'state',
             'more',
+            'per_page',
             'display_count',
         ];
         $settings['facet']['mode'] = in_array($settings['facet']['mode'] ?? null, ['button', 'link', 'js']) ? $settings['facet']['mode'] : 'button';
@@ -577,7 +578,7 @@ class SearchConfigController extends AbstractActionController
             if (isset($facet['display_count'])) {
                 $facet['display_count'] = (bool) $facet['display_count'];
             }
-            foreach (['limit', 'more', 'min', 'max'] as $k) {
+            foreach (['limit', 'more', 'per_page', 'min', 'max'] as $k) {
                 if (isset($facet[$k])) {
                     if ($facet[$k] === '') {
                         unset($facet[$k]);
@@ -738,7 +739,7 @@ class SearchConfigController extends AbstractActionController
             if (isset($facet['display_count'])) {
                 $facet['display_count'] = (bool) $facet['display_count'];
             }
-            foreach (['limit', 'more', 'min', 'max'] as $k) {
+            foreach (['limit', 'more', 'per_page', 'min', 'max'] as $k) {
                 if (isset($facet[$k])) {
                     if ($facet[$k] === '') {
                         unset($facet[$k]);

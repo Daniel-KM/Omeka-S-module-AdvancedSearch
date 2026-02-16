@@ -467,6 +467,38 @@
         content: "🞁";
     }
 
+    .facet-pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.2em;
+        margin: 0.5em 0;
+    }
+    .facet-pagination button {
+        background: none;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        cursor: pointer;
+        padding: 2px 6px;
+        font-size: 1em;
+        line-height: 1;
+        min-width: 1.8em;
+        text-align: center;
+        box-shadow: none;
+    }
+    .facet-pagination button:hover:not(:disabled) {
+        background-color: #f0f0f0;
+    }
+    .facet-pagination button:disabled {
+        opacity: 0.3;
+        cursor: default;
+    }
+    .facet-page-indicator {
+        font-size: 0.9em;
+        padding: 0 0.3em;
+        white-space: nowrap;
+    }
+
     /* Search range */
     /* Render gradient on .range-progress; native tracks are invisible to fix Chrome. */
 

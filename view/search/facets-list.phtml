@@ -109,7 +109,7 @@ if (!empty($itemSet)) {
                     <?= $facetElements($name, $facetValues, $facetParams) ?>
                     <?php if (($facetParams['more'] ?? '') !== '' && in_array($facetParams['type'] ?? '', ['', 'Checkbox', 'CheckboxFilter', 'Link', 'Tree', 'TreeLink', 'Thesaurus', 'ThesaurusLink']) && count($facetValues) > (int) $facetParams['more']): ?>
                     <div class="facet-see-more">
-                        <button type="button" class="button facet-see-more-or-less expand" data-default-count="<?= (int) $facetParams['more'] ?>" data-more-count="<?= count($facetValues) - (int) $facetParams['more'] ?>" data-label-see-more="<?= $escapeAttr($translate('See more')) ?>" data-label-see-less="<?= $escapeAttr($translate('See less')) ?>"><?= $escape($translate('See more')) ?></button>
+                        <button type="button" class="button facet-see-more-or-less expand" data-default-count="<?= (int) $facetParams['more'] ?>" data-more-count="<?= count($facetValues) - (int) $facetParams['more'] ?>" data-per-page="<?= (int) ($facetParams['per_page'] ?? 0) ?>" data-label-see-more="<?= $escapeAttr($translate('See more')) ?>" data-label-see-less="<?= $escapeAttr($translate('See less')) ?>" data-label-page="<?= $escapeAttr($translate('Page')) ?>"><?= $escape($translate('See more')) ?></button>
                     </div>
                     <?php endif; ?>
                 </div>

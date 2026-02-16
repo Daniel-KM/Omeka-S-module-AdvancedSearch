@@ -408,6 +408,8 @@ return [
             'advancedsearch_api_config' => '',
             // Hidden value.
             'advancedsearch_all_configs' => [1 => 'find'],
+            // Hidden value, storing last processed cron time.
+            'advancedsearch_cron_last' => null,
         ],
         'site_settings' => [
             // See the full list below.
@@ -689,6 +691,16 @@ return [
                 'default_admin' => true,
                 'default_site' => true,
             ],
+        ],
+    ],
+    // Cron tasks registered with the EasyAdmin/Cron module.
+    'cron_tasks' => [
+        'search_index' => [
+            'label' => 'Reindex search engines', // @translate
+            'module' => 'AdvancedSearch',
+            'task_type' => 'job',
+            'frequencies' => ['hourly', 'daily', 'weekly'],
+            'default_frequency' => 'daily',
         ],
     ],
 ];

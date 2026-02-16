@@ -218,6 +218,26 @@ class Module extends AbstractModule
 
     public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
     {
+        // Handle cron reindexation: use EasyAdmin/Cron module if available,
+        // otherwise run independently via view.layout trigger.
+        if (class_exists('EasyAdmin\Job\CronTasks', false)
+            || class_exists('Cron\Job\CronTasks', false)
+        ) {
+            $sharedEventManager->attach(
+                \EasyAdmin\Job\CronTasks::class,
+                'easyadmin.cron.execute',
+                [$this, 'handleCronExecute']
+            );
+        } else {
+            // Handle cron reindexation independently when EasyAdmin/Cron
+            // module is not installed. Triggered on admin page load.
+            $sharedEventManager->attach(
+                '*',
+                'view.layout',
+                [$this, 'handleCron']
+            );
+        }
+
         $sharedEventManager->attach(
             '*',
             'view.layout',
@@ -1340,6 +1360,88 @@ class Module extends AbstractModule
             }
         }
         return array_values($resources);
+    }
+
+    /**
+     * Handle cron execute event from EasyAdmin/Cron module.
+     *
+     * Triggered by `easyadmin.cron.execute` on `EasyAdmin\Job\CronTasks`.
+     */
+    public function handleCronExecute(Event $event): void
+    {
+        $taskId = $event->getParam('task_id');
+        if ($taskId !== 'search_index') {
+            return;
+        }
+
+        $this->runCronIndexSearch();
+        $event->setParam('handled', true);
+    }
+
+    /**
+     * Handle cron reindexation independently when EasyAdmin/Cron is not installed.
+     *
+     * This method is triggered on view.layout to execute scheduled
+     * reindexation without requiring the EasyAdmin or Cron module.
+     */
+    public function handleCron(Event $event): void
+    {
+        $services = $this->getServiceLocator();
+
+        /** @var \Omeka\Mvc\Status $status */
+        $status = $services->get('Omeka\Status');
+        if (!$status->isAdminRequest()) {
+            return;
+        }
+
+        /** @var \Omeka\Settings\Settings $settings */
+        $settings = $services->get('Omeka\Settings');
+
+        // Check frequency (at most once per day = 86400 seconds).
+        $lastCron = (int) $settings->get('advancedsearch_cron_last');
+        $time = time();
+        if ($lastCron + 86400 > $time) {
+            return;
+        }
+        $settings->set('advancedsearch_cron_last', $time);
+
+        $this->runCronIndexSearch();
+    }
+
+    /**
+     * Run the reindexation of all search engines as a background job.
+     */
+    protected function runCronIndexSearch(): void
+    {
+        $services = $this->getServiceLocator();
+        $api = $services->get('Omeka\ApiManager');
+        $logger = $services->get('Omeka\Logger');
+
+        /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
+        $searchEngines = $api->search('search_engines')->getContent();
+        if (!count($searchEngines)) {
+            return;
+        }
+
+        $searchEngineIds = [];
+        foreach ($searchEngines as $searchEngine) {
+            $searchEngineIds[] = $searchEngine->id();
+        }
+
+        $jobArgs = [];
+        $jobArgs['search_engine_ids'] = $searchEngineIds;
+        $jobArgs['clear_index'] = false;
+        $jobArgs['force'] = false;
+
+        $dispatcher = $services->get(\Omeka\Job\Dispatcher::class);
+        try {
+            $dispatcher->dispatch(\AdvancedSearch\Job\IndexSearch::class, $jobArgs);
+        } catch (\Exception $e) {
+            $logger->err(
+                'AdvancedSearch cron: unable to launch reindexation: {message}', // @translate
+                ['message' => $e->getMessage()]
+            );
+        }
     }
 
     /**

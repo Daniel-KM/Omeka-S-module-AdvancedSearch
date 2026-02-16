@@ -91,7 +91,7 @@ class SearchSuggester extends AbstractEntity
 
     public function __construct()
     {
-        $this->suggests = new ArrayCollection;
+        $this->suggestions = new ArrayCollection;
     }
 
     public function getId()

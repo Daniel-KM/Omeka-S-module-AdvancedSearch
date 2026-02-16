@@ -67,10 +67,10 @@ class SearchSuggestion extends \AdvancedSearch\Entity\SearchSuggestion implement
     public function __sleep()
     {
         if ($this->__isInitialized__) {
-            return ['__isInitialized__', 'id', 'suggester', 'text', 'totalAll', 'totalPublic'];
+            return ['__isInitialized__', 'id', 'suggester', 'text', 'sites'];
         }
 
-        return ['__isInitialized__', 'id', 'suggester', 'text', 'totalAll', 'totalPublic'];
+        return ['__isInitialized__', 'id', 'suggester', 'text', 'sites'];
     }
 
     /**
@@ -133,7 +133,7 @@ class SearchSuggestion extends \AdvancedSearch\Entity\SearchSuggestion implement
      * {@inheritDoc}
      * @internal generated method: use only when explicitly handling proxy specific loading logic
      */
-    public function __setInitializer(\Closure $initializer = null): void
+    public function __setInitializer(?\Closure $initializer = null): void
     {
         $this->__initializer__ = $initializer;
     }
@@ -151,7 +151,7 @@ class SearchSuggestion extends \AdvancedSearch\Entity\SearchSuggestion implement
      * {@inheritDoc}
      * @internal generated method: use only when explicitly handling proxy specific loading logic
      */
-    public function __setCloner(\Closure $cloner = null): void
+    public function __setCloner(?\Closure $cloner = null): void
     {
         $this->__cloner__ = $cloner;
     }
@@ -239,45 +239,12 @@ class SearchSuggestion extends \AdvancedSearch\Entity\SearchSuggestion implement
     /**
      * {@inheritDoc}
      */
-    public function setTotalAll(int $totalAll): \AdvancedSearch\Entity\SearchSuggestion
+    public function getSites(): \Doctrine\Common\Collections\Collection
     {
 
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setTotalAll', [$totalAll]);
+        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getSites', []);
 
-        return parent::setTotalAll($totalAll);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTotalAll(): int
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTotalAll', []);
-
-        return parent::getTotalAll();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function setTotalPublic(int $totalPublic): \AdvancedSearch\Entity\SearchSuggestion
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'setTotalPublic', [$totalPublic]);
-
-        return parent::setTotalPublic($totalPublic);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getTotalPublic(): int
-    {
-
-        $this->__initializer__ && $this->__initializer__->__invoke($this, 'getTotalPublic', []);
-
-        return parent::getTotalPublic();
+        return parent::getSites();
     }
 
     /**

@@ -633,10 +633,10 @@ class Query implements JsonSerializable
     }
 
     /**
-     * Available options are (internal engine when direct (without index)):
-     * - suggester: id of the suggester
-     * - direct: direct query without the index (default false)
-     * - mode_index: "start" (default) or "contain"
+     * Available options for suggestions:
+     * - suggester: id of the suggester (uses indexed suggestions)
+     * - direct: direct query without index for field-specific suggestions (default false)
+     * - mode_index: "start" (default), "contain", "full", "start_full", "contain_full"
      * - mode_search: "start" (default) or "contain"
      * - length: max size of a string (default 50)
      */

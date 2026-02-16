@@ -2,19 +2,22 @@
 
 namespace AdvancedSearch\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Omeka\Entity\AbstractEntity;
 
 /**
  * @Entity
  * @Table(
- *     indexes={
- *         @Index(
- *             name="search_text_idx",
+ *     uniqueConstraints={
+ *         @UniqueConstraint(
  *             columns={
- *                 "text",
- *                 "suggester_id"
+ *                 "suggester_id",
+ *                 "text"
  *             }
- *         ),
+ *         )
+ *     },
+ *     indexes={
  *         @Index(
  *             columns={
  *                 "text"
@@ -44,7 +47,7 @@ class SearchSuggestion extends AbstractEntity
      *
      * @ManyToOne(
      *     targetEntity=SearchSuggester::class,
-     *     inversedBy="suggests"
+     *     inversedBy="suggestions"
      * )
      * @JoinColumn(
      *     nullable=false,
@@ -65,24 +68,25 @@ class SearchSuggestion extends AbstractEntity
     protected $text;
 
     /**
-     * @var int
+     * @var Collection|SearchSuggestionSite[]
      *
-     * @Column(
-     *     type="integer",
-     *     nullable=false
+     * @OneToMany(
+     *     targetEntity=SearchSuggestionSite::class,
+     *     mappedBy="suggestion",
+     *     orphanRemoval=true,
+     *     cascade={
+     *         "persist",
+     *         "remove"
+     *     },
+     *     indexBy="siteId"
      * )
      */
-    protected $totalAll = 0;
+    protected $sites;
 
-    /**
-     * @var int
-     *
-     * @Column(
-     *     type="integer",
-     *     nullable=false
-     * )
-     */
-    protected $totalPublic = 0;
+    public function __construct()
+    {
+        $this->sites = new ArrayCollection();
+    }
 
     public function getId()
     {
@@ -111,25 +115,8 @@ class SearchSuggestion extends AbstractEntity
         return $this->text;
     }
 
-    public function setTotalAll(int $totalAll): self
+    public function getSites(): Collection
     {
-        $this->totalAll = $totalAll;
-        return $this;
-    }
-
-    public function getTotalAll(): int
-    {
-        return $this->totalAll;
-    }
-
-    public function setTotalPublic(int $totalPublic): self
-    {
-        $this->totalPublic = $totalPublic;
-        return $this;
-    }
-
-    public function getTotalPublic(): int
-    {
-        return $this->totalPublic;
+        return $this->sites;
     }
 }

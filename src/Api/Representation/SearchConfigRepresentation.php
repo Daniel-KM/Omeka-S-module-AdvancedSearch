@@ -427,8 +427,11 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
     }
 
     /**
-     * @todo Remove site (but manage direct query).
-     * @todo Manage direct query here? Remove it?
+     * Get suggestions for autocompletion.
+     *
+     * When a suggester is configured and no specific field is requested, the
+     * indexed suggestions are used. When a specific field is requested, a
+     * direct database query is performed (slower but field-specific).
      *
      * Adapted:
      * @see \AdvancedSearch\Api\Representation\SearchConfigRepresentation::suggest()

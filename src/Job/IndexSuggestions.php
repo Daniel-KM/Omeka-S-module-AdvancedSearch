@@ -4,21 +4,24 @@ namespace AdvancedSearch\Job;
 
 use AdvancedSearch\Api\Representation\SearchSuggesterRepresentation;
 use AdvancedSearch\Entity\SearchSuggestion;
-use Doctrine\Common\Collections\Criteria;
 use Omeka\Job\AbstractJob;
 
 /**
- * @todo This is an internal indexer, not the generic suggestion indexer.
+ * Index suggestions for the internal search engine.
+ *
+ * Optimized for per-site indexing:
+ * - Global (site_id = NULL): all resources (public + private) for admin
+ * - Per site: both total (all) and total_public (public only)
+ *
+ * @todo Incremental update: when a resource is added/modified/deleted, update
+ * the suggestion counts accordingly instead of full reindexation:
+ * - On resource create: extract suggestions from values, increment totals
+ * - On resource update: diff old/new values, adjust totals
+ * - On resource delete: decrement totals, remove suggestions with total=0
+ * - On site assignment change: move counts between sites
  */
 class IndexSuggestions extends AbstractJob
 {
-    /**
-     * Limit for the loop to avoid heavy sql requests.
-     *
-     * @var int
-     */
-    const SQL_LIMIT = 1000;
-
     /**
      * @var \Omeka\Api\Manager
      */
@@ -44,12 +47,13 @@ class IndexSuggestions extends AbstractJob
      */
     protected $logger;
 
+    /**
+     * @var string
+     */
+    protected $modeIndex;
+
     public function perform(): void
     {
-        /**
-         * @var \Omeka\Api\Manager $api
-         * @var \Doctrine\ORM\EntityManager $entityManager
-         */
         $services = $this->getServiceLocator();
         $this->api = $services->get('Omeka\ApiManager');
         $this->logger = $services->get('Omeka\Logger');
@@ -70,7 +74,7 @@ class IndexSuggestions extends AbstractJob
         $engineAdapter = $searchEngine->engineAdapter();
         if (!$engineAdapter || !($engineAdapter instanceof \AdvancedSearch\EngineAdapter\Internal)) {
             $this->logger->err(
-                'Suggester #{search_suggester_id} ("{name}"): Only search engine with the intenal adapter (sql) can be indexed currently.', // @translate
+                'Suggester #{search_suggester_id} ("{name}"): Only search engine with the internal adapter (sql) can be indexed.', // @translate
                 ['search_suggester_id' => $suggester->id(), 'name' => $suggester->name()]
             );
             return;
@@ -88,7 +92,7 @@ class IndexSuggestions extends AbstractJob
         $resourceClasses = array_intersect_key($mapResources, array_flip($resourceTypes));
         if (!$resourceClasses) {
             $this->logger->notice(
-                'Suggester #{search_suggester_id} ("{name}"): there is no resource type to index or the indexation is not needed.', // @translate
+                'Suggester #{search_suggester_id} ("{name}"): there is no resource type to index.', // @translate
                 ['search_suggester_id' => $suggester->id(), 'name' => $suggester->name()]
             );
             return;
@@ -100,37 +104,32 @@ class IndexSuggestions extends AbstractJob
         if (count($listJobStatusesByIds)) {
             if (!$force) {
                 $this->logger->err(
-                    'Suggester #{search_suggester_id} ("{name}"): There are already {total} other jobs "Index Suggestion" (#{list}) and the current one is not forced.', // @translate
+                    'Suggester #{search_suggester_id} ("{name}"): There are already {total} other jobs "Index Suggestion" and the current one is not forced.', // @translate
                     [
                         'search_suggester_id' => $suggester->id(),
                         'name' => $suggester->name(),
                         'total' => count($listJobStatusesByIds),
-                        'list' => implode(', #', array_keys($listJobStatusesByIds)),
                     ]
                 );
                 return;
             }
             $this->logger->warn(
-                'There are already {total} other jobs "Index Suggestions". Slowdowns may occur on the site.', // @translate
-                ['total' => $listJobStatusesByIds]
+                'There are already {total} other jobs "Index Suggestions". Slowdowns may occur.', // @translate
+                ['total' => count($listJobStatusesByIds)]
             );
         }
 
         $timeStart = microtime(true);
-
-        $modeIndex = $suggester->setting('mode_index') ?: 'start';
-
-        $processMode = $this->getArg('process_mode') === 'sql' ? 'sql' : 'orm';
+        $this->modeIndex = $suggester->setting('mode_index') ?: 'start';
 
         $this->logger->notice(
-            'Suggester #{search_suggester_id} ("{name}"): start of indexing (index mode: {mode}, process mode: {mode_2}).', // @translate
-            ['search_suggester_id' => $suggester->id(), 'name' => $suggester->name(), 'mode' => $modeIndex, 'mode_2' => $processMode]
+            'Suggester #{search_suggester_id} ("{name}"): start of indexing (mode: {mode}).', // @translate
+            ['search_suggester_id' => $suggester->id(), 'name' => $suggester->name(), 'mode' => $this->modeIndex]
         );
 
-        $this->process($suggester, $processMode);
+        $this->process($suggester);
 
         $timeTotal = (int) (microtime(true) - $timeStart);
-
         $totalResults = $this->entityManager->getRepository(SearchSuggestion::class)->count(['suggester' => $suggester->id()]);
 
         $this->logger->notice(
@@ -139,19 +138,19 @@ class IndexSuggestions extends AbstractJob
         );
     }
 
-    protected function process(SearchSuggesterRepresentation $suggester, string $processMode): self
+    protected function process(SearchSuggesterRepresentation $suggester): self
     {
-        $dql = 'DELETE FROM AdvancedSearch\Entity\SearchSuggestion s WHERE s.suggester = ' . $suggester->id();
-        $query = $this->entityManager->createQuery($dql);
-        $totalDeleted = $query->execute();
-
-        $this->logger->notice(
-            'Suggester #{search_suggester_id} ("{name}"): {total} suggestions deleted.', // @translate
-            ['search_suggester_id' => $suggester->id(), 'name' => $suggester->name(), 'total' => $totalDeleted]
-        );
-
         // TODO Index value annotations with resources (for now, they can't be selected individually in the config).
 
+        $suggesterId = $suggester->id();
+
+        // Delete existing suggestions for this suggester.
+        $sql = 'DELETE FROM `search_suggestion` WHERE `suggester_id` = :suggester_id';
+        $this->connection->executeStatement($sql, ['suggester_id' => $suggesterId]);
+
+        $this->logger->info('Suggester #{id}: old suggestions deleted.', ['id' => $suggesterId]);
+
+        // Get configuration.
         $resourceTypes = $suggester->searchEngine()->setting('resource_types', []);
         $mapResourcesToClasses = [
             'items' => \Omeka\Entity\Item::class,
@@ -164,593 +163,218 @@ class IndexSuggestions extends AbstractJob
             ? []
             : array_intersect_key($mapResourcesToClasses, array_flip($resourceTypes));
 
-        // FIXME Fields are not only properties, but titles, classes and templates.
         $fields = $suggester->setting('fields') ?: [];
         $fields = $this->easyMeta->propertyIds($fields);
         $excludedFields = $suggester->setting('excluded_fields') ?: [];
         $excludedFields = $this->easyMeta->propertyIds($excludedFields);
 
-        $modeIndex = $suggester->setting('mode_index') ?: 'start';
+        // Build SQL conditions.
+        $bind = ['suggester_id' => $suggesterId];
+        $types = ['suggester_id' => \Doctrine\DBAL\ParameterType::INTEGER];
 
-        if ($processMode === 'sql') {
-            $modeIndex === 'contain' || $modeIndex === 'contain_full'
-                ? $this->processContain($suggester, $resourceClasses, $fields, $excludedFields, $modeIndex)
-                : $this->processStart($suggester, $resourceClasses, $fields, $excludedFields, $modeIndex);
-        } else {
-            $this->processOrm($suggester, $resourceClasses, $fields, $excludedFields, $modeIndex);
-        }
-
-        return $this;
-    }
-
-    protected function processStart(
-        SearchSuggesterRepresentation $suggester,
-        array $resourceClassesByNames,
-        array $fields,
-        array $excludedFields,
-        string $modeIndex
-    ): self {
-        $bind = [
-            'suggester_id' => $suggester->id(),
-        ];
-        $types = [
-            'suggester_id' => \Doctrine\DBAL\ParameterType::INTEGER,
-        ];
-        if ($resourceClassesByNames && !isset($resourceClassesByNames['resources'])) {
+        $sqlResourceTypes = '';
+        if ($resourceClasses) {
             $sqlResourceTypes = 'AND `resource`.`resource_type` IN (:resource_types)';
-            $bind['resource_types'] = array_values($resourceClassesByNames);
+            $bind['resource_types'] = array_values($resourceClasses);
             $types['resource_types'] = $this->connection::PARAM_STR_ARRAY;
-        } else {
-            $sqlResourceTypes = '';
         }
 
+        $sqlFields = '';
         if ($fields) {
             $sqlFields = 'AND `value`.`property_id` IN (:properties)';
             $bind['properties'] = array_values($fields);
             $types['properties'] = $this->connection::PARAM_INT_ARRAY;
-        } else {
-            $sqlFields = '';
         }
-
         if ($excludedFields) {
             $sqlFields .= ' AND `value`.`property_id` NOT IN (:excluded_property_ids)';
             $bind['excluded_property_ids'] = array_values($excludedFields);
             $types['excluded_property_ids'] = $this->connection::PARAM_INT_ARRAY;
         }
 
+        // Get all site IDs.
+        $siteIds = $this->connection->executeQuery('SELECT `id` FROM `site`')->fetchFirstColumn();
+
+        // Create temporary table for suggestions with both total and total_public.
+        // site_id = 0 means global (all sites).
         $sql = <<<'SQL'
-            # Process listing in a temporary table: the table has no auto-increment id.
-            DROP TABLE IF EXISTS `_suggestions_temporary`;
-            CREATE TEMPORARY TABLE `_suggestions_temporary` (
+            DROP TABLE IF EXISTS `_suggestions_temp`;
+            CREATE TEMPORARY TABLE `_suggestions_temp` (
                 `text` VARCHAR(190) NOT NULL COLLATE utf8mb4_unicode_ci,
-                `total_all` INT NOT NULL DEFAULT 1,
+                `site_id` INT NOT NULL DEFAULT 0,
+                `total` INT NOT NULL DEFAULT 0,
                 `total_public` INT NOT NULL DEFAULT 0,
-                PRIMARY KEY(`text`)
+                PRIMARY KEY (`text`, `site_id`)
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
             SQL;
+        $this->connection->executeStatement($sql);
 
-        $sqlsVisibility = [
-            'all' => '',
-            'public' => 'AND `resource`.`is_public` = 1 AND `value`.`is_public` = 1',
-        ];
+        // 1. Index global (site_id = NULL): all resources (public + private).
+        $this->logger->info('Suggester #{id}: indexing global (all resources)...', ['id' => $suggesterId]);
+        $this->indexSuggestions($sqlResourceTypes, $sqlFields, null, $bind, $types);
 
-        if ($modeIndex === 'start' || $modeIndex === 'start_full') {
-            foreach ($sqlsVisibility as $column => $sqlVisibility) {
-                for ($numberWords = 3; $numberWords >= 1; $numberWords--) {
-                    // Don't "insert ignore and distinct", increment on duplicate.
-                    $sql .= "\n\n" . <<<SQL
-                        # Create $numberWords words index (compute $column).
-                        INSERT INTO `_suggestions_temporary` (`text`)
-                        SELECT
-                            SUBSTRING(
-                                TRIM(
-                                    # Security replacements.
-                                    TRIM('"' FROM
-                                    TRIM("'" FROM
-                                    TRIM("\\\\" FROM
-                                    TRIM("%" FROM
-                                    TRIM("_" FROM
-                                    TRIM("#" FROM
-                                    TRIM("?" FROM
-                                    TRIM("$" FROM
-                                    # Cleaning replacements.
-                                    TRIM("," FROM
-                                    TRIM(";" FROM
-                                    TRIM("!" FROM
-                                    TRIM(":" FROM
-                                    TRIM("." FROM
-                                    TRIM("[" FROM
-                                    TRIM("]" FROM
-                                    TRIM("<" FROM
-                                    TRIM(">" FROM
-                                    TRIM("(" FROM
-                                    TRIM(")" FROM
-                                    TRIM("{" FROM
-                                    TRIM("}" FROM
-                                    TRIM("=" FROM
-                                    TRIM("&" FROM
-                                    TRIM("’" FROM
-                                    TRIM(
-                                        SUBSTRING_INDEX(
-                                            CONCAT(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), " "),
-                                            " ",
-                                            $numberWords
-                                        )
-                                    )))))))))))))))))))))))))
-                                ),
-                            1, 190)
-                        FROM `value` AS `value`
-                        INNER JOIN `resource`
-                            ON `resource`.`id` = `value`.`resource_id`
-                            $sqlResourceTypes
-                        WHERE
-                            `value`.`value` IS NOT NULL
-                            $sqlFields
-                            $sqlVisibility
-                        ON DUPLICATE KEY UPDATE `_suggestions_temporary`.`total_$column` = `_suggestions_temporary`.`total_$column` + 1;
-                        SQL;
-                }
-            }
-        }
-
-        if ($modeIndex === 'full' || $modeIndex === 'start_full') {
-            $sql .= "\n\n" . $this->appendSqlFull($sqlResourceTypes, $sqlFields);
-        }
-
-        $sql .= "\n\n" . <<<SQL
-            # Finalize creation of suggestions.
-            INSERT INTO `search_suggestion` (`suggester_id`, `text`, `total_all`, `total_public`)
-            SELECT DISTINCT
-                :suggester_id,
-                `text`,
-                `total_all`,
-                `total_public`
-            FROM `_suggestions_temporary`
-            WHERE
-                LENGTH(`text`) > 1;
-            DROP TABLE IF EXISTS `_suggestions_temporary`;
-            SQL;
-
-        $this->connection->executeStatement($sql, $bind, $types);
-
-        return $this;
-    }
-
-    protected function processContain(
-        SearchSuggesterRepresentation $suggester,
-        array $resourceClassesByNames,
-        array $fields,
-        array $excludedFields,
-        string $modeIndex
-    ): self {
-        $bind = [
-            'suggester_id' => $suggester->id(),
-        ];
-        $types = [
-            'suggester_id' => \Doctrine\DBAL\ParameterType::INTEGER,
-        ];
-        if ($resourceClassesByNames && !isset($resourceClassesByNames['resources'])) {
-            $sqlResourceTypes = 'AND `resource`.`resource_type` IN (:resource_types)';
-            $bind['resource_types'] = array_values($resourceClassesByNames);
-            $types['resource_types'] = $this->connection::PARAM_STR_ARRAY;
-        } else {
-            $sqlResourceTypes = '';
-        }
-
-        if ($fields) {
-            $sqlFields = 'AND `value`.`property_id` IN (:properties)';
-            $bind['properties'] = array_values($fields);
-            $types['properties'] = $this->connection::PARAM_INT_ARRAY;
-        } else {
-            $sqlFields = '';
-        }
-
-        if ($excludedFields) {
-            $sqlFields .= ' AND `value`.`property_id` NOT IN (:excluded_property_ids)';
-            $bind['excluded_property_ids'] = array_values($excludedFields);
-            $types['excluded_property_ids'] = $this->connection::PARAM_INT_ARRAY;
-        }
-
-        $sql = <<<'SQL'
-            # Process listing in a temporary table: the table has no auto-increment id and size is not limited.
-            DROP TABLE IF EXISTS `_suggestions_temporary`;
-            CREATE TEMPORARY TABLE `_suggestions_temporary` (
-                `text` LONGTEXT NOT NULL COLLATE utf8mb4_unicode_ci,
-                `total_all` INT NOT NULL DEFAULT 1,
-                `total_public` INT NOT NULL DEFAULT 0,
-                PRIMARY KEY(`text`(190))
-            ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
-            SQL;
-
-        $sqlsVisibility = [
-            'all' => '',
-            'public' => 'AND `resource`.`is_public` = 1 AND `value`.`is_public` = 1',
-        ];
-
-        if ($modeIndex === 'contain' || $modeIndex === 'contain_full') {
-            foreach ($sqlsVisibility as $column => $sqlVisibility) {
-                // Only one word for now.
-                // Don't "insert ignore and distinct", increment on duplicate.
-                $sql .= "\n\n" . <<<SQL
-                    # Create single words index (compute $column).
-                    # TODO Divide values by 1000 and use a loop.
-                    SET @pr = CONCAT(
-                        "INSERT INTO `_suggestions_temporary` (`text`) VALUES ('",
-                        REPLACE(
-                            (SELECT
-                                GROUP_CONCAT( DISTINCT
-                                    TRIM(
-                                        REPLACE(
-                                        REPLACE(
-                                        REPLACE(
-                                        REPLACE(
-                                        REPLACE(
-                                        REPLACE(
-                                        REPLACE(
-                                        REPLACE(
-                                        REPLACE(
-                                        REPLACE(
-                                        REPLACE(
-                                        REPLACE(
-                                        REPLACE(
-                                        REPLACE(
-                                        REPLACE(
-                                            `value`.`value`,
-                                        "\n", " "),
-                                        "\r", " "),
-                                        # Security replacements.
-                                        '"', " "),
-                                        "'", " "),
-                                        "\\\\", " "),
-                                        "%", " "),
-                                        "_", " "),
-                                        "#", " "),
-                                        "?", " "),
-                                        "$", " "),
-                                        # More common separators to avoid too long data.
-                                        ",", " "),
-                                        ";", " "),
-                                        "!", " "),
-                                        "’", " "),
-                                        "  ", " ")
-                                    )
-                                    SEPARATOR " "
-                                ) AS data
-                                FROM `value`
-                                JOIN `resource`
-                                    ON `resource`.`id` = `value`.`resource_id`
-                                    $sqlResourceTypes
-                                WHERE
-                                    `value`.`value` IS NOT NULL
-                                    $sqlFields
-                                    $sqlVisibility
-                            ),
-                            " ",
-                            "'),('"),
-                            "')",
-                            "ON DUPLICATE KEY UPDATE `_suggestions_temporary`.`total_$column` = `_suggestions_temporary`.`total_$column` + 1;"
-                        );
-                    PREPARE stmt1 FROM @pr;
-                    EXECUTE stmt1;
-                    SQL;
-            }
-        }
-
-        if ($modeIndex === 'full' || $modeIndex === 'contain_full') {
-            $sql .= "\n\n" . $this->appendSqlFull($sqlResourceTypes, $sqlFields);
-        }
-
-        $sql .= "\n\n" . <<<'SQL'
-            # Finalize creation of suggestions.
-            INSERT INTO `search_suggestion` (`suggester_id`, `text`, `total_all`, `total_public`)
-            SELECT DISTINCT
-                :suggester_id,
-                SUBSTRING(
-                    TRIM(
-                        # Security replacements.
-                        TRIM('"' FROM
-                        TRIM("'" FROM
-                        TRIM("\\\\" FROM
-                        TRIM("%" FROM
-                        TRIM("_" FROM
-                        TRIM("#" FROM
-                        # Cleaning replacements.
-                        TRIM("," FROM
-                        TRIM(";" FROM
-                        TRIM("!" FROM
-                        TRIM("?" FROM
-                        TRIM(":" FROM
-                        TRIM("." FROM
-                        TRIM("[" FROM
-                        TRIM("]" FROM
-                        TRIM("<" FROM
-                        TRIM(">" FROM
-                        TRIM("(" FROM
-                        TRIM(")" FROM
-                        TRIM("{" FROM
-                        TRIM("}" FROM
-                        TRIM("=" FROM
-                        TRIM("&" FROM
-                        TRIM(
-                           `text`
-                        )))))))))))))))))))))))
-                    ),
-                1, 190) AS "val",
-                `total_all`,
-                `total_public`
-            FROM `_suggestions_temporary`
-            WHERE
-                LENGTH(`text`) > 1;
-            
-            # Remove useless rows.
-            DELETE FROM `search_suggestion`
-            WHERE `suggester_id` = :suggester_id
-                AND LENGTH(`text`) <= 1;
-            
-            DROP TABLE IF EXISTS `_suggestions_temporary`;
-            SQL;
-
-        $this->connection->executeStatement($sql, $bind, $types);
-
-        return $this;
-    }
-
-    protected function appendSqlFull(string $sqlResourceTypes, string $sqlFields): string
-    {
-        $sql = '';
-        $sqlsVisibility = [
-            'all' => '',
-            'public' => 'AND `resource`.`is_public` = 1 AND `value`.`is_public` = 1',
-        ];
-        foreach ($sqlsVisibility as $column => $sqlVisibility) {
-            // Don't "insert ignore and distinct", increment on duplicate.
-            $sql .= "\n\n" . <<<SQL
-                # Create full value index (compute $column).
-                INSERT INTO `_suggestions_temporary` (`text`)
-                SELECT
-                    TRIM(SUBSTRING(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " "), 1, 190))
-                FROM `value` AS `value`
-                INNER JOIN `resource`
-                    ON `resource`.`id` = `value`.`resource_id`
-                    $sqlResourceTypes
-                WHERE
-                    `value`.`value` IS NOT NULL
-                    $sqlFields
-                    $sqlVisibility
-                ON DUPLICATE KEY UPDATE `_suggestions_temporary`.`total_$column` = `_suggestions_temporary`.`total_$column` + 1;
-                SQL;
-        }
-        return $sql;
-    }
-
-    protected function processOrm(
-        SearchSuggesterRepresentation $suggester,
-        array $resourceClassesByNames,
-        array $fields,
-        array $excludedFields,
-        string $modeIndex
-    ): self {
-        $criteria = new Criteria;
-        $expr = $criteria->expr();
-
-        // Expr is not null does not exist.
-        $criteria
-            ->where($expr->neq('value', null));
-
-        /* // Cannot be added, because criteria does not match not-in memory.
-        if ($resourceClassesByNames) {
-            // in() with string is messy.
-            // https://www.doctrine-project.org/projects/doctrine-orm/en/2.6/reference/inheritance-mapping.html#query-the-type
-            if (count($resourceClassesByNames) === 1) {
-                $criteria
-                    ->andWhere($expr->memberOf('resource', key($resourceClassesByNames)));
-            } elseif (count($resourceClassesByNames) === 2) {
-                $resourceTypes = array_keys($resourceClassesByNames);
-                $criteria
-                    ->andWhere($expr->orX(
-                        $expr->memberOf('resource', $resourceTypes[0]),
-                        $expr->memberOf('resource', $resourceTypes[1])
-                    ));
-            }
-        }
-        */
-
-        if ($fields) {
-            $criteria
-                ->andWhere($expr->in('property', $fields));
-        }
-
-        if ($excludedFields) {
-            $criteria
-                ->andWhere($expr->notIn('property', $excludedFields));
-        }
-
-        $criteria
-            ->orderBy(['id' => 'ASC'])
-            ->setFirstResult(null)
-            ->setMaxResults(self::SQL_LIMIT);
-
-        $valueRepository = $this->entityManager->getRepository(\Omeka\Entity\Value::class);
-        $collection = $valueRepository->matching($criteria);
-
-        $totalToProcess = $collection->count();
-        $this->logger->notice(
-            'Indexing suggestions for {total} resource values.', // @translate
-            ['total' => $totalToProcess]
-        );
-
-        // The suggestions are empty.
-        $suggesterId = $suggester->id();
-        $suggester = $suggester->getEntity();
-        $suggestionRepository = $this->entityManager->getRepository(\AdvancedSearch\Entity\SearchSuggestion::class);
-
-        $replacements = [
-            // Security replacements.
-            "\n" => ' ',
-            "\r" => ' ',
-            "'" => ' ',
-            '"' => ' ',
-            '\\' => ' ',
-            '%' => ' ',
-            '_' => ' ',
-            '#' => ' ',
-            '?' => ' ',
-            '$' => ' ',
-            # Cleaning replacements.
-            ',' => ' ',
-            ';' => ' ',
-            '!' => ' ',
-            // Keep urls, ark/doi.
-            // ':' => ' ',
-            // '.' => ' ',
-            '[' => ' ',
-            ']' => ' ',
-            '<' => ' ',
-            '>' => ' ',
-            '(' => ' ',
-            ')' => ' ',
-            '{' => ' ',
-            '}' => ' ',
-            '=' => ' ',
-            '&' => ' ',
-            '’' => ' ',
-            '  ' => ' ',
-        ];
-        $replacementsFull = [
-            "\n" => ' ',
-            "\r" => ' ',
-            '\\' => ' ',
-        ];
-
-        // Since the fixed medias are no more available in the database, the
-        // loop should take care of them, so a check is done on it.
-        // Some new values may have been added during process, so don't check
-        // the total to process, but the last id.
-        $lastId = 0;
-
-        $baseCriteria = $criteria;
-        $offset = 0;
-        $totalProcessed = 0;
-        while (true) {
-            $criteria = clone $baseCriteria;
-            $criteria
-                ->andWhere($expr->gt('id', $lastId));
-            $values = $valueRepository->matching($criteria);
-            if (!$values->count() || $offset >= $totalToProcess || $totalProcessed >= $totalToProcess) {
-                break;
-            }
-
+        // 2. Index per site: both total (all) and total_public (public only).
+        foreach ($siteIds as $siteId) {
             if ($this->shouldStop()) {
-                $this->logger->warn(
-                    'Job stopped: {count}/{total} processed (index mode: {mode}).', // @translate
-                    ['count' => $totalProcessed, 'total' => $totalToProcess, 'mode' => $modeIndex]
-                );
+                $this->logger->warn('Job stopped by user.');
                 return $this;
             }
-
-            if ($totalProcessed) {
-                $this->logger->info(
-                    '{count}/{total} values processed.', // @translate
-                    ['count' => $totalProcessed, 'total' => $totalToProcess]
-                );
-            }
-
-            // Get it each loop because of the entity manager clearing clearing.
-            $suggester = $this->entityManager->find(\AdvancedSearch\Entity\SearchSuggester::class, $suggesterId);
-
-            $suggestionCriteria = new Criteria($expr->eq('suggester', $suggester));
-            $suggestions = $suggestionRepository->matching($suggestionCriteria);
-
-            /** @var \Omeka\Entity\Value $value */
-            foreach ($values as $value) {
-                $lastId = $value->getId();
-                ++$totalProcessed;
-
-                $resource = $value->getResource();
-                if ($resourceClassesByNames
-                    && !isset($resourceClassesByNames[$resource->getResourceName()])
-                ) {
-                    continue;
-                }
-
-                $stringValue = $value->getValue();
-
-                // TODO Skip words without meaning like "the".
-                $list = [];
-                if ($modeIndex === 'start' || $modeIndex === 'start_full') {
-                    $string = strtr(strip_tags($stringValue), $replacements);
-                    $prevPart = '';
-                    foreach (array_filter(explode(' ', $string), 'strlen') as $part) {
-                        $part = trim($part, ".: \t\n\r\0\x0B");
-                        if (strlen($part) > 1) {
-                            $fullPart = $prevPart . $part;
-                            $list[] = $fullPart;
-                            if (count($list) >= 3) {
-                                break;
-                            }
-                            $prevPart = $fullPart . ' ';
-                        }
-                    }
-                } elseif ($modeIndex === 'contain' || $modeIndex === 'contain_full') {
-                    $string = strtr(strip_tags($stringValue), $replacements);
-                    foreach (array_filter(explode(' ', $string), 'strlen') as $part) {
-                        $part = trim($part, ".: \t\n\r\0\x0B");
-                        if (strlen($part) > 1) {
-                            $list[] = $part;
-                        }
-                    }
-                }
-
-                if (strpos($modeIndex, 'full') !== false) {
-                    $list[] = strtr(strip_tags($stringValue), $replacementsFull);
-                }
-
-                if (!count($list)) {
-                    continue;
-                }
-
-                $list = array_unique($list);
-
-                // TODO Check if a double loop (all then public only) is quicker: it will avoid a load of resource.
-                $isPublic = $value->isPublic()
-                    && $resource->isPublic();
-
-                foreach ($list as $part) {
-                    $part = mb_substr($part, 0, 190);
-                    $suggestCriteria = clone $suggestionCriteria;
-                    $suggestCriteria
-                        ->andWhere($expr->eq('text', $part));
-
-                    $existingSuggestions = $suggestions->matching($suggestCriteria);
-                    if ($existingSuggestions->count()) {
-                        $suggestion = $existingSuggestions->first();
-                    } else {
-                        $suggestion = new SearchSuggestion();
-                        $suggestion
-                            ->setSuggester($suggester)
-                            ->setText($part);
-                        $suggestions->add($suggestion);
-                        $this->entityManager->persist($suggestion);
-                    }
-                    $suggestion->setTotalAll($suggestion->getTotalAll() + 1);
-                    if ($isPublic) {
-                        $suggestion->setTotalPublic($suggestion->getTotalPublic() + 1);
-                    }
-                }
-            }
-
-            $this->entityManager->flush();
-            $this->entityManager->clear();
-            unset($values);
-
-            $offset += self::SQL_LIMIT;
+            $this->logger->info('Suggester #{id}: indexing site #{site_id}...', ['id' => $suggesterId, 'site_id' => $siteId]);
+            $this->indexSuggestions($sqlResourceTypes, $sqlFields, (int) $siteId, $bind, $types);
         }
 
-        $this->logger->warn(
-            'End of process: {count}/{total} processed (index mode: {mode}).', // @translate
-            ['count' => $totalProcessed, 'total' => $totalToProcess, 'mode' => $modeIndex]
-        );
+        // Transfer from temporary table to final tables.
+        $sql = <<<SQL
+            INSERT INTO `search_suggestion` (`suggester_id`, `text`)
+            SELECT DISTINCT :suggester_id, `text`
+            FROM `_suggestions_temp`
+            WHERE LENGTH(`text`) > 1
+            ON DUPLICATE KEY UPDATE `text` = VALUES(`text`);
+            SQL;
+        $this->connection->executeStatement($sql, $bind, $types);
+
+        // site_id = 0 means global (all sites).
+        $sql = <<<SQL
+            INSERT INTO `search_suggestion_site` (`suggestion_id`, `site_id`, `total`, `total_public`)
+            SELECT s.`id`, t.`site_id`, t.`total`, t.`total_public`
+            FROM `_suggestions_temp` t
+            JOIN `search_suggestion` s ON s.`text` = t.`text` AND s.`suggester_id` = :suggester_id
+            WHERE LENGTH(t.`text`) > 1
+            ON DUPLICATE KEY UPDATE `total` = VALUES(`total`), `total_public` = VALUES(`total_public`);
+            SQL;
+        $this->connection->executeStatement($sql, $bind, $types);
+
+        // Cleanup.
+        $this->connection->executeStatement('DROP TABLE IF EXISTS `_suggestions_temp`');
 
         return $this;
+    }
+
+    /**
+     * Index suggestions for a specific site or global (null).
+     *
+     * For global (null): indexes all resources (public + private) into total.
+     * For site: indexes all site resources into total, public only into total_public.
+     */
+    protected function indexSuggestions(
+        string $sqlResourceTypes,
+        string $sqlFields,
+        ?int $siteId,
+        array $bind,
+        array $types
+    ): void {
+        if ($siteId === null) {
+            // Global: all resources (public + private), no site filter.
+            // Use 0 as sentinel value (will be converted to NULL in final table).
+            $sqlSite = '';
+            $siteValue = '0';
+
+            // Index all resources into total column.
+            $this->indexWithMode($sqlResourceTypes, $sqlFields, $sqlSite, $siteValue, '', 'total', $bind, $types);
+            // For global, total_public = count of public resources.
+            $sqlVisibility = 'AND `resource`.`is_public` = 1 AND `value`.`is_public` = 1';
+            $this->indexWithMode($sqlResourceTypes, $sqlFields, $sqlSite, $siteValue, $sqlVisibility, 'total_public', $bind, $types);
+        } else {
+            // Site: filter by item_site.
+            $sqlSite = 'JOIN `item_site` ON `item_site`.`item_id` = `resource`.`id` AND `item_site`.`site_id` = ' . $siteId;
+            $siteValue = (string) $siteId;
+
+            // Index all site resources (public + private) into total column.
+            $this->indexWithMode($sqlResourceTypes, $sqlFields, $sqlSite, $siteValue, '', 'total', $bind, $types);
+            // Index public only into total_public column.
+            $sqlVisibility = 'AND `resource`.`is_public` = 1 AND `value`.`is_public` = 1';
+            $this->indexWithMode($sqlResourceTypes, $sqlFields, $sqlSite, $siteValue, $sqlVisibility, 'total_public', $bind, $types);
+        }
+    }
+
+    /**
+     * Index suggestions with the configured mode (start, contain, full).
+     */
+    protected function indexWithMode(
+        string $sqlResourceTypes,
+        string $sqlFields,
+        string $sqlSite,
+        string $siteValue,
+        string $sqlVisibility,
+        string $column,
+        array $bind,
+        array $types
+    ): void {
+        // For start mode: extract 1, 2, 3 word combinations.
+        if ($this->modeIndex === 'start' || $this->modeIndex === 'start_full' || !$this->modeIndex) {
+            for ($numberWords = 3; $numberWords >= 1; $numberWords--) {
+                // Don't "insert ignore and distinct", increment on duplicate.
+                $sql = <<<SQL
+                    INSERT INTO `_suggestions_temp` (`text`, `site_id`, `$column`)
+                    SELECT
+                        SUBSTRING(
+                            TRIM(
+                                # Security replacements.
+                                TRIM('"' FROM
+                                TRIM("'" FROM
+                                TRIM("\\\\" FROM
+                                TRIM("%" FROM
+                                TRIM("_" FROM
+                                TRIM("#" FROM
+                                TRIM("?" FROM
+                                # Cleaning replacements.
+                                TRIM("," FROM
+                                TRIM(";" FROM
+                                TRIM("!" FROM
+                                TRIM(":" FROM
+                                TRIM("." FROM
+                                TRIM("[" FROM
+                                TRIM("]" FROM
+                                TRIM("<" FROM
+                                TRIM(">" FROM
+                                TRIM("(" FROM
+                                TRIM(")" FROM
+                                TRIM("{" FROM
+                                TRIM("}" FROM
+                                TRIM("=" FROM
+                                TRIM("&" FROM
+                                TRIM(
+                                    SUBSTRING_INDEX(
+                                        CONCAT(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", ' '), "\r", ' ')), ' '),
+                                        ' ',
+                                        $numberWords
+                                    )
+                                )))))))))))))))))))))))
+                            ),
+                            1, 190
+                        ),
+                        $siteValue,
+                        1
+                    FROM `value`
+                    JOIN `resource` ON `resource`.`id` = `value`.`resource_id`
+                        $sqlResourceTypes
+                    $sqlSite
+                    WHERE `value`.`value` IS NOT NULL
+                        $sqlFields
+                        $sqlVisibility
+                    ON DUPLICATE KEY UPDATE `_suggestions_temp`.`$column` = `_suggestions_temp`.`$column` + 1;
+                    SQL;
+                $this->connection->executeStatement($sql, $bind, $types);
+            }
+        }
+
+        // For full mode: also add complete trimmed values.
+        if ($this->modeIndex === 'full' || $this->modeIndex === 'start_full' || $this->modeIndex === 'contain_full') {
+            $sql = <<<SQL
+                INSERT INTO `_suggestions_temp` (`text`, `site_id`, `$column`)
+                SELECT
+                    TRIM(SUBSTRING(REPLACE(REPLACE(`value`.`value`, "\n", ' '), "\r", ' '), 1, 190)),
+                    $siteValue,
+                    1
+                FROM `value`
+                JOIN `resource` ON `resource`.`id` = `value`.`resource_id`
+                    $sqlResourceTypes
+                $sqlSite
+                WHERE `value`.`value` IS NOT NULL
+                    $sqlFields
+                    $sqlVisibility
+                ON DUPLICATE KEY UPDATE `_suggestions_temp`.`$column` = `_suggestions_temp`.`$column` + 1;
+                SQL;
+            $this->connection->executeStatement($sql, $bind, $types);
+        }
     }
 }

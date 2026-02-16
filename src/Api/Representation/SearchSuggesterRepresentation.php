@@ -97,9 +97,6 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
     }
 
     /**
-     * @todo Remove site (but manage direct query).
-     * @todo Manage direct query here? Remove it?
-     *
      * Adapted:
      * @see \AdvancedSearch\Api\Representation\SearchConfigRepresentation::suggest()
      * @see \AdvancedSearch\Api\Representation\SearchSuggesterRepresentation::suggest()

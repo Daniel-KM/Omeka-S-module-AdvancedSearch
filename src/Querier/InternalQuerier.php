@@ -170,13 +170,11 @@ class InternalQuerier extends AbstractQuerier
         }
 
         $suggestOptions = $this->query->getSuggestOptions();
-        if (!empty($suggestOptions['direct'])) {
-            return $this->querySuggestionsDirect();
-        }
 
-        // TODO Manage site id and item set id and any other filter query.
-        // TODO Use the index full text?
-        // TODO Manage site here?
+        // Direct query without index, used for field-specific suggestions.
+        if (!empty($suggestOptions['direct'])) {
+            return $this->querySuggestionsForField();
+        }
 
         // The mode index, resource types, fields, and length are managed during
         // indexation.
@@ -187,9 +185,6 @@ class InternalQuerier extends AbstractQuerier
                 ->setMessage('An issue occurred for the suggester.'); // @translate
         }
 
-        $isPublic = $this->query->getIsPublic();
-        $column = $isPublic ? 'public' : 'all';
-
         $modeSearch = $suggestOptions['mode_search'] ?? 'start';
 
         /** @var \Doctrine\DBAL\Connection $connection */
@@ -198,23 +193,54 @@ class InternalQuerier extends AbstractQuerier
         $bind = [
             'suggester' => $suggester,
             'limit' => $this->query->getLimit(),
-            'value_like' => ($modeSearch === 'contain' ? '%' : '')
-                . strtr($q, ['%' => '\%', '_' => '\_']) . '%',
         ];
         $types = [
             'suggester' => \PDO::PARAM_INT,
             'limit' => \PDO::PARAM_INT,
-            'value_like' => \PDO::PARAM_STR,
         ];
+
+        // Determine site filter and column:
+        // - Admin (isPublic=false): use `total` column (all resources including private)
+        // - Public (isPublic=true): use `total_public` column (public resources only)
+        // - With site: filter by site_id
+        // - Without site: use global index (site_id = 0)
+        $isPublic = $this->query->getIsPublic();
+        $siteId = $this->query->getSiteId();
+
+        // Choose column based on visibility.
+        $column = $isPublic ? 'total_public' : 'total';
+
+        // Choose site filter (site_id = 0 means global).
+        $sqlSiteFilter = 'AND ss.`site_id` = :site_id';
+        $bind['site_id'] = $siteId ?: 0;
+        $types['site_id'] = \PDO::PARAM_INT;
+
+        // Choose search method based on mode:
+        // - "start": use LIKE 'term%' (B-tree index efficient for prefix search)
+        // - "contain": use FULLTEXT MATCH() AGAINST() (much faster than LIKE '%term%')
+        if ($modeSearch === 'contain') {
+            // FULLTEXT search: searches for words, not substrings.
+            // Boolean mode allows partial word matching with wildcard.
+            $bind['value_match'] = $q . '*';
+            $types['value_match'] = \PDO::PARAM_STR;
+            $sqlTextFilter = 'AND MATCH(s.`text`) AGAINST(:value_match IN BOOLEAN MODE)';
+        } else {
+            // Prefix search with LIKE (uses B-tree index).
+            $bind['value_like'] = strtr($q, ['%' => '\%', '_' => '\_']) . '%';
+            $types['value_like'] = \PDO::PARAM_STR;
+            $sqlTextFilter = 'AND s.`text` LIKE :value_like';
+        }
 
         $sql = <<<SQL
             SELECT DISTINCT
-                `text` AS "value",
-                `total_$column` AS "data"
-            FROM `search_suggestion` AS `search_suggestion`
-            WHERE `search_suggestion`.`suggester_id` = :suggester
-                AND `search_suggestion`.`text` LIKE :value_like
-            ORDER BY data DESC
+                s.`text` AS "value",
+                ss.`$column` AS "data"
+            FROM `search_suggestion` s
+            JOIN `search_suggestion_site` ss ON ss.`suggestion_id` = s.`id`
+            WHERE s.`suggester_id` = :suggester
+                $sqlTextFilter
+                $sqlSiteFilter
+            ORDER BY ss.`$column` DESC
             LIMIT :limit
             ;
             SQL;
@@ -231,12 +257,19 @@ class InternalQuerier extends AbstractQuerier
             ->setIsSuccess(true);
     }
 
-    protected function querySuggestionsDirect(): Response
+    /**
+     * Query suggestions directly from database for a specific field.
+     *
+     * Used when suggestions are requested for a specific field without a
+     * pre-built suggester index. This is slower than indexed suggestions
+     * but allows field-specific autocompletion.
+     *
+     * @todo Optimize with per-field suggestion index or use FULLTEXT search.
+     * @todo Support site filtering via item_site join for item sets.
+     * @todo Add caching for frequently requested fields.
+     */
+    protected function querySuggestionsForField(): Response
     {
-        // TODO Manage site id and item set id and any other filter query.
-        // TODO Use the full text search table.
-        // TODO Manage the field query args for suggestion.
-
         $mapResourcesToClasses = [
             'items' => \Omeka\Entity\Item::class,
             'item_sets' => \Omeka\Entity\ItemSet::class,
@@ -294,16 +327,15 @@ class InternalQuerier extends AbstractQuerier
         if ($excludedFields) {
             $ids = $this->easyMeta->propertyIds($excludedFields);
             if ($ids) {
-                $sqlFields .= 'AND `value`.`property_id` NOT IN (:excluded_property_ids)';
+                $sqlFields .= ' AND `value`.`property_id` NOT IN (:excluded_property_ids)';
                 $bind['excluded_property_ids'] = array_values($ids);
                 $types['excluded_property_ids'] = $connection::PARAM_INT_ARRAY;
             }
         }
 
-        // FIXME The sql for site doesn't manage site item sets.
         $site = $this->query->getSiteId();
         if ($site) {
-            $sqlSite = 'JOIN `item_site` ON `item_site`.`item_id` = `resource`.`id` AND `item_site`.`site_id` = ' . $site;
+            $sqlSite = 'JOIN `item_site` ON `item_site`.`item_id` = `resource`.`id` AND `item_site`.`site_id` = ' . (int) $site;
         } else {
             $sqlSite = '';
         }
@@ -342,36 +374,6 @@ class InternalQuerier extends AbstractQuerier
             $bind['value_like'] = '%' . strtr($q, ['%' => '\%', '_' => '\_']) . '%';
             $types['value_like'] = \PDO::PARAM_STR;
         } elseif ($mode === 'start') {
-            /*
-            $sql = <<<SQL
-                SELECT DISTINCT
-                    SUBSTRING(SUBSTRING_INDEX(
-                        CONCAT(
-                            TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")),
-                        " "), " ", 1
-                    ), 1, :length) AS "value",
-                    COUNT(SUBSTRING(SUBSTRING_INDEX(
-                        CONCAT(
-                            TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")),
-                        " "), " ", 1
-                    ), 1, :length)) as "data"
-                FROM `value` AS `value`
-                INNER JOIN
-                    `resource` ON `resource`.`id` = `value`.`resource_id`
-                    $sqlResourceTypes
-                $sqlSite
-                WHERE
-                    `value`.`value` LIKE :value_like
-                GROUP BY SUBSTRING(SUBSTRING_INDEX(
-                        CONCAT(
-                            TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")),
-                        " "), " ", 1
-                    ), 1, :length)
-                ORDER BY data DESC
-                LIMIT :limit
-                ;
-                SQL;
-                */
             $sql = <<<SQL
                 SELECT DISTINCT
                     SUBSTRING(

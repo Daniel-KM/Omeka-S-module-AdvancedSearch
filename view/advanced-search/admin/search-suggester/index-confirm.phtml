@@ -25,16 +25,8 @@ $this->form->setButtonLabel($translate('Confirm reindex'));
         <h3><?= sprintf($translate('Reindex "%s"'), $resource->name()) ?></h3>
         <p><?= $translate('Are you sure you would like to reindex this suggester?') ?></p>
         <p>
-        <?= $translate('All the suggestions will be cleared first, so the search will be unavailable for a while (instant for mode "full" by sql, some minutes or some hours else).') ?>
-        <?= $translate('You may redirect the users to a clone of the current suggester temporary.') ?>
-        </p>
-        <p>
-            <?= $translate('Process of indexation') ?>
-            <br/>
-            <br/>
-            <input form="<?= $form->getName() ?>" type="radio" name="process_mode" id="process_mode" value="sql"/><?= $translate('Direct sql (in particular mode "full")') ?>
-            <br/>
-            <input form="<?= $form->getName() ?>" type="radio" name="process_mode" id="process_mode" value="orm" checked="checked"/><?= $translate('Orm (slower but more precise index, required for old database, or small memory)') ?>
+        <?= $translate('All the suggestions will be cleared first, so the search will be unavailable for a while.') ?>
+        <?= $translate('You may redirect the users to a clone of the current suggester temporarily.') ?>
         </p>
         <p>
         <?php if ($listJobStatusesByIds): ?>

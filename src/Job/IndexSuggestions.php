@@ -236,6 +236,35 @@ class IndexSuggestions extends AbstractJob
             }
         }
 
+        // Remove suggestions starting or ending with stopwords.
+        // TODO Improvement: stopwords per language (using value's @language)
+        // with manual list per language or automatic list (stopwords-iso, external file).
+        $stopwords = $suggester->setting('stopwords') ?: [];
+        $stopwordsMode = $suggester->setting('stopwords_mode') ?: 'start_end';
+        if ($stopwords) {
+            // Escape special regex characters in stopwords.
+            $escapedStopwords = array_map(function ($word) {
+                return preg_quote(trim($word), '/');
+            }, $stopwords);
+            $escapedStopwords = array_filter($escapedStopwords);
+            if ($escapedStopwords) {
+                $stopwordsAlternation = implode('|', $escapedStopwords);
+                $sql = 'DELETE FROM `_suggestions_temp` WHERE `text` REGEXP :stopwords_pattern';
+                // MySQL REGEXP uses POSIX ERE: [[:space:]] for whitespace, not \s.
+                // Pattern for stopword at start: ^(word1|word2)[[:space:]]
+                if ($stopwordsMode === 'start' || $stopwordsMode === 'start_end') {
+                    $patternStart = '^(' . $stopwordsAlternation . ')[[:space:]]';
+                    $this->connection->executeStatement($sql, ['stopwords_pattern' => $patternStart]);
+                }
+                // Pattern for stopword at end: [[:space:]](word1|word2)$
+                if ($stopwordsMode === 'end' || $stopwordsMode === 'start_end') {
+                    $patternEnd = '[[:space:]](' . $stopwordsAlternation . ')$';
+                    $this->connection->executeStatement($sql, ['stopwords_pattern' => $patternEnd]);
+                }
+                $this->logger->info('Suggester #{id}: removed suggestions with stopwords ({mode}).', ['id' => $suggesterId, 'mode' => $stopwordsMode]);
+            }
+        }
+
         // Transfer from temporary table to final tables.
         $sql = <<<SQL
             INSERT INTO `search_suggestion` (`suggester_id`, `text`)

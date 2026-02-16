@@ -7,6 +7,7 @@ use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
 use Omeka\Api\Manager as ApiManager;
+use Omeka\Form\Element as OmekaElement;
 
 class SearchSuggesterForm extends Form
 {
@@ -202,6 +203,41 @@ class SearchSuggesterForm extends Form
                     'multiple' => true,
                     'class' => 'chosen-select',
                     'data-placeholder' => 'Select fields…', // @translate
+                ],
+            ])
+            ->add([
+                'name' => 'stopwords',
+                'type' => OmekaElement\ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Stopwords', // @translate
+                    'info' => 'Suggestions starting or ending with these words will be excluded. One word per line.', // @translate
+                    'documentation' => 'https://github.com/stopwords-iso/stopwords-iso',
+                ],
+                'attributes' => [
+                    'id' => 'stopwords',
+                    'rows' => 5,
+                    'value' => [
+                        // English
+                        'a', 'an', 'and', 'at', 'by', 'for', 'in', 'of', 'on', 'or', 'the', 'to', 'with',
+                        // French
+                        'a', 'au', 'aux', 'd', 'de', 'des', 'du', 'en', 'et', 'l', 'la', 'le', 'les', 'un', 'une',
+                    ],
+                ],
+            ])
+            ->add([
+                'name' => 'stopwords_mode',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Stopwords position', // @translate
+                    'value_options' => [
+                        'start_end' => 'Start and end (recommended)', // @translate
+                        'start' => 'Start only', // @translate
+                        'end' => 'End only', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'stopwords_mode',
+                    'value' => 'start_end',
                 ],
             ])
         ;

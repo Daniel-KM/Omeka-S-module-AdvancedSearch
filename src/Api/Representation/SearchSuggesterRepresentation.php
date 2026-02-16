@@ -159,7 +159,6 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
             ->setLimitPage(1, empty($suggesterSettings['limit']) ? \Omeka\Stdlib\Paginator::PER_PAGE : (int) $suggesterSettings['limit'])
             ->setSuggestOptions([
                 'suggester' => $this->resource->getId(),
-                'direct' => !empty($suggesterSettings['direct']),
                 'mode_index' => $suggesterSettings['mode_index'] ?? 'start',
                 'mode_search' => $suggesterSettings['mode_search'] ?? 'start',
                 'length' => $suggesterSettings['length'] ?? 50,

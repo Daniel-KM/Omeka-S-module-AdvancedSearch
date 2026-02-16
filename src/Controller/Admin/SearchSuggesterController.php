@@ -127,18 +127,11 @@ class SearchSuggesterController extends AbstractActionController
         $suggester = $this->api()->read('search_suggesters', $suggesterId)->getContent();
 
         $force = (bool) $this->params()->fromPost('force');
-        $processMode = $this->params()->fromPost('process_mode');
 
         $jobArgs = [];
         $jobArgs['search_suggester_id'] = $suggester->id();
         $jobArgs['force'] = $force;
-        $jobArgs['process_mode'] = $processMode;
-        $dispatcher = $this->jobDispatcher();
-        if ($this->params()->fromPost('foreground')) {
-            $job = $dispatcher->dispatch(IndexSuggestions::class, $jobArgs, $suggester->getServiceLocator()->get('Omeka\Job\DispatchStrategy\Synchronous'));
-        } else {
-            $job = $dispatcher->dispatch(IndexSuggestions::class, $jobArgs);
-        }
+        $job = $this->jobDispatcher()->dispatch(IndexSuggestions::class, $jobArgs);
 
         $urlPlugin = $this->url();
         $message = new PsrMessage(

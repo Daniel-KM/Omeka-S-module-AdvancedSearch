@@ -91,16 +91,6 @@ class SearchSuggesterForm extends Form
 
         $fieldset
             ->add([
-                'name' => 'direct',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'label' => 'Direct query in database (without index, but site specific)', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'direct',
-                ],
-            ])
-            ->add([
                 'name' => 'mode_index',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [

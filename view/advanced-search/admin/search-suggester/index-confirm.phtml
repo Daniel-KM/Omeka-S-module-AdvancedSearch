@@ -36,9 +36,6 @@ $this->form->setButtonLabel($translate('Confirm reindex'));
             <?= $translate('No running indexing: process can be launched.') ?>
         <?php endif; ?>
         </p>
-        <p>
-            <input form="<?= $form->getName() ?>" name="foreground" type="checkbox" /><?= $translate('Index in foreground') ?><br />
-        </p>
         <?= $this->form($form) ?>
     </div>
 <?php else: ?>

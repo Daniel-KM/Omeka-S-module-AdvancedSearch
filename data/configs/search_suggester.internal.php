@@ -8,7 +8,6 @@
  * @var array
  */
 return [
-    'direct' => false,
     'mode_index' => 'start',
     'mode_search' => 'start',
     'limit' => 25,

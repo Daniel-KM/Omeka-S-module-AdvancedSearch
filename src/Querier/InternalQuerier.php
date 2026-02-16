@@ -351,7 +351,6 @@ class InternalQuerier extends AbstractQuerier
 
         $mode = $this->query->getSuggestOptions()['mode_search'] ?: 'start';
         if ($mode === 'contain') {
-            // TODO Improve direct sql for full suggestions.
             $sql = <<<SQL
                 SELECT DISTINCT
                     SUBSTRING(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", " "), "\r", " ")), 1, :length) AS "value",

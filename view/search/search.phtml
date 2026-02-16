@@ -226,12 +226,26 @@ if ($showMapView) {
 
         <?php // Map view container (hidden by default, shown when map view is selected). ?>
         <?php if (!empty($showMapView)): ?>
+        <?php
+        // For map view, determine if we should pass item IDs or let Mapping show all.
+        // - If browse (no query): don't pass IDs, show all features
+        // - If filtered search with reasonable count: pass IDs
+        // - If filtered search with too many results: don't pass IDs (would be excessive)
+        $isBrowse = $query->isBrowse();
+        $totalItems = $response->getResourceTotalResults('items') ?: 0;
+        $maxItemsForMap = 10000; // Reasonable limit for passing IDs
+        // Use comma-separated format (Omeka supports "id=x,y,z").
+        $itemIdsString = (!$isBrowse && $totalItems > 0 && $totalItems <= $maxItemsForMap)
+            ? implode(',', $response->getAllResourceIds('items'))
+            : '';
+        ?>
         <div class="search-results-part search-results-map" style="display: none;">
             <div id="search-map"
                 data-basemap-provider="<?= $escape($mappingBasemapProvider) ?>"
                 data-disable-clustering="<?= $mappingDisableClustering ?>"
                 data-features-url="<?= $escape($mappingFeaturesUrl) ?>"
-                data-feature-popup-content-url="<?= $escape($mappingPopupUrl) ?>">
+                data-feature-popup-content-url="<?= $escape($mappingPopupUrl) ?>"
+                data-item-ids="<?= $escape($itemIdsString) ?>">
             </div>
         </div>
         <?php endif; ?>

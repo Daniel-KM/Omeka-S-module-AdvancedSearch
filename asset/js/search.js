@@ -419,6 +419,18 @@ var Search = (function() {
         var basemapProvider = searchMapDiv.dataset.basemapProvider || 'OpenStreetMap.Mapnik';
         var disableClustering = searchMapDiv.dataset.disableClustering === '1';
 
+        // Get item IDs from the search results (passed from PHP as comma-separated string).
+        // Empty string means: show all features (browse mode or too many results).
+        var itemIdsString = searchMapDiv.dataset.itemIds || '';
+        var itemsQuery = {};
+
+        if (itemIdsString) {
+            // Filtered search with reasonable number of results: pass IDs.
+            // Omeka API supports "id=x,y,z" format.
+            itemsQuery.id = itemIdsString;
+        }
+        // If empty, itemsQuery stays empty and Mapping will show all features.
+
         // Set map height.
         searchMapDiv.style.height = '600px';
 
@@ -432,17 +444,6 @@ var Search = (function() {
         self.features = mapResult[1];
         self.featuresPoint = mapResult[2];
         self.featuresPoly = mapResult[3];
-
-        // Build items query from current URL search parameters.
-        // Remove pagination and view-related params, keep search filters.
-        var urlParams = new URLSearchParams(window.location.search);
-        var itemsQuery = {};
-        urlParams.forEach(function(value, key) {
-            // Skip pagination, sort, and display params.
-            if (!['page', 'per_page', 'limit', 'offset', 'sort', 'sort_by', 'sort_order'].includes(key)) {
-                itemsQuery[key] = value;
-            }
-        });
 
         // Load features.
         var onFeaturesLoad = function() {

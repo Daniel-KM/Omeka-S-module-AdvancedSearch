@@ -29,6 +29,13 @@ $form->prepare();
 <?= $this->form()->closeTag() ?>
 <?php $this->trigger('view.edit.after'); ?>
 
-<?php if (!$form->getOption('is_internal')): ?>
-    <?= $translate('Only the internal adapter can have settings for now. For external suggesters, use the direct url in the search config.') ?>
+<?php
+// Check if form has settings elements (added by internal or external modules).
+$settingsFieldset = $form->has('o:settings') ? $form->get('o:settings') : null;
+$hasSettings = $settingsFieldset && count($settingsFieldset->getElements()) > 0;
+?>
+<?php if (!$hasSettings): ?>
+<p class="explanation">
+    <?= $translate('This search engine adapter does not have specific suggester settings. For external suggesters, use the direct url in the search config.') ?>
+</p>
 <?php endif; ?>

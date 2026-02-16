@@ -29,6 +29,3 @@ $form->prepare();
 <?= $this->form()->closeTag() ?>
 <?php $this->trigger('view.add.after'); ?>
 
-<?php if (!$form->getOption('is_internal')): ?>
-    <?= $translate('Only the internal adapter can have settings for now. For external suggesters, use the direct url in the search config.') ?>
-<?php endif; ?>

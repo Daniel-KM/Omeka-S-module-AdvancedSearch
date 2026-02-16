@@ -3,6 +3,8 @@
 namespace AdvancedSearch\Form\Admin;
 
 use Common\Form\Element as CommonElement;
+use Laminas\EventManager\Event;
+use Laminas\EventManager\EventManagerAwareTrait;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
@@ -11,6 +13,8 @@ use Omeka\Form\Element as OmekaElement;
 
 class SearchSuggesterForm extends Form
 {
+    use EventManagerAwareTrait;
+
     /**
      * @var ApiManager
      */
@@ -60,13 +64,13 @@ class SearchSuggesterForm extends Form
                 'options' => [
                     'label' => 'Search engine', // @translate
                     'value_options' => $this->getSearchEngineOptions(),
-                    'empty_option' => 'Select a search engine below…', // @translate
+                    'empty_option' => '',
+                    'info' => 'The search engine cannot be changed after creation.', // @translate
                 ],
                 'attributes' => [
                     'id' => 'search_engine',
                     'readonly' => true,
                     'disabled' => true,
-                    'info' => 'For Solr, the suggester can be set in the config.', // @translate
                 ],
             ]);
 
@@ -83,6 +87,25 @@ class SearchSuggesterForm extends Form
             ->get('o:settings');
 
         $isInternal = (bool) $this->getOption('is_internal');
+
+        // Allow other modules to add their own fields to the settings fieldset.
+        // Event params: form, fieldset, search_engine, engine_adapter
+        $searchEngine = $this->getOption('search_engine');
+        $engineAdapter = $searchEngine ? $searchEngine->engineAdapter() : null;
+
+        $event = new Event('form.add_elements', $this, [
+            'fieldset' => $fieldset,
+            'search_engine' => $searchEngine,
+            'engine_adapter' => $engineAdapter,
+        ]);
+        $this->getEventManager()->triggerEvent($event);
+
+        // Check if external module handled the form (added elements).
+        $externalHandled = $event->getParam('handled', false);
+        if ($externalHandled) {
+            return;
+        }
+
         if (!$isInternal) {
             return;
         }

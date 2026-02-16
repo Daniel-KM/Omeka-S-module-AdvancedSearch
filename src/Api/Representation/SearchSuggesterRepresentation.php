@@ -154,15 +154,26 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
         $searchEngineSettings = $searchEngine->settings();
         $suggesterSettings = $this->settings();
 
+        // Build suggest options, including Solr-specific settings if present.
+        $suggestOptions = [
+            'suggester' => $this->resource->getId(),
+            'mode_index' => $suggesterSettings['mode_index'] ?? 'start',
+            'mode_search' => $suggesterSettings['mode_search'] ?? 'start',
+            'length' => $suggesterSettings['length'] ?? 50,
+        ];
+
+        // Add Solr-specific options if configured.
+        if (!empty($suggesterSettings['solr_suggester_name'])) {
+            $suggestOptions['solr_suggester_name'] = $suggesterSettings['solr_suggester_name'];
+        } elseif (!empty($suggesterSettings['solr_field'])) {
+            // Auto-generate suggester name from the suggester name if field is set.
+            $suggestOptions['solr_suggester_name'] = 'omeka_' . preg_replace('/[^a-z0-9_]/i', '_', strtolower($this->name()));
+        }
+
         $query
             ->setResourceTypes($searchEngineSettings['resource_types'])
             ->setLimitPage(1, empty($suggesterSettings['limit']) ? \Omeka\Stdlib\Paginator::PER_PAGE : (int) $suggesterSettings['limit'])
-            ->setSuggestOptions([
-                'suggester' => $this->resource->getId(),
-                'mode_index' => $suggesterSettings['mode_index'] ?? 'start',
-                'mode_search' => $suggesterSettings['mode_search'] ?? 'start',
-                'length' => $suggesterSettings['length'] ?? 50,
-            ])
+            ->setSuggestOptions($suggestOptions)
             ->setSuggestFields($suggesterSettings['fields'] ?? [])
             ->setExcludedFields($suggesterSettings['excluded_fields'] ?? [])
         ;

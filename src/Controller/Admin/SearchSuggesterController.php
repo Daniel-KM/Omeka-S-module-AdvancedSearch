@@ -101,6 +101,15 @@ class SearchSuggesterController extends AbstractActionController
             $this->messenger()->addWarning('Don’t forget to run the indexation of the suggester.'); // @translate
         }
 
+        // Trigger event for other modules to handle post-save actions.
+        // For example, SearchSolr can create the Solr suggester here.
+        $this->getEventManager()->trigger('advancedsearch.suggester.save', $this, [
+            'suggester' => $suggester,
+            'search_engine' => $searchEngine,
+            'engine_adapter' => $engineAdapter,
+            'messenger' => $this->messenger(),
+        ]);
+
         return $this->redirect()->toRoute('admin/search-manager');
     }
 

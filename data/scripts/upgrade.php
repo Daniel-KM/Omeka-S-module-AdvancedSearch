@@ -56,7 +56,8 @@ if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActi
         $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
         'Common', '3.4.79'
     );
-    throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
+    $messenger->addError($message);
+    throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $translate('Missing requirement. Unable to upgrade.')); // @translate
 }
 
 if (version_compare($oldVersion, '3.3.6.2', '<')) {
@@ -496,7 +497,7 @@ if (version_compare($oldVersion, '3.4.22', '<')) {
     $manageModuleAndResources = $this->getManageModuleAndResources();
     $results = [];
     foreach ($checks as $name => $strings) {
-        $results[$name] = $manageModuleAndResources->checkStringsInFiles($strings, 'themes/*/view/search/*');
+        $results[$name] = $skipThemeResults($manageModuleAndResources->checkStringsInFiles($strings, 'themes/*/view/search/*'));
     }
     $result = array_filter($results);
     if ($result) {
@@ -546,7 +547,7 @@ if (version_compare($oldVersion, '3.4.24', '<')) {
     $manageModuleAndResources = $this->getManageModuleAndResources();
     $results = [];
     foreach ($strings as $path => $strings) {
-        $result = $manageModuleAndResources->checkStringsInFiles($strings, $path);
+        $result = $skipThemeResults($manageModuleAndResources->checkStringsInFiles($strings, $path));
         if ($result) {
             $results[] = $result;
         }
@@ -965,7 +966,7 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
     $manageModuleAndResources = $this->getManageModuleAndResources();
     $results = [];
     foreach ($stringsAndMessages as $key => $stringsAndMessage) foreach ($stringsAndMessage['strings'] as $path => $strings) {
-        $result = $manageModuleAndResources->checkStringsInFiles($strings, $path);
+        $result = $skipThemeResults($manageModuleAndResources->checkStringsInFiles($strings, $path));
         if (!$result) {
             continue;
         } elseif (!$doUpgrade || empty($stringsAndMessage['commands'])) {
@@ -1092,7 +1093,7 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
     $manageModuleAndResources = $this->getManageModuleAndResources();
     $results = [];
     foreach ($stringsAndMessages as $key => $stringsAndMessage) foreach ($stringsAndMessage['strings'] as $path => $strings) {
-        $result = $manageModuleAndResources->checkStringsInFiles($strings, $path);
+        $result = $skipThemeResults($manageModuleAndResources->checkStringsInFiles($strings, $path));
         if ($result) {
             $results[$key][] = $result;
         }
@@ -1194,7 +1195,7 @@ if (version_compare($oldVersion, '3.4.29', '<')) {
     $manageModuleAndResources = $this->getManageModuleAndResources();
     $results = [];
     foreach ($stringsAndMessages as $key => $stringsAndMessage) foreach ($stringsAndMessage['strings'] as $path => $strings) {
-        $result = $manageModuleAndResources->checkStringsInFiles($strings, $path);
+        $result = $skipThemeResults($manageModuleAndResources->checkStringsInFiles($strings, $path));
         if (!$result) {
             continue;
         }
@@ -1380,7 +1381,7 @@ if (version_compare($oldVersion, '3.4.31', '<')) {
     $manageModuleAndResources = $this->getManageModuleAndResources();
     $results = [];
     foreach ($stringsAndMessages as $key => $stringsAndMessage) foreach ($stringsAndMessage['strings'] as $path => $strings) {
-        $result = $manageModuleAndResources->checkStringsInFiles($strings, $path);
+        $result = $skipThemeResults($manageModuleAndResources->checkStringsInFiles($strings, $path));
         if (!$result) {
             continue;
         }
@@ -1451,6 +1452,9 @@ if (version_compare($oldVersion, '3.4.31', '<')) {
         $searchConfigSettings['display']['label_sort'] = $searchConfigSettings['sort']['label'] ?? $searchConfigSettings['display']['label_sort'] ?? null;
         $searchConfigSettings['display']['sort_list'] = $searchConfigSettings['sort']['fields'] ?? $searchConfigSettings['display']['sort_list'] ?? [];
         unset($searchConfigSettings['sort']);
+        // Renamed the option "pagination".
+        $searchConfigSettings['display']['per_page_list'] = $searchConfigSettings['pagination']['per_pages'] ?? $searchConfigSettings['display']['per_page_list'] ?? [];
+        unset($searchConfigSettings['pagination']);
         // Add sort by relevance for internal engine.
         if (!empty($searchEngineSettings[$searchEngineId])) {
             $searchConfigSettings['display']['sort_list']['relevance desc'] ??= ['name' => 'relevance desc', 'label' => $translate('Relevance')];
@@ -1787,7 +1791,7 @@ if (version_compare($oldVersion, '3.4.36', '<')) {
         "->has('reset')",
     ];
     $manageModuleAndResources = $this->getManageModuleAndResources();
-    $result = $manageModuleAndResources->checkStringsInFiles($strings, 'themes/*/view/search/*');
+    $result = $skipThemeResults($manageModuleAndResources->checkStringsInFiles($strings, 'themes/*/view/search/*'));
     if ($result) {
         $message = new PsrMessage(
             'The form element "reset" was renamed "form-reset" to avoid issues with javascript. You should fix your theme first: {json}', // @translate
@@ -1843,7 +1847,7 @@ if (version_compare($oldVersion, '3.4.37', '<')) {
         "etting('display',",
     ];
     $manageModuleAndResources = $this->getManageModuleAndResources();
-    $result = $manageModuleAndResources->checkStringsInFiles($strings, 'themes/*/view/search/*');
+    $result = $skipThemeResults($manageModuleAndResources->checkStringsInFiles($strings, 'themes/*/view/search/*'));
     if ($result) {
         $message = new PsrMessage(
             'The search config setting "display" was renamed "results". Check your theme. Matching templates: {json}', // @translate
@@ -2194,4 +2198,67 @@ if (version_compare($oldVersion, '3.4.56', '<')) {
         'The facet options "min", "max", and "step" were moved to "attributes" for consistency with filters. They are now HTML input attributes like for filters.' // @translate
     );
     $messenger->addSuccess($message);
+}
+
+if (version_compare($oldVersion, '3.4.57', '<')) {
+    // Optimize suggester: per-site indexing with separate counts for admin/public.
+    // Create new table search_suggestion_site for per-site suggestion counts.
+    // site_id = 0 means global admin index (all resources including private).
+    // total = all resources (public + private) for admin
+    // total_public = public resources only for visitors
+    $sqls = <<<'SQL'
+        CREATE TABLE IF NOT EXISTS `search_suggestion_site` (
+            `id` INT AUTO_INCREMENT NOT NULL,
+            `suggestion_id` INT NOT NULL,
+            `site_id` INT NOT NULL DEFAULT 0,
+            `total` INT NOT NULL DEFAULT 0,
+            `total_public` INT NOT NULL DEFAULT 0,
+            INDEX (`site_id`),
+            UNIQUE INDEX (`suggestion_id`, `site_id`),
+            PRIMARY KEY(`id`),
+            CONSTRAINT FK_suggestion FOREIGN KEY (`suggestion_id`) REFERENCES `search_suggestion` (`id`) ON DELETE CASCADE
+        ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
+        SQL;
+    foreach (array_filter(explode(";\n", $sqls)) as $sql) {
+        try {
+            $connection->executeStatement($sql);
+        } catch (\Exception $e) {
+            // Table may already exist.
+        }
+    }
+
+    // Migrate existing data: total_all becomes total (admin), total_public stays.
+    // site_id = 0 for global index.
+    $sql = <<<'SQL'
+        INSERT INTO `search_suggestion_site` (`suggestion_id`, `site_id`, `total`, `total_public`)
+        SELECT `id`, 0, `total_all`, `total_public`
+        FROM `search_suggestion`
+        WHERE `total_all` > 0
+        ON DUPLICATE KEY UPDATE `total` = VALUES(`total`), `total_public` = VALUES(`total_public`);
+        SQL;
+    try {
+        $connection->executeStatement($sql);
+    } catch (\Exception $e) {
+        // Ignore if no data or already migrated.
+    }
+
+    // Remove old columns and update index.
+    $sqls = <<<'SQL'
+        ALTER TABLE `search_suggestion` DROP INDEX IF EXISTS `search_text_idx`;
+        ALTER TABLE `search_suggestion` DROP COLUMN IF EXISTS `total_all`;
+        ALTER TABLE `search_suggestion` DROP COLUMN IF EXISTS `total_public`;
+        ALTER TABLE `search_suggestion` ADD UNIQUE INDEX IF NOT EXISTS `suggester_text_idx` (`suggester_id`, `text`);
+        SQL;
+    foreach (array_filter(explode(";\n", $sqls)) as $sql) {
+        try {
+            $connection->executeStatement($sql);
+        } catch (\Exception $e) {
+            // Column may not exist or already removed.
+        }
+    }
+
+    $message = new PsrMessage(
+        'The suggester indexation was optimized for per-site search. Please reindex your suggesters to enable site-specific suggestions.' // @translate
+    );
+    $messenger->addWarning($message);
 }

@@ -1541,10 +1541,13 @@ if (version_compare($oldVersion, '3.4.31', '<')) {
                             $filter['options']['value_options'] = $filter['options'];
                         }
                         // Avoid issue with duplicates.
+                        // Avoid issue with duplicates.
                         // Check if options values contain only scalar first:
                         // issue may occur when the upgrade is done multiple
                         // times.
                         if ($filter['options']['value_options'] && !array_filter($filter['options']['value_options'], 'is_array')) {
+                            // Filter out non-string/non-integer values (null, bool, float) to avoid array_flip() warning.
+                            $filter['options']['value_options'] = array_filter($filter['options']['value_options'], function ($v) { return is_string($v) || is_int($v); });
                             $filter['options']['value_options'] = array_filter(array_keys(array_flip($filter['options']['value_options'])), 'strlen');
                         }
                     }

@@ -116,7 +116,6 @@ class ApiSearch extends AbstractPlugin
      * - Some features of the Omeka api are not available.
      * - Currently, many parameters are unavailable. Some methods miss in Query.
      * - The event "api.search.query" is not triggered.
-     * - returnScalar is not managed.
      * - Ideally, the external search engine should answer like the api?
      *
      * @see \Omeka\Api\Manager::search()
@@ -203,9 +202,9 @@ class ApiSearch extends AbstractPlugin
         $response->setRequest($request);
 
         // Return scalar content as-is; do not validate or finalize.
-        // if (Request::SEARCH === $request->getOperation() && $request->getOption('returnScalar')) {
-        //     return $response;
-        // }
+        if ($request->getOption('returnScalar')) {
+            return $response;
+        }
 
         $validateContent = function ($value): void {
             if (!$value instanceof ResourceInterface) {
@@ -337,12 +336,26 @@ class ApiSearch extends AbstractPlugin
             throw new Exception\BadResponseException($e->getMessage(), $e->getCode(), $e);
         }
 
-        // TODO Manage returnScalar.
-
         $totalResults = array_map(fn ($resource) => $searchResponse->getResourceTotalResults($resource), $this->searchEngine->setting('resource_types', []));
 
-        // Get entities from the search response.
+        // Get resource IDs from the search response.
         $ids = $this->extractIdsFromResponse($searchResponse, $resourceType);
+
+        // Handle returnScalar option (from options) or return_scalar (from query).
+        // @see \Omeka\Api\Adapter\AbstractEntityAdapter::search()
+        $scalarField = $request->getOption('returnScalar');
+        if (!$scalarField && !empty($query['return_scalar'])) {
+            $scalarField = $query['return_scalar'];
+            $request->setOption('returnScalar', $scalarField);
+        }
+        if ($scalarField) {
+            $content = $this->getScalarResult($ids, $resourceType, $scalarField);
+            $response = new Response($content);
+            $response->setTotalResults($totalResults);
+            return $response;
+        }
+
+        // Get entities from the database.
         $entityClass = $this->easyMeta->entityClass($resourceType);
         $repository = $this->entityManager->getRepository($entityClass);
         $entities = $repository->findBy([
@@ -466,5 +479,68 @@ class ApiSearch extends AbstractPlugin
     protected function extractIdsFromResponse(SearchResponse $searchResponse, $resourceType)
     {
         return array_map(fn ($v) => $v['id'], $searchResponse->getResults($resourceType));
+    }
+
+    /**
+     * Get scalar results for the given IDs and field.
+     *
+     * Returns an array with format [id => scalarValue, ...].
+     *
+     * @see \Omeka\Api\Adapter\AbstractEntityAdapter::search()
+     *
+     * @param int[] $ids Resource IDs from search results
+     * @param string $resourceType Resource type (items, media, item_sets)
+     * @param string $scalarField Field name to return (id, title, etc.)
+     * @return array
+     */
+    protected function getScalarResult(array $ids, string $resourceType, string $scalarField): array
+    {
+        if (empty($ids)) {
+            return [];
+        }
+
+        // For 'id' field, just return the IDs directly.
+        if ($scalarField === 'id') {
+            return array_combine($ids, $ids);
+        }
+
+        // For other fields, query the database.
+        $entityClass = $this->easyMeta->entityClass($resourceType);
+        $classMetadata = $this->entityManager->getClassMetadata($entityClass);
+        $fieldNames = $classMetadata->getFieldNames();
+
+        $qb = $this->entityManager->createQueryBuilder();
+        $qb->from($entityClass, 'omeka_root');
+
+        if (in_array($scalarField, $fieldNames)) {
+            // Direct field (e.g., 'title', 'created', 'modified').
+            $qb->select(['omeka_root.id', 'omeka_root.' . $scalarField]);
+        } else {
+            // Association field (e.g., 'owner', 'resourceClass').
+            $associationNames = $classMetadata->getAssociationNames();
+            if (in_array($scalarField, $associationNames)) {
+                $qb->select(['omeka_root.id', "IDENTITY(omeka_root.$scalarField) AS $scalarField"]);
+            } else {
+                // Field not found, return IDs as fallback.
+                $this->logger->warn(
+                    'The "{field}" field is not available for returnScalar in resource type "{type}".', // @translate
+                    ['field' => $scalarField, 'type' => $resourceType]
+                );
+                return array_combine($ids, $ids);
+            }
+        }
+
+        $qb->where($qb->expr()->in('omeka_root.id', ':ids'))
+            ->setParameter('ids', $ids);
+
+        $results = $qb->getQuery()->getScalarResult();
+
+        // Build the result array with original order preserved.
+        $content = array_fill_keys($ids, null);
+        foreach ($results as $row) {
+            $content[$row['id']] = $row[$scalarField];
+        }
+
+        return $content;
     }
 }

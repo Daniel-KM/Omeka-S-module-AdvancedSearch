@@ -688,11 +688,9 @@ class MainSearchForm extends Form
         $element
             ->setLabel($filter['label'])
             ->setOptions([
-                'options' => [
-                    'label_from' => $this->translator->translate('From'), // @translate
-                    'label_to' => $this->translator->translate('To'), // @translate
-                ] + $filter['options'],
-            ])
+                'label_from' => 'From', // @translate
+                'label_to' => 'To', // @translate
+            ] + $filter['options'])
             ->setAttributes([
                 'placeholder' => $filter['attributes']['placeholder'] ?? 'YYYY', // @translate
             ] + $filter['attributes'])

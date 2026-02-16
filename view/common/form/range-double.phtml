@@ -11,6 +11,7 @@
 
 $plugins = $this->getHelperPluginManager();
 $escape = $plugins->get('escapeHtml');
+$translate = $plugins->get('translate');
 $formInput = $plugins->get('formInput');
 $escapeAttr = $plugins->get('escapeHtmlAttr');
 
@@ -46,11 +47,11 @@ $useInputNumber = $element->getUseInputNumber();
         ?>
     <div class="range-numerics">
         <div class="range-numeric">
-            <?= $labelFrom ? sprintf('<span class="range-numeric-label range-numeric-from-label">%s</span>', $escape($labelFrom)) : '' ?>
+            <?= $labelFrom ? sprintf('<span class="range-numeric-label range-numeric-from-label">%s</span>', $escape($translate($labelFrom))) : '' ?>
             <input <?= $formInput->createAttributesString($attributesFrom) ?>/>
         </div>
         <div class="range-numeric">
-            <?= $labelFrom ? sprintf('<span class="range-numeric-label range-numeric-to-label">%s</span>', $escape($labelTo)) : '' ?>
+            <?= $labelTo ? sprintf('<span class="range-numeric-label range-numeric-to-label">%s</span>', $escape($translate($labelTo))) : '' ?>
             <input <?= $formInput->createAttributesString($attributesTo) ?>/>
         </div>
     </div>

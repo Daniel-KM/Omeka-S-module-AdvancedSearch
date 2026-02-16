@@ -475,17 +475,11 @@ results too, that is used when no paginator is enable. The argument `limit`
 cannot go further.
 
 When ready, the api search is available via multiple means.
-- Add `index=1` as query in the block layouts that use it, like [Browse preview].
-- Do a standard search with `$this->api()->search()` with the value `'index' => true`
-  appended to the argument `$data` or `$options` (recommended when possible to
-  avoid to mix the query and the parameters).
-- Do a standard search in the theme with the view helpers `$this->apiSearch()`,
-  and `$this->apiSearchOne()`, that have the same arguments than `$this->api()->search()`
-  and `$this->api()->searchOne()`. The result is an Omeka Response.
-  Note that it is preferable to use `$this->api()->read()` when possible for
-  performance and simplicity of the processes.
 - Use the controller plugins `$this->apiSearch()` and `$this->apiSearchOne()`.
-- The main api manager understand these arguments too.
+  These have the same arguments as `$this->api()->search()` and
+  `$this->api()->searchOne()`. The result is an Omeka Response.
+- Use the view helpers `$this->apiSearch()` and `$this->apiSearchOne()` in themes.
+- Use the service `AdvancedSearch\IndexSearch` for programmatic access.
 - If the api config is made available on a site, it will be a quick access to
   the results at `/s/mysite/api_search_page`.
 
@@ -611,6 +605,7 @@ TODO
 - [ ] RangeDouble: sort items without date values last when no filter is active.
 - [ ] RangeDouble: exclude items without date when filter is active, include when not.
 - [ ] RangeDouble: add admin option to enable/disable "ignore extremes" behavior per field.
+- [ ] Stopwords by language according to values (and manage values without languages and a default language)
 
 No more todo:
 

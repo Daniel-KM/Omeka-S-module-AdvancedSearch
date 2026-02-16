@@ -191,8 +191,17 @@ class IndexSuggestions extends AbstractJob
             $types['excluded_property_ids'] = $this->connection::PARAM_INT_ARRAY;
         }
 
-        // Get all site IDs.
-        $siteIds = $this->connection->executeQuery('SELECT `id` FROM `site`')->fetchFirstColumn();
+        // Get sites to index from settings.
+        $sitesToIndex = $suggester->setting('sites') ?: ['admin', 'all'];
+        $allSiteIds = $this->connection->executeQuery('SELECT `id` FROM `site`')->fetchFirstColumn();
+
+        $indexAdmin = in_array('admin', $sitesToIndex);
+        if (in_array('all', $sitesToIndex)) {
+            $siteIds = $allSiteIds;
+        } else {
+            // Filter to only selected sites that exist (exclude 'admin' which is not a site ID).
+            $siteIds = array_intersect(array_diff($sitesToIndex, ['admin']), $allSiteIds);
+        }
 
         // Create temporary table for suggestions with both total and total_public.
         // site_id = 0 means global (all sites).
@@ -208,18 +217,23 @@ class IndexSuggestions extends AbstractJob
             SQL;
         $this->connection->executeStatement($sql);
 
-        // 1. Index global (site_id = NULL): all resources (public + private).
-        $this->logger->info('Suggester #{id}: indexing global (all resources)...', ['id' => $suggesterId]);
-        $this->indexSuggestions($sqlResourceTypes, $sqlFields, null, $bind, $types);
+        // 1. Index global (site_id = 0): all resources (public + private).
+        if ($indexAdmin) {
+            $this->logger->info('Suggester #{id}: indexing global (all resources)...', ['id' => $suggesterId]);
+            $this->indexSuggestions($sqlResourceTypes, $sqlFields, null, $bind, $types);
+        }
 
         // 2. Index per site: both total (all) and total_public (public only).
-        foreach ($siteIds as $siteId) {
-            if ($this->shouldStop()) {
-                $this->logger->warn('Job stopped by user.');
-                return $this;
+        if ($siteIds) {
+            $this->logger->info('Suggester #{id}: indexing {count} sites...', ['id' => $suggesterId, 'count' => count($siteIds)]);
+            foreach ($siteIds as $siteId) {
+                if ($this->shouldStop()) {
+                    $this->logger->warn('Job stopped by user.');
+                    return $this;
+                }
+                $this->logger->info('Suggester #{id}: indexing site #{site_id}...', ['id' => $suggesterId, 'site_id' => $siteId]);
+                $this->indexSuggestions($sqlResourceTypes, $sqlFields, (int) $siteId, $bind, $types);
             }
-            $this->logger->info('Suggester #{id}: indexing site #{site_id}...', ['id' => $suggesterId, 'site_id' => $siteId]);
-            $this->indexSuggestions($sqlResourceTypes, $sqlFields, (int) $siteId, $bind, $types);
         }
 
         // Transfer from temporary table to final tables.

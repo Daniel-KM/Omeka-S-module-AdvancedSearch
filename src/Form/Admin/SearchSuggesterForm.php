@@ -87,7 +87,27 @@ class SearchSuggesterForm extends Form
         }
 
         // TODO Add a default query to manage any suggestion on any field and suggestions on item set page.
-        // TODO Add site (or add the list of sites in the index).
+
+        $fieldset
+            ->add([
+                'name' => 'sites',
+                'type' => CommonElement\OptionalSiteSelect::class,
+                'options' => [
+                    'label' => 'Sites to index', // @translate
+                    'empty_option' => '',
+                    'prepend_value_options' => [
+                        'admin' => 'Admin', // @translate
+                        'all' => '[All sites]', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'sites',
+                    'class' => 'chosen-select',
+                    'multiple' => true,
+                    'data-placeholder' => 'Select sites…', // @translate
+                    'value' => ['admin', 'all'],
+                ],
+            ]);
 
         $fieldset
             ->add([

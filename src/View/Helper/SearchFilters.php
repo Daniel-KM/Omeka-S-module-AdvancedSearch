@@ -621,7 +621,10 @@ class SearchFilters extends AbstractHelper
         $linkIds = array_unique(array_filter(array_map('intval', $linkIds)));
         $linkUris = array_unique(array_filter($linkUris));
 
-        if ($linkIds) {
+        // Consolidate resource ID queries: $linkIds and $vrIds both query the
+        // Resource table for id => title mapping. Query once and split results.
+        $allResourceIds = array_unique(array_merge($linkIds, $vrIds));
+        if ($allResourceIds) {
             // Currently, "resources" cannot be searched, so use adapter
             // directly. Rights are managed.
             /** @var \Doctrine\ORM\EntityManager $entityManager */
@@ -634,13 +637,20 @@ class SearchFilters extends AbstractHelper
                 ->select('omeka_root.id', 'omeka_root.title')
                 ->from(\Omeka\Entity\Resource::class, 'omeka_root')
                 ->where($qb->expr()->in('omeka_root.id', ':ids'))
-                ->setParameter('ids', $linkIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
+                ->setParameter('ids', $allResourceIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
             if ($isAnonymous) {
                 $qb
                     ->andWhere($qb->expr()->eq('omeka_root.isPublic', ':is_public'))->setParameter('is_public', 1);
             }
             // Do not store unknown ids (may be removed or private).
-            $linkIds = array_filter(array_column($qb->getQuery()->getScalarResult(), 'title', 'id'));
+            $allResourceTitles = array_filter(array_column($qb->getQuery()->getScalarResult(), 'title', 'id'));
+            // Split results back into original variables.
+            $linkIds = array_intersect_key($allResourceTitles, array_flip($linkIds));
+            $vrIds = array_intersect_key($allResourceTitles, array_flip($vrIds));
+            unset($allResourceTitles);
+        } else {
+            $linkIds = [];
+            $vrIds = [];
         }
 
         if ($linkUris) {
@@ -663,28 +673,6 @@ class SearchFilters extends AbstractHelper
             }
             // Do not store uris without label (may be removed or private too).
             $linkUris = array_filter(array_column($qb->getQuery()->getScalarResult(), 'value', 'uri'));
-        }
-
-        if ($vrIds) {
-            // Currently, "resources" cannot be searched, so use adapter
-            // directly. Rights are managed.
-            /** @var \Doctrine\ORM\EntityManager $entityManager */
-            $services ??= $this->searchConfig
-                ? $this->searchConfig->getServiceLocator()
-                : $view->api()->read('vocabularies', 1)->getContent()->getServiceLocator();
-            $entityManager = $services->get('Omeka\EntityManager');
-            $qb = $entityManager->createQueryBuilder();
-            $qb
-                ->select('omeka_root.id', 'omeka_root.title')
-                ->from(\Omeka\Entity\Resource::class, 'omeka_root')
-                ->where($qb->expr()->in('omeka_root.id', ':ids'))
-                ->setParameter('ids', $vrIds, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
-            if ($isAnonymous) {
-                $qb
-                   ->andWhere($qb->expr()->eq('omeka_root.isPublic', ':is_public'))->setParameter('is_public', 1);
-            }
-            // Do not store unknown ids (may be removed or private).
-            $vrIds = array_filter(array_column($qb->getQuery()->getScalarResult(), 'title', 'id'));
         }
 
         $queryTypesLabels = $this->getQueryTypesLabels();

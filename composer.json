@@ -1,35 +1,46 @@
 {
     "name": "daniel-km/omeka-s-module-advanced-search",
-    "description": "Module for Omeka S to add improved search capabilities: auto-suggest, filters, facets, etc.",
-    "type": "library",
+    "type": "omeka-s-module",
+    "description": "Module for Omeka S: Improve search with new fields, aggregated properties, auto-suggest, filters, facets, specific pages, etc.",
+    "keywords": [
+        "Omeka S",
+        "Omeka S module",
+        "search",
+        "advanced search",
+        "auto-suggest",
+        "filter",
+        "facet",
+        "admin",
+        "curation"
+    ],
     "license": "CECILL-2.1",
+    "homepage": "https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch",
     "authors": [
         {
             "name": "Daniel Berthereau",
             "email": "Daniel.packagist@Berthereau.net"
         }
     ],
-    "homepage": "https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch",
     "support": {
         "issues": "https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch/-/issues",
         "forum": "https://forum.omeka.org/"
     },
-    "keywords": [
-        "Omeka S",
-        "module",
-        "search",
-        "auto-suggestion",
-        "filter",
-        "facet",
-        "solr"
-    ],
+    "_require (not set until Omeka S merges PR #2412)": {
+        "omeka/omeka-s": "^4.1",
+        "daniel-km/omeka-s-module-common": "*"
+    },
     "require": {
         "laminas/laminas-feed": "^2.18"
     },
-    "replace": {
+    "provide": {
         "laminas/laminas-escaper": "*",
         "laminas/laminas-servicemanager": "3.14",
         "laminas/laminas-stdlib": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "AdvancedSearch\\": "src/"
+        }
     },
     "autoload-dev": {
         "psr-4": {
@@ -39,9 +50,6 @@
     "config": {
         "platform": {
             "php": "7.4"
-        },
-        "allow-plugins": {
-            "composer/installers": true
         }
     },
     "extra": {

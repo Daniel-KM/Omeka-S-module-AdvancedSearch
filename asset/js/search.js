@@ -561,6 +561,77 @@ var Search = (function() {
     }
 
     /**
+     * Clean search query by removing empty inputs before form submission.
+     *
+     * This produces cleaner URLs like ?q=pont instead of
+     * ?q=pont&submit=&filter[0][join]=and&filter[0][field]=...&filter[0][val]=
+     *
+     * Generic solution for any form structure:
+     * - Groups with empty value field (val, text) AND type requiring value → remove group
+     * - Types without value (ex, nex, etc.) are kept even if val is empty
+     * - Empty simple inputs are removed directly
+     * - "0" is kept as a valid value
+     */
+    self.cleanSearchQuery = function(form) {
+        if (!form) return self;
+        const $form = $(form);
+
+        const isEmpty = (v) => v === '' || v === null || (Array.isArray(v) && !v.length);
+        const typesWithValue = self.filterTypes.withValue;
+
+        // Groups to remove (identified by their prefix).
+        const groupsToRemove = new Set();
+
+        // First pass: find groups with empty value fields where type requires value.
+        $form.find(':input[name]').each(function() {
+            const $input = $(this);
+            const name = $input.attr('name');
+            const value = $input.val();
+
+            // Keep "0" as valid value.
+            if (value === '0' || value === 0) return;
+
+            // Match grouped inputs: prefix[val] or prefix[text].
+            const match = name.match(/^(.+)\[(val|text)\]$/);
+            if (match && isEmpty(value)) {
+                const prefix = match[1]; // e.g., "filter[0]" or "property[1]"
+                // Check if the type requires a value.
+                const typeInput = $form.find(`[name="${prefix}[type]"]`);
+                const typeVal = typeInput.length ? typeInput.val() : null;
+                // Remove group if no type field, or type requires value.
+                if (!typeVal || typesWithValue.includes(typeVal)) {
+                    groupsToRemove.add(prefix);
+                }
+            }
+        });
+
+        // Second pass: remove groups and empty simple inputs.
+        $form.find(':input[name]').each(function() {
+            const $input = $(this);
+            const name = $input.attr('name');
+            const value = $input.val();
+
+            // Keep "0" as valid value.
+            if (value === '0' || value === 0) return;
+
+            // Check if this input belongs to a group to remove.
+            for (const prefix of groupsToRemove) {
+                if (name.startsWith(prefix + '[')) {
+                    $input.prop('name', '');
+                    return;
+                }
+            }
+
+            // Simple input: remove if empty.
+            if (isEmpty(value)) {
+                $input.prop('name', '');
+            }
+        });
+
+        return self;
+    }
+
+    /**
     * Search range double / sliders.
     *
     * "min" and "max" values are required to compute color.
@@ -948,12 +1019,15 @@ $(document).ready(function() {
         $('.range-slider-from').on('input', (event) => Search.rangeSliderDouble.controlSliderFrom(event.target));
         $('.range-slider-to').on('input', (event) => Search.rangeSliderDouble.controlSliderTo(event.target));
 
-        // Clear extreme values before form submission (filters and facets).
+        // Clear extreme values and empty inputs before form submission.
         // When slider is at min, don't filter by "from"; at max, don't filter by "to".
-        $('#search-form, #search-filters-form, #facets-form, .search-facets form').on('submit', function() {
+        // Also clean empty query parameters for cleaner URLs.
+        // Note: form ID can be "form-search", "search-form", or custom.
+        $('#search-form, #form-search, #search-filters-form, #facets-form, .search-facets form, #advanced-search-form form').on('submit', function() {
             $(this).find('.range-double').each(function() {
                 Search.rangeSliderDouble.clearExtremesBeforeSubmit(this);
             });
+            Search.cleanSearchQuery(this);
         });
 
         // Handle range-double submit button click (for link/js mode with Ok button).

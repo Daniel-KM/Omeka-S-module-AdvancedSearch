@@ -1519,6 +1519,7 @@ class Module extends AbstractModule
             }
 
             $plugins->get('headLink')
+                ->appendStylesheet($assetUrl('css/common-autocomplete.css', 'Common'))
                 ->appendStylesheet($assetUrl('css/advanced-search-admin.css', 'AdvancedSearch'));
             $plugins->get('headScript')
                 ->appendScript($script)

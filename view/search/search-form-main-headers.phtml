@@ -33,6 +33,7 @@ if (!$status->isAdminRequest()) {
 }
 
 $headLink
+    ->appendStylesheet($assetUrl('css/common-autocomplete.css', 'Common'))
     ->appendStylesheet($assetUrl('css/search.css', 'AdvancedSearch'));
 $headScript
     ->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);

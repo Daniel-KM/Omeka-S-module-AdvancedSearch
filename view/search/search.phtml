@@ -82,6 +82,7 @@ if ($itemSet && $site) {
 }
 
 $this->headLink()
+    ->appendStylesheet($assetUrl('css/common-autocomplete.css', 'Common'))
     ->appendStylesheet($assetUrl('css/search.css', 'AdvancedSearch'));
 $this->headScript()
     ->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);

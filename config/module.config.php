@@ -55,6 +55,7 @@ return [
         'invokables' => [
             'facetActives' => View\Helper\FacetActives::class,
             'facetCheckboxes' => View\Helper\FacetCheckboxes::class,
+            'facetCheckboxesFilter' => View\Helper\FacetCheckboxesFilter::class,
             'facetCheckboxesTree' => View\Helper\FacetCheckboxesTree::class,
             'facetElements' => View\Helper\FacetElements::class,
             'facetLinks' => View\Helper\FacetLinks::class,

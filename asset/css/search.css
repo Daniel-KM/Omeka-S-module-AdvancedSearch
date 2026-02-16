@@ -433,6 +433,16 @@
         word-break: break-word;
     }
 
+    .facet-search-input {
+        width: 100%;
+        padding: 4px 8px;
+        margin-bottom: 0.5em;
+        box-sizing: border-box;
+    }
+    .facet-item.facet-search-hidden {
+        display: none !important;
+    }
+
     .facet-see-more {
         /* text-align: right; */
         margin: 0.5em 0

@@ -1127,6 +1127,30 @@ $(document).ready(function() {
         });
 
         $searchFacets.find('.facet-see-more-or-less').each((index, button) => Search.facets.seeMoreOrLess(button));
+
+        // Filter facet values via the search input (CheckboxSearch type).
+        $searchFacets.on('input', '.facet-search-input', function() {
+            const input = $(this);
+            const filter = input.val().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            const facet = input.closest('.facet');
+            const seeMore = facet.find('.facet-see-more-or-less');
+            // Expand all items while filtering so hidden items become searchable.
+            if (filter.length) {
+                if (seeMore.length && seeMore.hasClass('expand')) {
+                    seeMore.removeClass('expand').addClass('collapse');
+                    Search.facets.seeMoreOrLess(seeMore);
+                }
+            }
+            facet.find('.facet-items .facet-item').each(function() {
+                const item = $(this);
+                const text = item.text().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                if (!filter.length || text.indexOf(filter) !== -1) {
+                    item.removeClass('facet-search-hidden');
+                } else {
+                    item.addClass('facet-search-hidden');
+                }
+            });
+        });
     }
 
     const rangeDoubles = document.querySelectorAll('.range-double');

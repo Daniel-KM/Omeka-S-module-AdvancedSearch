@@ -35,6 +35,9 @@ class FacetElements extends AbstractHelper
             case 'Checkbox':
                 $facetElements = $plugins->get('facetCheckboxes');
                 break;
+            case 'CheckboxFilter':
+                $facetElements = $plugins->get('facetCheckboxesFilter');
+                break;
             case 'Link':
                 $facetElements = $plugins->get('facetLinks');
                 break;

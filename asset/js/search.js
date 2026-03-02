@@ -842,6 +842,15 @@ var Search = (function() {
         if (!form) return self;
         const $form = $(form);
 
+        // Trim text inputs (q, refine, filter values…).
+        $form.find('input[type=search], input[type=text]').each(function() {
+            const $input = $(this);
+            const v = $input.val();
+            if (v && v !== v.trim()) {
+                $input.val(v.trim());
+            }
+        });
+
         const isEmpty = (v) => v === '' || v === null || (Array.isArray(v) && !v.length);
         const typesWithValue = self.filterTypes.withValue;
 
@@ -1385,7 +1394,7 @@ $(document).ready(function() {
         // When slider is at min, don't filter by "from"; at max, don't filter by "to".
         // Also clean empty query parameters for cleaner URLs.
         // Note: form ID can be "form-search", "search-form", or custom.
-        $('#search-form, #form-search, #search-filters-form, #facets-form, .search-facets form, #advanced-search-form form').on('submit', function() {
+        $('#search-form, #form-search, #search-headroom-form, #search-filters-form, #facets-form, .search-facets form, #advanced-search-form form').on('submit', function() {
             $(this).find('.range-double').each(function() {
                 Search.rangeSliderDouble.clearExtremesBeforeSubmit(this);
             });

@@ -613,6 +613,20 @@ var Search = (function() {
                 }
             });
 
+            // Stabilize the container height so pagination buttons
+            // don't jump: fix max-height from the first page, then
+            // use overflow for pages with more content.
+            var facetItems = facet.find('.facet-items');
+            var fixedHeight = facet.data('facet-fixed-height');
+            if (!fixedHeight) {
+                fixedHeight = facetItems.outerHeight();
+                facet.data('facet-fixed-height', fixedHeight);
+            }
+            facetItems.css({
+                'height': fixedHeight + 'px',
+                'overflow-y': 'auto',
+            });
+
             // Update indicator.
             var pageInput = facet.find('.facet-page-input');
             if (pageInput.length) {
@@ -637,9 +651,14 @@ var Search = (function() {
             button = $(button);
             var facet = button.closest('.facet');
             facet.find('.facet-pagination').remove();
+            facet.find('.facet-items').css({
+                'height': '',
+                'overflow-y': '',
+            });
             facet.removeData('facet-page');
             facet.removeData('facet-total-pages');
             facet.removeData('facet-per-page');
+            facet.removeData('facet-fixed-height');
             return self;
         };
 

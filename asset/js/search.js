@@ -1380,6 +1380,15 @@ $(document).ready(function() {
 
     const rangeDoubles = document.querySelectorAll('.range-double');
 
+    // Clean empty query parameters for cleaner URLs.
+    // Note: form ID can be "form-search", "search-form", or custom.
+    $('#search-form, #form-search, #search-headroom-form, #search-filters-form, #facets-form, .search-facets form, #advanced-search-form form').on('submit', function() {
+        $(this).find('.range-double').each(function() {
+            Search.rangeSliderDouble.clearExtremesBeforeSubmit(this);
+        });
+        Search.cleanSearchQuery(this);
+    });
+
     // Init ranges only when present.
     if (rangeDoubles.length) {
         rangeDoubles.forEach((rangeDouble) => {
@@ -1389,17 +1398,6 @@ $(document).ready(function() {
         $('.range-numeric-to').on('input', (event) => Search.rangeSliderDouble.controlNumericTo(event.target));
         $('.range-slider-from').on('input', (event) => Search.rangeSliderDouble.controlSliderFrom(event.target));
         $('.range-slider-to').on('input', (event) => Search.rangeSliderDouble.controlSliderTo(event.target));
-
-        // Clear extreme values and empty inputs before form submission.
-        // When slider is at min, don't filter by "from"; at max, don't filter by "to".
-        // Also clean empty query parameters for cleaner URLs.
-        // Note: form ID can be "form-search", "search-form", or custom.
-        $('#search-form, #form-search, #search-headroom-form, #search-filters-form, #facets-form, .search-facets form, #advanced-search-form form').on('submit', function() {
-            $(this).find('.range-double').each(function() {
-                Search.rangeSliderDouble.clearExtremesBeforeSubmit(this);
-            });
-            Search.cleanSearchQuery(this);
-        });
 
         // Handle range-double submit button click (for link/js mode with Ok button).
         $('.range-double-submit').on('click', function(e) {

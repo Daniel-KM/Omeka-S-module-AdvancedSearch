@@ -165,6 +165,7 @@ class SiteSettingsFieldset extends Fieldset
                     'element_group' => 'advanced_search',
                     'label' => 'Item sets to redirect to item/browse', // @translate
                     'empty_option' => '',
+                    'disable_inarray_validator' => true,
                     'prepend_value_options' => [
                         'all' => 'All item sets', // @translate
                     ],
@@ -183,6 +184,7 @@ class SiteSettingsFieldset extends Fieldset
                     'element_group' => 'advanced_search',
                     'label' => 'Item sets to redirect to search', // @translate
                     'empty_option' => '',
+                    'disable_inarray_validator' => true,
                     'prepend_value_options' => [
                         'all' => 'All item sets', // @translate
                     ],
@@ -201,6 +203,7 @@ class SiteSettingsFieldset extends Fieldset
                     'element_group' => 'advanced_search',
                     'label' => 'Item sets to redirect to search (display record only on first page, old default Omeka)', // @translate
                     'empty_option' => '',
+                    'disable_inarray_validator' => true,
                     'prepend_value_options' => [
                         'all' => 'All item sets', // @translate
                     ],

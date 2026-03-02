@@ -550,9 +550,9 @@ var Search = (function() {
                 : '<span class="facet-page-indicator">1 / ' + totalPages + '</span>';
             var paginationHtml = '<div class="facet-pagination">'
                 + '<button type="button" class="facet-page-first" title="' + labelPage + ' 1">&laquo;</button>'
-                + '<button type="button" class="facet-page-prev">&lsaquo;</button>'
+                + '<button type="button" class="facet-page-prev" title="' + (button.attr('data-label-page-prev') || 'Previous page') + '">&lsaquo;</button>'
                 + indicatorHtml
-                + '<button type="button" class="facet-page-next">&rsaquo;</button>'
+                + '<button type="button" class="facet-page-next" title="' + (button.attr('data-label-page-next') || 'Next page') + '">&rsaquo;</button>'
                 + '<button type="button" class="facet-page-last" title="' + labelPage + ' ' + totalPages + '">&raquo;</button>'
                 + '</div>';
             button.closest('.facet-see-more').before(paginationHtml);

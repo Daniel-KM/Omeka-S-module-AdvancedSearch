@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-16 00:00+0000\n"
+"POT-Creation-Date: 2026-03-02 00:00+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
 "Language-Team: \n"
@@ -66,19 +66,19 @@ msgstr "Titre (de z à a)"
 msgid "Date (most recent first)"
 msgstr "Date (du plus récent)"
 
-#: data/configs/search_config.default.php:605 data/scripts/upgrade.php:1232
+#: data/configs/search_config.default.php:605 data/scripts/upgrade.php:1240
 msgid "No facets"
 msgstr "Pas de facettes"
 
-#: data/configs/search_config.default.php:609 data/scripts/upgrade.php:1236
+#: data/configs/search_config.default.php:609 data/scripts/upgrade.php:1244
 msgid "Active facets"
 msgstr "Facettes actives"
 
-#: data/configs/search_config.default.php:611 data/scripts/upgrade.php:1238
+#: data/configs/search_config.default.php:611 data/scripts/upgrade.php:1246
 msgid "Apply facets"
 msgstr "Appliquer les facettes"
 
-#: data/configs/search_config.default.php:613 data/scripts/upgrade.php:1240
+#: data/configs/search_config.default.php:613 data/scripts/upgrade.php:1248
 msgid "Reset facets"
 msgstr "Effacer les facettes"
 
@@ -86,22 +86,26 @@ msgstr "Effacer les facettes"
 msgid "Refine search"
 msgstr "Affiner la recherche"
 
-#: data/scripts/upgrade.php:56 Module.php:99
+#: data/scripts/upgrade.php:56 Module.php:97
 #, php-format
 msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr ""
 "Le module « %1$s » doit être mis à niveau à la version « %2$s » ou "
 "supérieure."
 
-#: data/scripts/upgrade.php:1231
+#: data/scripts/upgrade.php:60
+msgid "Missing requirement. Unable to upgrade."
+msgstr "Pré-requis absent. Impossible de mettre à jour."
+
+#: data/scripts/upgrade.php:1239
 msgid "Facets"
 msgstr "Facettes"
 
-#: data/scripts/upgrade.php:1630 Module.php:1681
+#: data/scripts/upgrade.php:1650 Module.php:1679
 msgid "Main index"
 msgstr "Index principal"
 
-#: data/scripts/upgrade.php:1935 src/View/Helper/SearchFilters.php:531
+#: data/scripts/upgrade.php:1955 src/View/Helper/SearchFilters.php:531
 msgid "Full text"
 msgstr "Plein texte"
 
@@ -750,8 +754,8 @@ msgstr "Pas de réindexation du moteur interne"
 
 #: view/advanced-search/admin/index/browse.phtml:102
 #: view/advanced-search/admin/index/browse.phtml:103
+#: view/advanced-search/admin/index/browse.phtml:230
 #: view/advanced-search/admin/index/browse.phtml:231
-#: view/advanced-search/admin/index/browse.phtml:232
 msgid "Reindex"
 msgstr "Réindexer"
 
@@ -798,11 +802,7 @@ msgid "Edit disabled: search adapter not available"
 msgstr ""
 "Modification désactivée : l’adaptateur de recherche n’est pas disponible"
 
-#: view/advanced-search/admin/index/browse.phtml:235
-msgid "Reindex disabled: search adapter does not support it."
-msgstr "Réindexation désactivée : l’adapteur ne le supporte pas."
-
-#: view/advanced-search/admin/index/browse.phtml:254
+#: view/advanced-search/admin/index/browse.phtml:248
 msgid "No search suggesters created yet."
 msgstr "Aucun suggéreur créé."
 
@@ -829,12 +829,12 @@ msgid "Edit search engine"
 msgstr "Modifier le moteur de recherche"
 
 #: view/advanced-search/admin/search-engine/index-confirm.phtml:20
-#: view/advanced-search/admin/search-suggester/index-confirm.phtml:16
+#: view/advanced-search/admin/search-suggester/index-confirm.phtml:18
 msgid "Confirm reindex"
 msgstr "Confirmer la réindexation"
 
 #: view/advanced-search/admin/search-engine/index-confirm.phtml:38
-#: view/advanced-search/admin/search-suggester/index-confirm.phtml:25
+#: view/advanced-search/admin/search-suggester/index-confirm.phtml:27
 #, php-format
 msgid "Reindex \"%s\""
 msgstr "Réindexer \"%s\""
@@ -859,18 +859,18 @@ msgstr ""
 "temporairement."
 
 #: view/advanced-search/admin/search-engine/index-confirm.phtml:52
-#: view/advanced-search/admin/search-suggester/index-confirm.phtml:34
+#: view/advanced-search/admin/search-suggester/index-confirm.phtml:42
 msgid "Force indexing"
 msgstr "Forcer la réindexation"
 
 #: view/advanced-search/admin/search-engine/index-confirm.phtml:53
-#: view/advanced-search/admin/search-suggester/index-confirm.phtml:33
+#: view/advanced-search/admin/search-suggester/index-confirm.phtml:41
 #, php-format
 msgid "%1$d running indexings: #%2$s."
 msgstr "%1$d indexations en cours : #%2$s."
 
 #: view/advanced-search/admin/search-engine/index-confirm.phtml:55
-#: view/advanced-search/admin/search-suggester/index-confirm.phtml:36
+#: view/advanced-search/admin/search-suggester/index-confirm.phtml:44
 msgid "No running indexing: process can be launched."
 msgstr "Pas d’indexation en cours : la tâche peut être lancée."
 
@@ -944,7 +944,7 @@ msgid "Private only"
 msgstr "Privé seulement"
 
 #: view/advanced-search/admin/search-engine/index-confirm.phtml:116
-#: view/advanced-search/admin/search-suggester/index-confirm.phtml:42
+#: view/advanced-search/admin/search-suggester/index-confirm.phtml:50
 msgid "This index has no resource type to index."
 msgstr "L’index n’a pas de type de ressource à indexer."
 
@@ -961,11 +961,11 @@ msgstr ""
 "le suggéreur. Pour les suggéreurs externes, utiliser l'url directe dans la "
 "configuration de la page."
 
-#: view/advanced-search/admin/search-suggester/index-confirm.phtml:26
+#: view/advanced-search/admin/search-suggester/index-confirm.phtml:28
 msgid "Are you sure you would like to reindex this suggester?"
 msgstr "Êtes-vous sûr de vouloir ré-indexer ce suggéreur ?"
 
-#: view/advanced-search/admin/search-suggester/index-confirm.phtml:28
+#: view/advanced-search/admin/search-suggester/index-confirm.phtml:31
 msgid ""
 "All the suggestions will be cleared first, so the search will be unavailable "
 "for a while."
@@ -973,12 +973,20 @@ msgstr ""
 "Toutes les suggestions seront supprimées. La recherche ne sera donc plus "
 "disponible pendant un moment."
 
-#: view/advanced-search/admin/search-suggester/index-confirm.phtml:29
+#: view/advanced-search/admin/search-suggester/index-confirm.phtml:32
 msgid ""
 "You may redirect the users to a clone of the current suggester temporarily."
 msgstr ""
 "Vous pouvez rediriger les utilisateurs sur un clone du suggéreur "
 "temporairement."
+
+#: view/advanced-search/admin/search-suggester/index-confirm.phtml:36
+msgid ""
+"Reindexing is unnecessary if the search engine has just been reindexed, "
+"unless the suggester has option to skip reindex."
+msgstr ""
+"La réindexation est inutile si le moteur vient d’être réindexé, à moins que "
+"le suggéreur a une option pour l’ignorer."
 
 #: view/common/advanced-search/asset.phtml:14
 msgid "Has a specific asset as thumbnail"
@@ -1119,13 +1127,21 @@ msgstr "Choisir ci-dessous…"
 msgid "and"
 msgstr "et"
 
-#: view/search/facets-list.phtml:112
+#: view/search/facets-list.phtml:116
 msgid "See more"
 msgstr "Voir plus"
 
-#: view/search/facets-list.phtml:112
+#: view/search/facets-list.phtml:116
 msgid "See less"
 msgstr "Voir moins"
+
+#: view/search/facets-list.phtml:116
+msgid "Previous page"
+msgstr "Page précédente"
+
+#: view/search/facets-list.phtml:116
+msgid "Next page"
+msgstr "Page suivante"
 
 #: view/search/results-header-footer.phtml:67
 #, php-format
@@ -1178,11 +1194,11 @@ msgstr "Cette collection n’a pas de contenus."
 msgid "The query returned no results"
 msgstr "Votre recherche n'a retourné aucun résultat"
 
-#: data/scripts/upgrade.php:238
+#: data/scripts/upgrade.php:239
 msgid "The module {module} should be updated to version {version}."
 msgstr "Le module {module} doit être mis à niveau à la version {version}."
 
-#: data/scripts/upgrade.php:245
+#: data/scripts/upgrade.php:246
 msgid ""
 "It is now possible to aggregate properties with the internal (sql) adapter. "
 "See config of the internal search engine."
@@ -1190,25 +1206,25 @@ msgstr ""
 "Il est désormais possible de regrouper des propriétés avec l’adaptateur "
 "interne (sql). Voir la configuration du moteur de recherche interne."
 
-#: data/scripts/upgrade.php:250
+#: data/scripts/upgrade.php:251
 msgid "It is now possible to add a pagination per-page to the search page."
 msgstr ""
 "Il est désormais possible d’ajouter une pagination par page à la page de "
 "recherche."
 
-#: data/scripts/upgrade.php:255
+#: data/scripts/upgrade.php:256
 msgid "It is now possible to use \"not\" in advanced filters."
 msgstr ""
 "Il est désormais possible d’utiliser \"sauf\" dans les filtres avancés."
 
-#: data/scripts/upgrade.php:260
+#: data/scripts/upgrade.php:261
 msgid ""
 "It is now possible to display the used search filters in the results header."
 msgstr ""
 "Il est désormais possible d’afficher les filtres de recherche utilisés dans "
 "l’entête des résultats."
 
-#: data/scripts/upgrade.php:265
+#: data/scripts/upgrade.php:266
 msgid ""
 "Some field types have been renamed for filters in the form. To use the core "
 "input elements, the type should be \"Omeka\" (or prepend \"Omeka/\" if "
@@ -1219,7 +1235,7 @@ msgstr ""
 "(ou préfixer avec « Omeka/ » si besoin). Voir la page de configuration par "
 "défaut."
 
-#: data/scripts/upgrade.php:272
+#: data/scripts/upgrade.php:273
 msgid ""
 "It is now possible to query ressources with linked ressources in the "
 "standard advanced form."
@@ -1227,7 +1243,7 @@ msgstr ""
 "Il est désormais possible de chercher des ressources avec des ressources "
 "liées dans la recherche avancée standard."
 
-#: data/scripts/upgrade.php:279
+#: data/scripts/upgrade.php:280
 msgid ""
 "A new option was added to display the resources mixed (by default) or item "
 "sets and items separately (old behavior)."
@@ -1235,15 +1251,15 @@ msgstr ""
 "Une nouvelle option a été ajoutée pour afficher les ressources (par défaut) "
 "ou les collections et les contenus séparément (ancien comportement)."
 
-#: data/scripts/upgrade.php:283
+#: data/scripts/upgrade.php:284
 msgid "The template for the sort selector has been updated."
 msgstr "Le modèle pour le sélecteur de tri a été mis à jour."
 
-#: data/scripts/upgrade.php:287
+#: data/scripts/upgrade.php:288
 msgid "A helper for the pagination per page has been added."
 msgstr "Un « view helper » a été ajouté pour la pagination par page."
 
-#: data/scripts/upgrade.php:294
+#: data/scripts/upgrade.php:295
 msgid ""
 "It’s now possible to search resources by multiples properties, and resources "
 "without class, template, item set, site or owner."
@@ -1252,7 +1268,7 @@ msgstr ""
 "propriétés et des ressources sans classe, modèle, collection, site ou "
 "propriétaire."
 
-#: data/scripts/upgrade.php:301
+#: data/scripts/upgrade.php:302
 msgid ""
 "It’s now possible to use facet range with a double select (from/to). With "
 "internal sql engine, order is alphabetic only for now: it works for strings "
@@ -1267,7 +1283,7 @@ msgstr ""
 "les entiers ou les dates variables. Avec Solr, seuls les nombres et les "
 "dates sont gérés. Il peut être nécessaire de mettre à jour le thème."
 
-#: data/scripts/upgrade.php:305
+#: data/scripts/upgrade.php:306
 msgid ""
 "The property query types lower/greater have been updated to use alphabetic "
 "order, no more date-time only. For integer and date-time, use numeric data "
@@ -1277,7 +1293,7 @@ msgstr ""
 "pour utiliser l’ordre alphabétique et non plus seulement les dates. Pour les "
 "entiers et les dates, utiliser les types de données numériques."
 
-#: data/scripts/upgrade.php:309
+#: data/scripts/upgrade.php:310
 msgid ""
 "Update your theme to support new features for facets (active facets, button "
 "apply facets with id=\"apply-facets\", list of facet values)."
@@ -1286,7 +1302,7 @@ msgstr ""
 "facettes (facettes actives, bouton pour appliquer les facettes avec "
 "id=\"apply-facets\", liste des valeurs de facettes)."
 
-#: data/scripts/upgrade.php:326
+#: data/scripts/upgrade.php:327
 msgid ""
 "It’s now possible to search values similar other ones (via {link}"
 "Soundex{link_end}, designed for British English phonetic)."
@@ -1295,18 +1311,18 @@ msgstr ""
 "valeurs (via {link}Soundex{link_end}, conçu pour la phonétique de l’anglais "
 "britannique)."
 
-#: data/scripts/upgrade.php:335
+#: data/scripts/upgrade.php:336
 msgid "Some new options were added to manage facets."
 msgstr "De nouvelles options ont été ajoutées pour gérer les facettes."
 
-#: data/scripts/upgrade.php:365 data/scripts/upgrade.php:2123
+#: data/scripts/upgrade.php:366 data/scripts/upgrade.php:2143
 msgid ""
 "It is recommended to upgrade the module \"Reference\" to improve performance."
 msgstr ""
 "Il est recommandé de mettre à jour le module « Référence » pour améliorer "
 "les performances."
 
-#: data/scripts/upgrade.php:414
+#: data/scripts/upgrade.php:415
 msgid ""
 "A new settings allows to skip indexing after a batch process because an "
 "issue can occurs in some cases."
@@ -1314,7 +1330,7 @@ msgstr ""
 "Un nouveau paramètre permet de modifier l’indexation après un traitement en "
 "lot car il peut y avoir un problème dans certains cas."
 
-#: data/scripts/upgrade.php:427
+#: data/scripts/upgrade.php:428
 msgid ""
 "The performance was improved in many places, in particular for large "
 "databases."
@@ -1322,7 +1338,7 @@ msgstr ""
 "De nombreuses améliorations de performance ont été implémentées, notamment "
 "pour les grandes bases."
 
-#: data/scripts/upgrade.php:432
+#: data/scripts/upgrade.php:433
 msgid ""
 "It is now possible to order results by a list of ids with argument "
 "\"sort_by=ids\"."
@@ -1330,7 +1346,7 @@ msgstr ""
 "Il est désormais possible de trier les résultats par une liste "
 "d’identifiants avec l’argument « sort_by=ids »."
 
-#: data/scripts/upgrade.php:439
+#: data/scripts/upgrade.php:440
 msgid ""
 "It is now possible to do a standard search with a sub-query, for example to "
 "get all items with creators born in 1789."
@@ -1339,7 +1355,7 @@ msgstr ""
 "requête, par exemple pour chercher les contenus avec des créateurs nés en "
 "1789."
 
-#: data/scripts/upgrade.php:456
+#: data/scripts/upgrade.php:457
 msgid ""
 "When full text is managed in alto files, it is now possible to search full "
 "text or record only."
@@ -1347,7 +1363,7 @@ msgstr ""
 "Quand le texte intégral est géré dans des fichiers alto, il est désormais "
 "possible de chercher dans le texte intégral ou dans la notice seule."
 
-#: data/scripts/upgrade.php:463
+#: data/scripts/upgrade.php:464
 msgid ""
 "It is now possible to search resources with duplicated values to help "
 "curation."
@@ -1355,7 +1371,7 @@ msgstr ""
 "Il est désormais possible de chercher des ressources avec des valeurs "
 "dupliquées pour faciliter la curation."
 
-#: data/scripts/upgrade.php:468
+#: data/scripts/upgrade.php:469
 msgid ""
 "The speed of the derivative forms were improved and can be called directly "
 "from the search config with option \"variant\". Upgrade your theme if it was "
@@ -1365,7 +1381,7 @@ msgstr ""
 "directement depuis la configuration avec l’option « variant ». Mettez à jour "
 "votre thème si vous l’avez personnalisé."
 
-#: data/scripts/upgrade.php:505
+#: data/scripts/upgrade.php:506
 msgid ""
 "View helpers \"FacetActive\", \"FacetCheckbox\" and \"FacetLink\" and "
 "associate theme files were removed in favor of plural view helpers. Check "
@@ -1375,7 +1391,7 @@ msgstr ""
 "fichiers du thème correspondants ont été remplacés par leur version "
 "plurielle. Vérifier votre thème si vous l’avez personnalisé : {json}"
 
-#: data/scripts/upgrade.php:556
+#: data/scripts/upgrade.php:557
 msgid ""
 "The variables \"$heading\", \"$html\" and \"$cssClass\" were removed from "
 "block Searching Form. Remove them in the following files before upgrade and "
@@ -1385,7 +1401,7 @@ msgstr ""
 "bloc Recherche. Corrigez les fichiers suivants avant la mise à jour et la "
 "conversion automatique : {json}"
 
-#: data/scripts/upgrade.php:663
+#: data/scripts/upgrade.php:664
 msgid ""
 "The settings \"heading\" and \"html\" were removed from block Searching "
 "Form. New blocks \"Heading\" or \"Html\" were prepended to all blocks that "
@@ -1396,7 +1412,7 @@ msgstr ""
 "avec le précédent contenu. Vous pouvez vérifier les pages pour les styles : "
 "{json}"
 
-#: data/scripts/upgrade.php:673
+#: data/scripts/upgrade.php:674
 msgid ""
 "The setting \"template\" was moved to the new block layout settings "
 "available since Omeka S v4.1. You may check pages for styles: {json}"
@@ -1404,7 +1420,7 @@ msgstr ""
 "Le paramètre « template » a été déplacé dans les nouveaux paramètres de bloc "
 "depuis Omeka S v4.1. Vous pouvez vérifier les pages pour les styles : {json}"
 
-#: data/scripts/upgrade.php:680
+#: data/scripts/upgrade.php:681
 msgid ""
 "The template files for the block Searching Form should be moved from \"view/"
 "common/block-layout\" to \"view/common/block-template\" in your themes. You "
@@ -1414,7 +1430,7 @@ msgstr ""
 "« view/common/block-layout » vers « view/common/block-template » dans les "
 "thèmes. Vous pouvez vérifier les pages pour les pages : {json}"
 
-#: data/scripts/upgrade.php:688 data/scripts/upgrade.php:1141
+#: data/scripts/upgrade.php:689 data/scripts/upgrade.php:1149
 msgid ""
 "New options were added in search config: the choice of the theme template "
 "(search/search) and an option to display the breadcrumbs."
@@ -1423,14 +1439,14 @@ msgstr ""
 "choix du gabarit dans le thème (search/search) et une option pour afficher "
 "le fil d’Ariane."
 
-#: data/scripts/upgrade.php:723
+#: data/scripts/upgrade.php:724
 msgid ""
 "The option to redirect item set to search was improved to manage all pages."
 msgstr ""
 "L’option pour rediriger la page de collections vers la recherche a été "
 "améliorée pour gérer toutes les pages."
 
-#: data/scripts/upgrade.php:782 data/scripts/upgrade.php:1191
+#: data/scripts/upgrade.php:783 data/scripts/upgrade.php:1199
 msgid ""
 "The template for facets was simplified. See view/search/facets-list.phtml. "
 "Matching templates: {json}"
@@ -1438,7 +1454,7 @@ msgstr ""
 "Le gabarit pour les facettes a été simplifié. Voir view/search/facets-"
 "list.phtml. Gabarits correspondants : {json}"
 
-#: data/scripts/upgrade.php:853 data/scripts/upgrade.php:885
+#: data/scripts/upgrade.php:854 data/scripts/upgrade.php:886
 msgid ""
 "Command \"{name}\" #{index}/{total} for {key}: file #{count}/{count_total} "
 "{file} partially updated."
@@ -1446,7 +1462,7 @@ msgstr ""
 "Commande « {name} » #{index}/{total} pour {key} : fichier #{count}/"
 "{count_total} {file} partiellement mis à jour."
 
-#: data/scripts/upgrade.php:863
+#: data/scripts/upgrade.php:864
 msgid ""
 "The option \"facet_filters\" was removed. Update the theme to use facets "
 "instead. Matching templates: {json}"
@@ -1454,7 +1470,7 @@ msgstr ""
 "L’option \"facet_filters\" a été supprimée. Mettez à jour le thème pour "
 "utiliser les facettes à la place. Modèles correspondants : {json}"
 
-#: data/scripts/upgrade.php:871
+#: data/scripts/upgrade.php:872
 msgid ""
 "The view helper \"facetLabel()\" was removed. Update the theme and get the "
 "label directly from the each facet config: replace `$facetLabel($name)` by "
@@ -1465,7 +1481,7 @@ msgstr ""
 "remplacez `$facetLabel($name)` par `$facetOptions['label'] ? : $name)`. "
 "Gabarits correspondants : {json}"
 
-#: data/scripts/upgrade.php:898
+#: data/scripts/upgrade.php:899
 msgid ""
 "The view helper `searchForm()` was removed. You should replace it with "
 "`$searchConfig->renderForm([])`. Matching templates: {json}"
@@ -1473,7 +1489,7 @@ msgstr ""
 "L’aide de vue `searchForm()` a été supprimée. Vous devez la remplacer par "
 "`$searchConfig->renderForm([])`. Gabarits correspondants : {json}"
 
-#: data/scripts/upgrade.php:906
+#: data/scripts/upgrade.php:907
 msgid ""
 "The template \"search/facets\" was renamed \"search/facets-list\". Update it "
 "in your theme. Matching templates: {json}"
@@ -1481,7 +1497,7 @@ msgstr ""
 "Le gabarit « search/facets » a été renommé « search/facets-list ». Mettez-le "
 "à jour dans votre thème. Gabarits correspondants : {json}"
 
-#: data/scripts/upgrade.php:926
+#: data/scripts/upgrade.php:927
 msgid ""
 "The template \"search/resource-list\" was renamed \"search/results\". Update "
 "your theme. Matching templates: {json}"
@@ -1489,7 +1505,7 @@ msgstr ""
 "Le gabarit « search/resource-list » a été renommé « search/results ». Mettez "
 "à jour votre thème. Gabarits correspondants : {json}"
 
-#: data/scripts/upgrade.php:947
+#: data/scripts/upgrade.php:948
 msgid ""
 "The templates \"search/results-header\" and \"search/results-footer\" were "
 "replaced by \"search/results-header-footer\". Remove them in your theme. "
@@ -1499,7 +1515,7 @@ msgstr ""
 "remplacés par « search/results-header-footer ». Supprimez-les dans votre "
 "thème. Gabarits correspondants : {json}"
 
-#: data/scripts/upgrade.php:955
+#: data/scripts/upgrade.php:956
 msgid ""
 "The key \"per_pages\" was renamed \"per_page\". Update your theme. Matching "
 "templates: {json}"
@@ -1507,7 +1523,7 @@ msgstr ""
 "La clé « per_pages » a été renommée « per_page ». Mettez à jour votre thème. "
 "Gabarits correspondants : {json}"
 
-#: data/scripts/upgrade.php:996
+#: data/scripts/upgrade.php:997
 msgid ""
 "Command \"{name}\" #{index}/{total} for {key}: file #{count}/{count_total} "
 "{file} failed to be renamed {file_new}."
@@ -1515,7 +1531,7 @@ msgstr ""
 "Commande « {name} » #{index}/{total} pour {key} : fichier #{count}/"
 "{count_total} {file} n'a pas pu être renommé {file_new}."
 
-#: data/scripts/upgrade.php:1003
+#: data/scripts/upgrade.php:1004
 msgid ""
 "Command \"{name}\" #{index}/{total} for {key}: file #{count}/{count_total} "
 "{file} successfully renamed {file_new}."
@@ -1523,7 +1539,7 @@ msgstr ""
 "Commande « {name} » #{index}/{total} pour {key} : fichier #{count}/"
 "{count_total} {file} renommé avec succès {file_new}."
 
-#: data/scripts/upgrade.php:1023
+#: data/scripts/upgrade.php:1024
 msgid ""
 "Command \"{name}\" #{index}/{total} for {key}: file #{count}/{count_total}  "
 "{file} unwriteable."
@@ -1531,7 +1547,7 @@ msgstr ""
 "Commande « {name} » #{index}/{total} pour {key} : fichier #{count}/"
 "{count_total} {file} non inscriptible."
 
-#: data/scripts/upgrade.php:1030
+#: data/scripts/upgrade.php:1031
 msgid ""
 "Command \"{name}\" #{index}/{total} for {key}: file #{count}/{count_total}  "
 "{file} updated."
@@ -1539,7 +1555,7 @@ msgstr ""
 "Commande « {name} » #{index}/{total} pour {key} : fichier #{count}/"
 "{count_total} {file} mis à jour."
 
-#: data/scripts/upgrade.php:1038
+#: data/scripts/upgrade.php:1039
 msgid ""
 "Command \"{name}\" #{index}/{total} for {key}: file #{count}/{count_total} "
 "{file} unreadable."
@@ -1547,7 +1563,7 @@ msgstr ""
 "Commande « {name} » #{index}/{total} pour {key} : fichier #{count}/"
 "{count_total} {file} illisible."
 
-#: data/scripts/upgrade.php:1051
+#: data/scripts/upgrade.php:1052
 msgid ""
 "The module may break the theme to manage new features, in particular for "
 "facets."
@@ -1555,7 +1571,7 @@ msgstr ""
 "Le module peut caser le thème pour gérer de nouvelles fonctionnalités, en "
 "particulier pour les facettes."
 
-#: data/scripts/upgrade.php:1078
+#: data/scripts/upgrade.php:1079
 msgid ""
 "The view helper `searchingForm()` is deprecated. Replace it with "
 "`$searchConfig->renderForm([])`. Matching templates: {json}"
@@ -1563,7 +1579,7 @@ msgstr ""
 "L’aide de vue `searchingForm()` est obsolète. Remplacez-la par "
 "`$searchConfig->renderForm([])`. Gabarits correspondants : {json}"
 
-#: data/scripts/upgrade.php:1089
+#: data/scripts/upgrade.php:1090
 msgid ""
 "The title of the result part is no more appended in template \"search/"
 "resource-list\" or \"search/results\", but in main search template. Update "
@@ -1574,17 +1590,17 @@ msgstr ""
 "principal de la recherche. Mettez à jour votre thème. Gabarits "
 "correspondants : {json}"
 
-#: data/scripts/upgrade.php:1146
+#: data/scripts/upgrade.php:1154
 msgid "New options were added to define the thumbnail."
 msgstr "De nouvelles options ont été ajoutées pour définir la vignette."
 
-#: data/scripts/upgrade.php:1151
+#: data/scripts/upgrade.php:1159
 msgid "It is now possible to sort by relevance with the internal querier."
 msgstr ""
 "Il est désormais possible de trier les résultats par pertinence avec le "
 "moteur interne."
 
-#: data/scripts/upgrade.php:1156
+#: data/scripts/upgrade.php:1164
 msgid ""
 "The default template for the list of results was updated to use css flex. "
 "Check your theme."
@@ -1592,12 +1608,12 @@ msgstr ""
 "Le modèle par défaut pour la liste des résultats a été mis à jour pour "
 "utiliser css flex. Vérifiez votre thème."
 
-#: data/scripts/upgrade.php:1162 data/scripts/upgrade.php:1169
+#: data/scripts/upgrade.php:1170 data/scripts/upgrade.php:1177
 msgid "The key \"{key}\" can be removed from the file config/local.config.php."
 msgstr ""
 "La clé \"{key}\" peut être supprimée du fichier config/local.config.php."
 
-#: data/scripts/upgrade.php:1180
+#: data/scripts/upgrade.php:1188
 msgid ""
 "The html/css class names were simplified in the search page, in particular "
 "for facets. You should check your theme if you customized it."
@@ -1606,7 +1622,7 @@ msgstr ""
 "particulier pour les facettes. Vous devez vérifier votre thème si vous "
 "l’avez personnalisé."
 
-#: data/scripts/upgrade.php:1299
+#: data/scripts/upgrade.php:1307
 msgid ""
 "It is now possible to have a specific config for each facet (index, type, "
 "size, display, etc.)."
@@ -1614,7 +1630,7 @@ msgstr ""
 "Il est désormais possible d'avoir une configuration spécifique pour chaque "
 "facette (index, type, taille, affichage, etc.)."
 
-#: data/scripts/upgrade.php:1314
+#: data/scripts/upgrade.php:1322
 msgid ""
 "The option to display available or all facets was inverted and the same for "
 "the internal engine."
@@ -1622,7 +1638,7 @@ msgstr ""
 "L’option pour afficher les facettes disponibles ou toutes les facettes a été "
 "inversée et de même pour le moteur interne."
 
-#: data/scripts/upgrade.php:1329
+#: data/scripts/upgrade.php:1337
 msgid ""
 "The search config setting \"search\" was renamed \"request\". Check your "
 "theme. Matching templates: {json}"
@@ -1630,7 +1646,7 @@ msgstr ""
 "Le paramètre de la page de recherche « search » a été renommé « request ». "
 "Mettez à jour votre thème. Gabarits correspondants : {json}"
 
-#: data/scripts/upgrade.php:1337
+#: data/scripts/upgrade.php:1345
 msgid ""
 "The search config setting \"autosuggest\" was renamed \"q\" and sub-settings "
 "too. Check your theme. Matching templates: {json}"
@@ -1639,7 +1655,7 @@ msgstr ""
 "les sous-paramètres également. Mettez à jour votre thème. Gabarits "
 "correspondants : {json}"
 
-#: data/scripts/upgrade.php:1345
+#: data/scripts/upgrade.php:1353
 msgid ""
 "The search config setting \"pagination/per_page\" was renamed \"display/"
 "per_page_list\". Check your theme. Matching templates: {json}"
@@ -1648,7 +1664,7 @@ msgstr ""
 "« display/per_page_list ». Mettez à jour votre thème. Gabarits "
 "correspondants : {json}"
 
-#: data/scripts/upgrade.php:1353
+#: data/scripts/upgrade.php:1361
 msgid ""
 "The search config setting \"sort/fields\" was renamed \"display/sort_list\" "
 "and label \"sort/label\" was renamed \"display/label_sort\". Check your "
@@ -1658,7 +1674,7 @@ msgstr ""
 "sort_list » et « sort/label » a été renommé « display/label_sort ». Mettez à "
 "jour votre thème. Gabarits correspondants : {json}"
 
-#: data/scripts/upgrade.php:1361
+#: data/scripts/upgrade.php:1369
 msgid ""
 "The variable \"$resourceName\" was renamed \"$resourceType\". Check your "
 "theme. Matching templates: {json}"
@@ -1666,7 +1682,7 @@ msgstr ""
 "La variable « $resourceName » a été renommée « $resourceType ». Mettez à "
 "jour votre thème. Gabarits correspondants : {json}"
 
-#: data/scripts/upgrade.php:1369
+#: data/scripts/upgrade.php:1377
 msgid ""
 "The template for sort-selector was simplified. See view/search/sort-"
 "selector.phtml. Check your theme. Matching templates: {json}"
@@ -1674,7 +1690,7 @@ msgstr ""
 "Le gabarit pour sort-selector a été simplifié. Voir view/search/sort-"
 "selector.phtml. Vérifiez votre thème. Gabarits correspondants : {json}"
 
-#: data/scripts/upgrade.php:1377
+#: data/scripts/upgrade.php:1385
 msgid ""
 "The use of the view helper searchingFilters() is deprecated. Use "
 "$searchConfig->renderSearchFilters() instead. Check your theme. Matching "
@@ -1684,7 +1700,7 @@ msgstr ""
 "`$searchConfig->renderSearchFilters()`. Vérifiez votre thème. Gabarits "
 "correspondants : {json}"
 
-#: data/scripts/upgrade.php:1529
+#: data/scripts/upgrade.php:1537
 msgid ""
 "The search type \"{type}\" is no more managed and should be migrated "
 "manually in search config #{search_config_id}."
@@ -1692,11 +1708,11 @@ msgstr ""
 "Le type de recherche « {type} » n'est plus géré et doit être migré "
 "manuellement dans la configuration de recherche #{search_config_id}."
 
-#: data/scripts/upgrade.php:1640
+#: data/scripts/upgrade.php:1660
 msgid "The form simple filters is now simpler to manage."
 msgstr "Le formulaire des filtres simples est désormais plus simple à gérer."
 
-#: data/scripts/upgrade.php:1645
+#: data/scripts/upgrade.php:1665
 msgid ""
 "Each simple filter can have a specific input type instead of a html input "
 "text. When a specific type is set, it is automatically filled with values "
@@ -1706,7 +1722,7 @@ msgstr ""
 "champ texte. Lorsqu’un type spécifique est défini, il est automatiquement "
 "rempli avec les valeurs du champ."
 
-#: data/scripts/upgrade.php:1650
+#: data/scripts/upgrade.php:1670
 msgid ""
 "Filters are now standard Omeka or Laminas html elements, so any options and "
 "attributes can be passed from the config."
@@ -1715,7 +1731,7 @@ msgstr ""
 "et toutes les options et attributs peuvent être définis dans la "
 "configuration."
 
-#: data/scripts/upgrade.php:1655
+#: data/scripts/upgrade.php:1675
 msgid ""
 "The advanced filters was restructured and new options were added to manage "
 "most common needs."
@@ -1723,7 +1739,7 @@ msgstr ""
 "Les filtres avancés ont été restructurés et de nouvelles options ont été "
 "ajoutées pour répondre aux besoins les plus courants."
 
-#: data/scripts/upgrade.php:1660
+#: data/scripts/upgrade.php:1680
 msgid ""
 "The autosuggester is now auto-submitting the selected suggestion. An option "
 "was added to keep old behavior (fill the input and stay on form)."
@@ -1732,14 +1748,14 @@ msgstr ""
 "Une option a été ajoutée pour conserver l’'ancien comportement (remplir "
 "l'entrée et rester sur le formulaire)."
 
-#: data/scripts/upgrade.php:1665
+#: data/scripts/upgrade.php:1685
 msgid ""
 "The autosuggester can be enabled for any filter in advanced search form."
 msgstr ""
 "Le suggéreur automatique peut désormais être activé pour tout les filtres "
 "dans le formulaire de recherche avancée."
 
-#: data/scripts/upgrade.php:1670
+#: data/scripts/upgrade.php:1690
 msgid ""
 "it is now possible to display all resources (item sets, items, etc.) "
 "together in results or to separate them, like in previous versions."
@@ -1748,7 +1764,7 @@ msgstr ""
 "contenus, etc.) ensemble dans les résultats ou de les séparer, comme dans "
 "les versions précédentes."
 
-#: data/scripts/upgrade.php:1675
+#: data/scripts/upgrade.php:1695
 msgid ""
 "A new element was added to the standard advanced search for a thumbnail "
 "attached to a resource."
@@ -1756,7 +1772,7 @@ msgstr ""
 "Un nouvel élément a été ajouté à la recherche avancée standard pour une "
 "vignette attachée à une ressource."
 
-#: data/scripts/upgrade.php:1680
+#: data/scripts/upgrade.php:1700
 msgid ""
 "A new element was added to the standard advanced search to filter "
 "properties. It allows to avoid to override the default element to search "
@@ -1767,7 +1783,7 @@ msgstr ""
 "d’un thésaurus ou l’arborescence des collections ont été simplifiés. Vous "
 "pouvez vérifier la page de recherche."
 
-#: data/scripts/upgrade.php:1685
+#: data/scripts/upgrade.php:1705
 msgid ""
 "You should check all your search engines: form, filters, results, sort, "
 "facets. It may be simpler to remove all your specific search files and to "
@@ -1777,7 +1793,7 @@ msgstr ""
 "résultats, tri, facettes. Il peut être plus simple de supprimer tous vos "
 "fichiers de recherche spécifiques et de ne mettre à jour que les css."
 
-#: data/scripts/upgrade.php:1742
+#: data/scripts/upgrade.php:1762
 msgid ""
 "It is now possible to configure a search engine to index only public "
 "resources."
@@ -1785,7 +1801,7 @@ msgstr ""
 "Il est désormais possible de configurer un moteur pour indexer seulement les "
 "ressources publiques."
 
-#: data/scripts/upgrade.php:1777
+#: data/scripts/upgrade.php:1797
 msgid ""
 "It is now possible to configure the redirect to search for each item set "
 "separately in site settings."
@@ -1793,14 +1809,14 @@ msgstr ""
 "Il est désormais possible de configurer la redirection vers la recherche "
 "pour chaque collection séparément dans les paramètres de site."
 
-#: data/scripts/upgrade.php:1782
+#: data/scripts/upgrade.php:1802
 msgid ""
 "Any item set can be redirected to the search page or any site page or url."
 msgstr ""
 "Chaque collection peut être redirigée vers une page de recherche, une page "
 "ou une url."
 
-#: data/scripts/upgrade.php:1796
+#: data/scripts/upgrade.php:1816
 msgid ""
 "The form element \"reset\" was renamed \"form-reset\" to avoid issues with "
 "javascript. You should fix your theme first: {json}"
@@ -1808,7 +1824,7 @@ msgstr ""
 "L’élément du formulaire « reset » a été renommé « form-reset » pour éviter "
 "les problèmes avec javascript. Vous devez corriger votre thème : {json}"
 
-#: data/scripts/upgrade.php:1835
+#: data/scripts/upgrade.php:1855
 msgid ""
 "Some search page configs were enabled for site \"{site_slug}\", because the "
 "navigation uses them."
@@ -1816,7 +1832,7 @@ msgstr ""
 "Certaines pages de recherche ont été activées pour le site \"{site_slug}\", "
 "car la navigation les utilise."
 
-#: data/scripts/upgrade.php:1852
+#: data/scripts/upgrade.php:1872
 msgid ""
 "The search config setting \"display\" was renamed \"results\". Check your "
 "theme. Matching templates: {json}"
@@ -1824,7 +1840,7 @@ msgstr ""
 "Le paramètre de la page de recherche « display » a été renommé « results ». "
 "Mettez à jour votre thème. Gabarits correspondants : {json}"
 
-#: data/scripts/upgrade.php:1887
+#: data/scripts/upgrade.php:1907
 msgid ""
 "New site settings and main settings were added to manage standard search "
 "form or improved search elements."
@@ -1832,7 +1848,7 @@ msgstr ""
 "De nouveaux paramètres de site et généraux permettent de gérer le formulaire "
 "de recherche standard et les éléments de recherche amélioré."
 
-#: data/scripts/upgrade.php:1947
+#: data/scripts/upgrade.php:1967
 msgid ""
 "The option \"Record or Full text\" is now configurable with alias "
 "\"full_text\" to define properties with full text."
@@ -1840,7 +1856,7 @@ msgstr ""
 "L’option « Notice ou plein texte » est désormais configurable avec l’alias "
 "« full_text » pour définir les propriétés contenant du texte."
 
-#: data/scripts/upgrade.php:1967 Module.php:114
+#: data/scripts/upgrade.php:1987 Module.php:112
 msgid ""
 "The module Reference is required to use the facets with the default internal "
 "adapter, but not for the Solr adapter."
@@ -1848,20 +1864,20 @@ msgstr ""
 "Le module Référence est nécessaire pour utiliser les facettes avec "
 "l’adapteur interne, mais pas avec l’adapteur Solr."
 
-#: data/scripts/upgrade.php:1970 Module.php:117 Module.php:132
+#: data/scripts/upgrade.php:1990 Module.php:115 Module.php:130
 msgid "The module {module} should be upgraded to version {version} or later."
 msgstr ""
 "Le module {module} doit être mis à niveau à la version {version} ou "
 "supérieure."
 
-#: data/scripts/upgrade.php:1994
+#: data/scripts/upgrade.php:2014
 msgid ""
 "It is now possible to limit filters and facets to the language of the site."
 msgstr ""
 "Il est désormais possible de limiter les filtres et les facettes à la langue "
 "du site."
 
-#: data/scripts/upgrade.php:2010
+#: data/scripts/upgrade.php:2030
 msgid ""
 "Json-ld data are appended to results when enabled. You may need to add "
 "triggers if the theme is customized."
@@ -1870,7 +1886,7 @@ msgstr ""
 "activé. Des déclencheurs doivent être ajoutés dans le thème s’il a été "
 "personnalisé."
 
-#: data/scripts/upgrade.php:2051
+#: data/scripts/upgrade.php:2071
 msgid ""
 "A new order for facets was added: order by total descendant, then "
 "alphabetically for hidden values."
@@ -1878,7 +1894,7 @@ msgstr ""
 "Un nouvel ordre a été ajouté pour les facettes : tri par total descendant, "
 "puis tri alphabétique pour les valeurs cachées."
 
-#: data/scripts/upgrade.php:2080
+#: data/scripts/upgrade.php:2100
 msgid ""
 "A resource page block has been added, in particular to search inside an item "
 "set."
@@ -1886,7 +1902,7 @@ msgstr ""
 "Un bloc de ressource a été ajouté, en particulier pour recherche dans une "
 "collection."
 
-#: data/scripts/upgrade.php:2084
+#: data/scripts/upgrade.php:2104
 msgid ""
 "The css of the sidebar for facets and the css for structure of a thesaurus "
 "or a a hierarchy of item sets were simplified. You may check the search page."
@@ -1895,14 +1911,14 @@ msgstr ""
 "d’un thésaurus ou l’arborescence des collections ont été simplifiés. Vous "
 "pouvez vérifier la page de recherche."
 
-#: data/scripts/upgrade.php:2091
+#: data/scripts/upgrade.php:2111
 msgid ""
 "It is now possible to redirect the page to browse item sets to a search page."
 msgstr ""
 "Il est désormais possible de rediriger la page des collections vers une page "
 "de recherche."
 
-#: data/scripts/upgrade.php:2098
+#: data/scripts/upgrade.php:2118
 msgid ""
 "The class `search-results-list` was renamed `search-result-list` in view "
 "template `search/results`. Check it if the theme is customized."
@@ -1910,13 +1926,13 @@ msgstr ""
 "La classe `search-results-list` a été renommé `search-result-list` dans la "
 "vue `search/results`. Vérifiez-la si votre thème est personnalisé."
 
-#: data/scripts/upgrade.php:2103
+#: data/scripts/upgrade.php:2123
 msgid ""
 "It is now possible to add boost multiplier for specific index (Solr only)."
 msgstr ""
 "Il est désormais possible d’ajouter une pondération par index (pour Solr)."
 
-#: data/scripts/upgrade.php:2110
+#: data/scripts/upgrade.php:2130
 msgid ""
 "New options were added: quick filter on advanced form, specific properties "
 "in results, and auto-scroll to results."
@@ -1924,7 +1940,7 @@ msgstr ""
 "De nouvelles options : filtre rapide sur le formulaire de recherche, "
 "propriétés spécifiques dans les résultats et auto-scroll aux résultats."
 
-#: data/scripts/upgrade.php:2153
+#: data/scripts/upgrade.php:2173
 msgid ""
 "The facet option \"integer\" was renamed \"first_digits\" for consistency "
 "with filters. It is now enabled by default for RangeDouble and SelectRange "
@@ -1934,7 +1950,7 @@ msgstr ""
 "cohérente avec les filtres. Elle est maintenant activée par défaut pour les "
 "facettes RangeDouble et SelectRange afin d'extraire les années des dates."
 
-#: data/scripts/upgrade.php:2197
+#: data/scripts/upgrade.php:2217
 msgid ""
 "The facet options \"min\", \"max\", and \"step\" were moved to "
 "\"attributes\" for consistency with filters. They are now HTML input "
@@ -1944,7 +1960,7 @@ msgstr ""
 "les attributs pour cohérence avec les filtres. Ils sont désormais des "
 "attributs html comme les filtres."
 
-#: data/scripts/upgrade.php:2260
+#: data/scripts/upgrade.php:2280
 msgid ""
 "The suggester indexation was optimized for per-site search. Please reindex "
 "your suggesters to enable site-specific suggestions."
@@ -1952,11 +1968,11 @@ msgstr ""
 "L’indexation des suggestions a été optimisée pour la recherche par site. "
 "Merci de réindexer les suggestions pour les activer."
 
-#: Module.php:137
+#: Module.php:135
 msgid "The module {module} can be reenabled."
 msgstr "Le module {module} peut être réactivé."
 
-#: Module.php:210 src/Controller/Admin/IndexController.php:128
+#: Module.php:208 src/Controller/Admin/IndexController.php:128
 msgid ""
 "The setting to override search element \"property\" is enabled. This feature "
 "will be removed in a future version and should be {link}replaced by the "
@@ -1968,15 +1984,15 @@ msgstr ""
 "remplacée par l’élément « filter »{link_end}. Vérifier vos pages et "
 "paramètres. Sites identifiés : {json}"
 
-#: Module.php:1188
+#: Module.php:1186
 msgid "Unable to launch indexing metadata: {message}"
 msgstr "Impossible d’indexer les métadonnées : {message}"
 
-#: Module.php:1192
+#: Module.php:1190
 msgid "Unable to launch indexing metadata: see log."
 msgstr "Impossible d’indexer les métadonnées : voir les journaux."
 
-#: Module.php:1295
+#: Module.php:1293
 msgid ""
 "Unable to delete the search index for resource #{resource_id} in search "
 "engine \"{name}\": {message}"
@@ -1984,7 +2000,7 @@ msgstr ""
 "Impossible de supprimer l’index de recherche pour la ressource "
 "#{resource_id} dans le moteur « {name} » : {message}"
 
-#: Module.php:1300
+#: Module.php:1298
 msgid ""
 "Unable to delete the search index for the deleted resource #{resource_id} in "
 "search engine \"{name}\": see log."
@@ -1992,7 +2008,7 @@ msgstr ""
 "Impossible de supprimer l’index de recherche pour la ressource supprimée "
 "#{resource_id} dans le moteur « {name} » : voir les journaux."
 
-#: Module.php:1326
+#: Module.php:1324
 msgid ""
 "Unable to index metadata of resource #{resource_id} for search in search "
 "engine \"{name}\": {message}"
@@ -2000,7 +2016,7 @@ msgstr ""
 "Impossible d’indexer les métadonnées de la ressource #{resource_id} dans le "
 "moteur « {name} » : {message}"
 
-#: Module.php:1331
+#: Module.php:1329
 msgid ""
 "Unable to update the search index for resource #{resource_id} in search "
 "engine \"{name}\": see log."
@@ -2008,11 +2024,11 @@ msgstr ""
 "Impossible de mettre à jour l’index pour la ressource #{resource_id} dans le "
 "moteur « {name} » : voir les journaux."
 
-#: Module.php:1441
+#: Module.php:1439
 msgid "AdvancedSearch cron: unable to launch reindexation: {message}"
 msgstr "Cron AdvancedSearch : Impossible d’indexer les métadonnées : {message}"
 
-#: Module.php:1659
+#: Module.php:1657
 msgid ""
 "The internal search engine (sql) can be edited in the {link_url}search "
 "manager{link_end}."
@@ -2020,7 +2036,7 @@ msgstr ""
 "Le moteur de recherche interne (sql) peut être configuré dans le menu "
 "{link_url}Moteurs de recherche{link_end}."
 
-#: Module.php:1695
+#: Module.php:1693
 msgid ""
 "The {link_url}internal suggester{link_end} (sql) will be available after "
 "indexation."
@@ -2028,7 +2044,7 @@ msgstr ""
 "Le {link_url}suggéreur interne{link_end} (sql) sera disponible après "
 "indexation."
 
-#: Module.php:1732
+#: Module.php:1730
 msgid ""
 "The default search config can be {link_1}edited{link_end}, {link_2}"
 "configured{link_end} and defined in the {link_3}main settings{link_end} for "
@@ -4050,7 +4066,7 @@ msgstr ""
 msgid "The slug \"{search_slug}\" is already taken."
 msgstr "Le chemin « {search_slug} » est déjà utilisé."
 
-#: src/Api/Representation/SearchSuggesterRepresentation.php:189
+#: src/Api/Representation/SearchSuggesterRepresentation.php:191
 #: src/Api/Representation/SearchConfigRepresentation.php:578
 msgid ""
 "Query error: {message}\n"
@@ -4101,7 +4117,7 @@ msgstr "Le suggéreur « {name} » a été configuré correctement."
 msgid "Don’t forget to run the indexation of the suggester."
 msgstr "N’oubliez pas de lancer l’indexation du suggéreur."
 
-#: src/Controller/Admin/SearchSuggesterController.php:147
+#: src/Controller/Admin/SearchSuggesterController.php:157
 msgid ""
 "Indexing suggestions of suggester \"{name}\" started in job {link_job}"
 "#{job_id}{link_end} ({link_log}logs{link_end})."
@@ -4109,20 +4125,20 @@ msgstr ""
 "L'indexation des suggestions du suggéreur « {name} » a commencé dans la "
 "tâche {link_job}#{job_id}{link_end} ({link_log}journaux{link_end})."
 
-#: src/Controller/Admin/SearchSuggesterController.php:188
+#: src/Controller/Admin/SearchSuggesterController.php:208
 msgid "Search suggester \"{name}\" successfully deleted"
 msgstr "Le suggéreur « {name} » a été supprimé"
 
-#: src/Controller/Admin/SearchSuggesterController.php:193
+#: src/Controller/Admin/SearchSuggesterController.php:213
 msgid "Search suggester \"{name}\" could not be deleted"
 msgstr "Le suggéreur « {name} » ne peut pas être supprimé"
 
-#: src/Controller/Admin/SearchSuggesterController.php:218
-#: src/Controller/Admin/SearchSuggesterController.php:229
+#: src/Controller/Admin/SearchSuggesterController.php:238
+#: src/Controller/Admin/SearchSuggesterController.php:249
 msgid "The name should be unique."
 msgstr "Le nom doit être unique."
 
-#: src/Controller/Admin/SearchSuggesterController.php:244
+#: src/Controller/Admin/SearchSuggesterController.php:264
 #: src/Controller/Admin/SearchEngineController.php:72
 #: src/Controller/Admin/SearchEngineController.php:131
 #: src/Controller/Admin/SearchConfigController.php:205
@@ -4420,7 +4436,7 @@ msgstr ""
 msgid "An internal issue occurred."
 msgstr "Un problème interne est survenu."
 
-#: src/Querier/InternalQuerier.php:658
+#: src/Querier/InternalQuerier.php:659
 msgid ""
 "The query \"{query}\" uses {count} properties or filters, that is more than "
 "the {total} supported currently. The query should be simplified."
@@ -4428,7 +4444,7 @@ msgstr ""
 "La requête « {query} » utilise {count} propriétés ou filtres, ce qui est "
 "plus que la limite de {total} champs. La requête doit être simplifiée."
 
-#: src/Querier/InternalQuerier.php:663
+#: src/Querier/InternalQuerier.php:664
 msgid ""
 "A user tried a query with {count} arguments. The config or theme should be "
 "checked to forbid them earlier. Query: {query}"
@@ -4437,7 +4453,7 @@ msgstr ""
 "configuration ou le thème doivent être vérifiés pour l’interdire en amont. "
 "Requête : {query}"
 
-#: src/Querier/InternalQuerier.php:1450
+#: src/Querier/InternalQuerier.php:1453
 msgid "The field for the facet \"{name}\" is not set."
 msgstr "Le champ pour la facette « {name} » n’est pas défini."
 
@@ -4568,6 +4584,9 @@ msgstr "🖒"
 #: config/module.config.php:700
 msgid "Reindex search engines"
 msgstr "Réindexer les moteurs de recherche"
+
+#~ msgid "Reindex disabled: search adapter does not support it."
+#~ msgstr "Réindexation désactivée : l’adapteur ne le supporte pas."
 
 #~ msgid ""
 #~ "All the suggestions will be cleared first, so the search will be "

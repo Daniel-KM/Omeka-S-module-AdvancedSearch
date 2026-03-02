@@ -1116,6 +1116,13 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
         ;
         SQL;
     $connection->executeStatement($sql);
+    $sql = <<<'SQL'
+        UPDATE `site`
+        SET
+            `navigation` = REPLACE(`navigation`, '"type":"search-page"', '"type":"searchingPage"')
+        ;
+        SQL;
+    $connection->executeStatement($sql);
 
     // Normalize name of a column.
     $sql = <<<'SQL'
@@ -1585,6 +1592,18 @@ if (version_compare($oldVersion, '3.4.31', '<')) {
             }
             unset($filter['name']);
             $filters[$name] = $filter;
+        }
+
+        // Auto-populate form.filters from index.aliases when filters
+        // were not explicitly configured (pre-3.4.31 behavior).
+        if (empty($filters) && !empty($searchConfigSettings['index']['aliases'])) {
+            foreach ($searchConfigSettings['index']['aliases'] as $aliasName => $alias) {
+                $name = mb_strtolower(strtr($aliasName, ['-' => '_', ':' => '_']));
+                $filters[$name] = [
+                    'field' => $aliasName,
+                    'label' => $alias['label'] ?? $aliasName,
+                ];
+            }
         }
 
         // Manage advanced filters separately, except label, field and type.
@@ -2261,4 +2280,41 @@ if (version_compare($oldVersion, '3.4.57', '<')) {
         'The suggester indexation was optimized for per-site search. Please reindex your suggesters to enable site-specific suggestions.' // @translate
     );
     $messenger->addWarning($message);
+}
+
+if (version_compare($oldVersion, '3.4.58', '<')) {
+    // Fix navigation link type "search-page" (from old module Search) not
+    // covered during upgrade to 3.4.29 (added above too now).
+    $sql = <<<'SQL'
+        UPDATE `site`
+        SET
+            `navigation` = REPLACE(`navigation`, '"type":"search-page"', '"type":"searchingPage"')
+        ;
+        SQL;
+    $connection->executeStatement($sql);
+
+    // Fix: auto-populate form.filters from index.aliases for configs that were
+    // upgraded from before 3.4.31 without explicit filters.
+    $sql = 'SELECT `id`, `settings` FROM `search_config`';
+    $searchConfigs = $connection->executeQuery($sql)->fetchAllKeyValue();
+    foreach ($searchConfigs as $id => $settings) {
+        $searchConfigSettings = json_decode($settings, true) ?: [];
+        $filters = $searchConfigSettings['form']['filters'] ?? [];
+        // Only fix configs with empty filters but existing aliases.
+        if (empty($filters) && !empty($searchConfigSettings['index']['aliases'])) {
+            foreach ($searchConfigSettings['index']['aliases'] as $aliasName => $alias) {
+                $name = mb_strtolower(strtr($aliasName, ['-' => '_', ':' => '_']));
+                $filters[$name] = [
+                    'field' => $aliasName,
+                    'label' => $alias['label'] ?? $aliasName,
+                ];
+            }
+            $searchConfigSettings['form']['filters'] = $filters;
+            $sql = 'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?';
+            $connection->executeStatement($sql, [
+                json_encode($searchConfigSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+                $id,
+            ]);
+        }
+    }
 }

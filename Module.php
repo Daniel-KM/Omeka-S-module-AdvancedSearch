@@ -35,7 +35,9 @@
 namespace AdvancedSearch;
 
 if (!class_exists('Common\TraitModule', false)) {
-    require_once dirname(__DIR__) . '/Common/TraitModule.php';
+    require_once file_exists(dirname(__DIR__) . '/Common/src/TraitModule.php')
+        ? dirname(__DIR__) . '/Common/src/TraitModule.php'
+        : dirname(__DIR__) . '/Common/TraitModule.php';
 }
 
 use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
@@ -52,10 +54,6 @@ class Module extends AbstractModule
     use TraitModule;
 
     const NAMESPACE = __NAMESPACE__;
-
-    protected $dependencies = [
-        'Common',
-    ];
 
     /**
      * @var bool

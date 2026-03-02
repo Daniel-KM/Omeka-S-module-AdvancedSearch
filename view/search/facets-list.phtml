@@ -84,7 +84,10 @@ if (!empty($itemSet)) {
             <?php endif; ?>
             <?php
             $url = $plugins->get('url');
-            $suggestUrl = $url('search-page-' . $searchConfig->slug(), ['site-slug' => $site->slug()]) . '/suggest';
+            $suggestUrl = $site
+                ? $url('search-page-' . $searchConfig->slug(), ['site-slug' => $site->slug()])
+                : $url('search-admin-page-' . $searchConfig->slug());
+            $suggestUrl .= '/suggest';
             ?>
             <input id="search-refine" name="refine" class="search-refine autosuggest" autocomplete="off" data-autosuggest-url="<?= $escapeAttr($suggestUrl) ?>" data-autosuggest-fill-input="1" value="<?= $escape($query->getQueryRefine()) ?>"<?= $labelRefine ? ' data-placeholder="' . $escapeAttr($translate($labelRefine)) . '"' : '' ?>/>
             <?php if (!$displayButtonSubmit): ?>

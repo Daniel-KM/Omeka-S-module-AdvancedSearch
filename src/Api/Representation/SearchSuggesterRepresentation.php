@@ -166,8 +166,10 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
         if (!empty($suggesterSettings['solr_suggester_name'])) {
             $suggestOptions['solr_suggester_name'] = $suggesterSettings['solr_suggester_name'];
         } elseif (!empty($suggesterSettings['solr_field'])) {
-            // Auto-generate suggester name from the suggester name if field is set.
             $suggestOptions['solr_suggester_name'] = 'omeka_' . preg_replace('/[^a-z0-9_]/i', '_', strtolower($this->name()));
+        }
+        if (!empty($suggesterSettings['solr_fields'])) {
+            $suggestOptions['solr_fields'] = $suggesterSettings['solr_fields'];
         }
 
         $query

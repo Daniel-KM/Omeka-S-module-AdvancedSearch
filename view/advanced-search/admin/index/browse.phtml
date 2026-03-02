@@ -224,17 +224,11 @@ $this->htmlElement('body')->appendAttribute('class', 'search-admin resource brow
                             <?php endif; ?>
                             </li>
                             <li>
-                            <?php if ($isInternal): ?>
                                 <a href="#"
                                 data-sidebar-content-url="<?= $escape($suggester->url('index-confirm')) ?>"
                                 class="o-icon- fa fa-refresh fa-sync sidebar-content"
                                 aria-label="<?= $escape($translate('Reindex')) ?>"
                                 title="<?= $escape($translate('Reindex')) ?>"></a>
-                            <?php else: ?>
-                                <span class="o-icon- fa fa-refresh fa-sync sidebar-content disabled"
-                                    title="<?= $escapeAttr($translate('Reindex disabled: search adapter does not support it.')) ?>">
-                                </span>
-                            <?php endif; ?>
                             </li>
                             <li>
                                 <a href="#"

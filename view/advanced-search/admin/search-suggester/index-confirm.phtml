@@ -11,6 +11,8 @@
 $translate = $this->plugin('translate');
 
 $resourceTypes = $resource->searchEngine()->setting('resource_types', []);
+$engineAdapter = $resource->engineAdapter();
+$isInternal = $engineAdapter && $engineAdapter instanceof \AdvancedSearch\EngineAdapter\Internal;
 
 $this->form->setAttribute('action', $resource->url('index'));
 $this->form->setButtonLabel($translate('Confirm reindex'));
@@ -24,10 +26,16 @@ $this->form->setButtonLabel($translate('Confirm reindex'));
     <div id="sidebar-confirm">
         <h3><?= sprintf($translate('Reindex "%s"'), $resource->name()) ?></h3>
         <p><?= $translate('Are you sure you would like to reindex this suggester?') ?></p>
+        <?php if ($isInternal): ?>
         <p>
         <?= $translate('All the suggestions will be cleared first, so the search will be unavailable for a while.') ?>
         <?= $translate('You may redirect the users to a clone of the current suggester temporarily.') ?>
         </p>
+        <?php else: ?>
+        <p>
+        <?= $translate('Reindexing is unnecessary if the search engine has just been reindexed, unless the suggester has option to skip reindex.') ?>
+        </p>
+        <?php endif; ?>
         <p>
         <?php if ($listJobStatusesByIds): ?>
 	        <?= sprintf($translate('%1$d running indexings: #%2$s.'), count($listJobStatusesByIds), implode(', #', array_keys($listJobStatusesByIds))) ?><br />

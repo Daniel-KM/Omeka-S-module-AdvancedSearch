@@ -500,7 +500,7 @@ var Search = (function() {
                 self.removePagination(button);
                 button.text(button.attr('data-label-see-more') ? button.attr('data-label-see-more') : (hasOmekaTranslate ? Omeka.jsTranslate('See more') : 'See more'));
                 const defaultCount = Number(button.attr('data-default-count')) + 1;
-                button.closest('.facet').find('.facet-items .facet-item:nth-child(n+' + defaultCount + ')').attr('hidden', 'hidden');
+                button.closest('.facet').find('.facet-items .facet-item:nth-child(n+' + defaultCount + ')').css('display', '').attr('hidden', 'hidden');
             } else {
                 // Expanding: check if pagination is enabled.
                 const perPage = Number(button.attr('data-per-page')) || 0;
@@ -540,7 +540,7 @@ var Search = (function() {
 
             // Don't show pagination when there is only one page.
             if (totalPages <= 1) {
-                facet.find('.facet-items li').show();
+                facet.find('.facet-items li').css('display', '').removeAttr('hidden');
                 return self;
             }
 

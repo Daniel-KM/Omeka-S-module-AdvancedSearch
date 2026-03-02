@@ -229,6 +229,7 @@ var Search = (function() {
             serviceUrl: serviceUrl,
             dataType: 'json',
             paramName: paramName,
+            triggerSelectOnValidInput: false,
             transformResult: transformResult,
             onSearchError: function(query, jqXHR, textStatus, errorThrown) {
                 if (jqXHR.responseJSON && jqXHR.responseJSON.message) {

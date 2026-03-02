@@ -943,7 +943,8 @@ class SearchConfigController extends AbstractActionController
     protected function slugify($input): string
     {
         if (extension_loaded('intl')) {
-            $transliterator = \Transliterator::createFromRules(':: NFD; :: [:Nonspacing Mark:] Remove; :: NFC;');
+            static $transliterator;
+            $transliterator ??= \Transliterator::createFromRules(':: NFD; :: [:Nonspacing Mark:] Remove; :: NFC;');
             $slug = (string) $transliterator->transliterate((string) $input);
         } elseif (extension_loaded('iconv')) {
             $slug = (string) iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', (string) $input);

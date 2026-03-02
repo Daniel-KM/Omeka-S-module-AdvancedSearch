@@ -713,7 +713,8 @@ class InternalQuerier extends AbstractQuerier
 
         if ($this->query->getOption('remove_diacritics', false)) {
             if (extension_loaded('intl')) {
-                $transliterator = \Transliterator::createFromRules(':: NFD; :: [:Nonspacing Mark:] Remove; :: NFC;');
+                static $transliterator;
+                $transliterator ??= \Transliterator::createFromRules(':: NFD; :: [:Nonspacing Mark:] Remove; :: NFC;');
                 $q = $transliterator->transliterate($q);
             } elseif (extension_loaded('iconv')) {
                 $q = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $q);
@@ -771,7 +772,8 @@ class InternalQuerier extends AbstractQuerier
 
         if ($this->query->getOption('remove_diacritics', false)) {
             if (extension_loaded('intl')) {
-                $transliterator = \Transliterator::createFromRules(':: NFD; :: [:Nonspacing Mark:] Remove; :: NFC;');
+                static $transliterator;
+                $transliterator ??= \Transliterator::createFromRules(':: NFD; :: [:Nonspacing Mark:] Remove; :: NFC;');
                 $q = $transliterator->transliterate($q);
             } elseif (extension_loaded('iconv')) {
                 $q = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $q);

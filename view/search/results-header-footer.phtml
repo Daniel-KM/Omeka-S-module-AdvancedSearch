@@ -106,7 +106,7 @@ $multiMode ??= isset($displayParts['grid_list']) && !in_array($gridListMode, ['l
 <div class="search-results-display">
     <a class="search-view-type search-view-type-list<?= $gridListMode === 'list' ? ' active' : '' ?>" href="#"><?= $translate('list') ?></a>
     |
-    <a class="search-view-type search-view-type-grid<?= $gridListMode === 'grid' ? ' active' : '' ?>" href="#"><?= $translate('grid') ?></a>
+    <a class="search-view-type search-view-type-grid<?= in_array($gridListMode, ['grid', 'auto']) ? ' active' : '' ?>" href="#"><?= $translate('grid') ?></a>
     <?php if ($showMapView): ?>
     |
     <a class="search-view-type search-view-type-map<?= $gridListMode === 'map' ? ' active' : '' ?>" href="#"><?= $translate('map') ?></a>

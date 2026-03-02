@@ -498,6 +498,23 @@
         padding: 0 0.3em;
         white-space: nowrap;
     }
+    .facet-page-input {
+        width: 3.5em;
+        height: auto;
+        text-align: center;
+        font-size: inherit;
+        line-height: 1;
+        padding: 2px 4px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+        box-sizing: border-box;
+        -moz-appearance: textfield;
+    }
+    .facet-page-input::-webkit-outer-spin-button,
+    .facet-page-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
 
     /* Search range */
     /* Render gradient on .range-progress; native tracks are invisible to fix Chrome. */

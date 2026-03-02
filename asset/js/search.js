@@ -538,11 +538,20 @@ var Search = (function() {
             // Remove any existing pagination.
             facet.find('.facet-pagination').remove();
 
+            // Don't show pagination when there is only one page.
+            if (totalPages <= 1) {
+                facet.find('.facet-items li').show();
+                return self;
+            }
+
             var labelPage = button.attr('data-label-page') || 'Page';
+            var indicatorHtml = totalPages > 4
+                ? '<span class="facet-page-indicator"><input type="number" class="facet-page-input" value="1" min="1" max="' + totalPages + '" title="' + labelPage + '"> / ' + totalPages + '</span>'
+                : '<span class="facet-page-indicator">1 / ' + totalPages + '</span>';
             var paginationHtml = '<div class="facet-pagination">'
                 + '<button type="button" class="facet-page-first" title="' + labelPage + ' 1">&laquo;</button>'
                 + '<button type="button" class="facet-page-prev">&lsaquo;</button>'
-                + '<span class="facet-page-indicator">1/' + totalPages + '</span>'
+                + indicatorHtml
                 + '<button type="button" class="facet-page-next">&rsaquo;</button>'
                 + '<button type="button" class="facet-page-last" title="' + labelPage + ' ' + totalPages + '">&raquo;</button>'
                 + '</div>';
@@ -587,8 +596,12 @@ var Search = (function() {
                 var isActive = input.length && input.prop('checked');
 
                 if (isActive) {
-                    // Active/checked items: always visible, don't count.
-                    item.removeAttr('hidden');
+                    // Active/checked items: visible on first page only.
+                    if (page === 1) {
+                        item.removeAttr('hidden');
+                    } else {
+                        item.attr('hidden', 'hidden');
+                    }
                 } else {
                     // All non-active items are paginated.
                     if (paginableIndex >= startIndex && paginableIndex < endIndex) {
@@ -601,7 +614,12 @@ var Search = (function() {
             });
 
             // Update indicator.
-            facet.find('.facet-page-indicator').text(page + '/' + totalPages);
+            var pageInput = facet.find('.facet-page-input');
+            if (pageInput.length) {
+                pageInput.val(page);
+            } else {
+                facet.find('.facet-page-indicator').text(page + ' / ' + totalPages);
+            }
 
             // Update button states.
             facet.find('.facet-page-first, .facet-page-prev').prop('disabled', page <= 1);
@@ -1269,6 +1287,19 @@ $(document).ready(function() {
             var button = facet.find('.facet-see-more-or-less');
             var totalPages = facet.data('facet-total-pages') || 1;
             Search.facets.showPage(button, totalPages);
+        });
+        $searchFacets.on('change', '.facet-page-input', function() {
+            var input = $(this);
+            var facet = input.closest('.facet');
+            var button = facet.find('.facet-see-more-or-less');
+            var page = parseInt(input.val(), 10) || 1;
+            Search.facets.showPage(button, page);
+        });
+        $searchFacets.on('keydown', '.facet-page-input', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                $(this).trigger('change');
+            }
         });
 
         // Filter facet values via the search input (CheckboxSearch type).

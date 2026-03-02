@@ -82,7 +82,11 @@ if (!empty($itemSet)) {
             <?php if ($labelRefine): ?>
             <h4><label for="search-refine"><?= $escape($translate($labelRefine)) ?></label></h4>
             <?php endif; ?>
-            <input id="search-refine" name="refine" class="search-refine" value="<?= $escape($query->getQueryRefine()) ?>"<?= $labelRefine ? ' data-placeholder="' . $escapeAttr($translate($labelRefine)) . '"' : '' ?>/>
+            <?php
+            $url = $plugins->get('url');
+            $suggestUrl = $url('search-page-' . $searchConfig->slug(), ['site-slug' => $site->slug()]) . '/suggest';
+            ?>
+            <input id="search-refine" name="refine" class="search-refine autosuggest" autocomplete="off" data-autosuggest-url="<?= $escapeAttr($suggestUrl) ?>" data-autosuggest-fill-input="1" value="<?= $escape($query->getQueryRefine()) ?>"<?= $labelRefine ? ' data-placeholder="' . $escapeAttr($translate($labelRefine)) . '"' : '' ?>/>
             <?php if (!$displayButtonSubmit): ?>
             <button id="search-refine-submit" class="button search-refine" type="submit"><?= $escape($translate('Submit')) ?></button>
             <?php endif; ?>

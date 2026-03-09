@@ -3,7 +3,7 @@
 namespace AdvancedSearch\Service\Delegator;
 
 use AdvancedSearch\Api\ManagerDelegator as ApiManagerDelegator;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\DelegatorFactoryInterface;
 
 /**

@@ -4,7 +4,7 @@ namespace AdvancedSearch\Service\ControllerPlugin;
 
 use AdvancedSearch\EngineAdapter;
 use AdvancedSearch\Mvc\Controller\Plugin\ApiSearch;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ApiSearchFactory implements FactoryInterface

@@ -3,7 +3,7 @@
 namespace AdvancedSearch\Service\ViewHelper;
 
 use AdvancedSearch\View\Helper\FieldSelect;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class FieldSelectFactory implements FactoryInterface

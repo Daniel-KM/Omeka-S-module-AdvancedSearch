@@ -3,7 +3,7 @@
 namespace AdvancedSearch\Service\Form;
 
 use AdvancedSearch\Form\SearchingFormFieldset;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class SearchingFormFieldsetFactory implements FactoryInterface

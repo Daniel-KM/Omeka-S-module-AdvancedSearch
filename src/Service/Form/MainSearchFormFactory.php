@@ -30,7 +30,7 @@
 namespace AdvancedSearch\Service\Form;
 
 use AdvancedSearch\Form\MainSearchForm;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class MainSearchFormFactory implements FactoryInterface

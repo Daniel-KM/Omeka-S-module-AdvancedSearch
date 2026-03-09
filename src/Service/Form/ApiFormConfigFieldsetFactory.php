@@ -3,7 +3,7 @@
 namespace AdvancedSearch\Service\Form;
 
 use AdvancedSearch\Form\Admin\ApiFormConfigFieldset;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ApiFormConfigFieldsetFactory implements FactoryInterface

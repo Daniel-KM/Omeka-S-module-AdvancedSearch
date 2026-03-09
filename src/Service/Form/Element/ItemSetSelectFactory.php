@@ -3,7 +3,7 @@
 namespace AdvancedSearch\Service\Form\Element;
 
 use AdvancedSearch\Form\Element\ItemSetSelect;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ItemSetSelectFactory implements FactoryInterface

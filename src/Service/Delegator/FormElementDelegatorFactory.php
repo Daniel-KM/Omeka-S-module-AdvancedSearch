@@ -2,7 +2,7 @@
 
 namespace AdvancedSearch\Service\Delegator;
 
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\DelegatorFactoryInterface;
 
 class FormElementDelegatorFactory implements DelegatorFactoryInterface

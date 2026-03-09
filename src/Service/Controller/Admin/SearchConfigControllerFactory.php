@@ -3,7 +3,7 @@
 namespace AdvancedSearch\Service\Controller\Admin;
 
 use AdvancedSearch\Controller\Admin\SearchConfigController;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class SearchConfigControllerFactory implements FactoryInterface

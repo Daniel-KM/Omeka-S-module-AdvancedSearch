@@ -3,7 +3,7 @@
 namespace AdvancedSearch\Service\Delegator;
 
 use AdvancedSearch\Stdlib\FulltextSearchDelegator;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\DelegatorFactoryInterface;
 
 class FulltextSearchDelegatorFactory implements DelegatorFactoryInterface

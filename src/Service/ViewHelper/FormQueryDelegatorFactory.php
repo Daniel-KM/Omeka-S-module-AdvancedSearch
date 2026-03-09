@@ -3,7 +3,7 @@
 namespace AdvancedSearch\Service\ViewHelper;
 
 use AdvancedSearch\View\Helper\FormQueryDelegator;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\DelegatorFactoryInterface;
 
 class FormQueryDelegatorFactory implements DelegatorFactoryInterface

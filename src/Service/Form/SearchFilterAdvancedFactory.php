@@ -3,7 +3,7 @@
 namespace AdvancedSearch\Service\Form;
 
 use AdvancedSearch\Form\SearchFilter\Advanced;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class SearchFilterAdvancedFactory implements FactoryInterface

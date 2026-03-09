@@ -3,7 +3,7 @@
 namespace AdvancedSearch\Service\ControllerPlugin;
 
 use AdvancedSearch\Mvc\Controller\Plugin\SearchResources;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class SearchResourcesFactory implements FactoryInterface

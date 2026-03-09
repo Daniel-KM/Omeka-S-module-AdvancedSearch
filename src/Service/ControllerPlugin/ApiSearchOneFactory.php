@@ -2,7 +2,7 @@
 namespace AdvancedSearch\Service\ControllerPlugin;
 
 use AdvancedSearch\Mvc\Controller\Plugin\ApiSearchOne;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ApiSearchOneFactory implements FactoryInterface

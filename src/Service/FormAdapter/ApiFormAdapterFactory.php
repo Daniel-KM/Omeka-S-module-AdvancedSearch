@@ -3,7 +3,7 @@
 namespace AdvancedSearch\Service\FormAdapter;
 
 use AdvancedSearch\FormAdapter\ApiFormAdapter;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ApiFormAdapterFactory implements FactoryInterface

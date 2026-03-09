@@ -1,4 +1,8 @@
 @media all {
+    [class*="o-icon-"].far::before {
+        font-weight: 400;
+    }
+
     .search-admin .subhead::before {
         content:"";
     }

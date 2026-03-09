@@ -31,10 +31,12 @@ $applyTemplates = $isSiteRequest ? $siteSetting('search_apply_templates') : fals
 $usedTerms = !$isSiteRequest;
 
 $setting = $isSiteRequest ? $siteSetting : $plugins->get('setting');
-$allowedFilterTypes = $setting('advancedsearch_filter_types');
-if (empty($allowedFilterTypes)) {
-    $allowedFilterTypes = \AdvancedSearch\Form\TraitCommonSettings::defaultFilterTypes();
+$allowedFilterTypes = $setting('advancedsearch_filter_types') ?: [];
+if (!$allowedFilterTypes) {
+    // Empty: only "in" as hidden input, no select.
+    $allowedFilterTypes = ['in'];
 }
+$filterTypeIsHidden = count($allowedFilterTypes) === 1;
 $allowedFilterTypes = array_flip($allowedFilterTypes);
 
 // Autosuggest on filter values (enabled by default via whitelist).
@@ -179,6 +181,9 @@ if ($isSiteRequest) {
                         'data-placeholder' => '[any metadata]', // @translate
                     ],
                 ]) ?>
+                <?php if ($filterTypeIsHidden): ?>
+                <input type="hidden" name="<?= $escape($stem . '[type]') ?>" value="<?= $escapeAttr(array_key_first($allowedFilterTypes)) ?>">
+                <?php else: ?>
                 <select class="query-type chosen-select" name="<?= $escape($stem . '[type]') ?>" aria-label="<?= $translate('Query type') ?>">
                     <?php if ($hasGroupType(['eq', 'neq', 'in', 'nin', 'sw', 'nsw', 'ew', 'new', 'near', 'nnear', 'ma', 'nma', 'lt', 'lte', 'gte', 'gt', '<', '≤', '≥', '>', 'yreq', 'nyreq', 'yrgte', 'yrlte', 'yrgt', 'yrlt'])): ?>
                     <optgroup label="<?= $translate('Value') ?>">
@@ -289,6 +294,7 @@ if ($isSiteRequest) {
                     </optgroup>
                     <?php endif; ?>
                 </select>
+                <?php endif; ?>
                 <?= $queryText($isSubQuery ? [] : $filter, $index) ?>
                 <?= $dataTypeHelper->getSelect($stem . '[val]', $query['filter'][$index]['val'] ?? null, ['multiple' => false, 'class' => 'query-text query-data-type chosen-select', 'aria-label' => $translate('Data types'), 'data-placeholder' => $translate('Select data type…')], ['used' => true]) ?>
                 <?= $formSelect($selectMainDataType->setName($stem . '[val]')->setValue($query['filter'][$index]['val'] ?? null)) ?>

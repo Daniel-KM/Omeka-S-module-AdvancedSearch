@@ -298,6 +298,10 @@ class IndexSearch extends AbstractJob
             'End of indexing. Execution time: {duration} seconds. Max memory: {memory}. Failed indexed resources should be checked manually.', // @translate
             ['duration' => $timeTotal, 'memory' => $maxMemory]
         );
+
+        if (!$this->shouldStop()) {
+            $this->reindexSuggesters($searchEngines);
+        }
     }
 
     protected function indexSearchEngine(SearchEngineRepresentation $searchEngine): void
@@ -710,5 +714,72 @@ class IndexSearch extends AbstractJob
                 'memory' => $memory,
             ]
         );
+    }
+
+    /**
+     * Dispatch reindexing of suggesters linked to the indexed
+     * search engines.
+     *
+     * @param SearchEngineRepresentation[] $searchEngines
+     */
+    protected function reindexSuggesters(array $searchEngines): void
+    {
+        $services = $this->getServiceLocator();
+        $dispatcher = $services->get(\Omeka\Job\Dispatcher::class);
+
+        foreach ($searchEngines as $searchEngine) {
+            $suggesters = $this->api
+                ->search('search_suggesters', [
+                    'engine_id' => $searchEngine->id(),
+                ])
+                ->getContent();
+
+            if (!$suggesters) {
+                continue;
+            }
+
+            $engineAdapter = $searchEngine->engineAdapter();
+            $isInternal = $engineAdapter
+                && $engineAdapter instanceof \AdvancedSearch\EngineAdapter\Internal;
+
+            foreach ($suggesters as $suggester) {
+                if ($isInternal) {
+                    $dispatcher->dispatch(
+                        IndexSuggestions::class,
+                        ['search_suggester_id' => $suggester->id()]
+                    );
+                    $this->logger->info(
+                        'Dispatched reindex of internal suggester "{name}".', // @translate
+                        ['name' => $suggester->name()]
+                    );
+                } else {
+                    // Solr suggesters: skip if build on
+                    // commit is disabled.
+                    $skip = $suggester->setting(
+                        'solr_skip_build_on_commit', false
+                    );
+                    if ($skip) {
+                        $this->logger->info(
+                            'Skipped suggester "{name}": build on commit is disabled.', // @translate
+                            ['name' => $suggester->name()]
+                        );
+                        continue;
+                    }
+                    // Dispatch via class name string to
+                    // avoid coupling with SearchSolr.
+                    $class = 'SearchSolr\Job\CreateSolrSuggesters';
+                    if (class_exists($class)) {
+                        $dispatcher->dispatch(
+                            $class,
+                            ['search_suggester_id' => $suggester->id()]
+                        );
+                        $this->logger->info(
+                            'Dispatched reindex of Solr suggester "{name}".', // @translate
+                            ['name' => $suggester->name()]
+                        );
+                    }
+                }
+            }
+        }
     }
 }

@@ -72,39 +72,6 @@ $(document).ready(function() {
     }
 
     Omeka.cleanFormSearchQuery = function(form) {
-        const inputNames = [
-            'fulltext_search',
-            'resource_class_id[]',
-            'resource_template_id[]',
-            'item_set_id[]',
-            'not_item_set_id[]',
-            'site_id',
-            'owner_id',
-            'media_type',
-            'sort_by',
-            'sort_order',
-            'is_public',
-            'has_media',
-            'id',
-            // Modules.
-            // Access.
-            'access',
-            // Advanced Search.
-            'has_original',
-            'has_thumbnails',
-            'has_asset',
-            'asset_id',
-            // Data Type Geometry.
-            'geo[box]',
-            'geo[zone]',
-            'geo[mapbox]',
-            'geo[area]',
-            // Dynamic item sets.
-            'is_dynamic',
-            // Mapping.
-            'has_markers',
-            'has_features',
-        ];
         const inputFakes = [
             // Data Type Geometry.
             'geo[mode]',
@@ -126,22 +93,33 @@ $(document).ready(function() {
             'integer',
         ];
         const fieldQueryTypeWithText = ['eq', 'neq', 'in', 'nin', 'sw', 'nsw', 'ew', 'new', 'near', 'nnear', 'ma', 'nma', 'lt', 'lte', 'gte', 'gt', '<', '≤', '≥', '>', 'yreq', 'nyreq', 'yrlt', 'yrlte', 'yrgte', 'yrgt', 'list', 'nlist', 'res', 'nres', 'resq', 'nresq', 'lres', 'nlres', 'lkq', 'nlkq', 'dt', 'ndt', 'dtp', 'ndtp', 'tp', 'ntp'];
-        form.find(":input[name]:not([name='']):not(:disabled)").each(function(index) {
+
+        // First pass: remove all inputs with empty value, submit buttons, and
+        // fake inputs. Note: "0" is a valid value.
+        form.find(':input[name]:not(:disabled)').each(function() {
             const input = $(this);
-            const inputName = input.attr('name');
-            const inputValue = input.val();
-            var match;
-            if (inputFakes.includes(inputName)) {
+            if (input.is('[type="submit"]')
+                || inputFakes.includes(input.attr('name'))
+                || input.val() === ''
+            ) {
                 input.prop('name', '');
             }
+        });
+
+        // Second pass: remove grouped inputs whose text/val is now empty
+        // (property, filter, datetime, geo, mapping, numeric, sort).
+        form.find(":input[name]:not([name='']):not(:disabled)").each(function() {
+            const input = $(this);
+            const inputName = input.attr('name');
+            var match;
             // Module Data Type Geometry.
-            else if (['geo[around][x]', 'geo[around][y]', 'geo[around][latitude]', 'geo[around][longitude]', 'geo[around][radius]'].includes(inputName)) {
+            if (['geo[around][x]', 'geo[around][y]', 'geo[around][latitude]', 'geo[around][longitude]', 'geo[around][radius]'].includes(inputName)) {
                 const xInput = form.find('[name="geo[around][x]"]');
                 const yInput = form.find('[name="geo[around][y]"]');
-                const hasPosition = $.isNumeric(xInput.val()) && $.isNumeric(yInput.val()) ;
+                const hasPosition = $.isNumeric(xInput.val()) && $.isNumeric(yInput.val());
                 const latitudeInput = form.find('[name="geo[around][latitude]"]');
                 const longitudeInput = form.find('[name="geo[around][longitude]"]');
-                const hasCoordinates = $.isNumeric(latitudeInput.val()) && $.isNumeric(longitudeInput.val()) ;
+                const hasCoordinates = $.isNumeric(latitudeInput.val()) && $.isNumeric(longitudeInput.val());
                 const radiusInput = form.find('[name="geo[around][radius]"]');
                 const unitInput = form.find('[name="geo[around][unit]"]');
                 const hasRadius = radiusInput.val() !== '';
@@ -168,65 +146,62 @@ $(document).ready(function() {
                     unitInput.prop('name', '');
                 }
             }
-            // Empty values.
-            else if (inputName && '' === inputValue) {
-                if (inputNames.includes(inputName)) {
-                    input.prop('name', '');
-                } else if (match = inputName.match(/property\[(\d+)\]\[text\]/)) {
-                    const subIndex = match[1];
-                    const propertyType = form.find(`[name="property[${subIndex}][type]"]`);
-                    if (['eq', 'neq', 'in', 'nin', 'sw', 'nsw', 'ew', 'new', 'res', 'nres', 'dt', 'ndt'].includes(propertyType.val())) {
-                        form.find(`[name="property[${subIndex}][joiner]"]`).prop('name', '');
-                        form.find(`[name="property[${subIndex}][property]"]`).prop('name', '');
-                        form.find(`[name="property[${subIndex}][text]"]`).prop('name', '');
-                        propertyType.prop('name', '');
+            // Core properties: clean group when text is empty.
+            else if (match = inputName.match(/property\[(\d+)\]\[type\]/)) {
+                const i = match[1];
+                if (!form.find(`[name="property[${i}][text]"]`).length) {
+                    const type = input.val();
+                    if (['eq', 'neq', 'in', 'nin', 'sw', 'nsw', 'ew', 'new', 'res', 'nres', 'dt', 'ndt'].includes(type)) {
+                        form.find(`[name="property[${i}][joiner]"]`).prop('name', '');
+                        form.find(`[name="property[${i}][property]"]`).prop('name', '');
+                        input.prop('name', '');
                     }
-                }
-                // Module Advanced Search.
-                else if (match = inputName.match(/filter\[(\d+)\]\[val\]/)) {
-                    const subIndex = match[1];
-                    const fieldType = form.find(`[name="filter[${subIndex}][type]"]`);
-                    if (fieldQueryTypeWithText.includes(fieldType.val())) {
-                        form.find(`[name="filter[${subIndex}][join]"]`).prop('name', '');
-                        form.find(`[name="filter[${subIndex}][field]"]`).prop('name', '');
-                        form.find(`[name="filter[${subIndex}][val]"]`).prop('name', '');
-                        fieldType.prop('name', '');
-                    }
-                } else if (match = inputName.match(/datetime\[(\d+)\]\[val\]/)) {
-                    const subIndex = match[1];
-                    const datetimeType = form.find(`[name="datetime[${subIndex}][type]"]`);
-                    if (!['ex', 'nex'].includes(datetimeType.val())) {
-                        form.find(`[name="datetime[${subIndex}][join]"]`).prop('name', '');
-                        form.find(`[name="datetime[${subIndex}][field]"]`).prop('name', '');
-                        form.find(`[name="datetime[${subIndex}][val]"]`).prop('name', '');
-                        datetimeType.prop('name', '');
-                    }
-                }
-                // Module Mapping.
-                else if (['mapping_address', 'mapping_radius', 'mapping_radius_unit'].includes(inputName)) {
-                    const address = form.find('[name="mapping_address"]').val();
-                    const radius = form.find('[name="mapping_radius"]').val();
-                    if (!address || address.trim() === '' || !radius || !parseFloat(radius)) {
-                        form.find('[name="mapping_address"]').prop('name', '');
-                        form.find('[name="mapping_radius"]').prop('name', '');
-                        form.find('[name="mapping_radius_unit"]').prop('name', '');
-                    }
-                }
-                // Module Numeric Data Types.
-                else if (match = inputName.match(/numeric\[(ts\]\[gte|ts\]\[lte|dur\]\[gt|dur\]\[lt|ivl|int\]\[gt|int\]\[lt)\]\[(pid|val)\]/)) {
-                    const numericType = match[1];
-                    const pidOrVal = match[2] === 'pid' ? 'val' : 'pid';
-                    const pidOrValInput = form.find(`[name="numeric[${numericType}][${pidOrVal}]"]`);
-                    input.prop('name', '');
-                    pidOrValInput.prop('name', '');
                 }
             }
-            // Empty order.
+            // Module Advanced Search filters.
+            else if (match = inputName.match(/filter\[(\d+)\]\[type\]/)) {
+                const i = match[1];
+                if (!form.find(`[name="filter[${i}][val]"]`).length) {
+                    const type = input.val();
+                    if (fieldQueryTypeWithText.includes(type)) {
+                        form.find(`[name="filter[${i}][join]"]`).prop('name', '');
+                        form.find(`[name="filter[${i}][field]"]`).prop('name', '');
+                        input.prop('name', '');
+                    }
+                }
+            }
+            // Datetime queries.
+            else if (match = inputName.match(/datetime\[(\d+)\]\[type\]/)) {
+                const i = match[1];
+                if (!form.find(`[name="datetime[${i}][val]"]`).length) {
+                    const type = input.val();
+                    if (!['ex', 'nex'].includes(type)) {
+                        form.find(`[name="datetime[${i}][join]"]`).prop('name', '');
+                        form.find(`[name="datetime[${i}][field]"]`).prop('name', '');
+                        input.prop('name', '');
+                    }
+                }
+            }
+            // Module Mapping.
+            else if (['mapping_address', 'mapping_radius', 'mapping_radius_unit'].includes(inputName)) {
+                const address = form.find('[name="mapping_address"]').val();
+                const radius = form.find('[name="mapping_radius"]').val();
+                if (!address || !radius || !parseFloat(radius)) {
+                    form.find('[name="mapping_address"]').prop('name', '');
+                    form.find('[name="mapping_radius"]').prop('name', '');
+                    form.find('[name="mapping_radius_unit"]').prop('name', '');
+                }
+            }
+            // Module Numeric Data Types.
+            else if (match = inputName.match(/numeric\[(ts\]\[gte|ts\]\[lte|dur\]\[gt|dur\]\[lt|ivl|int\]\[gt|int\]\[lt)\]\[(pid|val)\]/)) {
+                const numericType = match[1];
+                const pidOrVal = match[2] === 'pid' ? 'val' : 'pid';
+                form.find(`[name="numeric[${numericType}][${pidOrVal}]"]`).prop('name', '');
+                input.prop('name', '');
+            }
+            // Empty sort order without sort field.
             else if (inputName === 'sort_order') {
-                const sortByInput = form.find('[name="sort_by"]');
-                const sortBy = sortByInput.val();
-                if (!sortBy || sortBy.trim() === '') {
-                    sortByInput.prop('name', '');
+                if (!form.find('[name="sort_by"]').length) {
                     input.prop('name', '');
                 }
             }

@@ -29,15 +29,37 @@ trait TraitCommonSettings
                 ],
             ])
             ->add([
-                'name' => 'advancedsearch_filter_autosuggest',
-                'type' => \Laminas\Form\Element\Checkbox::class,
+                'name' => 'advancedsearch_filter_value_autosuggest_whitelist',
+                'type' => CommonElement\OptionalPropertySelect::class,
                 'options' => [
                     'element_group' => 'search',
-                    'label' => 'Enable autocompletion on filter values', // @translate
-                    'info' => 'Requires module Reference or SearchSolr.', // @translate
+                    'label' => 'Properties with autocompletion on filter values (whitelist)', // @translate
+                    'info' => 'Autocompletion requires module Reference.', // @translate
+                    'term_as_value' => true,
+                    'prepend_value_options' => [
+                        'all' => 'All properties', // @translate
+                    ],
                 ],
                 'attributes' => [
-                    'id' => 'advancedsearch_filter_autosuggest',
+                    'id' => 'advancedsearch_filter_value_autosuggest_whitelist',
+                    'multiple' => true,
+                    'class' => 'chosen-select',
+                    'data-placeholder' => 'Select properties…', // @translate
+                ],
+            ])
+            ->add([
+                'name' => 'advancedsearch_filter_value_autosuggest_blacklist',
+                'type' => CommonElement\OptionalPropertySelect::class,
+                'options' => [
+                    'element_group' => 'search',
+                    'label' => 'Properties without autocompletion on filter values (blacklist)', // @translate
+                    'term_as_value' => true,
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearch_filter_value_autosuggest_blacklist',
+                    'multiple' => true,
+                    'class' => 'chosen-select',
+                    'data-placeholder' => 'Select properties…', // @translate
                 ],
             ])
         ;

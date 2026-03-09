@@ -2,6 +2,19 @@
 
 namespace AdvancedSearch;
 
+$defaultAutosuggestBlacklist = [
+    'dcterms:abstract',
+    'dcterms:bibliographicCitation',
+    'dcterms:description',
+    'dcterms:extent',
+    'dcterms:tableOfContents',
+    'bibo:abstract',
+    'bibo:content',
+    'curation:data',
+    'curation:note',
+    'extracttext:extracted_text',
+];
+
 return [
     'api_adapters' => [
         'invokables' => [
@@ -404,7 +417,8 @@ return [
                 'common/advanced-search/data-type-geography',
                 'common/numeric-data-types-advanced-search',
             ],
-            'advancedsearch_filter_autosuggest' => false,
+            'advancedsearch_filter_value_autosuggest_whitelist' => ['all'],
+            'advancedsearch_filter_value_autosuggest_blacklist' => $defaultAutosuggestBlacklist,
             'advancedsearch_fulltextsearch_alto' => false,
             'advancedsearch_main_config' => 1,
             'advancedsearch_api_config' => '',
@@ -437,7 +451,8 @@ return [
                 'common/advanced-search/data-type-geography',
                 'common/numeric-data-types-advanced-search',
             ],
-            'advancedsearch_filter_autosuggest' => false,
+            'advancedsearch_filter_value_autosuggest_whitelist' => ['all'],
+            'advancedsearch_filter_value_autosuggest_blacklist' => $defaultAutosuggestBlacklist,
             'advancedsearch_configs' => [1],
             'advancedsearch_main_config' => 1,
             'advancedsearch_items_config' => 1,

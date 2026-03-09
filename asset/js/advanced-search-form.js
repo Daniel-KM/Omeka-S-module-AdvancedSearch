@@ -405,9 +405,26 @@ $(document).ready(function() {
 
     /**
      * Autosuggest on filter values using api of module Reference.
+     *
+     * Whitelist/blacklist filtering: a field gets autosuggest if it
+     * is in the whitelist (or whitelist is "all") AND not in the
+     * blacklist.
      */
-    var filterAutosuggestUrl = $('#filter-queries').data('autosuggest-url');
+    var $filterQueries = $('#filter-queries');
+    var filterAutosuggestUrl = $filterQueries.data('autosuggest-url');
     if (filterAutosuggestUrl && typeof $.fn.autocomplete === 'function') {
+        var autosuggestAll = $filterQueries.data('autosuggest-all') === 1
+            || $filterQueries.data('autosuggest-all') === '1';
+        var autosuggestWhitelist = $filterQueries.data('autosuggest-whitelist') || [];
+        var autosuggestBlacklist = $filterQueries.data('autosuggest-blacklist') || [];
+
+        var isFieldAllowed = function(field) {
+            if (autosuggestBlacklist.indexOf(field) !== -1) {
+                return false;
+            }
+            return autosuggestAll || autosuggestWhitelist.indexOf(field) !== -1;
+        };
+
         var initFilterAutosuggest = function(value) {
             var input = value.find('input.query-text');
             if (!input.length) return;
@@ -424,9 +441,15 @@ $(document).ready(function() {
             if (!Array.isArray(fields)) {
                 fields = [fields];
             }
+            // Filter by whitelist/blacklist.
+            var allowed = [];
+            $.each(fields, function(i, f) {
+                if (isFieldAllowed(f)) allowed.push(f);
+            });
+            if (!allowed.length) return;
             // Build base URL with metadata fields.
             var params = [];
-            $.each(fields, function(i, f) {
+            $.each(allowed, function(i, f) {
                 params.push('metadata[]=' + encodeURIComponent(f));
             });
             params.push('option[per_page]=25');

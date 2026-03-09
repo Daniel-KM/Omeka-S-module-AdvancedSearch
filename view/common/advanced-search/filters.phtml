@@ -32,18 +32,17 @@ $isSiteRequest = $status->isSiteRequest();
 $applyTemplates = $isSiteRequest ? $siteSetting('search_apply_templates') : false;
 $usedTerms = !$isSiteRequest;
 
-// Autosuggest on filter values.
-$filterAutosuggest = (bool) $setting('advancedsearch_filter_autosuggest');
+// Autosuggest on filter values (enabled by default via whitelist).
 $filterAutosuggestUrl = '';
-if ($filterAutosuggest) {
-    $services = $plugins->getServiceLocator();
-    // Use api of module reference if available, else no autosuggest.
-    if (class_exists('Reference\Module', false)) {
-        $url = $plugins->get('url');
-        $basePath = $plugins->get('basePath');
-        $filterAutosuggestUrl = $basePath() . '/api/references';
-    }
+$autosuggestWhitelist = $setting('advancedsearch_filter_value_autosuggest_whitelist') ?: [];
+if ($autosuggestWhitelist && $plugins->has('references')) {
+    $basePath = $plugins->get('basePath');
+    $filterAutosuggestUrl = $basePath() . '/api/references';
 }
+$autosuggestBlacklist = $filterAutosuggestUrl
+    ? ($setting('advancedsearch_filter_value_autosuggest_blacklist') ?: [])
+    : [];
+$autosuggestAll = in_array('all', $autosuggestWhitelist);
 
 $resourceTypesToNames = ['item' => 'items', 'item-set' => 'item_sets', 'media' => 'media', 'annotation' => 'annotations'];
 $resourceName = $resourceTypesToNames[$this->resourceType ?? null] ?? 'items';
@@ -111,7 +110,7 @@ if ($isSiteRequest) {
 }
 ?>
 
-<div id="filter-queries" class="field removable multi-value" role="group" aria-labelledby="by-value-label"<?php if ($filterAutosuggestUrl): ?> data-autosuggest-url="<?= $escapeAttr($filterAutosuggestUrl) ?>"<?php endif; ?>>
+<div id="filter-queries" class="field removable multi-value" role="group" aria-labelledby="by-value-label"<?php if ($filterAutosuggestUrl): ?> data-autosuggest-url="<?= $escapeAttr($filterAutosuggestUrl) ?>" data-autosuggest-all="<?= $autosuggestAll ? '1' : '0' ?>"<?php if (!$autosuggestAll && $autosuggestWhitelist): ?> data-autosuggest-whitelist="<?= $escapeAttr(json_encode($autosuggestWhitelist)) ?>"<?php endif; ?><?php if ($autosuggestBlacklist): ?> data-autosuggest-blacklist="<?= $escapeAttr(json_encode($autosuggestBlacklist)) ?>"<?php endif; ?><?php endif; ?>>
     <div class="field-meta">
         <span id="by-value-label" class="label"><?= $translate('Filters') ?></span>
         <button type="button" class="button add-value o-icon-add" aria-label="<?= $translate('Add new value') ?>" title="<?= $translate('Add new value') ?>"></button>

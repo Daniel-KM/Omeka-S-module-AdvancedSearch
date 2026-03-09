@@ -916,7 +916,7 @@ class Module extends AbstractModule
 
         // Load autocomplete JS/CSS when filter autosuggest is enabled.
         $settingHelper = $isSite ? 'siteSetting' : 'setting';
-        if ($plugins->get($settingHelper)('advancedsearch_filter_autosuggest')) {
+        if ($plugins->get($settingHelper)('advancedsearch_filter_value_autosuggest_whitelist')) {
             $headLink
                 ->appendStylesheet($assetUrl('css/common-autocomplete.css', 'Common'));
             $headScript

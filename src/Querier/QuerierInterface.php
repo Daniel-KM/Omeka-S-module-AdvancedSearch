@@ -64,7 +64,7 @@ interface QuerierInterface extends LoggerAwareInterface
      *
      * @return array Key-value pairs for name and label, generally the same.
      */
-    public function queryValues(string $field): array;
+    public function queryValues(string $field, ?string $prefix = null, int $limit = 0): array;
 
     /**
      * Process a search query to get all ids of a type, without pagination.

@@ -337,8 +337,9 @@ class SearchController extends AbstractActionController
         $query->setAliases($aliases);
         $querier->setQuery($query);
 
+        $prefix = strlen($q) ? $q : null;
         try {
-            $values = $querier->queryValues($field);
+            $values = $querier->queryValues($field, $prefix, 25);
         } catch (\Throwable $e) {
             return new JsonModel([
                 'status' => 'error',
@@ -346,13 +347,7 @@ class SearchController extends AbstractActionController
             ]);
         }
 
-        if (strlen($q)) {
-            $qLower = mb_strtolower($q);
-            $values = array_filter($values, fn ($v) =>
-                mb_strpos(mb_strtolower($v), $qLower) === 0);
-        }
-
-        $values = array_slice(array_values($values), 0, 25);
+        $values = array_values($values);
 
         return new JsonModel([
             'status' => 'success',

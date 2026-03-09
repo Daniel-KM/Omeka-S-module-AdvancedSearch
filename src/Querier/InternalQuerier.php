@@ -452,7 +452,7 @@ class InternalQuerier extends AbstractQuerier
      * @see \AdvancedSearch\Querier\InternalQuerier::queryValues()
      * @see \Reference\Mvc\Controller\Plugin\References
      */
-    public function queryValues(string $field): array
+    public function queryValues(string $field, ?string $prefix = null, int $limit = 0): array
     {
         // Check if the field is a special or a multifield.
 
@@ -551,7 +551,15 @@ class InternalQuerier extends AbstractQuerier
             ->groupBy('v')
             ->orderBy('v', 'asc');
 
-        // Empty values (null and "") and duplicates are removed earlier.
+        if ($prefix !== null && $prefix !== '') {
+            $qb
+                ->andWhere($expr->like('v', ':prefix'))
+                ->setParameter('prefix', $prefix . '%');
+        }
+        if ($limit > 0) {
+            $qb->setMaxResults($limit);
+        }
+
         $list = $qb->getQuery()->getSingleColumnResult();
         return array_combine($list, $list);
     }

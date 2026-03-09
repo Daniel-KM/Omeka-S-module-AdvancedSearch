@@ -29,7 +29,7 @@ class TestQuerier extends AbstractQuerier
     {
         return [];
     }
-    public function queryValues(string $field): array
+    public function queryValues(string $field, ?string $prefix = null, int $limit = 0): array
     {
         return [];
     }

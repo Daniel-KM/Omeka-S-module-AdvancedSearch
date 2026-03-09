@@ -43,7 +43,7 @@ class NoopQuerier implements QuerierInterface
         return new Response();
     }
 
-    public function queryValues(string $field): array
+    public function queryValues(string $field, ?string $prefix = null, int $limit = 0): array
     {
         return [];
     }

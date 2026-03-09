@@ -44,6 +44,14 @@ $autosuggestBlacklist = $filterAutosuggestUrl
     : [];
 $autosuggestAll = in_array('all', $autosuggestWhitelist);
 
+// Joiner "not": when enabled, negative types are removed and the
+// joiner gets a third option.
+$joinerNot = (bool) $setting('advancedsearch_filter_joiner_not');
+if ($joinerNot) {
+    $negativeTypes = array_flip(\AdvancedSearch\Stdlib\SearchResources::FIELD_QUERY['negative']);
+    $allowedFilterTypes = array_diff_key($allowedFilterTypes, $negativeTypes);
+}
+
 $resourceTypesToNames = ['item' => 'items', 'item-set' => 'item_sets', 'media' => 'media', 'annotation' => 'annotations'];
 $resourceName = $resourceTypesToNames[$this->resourceType ?? null] ?? 'items';
 
@@ -119,7 +127,7 @@ if ($isSiteRequest) {
 }
 ?>
 
-<div id="filter-queries" class="field removable multi-value" role="group" aria-labelledby="by-value-label"<?php if ($filterAutosuggestUrl): ?> data-autosuggest-url="<?= $escapeAttr($filterAutosuggestUrl) ?>" data-autosuggest-all="<?= $autosuggestAll ? '1' : '0' ?>"<?php if (!$autosuggestAll && $autosuggestWhitelist): ?> data-autosuggest-whitelist="<?= $escapeAttr(json_encode($autosuggestWhitelist)) ?>"<?php endif; ?><?php if ($autosuggestBlacklist): ?> data-autosuggest-blacklist="<?= $escapeAttr(json_encode($autosuggestBlacklist)) ?>"<?php endif; ?><?php endif; ?>>
+<div id="filter-queries" class="field removable multi-value<?= $joinerNot ? ' has-joiner-not' : '' ?>" role="group" aria-labelledby="by-value-label"<?php if ($filterAutosuggestUrl): ?> data-autosuggest-url="<?= $escapeAttr($filterAutosuggestUrl) ?>" data-autosuggest-all="<?= $autosuggestAll ? '1' : '0' ?>"<?php if (!$autosuggestAll && $autosuggestWhitelist): ?> data-autosuggest-whitelist="<?= $escapeAttr(json_encode($autosuggestWhitelist)) ?>"<?php endif; ?><?php if ($autosuggestBlacklist): ?> data-autosuggest-blacklist="<?= $escapeAttr(json_encode($autosuggestBlacklist)) ?>"<?php endif; ?><?php endif; ?>>
     <div class="field-meta">
         <span id="by-value-label" class="label"><?= $translate('Filters') ?></span>
         <button type="button" class="button add-value o-icon-add" aria-label="<?= $translate('Add new value') ?>" title="<?= $translate('Add new value') ?>"></button>
@@ -142,6 +150,9 @@ if ($isSiteRequest) {
                 <select class="joiner chosen-select" name="<?= $escape($stem . '[join]') ?>" aria-label="<?= $translate('Joiner') ?>">
                     <?= $htmlOption('and', $filter, 'join', $translate('and')) ?>
                     <?= $htmlOption('or', $filter, 'join', $translate('or')) ?>
+                    <?php if ($joinerNot): ?>
+                    <?= $htmlOption('not', $filter, 'join', $translate('not')) ?>
+                    <?php endif; ?>
                 </select>
                 <?= $fieldSelect([
                     'name' => $stem . '[field]',

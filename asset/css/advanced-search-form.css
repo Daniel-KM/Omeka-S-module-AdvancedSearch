@@ -27,11 +27,8 @@
     #advanced-search #property-queries.multi-value .value:first-child .chosen-container:first-of-type,
     #advanced-search #filter-queries .query-text:disabled,
     #advanced-search #filter-queries .chosen-disabled,
-    #advanced-search #filter-queries.multi-value .value:first-child .joiner:first-of-type,
-    #advanced-search #filter-queries.multi-value .value:first-child .chosen-container:first-of-type,
-    #advanced-search #datetime-queries .query-text:disabled,
-    #advanced-search #datetime-queries.multi-value .value:first-child .joiner:first-of-type
-    #advanced-search #datetime-queries.multi-value .value:first-child .chosen-container:first-of-type {
+    #advanced-search #filter-queries.multi-value:not(.has-joiner-not) .value:first-child .joiner:first-of-type,
+    #advanced-search #filter-queries.multi-value:not(.has-joiner-not) .value:first-child .chosen-container:first-of-type {
        display: none;
     }
     #advanced-search .inputs .chosen-choices li.search-choice span {

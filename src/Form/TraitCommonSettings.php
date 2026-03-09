@@ -62,6 +62,18 @@ trait TraitCommonSettings
                     'data-placeholder' => 'Select properties…', // @translate
                 ],
             ])
+            ->add([
+                'name' => 'advancedsearch_filter_joiner_not',
+                'type' => \Laminas\Form\Element\Checkbox::class,
+                'options' => [
+                    'element_group' => 'search',
+                    'label' => 'Add joiner "not" to filters and simplify query types', // @translate
+                    'info' => 'When enabled, negative query types (does not contain, is not…) are removed and replaced by the "not" joiner.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearch_filter_joiner_not',
+                ],
+            ])
         ;
     }
 

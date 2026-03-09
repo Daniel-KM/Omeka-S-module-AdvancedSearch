@@ -95,6 +95,9 @@
     #search-filters .filter:first-of-type {
         padding-top: 0.4em;
     }
+    #search-filters:not(.has-joiner-not) .filter:first-of-type select[name$="[join]"] {
+        display: none;
+    }
     #search-filters .filter select,
     #search-filters .filter input {
         margin-top: 0;

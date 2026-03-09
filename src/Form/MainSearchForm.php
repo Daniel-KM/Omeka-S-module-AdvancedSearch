@@ -558,7 +558,8 @@ class MainSearchForm extends Form
             ] + $filter['options'])
             ->setAttributes([
                 'id' => 'search-filters',
-                'class' => 'search-filters-advanced',
+                'class' => 'search-filters-advanced'
+                    . (!empty($filter['field_joiner_not']) ? ' has-joiner-not' : ''),
                 'required' => false,
                 // TODO Remove this attribute data and use only search config?
                 'data-count-default' => $defaultNumber,

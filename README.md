@@ -606,6 +606,7 @@ TODO
 - [ ] RangeDouble: exclude items without date when filter is active, include when not.
 - [ ] RangeDouble: add admin option to enable/disable "ignore extremes" behavior per field.
 - [ ] Stopwords by language according to values (and manage values without languages and a default language)
+- [ ] Autosuggestion: for solr, use _txt or _ss according to property, length of values and type too.
 
 No more todo:
 

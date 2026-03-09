@@ -409,6 +409,7 @@ return [
             'advancedsearch_api_config' => '',
             // Hidden value.
             'advancedsearch_all_configs' => [1 => 'find'],
+            'advancedsearch_cron_index' => false,
             // Hidden value, storing last processed cron time.
             'advancedsearch_cron_last' => null,
         ],

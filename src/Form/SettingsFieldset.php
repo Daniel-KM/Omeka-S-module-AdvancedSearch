@@ -36,6 +36,17 @@ class SettingsFieldset extends Fieldset
             ->initSearchFields()
 
             ->add([
+                'name' => 'advancedsearch_cron_index',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'element_group' => 'advanced_search',
+                    'label' => 'Enable automatic reindexation (daily cron)', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearch_cron_index',
+                ],
+            ])
+            ->add([
                 'name' => 'advancedsearch_fulltextsearch_alto',
                 'type' => Element\Checkbox::class,
                 'options' => [

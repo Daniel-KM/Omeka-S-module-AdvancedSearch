@@ -1379,6 +1379,12 @@ class Module extends AbstractModule
             return;
         }
 
+        $services = $this->getServiceLocator();
+        $settings = $services->get('Omeka\Settings');
+        if (!$settings->get('advancedsearch_cron_index')) {
+            return;
+        }
+
         $this->runCronIndexSearch();
         $event->setParam('handled', true);
     }
@@ -1401,6 +1407,10 @@ class Module extends AbstractModule
 
         /** @var \Omeka\Settings\Settings $settings */
         $settings = $services->get('Omeka\Settings');
+
+        if (!$settings->get('advancedsearch_cron_index')) {
+            return;
+        }
 
         // Check frequency (at most once per day = 86400 seconds).
         $lastCron = (int) $settings->get('advancedsearch_cron_last');

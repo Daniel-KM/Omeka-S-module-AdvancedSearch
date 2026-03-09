@@ -47,10 +47,13 @@ class IndexController extends AbstractActionController
 
         $this->updateListSearchSlugs($searchConfigs);
 
+        $runningJobs = $this->listRunningSearchJobs();
+
         return new ViewModel([
             'searchEngines' => $searchEngines,
             'searchConfigs' => $searchConfigs,
             'suggesters' => $suggesters,
+            'runningJobs' => $runningJobs,
         ]);
     }
 
@@ -132,5 +135,77 @@ class IndexController extends AbstractActionController
         $messenger->addWarning($message);
 
         return true;
+    }
+
+    /**
+     * List running jobs for search indexing and suggesters.
+     *
+     * @return array Keys: "engines" and "suggesters", each an
+     * array of JobRepresentation keyed by engine/suggester id.
+     */
+    protected function listRunningSearchJobs(): array
+    {
+        $connection = $this->getEvent()
+            ->getApplication()
+            ->getServiceManager()
+            ->get('Omeka\Connection');
+
+        $jobClasses = [
+            \AdvancedSearch\Job\IndexSearch::class,
+            \AdvancedSearch\Job\IndexSuggestions::class,
+        ];
+        $solrClass = 'SearchSolr\Job\CreateSolrSuggesters';
+        if (class_exists($solrClass)) {
+            $jobClasses[] = $solrClass;
+        }
+
+        $sql = 'SELECT id, class, args FROM job'
+            . ' WHERE class IN (?)'
+            . ' AND status IN (?, ?)'
+            . ' ORDER BY id DESC';
+        $rows = $connection->executeQuery($sql, [
+            $jobClasses,
+            \Omeka\Entity\Job::STATUS_STARTING,
+            \Omeka\Entity\Job::STATUS_IN_PROGRESS,
+        ], [
+            \Doctrine\DBAL\Connection::PARAM_STR_ARRAY,
+            \Doctrine\DBAL\ParameterType::STRING,
+            \Doctrine\DBAL\ParameterType::STRING,
+        ])->fetchAllAssociative();
+
+        if (!$rows) {
+            return ['engines' => [], 'suggesters' => []];
+        }
+
+        $api = $this->api();
+        $jobRepresentations = [];
+        foreach (array_unique(array_column($rows, 'id')) as $jobId) {
+            try {
+                $jobRepresentations[$jobId] = $api
+                    ->read('jobs', $jobId)->getContent();
+            } catch (\Exception $e) {
+                // Job may have completed between query and read.
+            }
+        }
+
+        $result = ['engines' => [], 'suggesters' => []];
+        foreach ($rows as $row) {
+            if (!isset($jobRepresentations[$row['id']])) {
+                continue;
+            }
+            $job = $jobRepresentations[$row['id']];
+            $args = json_decode($row['args'] ?? '{}', true) ?: [];
+            if ($row['class'] === \AdvancedSearch\Job\IndexSearch::class) {
+                foreach ($args['search_engine_ids'] ?? [] as $eid) {
+                    $result['engines'][$eid] = $job;
+                }
+            } else {
+                $sid = $args['search_suggester_id'] ?? null;
+                if ($sid) {
+                    $result['suggesters'][$sid] = $job;
+                }
+            }
+        }
+        return $result;
     }
 }

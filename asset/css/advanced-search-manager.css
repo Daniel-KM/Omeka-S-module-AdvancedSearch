@@ -21,6 +21,9 @@
         border: 0;
         box-shadow: none;
     }
+    .search-admin .actions .system-state-icon.fa-spin {
+        margin-left: 8px;
+    }
     .search-admin #sidebar-confirm .inputs label {
         margin-bottom: 0;
         padding-bottom: 0;

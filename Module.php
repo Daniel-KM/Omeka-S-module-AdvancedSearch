@@ -1423,7 +1423,16 @@ class Module extends AbstractModule
 
         $searchEngineIds = [];
         foreach ($searchEngines as $searchEngine) {
-            $searchEngineIds[] = $searchEngine->id();
+            $indexer = $searchEngine->indexer();
+            if ($indexer->canIndex('items')
+                || $indexer->canIndex('item_sets')
+                || $indexer->canIndex('media')
+            ) {
+                $searchEngineIds[] = $searchEngine->id();
+            }
+        }
+        if (!count($searchEngineIds)) {
+            return;
         }
 
         $jobArgs = [];

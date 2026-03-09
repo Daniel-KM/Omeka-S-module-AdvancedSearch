@@ -62,6 +62,14 @@ $this->htmlElement('body')->appendAttribute('class', 'search-admin resource brow
     <?php endif; ?>
 </div>
 
+<?php
+$hasJobState = $plugins->has('jobState');
+$hasLog = $hasJobState || class_exists('Log\Module', false);
+$jobStateCssJsIncluded = false;
+$runningEngineJobs = $runningJobs['engines'] ?? [];
+$runningSuggesterJobs = $runningJobs['suggesters'] ?? [];
+?>
+
 <h3 id="table-caption-engines"><?= $translate('Search engines') ?></h3>
 
 <?php if (count($searchEngines) > 0): ?>
@@ -81,6 +89,24 @@ $this->htmlElement('body')->appendAttribute('class', 'search-admin resource brow
                     <td>
                         <span><?= $searchEngine->name() ?></span>
                         <ul class="actions">
+                            <?php if (isset($runningEngineJobs[$searchEngine->id()])): ?>
+                                <?php $job = $runningEngineJobs[$searchEngine->id()]; ?>
+                            <li>
+                                <?php $jobUrl = $hasLog
+                                    ? $url('admin/default', ['controller' => 'log'], ['query' => ['job_id' => $job->id()]])
+                                    : $url('admin/id', ['controller' => 'job', 'id' => $job->id()]); ?>
+                                <?php if ($hasJobState): ?>
+                                <a href="<?= $escape($jobUrl) ?>"
+                                title="<?= $escapeAttr(sprintf($translate('Indexing in progress (job #%d)'), $job->id())) ?>"><?= $this->jobState($job, ['output' => 'html', 'inline' => true, 'include_css_js' => !$jobStateCssJsIncluded]) ?></a>
+                                <?php $jobStateCssJsIncluded = true; ?>
+                                <?php else: ?>
+                                <a href="<?= $escape($jobUrl) ?>"
+                                class="o-icon- fas fa-spinner fa-spin"
+                                aria-label="<?= $escape($translate('Indexing in progress')) ?>"
+                                title="<?= $escapeAttr(sprintf($translate('Indexing in progress (job #%d)'), $job->id())) ?>"></a>
+                                <?php endif; ?>
+                            </li>
+                            <?php endif; ?>
                             <?php if ($engineAdapter): ?>
                                 <li>
                                     <?= $searchEngine->link('', 'edit', [
@@ -210,6 +236,24 @@ $this->htmlElement('body')->appendAttribute('class', 'search-admin resource brow
                     <td>
                         <span><?= $suggester->name() ?></span>
                         <ul class="actions">
+                            <?php if (isset($runningSuggesterJobs[$suggester->id()])): ?>
+                                <?php $job = $runningSuggesterJobs[$suggester->id()]; ?>
+                            <li>
+                                <?php $jobUrl = $hasLog
+                                    ? $url('admin/default', ['controller' => 'log'], ['query' => ['job_id' => $job->id()]])
+                                    : $url('admin/id', ['controller' => 'job', 'id' => $job->id()]); ?>
+                                <?php if ($hasJobState): ?>
+                                <a href="<?= $escape($jobUrl) ?>"
+                                title="<?= $escapeAttr(sprintf($translate('Indexing in progress (job #%d)'), $job->id())) ?>"><?= $this->jobState($job, ['output' => 'html', 'inline' => true, 'include_css_js' => !$jobStateCssJsIncluded]) ?></a>
+                                <?php $jobStateCssJsIncluded = true; ?>
+                                <?php else: ?>
+                                <a href="<?= $escape($jobUrl) ?>"
+                                class="o-icon- fas fa-spinner fa-spin"
+                                aria-label="<?= $escape($translate('Indexing in progress')) ?>"
+                                title="<?= $escapeAttr(sprintf($translate('Indexing in progress (job #%d)'), $job->id())) ?>"></a>
+                                <?php endif; ?>
+                            </li>
+                            <?php endif; ?>
                             <li>
                             <?php if ($engineAdapter): ?>
                                 <?= $suggester->link('', 'edit', [

@@ -2413,7 +2413,7 @@ if (version_compare($oldVersion, '3.4.59', '<')) {
                     $joiner, ['and', 'or']
                 );
 
-                // Standard type + single property + single value+ valid joiner
+                // Standard type + single property + single value + valid joiner
                 // => keep as core property format.
                 if (!$isMultiProp
                     && !$isMultiVal
@@ -2588,143 +2588,195 @@ if (version_compare($oldVersion, '3.4.59', '<')) {
         unset($value);
     };
 
-    $normalizedCount = 0;
-
-    // 1. Settings: json object of queries keyed by resource id.
-    $settingQueryMaps = [
-        'dynamicitemsets_item_sets_queries_dynamic',
-        'dynamicitemsets_item_sets_queries_static',
-        'advancedresourcetemplate_item_set_queries',
-    ];
-    foreach ($settingQueryMaps as $settingKey) {
-        $sql = 'SELECT `value` FROM `setting` WHERE `id` = ?';
-        $value = $connection->executeQuery(
-            $sql, [$settingKey]
-        )->fetchOne();
-        if ($value === false || $value === null) {
-            continue;
+    /**
+     * Check if an array looks like a query.
+     *
+     * An array may have "property" or "filter" entries with expected sub-keys.
+     */
+    $isQueryLike = function ($data): bool {
+        if (!is_array($data)) {
+            return false;
         }
-        $data = json_decode($value, true);
-        if (!is_array($data) || empty($data)) {
-            continue;
-        }
-        $anyModified = false;
-        foreach ($data as $id => &$query) {
-            $normalized = $normalizeQuery($query);
-            if ($normalized !== null) {
-                $query = $normalized;
-                $anyModified = true;
+        if (!empty($data['property'])
+            && is_array($data['property'])
+        ) {
+            foreach ($data['property'] as $entry) {
+                if (is_array($entry)
+                    && (isset($entry['type'])
+                        || isset($entry['joiner'])
+                        || isset($entry['text'])
+                        || isset($entry['term']))
+                ) {
+                    return true;
+                }
             }
         }
-        unset($query);
-        if ($anyModified) {
-            $updateSetting('setting', 'id', $settingKey, $data);
-            ++$normalizedCount;
+        if (!empty($data['filter'])
+            && is_array($data['filter'])
+        ) {
+            foreach ($data['filter'] as $entry) {
+                if (is_array($entry)
+                    && (isset($entry['type'])
+                        || isset($entry['join'])
+                        || isset($entry['field']))
+                ) {
+                    return true;
+                }
+            }
         }
-    }
+        if (isset($data['site_id'])
+            && is_array($data['site_id'])
+        ) {
+            return true;
+        }
+        return false;
+    };
 
-    // 2. Settings: json array of query objects.
-    $settingQueryArrays = [
-        'oaipmhrepository_sets_queries',
-    ];
-    foreach ($settingQueryArrays as $settingKey) {
-        $sql = 'SELECT `value` FROM `setting` WHERE `id` = ?';
-        $value = $connection->executeQuery(
-            $sql, [$settingKey]
-        )->fetchOne();
-        if ($value === false || $value === null) {
-            continue;
+    /**
+     * Recursively detect and normalize query structures anywhere in a data tree:
+     * direct query arrays, url-encoded query strings, or nested structures.
+     *
+     * Unlike $walkAndNormalize (which only triggers on known key names), this
+     * detects query-like structures by their content, so it catches queries
+     * stored under any key name by any module.
+     */
+    $deepNormalize = function (
+        &$data, &$modified, int $depth = 0
+    ) use (
+        &$deepNormalize, $normalizeQuery,
+        $normalizeQueryString, $walkAndNormalize,
+        $isQueryLike, $queryKeys
+    ): void {
+        if ($depth > 20 || !is_array($data)) {
+            return;
         }
-        $data = json_decode($value, true);
-        if (!is_array($data) || empty($data)) {
-            continue;
+        // If this array is itself a query, normalize it.
+        if ($isQueryLike($data)) {
+            $n = $normalizeQuery($data);
+            if ($n !== null) {
+                $data = $n;
+                $modified = true;
+            }
+            return;
         }
-        $anyModified = false;
-        foreach ($data as &$query) {
-            if (!is_array($query)) {
+        foreach ($data as $key => &$value) {
+            // Known query keys: delegate to walk.
+            if (in_array($key, $queryKeys, true)) {
+                if (is_array($value)) {
+                    $n = $normalizeQuery($value);
+                    if ($n !== null) {
+                        $value = $n;
+                        $modified = true;
+                    }
+                } elseif (is_string($value)
+                    && $value !== ''
+                ) {
+                    $n = $normalizeQueryString($value);
+                    if ($n !== null) {
+                        $value = $n;
+                        $modified = true;
+                    }
+                }
                 continue;
             }
-            $normalized = $normalizeQuery($query);
-            if ($normalized !== null) {
-                $query = $normalized;
-                $anyModified = true;
+            // Url-encoded query string detection.
+            if (is_string($value) && $value !== '') {
+                if (strpos($value, 'property%5B') !== false
+                    || strpos($value, 'property[') !== false
+                    || strpos($value, 'filter%5B') !== false
+                    || strpos($value, 'filter[') !== false
+                ) {
+                    $n = $normalizeQueryString($value);
+                    if ($n !== null) {
+                        $value = $n;
+                        $modified = true;
+                    }
+                }
+                continue;
+            }
+            // Recurse into sub-arrays.
+            if (is_array($value)) {
+                $deepNormalize(
+                    $value, $modified, $depth + 1
+                );
             }
         }
-        unset($query);
-        if ($anyModified) {
-            $updateSetting('setting', 'id', $settingKey, $data);
-            ++$normalizedCount;
-        }
-    }
+        unset($value);
+    };
 
-    // 3. Settings: url-encoded query strings.
-    $settingQueryStrings = [
-        'sparql_resource_query',
-    ];
-    foreach ($settingQueryStrings as $settingKey) {
-        $sql = 'SELECT `value` FROM `setting` WHERE `id` = ?';
-        $value = $connection->executeQuery(
-            $sql, [$settingKey]
-        )->fetchOne();
-        if ($value === false || $value === null) {
+    $normalizedCount = 0;
+
+    // 1. Global settings: scan all values for query structures.
+    //
+    // CoverDynamicItemSets, OaiPmhRepository, AdvancedResourceTemplate, Sparql,
+    // BlockPlus models, and any unknown module.
+    $sql = 'SELECT `id`, `value` FROM `setting`';
+    $allSettings = $connection->executeQuery($sql)
+        ->fetchAllKeyValue();
+    foreach ($allSettings as $settingKey => $rawValue) {
+        if ($rawValue === null || $rawValue === '') {
             continue;
         }
-        // Value is JSON-encoded string in setting table.
-        $queryString = json_decode($value, true);
-        $normalized = $normalizeQueryString($queryString);
-        if ($normalized !== null) {
+        $data = json_decode($rawValue, true);
+        if ($data === null) {
+            continue;
+        }
+        $settingModified = false;
+        if (is_array($data)) {
+            $deepNormalize($data, $settingModified);
+        } elseif (is_string($data) && $data !== '') {
+            // Json-encoded string (e.g. url-encoded query).
+            if (strpos($data, 'property%5B') !== false
+                || strpos($data, 'property[') !== false
+                || strpos($data, 'filter%5B') !== false
+                || strpos($data, 'filter[') !== false
+            ) {
+                $n = $normalizeQueryString($data);
+                if ($n !== null) {
+                    $data = $n;
+                    $settingModified = true;
+                }
+            }
+        }
+        if ($settingModified) {
             $updateSetting(
-                'setting', 'id', $settingKey,
-                $normalized
+                'setting', 'id', $settingKey, $data
             );
             ++$normalizedCount;
         }
     }
 
-    // 4. Page models: blockplus_page_models in global settings and
-    // theme_settings_* in site settings (embedded blocks with queries anywhere
-    // in their data).
-    $sql = <<<'SQL'
-        SELECT `value` FROM `setting`
-        WHERE `id` = 'blockplus_page_models'
-        SQL;
-    $value = $connection->executeQuery($sql)->fetchOne();
-    if ($value !== false && $value !== null) {
-        $models = json_decode($value, true);
-        if (is_array($models) && !empty($models)) {
-            $modelsModified = false;
-            $walkAndNormalize($models, $modelsModified);
-            if ($modelsModified) {
-                $updateSetting(
-                    'setting', 'id',
-                    'blockplus_page_models', $models
-                );
-                ++$normalizedCount;
-            }
-        }
-    }
-
-    // 4b. Theme settings with page_models in site_setting.
-    $sql = <<<'SQL'
-        SELECT `id`, `site_id`, `value`
-        FROM `site_setting`
-        WHERE `id` LIKE 'theme\_settings\_%'
-            AND `value` LIKE '%page_models%'
-        SQL;
-    $themeRows = $connection->executeQuery($sql)
+    // 2. Site settings: scan all values for query structures.
+    // Covers prevnext queries, theme page_models, and any unknown module.
+    $sql = 'SELECT `id`, `site_id`, `value` FROM `site_setting`';
+    $allSiteSettings = $connection->executeQuery($sql)
         ->fetchAllAssociative();
-    foreach ($themeRows as $row) {
-        $data = json_decode($row['value'], true);
-        if (!is_array($data)
-            || empty($data['page_models'])
-        ) {
+    foreach ($allSiteSettings as $row) {
+        $rawValue = $row['value'];
+        if ($rawValue === null || $rawValue === '') {
             continue;
         }
-        $themeModified = false;
-        $walkAndNormalize(
-            $data['page_models'], $themeModified
-        );
-        if ($themeModified) {
+        $data = json_decode($rawValue, true);
+        if ($data === null) {
+            continue;
+        }
+        $settingModified = false;
+        if (is_array($data)) {
+            $deepNormalize($data, $settingModified);
+        } elseif (is_string($data) && $data !== '') {
+            if (strpos($data, 'property%5B') !== false
+                || strpos($data, 'property[') !== false
+                || strpos($data, 'filter%5B') !== false
+                || strpos($data, 'filter[') !== false
+            ) {
+                $n = $normalizeQueryString($data);
+                if ($n !== null) {
+                    $data = $n;
+                    $settingModified = true;
+                }
+            }
+        }
+        if ($settingModified) {
             $sql = 'UPDATE `site_setting`'
                 . ' SET `value` = ?'
                 . ' WHERE `id` = ? AND `site_id` = ?';
@@ -2737,36 +2789,8 @@ if (version_compare($oldVersion, '3.4.59', '<')) {
         }
     }
 
-    // 5. Site settings: URL-encoded query strings.
-    $siteSettingQueryStrings = [
-        'blockplus_prevnext_items_query',
-        'blockplus_prevnext_item_sets_query',
-    ];
-    foreach ($siteSettingQueryStrings as $settingKey) {
-        $sql = 'SELECT `site_id`, `value` FROM `site_setting`'
-            . ' WHERE `id` = ?';
-        $rows = $connection->executeQuery(
-            $sql, [$settingKey]
-        )->fetchAllKeyValue();
-        foreach ($rows as $siteId => $value) {
-            $queryString = json_decode($value, true);
-            $normalized = $normalizeQueryString($queryString);
-            if ($normalized !== null) {
-                $sql = 'UPDATE `site_setting`'
-                    . ' SET `value` = ?'
-                    . ' WHERE `id` = ? AND `site_id` = ?';
-                $connection->executeStatement($sql, [
-                    json_encode($normalized, $jsonFlags),
-                    $settingKey,
-                    $siteId,
-                ]);
-                ++$normalizedCount;
-            }
-        }
-    }
-
-    // 6. Page blocks: recursively normalize any query key in block data.
-    // Covers browsePreview, searchingForm, reference, timeline, bibliography,
+    // 3. Page blocks: recursively normalize any query key in block data.
+    // Cover browsePreview, searchingForm, reference, timeline, bibliography,
     // tagCloud, mappingMapSearch, topicsList, searchResults, etc.
     $sql = <<<'SQL'
         SELECT `id`, `data`
@@ -2797,7 +2821,7 @@ if (version_compare($oldVersion, '3.4.59', '<')) {
     }
     $normalizedCount += $blockCount;
 
-    // 7. Site navigation: browse links with query strings.
+    // 4. Site navigation: browse links with query strings.
     $sql = 'SELECT `id`, `navigation` FROM `site`'
         . ' WHERE `navigation` LIKE \'%"query"%\'';
     $sites = $connection->executeQuery($sql)
@@ -2843,7 +2867,7 @@ if (version_compare($oldVersion, '3.4.59', '<')) {
         }
     }
 
-    // 8. Bulk export: formatter.query in params and config.
+    // 5. Bulk export: formatter.query in params and config.
     $bulkTables = [
         'bulk_export' => 'params',
         'bulk_exporter' => 'config',
@@ -2887,10 +2911,8 @@ if (version_compare($oldVersion, '3.4.59', '<')) {
         }
     }
 
-    // 9. Site item pool: json query in site.item_pool.
-    $sql = 'SELECT `id`, `item_pool` FROM `site`'
-        . ' WHERE `item_pool` IS NOT NULL'
-        . ' AND `item_pool` != \'[]\'';
+    // 6. Site item pool: json query in site.item_pool.
+    $sql = 'SELECT `id`, `item_pool` FROM `site` WHERE `item_pool` IS NOT NULL AND `item_pool` != "[]"';
     $sites = $connection->executeQuery($sql)
         ->fetchAllKeyValue();
     foreach ($sites as $siteId => $poolJson) {
@@ -2910,7 +2932,7 @@ if (version_compare($oldVersion, '3.4.59', '<')) {
         }
     }
 
-    // 10. Module tables with url-encoded query columns.
+    // 7. Module tables with url-encoded query columns.
     // Each entry: [table, id_column, query_column].
     $moduleTables = [
         ['collecting_prompt', 'id', 'resource_query'],

@@ -22,7 +22,7 @@ trait SearchFiltersTrait
                 ->get('translate')->getTranslator();
             $queryTypesLabels = array_map(
                 [$this->translator, 'translate'],
-                \AdvancedSearch\Form\TraitCommonSettings::filterTypeLabels()
+                \AdvancedSearch\Stdlib\SearchResources::FIELD_QUERY['labels']
             );
             // Extra aliases for core property types (dt/ndt) and
             // deprecated types (list/nlist).

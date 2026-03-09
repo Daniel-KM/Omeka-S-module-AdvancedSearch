@@ -12,7 +12,7 @@ class GetSearchConfig extends AbstractHelper
      *
      * The search config should be available in the current site or in admin.
      */
-    public function __invoke($searchConfigIdOrSlug = null, string $resourceName = null): ?SearchConfigRepresentation
+    public function __invoke($searchConfigIdOrSlug = null, ?string $resourceName = null): ?SearchConfigRepresentation
     {
         // Most of the time, only the current main search config is stored.
         static $searchConfigs = [];

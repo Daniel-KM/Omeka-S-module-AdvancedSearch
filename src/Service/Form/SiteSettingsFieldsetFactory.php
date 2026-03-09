@@ -8,7 +8,7 @@ use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class SiteSettingsFieldsetFactory implements FactoryInterface
 {
-    public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $services, $requestedName, ?array $options = null)
     {
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation[] $searchConfigs */
         $searchConfigs = $services->get('Omeka\ApiManager')->search('search_configs')->getContent();

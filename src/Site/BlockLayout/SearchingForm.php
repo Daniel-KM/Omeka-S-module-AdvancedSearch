@@ -56,8 +56,8 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
     public function form(
         PhpRenderer $view,
         SiteRepresentation $site,
-        SitePageRepresentation $searchConfig = null,
-        SitePageBlockRepresentation $block = null
+        ?SitePageRepresentation $searchConfig = null,
+        ?SitePageBlockRepresentation $block = null
     ) {
         // Factory is not used to make rendering simpler.
         $services = $site->getServiceLocator();

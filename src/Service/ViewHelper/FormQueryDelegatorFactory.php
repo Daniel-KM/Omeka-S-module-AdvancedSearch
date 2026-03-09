@@ -8,7 +8,7 @@ use Laminas\ServiceManager\Factory\DelegatorFactoryInterface;
 
 class FormQueryDelegatorFactory implements DelegatorFactoryInterface
 {
-    public function __invoke(ContainerInterface $services, $name, callable $callback, array $options = null)
+    public function __invoke(ContainerInterface $services, $name, callable $callback, ?array $options = null)
     {
         return new FormQueryDelegator($callback());
     }

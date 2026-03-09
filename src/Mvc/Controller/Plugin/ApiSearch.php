@@ -82,16 +82,16 @@ class ApiSearch extends AbstractPlugin
 
     public function __construct(
         ApiManager $api,
-        Acl $acl = null,
-        AdapterManager $adapterManager = null,
-        ApiFormAdapter $apiFormAdapter = null,
-        EasyMeta $easyMeta = null,
-        EntityManager $entityManager = null,
-        LoggerInterface $logger = null,
-        Paginator $paginator = null,
-        SearchConfigRepresentation $searchConfig = null,
-        SearchEngineRepresentation $searchEngine = null,
-        TranslatorInterface $translator = null
+        ?Acl $acl = null,
+        ?AdapterManager $adapterManager = null,
+        ?ApiFormAdapter $apiFormAdapter = null,
+        ?EasyMeta $easyMeta = null,
+        ?EntityManager $entityManager = null,
+        ?LoggerInterface $logger = null,
+        ?Paginator $paginator = null,
+        ?SearchConfigRepresentation $searchConfig = null,
+        ?SearchEngineRepresentation $searchEngine = null,
+        ?TranslatorInterface $translator = null
     ) {
         $this->api = $api;
         $this->acl = $acl;

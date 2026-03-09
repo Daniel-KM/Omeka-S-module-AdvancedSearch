@@ -24,7 +24,7 @@ class ApiManagerDelegatorFactory implements DelegatorFactoryInterface
      * @param array|null $options
      * @return ApiManagerDelegator
      */
-    public function __invoke(ContainerInterface $container, $name, callable $callback, array $options = null)
+    public function __invoke(ContainerInterface $container, $name, callable $callback, ?array $options = null)
     {
         // Get the original Manager instance via the callback.
         $originalManager = $callback();

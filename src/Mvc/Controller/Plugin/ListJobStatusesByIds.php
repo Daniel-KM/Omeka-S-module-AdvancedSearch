@@ -16,7 +16,7 @@ class ListJobStatusesByIds extends AbstractPlugin
     /**
      * @param EntityManager $entityManager
      */
-    public function __construct(EntityManager $entityManager = null)
+    public function __construct(?EntityManager $entityManager = null)
     {
         $this->entityManager = $entityManager;
     }

@@ -16,7 +16,7 @@ class PaginationSearchFactory implements FactoryInterface
      *
      * @return \AdvancedSearch\View\Helper\PaginationSearch
      */
-    public function __invoke(ContainerInterface $services, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $services, $requestedName, ?array $options = null)
     {
         // Warning: The service Paginator is not a shared service: each instance
         // is a new one. Furthermore, the delegator SitePaginatorFactory is not

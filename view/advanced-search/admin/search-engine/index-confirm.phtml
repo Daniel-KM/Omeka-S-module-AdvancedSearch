@@ -39,10 +39,10 @@ $formName = $form->getName();
 
         <p>
             <input name="clear_index" value="1" type="checkbox" form="<?= $formName ?>" />
-            <?= $translate('Clear index') ?>
+            <?= $translate('Clear all indexes of this search engine') ?>
         </p>
         <div class="setting-info">
-            <?= $translate('Clearing index will make the search unavailable during reindexation, but it avoids the rare cases where indexes of deleted resources were not removed.') ?>
+            <?= $translate('Clearing all indexes will make the search unavailable during reindexation, but it avoids the rare cases where indexes of deleted resources were not removed.') ?>
             <?= $translate('You may redirect the users to a clone of the current index temporary.') ?>
         </div>
 

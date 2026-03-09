@@ -347,28 +347,15 @@ class IndexSearch extends AbstractJob
             ['search_engine_id' => $searchEngine->id(), 'name' => $searchEngine->name()]
         );
 
-        if ($clearIndex && empty($resourceTypes)) {
+        if ($clearIndex) {
+            $indexer->clearIndex();
             $this->logger->info(
                 'Search index is fully cleared.' // @translate
             );
-            $indexer->clearIndex();
         }
 
         $totals = [];
         foreach ($resourceTypes as $resourceType) {
-            if ($clearIndex) {
-                $query = new Query();
-                // Here, no need to init the aliases and aggregated fields
-                // because there is no site or admin and aliases are managed
-                // earlier or later.
-                $query
-                    // By default the query process public resources only.
-                    // TODO Check the purpose of the check of isPublic here.
-                    ->setIsPublic(false)
-                    ->setResourceTypes([$resourceType]);
-                $indexer->clearIndex($query);
-            }
-
             $totals[$resourceType] = 0;
 
             $args = [

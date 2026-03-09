@@ -326,10 +326,21 @@ var Omeka = {
     // Disable query text according to query type.
     disableQueryTextInput: function() {
         var queryType = $(this);
+        var val = queryType.val();
         var queryText = queryType.siblings('.query-text');
-        queryText.prop('disabled',
-            ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'resq', 'nresq', 'lex', 'nlex', 'lkq', 'nlkq', 'dt', 'ndt', 'dtp', 'ndtp', 'tp', 'ntp', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu', 'dup', 'ndup', 'dupl', 'ndupl', 'dupt', 'ndupt', 'duptl', 'nduptl', 'dupv', 'ndupv', 'dupvl', 'ndupvl', 'dupvt', 'ndupvt', 'dupvtl', 'ndupvtl', 'dupr', 'ndupr', 'duprl', 'nduprl', 'duprt', 'nduprt', 'duprtl', 'nduprtl', 'dupu', 'ndupu', 'dupul', 'ndupul', 'duput', 'nduput', 'duputl', 'nduputl']
-                .includes(queryType.val()));
+        var queryTextDataType = queryType.siblings('.query-text-data-type');
+        var isDataType = ['dt', 'ndt', 'dtp', 'ndtp'].includes(val);
+        var isNoText = ['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm', 'resq', 'nresq', 'lex', 'nlex', 'lkq', 'nlkq', 'tp', 'ntp', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu', 'dup', 'ndup', 'dupl', 'ndupl', 'dupt', 'ndupt', 'duptl', 'nduptl', 'dupv', 'ndupv', 'dupvl', 'ndupvl', 'dupvt', 'ndupvt', 'dupvtl', 'ndupvtl', 'dupr', 'ndupr', 'duprl', 'nduprl', 'duprt', 'nduprt', 'duprtl', 'nduprtl', 'dupu', 'ndupu', 'dupul', 'ndupul', 'duput', 'nduput', 'duputl', 'nduputl'].includes(val);
+        if (isDataType) {
+            queryText.prop('disabled', true).val('');
+            queryTextDataType.prop('disabled', false).show();
+        } else if (isNoText) {
+            queryText.prop('disabled', true);
+            queryTextDataType.prop('disabled', true).hide();
+        } else {
+            queryText.prop('disabled', false);
+            queryTextDataType.prop('disabled', true).hide();
+        }
     },
 
     // Clean the search query of empty or otherwise unneeded inputs.
@@ -388,10 +399,10 @@ $(document).ready(function() {
             var toggle = $(this);
             toggle.toggleClass('collapse').toggleClass('expand');
             if (toggle.hasClass('expand')) {
-                toggle.attr('aria-label', Omeka.jsTranslate('Expand')).attr('title', Omeka.jsTranslate('Expand'));
+                toggle.attr('aria-label', Omeka.jsTranslate('Expand')).attr('title', Omeka.jsTranslate('Expand')).attr('aria-expanded', 'false');
                 toggle.trigger('o:collapsed');
             } else {
-                toggle.attr('aria-label', Omeka.jsTranslate('Collapse')).attr('title', Omeka.jsTranslate('Collapse'));
+                toggle.attr('aria-label', Omeka.jsTranslate('Collapse')).attr('title', Omeka.jsTranslate('Collapse')).attr('aria-expanded', 'true');
                 toggle.trigger('o:expanded');
             }
         });

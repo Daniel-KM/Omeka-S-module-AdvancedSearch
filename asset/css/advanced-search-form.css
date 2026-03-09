@@ -1,76 +1,92 @@
 /**
  * Manage the improvements of the standard advanced search.
  *
- * Adapted from application/asset/sass/_screen.scss and application/asset/sass/advanced-search-form.scss.
+ * Chosen containers are display:inline-block by default. Fix:
+ * display:block + min-width:0 for proper flex behavior.
+ *
+ * The admin CSS sets .inputs select { width: 100% }. Chosen
+ * also sets width:100% inline. In flex-nowrap, all elements
+ * with width:100% share space equally via flex-shrink — this
+ * is the correct core behavior. The module only needs to make
+ * chosen containers display:block and shrinkable.
  */
 @media all {
-    #advanced-search .item-set-select-type + .chosen-container {
-        margin: .25rem .25rem 0 0;
-        max-width: 25%;
-    }
-    #advanced-search .item-set-select + .chosen-container {
-        margin: .25rem .25rem 0 0;
-    }
+    /* Override theme .value { flex-wrap: wrap } to keep
+       multi-element rows on one line. Property-queries,
+       item-sets and datetime need nowrap. */
+    #advanced-search #property-queries .value,
+    #advanced-search #item-sets .value,
     #advanced-search #datetime-queries .value {
-        align-items: baseline;
-        gap: 0.25rem;
-    }
-    #advanced-search #property-queries .inputs > .value .joiner + .chosen-container,
-    #advanced-search #filter-queries .inputs > .value .joiner + .chosen-container,
-    #advanced-search #datetime-queries .inputs > .value .joiner + .chosen-container {
-        max-width: fit-content;
+        flex-wrap: nowrap;
     }
 
-    #advanced-search #property-queries .query-text:disabled,
-    #advanced-search #property-queries .chosen-disabled,
-    #advanced-search #property-queries.multi-value .value:first-child .joiner:first-of-type,
-    #advanced-search #property-queries.multi-value .value:first-child .chosen-container:first-of-type,
+    /* Make chosen behave like native selects in flex:
+       block display + shrinkable. */
+    #advanced-search .chosen-container {
+        display: block;
+        min-width: 0;
+    }
+
+    /* === Filter-queries specific === */
+
+    /* Filter .value needs wrap so sub-query goes below. */
+    #advanced-search #filter-queries .inputs > .value {
+        flex-wrap: wrap;
+    }
+
+    /* Filter .value-fields: inner flex row. */
+    #advanced-search .inputs > .value .value-fields {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: .25rem;
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    /* In filters, chosen and text input grow to fill space
+       while joiner and query-type keep natural width. */
+    #advanced-search #filter-queries .chosen-container,
+    #advanced-search #filter-queries .query-text {
+        flex: 1 1 0;
+    }
+    #advanced-search #filter-queries .query-type {
+        width: auto;
+        flex: 0 0 auto;
+    }
+    #advanced-search #filter-queries .joiner {
+        width: auto;
+        flex: 0 0 auto;
+        min-width: 4em;
+    }
+
+    /* Hide disabled/empty filter elements. */
     #advanced-search #filter-queries .query-text:disabled,
     #advanced-search #filter-queries .chosen-disabled,
-    #advanced-search #filter-queries.multi-value:not(.has-joiner-not) .value:first-child .joiner:first-of-type,
+    #advanced-search #filter-queries.multi-value:not(.has-joiner-not) .value:first-child .joiner,
     #advanced-search #filter-queries.multi-value:not(.has-joiner-not) .value:first-child .chosen-container:first-of-type {
        display: none;
     }
-    #advanced-search .inputs .chosen-choices li.search-choice span {
-        padding: 4px;
+    /* Show first joiner when "not" joiner is enabled. */
+    #advanced-search #filter-queries.multi-value.has-joiner-not .value:first-child .joiner {
+        display: initial;
     }
 
-    #advanced-search #property-queries .chosen-container-multi .chosen-choices .search-choice,
     #advanced-search #filter-queries .chosen-container-multi .chosen-choices .search-choice {
         max-width: 24em;
     }
+    #advanced-search .chosen-choices li.search-choice span {
+        padding: 4px;
+    }
 
-    #advanced-search #property-queries .query-form-element,
     #advanced-search #filter-queries .query-form-element {
         display: none;
     }
-    #advanced-search #property-queries .query-text.hide,
     #advanced-search #filter-queries .query-text.hide {
         display: none;
     }
 
-    #advanced-search #property-queries.property-queries-improved .inputs > .value,
-    #advanced-search #filter-queries .inputs > .value {
-        display: flex;
-        flex-direction: column;
-        gap: .25rem 0;
-    }
-    #advanced-search #property-queries:not(.property-queries-improved) .inputs > .value * {
-        margin: 0 0.10rem .25rem 0;
-    }
-
-    #advanced-search .inputs > .value .value-fields {
-        display: flex;
-        flex-wrap: wrap;
-        flex-direction: row;
-        align-items: center;
-        gap: .25rem;
-    }
-    #advanced-search .inputs > .value .value-fields .chosen-container,
-    #advanced-search .inputs > .value .value-fields .query-text {
-        flex: 1;
-    }
-
+    /* Sub-query wraps to next line in the parent .value. */
     #advanced-search .inputs > .value .sub-query {
         width: 100%;
     }
@@ -83,31 +99,28 @@
         margin-bottom: 0.5rem;
     }
 
-    .sidebar #advanced-search .item-set-select-type,
-    .sidebar #advanced-search .item-set-select-type + .chosen-container {
-        margin: 0 0 .25rem 0;
-        max-width: fit-content;
+    /* === Item-sets === */
+    #advanced-search #item-sets .value {
+        gap: .25rem;
     }
-    .sidebar #advanced-search .item-set-select,
-    .sidebar #advanced-search .item-set-select + .chosen-container {
-        margin: 0 0 .25rem 0;
-        max-width: initial;
+    /* "Dans/Pas dans" fixed width for column alignment. */
+    #advanced-search #item-sets .item-set-select-type + .chosen-container {
+        flex: 0 0 7em;
+        width: 7em !important;
     }
 
-    .sidebar #advanced-search .inputs > .value .value-fields {
-        flex-direction: column;
-        align-items: initial;
+    /* === Datetime: native selects, no chosen === */
+    #advanced-search #datetime-queries .value {
+        gap: .25rem;
+        align-items: center;
     }
-    .sidebar #advanced-search .inputs > .value .value-fields > * {
-        margin: 0;
+    #advanced-search #datetime-queries .value select {
+        width: auto;
+        flex: 0 0 auto;
     }
-    .sidebar #advanced-search .inputs label.type-radio,
-    .sidebar #advanced-search #mapping-geographic-location .inputs label {
-        margin: auto;
-        padding: initial;
-    }
-    .sidebar #advanced-search .inputs label.type-radio::after,
-    .sidebar #advanced-search #mapping-geographic-location .inputs label::after {
-        background: initial;
+    #advanced-search #datetime-queries .value .query-text {
+        width: auto;
+        flex: 1 1 auto;
+        min-width: 12em;
     }
 }

@@ -54,9 +54,14 @@ $(document).ready(function() {
         const queryTextDataType = queryType.siblings('.query-data-type, .query-text-data-type');
         const queryTextMainType = queryType.siblings('.query-main-type');
         queryTextInput.prop('disabled', isTypeWithoutText || isTypeSubQuery || isTypeDataType || isTypeMainType);
+        if (isTypeDataType) {
+            queryTextInput.val('');
+        }
         queryTextSubQuery.prop('disabled', !isTypeSubQuery);
         queryTextDataType.prop('disabled', !isTypeDataType);
+        isTypeDataType ? queryTextDataType.show() : queryTextDataType.hide();
         queryTextMainType.prop('disabled', !isTypeMainType);
+        isTypeMainType ? queryTextMainType.show() : queryTextMainType.hide();
         if (hasChosenSelect) {
             queryTextDataType.chosen('destroy');
             queryTextDataType.find('+ .chosen-container').remove();
@@ -66,10 +71,6 @@ $(document).ready(function() {
             queryTextMainType.chosen(chosenOptions);
         }
     };
-
-    Omeka.disableQueryTextInput = function() {
-        Omeka.handleQueryTextInput($(this));
-    }
 
     Omeka.cleanFormSearchQuery = function(form) {
         const inputFakes = [
@@ -98,9 +99,12 @@ $(document).ready(function() {
         // fake inputs. Note: "0" is a valid value.
         form.find(':input[name]:not(:disabled)').each(function() {
             const input = $(this);
+            const val = input.val();
             if (input.is('[type="submit"]')
                 || inputFakes.includes(input.attr('name'))
-                || input.val() === ''
+                || val === ''
+                || val === null
+                || (Array.isArray(val) && !val.length)
             ) {
                 input.prop('name', '');
             }
@@ -229,16 +233,39 @@ $(document).ready(function() {
      * Add chosen-select when possible.
      */
     if (hasChosenSelect) {
-        $('#advanced-search').find('#filter-queries .value select, #property-queries .value select, #resource-class .value select, #resource-templates .value select, #item-sets .value select, #datetime-queries .value select, select#site_id, select#owner_id')
+        $('#advanced-search')
+            .find('#filter-queries .value select:not(.joiner), #resource-class .value select, #resource-templates .value select, #item-sets .value select, select#site_id, select#owner_id')
             .addClass('chosen-select');
         $('#advanced-search select.chosen-select').chosen(chosenOptions);
         $('#advanced-search select.chosen-select option[value=""][selected]').prop('selected',  false).parent().trigger('chosen:updated');
 
-        $(document).on('o:value-created', '#filter-queries .value, #resource-class .value, #resource-templates .value, #item-sets .value, #datetime-queries .value', function(e) {
+        $(document).on('o:value-created', '#filter-queries .value', function(e) {
+            const newValue = $(this);
+            newValue.find('select:not(.joiner)').chosen('destroy');
+            newValue.find('.chosen-container').remove();
+            newValue.find('select:not(.joiner)').addClass('chosen-select').chosen(chosenOptions);
+        });
+        $(document).on('o:value-created', '#resource-class .value, #resource-templates .value, #item-sets .value', function(e) {
             const newValue = $(this);
             newValue.find('select').chosen('destroy');
             newValue.find('.chosen-container').remove();
             newValue.find('select').addClass('chosen-select').chosen(chosenOptions);
+        });
+        // Datetime: no chosen. Destroy any applied at init
+        // and clean inline styles left by chosen.
+        var cleanChosenFromDatetime = function(container) {
+            container.find('select').chosen('destroy');
+            container.find('.chosen-container').remove();
+            container.find('select')
+                .removeClass('chosen-select')
+                .removeAttr('style')
+                .show();
+        };
+        $('#datetime-queries .value').each(function() {
+            cleanChosenFromDatetime($(this));
+        });
+        $(document).on('o:value-created', '#datetime-queries .value', function(e) {
+            cleanChosenFromDatetime($(this));
         });
     }
 
@@ -306,28 +333,24 @@ $(document).ready(function() {
     });
 
     /**
-     * Handle the query type for filters (extended types: resq, exs, dup*, etc.).
-     * Replaces the core handler which only knows basic types (eq, in, ex, dt…).
-     *
-     * @see application/asset/js/advanced-search.js
-     * @see application/asset/js/global.js
-     * @see application/asset/js/query-form.js
+     * Handle the query type for filters only (extended types).
+     * The core handler manages #property-queries via
+     * Omeka.disableQueryTextInput in global.js.
      */
-    $(document).off('change', '.query-type');
-    $(document).on('change', '.query-type', function () {
-         Omeka.handleQueryTextInput($(this));
+    $(document).on('change', '#filter-queries .query-type', function () {
+        Omeka.handleQueryTextInput($(this));
     });
 
-    // The core submit handler (Omeka.cleanSearchQuery) handles properties.
-    // Append the module handler for filters and extras.
+    // The core submit handler (Omeka.cleanSearchQuery) handles
+    // properties. Append the module handler for filters/extras.
     $(document).on('submit', '#advanced-search', function(e) {
         Omeka.cleanFormSearchQuery($(this));
     });
 
     /**
-     * Handle preparation of the advanced search form for filter part on load.
+     * Handle preparation of the filter part on load.
      */
-    $('.query-type').each(function() {
+    $('#filter-queries .query-type').each(function() {
         Omeka.handleQueryTextInput($(this));
     });
 

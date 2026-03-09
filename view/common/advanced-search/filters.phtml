@@ -156,7 +156,7 @@ if ($isSiteRequest) {
         ?>
         <div class="value">
             <div class="value-common value-fields">
-                <select class="joiner chosen-select" name="<?= $escape($stem . '[join]') ?>" aria-label="<?= $translate('Joiner') ?>">
+                <select class="joiner" name="<?= $escape($stem . '[join]') ?>" aria-label="<?= $translate('Joiner') ?>">
                     <?= $htmlOption('and', $filter, 'join', $translate('and')) ?>
                     <?= $htmlOption('or', $filter, 'join', $translate('or')) ?>
                     <?php if ($joinerNot): ?>

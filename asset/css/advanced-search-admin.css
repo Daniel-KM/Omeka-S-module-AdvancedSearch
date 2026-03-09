@@ -50,4 +50,15 @@
     input[type=submit][disabled] {
         cursor: unset;
     }
+
+    /* Group labels for filter type checkboxes in settings. */
+    label.filter-type-group-start {
+        clear: left;
+    }
+    label.filter-type-group-start::before {
+        content: attr(data-group-label);
+        display: block;
+        font-weight: bold;
+        margin: 0.75em 0 0.25em;
+    }
 }

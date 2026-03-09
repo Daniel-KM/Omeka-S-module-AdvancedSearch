@@ -26,11 +26,16 @@ $escapeAttr = $plugins->get('escapeHtmlAttr');
 $formSelect = $plugins->get('formSelect');
 $queryInput = $plugins->get('queryInput');
 $fieldSelect = $plugins->get('fieldSelect');
-$dataTypeHelper = $plugins->get('dataType');
-
 $isSiteRequest = $status->isSiteRequest();
 $applyTemplates = $isSiteRequest ? $siteSetting('search_apply_templates') : false;
 $usedTerms = !$isSiteRequest;
+
+$setting = $isSiteRequest ? $siteSetting : $plugins->get('setting');
+$allowedFilterTypes = $setting('advancedsearch_filter_types');
+if (empty($allowedFilterTypes)) {
+    $allowedFilterTypes = \AdvancedSearch\Form\TraitCommonSettings::defaultFilterTypes();
+}
+$allowedFilterTypes = array_flip($allowedFilterTypes);
 
 // Autosuggest on filter values (enabled by default via whitelist).
 $filterAutosuggestUrl = '';
@@ -70,6 +75,8 @@ $selectMainDataType
         'aria-label' => $translate('Filters'), // @translate
         'data-placeholder' => 'Select main data type…', // @translate
     ]);
+
+$dataTypeHelper = $plugins->get('dataType');
 
 $queryInput = $queryInput();
 $queryInput->setOption('query_resource_type', $resourceName);
@@ -173,6 +180,7 @@ if ($isSiteRequest) {
                     ],
                 ]) ?>
                 <select class="query-type chosen-select" name="<?= $escape($stem . '[type]') ?>" aria-label="<?= $translate('Query type') ?>">
+                    <?php if ($hasGroupType(['eq', 'neq', 'in', 'nin', 'sw', 'nsw', 'ew', 'new', 'near', 'nnear', 'ma', 'nma', 'lt', 'lte', 'gte', 'gt', '<', '≤', '≥', '>', 'yreq', 'nyreq', 'yrgte', 'yrlte', 'yrgt', 'yrlt'])): ?>
                     <optgroup label="<?= $translate('Value') ?>">
                         <?= $queryOption('eq', $filter, 'type', $translate('is exactly')) ?>
                         <?= $queryOption('neq', $filter, 'type', $translate('is not exactly')) ?>
@@ -201,12 +209,16 @@ if ($isSiteRequest) {
                         <?= $queryOption('yrgt', $filter, 'type', $translate('since year (excluded)')) ?>
                         <?= $queryOption('yrlt', $filter, 'type', $translate('until year (excluded)')) ?>
                     </optgroup>
+                    <?php endif; ?>
+                    <?php if ($hasGroupType(['res', 'nres', 'resq', 'nresq'])): ?>
                     <optgroup label="<?= $translate('Resource') ?>">
                         <?= $queryOption('res', $filter, 'type', $translate('is resource with ID')) ?>
                         <?= $queryOption('nres', $filter, 'type', $translate('is not resource with ID')) ?>
                         <?= $queryOption('resq', $filter, 'type', $translate('is resource matching query')) ?>
                         <?= $queryOption('nresq', $filter, 'type', $translate('is not resource matching query')) ?>
                     </optgroup>
+                    <?php endif; ?>
+                    <?php if ($hasGroupType(['lex', 'nlex', 'lres', 'nlres', 'lkq', 'nlkq'])): ?>
                     <optgroup label="<?= $translate('Linked resource') ?>">
                         <?= $queryOption('lex', $filter, 'type', $translate('is a linked resource')) ?>
                         <?= $queryOption('nlex', $filter, 'type', $translate('is not a linked resource')) ?>
@@ -215,6 +227,8 @@ if ($isSiteRequest) {
                         <?= $queryOption('lkq', $filter, 'type', $translate('is linked with resources matching query (expert)')) ?>
                         <?= $queryOption('nlkq', $filter, 'type', $translate('is not linked with resources matching query (expert)')) ?>
                     </optgroup>
+                    <?php endif; ?>
+                    <?php if ($hasGroupType(['ex', 'nex', 'exs', 'nexs', 'exm', 'nexm'])): ?>
                     <optgroup label="<?= $translate('Count') ?>">
                         <?= $queryOption('ex', $filter, 'type', $translate('has any value')) ?>
                         <?= $queryOption('nex', $filter, 'type', $translate('has no values')) ?>
@@ -223,6 +237,8 @@ if ($isSiteRequest) {
                         <?= $queryOption('exm', $filter, 'type', $translate('has multiple values')) ?>
                         <?= $queryOption('nexm', $filter, 'type', $translate('does not have multiple values')) ?>
                     </optgroup>
+                    <?php endif; ?>
+                    <?php if ($hasGroupType(['dtp', 'ndtp', 'tp', 'ntp', 'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu'])): ?>
                     <optgroup label="<?= $translate('Data type') ?>">
                         <?= $queryOption('dtp', $filter, 'type', $translate('has data type')) ?>
                         <?= $queryOption('ndtp', $filter, 'type', $translate('does not have data type')) ?>
@@ -235,6 +251,8 @@ if ($isSiteRequest) {
                         <?= $queryOption('tpu', $filter, 'type', $translate('has type uri-like')) ?>
                         <?= $queryOption('ntpu', $filter, 'type', $translate('does not have type uri-like')) ?>
                     </optgroup>
+                    <?php endif; ?>
+                    <?php if ($hasGroupType(['dup', 'ndup', 'dupt', 'ndupt', 'dupl', 'ndupl', 'duptl', 'nduptl', 'dupv', 'ndupv', 'dupvt', 'ndupvt', 'dupvl', 'ndupvl', 'dupvtl', 'ndupvtl', 'dupr', 'ndupr', 'duprt', 'nduprt', 'duprl', 'nduprl', 'duprtl', 'nduprtl', 'dupu', 'ndupu', 'duput', 'nduput', 'dupul', 'ndupul', 'duputl', 'nduputl'])): ?>
                     <optgroup label="<?= $translate('Curation') ?>">
                         <?= $queryOption('dup', $filter, 'type', $translate('has duplicate values')) ?>
                         <?= $queryOption('ndup', $filter, 'type', $translate('does not have duplicate values')) ?>
@@ -269,9 +287,10 @@ if ($isSiteRequest) {
                         <?= $queryOption('duputl', $filter, 'type', $translate('has duplicate uris, type and language')) ?>
                         <?= $queryOption('nduputl', $filter, 'type', $translate('does not have duplicate uris, type and language')) ?>
                     </optgroup>
+                    <?php endif; ?>
                 </select>
                 <?= $queryText($isSubQuery ? [] : $filter, $index) ?>
-                <?= $dataTypeHelper->getSelect($stem . '[val]', $query['filter'][$index]['val'] ?? null, ['multiple' => false, 'class' => 'query-text query-data-type chosen-select', 'aria-label' => 'Data types', 'data-placeholder' => $translate('Select data type…')]) // TODO Manage search on property for multiple data types. ?>
+                <?= $dataTypeHelper->getSelect($stem . '[val]', $query['filter'][$index]['val'] ?? null, ['multiple' => false, 'class' => 'query-text query-data-type chosen-select', 'aria-label' => $translate('Data types'), 'data-placeholder' => $translate('Select data type…')], ['used' => true]) ?>
                 <?= $formSelect($selectMainDataType->setName($stem . '[val]')->setValue($query['filter'][$index]['val'] ?? null)) ?>
                 <button type="button" class="button o-icon-delete remove-value" aria-label="<?= $translate('Remove value') ?>" title="<?= $translate('Remove value') ?>"></button>
             </div>

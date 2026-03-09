@@ -3016,6 +3016,16 @@ class SearchResources
 
     protected function sortQuery(QueryBuilder $qb, array $query): self
     {
+        // Add explicit doctrine class discriminator filter so the optimizer can
+        // use composite indexes (resource_type, created/modified) instead of a
+        // full table filesort.
+        $entityClass = $this->adapter->getEntityClass();
+        if ($entityClass !== \Omeka\Entity\Resource::class) {
+            $qb->andWhere(
+                'omeka_root INSTANCE OF ' . $entityClass
+            );
+        }
+
         // Order by is the last part or a sql query.
         // Sort by listed id.
         // The list is the one set in key "sort_ids" or in main query key "id".

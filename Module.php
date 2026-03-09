@@ -657,7 +657,62 @@ class Module extends AbstractModule
         $siteSettings->setTargetId($site->getId());
         $siteSearchConfigs = $siteSettings->get('advancedsearch_configs', []);
         $siteSearchConfigs = array_intersect_key($searchConfigs, array_flip($siteSearchConfigs));
+
+        $feedModule = $services->get('Omeka\ModuleManager')
+            ->getModule('Feed');
+        $hasFeed = $feedModule
+            && $feedModule->getState() === \Omeka\Module\Manager::STATE_ACTIVE;
+
         foreach ($siteSearchConfigs as $searchConfigId => $searchConfigSlug) {
+            $childRoutes = [
+                'suggest' => [
+                    'type' => \Laminas\Router\Http\Literal::class,
+                    'options' => [
+                        'route' => '/suggest',
+                        'defaults' => [
+                            '__NAMESPACE__' => 'AdvancedSearch\Controller',
+                            '__SITE__' => true,
+                            'controller' => \AdvancedSearch\Controller\SearchController::class,
+                            'action' => 'suggest',
+                            'id' => $searchConfigId,
+                            'page-slug' => $searchConfigSlug,
+                            'search-slug' => $searchConfigSlug,
+                        ],
+                    ],
+                ],
+            ];
+
+            if ($hasFeed) {
+                $childRoutes['atom'] = [
+                    'type' => \Laminas\Router\Http\Literal::class,
+                    'options' => [
+                        'route' => '/atom',
+                        'defaults' => [
+                            '__NAMESPACE__' => 'Feed\Controller',
+                            '__SITE__' => true,
+                            'controller' => 'Feed\Controller\Feed',
+                            'action' => 'rss',
+                            'feed' => 'atom',
+                            'search_config_id' => $searchConfigId,
+                        ],
+                    ],
+                ];
+                $childRoutes['rss'] = [
+                    'type' => \Laminas\Router\Http\Literal::class,
+                    'options' => [
+                        'route' => '/rss',
+                        'defaults' => [
+                            '__NAMESPACE__' => 'Feed\Controller',
+                            '__SITE__' => true,
+                            'controller' => 'Feed\Controller\Feed',
+                            'action' => 'rss',
+                            'feed' => 'rss',
+                            'search_config_id' => $searchConfigId,
+                        ],
+                    ],
+                ];
+            }
+
             $router->addRoute(
                 'search-page-' . $searchConfigSlug,
                 [
@@ -675,55 +730,7 @@ class Module extends AbstractModule
                         ],
                     ],
                     'may_terminate' => true,
-                    'child_routes' => [
-                        'suggest' => [
-                            'type' => \Laminas\Router\Http\Literal::class,
-                            'options' => [
-                                'route' => '/suggest',
-                                'defaults' => [
-                                    '__NAMESPACE__' => 'AdvancedSearch\Controller',
-                                    '__SITE__' => true,
-                                    'controller' => \AdvancedSearch\Controller\SearchController::class,
-                                    'action' => 'suggest',
-                                    'id' => $searchConfigId,
-                                    'page-slug' => $searchConfigSlug,
-                                    'search-slug' => $searchConfigSlug,
-                                ],
-                            ],
-                        ],
-                        'atom' => [
-                            'type' => \Laminas\Router\Http\Literal::class,
-                            'options' => [
-                                'route' => '/atom',
-                                'defaults' => [
-                                    '__NAMESPACE__' => 'AdvancedSearch\Controller',
-                                    '__SITE__' => true,
-                                    'controller' => \AdvancedSearch\Controller\SearchController::class,
-                                    'action' => 'rss',
-                                    'feed' => 'atom',
-                                    'id' => $searchConfigId,
-                                    'page-slug' => $searchConfigSlug,
-                                    'search-slug' => $searchConfigSlug,
-                                ],
-                            ],
-                        ],
-                        'rss' => [
-                            'type' => \Laminas\Router\Http\Literal::class,
-                            'options' => [
-                                'route' => '/rss',
-                                'defaults' => [
-                                    '__NAMESPACE__' => 'AdvancedSearch\Controller',
-                                    '__SITE__' => true,
-                                    'controller' => \AdvancedSearch\Controller\SearchController::class,
-                                    'action' => 'rss',
-                                    'feed' => 'rss',
-                                    'id' => $searchConfigId,
-                                    'page-slug' => $searchConfigSlug,
-                                    'search-slug' => $searchConfigSlug,
-                                ],
-                            ],
-                        ],
-                    ],
+                    'child_routes' => $childRoutes,
                 ]
             );
         }

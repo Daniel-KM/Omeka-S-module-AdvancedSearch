@@ -29,14 +29,6 @@
         "omeka/omeka-s": "^4.1",
         "daniel-km/omeka-s-module-common": "*"
     },
-    "require": {
-        "laminas/laminas-feed": "^2.18"
-    },
-    "provide": {
-        "laminas/laminas-escaper": "*",
-        "laminas/laminas-servicemanager": "3.14",
-        "laminas/laminas-stdlib": "*"
-    },
     "autoload": {
         "psr-4": {
             "AdvancedSearch\\": "src/"
@@ -45,11 +37,6 @@
     "autoload-dev": {
         "psr-4": {
             "AdvancedSearchTest\\": "tests/AdvancedSearchTest/"
-        }
-    },
-    "config": {
-        "platform": {
-            "php": "7.4"
         }
     },
     "extra": {

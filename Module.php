@@ -92,12 +92,24 @@ class Module extends AbstractModule
         $services = $this->getServiceLocator();
         $translate = $services->get('ControllerPluginManager')->get('translate');
 
+        $errors = [];
+
+        if (PHP_VERSION_ID < 80100) {
+            $errors[] = (string) new \Omeka\Stdlib\Message(
+                $translate('The module %1$s requires PHP %2$s or later.'), // @translate
+                'AdvancedSearch', '8.1'
+            );
+        }
+
         if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.81')) {
-            $message = new \Omeka\Stdlib\Message(
+            $errors[] = (string) new \Omeka\Stdlib\Message(
                 $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
                 'Common', '3.4.81'
             );
-            throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message);
+        }
+
+        if ($errors) {
+            throw new \Omeka\Module\Exception\ModuleCannotInstallException(implode("\n", $errors));
         }
     }
 
@@ -110,10 +122,10 @@ class Module extends AbstractModule
 
         if (!$this->isModuleActive('Reference')) {
             $messenger->addWarning('The module Reference is required to use the facets with the default internal adapter, but not for the Solr adapter.'); // @translate
-        } elseif (!$this->isModuleVersionAtLeast('Reference', '3.4.57')) {
+        } elseif (!$this->isModuleVersionAtLeast('Reference', '3.4.58')) {
             $messenger->addWarning(new PsrMessage(
                 'The module {module} should be upgraded to version {version} or later.', // @translate
-                ['module' => 'Reference', 'version' => '3.4.57']
+                ['module' => 'Reference', 'version' => '3.4.58']
             ));
         }
 

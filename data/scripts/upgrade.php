@@ -60,6 +60,21 @@ if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActi
     throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $translate('Missing requirement. Unable to upgrade.')); // @translate
 }
 
+$hasError = false;
+
+if (PHP_VERSION_ID < 80100) {
+    $message = new \Omeka\Stdlib\Message(
+        $translate('The module %1$s requires PHP %2$s or later.'), // @translate
+        'AdvancedSearch', '8.1'
+    );
+    $messenger->addError($message);
+    $hasError = true;
+}
+
+if ($hasError) {
+    throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $translate('Missing requirement. Unable to upgrade.')); // @translate
+}
+
 if (version_compare($oldVersion, '3.3.6.2', '<')) {
     $this->checkDependencies();
 
@@ -2633,12 +2648,13 @@ if (version_compare($oldVersion, '3.4.59', '<')) {
     };
 
     /**
-     * Recursively detect and normalize query structures anywhere in a data tree:
-     * direct query arrays, url-encoded query strings, or nested structures.
+     * Recursively detect and normalize query structures anywhere in
+     * a data tree: direct query arrays, url-encoded query strings,
+     * or nested structures.
      *
-     * Unlike $walkAndNormalize (which only triggers on known key names), this
-     * detects query-like structures by their content, so it catches queries
-     * stored under any key name by any module.
+     * Unlike $walkAndNormalize (which only triggers on known key
+     * names), this detects query-like structures by their content,
+     * so it catches queries stored under any key name by any module.
      */
     $deepNormalize = function (
         &$data, &$modified, int $depth = 0
@@ -2706,10 +2722,9 @@ if (version_compare($oldVersion, '3.4.59', '<')) {
 
     $normalizedCount = 0;
 
-    // 1. Global settings: scan all values for query structures.
-    //
-    // CoverDynamicItemSets, OaiPmhRepository, AdvancedResourceTemplate, Sparql,
-    // BlockPlus models, and any unknown module.
+    // 1. Global settings: scan all values for query structures (covers
+    // DynamicItemSets, OaiPmhRepository, AdvancedResourceTemplate, Sparql,
+    // BlockPlus models, and any unknown module).
     $sql = 'SELECT `id`, `value` FROM `setting`';
     $allSettings = $connection->executeQuery($sql)
         ->fetchAllKeyValue();
@@ -2746,8 +2761,8 @@ if (version_compare($oldVersion, '3.4.59', '<')) {
         }
     }
 
-    // 2. Site settings: scan all values for query structures.
-    // Covers prevnext queries, theme page_models, and any unknown module.
+    // 2. Site settings: scan all values for query structures (covers
+    // prevnext queries, theme page_models, and any unknown module).
     $sql = 'SELECT `id`, `site_id`, `value` FROM `site_setting`';
     $allSiteSettings = $connection->executeQuery($sql)
         ->fetchAllAssociative();
@@ -2789,9 +2804,9 @@ if (version_compare($oldVersion, '3.4.59', '<')) {
         }
     }
 
-    // 3. Page blocks: recursively normalize any query key in block data.
-    // Cover browsePreview, searchingForm, reference, timeline, bibliography,
-    // tagCloud, mappingMapSearch, topicsList, searchResults, etc.
+    // 3. Page blocks: recursively normalize any query key in block data
+    // (covers browsePreview, searchingForm, reference, timeline, bibliography,
+    // tagCloud, mappingMapSearch, topicsList, etc.).
     $sql = <<<'SQL'
         SELECT `id`, `data`
         FROM `site_page_block`
@@ -2968,7 +2983,7 @@ if (version_compare($oldVersion, '3.4.59', '<')) {
         }
     }
 
-    // 11. Resource template property data: resource_query in json data column.
+    // 8. Resource template property data: resource_query in json data column.
     try {
         $connection->executeQuery(
             'SELECT 1 FROM `resource_template_property_data`'
@@ -3014,8 +3029,44 @@ if (version_compare($oldVersion, '3.4.59', '<')) {
         $messenger->addSuccess($message);
     }
 
+    $deprecated = 'common/advanced-search/properties-improved';
+
+    // Admin settings: replace properties-improved with properties + filters.
+    $searchFields = $settings->get('advancedsearch_search_fields') ?: [];
+    if (in_array($deprecated, $searchFields)) {
+        $searchFields = array_diff($searchFields, [$deprecated]);
+        if (!in_array('common/advanced-search/properties', $searchFields)) {
+            $searchFields[] = 'common/advanced-search/properties';
+        }
+        if (!in_array('common/advanced-search/filters', $searchFields)) {
+            $searchFields[] = 'common/advanced-search/filters';
+        }
+        $settings->set('advancedsearch_search_fields', array_values($searchFields));
+    }
+
+    // Site settings: replace properties-improved with filters only and remove
+    // properties when filters is added.
+    $siteIds = $api->search('sites', [], ['returnScalar' => 'id'])->getContent();
+    foreach ($siteIds as $siteId) {
+        $siteSettings->setTargetId($siteId);
+        $searchFields = $siteSettings->get('advancedsearch_search_fields') ?: [];
+        if (in_array($deprecated, $searchFields)) {
+            $searchFields = array_diff($searchFields, [$deprecated]);
+            if (!in_array('common/advanced-search/filters', $searchFields)) {
+                $searchFields[] = 'common/advanced-search/filters';
+            }
+            $searchFields = array_diff($searchFields, ['common/advanced-search/properties']);
+            $siteSettings->set('advancedsearch_search_fields', array_values($searchFields));
+        }
+    }
+
     $message = new PsrMessage(
-        'The RSS/Atom feed feature for search pages has been moved to the module {link}Feed{link_end}. Install it to keep feed urls on search pages.', // @translate
+        'The deprecated search field "properties-improved" has been removed and replaced by "properties" and "filters" in admin, or "filters" only in sites.' // @translate
+    );
+    $messenger->addWarning($message);
+
+    $message = new PsrMessage(
+        'The rss/atom feed feature for search pages has been moved to the module {link}Feed{link_end}. Install it to keep feed urls on search pages.', // @translate
         [
             'link' => '<a href="https://gitlab.com/Daniel-KM/Omeka-S-module-Feed" target="_blank" rel="noopener">',
             'link_end' => '</a>',
@@ -3023,4 +3074,53 @@ if (version_compare($oldVersion, '3.4.59', '<')) {
     );
     $message->setEscapeHtml(false);
     $messenger->addWarning($message);
+
+    $settings->set(
+        'advancedsearch_cron_index',
+        $settings->get('advancedsearch_cron_index', false)
+    );
+
+    $message = new PsrMessage(
+        'Automatic daily reindexation is now disabled by default. Enable it in the main settings if needed.' // @translate
+    );
+    $messenger->addWarning($message);
+
+    // Set default filter options for all sites.
+    $siteDefaults = $localConfig['advancedsearch']['site_settings'];
+    $newSiteSettings = [
+        'advancedsearch_filter_types',
+        'advancedsearch_filter_value_autosuggest_whitelist',
+        'advancedsearch_filter_value_autosuggest_blacklist',
+        'advancedsearch_filter_joiner_not',
+    ];
+    $siteIds = $api->search('sites', [], ['returnScalar' => 'id'])->getContent();
+    foreach ($siteIds as $siteId) {
+        $siteSettings->setTargetId($siteId);
+        foreach ($newSiteSettings as $key) {
+            $current = $siteSettings->get($key);
+            if ($current === null) {
+                $siteSettings->set($key, $siteDefaults[$key]);
+            }
+        }
+    }
+
+    // Same for admin settings.
+    $adminDefaults = $localConfig['advancedsearch']['settings'];
+    $newAdminSettings = [
+        'advancedsearch_filter_types',
+        'advancedsearch_filter_value_autosuggest_whitelist',
+        'advancedsearch_filter_value_autosuggest_blacklist',
+        'advancedsearch_filter_joiner_not',
+    ];
+    foreach ($newAdminSettings as $key) {
+        $current = $settings->get($key);
+        if ($current === null) {
+            $settings->set($key, $adminDefaults[$key]);
+        }
+    }
+
+    $message = new PsrMessage(
+        'New options are available for standard and module search filters: configurable query types, joiner "not" (simplifies negative operators), and autocompletion on filter values (requires module Reference or SearchSolr). Check main settings and site settings.' // @translate
+    );
+    $messenger->addSuccess($message);
 }

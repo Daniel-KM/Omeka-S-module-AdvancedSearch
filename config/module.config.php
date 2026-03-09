@@ -2,6 +2,42 @@
 
 namespace AdvancedSearch;
 
+// The constant is not available during upgrade.
+/** @see \AdvancedSearch\Stdlib\SearchResources::FIELD_QUERY['labels'] */
+$allFilterTypes = [
+    'eq', 'neq', 'in', 'nin',
+    'sw', 'nsw', 'ew', 'new',
+    'near', 'nnear', 'ma', 'nma',
+    'lt', 'lte', 'gte', 'gt',
+    '<', '≤', '≥', '>',
+    'yreq', 'nyreq', 'yrgte', 'yrlte', 'yrgt', 'yrlt',
+    'res', 'nres', 'resq', 'nresq',
+    'lex', 'nlex', 'lres', 'nlres', 'lkq', 'nlkq',
+    'ex', 'nex', 'exs', 'nexs', 'exm', 'nexm',
+    'dtp', 'ndtp', 'tp', 'ntp',
+    'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu',
+    'dup', 'ndup', 'dupt', 'ndupt', 'dupl', 'ndupl',
+    'duptl', 'nduptl',
+    'dupv', 'ndupv', 'dupvt', 'ndupvt', 'dupvl', 'ndupvl',
+    'dupvtl', 'ndupvtl',
+    'dupr', 'ndupr', 'duprt', 'nduprt', 'duprl', 'nduprl',
+    'duprtl', 'nduprtl',
+    'dupu', 'ndupu', 'duput', 'nduput', 'dupul', 'ndupul',
+    'duputl', 'nduputl',
+];
+
+/** @see \AdvancedSearch\Stdlib\SearchResources::FIELD_QUERY['default'] */
+$defaultFilterTypes = [
+    'eq', 'neq', 'in', 'nin',
+    'sw', 'nsw', 'ew', 'new',
+    'lt', 'lte', 'gte', 'gt',
+    'yreq', 'nyreq', 'yrgte', 'yrlte',
+    'res', 'nres',
+    'lex', 'nlex',
+    'ex', 'nex', 'exs', 'nexs', 'exm', 'nexm',
+    'dtp', 'ndtp', 'tp', 'ntp',
+];
+
 $defaultAutosuggestBlacklist = [
     'dcterms:abstract',
     'dcterms:bibliographicCitation',
@@ -417,7 +453,7 @@ return [
                 'common/advanced-search/data-type-geography',
                 'common/numeric-data-types-advanced-search',
             ],
-            'advancedsearch_filter_types' => Stdlib\SearchResources::FIELD_QUERY['default'],
+            'advancedsearch_filter_types' => $allFilterTypes,
             'advancedsearch_filter_value_autosuggest_whitelist' => ['all'],
             'advancedsearch_filter_value_autosuggest_blacklist' => $defaultAutosuggestBlacklist,
             'advancedsearch_filter_joiner_not' => true,
@@ -453,7 +489,7 @@ return [
                 'common/advanced-search/data-type-geography',
                 'common/numeric-data-types-advanced-search',
             ],
-            'advancedsearch_filter_types' => Stdlib\SearchResources::FIELD_QUERY['default'],
+            'advancedsearch_filter_types' => $defaultFilterTypes,
             'advancedsearch_filter_value_autosuggest_whitelist' => ['all'],
             'advancedsearch_filter_value_autosuggest_blacklist' => $defaultAutosuggestBlacklist,
             'advancedsearch_filter_joiner_not' => true,

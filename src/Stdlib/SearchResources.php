@@ -2717,6 +2717,10 @@ class SearchResources
                 $subquery = $this->createSubQueryBuilder()
                     ->select("IDENTITY($subqueryAlias.resource)")
                     ->from(\Omeka\Entity\Value::class, $subqueryAlias)
+                    // Exclude values with annotations: they are not duplicates.
+                    ->andWhere($expr->isNull(
+                        "$subqueryAlias.valueAnnotation"
+                    ))
                     ->groupBy(...$groupBy)
                     ->having($expr->gt("COUNT($subqueryAlias.resource)", 1));
                 if ($propertyIds) {

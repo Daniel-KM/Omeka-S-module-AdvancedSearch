@@ -28,6 +28,18 @@ trait TraitCommonSettings
                     'id' => 'advancedsearch_search_fields',
                 ],
             ])
+            ->add([
+                'name' => 'advancedsearch_filter_autosuggest',
+                'type' => \Laminas\Form\Element\Checkbox::class,
+                'options' => [
+                    'element_group' => 'search',
+                    'label' => 'Enable autocompletion on filter values', // @translate
+                    'info' => 'Requires module Reference or SearchSolr.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearch_filter_autosuggest',
+                ],
+            ])
         ;
     }
 

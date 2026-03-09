@@ -913,6 +913,16 @@ class Module extends AbstractModule
 
         $headLink
             ->appendStylesheet($assetUrl('css/advanced-search-form.css', 'AdvancedSearch'));
+
+        // Load autocomplete JS/CSS when filter autosuggest is enabled.
+        $settingHelper = $isSite ? 'siteSetting' : 'setting';
+        if ($plugins->get($settingHelper)('advancedsearch_filter_autosuggest')) {
+            $headLink
+                ->appendStylesheet($assetUrl('css/common-autocomplete.css', 'Common'));
+            $headScript
+                ->appendFile($assetUrl('vendor/jquery-autocomplete/jquery.autocomplete.min.js', 'Common'), 'text/javascript', ['defer' => 'defer']);
+        }
+
         $headScript
             ->appendFile($assetUrl('js/advanced-search-form.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
 

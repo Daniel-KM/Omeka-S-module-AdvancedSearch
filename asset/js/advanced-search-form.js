@@ -403,4 +403,73 @@ $(document).ready(function() {
     // Index of filter search values.
     $('#filter-queries').data('filter-search-index', $('#filter-queries .value').length - 1);
 
+    /**
+     * Autosuggest on filter values using api of module Reference.
+     */
+    var filterAutosuggestUrl = $('#filter-queries').data('autosuggest-url');
+    if (filterAutosuggestUrl && typeof $.fn.autocomplete === 'function') {
+        var initFilterAutosuggest = function(value) {
+            var input = value.find('input.query-text');
+            if (!input.length) return;
+            // Destroy previous instance.
+            if (input.data('autocomplete')) {
+                input.autocomplete('dispose');
+            }
+            // Get selected field(s) from the property select.
+            var fieldSelect = value.find('.query-property');
+            var fields = fieldSelect.val();
+            if (!fields || (Array.isArray(fields) && !fields.length)) {
+                return;
+            }
+            if (!Array.isArray(fields)) {
+                fields = [fields];
+            }
+            // Build base URL with metadata fields.
+            var params = [];
+            $.each(fields, function(i, f) {
+                params.push('metadata[]=' + encodeURIComponent(f));
+            });
+            params.push('option[per_page]=25');
+            var baseUrl = filterAutosuggestUrl + '?' + params.join('&');
+            input.autocomplete({
+                serviceUrl: baseUrl,
+                dataType: 'json',
+                paramName: 'option[filters][begin][]',
+                minChars: 2,
+                transformResult: function(response) {
+                    var suggestions = [];
+                    $.each(response, function(field, data) {
+                        var refs = data['o:references'];
+                        if (!Array.isArray(refs)) return;
+                        $.each(refs, function(i, ref) {
+                            if (ref.val) {
+                                suggestions.push({
+                                    value: ref.val,
+                                    data: ref.total || 1,
+                                });
+                            }
+                        });
+                    });
+                    return { suggestions: suggestions };
+                },
+            });
+            input.attr('autocomplete', 'off');
+        };
+
+        // Init on field change.
+        $(document).on('change', '#filter-queries .query-property', function() {
+            initFilterAutosuggest($(this).closest('.value'));
+        });
+
+        // Init on new value created.
+        $(document).on('o:value-created', '#filter-queries .value', function() {
+            initFilterAutosuggest($(this));
+        });
+
+        // Init on page load for existing filters.
+        $('#filter-queries .value').each(function() {
+            initFilterAutosuggest($(this));
+        });
+    }
+
 });

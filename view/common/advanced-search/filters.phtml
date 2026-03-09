@@ -85,12 +85,21 @@ if (isset($query['search'])) {
     ]);
 }
 
-$queryOption = function ($value, array $search, $key, $text) use($escapeAttr, $escape) {
+$htmlOption = function ($value, array $search, $key, $text) use($escapeAttr, $escape) {
     $selected = null;
     if (isset($search[$key]) && $value === $search[$key]) {
         $selected = ' selected="selected"';
     }
     return sprintf('<option value="%s"%s>%s</option>' . "\n", $escapeAttr($value), $selected, $escape($text));
+};
+$queryOption = function ($value, array $search, $key, $text) use($htmlOption, $allowedFilterTypes) {
+    if (!isset($allowedFilterTypes[$value])) {
+        return '';
+    }
+    return $htmlOption($value, $search, $key, $text);
+};
+$hasGroupType = function (array $types) use ($allowedFilterTypes) {
+    return (bool) array_intersect_key($allowedFilterTypes, array_flip($types));
 };
 $queryText = function (array $search, $index) use ($escapeAttr, $translate) {
     $val = $search['val'] ?? null;
@@ -131,8 +140,8 @@ if ($isSiteRequest) {
         <div class="value">
             <div class="value-common value-fields">
                 <select class="joiner chosen-select" name="<?= $escape($stem . '[join]') ?>" aria-label="<?= $translate('Joiner') ?>">
-                    <?= $queryOption('and', $filter, 'join', $translate('AND')) ?>
-                    <?= $queryOption('or', $filter, 'join', $translate('OR')) ?>
+                    <?= $htmlOption('and', $filter, 'join', $translate('and')) ?>
+                    <?= $htmlOption('or', $filter, 'join', $translate('or')) ?>
                 </select>
                 <?= $fieldSelect([
                     'name' => $stem . '[field]',

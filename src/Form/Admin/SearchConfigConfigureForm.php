@@ -672,6 +672,17 @@ class SearchConfigConfigureForm extends Form
                 ],
             ])
             ->add([
+                'name' => 'field_value_autosuggest',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Enable autocompletion on filter values', // @translate
+                    'info' => 'Requires module Reference (database values) or SearchSolr (indexed values).', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'field_value_autosuggest',
+                ],
+            ])
+            ->add([
                 'name' => 'fields',
                 'type' => CommonElement\DataTextarea::class,
                 'options' => [

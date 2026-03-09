@@ -420,13 +420,13 @@ var Search = (function() {
         var basemapProvider = searchMapDiv.dataset.basemapProvider || 'OpenStreetMap.Mapnik';
         var disableClustering = searchMapDiv.dataset.disableClustering === '1';
 
-        // Get item IDs from the search results (passed from PHP as comma-separated string).
+        // Get item ids from the search results (passed from PHP as comma-separated string).
         // Empty string means: show all features (browse mode or too many results).
         var itemIdsString = searchMapDiv.dataset.itemIds || '';
         var itemsQuery = {};
 
         if (itemIdsString) {
-            // Filtered search with reasonable number of results: pass IDs.
+            // Filtered search with reasonable number of results: pass ids.
             // Omeka API supports "id=x,y,z" format.
             itemsQuery.id = itemIdsString;
         }
@@ -1232,6 +1232,51 @@ $(document).ready(function() {
     });
 
     /**
+     * Autosuggest on advanced filter values.
+     *
+     * Use search engine values endpoint to get field values with prefix filtering.
+     */
+    var advFilterAutosuggestUrl = $searchFiltersAdvanced.data('autosuggest-url');
+    if (advFilterAutosuggestUrl && typeof $.fn.autocomplete === 'function') {
+        var initAdvFilterAutosuggest = function(filterFieldset) {
+            var input = filterFieldset.find('input[name$="[val]"]');
+            if (!input.length) return;
+            if (input.data('autocomplete')) {
+                input.autocomplete('dispose');
+            }
+            var fieldSelect = filterFieldset.find('select[name$="[field]"]');
+            var field = fieldSelect.val();
+            if (!field) return;
+
+            input.autocomplete({
+                serviceUrl: advFilterAutosuggestUrl
+                    + '&field=' + encodeURIComponent(field),
+                dataType: 'json',
+                paramName: 'q',
+                minChars: 2,
+                transformResult: function(response) {
+                    return response.data ? response.data : response;
+                },
+            });
+            input.attr('autocomplete', 'off');
+        };
+
+        $searchFiltersAdvanced.on('change', 'select[name$="[field]"]', function() {
+            initAdvFilterAutosuggest($(this).closest('fieldset.filter'));
+        });
+
+        $searchFiltersAdvanced.on('o:advanced-search.filter.append', function() {
+            $(this).find('> fieldset.filter').each(function() {
+                initAdvFilterAutosuggest($(this));
+            });
+        });
+
+        $searchFiltersAdvanced.find('> fieldset.filter').each(function() {
+            initAdvFilterAutosuggest($(this));
+        });
+    }
+
+    /**
      * Results tools (sort, pagination, per-page).
      */
 
@@ -1382,7 +1427,7 @@ $(document).ready(function() {
     const rangeDoubles = document.querySelectorAll('.range-double');
 
     // Clean empty query parameters for cleaner URLs.
-    // Note: form ID can be "form-search", "search-form", or custom.
+    // Note: form id can be "form-search", "search-form", or custom.
     $('#search-form, #form-search, #search-headroom-form, #search-filters-form, #facets-form, .search-facets form, #advanced-search-form form').on('submit', function() {
         $(this).find('.range-double').each(function() {
             Search.rangeSliderDouble.clearExtremesBeforeSubmit(this);

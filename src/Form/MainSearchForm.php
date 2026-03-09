@@ -545,26 +545,31 @@ class MainSearchForm extends Form
                 ->setLabelOption('disable_html_escape', true);
         }
 
+        $attributes = [
+            'id' => 'search-filters',
+            'class' => 'search-filters-advanced'
+                . (!empty($filter['field_joiner_not']) ? ' has-joiner-not' : ''),
+            'required' => false,
+            'data-count-default' => $defaultNumber,
+            'data-count-max' => $maxNumber,
+        ];
+
+        if (!empty($filter['field_value_autosuggest']) && $this->searchConfig) {
+            $attributes['data-autosuggest-url'] = $this->basePath
+                . ($this->site ? '/s/' . $this->site->slug() : '/admin')
+                . '/' . $this->searchConfig->slug()
+                . '/suggest?mode=values';
+        }
+
         $element
             ->setOptions([
-                // When there are more filters in the query used to fill form
-                // than the default number, new filters will be added
-                // automatically (allow_add).
                 'count' => $defaultNumber,
                 'should_create_template' => true,
                 'allow_add' => true,
                 'allow_remove' => true,
                 'target_element' => $advanced,
             ] + $filter['options'])
-            ->setAttributes([
-                'id' => 'search-filters',
-                'class' => 'search-filters-advanced'
-                    . (!empty($filter['field_joiner_not']) ? ' has-joiner-not' : ''),
-                'required' => false,
-                // TODO Remove this attribute data and use only search config?
-                'data-count-default' => $defaultNumber,
-                'data-count-max' => $maxNumber,
-            ] + $filter['attributes'])
+            ->setAttributes($attributes + $filter['attributes'])
         ;
 
         return $element;

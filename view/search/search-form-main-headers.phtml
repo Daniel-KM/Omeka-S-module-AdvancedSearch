@@ -20,6 +20,7 @@ $headScript = $plugins->get('headScript');
 
 if ($searchConfig->subSetting('q', 'suggester')
     || $searchConfig->subSetting('q', 'suggest_url')
+    || $searchConfig->subSubSetting('form', 'advanced', 'field_value_autosuggest')
 ) {
     $headScript
         ->appendFile($assetUrl('vendor/jquery-autocomplete/jquery.autocomplete.min.js', 'Common'), 'text/javascript', ['defer' => 'defer']);

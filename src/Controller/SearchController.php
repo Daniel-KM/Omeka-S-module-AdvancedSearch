@@ -279,6 +279,13 @@ class SearchController extends AbstractActionController
         }
 
         $field = $params->fromQuery('field');
+        $mode = $params->fromQuery('mode');
+
+        // Mode "values": return field values with prefix filtering
+        // for autocompletion on advanced filter inputs.
+        if ($mode === 'values' && $field) {
+            return $this->fieldValues($searchConfig, $field, $q, $isSiteRequest, $site);
+        }
 
         $response = $searchConfig->suggest($q, $field, $site);
 
@@ -304,6 +311,55 @@ class SearchController extends AbstractActionController
             'data' => [
                 'query' => $q,
                 'suggestions' => $response->getSuggestions(),
+            ],
+        ]);
+    }
+
+    /**
+     * Return distinct values for a field via the search engine querier.
+     */
+    protected function fieldValues(
+        SearchConfigRepresentation $searchConfig,
+        string $field,
+        string $q,
+        bool $isSiteRequest,
+        ?\Omeka\Api\Representation\SiteRepresentation $site
+    ): JsonModel {
+        $querier = $searchConfig->searchEngine()->querier();
+
+        $query = new Query();
+        $query->setIsPublic($isSiteRequest);
+        if ($site) {
+            $query->setSiteId($site->id());
+        }
+        $formSettings = $searchConfig->settings()['form'] ?? [];
+        $aliases = $formSettings['advanced']['fields'] ?? [];
+        $query->setAliases($aliases);
+        $querier->setQuery($query);
+
+        try {
+            $values = $querier->queryValues($field);
+        } catch (\Throwable $e) {
+            return new JsonModel([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ]);
+        }
+
+        if (strlen($q)) {
+            $qLower = mb_strtolower($q);
+            $values = array_filter($values, fn ($v) =>
+                mb_strpos(mb_strtolower($v), $qLower) === 0);
+        }
+
+        $values = array_slice(array_values($values), 0, 25);
+
+        return new JsonModel([
+            'status' => 'success',
+            'data' => [
+                'query' => $q,
+                'suggestions' => array_map(fn ($v) =>
+                    ['value' => $v, 'data' => $v], $values),
             ],
         ]);
     }

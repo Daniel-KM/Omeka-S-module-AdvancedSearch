@@ -1858,6 +1858,11 @@ class SearchResources
 
             $joiner = $queryRow['join'] ?? '';
             $propertyIds = $queryRow['field'] ?? null;
+            // Field may be an array from a multi-select form.
+            if (is_array($propertyIds)) {
+                $propertyIds = array_filter($propertyIds, 'strlen');
+                $propertyIds = $propertyIds ?: null;
+            }
             $except = $queryRow['except'] ?? null;
             $queryType = $queryRow['type'];
             $value = $queryRow['val'] ?? '';
@@ -2190,51 +2195,82 @@ class SearchResources
 
         $incorrectValue = false;
 
+        // Pre-fetch linked resource ids via dbal to avoid doctrine class
+        // discriminator left joins (value_annotation, item_set, item, media)
+        // in the dql subquery.
+        $conn = $this->adapter->getEntityManager()->getConnection();
+        $fetchLinkedIds = function (string $sqlOp, $sqlValues) use ($conn): array {
+            if (is_array($sqlValues)) {
+                return $conn->fetchFirstColumn(
+                    'SELECT id FROM resource WHERE title IN (?)',
+                    [$sqlValues],
+                    [Connection::PARAM_STR_ARRAY]
+                );
+            }
+            return $conn->fetchFirstColumn(
+                "SELECT id FROM resource WHERE title $sqlOp ?",
+                [$sqlValues]
+            );
+        };
+        $linkedExpr = function (array $ids) use ($qb, $expr, $valuesAlias) {
+            if (!$ids) {
+                return null;
+            }
+            $param = $this->adapter->createAlias();
+            $qb->setParameter(
+                $param,
+                array_map('intval', $ids),
+                Connection::PARAM_INT_ARRAY
+            );
+            return $expr->in(
+                "$valuesAlias.valueResource", ":$param"
+            );
+        };
+
         switch ($queryType) {
             case 'eq':
             case 'list':
-                $subqueryAlias = $this->adapter->createAlias();
-                $subquery = $this->createSubQueryBuilder()
-                    ->select("$subqueryAlias.id")
-                    ->from('Omeka\Entity\Resource', $subqueryAlias);
                 if (count($value) <= 1) {
                     $value = reset($value);
                     $param = $this->adapter->createNamedParameter($qb, $value);
-                    $subquery
-                        ->where($expr->eq("$subqueryAlias.title", $param));
-                    $predicateExpr = $expr->orX(
-                        $expr->in("$valuesAlias.valueResource", $subquery->getDQL()),
+                    $linked = $linkedExpr($fetchLinkedIds('=', $value));
+                    $parts = [
                         $expr->eq("$valuesAlias.value", $param),
-                        $expr->eq("$valuesAlias.uri", $param)
-                    );
+                        $expr->eq("$valuesAlias.uri", $param),
+                    ];
+                    if ($linked) {
+                        array_unshift($parts, $linked);
+                    }
+                    $predicateExpr = $expr->orX(...$parts);
                 } else {
                     $param = $this->adapter->createNamedParameter($qb, $value);
                     $qb->setParameter(substr($param, 1), $value, Connection::PARAM_STR_ARRAY);
-                    $subquery
-                        ->where($expr->in("$subqueryAlias.title", $param));
-                    $predicateExpr = $expr->orX(
-                        $expr->in("$valuesAlias.valueResource", $subquery->getDQL()),
+                    $linked = $linkedExpr($fetchLinkedIds('IN', $value));
+                    $parts = [
                         $expr->in("$valuesAlias.value", $param),
-                        $expr->in("$valuesAlias.uri", $param)
-                    );
+                        $expr->in("$valuesAlias.uri", $param),
+                    ];
+                    if ($linked) {
+                        array_unshift($parts, $linked);
+                    }
+                    $predicateExpr = $expr->orX(...$parts);
                 }
                 break;
 
             case 'in':
-                $subqueryAlias = $this->adapter->createAlias();
-                $subquery = $this->createSubQueryBuilder()
-                    ->select("$subqueryAlias.id")
-                    ->from('Omeka\Entity\Resource', $subqueryAlias);
                 $sub = [];
                 foreach ($value as $val) {
-                    $param = $this->adapter->createNamedParameter($qb, '%' . $escapeSqlLike($val) . '%');
-                    $subquery
-                        ->where($expr->like("$subqueryAlias.title", $param));
-                    $sub[] = $expr->orX(
-                        $expr->in("$valuesAlias.valueResource", $subquery->getDQL()),
+                    $likeVal = '%' . $escapeSqlLike($val) . '%';
+                    $param = $this->adapter->createNamedParameter($qb, $likeVal);
+                    $linked = $linkedExpr($fetchLinkedIds('LIKE', $likeVal));
+                    $parts = [
                         $expr->like("$valuesAlias.value", $param),
-                        $expr->like("$valuesAlias.uri", $param)
-                    );
+                        $expr->like("$valuesAlias.uri", $param),
+                    ];
+                    if ($linked) {
+                        array_unshift($parts, $linked);
+                    }
+                    $sub[] = $expr->orX(...$parts);
                 }
                 $predicateExpr = count($value) <= 1
                     ? reset($sub)
@@ -2242,20 +2278,19 @@ class SearchResources
                 break;
 
             case 'sw':
-                $subqueryAlias = $this->adapter->createAlias();
-                $subquery = $this->createSubQueryBuilder()
-                    ->select("$subqueryAlias.id")
-                    ->from('Omeka\Entity\Resource', $subqueryAlias);
                 $sub = [];
                 foreach ($value as $val) {
-                    $param = $this->adapter->createNamedParameter($qb, $escapeSqlLike($val) . '%');
-                    $subquery
-                        ->where($expr->like("$subqueryAlias.title", $param));
-                    $sub[] = $expr->orX(
-                        $expr->in("$valuesAlias.valueResource", $subquery->getDQL()),
+                    $likeVal = $escapeSqlLike($val) . '%';
+                    $param = $this->adapter->createNamedParameter($qb, $likeVal);
+                    $linked = $linkedExpr($fetchLinkedIds('LIKE', $likeVal));
+                    $parts = [
                         $expr->like("$valuesAlias.value", $param),
-                        $expr->like("$valuesAlias.uri", $param)
-                    );
+                        $expr->like("$valuesAlias.uri", $param),
+                    ];
+                    if ($linked) {
+                        array_unshift($parts, $linked);
+                    }
+                    $sub[] = $expr->orX(...$parts);
                 }
                 $predicateExpr = count($value) <= 1
                     ? reset($sub)
@@ -2263,20 +2298,19 @@ class SearchResources
                 break;
 
             case 'ew':
-                $subqueryAlias = $this->adapter->createAlias();
-                $subquery = $this->createSubQueryBuilder()
-                    ->select("$subqueryAlias.id")
-                    ->from('Omeka\Entity\Resource', $subqueryAlias);
                 $sub = [];
                 foreach ($value as $val) {
-                    $param = $this->adapter->createNamedParameter($qb, '%' . $escapeSqlLike($val));
-                    $subquery
-                        ->where($expr->like("$subqueryAlias.title", $param));
-                    $sub[] = $expr->orX(
-                        $expr->in("$valuesAlias.valueResource", $subquery->getDQL()),
+                    $likeVal = '%' . $escapeSqlLike($val);
+                    $param = $this->adapter->createNamedParameter($qb, $likeVal);
+                    $linked = $linkedExpr($fetchLinkedIds('LIKE', $likeVal));
+                    $parts = [
                         $expr->like("$valuesAlias.value", $param),
-                        $expr->like("$valuesAlias.uri", $param)
-                    );
+                        $expr->like("$valuesAlias.uri", $param),
+                    ];
+                    if ($linked) {
+                        array_unshift($parts, $linked);
+                    }
+                    $sub[] = $expr->orX(...$parts);
                 }
                 $predicateExpr = count($value) <= 1
                     ? reset($sub)

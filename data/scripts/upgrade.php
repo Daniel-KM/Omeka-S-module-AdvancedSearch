@@ -2318,3 +2318,687 @@ if (version_compare($oldVersion, '3.4.58', '<')) {
         }
     }
 }
+
+if (version_compare($oldVersion, '3.4.59', '<')) {
+    // Normalize stored queries to standard Omeka core format.
+
+    // AdvancedSearch may:
+    // - store "property" values as arrays (multi-property select),
+    // - use non-standard keys ("term" instead of "property"),
+    // - store "site_id" as array.
+    // Fix these or convert to "filter" format when not simplifiable.
+    // Applies to all storage locations: settings, site settings, page blocks,
+    // bulk exports, navigation.
+
+    $corePropertyTypes = [
+        'eq',
+        'neq',
+        'in',
+        'nin',
+        'sw',
+        'nsw',
+        'ew',
+        'new',
+        'res',
+        'nres',
+        'ex',
+        'nex',
+        'dt',
+        'ndt',
+    ];
+    $jsonFlags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
+
+    /**
+     * Normalize a query array to standard Omeka core format.
+     *
+     * @return array|null Normalized query, or null if unchanged.
+     */
+    $normalizeQuery = function ($query) use ($corePropertyTypes): ?array {
+        if (!is_array($query) || empty($query)) {
+            return null;
+        }
+
+        $modified = false;
+
+        // Normalize "property" entries.
+        if (!empty($query['property'])
+            && is_array($query['property'])
+        ) {
+            $newProperty = [];
+            $newFilter = $query['filter'] ?? [];
+
+            foreach ($query['property'] as $entry) {
+                if (!is_array($entry)) {
+                    continue;
+                }
+
+                // Fix "term" key => "property".
+                if (isset($entry['term'])
+                    && !isset($entry['property'])
+                ) {
+                    $entry['property'] = $entry['term'];
+                    unset($entry['term']);
+                    $modified = true;
+                }
+
+                $prop = $entry['property'] ?? null;
+                $type = $entry['type'] ?? 'eq';
+                $joiner = $entry['joiner'] ?? 'and';
+                $text = $entry['text'] ?? '';
+
+                // Fix array property to scalar.
+                $isMultiProp = false;
+                if (is_array($prop)) {
+                    if (count($prop) <= 1) {
+                        $prop = (string) reset($prop);
+                        $modified = true;
+                    } else {
+                        $isMultiProp = true;
+                    }
+                }
+
+                // Fix array text to scalar.
+                $isMultiVal = false;
+                if (is_array($text)) {
+                    if (count($text) <= 1) {
+                        $text = (string) reset($text);
+                        $modified = true;
+                    } else {
+                        $isMultiVal = true;
+                    }
+                }
+
+                // Check joiner validity for core format.
+                $isInvalidJoiner = !in_array(
+                    $joiner, ['and', 'or']
+                );
+
+                // Standard type + single property + single value+ valid joiner
+                // => keep as core property format.
+                if (!$isMultiProp
+                    && !$isMultiVal
+                    && !$isInvalidJoiner
+                    && in_array($type, $corePropertyTypes)
+                ) {
+                    $newProperty[] = [
+                        'property' => (string) $prop,
+                        'type' => $type,
+                        'text' => $text,
+                        'joiner' => $joiner,
+                    ];
+                } else {
+                    // Convert to filter format.
+                    $newFilter[] = [
+                        'field' => $prop,
+                        'type' => $type,
+                        'val' => $text,
+                        'join' => $isInvalidJoiner
+                            ? 'and'
+                            : ($joiner === 'or'
+                                ? 'or' : 'and'),
+                    ];
+                    $modified = true;
+                }
+            }
+
+            if ($modified) {
+                if ($newProperty) {
+                    $query['property'] = $newProperty;
+                } else {
+                    unset($query['property']);
+                }
+                if ($newFilter) {
+                    $query['filter'] = $newFilter;
+                }
+            }
+        }
+
+        // Normalize "filter" entries: flatten single-element arrays in "field"
+        // and "val".
+        if (!empty($query['filter'])
+            && is_array($query['filter'])
+        ) {
+            foreach ($query['filter'] as &$entry) {
+                if (!is_array($entry)) {
+                    continue;
+                }
+                if (isset($entry['field'])
+                    && is_array($entry['field'])
+                    && count($entry['field']) === 1
+                ) {
+                    $entry['field'] = (string) reset(
+                        $entry['field']
+                    );
+                    $modified = true;
+                }
+                if (isset($entry['val'])
+                    && is_array($entry['val'])
+                    && count($entry['val']) === 1
+                ) {
+                    $entry['val'] = (string) reset(
+                        $entry['val']
+                    );
+                    $modified = true;
+                }
+            }
+            unset($entry);
+        }
+
+        // Normalize "site_id": array => scalar or in_sites.
+        if (isset($query['site_id'])
+            && is_array($query['site_id'])
+        ) {
+            if (count($query['site_id']) <= 1) {
+                $query['site_id'] = (string) reset(
+                    $query['site_id']
+                );
+            } else {
+                $query['in_sites'] = $query['site_id'];
+                unset($query['site_id']);
+            }
+            $modified = true;
+        }
+
+        return $modified ? $query : null;
+    };
+
+    /**
+     * Normalize a url-encoded query string.
+     *
+     * @return string|null Normalized string, or null if unchanged.
+     */
+    $normalizeQueryString = function ($queryString)
+        use ($normalizeQuery): ?string
+    {
+        if (!is_string($queryString)
+            || $queryString === ''
+        ) {
+            return null;
+        }
+        parse_str($queryString, $query);
+        if (!is_array($query) || empty($query)) {
+            return null;
+        }
+        $normalized = $normalizeQuery($query);
+        if ($normalized === null) {
+            return null;
+        }
+        return http_build_query(
+            $normalized, '', '&', PHP_QUERY_RFC3986
+        );
+    };
+
+    // Helper to update a setting.
+    $updateSetting = function (
+        string $table,
+        string $idColumn,
+        string $key,
+        $data,
+        ?string $siteIdColumn = null,
+        ?int $siteId = null
+    ) use ($connection, $jsonFlags): void {
+        $where = "`$idColumn` = ?";
+        $params = [
+            json_encode($data, $jsonFlags),
+            $key,
+        ];
+        if ($siteIdColumn && $siteId !== null) {
+            $where .= " AND `$siteIdColumn` = ?";
+            $params[] = $siteId;
+        }
+        $sql = "UPDATE `$table` SET `value` = ? WHERE $where";
+        $connection->executeStatement($sql, $params);
+    };
+
+    // Keys that may contain a query (array or string).
+    $queryKeys = [
+        'query', 'query_filter', 'resource_query',
+    ];
+    /**
+     * Recursively walk an array and normalize query values.
+     */
+    $walkAndNormalize = function (
+        &$data, &$modified
+    ) use (
+        &$walkAndNormalize,
+        $normalizeQuery, $normalizeQueryString, $queryKeys
+    ): void {
+        if (!is_array($data)) {
+            return;
+        }
+        foreach ($data as $key => &$value) {
+            if (in_array($key, $queryKeys, true)) {
+                if (is_array($value)) {
+                    $n = $normalizeQuery($value);
+                    if ($n !== null) {
+                        $value = $n;
+                        $modified = true;
+                    }
+                } elseif (is_string($value)) {
+                    $n = $normalizeQueryString($value);
+                    if ($n !== null) {
+                        $value = $n;
+                        $modified = true;
+                    }
+                }
+            } elseif (is_array($value)) {
+                $walkAndNormalize($value, $modified);
+            }
+        }
+        unset($value);
+    };
+
+    $normalizedCount = 0;
+
+    // 1. Settings: json object of queries keyed by resource id.
+    $settingQueryMaps = [
+        'dynamicitemsets_item_sets_queries_dynamic',
+        'dynamicitemsets_item_sets_queries_static',
+        'advancedresourcetemplate_item_set_queries',
+    ];
+    foreach ($settingQueryMaps as $settingKey) {
+        $sql = 'SELECT `value` FROM `setting` WHERE `id` = ?';
+        $value = $connection->executeQuery(
+            $sql, [$settingKey]
+        )->fetchOne();
+        if ($value === false || $value === null) {
+            continue;
+        }
+        $data = json_decode($value, true);
+        if (!is_array($data) || empty($data)) {
+            continue;
+        }
+        $anyModified = false;
+        foreach ($data as $id => &$query) {
+            $normalized = $normalizeQuery($query);
+            if ($normalized !== null) {
+                $query = $normalized;
+                $anyModified = true;
+            }
+        }
+        unset($query);
+        if ($anyModified) {
+            $updateSetting('setting', 'id', $settingKey, $data);
+            ++$normalizedCount;
+        }
+    }
+
+    // 2. Settings: json array of query objects.
+    $settingQueryArrays = [
+        'oaipmhrepository_sets_queries',
+    ];
+    foreach ($settingQueryArrays as $settingKey) {
+        $sql = 'SELECT `value` FROM `setting` WHERE `id` = ?';
+        $value = $connection->executeQuery(
+            $sql, [$settingKey]
+        )->fetchOne();
+        if ($value === false || $value === null) {
+            continue;
+        }
+        $data = json_decode($value, true);
+        if (!is_array($data) || empty($data)) {
+            continue;
+        }
+        $anyModified = false;
+        foreach ($data as &$query) {
+            if (!is_array($query)) {
+                continue;
+            }
+            $normalized = $normalizeQuery($query);
+            if ($normalized !== null) {
+                $query = $normalized;
+                $anyModified = true;
+            }
+        }
+        unset($query);
+        if ($anyModified) {
+            $updateSetting('setting', 'id', $settingKey, $data);
+            ++$normalizedCount;
+        }
+    }
+
+    // 3. Settings: url-encoded query strings.
+    $settingQueryStrings = [
+        'sparql_resource_query',
+    ];
+    foreach ($settingQueryStrings as $settingKey) {
+        $sql = 'SELECT `value` FROM `setting` WHERE `id` = ?';
+        $value = $connection->executeQuery(
+            $sql, [$settingKey]
+        )->fetchOne();
+        if ($value === false || $value === null) {
+            continue;
+        }
+        // Value is JSON-encoded string in setting table.
+        $queryString = json_decode($value, true);
+        $normalized = $normalizeQueryString($queryString);
+        if ($normalized !== null) {
+            $updateSetting(
+                'setting', 'id', $settingKey,
+                $normalized
+            );
+            ++$normalizedCount;
+        }
+    }
+
+    // 4. Page models: blockplus_page_models in global settings and
+    // theme_settings_* in site settings (embedded blocks with queries anywhere
+    // in their data).
+    $sql = <<<'SQL'
+        SELECT `value` FROM `setting`
+        WHERE `id` = 'blockplus_page_models'
+        SQL;
+    $value = $connection->executeQuery($sql)->fetchOne();
+    if ($value !== false && $value !== null) {
+        $models = json_decode($value, true);
+        if (is_array($models) && !empty($models)) {
+            $modelsModified = false;
+            $walkAndNormalize($models, $modelsModified);
+            if ($modelsModified) {
+                $updateSetting(
+                    'setting', 'id',
+                    'blockplus_page_models', $models
+                );
+                ++$normalizedCount;
+            }
+        }
+    }
+
+    // 4b. Theme settings with page_models in site_setting.
+    $sql = <<<'SQL'
+        SELECT `id`, `site_id`, `value`
+        FROM `site_setting`
+        WHERE `id` LIKE 'theme\_settings\_%'
+            AND `value` LIKE '%page_models%'
+        SQL;
+    $themeRows = $connection->executeQuery($sql)
+        ->fetchAllAssociative();
+    foreach ($themeRows as $row) {
+        $data = json_decode($row['value'], true);
+        if (!is_array($data)
+            || empty($data['page_models'])
+        ) {
+            continue;
+        }
+        $themeModified = false;
+        $walkAndNormalize(
+            $data['page_models'], $themeModified
+        );
+        if ($themeModified) {
+            $sql = 'UPDATE `site_setting`'
+                . ' SET `value` = ?'
+                . ' WHERE `id` = ? AND `site_id` = ?';
+            $connection->executeStatement($sql, [
+                json_encode($data, $jsonFlags),
+                $row['id'],
+                $row['site_id'],
+            ]);
+            ++$normalizedCount;
+        }
+    }
+
+    // 5. Site settings: URL-encoded query strings.
+    $siteSettingQueryStrings = [
+        'blockplus_prevnext_items_query',
+        'blockplus_prevnext_item_sets_query',
+    ];
+    foreach ($siteSettingQueryStrings as $settingKey) {
+        $sql = 'SELECT `site_id`, `value` FROM `site_setting`'
+            . ' WHERE `id` = ?';
+        $rows = $connection->executeQuery(
+            $sql, [$settingKey]
+        )->fetchAllKeyValue();
+        foreach ($rows as $siteId => $value) {
+            $queryString = json_decode($value, true);
+            $normalized = $normalizeQueryString($queryString);
+            if ($normalized !== null) {
+                $sql = 'UPDATE `site_setting`'
+                    . ' SET `value` = ?'
+                    . ' WHERE `id` = ? AND `site_id` = ?';
+                $connection->executeStatement($sql, [
+                    json_encode($normalized, $jsonFlags),
+                    $settingKey,
+                    $siteId,
+                ]);
+                ++$normalizedCount;
+            }
+        }
+    }
+
+    // 6. Page blocks: recursively normalize any query key in block data.
+    // Covers browsePreview, searchingForm, reference, timeline, bibliography,
+    // tagCloud, mappingMapSearch, topicsList, searchResults, etc.
+    $sql = <<<'SQL'
+        SELECT `id`, `data`
+        FROM `site_page_block`
+        WHERE `data` LIKE '%"query"%'
+            OR `data` LIKE '%"query_filter"%'
+            OR `data` LIKE '%"resource_query"%'
+        SQL;
+    $blocks = $connection->executeQuery($sql)
+        ->fetchAllKeyValue();
+    $blockCount = 0;
+    foreach ($blocks as $blockId => $blockData) {
+        $data = json_decode($blockData, true);
+        if (!is_array($data)) {
+            continue;
+        }
+        $blockModified = false;
+        $walkAndNormalize($data, $blockModified);
+        if ($blockModified) {
+            $sql = 'UPDATE `site_page_block`'
+                . ' SET `data` = ? WHERE `id` = ?';
+            $connection->executeStatement($sql, [
+                json_encode($data, $jsonFlags),
+                $blockId,
+            ]);
+            ++$blockCount;
+        }
+    }
+    $normalizedCount += $blockCount;
+
+    // 7. Site navigation: browse links with query strings.
+    $sql = 'SELECT `id`, `navigation` FROM `site`'
+        . ' WHERE `navigation` LIKE \'%"query"%\'';
+    $sites = $connection->executeQuery($sql)
+        ->fetchAllKeyValue();
+    foreach ($sites as $siteId => $navJson) {
+        $nav = json_decode($navJson, true);
+        if (!is_array($nav)) {
+            continue;
+        }
+        $navModified = false;
+        // Recursive walk through navigation tree.
+        $walkNav = function (&$links)
+            use (&$walkNav, $normalizeQueryString,
+                &$navModified): void
+        {
+            foreach ($links as &$link) {
+                if (isset($link['data']['query'])
+                    && is_string($link['data']['query'])
+                ) {
+                    $n = $normalizeQueryString(
+                        $link['data']['query']
+                    );
+                    if ($n !== null) {
+                        $link['data']['query'] = $n;
+                        $navModified = true;
+                    }
+                }
+                if (!empty($link['links'])) {
+                    $walkNav($link['links']);
+                }
+            }
+            unset($link);
+        };
+        $walkNav($nav);
+        if ($navModified) {
+            $sql = 'UPDATE `site` SET `navigation` = ?'
+                . ' WHERE `id` = ?';
+            $connection->executeStatement($sql, [
+                json_encode($nav, $jsonFlags),
+                $siteId,
+            ]);
+            ++$normalizedCount;
+        }
+    }
+
+    // 8. Bulk export: formatter.query in params and config.
+    $bulkTables = [
+        'bulk_export' => 'params',
+        'bulk_exporter' => 'config',
+    ];
+    foreach ($bulkTables as $table => $column) {
+        // Check if table exists.
+        try {
+            $connection->executeQuery(
+                "SELECT 1 FROM `$table` LIMIT 1"
+            );
+        } catch (\Exception $e) {
+            continue;
+        }
+        $sql = "SELECT `id`, `$column` FROM `$table`"
+            . " WHERE `$column` LIKE '%query%'";
+        $rows = $connection->executeQuery($sql)
+            ->fetchAllKeyValue();
+        foreach ($rows as $rowId => $rowJson) {
+            $rowData = json_decode($rowJson, true);
+            if (!is_array($rowData)) {
+                continue;
+            }
+            $queryString = $rowData['formatter']['query']
+                ?? null;
+            if (!is_string($queryString)
+                || $queryString === ''
+            ) {
+                continue;
+            }
+            $normalized = $normalizeQueryString($queryString);
+            if ($normalized !== null) {
+                $rowData['formatter']['query'] = $normalized;
+                $sql = "UPDATE `$table`"
+                    . " SET `$column` = ? WHERE `id` = ?";
+                $connection->executeStatement($sql, [
+                    json_encode($rowData, $jsonFlags),
+                    $rowId,
+                ]);
+                ++$normalizedCount;
+            }
+        }
+    }
+
+    // 9. Site item pool: json query in site.item_pool.
+    $sql = 'SELECT `id`, `item_pool` FROM `site`'
+        . ' WHERE `item_pool` IS NOT NULL'
+        . ' AND `item_pool` != \'[]\'';
+    $sites = $connection->executeQuery($sql)
+        ->fetchAllKeyValue();
+    foreach ($sites as $siteId => $poolJson) {
+        $pool = json_decode($poolJson, true);
+        if (!is_array($pool) || empty($pool)) {
+            continue;
+        }
+        $normalized = $normalizeQuery($pool);
+        if ($normalized !== null) {
+            $sql = 'UPDATE `site` SET `item_pool` = ?'
+                . ' WHERE `id` = ?';
+            $connection->executeStatement($sql, [
+                json_encode($normalized, $jsonFlags),
+                $siteId,
+            ]);
+            ++$normalizedCount;
+        }
+    }
+
+    // 10. Module tables with url-encoded query columns.
+    // Each entry: [table, id_column, query_column].
+    $moduleTables = [
+        ['collecting_prompt', 'id', 'resource_query'],
+        ['faceted_browse_category', 'id', 'query'],
+        ['datavis_vis', 'id', 'query'],
+        ['search_request', 'id', 'query'],
+        ['scripto_project', 'id', 'item_pool'],
+    ];
+    foreach ($moduleTables as [$table, $idCol, $queryCol]) {
+        try {
+            $connection->executeQuery(
+                "SELECT 1 FROM `$table` LIMIT 1"
+            );
+        } catch (\Exception $e) {
+            continue;
+        }
+        $sql = "SELECT `$idCol`, `$queryCol` FROM `$table`"
+            . " WHERE `$queryCol` IS NOT NULL"
+            . " AND `$queryCol` != ''";
+        $rows = $connection->executeQuery($sql)
+            ->fetchAllKeyValue();
+        foreach ($rows as $rowId => $queryString) {
+            $normalized = $normalizeQueryString($queryString);
+            if ($normalized !== null) {
+                $sql = "UPDATE `$table`"
+                    . " SET `$queryCol` = ?"
+                    . " WHERE `$idCol` = ?";
+                $connection->executeStatement(
+                    $sql, [$normalized, $rowId]
+                );
+                ++$normalizedCount;
+            }
+        }
+    }
+
+    // 11. Resource template property data: resource_query in json data column.
+    try {
+        $connection->executeQuery(
+            'SELECT 1 FROM `resource_template_property_data`'
+            . ' LIMIT 1'
+        );
+        $sql = <<<'SQL'
+            SELECT `id`, `data`
+            FROM `resource_template_property_data`
+            WHERE `data` LIKE '%resource_query%'
+            SQL;
+        $rows = $connection->executeQuery($sql)
+            ->fetchAllKeyValue();
+        foreach ($rows as $rowId => $rowJson) {
+            $rowData = json_decode($rowJson, true);
+            if (!is_array($rowData)) {
+                continue;
+            }
+            $rq = $rowData['resource_query'] ?? null;
+            if (!is_string($rq) || $rq === '') {
+                continue;
+            }
+            $normalized = $normalizeQueryString($rq);
+            if ($normalized !== null) {
+                $rowData['resource_query'] = $normalized;
+                $sql = 'UPDATE `resource_template_property_data`'
+                    . ' SET `data` = ? WHERE `id` = ?';
+                $connection->executeStatement($sql, [
+                    json_encode($rowData, $jsonFlags),
+                    $rowId,
+                ]);
+                ++$normalizedCount;
+            }
+        }
+    } catch (\Exception $e) {
+        // Table does not exist.
+    }
+
+    if ($normalizedCount) {
+        $message = new PsrMessage(
+            '{count} stored queries have been normalized to standard Omeka format.', // @translate
+            ['count' => $normalizedCount]
+        );
+        $messenger->addSuccess($message);
+    }
+
+    $message = new PsrMessage(
+        'The RSS/Atom feed feature for search pages has been moved to the module {link}Feed{link_end}. Install it to keep feed urls on search pages.', // @translate
+        [
+            'link' => '<a href="https://gitlab.com/Daniel-KM/Omeka-S-module-Feed" target="_blank" rel="noopener">',
+            'link_end' => '</a>',
+        ]
+    );
+    $message->setEscapeHtml(false);
+    $messenger->addWarning($message);
+}

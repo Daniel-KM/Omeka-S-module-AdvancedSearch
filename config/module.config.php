@@ -504,6 +504,7 @@ return [
             'common/advanced-search/properties' => [
                 'label' => 'Properties', // @translate
             ],
+            /*
             'common/advanced-search/properties-improved' => [
                 'module' => 'AdvancedSearch',
                 'label' => 'Properties *', // @translate
@@ -511,6 +512,7 @@ return [
                 'default_site' => false,
                 'improve' => 'common/advanced-search/properties',
             ],
+            */
             'common/advanced-search/filters' => [
                 'module' => 'AdvancedSearch',
                 'label' => 'Filters', // @translate

@@ -141,79 +141,6 @@ class Module extends AbstractModule
         $this->installResources();
     }
 
-    protected function postUpgrade(?string $oldVersion, ?string $newVersion): void
-    {
-        $this->warnOverriddenSearch();
-        $this->postUpgradeAuto($oldVersion, $newVersion);
-    }
-
-    /**
-     * Adapted:
-     * @see \AdvancedSearch\Module::warnOverriddenSearch()
-     * @see \AdvancedSearch\Controller\Admin\IndexController::warnOverriddenSearch()
-     *
-     * @todo Identify modules, blocks and queries that use old features.
-     */
-    protected function warnOverriddenSearch(): bool
-    {
-        $services = $this->getServiceLocator();
-        $api = $services->get('Omeka\ApiManager');
-        $settings = $services->get('Omeka\Settings');
-        $siteSettings = $services->get('Omeka\Settings\Site');
-        $messenger = $services->get('ControllerPluginManager')->get('messenger');
-
-        /*
-        $improvedTemplates = [
-            'common/advanced-search/properties-improved'
-            'common/advanced-search/resource-class-improved',
-            'common/advanced-search/resource-template-improved',
-            'common/advanced-search/item-sets-improved',
-            'common/advanced-search/site-improved',
-            'common/advanced-search/media-type-improved',
-            'common/advanced-search/owner-improved',
-        ];
-        */
-
-        $results = [];
-        $searchFields = $settings->get('advancedsearch_search_fields') ?: [];
-        // foreach ($searchFields as $searchField) {
-        //     if (substr($searchField, -9) === '-improved') {
-        //         $results[0] = 'admin';
-        //         break;
-        //     }
-        // }
-        if (in_array('common/advanced-search/properties-improved', $searchFields)) {
-            $results[0] = 'admin';
-        }
-
-        $siteSlugs = $api->search('sites', [], ['returnScalar' => 'slug'])->getContent();
-        foreach ($siteSlugs as $siteId => $siteSlug) {
-            $searchFields = $siteSettings->get('advancedsearch_search_fields', null, $siteId) ?: [];
-            // foreach ($searchFields as $searchField) {
-            //     if (substr($searchField, -9) === '-improved') {
-            //         $results[$siteId] = $siteSlug;
-            //         break;
-            //     }
-            // }
-            if (in_array('common/advanced-search/properties-improved', $searchFields)) {
-                $results[$siteId] = $siteSlug;
-            }
-        }
-
-        if (!count($results)) {
-            return false;
-        }
-
-        $message = new PsrMessage(
-            'The setting to override search element "property" is enabled. This feature will be removed in a future version and should be {link}replaced by the search element "filter"{link_end}. Check your pages and settings. Matching sites: {json}', // @translate
-            ['link' => '<a href="https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch#deprecated-improvements-of-the-advanced-search-elements" target="_blank" rel="noopener">', 'link_end' => '</a>', 'json' => json_encode($results, 448)]
-        );
-        $message->setEscapeHtml(false);
-        $messenger->addWarning($message);
-
-        return true;
-    }
-
     public function attachListeners(SharedEventManagerInterface $sharedEventManager): void
     {
         // Handle cron reindexation: use EasyAdmin/Cron module if available,
@@ -1002,17 +929,6 @@ class Module extends AbstractModule
         $query = $event->getParam('query', []);
         if ($query) {
             if (!empty($query['property'])) {
-                // TODO Clean joiner and type for property.
-                if (in_array('common/advanced-search/properties-improved', $partials)) {
-                    foreach ($query['property'] as $propertyField) {
-                        if (array_key_exists('property', $propertyField) && !is_array($propertyField['property'])) {
-                            $propertyField['property'] = (array) $propertyField['property'];
-                        }
-                        if (array_key_exists('text', $propertyField) && is_array($propertyField['text'])) {
-                            $propertyField['text'] = count($propertyField['text']) === 1 ? reset($propertyField['text']) : '';
-                        }
-                    }
-                }
                 if (in_array('common/advanced-search/properties', $partials)) {
                     foreach ($query['property'] as $propertyField) {
                         // TODO Clean joiner and type for property.

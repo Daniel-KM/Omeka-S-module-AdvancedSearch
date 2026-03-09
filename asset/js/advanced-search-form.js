@@ -2,11 +2,13 @@
 
 /**
  * Manage the improvements of the standard advanced search.
+ *
+ * Improve methods "disableQueryTextInput" and "cleanSearchQuery" of Omeka.
+ *
+ * @see application/asset/js/global.js.
  */
 
 /**
- * Improve methods "disableQueryTextInput" and "cleanSearchQuery"
- * of Omeka from application/asset/js/global.js.
  * In some themes or pages, the js variable Omeka may be missing.
  */
 var Omeka = Omeka || {
@@ -47,9 +49,9 @@ $(document).ready(function() {
         const isTypeSubQuery = ['resq', 'nresq', 'lkq', 'nlkq'].includes(typeQuery);
         const isTypeDataType = ['dt', 'ndt', 'dtp', 'ndtp'].includes(typeQuery);
         const isTypeMainType = ['tp', 'ntp'].includes(typeQuery);
-        const queryTextInput = queryType.siblings('.query-text:not(.query-data-type):not(.query-main-type)');
+        const queryTextInput = queryType.siblings('.query-text:not(.query-data-type):not(.query-text-data-type):not(.query-main-type)');
         const queryTextSubQuery = queryType.closest('.value').find('.sub-query .query-form-query');
-        const queryTextDataType = queryType.siblings('.query-data-type');
+        const queryTextDataType = queryType.siblings('.query-data-type, .query-text-data-type');
         const queryTextMainType = queryType.siblings('.query-main-type');
         queryTextInput.prop('disabled', isTypeWithoutText || isTypeSubQuery || isTypeDataType || isTypeMainType);
         queryTextSubQuery.prop('disabled', !isTypeSubQuery);
@@ -173,7 +175,7 @@ $(document).ready(function() {
                 } else if (match = inputName.match(/property\[(\d+)\]\[text\]/)) {
                     const subIndex = match[1];
                     const propertyType = form.find(`[name="property[${subIndex}][type]"]`);
-                    if (fieldQueryTypeWithText.includes(propertyType.val())) {
+                    if (['eq', 'neq', 'in', 'nin', 'sw', 'nsw', 'ew', 'new', 'res', 'nres', 'dt', 'ndt'].includes(propertyType.val())) {
                         form.find(`[name="property[${subIndex}][joiner]"]`).prop('name', '');
                         form.find(`[name="property[${subIndex}][property]"]`).prop('name', '');
                         form.find(`[name="property[${subIndex}][text]"]`).prop('name', '');
@@ -257,7 +259,7 @@ $(document).ready(function() {
         $('#advanced-search select.chosen-select').chosen(chosenOptions);
         $('#advanced-search select.chosen-select option[value=""][selected]').prop('selected',  false).parent().trigger('chosen:updated');
 
-        $(document).on('o:value-created', '#filter-queries .value, #property-queries .value, #resource-class .value, #resource-templates .value, #item-sets .value, #datetime-queries .value', function(e) {
+        $(document).on('o:value-created', '#filter-queries .value, #resource-class .value, #resource-templates .value, #item-sets .value, #datetime-queries .value', function(e) {
             const newValue = $(this);
             newValue.find('select').chosen('destroy');
             newValue.find('.chosen-container').remove();
@@ -307,45 +309,6 @@ $(document).ready(function() {
     });
 
     /**
-     * Handle clearing fields on new property multi-value.
-     *
-     * @see application/asset/js/advanced-search.js.
-     */
-    $(document).on('o:value-created', '#property-queries .value', function(e) {
-        // In advanced-search.js, "children" is used, but it is not possible here,
-        // because a div is inserted to manage sub-query form.
-        // Furthermore, there is a hidden input.
-        const newValue = $(this);
-        const isSidebar = newValue.parents('.sidebar').length > 0;
-        if (isSidebar) {
-            newValue.find('.query-type option[value="resq"]').remove();
-            newValue.find('.query-type option[value="nresq"]').remove();
-            newValue.find('.query-type option[value="lkq"]').remove();
-            newValue.find('.query-type option[value="nlkq"]').remove();
-            newValue.find('.query-form-element').remove();
-        } else {
-            newValue.find('.query-form-element').attr('data-query', '').hide();
-            newValue.find('.query-form-element input[type="hidden"]').val(null);
-            newValue.find('.query-form-element .search-filters').empty().html(Omeka.jsTranslate('[Edit below]'));
-        }
-        newValue.children().children('input[type="text"]').val(null);
-        newValue.children().children('select').prop('selectedIndex', 0);
-        newValue.children().children('.query-property').find('option:selected').prop('selected', false);
-        Omeka.handleQueryTextInput(newValue.find('.query-type'));
-        if (hasChosenSelect) {
-            if (isSidebar) {
-                newValue.children().children('select.chosen-select').chosen(chosenOptionsSidebar);
-            }
-            newValue.children().children('select.chosen-select').trigger('chosen:updated');
-        }
-        --Omeka.propertySearchIndex;
-        newValue.find(':input').attr('name', function () {
-            return this.name.replace(/\[\d\]/, '[' + Omeka.propertySearchIndex + ']');
-        });
-        ++Omeka.propertySearchIndex;
-    });
-
-    /**
      * Copy of resource-selector for sidebar (not loaded in search form).
      *
      * @see application/asset/js/resource-selector.js
@@ -368,11 +331,10 @@ $(document).ready(function() {
     });
 
     /**
-     * Clean the query before submitting the form.
+     * Handle the query type for filters (extended types: resq, exs, dup*, etc.).
+     * Replaces the core handler which only knows basic types (eq, in, ex, dt…).
      *
-     * Skip core functions, since they are improved above.
-     *
-     * @see application/asset/js//advanced-search.js
+     * @see application/asset/js/advanced-search.js
      * @see application/asset/js/global.js
      * @see application/asset/js/query-form.js
      */
@@ -381,14 +343,14 @@ $(document).ready(function() {
          Omeka.handleQueryTextInput($(this));
     });
 
-    $(document).off('submit', '#advanced-search');
+    // The core submit handler (Omeka.cleanSearchQuery) handles properties.
+    // Append the module handler for filters and extras.
     $(document).on('submit', '#advanced-search', function(e) {
         Omeka.cleanFormSearchQuery($(this));
     });
 
     /**
-     * Handle preparation of the advanced search form for filter and property
-     * part on load.
+     * Handle preparation of the advanced search form for filter part on load.
      */
     $('.query-type').each(function() {
         Omeka.handleQueryTextInput($(this));

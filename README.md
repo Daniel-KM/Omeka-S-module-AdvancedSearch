@@ -582,6 +582,7 @@ TODO
 - [x] Manage pagination when item set is redirected to search.
 - [ ] Reorder items in items set (from module Next, see MvcListeners).
 - [x] Integrate the override in a way a direct call to adapter->buildQuery() can work with advanced property search (see Reference and some other modules).
+- [ ] Add an option to expand/collapse tree facets (ItemSetsTree, Thesaurus) by default, with a threshold on the number of items.
 - [ ] Rename search config "name" by "title" or "label".
 - [ ] Add hidden query to site settings.
 - [ ] DateRange field (_dr) may not appear in the type of index in mapping.

@@ -99,31 +99,30 @@ trait TraitCommonSettings
             : [];
         $labels = SearchResources::FIELD_QUERY['labels'];
         $groups = SearchResources::FIELD_QUERY['groups'];
-        $typeGroup = [];
-        foreach ($groups as $group => $types) {
-            foreach ($types as $type) {
-                $typeGroup[$type] = $group;
-            }
-        }
+
+        // Build optgroup format handled by TraitGroupedMultiOptions.
         $options = [];
-        $openedGroup = null;
-        foreach ($labels as $value => $label) {
-            $option = [
-                'value' => $value,
-                'label' => $label,
-            ];
-            if (isset($disabled[$value])) {
-                $option['disabled'] = true;
-            }
-            $group = $typeGroup[$value] ?? null;
-            if ($group && $group !== $openedGroup) {
-                $option['label_attributes'] = [
-                    'class' => 'filter-type-group-start',
-                    'data-group-label' => $group,
+        foreach ($groups as $group => $types) {
+            $groupOptions = [];
+            foreach ($types as $type) {
+                if (!isset($labels[$type])) {
+                    continue;
+                }
+                $option = [
+                    'value' => $type,
+                    'label' => $labels[$type],
                 ];
-                $openedGroup = $group;
+                if (isset($disabled[$type])) {
+                    $option['disabled'] = true;
+                }
+                $groupOptions[$type] = $option;
             }
-            $options[] = $option;
+            if ($groupOptions) {
+                $options[$group] = [
+                    'label' => $group,
+                    'options' => $groupOptions,
+                ];
+            }
         }
         return $options;
     }

@@ -90,20 +90,20 @@ class Module extends AbstractModule
     protected function preInstall(): void
     {
         $services = $this->getServiceLocator();
-        $translate = $services->get('ControllerPluginManager')->get('translate');
+        $translator = $services->get('MvcTranslator');
 
         $errors = [];
 
         if (PHP_VERSION_ID < 80100) {
             $errors[] = (string) new \Omeka\Stdlib\Message(
-                $translate('The module %1$s requires PHP %2$s or later.'), // @translate
+                $translator->translate('The module %1$s requires PHP %2$s or later.'), // @translate
                 'AdvancedSearch', '8.1'
             );
         }
 
         if (!method_exists($this, 'checkModuleActiveVersion') || !$this->checkModuleActiveVersion('Common', '3.4.82')) {
             $errors[] = (string) new \Omeka\Stdlib\Message(
-                $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
+                $translator->translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
                 'Common', '3.4.82'
             );
         }

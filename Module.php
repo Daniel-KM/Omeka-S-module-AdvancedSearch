@@ -1126,7 +1126,7 @@ class Module extends AbstractModule
         $jobArgs['force'] = true;
         try {
             $jobDispatcher->dispatch(\AdvancedSearch\Job\IndexSearch::class, $jobArgs, $strategy);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $logger->err(
                 'Unable to launch indexing metadata: {message}', // @translate
                 ['message' => $e->getMessage()]
@@ -1231,7 +1231,7 @@ class Module extends AbstractModule
         $indexer = $searchEngine->indexer();
         try {
             $indexer->deleteResource($resourceType, $id);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $services = $this->getServiceLocator();
             $logger = $services->get('Omeka\Logger');
             $logger->err(
@@ -1262,7 +1262,7 @@ class Module extends AbstractModule
         $indexer = $searchEngine->indexer();
         try {
             $indexer->indexResource($resource);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $services = $this->getServiceLocator();
             $logger = $services->get('Omeka\Logger');
             $logger->err(
@@ -1398,7 +1398,7 @@ class Module extends AbstractModule
         $dispatcher = $services->get(\Omeka\Job\Dispatcher::class);
         try {
             $dispatcher->dispatch(\AdvancedSearch\Job\IndexSearch::class, $jobArgs);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $logger->err(
                 'AdvancedSearch cron: unable to launch reindexation: {message}', // @translate
                 ['message' => $e->getMessage()]
@@ -1448,7 +1448,7 @@ class Module extends AbstractModule
         try {
             /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
             $searchConfig = $plugins->get('api')->read('search_configs', [is_numeric($searchConfig) ? 'id' : 'slug' => $searchConfig])->getContent();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return;
         }
 
@@ -1525,7 +1525,7 @@ class Module extends AbstractModule
             if ($defaultSite) {
                 try {
                     $site = $api->read('sites', ['id' => $defaultSite])->getContent();
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                 }
             }
         }
@@ -1538,14 +1538,14 @@ class Module extends AbstractModule
         if ($searchConfigId) {
             try {
                 $searchConfig = $api->read('search_configs', [is_numeric($searchConfigId) ? 'id' : 'slug' => $searchConfigId])->getContent();
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
             }
         }
         if (!$searchConfig) {
             try {
                 $searchConfig = $api->search('search_configs', ['limit' => 1])->getContent();
                 $searchConfig = reset($searchConfig);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
             }
         }
         if (!$searchConfig) {

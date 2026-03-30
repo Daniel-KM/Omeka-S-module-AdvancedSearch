@@ -145,7 +145,7 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
                     ->setFieldsQueryArgs($fieldQueryArgs)
                     ->setOption('remove_diacritics', (bool) $searchConfig->subSetting('q', 'remove_diacritics', false))
                     ->setOption('default_search_partial_word', (bool) $searchConfig->subSetting('q', 'default_search_partial_word', false));
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 // No aliases.
             }
         }

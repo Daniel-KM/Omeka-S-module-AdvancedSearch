@@ -397,29 +397,29 @@ if (version_compare($oldVersion, '3.4.14', '<')) {
     /** @see https://github.com/omeka/omeka-s/pull/2096 */
     try {
         $connection->executeStatement('ALTER TABLE `resource` ADD INDEX `idx_public_type_id_title` (`is_public`,`resource_type`,`id`,`title` (190));');
-    } catch (\Exception $e) {
+    } catch (\Throwable $e) {
         // Index exists.
     }
     try {
         $connection->executeStatement('ALTER TABLE `value` ADD INDEX `idx_public_resource_property` (`is_public`,`resource_id`,`property_id`);');
-    } catch (\Exception $e) {
+    } catch (\Throwable $e) {
         // Index exists.
     }
 
     /** @see https://github.com/omeka/omeka-s/pull/2105 */
     try {
         $connection->executeStatement('ALTER TABLE `resource` ADD INDEX `is_public` (`is_public`);');
-    } catch (\Exception $e) {
+    } catch (\Throwable $e) {
         // Index exists.
     }
     try {
         $connection->executeStatement('ALTER TABLE `value` ADD INDEX `is_public` (`is_public`);');
-    } catch (\Exception $e) {
+    } catch (\Throwable $e) {
         // Index exists.
     }
     try {
         $connection->executeStatement('ALTER TABLE `site_page` ADD INDEX `is_public` (`is_public`);');
-    } catch (\Exception $e) {
+    } catch (\Throwable $e) {
         // Index exists.
     }
 
@@ -780,7 +780,7 @@ $sql = <<<'SQL'
         SQL;
 try {
     $connection->executeStatement($sql);
-} catch (\Exception $e) {
+} catch (\Throwable $e) {
     // Already done.
 }
 
@@ -1147,7 +1147,7 @@ if (version_compare($oldVersion, '3.4.28', '<')) {
         SQL;
     try {
         $connection->executeStatement($sql);
-    } catch (\Exception $e) {
+    } catch (\Throwable $e) {
         // Already done.
     }
 
@@ -2256,7 +2256,7 @@ if (version_compare($oldVersion, '3.4.57', '<')) {
     foreach (array_filter(explode(";\n", $sqls)) as $sql) {
         try {
             $connection->executeStatement($sql);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Table may already exist.
         }
     }
@@ -2272,7 +2272,7 @@ if (version_compare($oldVersion, '3.4.57', '<')) {
         SQL;
     try {
         $connection->executeStatement($sql);
-    } catch (\Exception $e) {
+    } catch (\Throwable $e) {
         // Ignore if no data or already migrated.
     }
 
@@ -2286,7 +2286,7 @@ if (version_compare($oldVersion, '3.4.57', '<')) {
     foreach (array_filter(explode(";\n", $sqls)) as $sql) {
         try {
             $connection->executeStatement($sql);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Column may not exist or already removed.
         }
     }
@@ -2893,7 +2893,7 @@ if (version_compare($oldVersion, '3.4.59', '<')) {
                 . " WHERE `$column` LIKE '%query%'";
             $rows = $connection->executeQuery($sql)
                 ->fetchAllKeyValue();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             continue;
         }
         foreach ($rows as $rowId => $rowJson) {
@@ -2959,7 +2959,7 @@ if (version_compare($oldVersion, '3.4.59', '<')) {
                 . " AND `$queryCol` != ''";
             $rows = $connection->executeQuery($sql)
                 ->fetchAllKeyValue();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             continue;
         }
         foreach ($rows as $rowId => $queryString) {
@@ -3010,7 +3010,7 @@ if (version_compare($oldVersion, '3.4.59', '<')) {
                 ++$normalizedCount;
             }
         }
-    } catch (\Exception $e) {
+    } catch (\Throwable $e) {
         // Table does not exist.
     }
 

@@ -3692,7 +3692,7 @@ class SearchResources
         // zone than the method getDateTimeFromValue().
         try {
             return (new DateTime((string) $value))->format('Y-m-d H:i:s');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return null;
         }
     }

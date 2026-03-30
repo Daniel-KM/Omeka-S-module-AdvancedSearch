@@ -247,7 +247,7 @@ class InternalQuerier extends AbstractQuerier
 
         try {
             $results = $connection->executeQuery($sql, $bind, $types)->fetchAllAssociative();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->err($e->getMessage());
             return $this->response
                 ->setMessage('An internal issue in database occurred.'); // @translate
@@ -425,7 +425,7 @@ class InternalQuerier extends AbstractQuerier
             $this->logger->err($e->getMessage());
             return $this->response
                 ->setMessage('An internal issue in database occurred.'); // @translate
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->logger->err($e->getMessage());
             return $this->response
                 ->setMessage('An internal issue occurred.'); // @translate

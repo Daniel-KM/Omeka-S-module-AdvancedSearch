@@ -241,7 +241,7 @@ class SearchSuggesterController extends AbstractActionController
             }
             try {
                 $suggesterId = (int) $this->api()->read('search_suggesters', ['name' => $name])->getContent()->id();
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $suggesterId = null;
             }
             if ($id !== $suggesterId) {

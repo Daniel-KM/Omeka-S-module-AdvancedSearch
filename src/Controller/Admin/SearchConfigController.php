@@ -356,7 +356,7 @@ class SearchConfigController extends AbstractActionController
             }
             try {
                 $searchConfigId = (int) $this->api()->read('search_configs', ['slug' => $slug])->getContent()->id();
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $searchConfigId = null;
             }
             if ($id !== $searchConfigId) {

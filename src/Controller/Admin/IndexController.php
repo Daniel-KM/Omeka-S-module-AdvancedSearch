@@ -115,7 +115,7 @@ class IndexController extends AbstractActionController
             try {
                 $jobRepresentations[$jobId] = $api
                     ->read('jobs', $jobId)->getContent();
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 // Job may have completed between query and read.
             }
         }

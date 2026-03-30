@@ -130,7 +130,7 @@ class FulltextSearchDelegator extends FulltextSearch
         try {
             $xmlContent = file_get_contents($filepath);
             $xml = @simplexml_load_string($xmlContent, null, LIBXML_NONET);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // No log.
             return '';
         }

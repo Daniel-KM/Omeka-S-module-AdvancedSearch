@@ -421,7 +421,7 @@ class IndexSearch extends AbstractJob
                             ->getRepresentation($entity),
                         $entities
                     );
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     $this->logger->err(
                         'Error loading batch #{number} of {resource_type}: {message}. Skipping.', // @translate
                         [
@@ -450,7 +450,7 @@ class IndexSearch extends AbstractJob
                     try {
                         $indexer->indexResources($resources);
                         $totals[$resourceType] += count($resources);
-                    } catch (\Exception $e) {
+                    } catch (\Throwable $e) {
                         $this->logger->err(
                             'Error indexing batch #{number} of {resource_type}: {message}', // @translate
                             [
@@ -497,7 +497,7 @@ class IndexSearch extends AbstractJob
             if (method_exists($indexer, 'commit')) {
                 try {
                     $indexer->commit();
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     $this->logger->warn(
                         'Final commit failed for {resource_type}: {message}', // @translate
                         ['resource_type' => $resourceType, 'message' => $e->getMessage()]

@@ -261,7 +261,7 @@ class AbstractFacet extends AbstractHelper
                 try {
                     // Resources cannot be searched, only read.
                     $resource = $this->api->read('resources', $data)->getContent();
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                 }
                 return $resource
                     ? (string) $resource->displayTitle(null, $this->siteLocales)
@@ -279,7 +279,7 @@ class AbstractFacet extends AbstractHelper
                 if (is_numeric($value)) {
                     try {
                         return $this->api->read('users', ['id' => $value])->getContent()->name();
-                    } catch (\Exception $e) {
+                    } catch (\Throwable $e) {
                         return null;
                     }
                 }
@@ -295,7 +295,7 @@ class AbstractFacet extends AbstractHelper
                 // Manage the case where a resource was indexed but removed.
                 try {
                     return $this->api->read('sites', [is_numeric($value) ? 'id' : 'slug' => $value])->getContent()->title();
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     return null;
                 }
 
@@ -311,7 +311,7 @@ class AbstractFacet extends AbstractHelper
                 if (is_numeric($value)) {
                     try {
                         $resource = $this->api->read('resource_classes', ['id' => $value])->getContent();
-                    } catch (\Exception $e) {
+                    } catch (\Throwable $e) {
                         return null;
                     }
                 } elseif (!strpos($value, ':')) {
@@ -320,7 +320,7 @@ class AbstractFacet extends AbstractHelper
                     try {
                         $vocabularyId = $this->api->read('vocabularies', ['prefix' => strtok($value, ':')])->getContent()->id();
                         $resource = $this->api->read('resource_classes', ['vocabulary' => $vocabularyId, 'localName' => strtok(':')])->getContent();
-                    } catch (\Exception $e) {
+                    } catch (\Throwable $e) {
                         return null;
                     }
                 }
@@ -338,13 +338,13 @@ class AbstractFacet extends AbstractHelper
                     try {
                         /** @var \Omeka\Api\Representation\ResourceTemplateRepresentation $resource */
                         $resource = $this->api->read('resource_templates', ['id' => $value])->getContent();
-                    } catch (\Exception $e) {
+                    } catch (\Throwable $e) {
                         return null;
                     }
                 } else {
                     try {
                         $resource = $this->api->read('resource_templates', ['label' => $value])->getContent();
-                    } catch (\Exception $e) {
+                    } catch (\Throwable $e) {
                         return null;
                     }
                 }
@@ -387,7 +387,7 @@ class AbstractFacet extends AbstractHelper
                     /** @var \Omeka\Api\Representation\ItemSetRepresentation $resource */
                     try {
                         $resource = $this->api->read('item_sets', $data)->getContent();
-                    } catch (\Exception $e) {
+                    } catch (\Throwable $e) {
                         return null;
                     }
                 }

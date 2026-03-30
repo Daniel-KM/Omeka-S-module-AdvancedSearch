@@ -88,7 +88,7 @@ class MvcListeners extends AbstractListenerAggregate
                 try {
                     $site = $api->read('sites', ['slug' => $siteSlug], [], ['responseContent' => 'resource', 'initialize' => false, 'finalize' => false])->getContent();
                     $api->read('site_pages', ['site' => $site->getId(), 'slug' => $redirectTo], [], ['responseContent' => 'resource', 'initialize' => false, 'finalize' => false]);
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     return;
                 }
 
@@ -118,7 +118,7 @@ class MvcListeners extends AbstractListenerAggregate
                 try {
                     $searchConfig = $api->read('search_configs', ['id' => $searchConfigId], [], ['responseContent' => 'resource'])->getContent();
                     $searchConfigSlug = $searchConfig->getSlug();
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     return;
                 }
 
@@ -196,7 +196,7 @@ class MvcListeners extends AbstractListenerAggregate
             try {
                 $site = $api->read('sites', ['slug' => $siteSlug], [], ['responseContent' => 'resource', 'initialize' => false, 'finalize' => false])->getContent();
                 $api->read('site_pages', ['site' => $site->getId(), 'slug' => $redirectTo], [], ['responseContent' => 'resource', 'initialize' => false, 'finalize' => false]);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 return;
             }
             $params = [
@@ -231,7 +231,7 @@ class MvcListeners extends AbstractListenerAggregate
         try {
             $searchConfig = $api->read('search_configs', ['id' => $searchConfigId], [], ['responseContent' => 'resource'])->getContent();
             $searchConfigSlug = $searchConfig->getSlug();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return;
         }
 

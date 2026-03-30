@@ -93,10 +93,10 @@ trait TraitCommonSettings
 
     protected function filterTypeOptions(): array
     {
-        $disabled = [
-            'resq' => true,
-            'nresq' => true,
-        ];
+        $isSiteSettings = $this instanceof SiteSettingsFieldset;
+        $disabled = $isSiteSettings
+            ? ['resq' => true, 'nresq' => true]
+            : [];
         $labels = SearchResources::FIELD_QUERY['labels'];
         $groups = SearchResources::FIELD_QUERY['groups'];
         $typeGroup = [];

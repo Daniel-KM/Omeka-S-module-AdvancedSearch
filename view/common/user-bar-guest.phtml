@@ -11,6 +11,7 @@ $plugins = $this->getHelperPluginManager();
 $translate = $plugins->get('translate');
 $hyperlink = $plugins->get('hyperlink');
 $urlHelper = $plugins->get('url');
+$basePath = $plugins->get('basePath');
 
 $isGuest = !$this->userIsAllowed('Omeka\Controller\Admin\Index', 'index');
 $hasGuest = $plugins->has('GuestWidget');
@@ -40,15 +41,17 @@ $this->headLink()
             ?>
         </span>
         <?php
-        $url = $hasGuest ? $urlHelper('site/guest/guest', ['site-slug' => $site->slug(), 'action' => 'logout'], ['query' => $this->params()->fromQuery() ?: []], true) : $urlHelper('logout');
+        $logoutQuery = $this->params()->fromQuery() ?: [];
+        $url = $hasGuest ? $basePath() . '/s/' . $site->slug() . '/guest/logout' . ($logoutQuery ? '?' . http_build_query($logoutQuery) : '') : $urlHelper('logout');
         echo $hyperlink($translate('Logout', null, $userLocale), $url, ['class' => 'logout']);
         ?>
     </div>
 <?php else: ?>
     <span class="login">
         <?php
+        $loginQuery = $this->params()->fromQuery() ?: [];
         $url = $hasGuest
-            ? $urlHelper('site/guest/anonymous', ['site-slug' => $site->slug(), 'action' => 'login'], ['query' => $this->params()->fromQuery() ?: []], true)
+            ? $basePath() . '/s/' . $site->slug() . '/guest/login' . ($loginQuery ? '?' . http_build_query($loginQuery) : '')
             : $urlHelper('login');
         echo $hyperlink($translate('Log in'), $url, ['class' => 'login']);
         ?>

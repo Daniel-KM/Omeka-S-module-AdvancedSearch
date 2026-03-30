@@ -21,19 +21,13 @@
         border: 0;
         float: left;
         margin: 0;
-        border-radius: 0;
+        border-radius: 0 3px 3px 0;
         position: relative;
         height: 36px;
         box-shadow: none;
     }
-    #search-form-quick button:last-of-type {
-        border-left: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 0 3px 3px 0;
-    }
-    #search-form-quick button:last-of-type:after {
-        content: "";
-    }
     #search-form-quick button:after {
+        content: "\f002";
         font-family: "Font Awesome 5 Free";
         font-weight: 900;
         text-indent: 0;
@@ -49,5 +43,28 @@
 
     input[type=submit][disabled] {
         cursor: unset;
+    }
+}
+
+@media screen and (max-width: 640px) {
+    header.admin-board {
+        width: 100%;
+        min-height: 0;
+        padding: 0;
+    }
+    #search-form-quick {
+        position: fixed;
+        top: -9999px;
+        left: -9999px;
+        z-index: 1000;
+    }
+    #search.active + #search-form-quick {
+        top: 36px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #fff;
+        margin: 0;
+        padding: 48px 4%;
     }
 }

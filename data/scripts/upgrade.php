@@ -2312,8 +2312,8 @@ if (version_compare($oldVersion, '3.4.58', '<')) {
     // upgraded from before 3.4.31 without explicit filters.
     $sql = 'SELECT `id`, `settings` FROM `search_config`';
     $searchConfigs = $connection->executeQuery($sql)->fetchAllKeyValue();
-    foreach ($searchConfigs as $id => $settings) {
-        $searchConfigSettings = json_decode($settings, true) ?: [];
+    foreach ($searchConfigs as $id => $searchConfigJson) {
+        $searchConfigSettings = json_decode($searchConfigJson, true) ?: [];
         $filters = $searchConfigSettings['form']['filters'] ?? [];
         // Only fix configs with empty filters but existing aliases.
         if (empty($filters) && !empty($searchConfigSettings['index']['aliases'])) {
@@ -2888,18 +2888,14 @@ if (version_compare($oldVersion, '3.4.59', '<')) {
         'bulk_exporter' => 'config',
     ];
     foreach ($bulkTables as $table => $column) {
-        // Check if table exists.
         try {
-            $connection->executeQuery(
-                "SELECT 1 FROM `$table` LIMIT 1"
-            );
+            $sql = "SELECT `id`, `$column` FROM `$table`"
+                . " WHERE `$column` LIKE '%query%'";
+            $rows = $connection->executeQuery($sql)
+                ->fetchAllKeyValue();
         } catch (\Exception $e) {
             continue;
         }
-        $sql = "SELECT `id`, `$column` FROM `$table`"
-            . " WHERE `$column` LIKE '%query%'";
-        $rows = $connection->executeQuery($sql)
-            ->fetchAllKeyValue();
         foreach ($rows as $rowId => $rowJson) {
             $rowData = json_decode($rowJson, true);
             if (!is_array($rowData)) {
@@ -2958,17 +2954,14 @@ if (version_compare($oldVersion, '3.4.59', '<')) {
     ];
     foreach ($moduleTables as [$table, $idCol, $queryCol]) {
         try {
-            $connection->executeQuery(
-                "SELECT 1 FROM `$table` LIMIT 1"
-            );
+            $sql = "SELECT `$idCol`, `$queryCol` FROM `$table`"
+                . " WHERE `$queryCol` IS NOT NULL"
+                . " AND `$queryCol` != ''";
+            $rows = $connection->executeQuery($sql)
+                ->fetchAllKeyValue();
         } catch (\Exception $e) {
             continue;
         }
-        $sql = "SELECT `$idCol`, `$queryCol` FROM `$table`"
-            . " WHERE `$queryCol` IS NOT NULL"
-            . " AND `$queryCol` != ''";
-        $rows = $connection->executeQuery($sql)
-            ->fetchAllKeyValue();
         foreach ($rows as $rowId => $queryString) {
             $normalized = $normalizeQueryString($queryString);
             if ($normalized !== null) {

@@ -159,7 +159,7 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
             'suggester' => $this->resource->getId(),
             'mode_index' => $suggesterSettings['mode_index'] ?? 'start',
             'mode_search' => $suggesterSettings['mode_search'] ?? 'start',
-            'length' => $suggesterSettings['length'] ?? 50,
+            'length' => $suggesterSettings['length'] ?? 20,
         ];
 
         // Add Solr-specific options if configured.

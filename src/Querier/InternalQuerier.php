@@ -284,7 +284,7 @@ class InternalQuerier extends AbstractQuerier
         $bind = [
             'limit' => $this->query->getLimit(),
             'value_length' => mb_strlen($q),
-            'length' => (int) ($this->query->getSuggestOptions()['length'] ?: 50),
+            'length' => (int) ($this->query->getSuggestOptions()['length'] ?: 20),
         ];
         $types = [
             'limit' => \PDO::PARAM_INT,

@@ -191,7 +191,7 @@ class SearchSuggesterForm extends Form
                 'attributes' => [
                     'id' => 'length',
                     'required' => false,
-                    'value' => '50',
+                    'value' => '20',
                     'min' => '1',
                     'max' => '190',
                 ],

@@ -52,6 +52,22 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                     'data-placeholder' => 'Set field or index…', // @translate
                 ],
             ])
+            ->add([
+                'name' => 'field_end',
+                'type' => Element\Select::class,
+                'options' => [
+                    'label' => 'Field (interval end)', // @translate
+                    'info' => 'For Range/RangeDouble filters on uncertain dates: when set, "Field" is used as the interval start and this field as the interval end. Search matches resources whose [start, end] overlaps the queried [from, to].', // @translate
+                    'value_options' => $availableFields,
+                    'empty_option' => '',
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_field_end',
+                    'required' => false,
+                    'class' => 'chosen-select',
+                    'data-placeholder' => 'Set interval end field…', // @translate
+                ],
+            ])
 
             ->add([
                 'name' => 'label',
@@ -352,6 +368,9 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
     {
         return [
             'field' => [
+                'required' => false,
+            ],
+            'field_end' => [
                 'required' => false,
             ],
             'type' => [

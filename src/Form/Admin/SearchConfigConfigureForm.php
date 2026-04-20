@@ -1507,11 +1507,11 @@ class SearchConfigConfigureForm extends Form
         $scaleTypes = ['RangeDouble'];
 
         $checks = [
-            ['form', 'filters', $scaleTypes],
-            ['facet', 'facets', $scaleTypes],
+            ['form', 'filters', $scaleTypes, ['Range', 'RangeDouble']],
+            ['facet', 'facets', $scaleTypes, ['RangeDouble']],
         ];
 
-        foreach ($checks as [$top, $sub, $allowedTypes]) {
+        foreach ($checks as [$top, $sub, $allowedTypes, $intervalTypes]) {
             if (empty($data[$top][$sub]) || !is_array($data[$top][$sub])) {
                 continue;
             }
@@ -1519,10 +1519,31 @@ class SearchConfigConfigureForm extends Form
                 if (!is_array($item)) {
                     continue;
                 }
+                $type = $item['type'] ?? '';
+                $fieldEnd = trim((string) ($item['field_end'] ?? ''));
+                if ($fieldEnd !== '') {
+                    if (!in_array($type, $intervalTypes, true)) {
+                        $valid = false;
+                        $this->setMessages([
+                            $top => [$sub => [$name => ['field_end' => [
+                                sprintf(
+                                    'Interval end field is only available for types %s.', // @translate
+                                    implode(', ', $intervalTypes)
+                                ),
+                            ]]]],
+                        ]);
+                    } elseif (trim((string) ($item['field'] ?? '')) === '') {
+                        $valid = false;
+                        $this->setMessages([
+                            $top => [$sub => [$name => ['field_end' => [
+                                'Interval end field requires a start field ("Field").', // @translate
+                            ]]]],
+                        ]);
+                    }
+                }
                 if (($item['scale_mode'] ?? 'linear') !== 'piecewise') {
                     continue;
                 }
-                $type = $item['type'] ?? '';
                 if (!in_array($type, $allowedTypes, true)) {
                     $valid = false;
                     $this->setMessages([

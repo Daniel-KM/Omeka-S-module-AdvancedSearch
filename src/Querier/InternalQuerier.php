@@ -976,24 +976,49 @@ class InternalQuerier extends AbstractQuerier
                 if (!$field) {
                     break;
                 }
+                $fieldEnd = !empty($fieldData['field_end'])
+                    ? $this->fieldToIndex($fieldData['field_end'])
+                    : null;
                 $firstKey = key($values);
                 // Check for a facet range.
                 if (count($values) <= 2 && ($firstKey === 'from' || $firstKey === 'to')) {
-                    if (isset($values['from']) && $values['from'] !== '') {
-                        $this->args['filter'][] = [
-                            'join' => 'and',
-                            'field' => $field,
-                            'type' => '≥',
-                            'val' => $values['from'],
-                        ];
-                    }
-                    if (isset($values['to']) && $values['to'] !== '') {
-                        $this->args['filter'][] = [
-                            'join' => 'and',
-                            'field' => $field,
-                            'type' => '≤',
-                            'val' => $values['to'],
-                        ];
+                    if ($fieldEnd) {
+                        // Interval overlap on uncertain dates: match resources
+                        // whose [start, end] intersects the queried [from, to],
+                        // i.e. start ≤ to AND end ≥ from.
+                        if (isset($values['to']) && $values['to'] !== '') {
+                            $this->args['filter'][] = [
+                                'join' => 'and',
+                                'field' => $field,
+                                'type' => '≤',
+                                'val' => $values['to'],
+                            ];
+                        }
+                        if (isset($values['from']) && $values['from'] !== '') {
+                            $this->args['filter'][] = [
+                                'join' => 'and',
+                                'field' => $fieldEnd,
+                                'type' => '≥',
+                                'val' => $values['from'],
+                            ];
+                        }
+                    } else {
+                        if (isset($values['from']) && $values['from'] !== '') {
+                            $this->args['filter'][] = [
+                                'join' => 'and',
+                                'field' => $field,
+                                'type' => '≥',
+                                'val' => $values['from'],
+                            ];
+                        }
+                        if (isset($values['to']) && $values['to'] !== '') {
+                            $this->args['filter'][] = [
+                                'join' => 'and',
+                                'field' => $field,
+                                'type' => '≤',
+                                'val' => $values['to'],
+                            ];
+                        }
                     }
                 } else {
                     // Check if first_digits is enabled for this facet.
@@ -1186,6 +1211,7 @@ class InternalQuerier extends AbstractQuerier
     protected function filterQueryRanges(array $dateRangeFilters): void
     {
         foreach ($dateRangeFilters as $fieldName => $filterValues) {
+            $fieldEnd = null;
             if ($fieldName === 'created' || $fieldName === 'modified') {
                 $argName = 'datetime';
                 $field = $fieldName;
@@ -1195,6 +1221,12 @@ class InternalQuerier extends AbstractQuerier
                     continue;
                 }
                 $argName = 'filter';
+                $formFilterData = $this->query
+                    ? $this->query->getFormFilter($fieldName)
+                    : null;
+                if ($formFilterData && !empty($formFilterData['field_end'])) {
+                    $fieldEnd = $this->fieldToIndex($formFilterData['field_end']);
+                }
             }
 
             // EDTF datatype: route to edtf[] args supported by module
@@ -1223,6 +1255,27 @@ class InternalQuerier extends AbstractQuerier
             foreach ($filterValues as $filterValue) {
                 // Skip simple and query filters (for hidden queries).
                 if (!is_array($filterValue)) {
+                    continue;
+                }
+                if ($fieldEnd) {
+                    // Interval overlap on uncertain dates: start ≤ to AND end ≥
+                    // from.
+                    if (isset($filterValue['to']) && strlen($filterValue['to'])) {
+                        $this->args[$argName][] = [
+                            'join' => 'and',
+                            'field' => $field,
+                            'type' => '≤',
+                            'val' => $filterValue['to'],
+                        ];
+                    }
+                    if (isset($filterValue['from']) && strlen($filterValue['from'])) {
+                        $this->args[$argName][] = [
+                            'join' => 'and',
+                            'field' => $fieldEnd,
+                            'type' => '≥',
+                            'val' => $filterValue['from'],
+                        ];
+                    }
                     continue;
                 }
                 if (isset($filterValue['from']) && strlen($filterValue['from'])) {

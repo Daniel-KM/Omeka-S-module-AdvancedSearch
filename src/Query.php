@@ -597,10 +597,22 @@ class Query implements JsonSerializable
 
     /**
      * Get configuration for a form filter.
+     *
+     * Looks up by filter key first, then falls back to a search by "field"
+     * value, since URL parameters are keyed by field name and may differ from
+     * the filter key declared in the search config.
      */
     public function getFormFilter(string $filterName): ?array
     {
-        return $this->formFilters[$filterName] ?? null;
+        if (isset($this->formFilters[$filterName])) {
+            return $this->formFilters[$filterName];
+        }
+        foreach ($this->formFilters as $filter) {
+            if (is_array($filter) && ($filter['field'] ?? null) === $filterName) {
+                return $filter;
+            }
+        }
+        return null;
     }
 
     public function setActiveFacets(array $activeFacets): self

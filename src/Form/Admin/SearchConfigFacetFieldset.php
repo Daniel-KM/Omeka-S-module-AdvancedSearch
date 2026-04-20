@@ -39,6 +39,22 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
             ])
             ->add([
+                'name' => 'field_end',
+                'type' => Element\Select::class,
+                'options' => [
+                    'label' => 'Field (interval end)', // @translate
+                    'info' => 'For RangeDouble facets on uncertain dates: when set, "Field" is used as the interval start and this field as the interval end. Search matches resources whose [start, end] overlaps the queried [from, to].', // @translate
+                    'value_options' => $availableFacetFields,
+                    'empty_option' => '',
+                ],
+                'attributes' => [
+                    'id' => 'form_facet_field_end',
+                    'required' => false,
+                    'class' => 'chosen-select',
+                    'data-placeholder' => 'Set interval end field…', // @translate
+                ],
+            ])
+            ->add([
                 'name' => 'label',
                 'type' => Element\Text::class,
                 'options' => [
@@ -379,6 +395,9 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
     {
         return [
             'field' => [
+                'required' => false,
+            ],
+            'field_end' => [
                 'required' => false,
             ],
             'language_site' => [

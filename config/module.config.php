@@ -123,6 +123,7 @@ return [
             'searchingValue' => View\Helper\SearchingValue::class,
             'searchPaginationPerPageSelector' => View\Helper\SearchPaginationPerPageSelector::class,
             'searchSortSelector' => View\Helper\SearchSortSelector::class,
+            'storeResourceNav' => View\Helper\StoreResourceNav::class,
         ],
         'factories' => [
             'apiSearch' => Service\ViewHelper\ApiSearchFactory::class,
@@ -515,6 +516,7 @@ return [
                 'selection',
             ],
             'advancedsearch_resource_nav_limit' => 25,
+            'advancedsearch_nav_resource_fallback_item_set' => '',
             // Hidden options.
             // This option is a merge of the previous ones for simplicity.
             'advancedsearch_item_sets_redirects' => [],

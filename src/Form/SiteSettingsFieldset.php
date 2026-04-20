@@ -260,6 +260,25 @@ class SiteSettingsFieldset extends Fieldset
                     'value' => '25',
                 ],
             ])
+            ->add([
+                'name' => 'advancedsearch_nav_resource_fallback_item_set',
+                'type' => CommonElement\OptionalPropertySelect::class,
+                'options' => [
+                    'element_group' => 'advanced_search',
+                    'label' => 'Block Resource navigation: fall back to an item set on direct access', // @translate
+                    'info' => 'When no browse context exists (no URL param, no session), show a navigation within an item set of the item. "First" picks the first item set; a property sorts the item sets by that property value and picks the first with a non-empty value.', // @translate
+                    'empty_option' => 'Disabled', // @translate
+                    'prepend_value_options' => [
+                        'first' => 'First item set', // @translate
+                    ],
+                    'term_as_value' => true,
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearch_nav_resource_fallback_item_set',
+                    'class' => 'chosen-select',
+                    'data-placeholder' => 'Select a fallback…', // @translate
+                ],
+            ])
 
             // Specific to sites.
             ->add([

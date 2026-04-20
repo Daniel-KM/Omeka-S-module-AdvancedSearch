@@ -82,6 +82,21 @@ class ResourceNav implements ResourcePageBlockLayoutInterface
             }
         }
 
+        // When the session/URL context is missing or does not contain the
+        // current item, optionally fall back to an item set of the item.
+        // This covers direct access to an item (bookmark, shared URL
+        // without param). Behavior is driven by a site setting which is
+        // either empty (disabled), the string "first" (first item set) or
+        // a property term used to sort the item sets.
+        $fallbackMode = $siteSetting('advancedsearch_nav_resource_fallback_item_set', '');
+        $fallbackMode = is_scalar($fallbackMode) ? (string) $fallbackMode : '';
+        if ($fallbackMode !== ''
+            && in_array('collection', $enabledTypes, true)
+            && $this->shouldFallback($data, (int) $resource->id())
+        ) {
+            $data = $this->contextFromFallbackItemSet($view, $site, $limit, $resource, $fallbackMode);
+        }
+
         if (!$data || empty($data['ids'])) {
             return '';
         }
@@ -137,6 +152,9 @@ class ResourceNav implements ResourcePageBlockLayoutInterface
             'next' => $next,
             'prevUrl' => $prevUrl,
             'nextUrl' => $nextUrl,
+            'showLabel' => !empty($data['show_label']),
+            'itemSetId' => isset($data['item_set_id']) ? (int) $data['item_set_id'] : null,
+            'selectionId' => isset($data['selection_id']) ? (int) $data['selection_id'] : null,
             'itemSet' => $data['item_set'] ?? null,
             'selection' => $data['selection'] ?? null,
         ]);
@@ -149,6 +167,97 @@ class ResourceNav implements ResourcePageBlockLayoutInterface
             return $url;
         }
         return $url . (strpos($url, '?') === false ? '?' : '&') . http_build_query($queryParams);
+    }
+
+    /**
+     * True when no usable context is known or when the current item is not
+     * part of the known context (so fallback is appropriate).
+     */
+    protected function shouldFallback(?array $data, int $itemId): bool
+    {
+        if (!$data || empty($data['ids'])) {
+            return true;
+        }
+        return !in_array($itemId, array_map('intval', $data['ids']), true);
+    }
+
+    /**
+     * Build a "collection" context by picking one of the item's item sets,
+     * according to the fallback mode:
+     * - "first": first item set returned by the item
+     * - a property term (ex: "dcterms:title"): sort item sets by the value of
+     *   this property (ascending, case-insensitive) and pick the first with
+     *   a non-empty value; return null if none has a value.
+     */
+    protected function contextFromFallbackItemSet(
+        PhpRenderer $view,
+        \Omeka\Api\Representation\SiteRepresentation $site,
+        int $limit,
+        ItemRepresentation $item,
+        string $mode
+    ): ?array {
+        $itemSets = $item->itemSets();
+        if (!$itemSets) {
+            return null;
+        }
+
+        /** @var \Omeka\Api\Representation\ItemSetRepresentation|null $itemSet */
+        $itemSet = null;
+        if ($mode === 'first') {
+            $itemSet = reset($itemSets) ?: null;
+        } else {
+            // Sort item sets by the value of the given property; skip those
+            // without a value for that property.
+            $candidates = [];
+            foreach ($itemSets as $is) {
+                $val = $is->value($mode);
+                if ($val === null) {
+                    continue;
+                }
+                $raw = trim((string) $val);
+                if ($raw === '') {
+                    continue;
+                }
+                $candidates[] = [$raw, $is];
+            }
+            if (!$candidates) {
+                return null;
+            }
+            usort($candidates, function ($a, $b) {
+                return strcasecmp($a[0], $b[0]);
+            });
+            $itemSet = $candidates[0][1];
+        }
+
+        if (!$itemSet) {
+            return null;
+        }
+
+        $api = $view->getHelperPluginManager()->get('api');
+        $apiResponse = $api->search('items', [
+            'item_set_id' => $itemSet->id(),
+            'site_id' => $site->id(),
+            'limit' => $limit,
+            'offset' => 0,
+            'return_scalar' => 'id',
+        ]);
+        $ids = array_values(array_map('intval', $apiResponse->getContent() ?: []));
+        if (!$ids) {
+            return null;
+        }
+
+        return [
+            'site_id' => $site->id(),
+            'type' => 'collection',
+            'subtype' => '',
+            'label' => $itemSet->displayTitle(),
+            'url' => $itemSet->siteUrl(),
+            'ids' => $ids,
+            'total' => (int) $apiResponse->getTotalResults(),
+            'limit' => $limit,
+            'item_set_id' => (int) $itemSet->id(),
+            'item_set' => $itemSet,
+        ];
     }
 
     /**
@@ -188,20 +297,23 @@ class ResourceNav implements ResourcePageBlockLayoutInterface
                 'site_id' => $site->id(),
                 'limit' => $limit,
                 'offset' => 0,
-            ], ['returnScalar' => 'id']);
-            $ids = array_values(array_map('intval', $apiResponse->getContent() ?: []));
+                'return_scalar' => 'id',
+            ]);
+            $rawContent = $apiResponse->getContent() ?: [];
+            $ids = array_values(array_map('intval', $rawContent));
             if (!$ids) {
                 return null;
             }
             return [
                 'site_id' => $site->id(),
                 'type' => 'collection',
-                'subtype' => $this->itemSetSubtype($itemSet),
+                'subtype' => '',
                 'label' => $itemSet->displayTitle(),
                 'url' => $itemSet->siteUrl(),
                 'ids' => $ids,
                 'total' => (int) $apiResponse->getTotalResults(),
                 'limit' => $limit,
+                'item_set_id' => $itemSetId,
                 'item_set' => $itemSet,
             ];
         }
@@ -247,17 +359,4 @@ class ResourceNav implements ResourcePageBlockLayoutInterface
         return null;
     }
 
-    /**
-     * Detect an item set subtype from a curation property, so themes can
-     * customize the label ("Album" vs "Collection").
-     */
-    protected function itemSetSubtype(\Omeka\Api\Representation\ItemSetRepresentation $itemSet): string
-    {
-        $val = $itemSet->value('curation:set');
-        if (!$val) {
-            return '';
-        }
-        $raw = strtolower((string) $val);
-        return $raw;
-    }
 }

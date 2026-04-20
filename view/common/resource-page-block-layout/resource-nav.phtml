@@ -3,7 +3,7 @@
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var \Omeka\Api\Representation\ItemRepresentation $resource
  * @var string $type       search|collection|selection
- * @var string $subtype    empty, or curation:set value for item sets (ex: "album")
+ * @var string $subtype    free tag (theme-specific)
  * @var string $label      search query, item set title or selection title
  * @var string $contextUrl link back to the browse context
  * @var int    $position
@@ -14,6 +14,9 @@
  * @var \Omeka\Api\Representation\ItemRepresentation|null $next
  * @var string $prevUrl
  * @var string $nextUrl
+ * @var bool $showLabel
+ * @var int|null $itemSetId
+ * @var int|null $selectionId
  * @var \Omeka\Api\Representation\ItemSetRepresentation|null $itemSet
  * @var mixed $selection
  */

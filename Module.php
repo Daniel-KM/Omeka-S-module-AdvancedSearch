@@ -1095,7 +1095,7 @@ class Module extends AbstractModule
         }
 
         [$siteSettings, $limit, $enabledTypes] = $this->resourceNavContext();
-        if (!$limit || !in_array('search', $enabledTypes, true)) {
+        if (!$limit) {
             return;
         }
 
@@ -1114,15 +1114,23 @@ class Module extends AbstractModule
             return;
         }
 
+        // Detect if the current search page is actually an item set browse
+        // redirected here by AdvancedSearch MvcListeners::redirectItemSet().
+        $mvcEvent = $services->get('Application')->getMvcEvent();
+        $routeMatch = $mvcEvent->getRouteMatch();
+        $redirectedFromItemSet = $routeMatch
+            && $routeMatch->getParam('redirected') === 'item-set';
+        $redirectedItemSetId = $redirectedFromItemSet
+            ? (int) $routeMatch->getParam('item-set-id')
+            : 0;
+
+        $targetType = $redirectedItemSetId ? 'collection' : 'search';
+        if (!in_array($targetType, $enabledTypes, true)) {
+            return;
+        }
+
         $request = $services->get('Request');
         $httpQuery = method_exists($request, 'getQuery') ? $request->getQuery()->toArray() : [];
-        $label = '';
-        foreach (['q', 'fulltext_search'] as $k) {
-            if (!empty($httpQuery[$k]) && is_scalar($httpQuery[$k])) {
-                $label = trim((string) $httpQuery[$k]);
-                break;
-            }
-        }
 
         try {
             $clonedQuery = clone $query;
@@ -1145,6 +1153,43 @@ class Module extends AbstractModule
         if (!$ids) {
             return;
         }
+        $total = (int) ($limitedResponse->getResourceTotalResults('items') ?: count($ids));
+
+        if ($targetType === 'collection') {
+            // Fetch the item set to get its title and URL; themes remain
+            // responsible for any site-specific display rule.
+            $label = '';
+            $contextUrl = $request->getRequestUri();
+            try {
+                /** @var \Omeka\Api\Representation\ItemSetRepresentation $itemSet */
+                $itemSet = $services->get('Omeka\ApiManager')
+                    ->read('item_sets', $redirectedItemSetId)
+                    ->getContent();
+                $label = (string) $itemSet->displayTitle();
+                $contextUrl = $itemSet->siteUrl();
+            } catch (\Throwable $e) {
+            }
+            $this->saveResourceNavSession([
+                'site_id' => $site->id(),
+                'type' => 'collection',
+                'subtype' => '',
+                'label' => $label,
+                'url' => $contextUrl,
+                'ids' => $ids,
+                'total' => $total,
+                'limit' => $limit,
+                'item_set_id' => $redirectedItemSetId,
+            ]);
+            return;
+        }
+
+        $label = '';
+        foreach (['q', 'fulltext_search'] as $k) {
+            if (!empty($httpQuery[$k]) && is_scalar($httpQuery[$k])) {
+                $label = trim((string) $httpQuery[$k]);
+                break;
+            }
+        }
 
         $this->saveResourceNavSession([
             'site_id' => $site->id(),
@@ -1153,7 +1198,7 @@ class Module extends AbstractModule
             'label' => $label,
             'url' => $request->getRequestUri(),
             'ids' => $ids,
-            'total' => (int) ($limitedResponse->getResourceTotalResults('items') ?: count($ids)),
+            'total' => $total,
             'limit' => $limit,
         ]);
     }
@@ -1217,19 +1262,10 @@ class Module extends AbstractModule
             return;
         }
 
-        $subtype = '';
-        try {
-            $val = $itemSet->value('curation:set');
-            if ($val) {
-                $subtype = strtolower((string) $val);
-            }
-        } catch (\Throwable $e) {
-        }
-
         $this->saveResourceNavSession([
             'site_id' => $site->id(),
             'type' => 'collection',
-            'subtype' => $subtype,
+            'subtype' => '',
             'label' => $itemSet->displayTitle(),
             'url' => $itemSet->siteUrl(),
             'ids' => $ids,

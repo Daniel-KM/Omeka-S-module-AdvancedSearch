@@ -199,6 +199,16 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
                     $response->getCurrentPage(),
                     $response->getPerPage()
                 );
+                // Store the browse context in session so the resource page
+                // block "Resource navigation" (ResourceNav) can display a
+                // prev/next navigation on the item page.
+                $this->storeResourceNavFromBlock(
+                    $block,
+                    $site,
+                    $searchConfig,
+                    $vars['query'],
+                    $request
+                );
             } else {
                 $msg = $response->getMessage();
                 if ($msg) {
@@ -210,5 +220,88 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
         }
 
         return $view->partial($templateViewScript, $vars);
+    }
+
+    /**
+     * Store a "search" browse context in the session so that the resource
+     * page block "ResourceNav" can display a prev/next navigation on the
+     * item page. This mirrors the logic of the SearchController listener
+     * but works for pages that embed the block "searchingForm".
+     */
+    protected function storeResourceNavFromBlock(
+        SitePageBlockRepresentation $block,
+        SiteRepresentation $site,
+        \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig,
+        \AdvancedSearch\Query $query,
+        array $request
+    ): void {
+        $services = $block->getServiceLocator();
+        $siteSettings = $services->get('Omeka\Settings\Site');
+        $limit = (int) $siteSettings->get('advancedsearch_nav_resource_limit', 25);
+        if ($limit <= 0) {
+            return;
+        }
+        $enabledTypes = $siteSettings->get('advancedsearch_nav_resource_types', ['search', 'collection', 'selection']);
+        if (!is_array($enabledTypes) || !in_array('search', $enabledTypes, true)) {
+            return;
+        }
+
+        try {
+            $clonedQuery = clone $query;
+            $clonedQuery->setLimitPage(1, $limit);
+            $limitedResponse = $searchConfig->searchEngine()
+                ->querier()
+                ->setQuery($clonedQuery)
+                ->query();
+        } catch (\Throwable $e) {
+            return;
+        }
+
+        $results = $limitedResponse->getResults('items') ?: [];
+        $ids = [];
+        foreach ($results as $result) {
+            if (isset($result['id'])) {
+                $ids[] = (int) $result['id'];
+            }
+        }
+        if (!$ids) {
+            return;
+        }
+        $total = (int) ($limitedResponse->getResourceTotalResults('items') ?: count($ids));
+
+        $label = '';
+        foreach (['q', 'fulltext_search'] as $k) {
+            if (!empty($request[$k]) && is_scalar($request[$k])) {
+                $label = trim((string) $request[$k]);
+                break;
+            }
+        }
+
+        $httpRequest = $services->get('Request');
+        $url = method_exists($httpRequest, 'getRequestUri')
+            ? (string) $httpRequest->getRequestUri()
+            : '';
+
+        $payload = [
+            'site_id' => $site->id(),
+            'type' => 'search',
+            'subtype' => '',
+            'label' => $label,
+            'url' => $url,
+            'ids' => $ids,
+            'total' => $total,
+            'limit' => $limit,
+        ];
+
+        $sessionManager = \Laminas\Session\Container::getDefaultManager();
+        if (!$sessionManager->sessionExists()) {
+            try {
+                $sessionManager->start();
+            } catch (\Throwable $e) {
+                return;
+            }
+        }
+        $session = new \Laminas\Session\Container('AdvancedSearch');
+        $session->resource_nav = $payload;
     }
 }

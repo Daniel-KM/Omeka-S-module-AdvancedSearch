@@ -445,20 +445,31 @@ class IndexSearch extends AbstractJob
                     );
                 }
 
-                // Index entire batch at once.
+                // Index entire batch at once. On failure, retry
+                // each resource individually to skip only the
+                // faulty one(s).
                 if (count($resources)) {
                     try {
                         $indexer->indexResources($resources);
                         $totals[$resourceType] += count($resources);
                     } catch (\Throwable $e) {
-                        $this->logger->err(
-                            'Error indexing batch #{number} of {resource_type}: {message}', // @translate
-                            [
-                                'number' => $loop,
-                                'resource_type' => $resourceType,
-                                'message' => $e->getMessage(),
-                            ]
-                        );
+                        // Retry one by one to identify and skip
+                        // the faulty resource(s).
+                        foreach ($resources as $resource) {
+                            try {
+                                $indexer->indexResources([$resource]);
+                                ++$totals[$resourceType];
+                            } catch (\Throwable $e2) {
+                                $this->logger->err(
+                                    'Indexing of {resource_type} #{resource_id} failed: {message}', // @translate
+                                    [
+                                        'resource_type' => $resourceType,
+                                        'resource_id' => $resource->id(),
+                                        'message' => $e2->getMessage(),
+                                    ]
+                                );
+                            }
+                        }
                     }
 
                     // Log progress periodically.

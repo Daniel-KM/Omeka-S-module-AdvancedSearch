@@ -212,6 +212,30 @@ class SearchConfigController extends AbstractActionController
             ['name' => $searchConfig->link($searchConfig->name(), 'edit')]
         ))->setEscapeHtml(false));
 
+        // For Solr engines, warn about new maps to sync.
+        if ($searchEngine
+            && $searchEngine->engineAdapter() instanceof \SearchSolr\EngineAdapter\Solarium
+        ) {
+            $solrCoreId = $searchEngine->settingEngineAdapter('solr_core_id');
+            if ($solrCoreId) {
+                $message = new PsrMessage(
+                    'If new fields were added, run {link}Sync maps{link_end} on the Solr core page, then reindex.', // @translate
+                    [
+                        'link' => sprintf(
+                            '<a href="%s">',
+                            htmlspecialchars($this->url()->fromRoute(
+                                'admin/search/solr/core-id',
+                                ['id' => $solrCoreId, 'action' => 'sync-maps']
+                            ))
+                        ),
+                        'link_end' => '</a>',
+                    ]
+                );
+                $message->setEscapeHtml(false);
+                $this->messenger()->addWarning($message);
+            }
+        }
+
         return $this->redirect()->toRoute('admin/search-manager');
     }
 

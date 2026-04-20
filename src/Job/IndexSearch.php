@@ -435,8 +435,8 @@ class IndexSearch extends AbstractJob
                 }
 
                 if (count($resources) && count($resources) !== count($resourceIdsSlice)) {
-                    $this->logger->warn(
-                        'Batch #{number} of {resource_type}: {count} resources missing.', // @translate
+                    $this->logger->info(
+                        'Batch #{number} of {resource_type}: {count} resources skipped (private, deleted, or filtered by module).', // @translate
                         [
                             'number' => $loop,
                             'resource_type' => $resourceType,

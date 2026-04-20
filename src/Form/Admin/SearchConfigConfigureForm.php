@@ -706,7 +706,7 @@ class SearchConfigConfigureForm extends Form
                 'type' => CommonElement\DataTextarea::class,
                 'options' => [
                     'label' => 'Fields', // @translate
-                    'info' => 'List of filters that will be displayed in the search form. Format is "term = Label". The field should exist in all resources fields. Only properties are managed for internal search engine.', // @translate
+                    'info' => 'List of filters that will be displayed in the search form. Format is "term or field = Label".', // @translate
                     'as_key_value' => true,
                     'key_value_separator' => '=',
                     'data_options' => [

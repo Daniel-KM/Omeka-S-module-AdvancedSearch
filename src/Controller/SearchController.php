@@ -107,6 +107,14 @@ class SearchController extends AbstractActionController
 
         $request = $params->fromQuery();
 
+        // Persist per_page choice across the session.
+        $session = new \Laminas\Session\Container('AdvancedSearch');
+        if (!empty($request['per_page']) && is_numeric($request['per_page'])) {
+            $session->perPage = (int) $request['per_page'];
+        } elseif (!isset($request['per_page']) && !empty($session->perPage)) {
+            $request['per_page'] = $session->perPage;
+        }
+
         // On an item set page, only one item set can be used and the page
         // should limit results to it.
         // With the module Advanced Search, the name of the arg was "item_set".

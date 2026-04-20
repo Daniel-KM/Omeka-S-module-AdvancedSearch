@@ -1136,10 +1136,15 @@ class SearchResources
         $shortFilters = [];
 
         foreach ($query['filter'] as $k => $queryRow) {
-            if (!is_array($queryRow)
-                || empty($queryRow['type'])
-                || !isset(self::FIELD_QUERY['reciprocal'][$queryRow['type']])
-            ) {
+            if (!is_array($queryRow)) {
+                unset($query['filter'][$k]);
+                continue;
+            }
+            if (empty($queryRow['type'])) {
+                $queryRow['type'] = 'in';
+                $query['filter'][$k]['type'] = 'in';
+            }
+            if (!isset(self::FIELD_QUERY['reciprocal'][$queryRow['type']])) {
                 unset($query['filter'][$k]);
                 continue;
             }

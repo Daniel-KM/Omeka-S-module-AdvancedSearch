@@ -438,6 +438,24 @@ class Module extends AbstractModule
             [$this, 'addSearchConfigToSite']
         );
 
+        // Keep main setting "advancedsearch_all_configs" in sync with the
+        // search_config table without requiring a visit to the search manager.
+        $sharedEventManager->attach(
+            \AdvancedSearch\Api\Adapter\SearchConfigAdapter::class,
+            'api.create.post',
+            [$this, 'refreshSearchConfigsList']
+        );
+        $sharedEventManager->attach(
+            \AdvancedSearch\Api\Adapter\SearchConfigAdapter::class,
+            'api.update.post',
+            [$this, 'refreshSearchConfigsList']
+        );
+        $sharedEventManager->attach(
+            \AdvancedSearch\Api\Adapter\SearchConfigAdapter::class,
+            'api.delete.post',
+            [$this, 'refreshSearchConfigsList']
+        );
+
         // Listeners for configs.
 
         $sharedEventManager->attach(
@@ -1908,6 +1926,17 @@ class Module extends AbstractModule
         // Compatibility for old themes.
         $siteSettings->set('advancedsearch_redirect_itemsets', ['default' => 'browse'], $siteId);
         $siteSettings->set('advancedsearch_redirect_itemset', 'browse', $siteId);
+    }
+
+    public function refreshSearchConfigsList(Event $event): void
+    {
+        $services = $this->getServiceLocator();
+        $connection = $services->get('Omeka\Connection');
+        $settings = $services->get('Omeka\Settings');
+        $rows = $connection
+            ->executeQuery('SELECT `id`, `slug` FROM `search_config` ORDER BY `id` ASC')
+            ->fetchAllKeyValue();
+        $settings->set('advancedsearch_all_configs', array_map('strval', $rows));
     }
 
     protected function installResources(): void

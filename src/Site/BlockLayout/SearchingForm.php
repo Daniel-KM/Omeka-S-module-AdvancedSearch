@@ -179,7 +179,20 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
             $request = $formAdapter->cleanRequest($request);
             $isEmptyRequest = $formAdapter->isEmptyRequest($request);
             if ($isEmptyRequest) {
-                $request = $query + ['page' => 1];
+                // Preserve pagination/sort from the original request so that
+                // navigating to ?page=2 (or sort changes) on the default query
+                // does not silently fall back to page 1.
+                $passthrough = array_intersect_key($request, [
+                    'page' => null,
+                    'per_page' => null,
+                    'limit' => null,
+                    'offset' => null,
+                    'sort_by' => null,
+                    'sort_order' => null,
+                    'sort' => null,
+                    'resource_type' => null,
+                ]);
+                $request = $passthrough + $query + ['page' => 1];
             } else {
                 $request += $filterQuery;
                 if (!$formAdapter->validateRequest($request)) {

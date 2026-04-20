@@ -110,7 +110,12 @@ class MvcListeners extends AbstractListenerAggregate
 
             // Browse item sets is redirected to a search.
 
-            $redirectTo = (int) $siteSettings->get('advancedsearch_item_sets_browse_config');
+            $redirectTo = $siteSettings->get('advancedsearch_item_sets_browse_config');
+            if ($redirectTo === 'default') {
+                $redirectTo = (int) $siteSettings->get('advancedsearch_main_config');
+            } else {
+                $redirectTo = (int) $redirectTo;
+            }
             if ($redirectTo) {
                 // The search config may have been removed, so check and get the slug.
                 // It should be cached by doctrine.

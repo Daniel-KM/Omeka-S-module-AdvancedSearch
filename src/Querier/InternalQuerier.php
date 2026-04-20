@@ -1185,16 +1185,41 @@ class InternalQuerier extends AbstractQuerier
 
     protected function filterQueryRanges(array $dateRangeFilters): void
     {
-        foreach ($dateRangeFilters as $field => $filterValues) {
-            if ($field === 'created' || $field === 'modified') {
+        foreach ($dateRangeFilters as $fieldName => $filterValues) {
+            if ($fieldName === 'created' || $fieldName === 'modified') {
                 $argName = 'datetime';
+                $field = $fieldName;
             } else {
-                $field = $this->fieldToIndex($field);
+                $field = $this->fieldToIndex($fieldName);
                 if (!$field) {
                     continue;
                 }
                 $argName = 'filter';
             }
+
+            // EDTF datatype: route to edtf[] args supported by module
+            // DataTypeEdtf. Requires the field query args to declare datatype
+            // "edtf".
+            $fieldQueryArgs = $this->query
+                ? $this->query->getFieldQueryArgs($fieldName)
+                : null;
+            $datatypes = isset($fieldQueryArgs['datatype'])
+                ? (is_array($fieldQueryArgs['datatype'])
+                    ? $fieldQueryArgs['datatype']
+                    : [$fieldQueryArgs['datatype']])
+                : [];
+            $isEdtf = in_array('edtf', $datatypes, true);
+            if ($isEdtf) {
+                $propertyId = $this->easyMeta
+                    ->propertyId($fieldName);
+                if ($propertyId) {
+                    $this->filterQueryRangesEdtf(
+                        $propertyId, $filterValues
+                    );
+                    continue;
+                }
+            }
+
             foreach ($filterValues as $filterValue) {
                 // Skip simple and query filters (for hidden queries).
                 if (!is_array($filterValue)) {
@@ -1216,6 +1241,37 @@ class InternalQuerier extends AbstractQuerier
                         'val' => $filterValue['to'],
                     ];
                 }
+            }
+        }
+    }
+
+    /**
+     * Build edtf[] range args for DataTypeEdtf adapter.
+     *
+     * @see \DataTypeEdtf\DataType\Edtf::buildQuery()
+     */
+    protected function filterQueryRangesEdtf(
+        int $propertyId, array $filterValues
+    ): void {
+        foreach ($filterValues as $filterValue) {
+            if (!is_array($filterValue)) {
+                continue;
+            }
+            if (isset($filterValue['from'])
+                && strlen($filterValue['from'])
+            ) {
+                $this->args['edtf']['gte'] = [
+                    'val' => $filterValue['from'],
+                    'pid' => $propertyId,
+                ];
+            }
+            if (isset($filterValue['to'])
+                && strlen($filterValue['to'])
+            ) {
+                $this->args['edtf']['lte'] = [
+                    'val' => $filterValue['to'],
+                    'pid' => $propertyId,
+                ];
             }
         }
     }

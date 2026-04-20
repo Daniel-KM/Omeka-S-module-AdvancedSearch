@@ -163,6 +163,11 @@ return [
             'resourceNav' => Site\ResourcePageBlockLayout\ResourceNav::class,
         ],
     ],
+    'block_templates' => [
+        'browsePreview' => [
+            'browse-preview-resource-nav' => 'Advanced Search: Browse preview with resource navigation', // @translate
+        ],
+    ],
     'form_elements' => [
         'invokables' => [
             Form\Element\MultiText::class => Form\Element\MultiText::class,

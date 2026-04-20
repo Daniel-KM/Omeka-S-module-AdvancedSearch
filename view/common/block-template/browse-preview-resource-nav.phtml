@@ -1,0 +1,70 @@
+<?php
+/**
+ * Block template "browsePreview" that stores the listed resources as a
+ * navigation series in the session, so that the resource page block
+ * "resourceNav" can display a prev/next navigation on an item page after the
+ * user clicked a resource of the series.
+ *
+ * Label shown in the nav block comes, in order of preference:
+ * 1. The heading of the browse preview block itself.
+ * 2. The first "heading" block inside the same block group (rank 1) as
+ *    the type label, and the second (rank 2) as the series name, so the nav
+ *    reads "<heading 1> : <heading 2>" (ex: "À la une : L'affaire Dreyfus").
+ * 3. Fallback to empty, the theme will display a generic "Browse".
+ *
+ * The URL returned by the label link points to the page containing the block,
+ * so users can come back to the origin.
+ *
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var \Omeka\Api\Representation\SitePageBlockRepresentation $block
+ * @var string $resourceType
+ * @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation[] $resources
+ * @var string $heading
+ * @var string $linkText
+ * @var array $components
+ * @var array $query
+ */
+
+$plugins = $this->getHelperPluginManager();
+
+if ($plugins->has('storeResourceNav') && !empty($resources)) {
+    $site = $this->currentSite();
+    $page = $block->page();
+    $pageUrl = $site && $page
+        ? $this->url('site/page', ['site-slug' => $site->slug(), 'page-slug' => $page->slug()])
+        : ($site ? $site->url() : '');
+
+    $seriesTypeLabel = '';
+    $seriesLabel = (string) ($heading ?? $block->dataValue('heading', ''));
+    if ($plugins->has('blockGroupData')) {
+        $groupFirst = (string) $this->blockGroupData($block, 'heading', 'text', 1);
+        $groupSecond = (string) $this->blockGroupData($block, 'heading', 'text', 2);
+        if ($groupSecond !== '') {
+            $seriesTypeLabel = $groupFirst;
+            $seriesLabel = $groupSecond;
+        } elseif ($seriesLabel === '' && $groupFirst !== '') {
+            $seriesLabel = $groupFirst;
+        }
+    }
+
+    $this->storeResourceNav([
+        'type' => 'series',
+        'resources' => $resources,
+        'subtype' => $seriesTypeLabel,
+        'label' => $seriesLabel,
+        'url' => $pageUrl,
+    ]);
+}
+
+echo $this->partial('common/block-layout/browse-preview', [
+    'block' => $block,
+    'resourceType' => $resourceType,
+    'resources' => $resources,
+    'heading' => $heading ?? '',
+    'linkText' => $linkText ?? '',
+    'components' => $components ?? [],
+    'query' => $query ?? [],
+    'sortHeadings' => $sortHeadings ?? [],
+    'pagination' => $pagination ?? false,
+    'resourceTemplate' => $resourceTemplate ?? '',
+]);

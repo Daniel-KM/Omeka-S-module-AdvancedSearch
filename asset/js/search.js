@@ -937,16 +937,32 @@ var Search = (function() {
 
         self.controlNumericFrom = function(element) {
             const [inputFrom, inputTo, sliderFrom, sliderTo] = self.getRangeDoubleElements(element);
+            // Let the user clear/edit the input freely; do not sync while the
+            // input is empty or not a valid number.
+            if (inputFrom.value === '' || isNaN(parseFloat(inputFrom.value))) {
+                return self;
+            }
             const [from, to] = self.parseTwoElementsToNumber(inputFrom, inputTo);
-            [inputFrom.value, sliderFrom.value] = from > to ? [to, to] : [from, from];
+            if (!isNaN(to) && from > to) {
+                sliderFrom.value = to;
+            } else {
+                sliderFrom.value = from;
+            }
             self.fillSlider(inputFrom, inputTo, sliderTo);
             return self;
         };
 
         self.controlNumericTo = function(element) {
             const [inputFrom, inputTo, sliderFrom, sliderTo] = self.getRangeDoubleElements(element);
+            if (inputTo.value === '' || isNaN(parseFloat(inputTo.value))) {
+                return self;
+            }
             const [from, to] = self.parseTwoElementsToNumber(inputFrom, inputTo);
-            [inputTo.value, sliderTo.value] = from <= to ? [to, to] : [from, from];
+            if (!isNaN(from) && from > to) {
+                sliderTo.value = from;
+            } else {
+                sliderTo.value = to;
+            }
             self.fillSlider(inputFrom, inputTo, sliderTo);
             self.toggleRangeSliderAccessible(sliderTo);
             return self;

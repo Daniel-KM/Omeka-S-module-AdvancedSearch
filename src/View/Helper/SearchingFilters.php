@@ -140,8 +140,11 @@ class SearchingFilters extends AbstractHelper
 
             switch ($key) {
                 case 'q':
+                    // The main search query is added first so that it appears
+                    // before any other filter previously collected by the
+                    // SearchFilters helper.
                     $filterLabel = $translate('Query'); // @translate
-                    $filters[$filterLabel][$this->urlQuery($key)] = $value;
+                    $filters = [$filterLabel => [$this->urlQuery($key) => $value]] + $filters;
                     break;
 
                 // Here, resource type is the api name (items, item_sets, etc.).

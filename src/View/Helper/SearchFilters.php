@@ -153,8 +153,10 @@ class SearchFilters extends AbstractHelper
             switch ($key) {
                 // Fulltext
                 case 'fulltext_search':
+                    // Always shown first, before any other filter, regardless
+                    // of the order of keys in the cleaned query.
                     $filterLabel = $translate('Search full-text'); // @translate
-                    $filters[$filterLabel][$this->urlQuery($key)] = $value;
+                    $filters = [$filterLabel => [$this->urlQuery($key) => $value]] + $filters;
                     break;
 
                 // Search by class

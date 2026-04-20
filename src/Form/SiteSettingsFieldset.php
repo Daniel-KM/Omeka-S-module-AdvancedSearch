@@ -262,7 +262,24 @@ class SiteSettingsFieldset extends Fieldset
                 ],
             ])
             ->add([
-                'name' => 'advancedsearch_nav_resource_fallback_item_set',
+                'name' => 'advancedsearch_resource_nav_display',
+                'type' => CommonElement\OptionalMultiCheckbox::class,
+                'options' => [
+                    'element_group' => 'advanced_search',
+                    'label' => 'Block Resource navigation: parts to display', // @translate
+                    'value_options' => [
+                        'type_label' => 'Type label (Search, Item set, Selection…)', // @translate
+                        'context_label' => 'Context name (item set title, selection title, query)', // @translate
+                        'position' => 'Position (n / total)', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearch_resource_nav_display',
+                    'value' => ['type_label', 'context_label', 'position'],
+                ],
+            ])
+            ->add([
+                'name' => 'advancedsearch_resource_nav_fallback_item_set',
                 'type' => CommonElement\OptionalPropertySelect::class,
                 'options' => [
                     'element_group' => 'advanced_search',
@@ -275,7 +292,7 @@ class SiteSettingsFieldset extends Fieldset
                     'term_as_value' => true,
                 ],
                 'attributes' => [
-                    'id' => 'advancedsearch_nav_resource_fallback_item_set',
+                    'id' => 'advancedsearch_resource_nav_fallback_item_set',
                     'class' => 'chosen-select',
                     'data-placeholder' => 'Select a fallback…', // @translate
                 ],

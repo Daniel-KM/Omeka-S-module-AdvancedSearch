@@ -516,7 +516,12 @@ return [
                 'selection',
             ],
             'advancedsearch_resource_nav_limit' => 25,
-            'advancedsearch_nav_resource_fallback_item_set' => '',
+            'advancedsearch_resource_nav_fallback_item_set' => '',
+            'advancedsearch_resource_nav_display' => [
+                'type_label',
+                'context_label',
+                'position',
+            ],
             // Hidden options.
             // This option is a merge of the previous ones for simplicity.
             'advancedsearch_item_sets_redirects' => [],

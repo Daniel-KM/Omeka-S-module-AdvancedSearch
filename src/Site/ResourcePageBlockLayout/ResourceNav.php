@@ -88,7 +88,7 @@ class ResourceNav implements ResourcePageBlockLayoutInterface
         // without param). Behavior is driven by a site setting which is
         // either empty (disabled), the string "first" (first item set) or
         // a property term used to sort the item sets.
-        $fallbackMode = $siteSetting('advancedsearch_nav_resource_fallback_item_set', '');
+        $fallbackMode = $siteSetting('advancedsearch_resource_nav_fallback_item_set', '');
         $fallbackMode = is_scalar($fallbackMode) ? (string) $fallbackMode : '';
         if ($fallbackMode !== ''
             && in_array('collection', $enabledTypes, true)
@@ -138,6 +138,11 @@ class ResourceNav implements ResourcePageBlockLayoutInterface
         $prevUrl = $prev ? $this->buildItemUrl($prev, $propagateQuery) : '';
         $nextUrl = $next ? $this->buildItemUrl($next, $propagateQuery) : '';
 
+        $display = $siteSetting('advancedsearch_resource_nav_display', ['type_label', 'context_label', 'position']);
+        if (!is_array($display)) {
+            $display = ['type_label', 'context_label', 'position'];
+        }
+
         return $view->partial('common/resource-page-block-layout/resource-nav', [
             'resource' => $resource,
             'type' => (string) ($data['type'] ?? ''),
@@ -157,6 +162,7 @@ class ResourceNav implements ResourcePageBlockLayoutInterface
             'selectionId' => isset($data['selection_id']) ? (int) $data['selection_id'] : null,
             'itemSet' => $data['item_set'] ?? null,
             'selection' => $data['selection'] ?? null,
+            'display' => $display,
         ]);
     }
 

@@ -237,11 +237,11 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
     ): void {
         $services = $block->getServiceLocator();
         $siteSettings = $services->get('Omeka\Settings\Site');
-        $limit = (int) $siteSettings->get('advancedsearch_nav_resource_limit', 25);
+        $limit = (int) $siteSettings->get('advancedsearch_resource_nav_limit', 25);
         if ($limit <= 0) {
             return;
         }
-        $enabledTypes = $siteSettings->get('advancedsearch_nav_resource_types', ['search', 'collection', 'selection']);
+        $enabledTypes = $siteSettings->get('advancedsearch_resource_nav_types', ['search', 'collection', 'selection']);
         if (!is_array($enabledTypes) || !in_array('search', $enabledTypes, true)) {
             return;
         }

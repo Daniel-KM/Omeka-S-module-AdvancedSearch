@@ -19,6 +19,7 @@
  * @var int|null $selectionId
  * @var \Omeka\Api\Representation\ItemSetRepresentation|null $itemSet
  * @var mixed $selection
+ * @var array $display    parts to render: type_label, context_label, position
  */
 
 $plugins = $this->getHelperPluginManager();
@@ -40,6 +41,11 @@ switch ($type) {
         break;
 }
 
+$display = $display ?? ['type_label', 'context_label', 'position'];
+$showType = in_array('type_label', $display, true);
+$showName = in_array('context_label', $display, true);
+$showPos = in_array('position', $display, true);
+
 $hasLabel = $label !== '';
 $navAriaLabel = $hasLabel ? $typeLabel . ' : ' . $label : $typeLabel;
 $prevTitle = $escape($translate('Previous')); // @translate
@@ -48,14 +54,16 @@ $nextTitle = $escape($translate('Next')); // @translate
 
 <div class="block block-resource block-resource-nav browse-controls type-<?= $escape($type) ?><?= $subtype ? ' subtype-' . $escape($subtype) : '' ?>">
     <nav class="resource-nav pagination" aria-label="<?= $escape($navAriaLabel) ?>">
-        <?php if ($contextUrl): ?>
+        <?php if ($contextUrl && ($showType || ($showName && $hasLabel))): ?>
         <a class="resource-nav-context" href="<?= $escape($contextUrl) ?>">
-            <?= $escape($typeLabel) ?><?php if ($hasLabel): ?> : <?= $escape($label) ?><?php endif; ?>
+            <?php if ($showType): ?><?= $escape($typeLabel) ?><?php endif; ?><?php if ($showType && $showName && $hasLabel): ?> : <?php endif; ?><?php if ($showName && $hasLabel): ?><?= $escape($label) ?><?php endif; ?>
         </a>
         <?php endif; ?>
+        <?php if ($showPos): ?>
         <span class="page-input-top" aria-label="<?= $escape($translate('Position')) ?>"><?= $position ?></span>
         /
         <span class="page-count"><?= $totalResults ?></span>
+        <?php endif; ?>
         <div class="pagination-buttons">
             <?php if ($prev): ?>
             <a class="previous o-icon-prev button" title="<?= $prevTitle ?>" aria-label="<?= $prevTitle ?>" href="<?= $escape($prevUrl) ?>"></a>

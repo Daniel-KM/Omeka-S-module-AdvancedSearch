@@ -47,11 +47,11 @@ class StoreResourceNav extends AbstractHelper
         }
 
         $siteSetting = $plugins->get('siteSetting');
-        $limit = (int) $siteSetting('advancedsearch_nav_resource_limit', 25);
+        $limit = (int) $siteSetting('advancedsearch_resource_nav_limit', 25);
         if ($limit <= 0) {
             return;
         }
-        $enabledTypes = $siteSetting('advancedsearch_nav_resource_types', ['search', 'collection', 'selection', 'series']);
+        $enabledTypes = $siteSetting('advancedsearch_resource_nav_types', ['search', 'collection', 'selection', 'series']);
         if (!is_array($enabledTypes)) {
             $enabledTypes = [];
         }

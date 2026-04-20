@@ -237,8 +237,24 @@ class AbstractFacet extends AbstractHelper
      */
     protected function facetValueLabel(string $facetField, $value): ?string
     {
+        static $no;
+        static $yes;
+        static $private;
+        static $public;
+
         if ($value === null || !strlen((string) $value)) {
             return null;
+        }
+
+        // Boolean fields: translate 1/true/yes to Yes, 0/false/no to No.
+        if (substr($facetField, -2) === '_b') {
+            if (!$yes) {
+                $no = $this->translate->__invoke('No'); // @translate
+                $yes = $this->translate->__invoke('Yes'); // @translate
+            }
+            return in_array(strtolower((string) $value), ['1', 'true', 'yes'], true)
+                ? $yes
+                : $no;
         }
 
         switch ($facetField) {
@@ -247,9 +263,13 @@ class AbstractFacet extends AbstractHelper
                 return $value;
 
             case 'is_public':
+                if (!$public) {
+                    $private = $this->translate->__invoke('Private'); // @translate
+                    $public = $this->translate->__invoke('Public'); // @translate
+                }
                 return $value
-                    ? 'Private'
-                    : 'Public';
+                    ? $private
+                    : $public;
 
             case 'id':
                 $data = ['id' => $value];

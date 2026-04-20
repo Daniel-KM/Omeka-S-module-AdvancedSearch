@@ -263,6 +263,9 @@ class MainSearchForm extends Form
                 case 'Checkbox':
                     $element = $this->searchCheckbox($filter);
                     break;
+                case 'Hasvalue':
+                    $element = $this->searchHasValue($filter);
+                    break;
                 case 'Csrf':
                 case 'Hidden':
                     $element = $this->searchHidden($filter);
@@ -590,6 +593,67 @@ class MainSearchForm extends Form
                 ->setOption('checked_value', $filter['options']['checked_value']);
         }
         return $this->appendOptionsAndAttributes($element, $filter);
+    }
+
+    /**
+     * Build a fieldset that injects a "filter[key][field/type/val]"
+     * triple into the query when its checkbox is checked.
+     *
+     * Supported options:
+     * - query_type: one of the Omeka filter types. Defaults to "ex"
+     *   ("has value"). Other useful values: "eq", "res", "in", "sw",
+     *   "ew". Their negative forms (nex, neq, nres…) give "has no value".
+     * - checked_value: the value submitted when checked. Required for
+     *   types that need a value (eq, res, in…). Defaults to "1".
+     * - The key used in "filter[key]" is the filter's slug in the
+     *   search form config.
+     */
+    protected function searchHasValue(array $filter): ?ElementInterface
+    {
+        $key = $filter['name'] ?? preg_replace(
+            '/[^a-z0-9_]/i', '_',
+            (string) ($filter['field'] ?? '')
+        );
+        if ($key === '') {
+            return null;
+        }
+
+        $queryType = $filter['options']['query_type']
+            ?? $filter['query_type']
+            ?? 'ex';
+        $checkedValue = $filter['options']['checked_value']
+            ?? $filter['checked_value']
+            ?? '1';
+
+        $fieldset = new \Laminas\Form\Fieldset('filter');
+        $sub = new \Laminas\Form\Fieldset($key);
+        $sub
+            ->add([
+                'name' => 'field',
+                'type' => Element\Hidden::class,
+                'attributes' => ['value' => $filter['field']],
+            ])
+            ->add([
+                'name' => 'type',
+                'type' => Element\Hidden::class,
+                'attributes' => ['value' => $queryType],
+            ])
+            ->add([
+                'name' => 'val',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => $filter['options']['value_label']
+                        ?? $filter['label'],
+                    'checked_value' => $checkedValue,
+                    'unchecked_value' => '',
+                    // Hide from HTTP submit when unchecked so the
+                    // filter triple is not sent.
+                    'use_hidden_element' => false,
+                ],
+            ])
+        ;
+        $fieldset->add($sub);
+        return $this->appendOptionsAndAttributes($fieldset, $filter);
     }
 
     protected function searchHidden(array $filter): ?ElementInterface

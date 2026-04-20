@@ -35,6 +35,23 @@ class FacetElements extends AbstractHelper
             case 'Checkbox':
                 $facetElements = $plugins->get('facetCheckboxes');
                 break;
+            case 'HasValue':
+                // Boolean facet: show a single checkbox with the facet label.
+                // Replace Solr values (1/0/true/false) with readable labels.
+                // Only truthy values are shown.
+                $truthy = ['1', 'true', 'yes'];
+                $label = $options['label'] ?? $facetField;
+                $filtered = [];
+                foreach ($facetValues as $fv) {
+                    $val = strtolower((string) $fv['value']);
+                    if (in_array($val, $truthy, true)) {
+                        $fv['label'] = $label;
+                        $filtered[] = $fv;
+                    }
+                }
+                $facetValues = $filtered;
+                $facetElements = $plugins->get('facetCheckboxes');
+                break;
             case 'CheckboxFilter':
                 $facetElements = $plugins->get('facetCheckboxesFilter');
                 break;

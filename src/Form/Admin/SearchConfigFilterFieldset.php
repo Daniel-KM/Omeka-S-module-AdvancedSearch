@@ -90,6 +90,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                         'text' => 'Text (default)', // @ŧranslate
                         'Advanced' => 'Advanced filter (configured below)', // @translate
                         'Checkbox' => 'Checkbox', // @translate
+                        'HasValue' => 'Checkbox: has a value / has no value', // @translate
                         // 'Date' => 'Date',
                         'MultiCheckbox' => 'Multi checkbox', // @translate
                         'Hidden' => 'Hidden', // @translate
@@ -201,6 +202,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                         List of specific options, in ini format, for example:
                         `empty_option = ""`,
                         `checked_value = "yes"`,
+                        `value_label = "Has an image"`,
                         `autosuggest = true`,
                         `value_options.first = "First"`,
                         `first_digits = false`.

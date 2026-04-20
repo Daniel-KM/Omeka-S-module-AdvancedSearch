@@ -67,6 +67,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                     'value_options' => [
                         'Checkbox' => 'Checkbox (default)', // @translate
                         'CheckboxFilter' => 'Checkbox with filter input', // @translate
+                        'HasValue' => 'Boolean (has a value / has no value)', // @translate
                         'Link' => 'Link (fake checkbox for mode "direct")', // @translate
                         'RangeDouble' => 'Slider for a range of values', // @translate
                         // A space is added to avoid an issue with translation.

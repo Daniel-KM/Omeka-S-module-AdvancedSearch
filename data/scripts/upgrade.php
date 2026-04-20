@@ -184,6 +184,9 @@ if (version_compare($oldVersion, '3.3.6.7', '<')) {
     foreach ($searchConfigsSettings as $id => $searchConfigSettings) {
         $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
         foreach ($searchConfigSettings['form']['filters'] ?? [] as $key => $filter) {
+            if (!is_array($filter) || !isset($filter['field'])) {
+                continue;
+            }
             if (in_array($filter['field'], [
                 'site_id',
                 'owner_id',
@@ -1267,15 +1270,18 @@ if (version_compare($oldVersion, '3.4.29', '<')) {
         $order = $searchConfigSettings['facet']['order'] ?? '';
         $limit = (int) ($searchConfigSettings['facet']['limit'] ?? 25);
         $displayCount = !empty($searchConfigSettings['facet']['display_count']);
-        foreach ($searchConfigSettings['facet']['facets'] ?? [] as $facet) {
-            $field = $facet['field'] ?? $facet['name'] ?? null;
+        foreach ($searchConfigSettings['facet']['facets'] ?? [] as $facetKey => $facet) {
+            if (!is_array($facet)) {
+                $facet = ['field' => is_string($facet) ? $facet : (string) $facetKey];
+            }
+            $field = $facet['field'] ?? $facet['name'] ?? (is_string($facetKey) ? $facetKey : null);
             if (!$field) {
                 continue;
             }
             // Options are no more used for facets.
             $optionsOptions = empty($facet['options'])
                 ? []
-                : (is_scalar($facet['options']) ? ['options' => $facet['options']] : $facet['options']);
+                : (is_scalar($facet['options']) ? [$facet['options']] : $facet['options']);
             $newFacet = [
                 'field' => $field,
                 'languages' => $facet['languages'] ?? $languages,
@@ -1485,20 +1491,28 @@ if (version_compare($oldVersion, '3.4.31', '<')) {
         $searchConfigSettings['display']['by_resource_type'] = true;
         $filters = [];
         foreach ($searchConfigSettings['form']['filters'] ?? [] as $key => $filter) {
-            $field = $filter['field'];
-            if (!$field) {
-                // Normally not possible.
+            if (!is_array($filter)) {
                 continue;
             }
-
-            $field = $filter['field'];
+            $field = $filter['field'] ?? $filter['name'] ?? (is_string($key) ? $key : '');
             $type = $filter['type'] ?? '';
 
             // Normally, there is only one advanced.
             if ($field === 'advanced' || $key === 'advanced' || mb_strtolower($type) === 'advanced') {
-                // Key is always "advanced" for advanced filters, so no duplicate.
+                // Key is always "advanced" for advanced filters, so no
+                // duplicate.
                 $name = 'advanced';
                 $type = 'Advanced';
+                // Preserve sub-options of advanced filter, if any, before
+                // normalizing keys so that values stored under the legacy
+                // "options" sub-key are not lost.
+                if (!empty($filter['options']) && is_array($filter['options'])) {
+                    foreach ($filter['options'] as $optKey => $optVal) {
+                        if (!array_key_exists($optKey, $filter)) {
+                            $filter[$optKey] = $optVal;
+                        }
+                    }
+                }
                 // Normalize some keys.
                 $filter['default_number'] = isset($filter['default_number']) ? (int) $filter['default_number'] : 1;
                 $filter['max_number'] = isset($filter['max_number']) ? (int) $filter['max_number'] : 10;
@@ -1511,8 +1525,11 @@ if (version_compare($oldVersion, '3.4.31', '<')) {
                 unset($filter['fields']);
                 $filter['fields'] = $filterFields;
             } else {
-                // Normally, there is no name.
-                // The key is numeric, except when the upgrade is done twice,
+                if (!$field) {
+                    continue;
+                }
+                // Normally, there is no name. The key is numeric, except when
+                // the upgrade is done twice,
                 $name = $filter['name'] ?? (is_numeric($key) ? $field : $key);
                 $name = mb_strtolower(strtr($name, ['-' => '_',  ':' => '_']));
                 if (isset($filters[$name])) {
@@ -1582,8 +1599,10 @@ if (version_compare($oldVersion, '3.4.31', '<')) {
                             $filter['options'] = ['value_options' => array_filter(array_map('trim', explode('|', $filter['options'])), 'strlen')];
                         } elseif (!is_array($filter['options'])) {
                             $filter['options'] = ['value_options' => [(string) $filter['options'] => (string) $filter['options']]];
+                        } elseif (array_key_exists('value_options', $filter['options'])) {
+                            // Already migrated.
                         } else {
-                            $filter['options']['value_options'] = $filter['options'];
+                            $filter['options'] = ['value_options' => $filter['options']];
                         }
                         // Avoid issue with duplicates.
                         // Avoid issue with duplicates.
@@ -1735,6 +1754,9 @@ if (version_compare($oldVersion, '3.4.32', '<')) {
         $facetMode = $searchConfigSettings['facet']['mode'] ?? '';
         if ($facetMode === 'link') {
             foreach ($searchConfigSettings['facet']['facets'] ?? [] as $key => $facet) {
+                if (!is_array($facet)) {
+                    continue;
+                }
                 $facetType = $searchConfigSettings['facet']['facets'][$key]['type'] ?? '';
                 if (in_array($facetType, ['', 'Checkbox'])) {
                     $searchConfigSettings['facet']['facets'][$key]['type'] = 'Link';
@@ -2058,8 +2080,14 @@ if (version_compare($oldVersion, '3.4.45', '<')) {
         $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
         $k = 0;
         $filters = [];
-        foreach ($searchConfigSettings['form']['filters'] ?? [] as $filter) {
-            $field = $filter['field'];
+        foreach ($searchConfigSettings['form']['filters'] ?? [] as $fKey => $filter) {
+            if (!is_array($filter)) {
+                continue;
+            }
+            $field = $filter['field'] ?? $filter['name'] ?? (is_string($fKey) ? $fKey : '');
+            if ($field === '') {
+                continue;
+            }
             if (isset($filters[$field])) {
                 $field = $field . '_' . ++$k;
             }
@@ -2068,8 +2096,14 @@ if (version_compare($oldVersion, '3.4.45', '<')) {
         $searchConfigSettings['form']['filters'] = $filters;
         $k = 0;
         $facets = [];
-        foreach ($searchConfigSettings['facet']['facets'] ?? [] as $facet) {
-            $field = $facet['field'];
+        foreach ($searchConfigSettings['facet']['facets'] ?? [] as $fKey => $facet) {
+            if (!is_array($facet)) {
+                continue;
+            }
+            $field = $facet['field'] ?? $facet['name'] ?? (is_string($fKey) ? $fKey : '');
+            if ($field === '') {
+                continue;
+            }
             if (isset($facets[$field])) {
                 $field = $field . '_' . ++$k;
             }
@@ -2172,6 +2206,9 @@ if (version_compare($oldVersion, '3.4.56', '<')) {
         $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
         $hasChange = false;
         foreach ($searchConfigSettings['facet']['facets'] ?? [] as $name => $facet) {
+            if (!is_array($facet)) {
+                continue;
+            }
             if (array_key_exists('integer', $facet)) {
                 $searchConfigSettings['facet']['facets'][$name]['first_digits'] = $facet['integer'];
                 unset($searchConfigSettings['facet']['facets'][$name]['integer']);
@@ -2202,6 +2239,9 @@ if (version_compare($oldVersion, '3.4.56', '<')) {
         $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
         $hasChange = false;
         foreach ($searchConfigSettings['facet']['facets'] ?? [] as $name => $facet) {
+            if (!is_array($facet)) {
+                continue;
+            }
             $attributes = $facet['attributes'] ?? [];
             $options = $facet['options'] ?? [];
             // Move min/max/step from root level to attributes.
@@ -2309,13 +2349,29 @@ if (version_compare($oldVersion, '3.4.58', '<')) {
     $connection->executeStatement($sql);
 
     // Fix: auto-populate form.filters from index.aliases for configs that were
-    // upgraded from before 3.4.31 without explicit filters.
+    // upgraded from before 3.4.31 without explicit filters. Note: the 3.4.37
+    // upgrade nests form parameters under form.default for future form
+    // variants. The 3.4.58 fix below ignored that move and rebuilt form.filters
+    // from index.aliases on configs that actually had filters under
+    // form.default.filters, desynchronizing the popup. Honor
+    // form.default.filters as a fallback before reconstructing.
     $sql = 'SELECT `id`, `settings` FROM `search_config`';
     $searchConfigs = $connection->executeQuery($sql)->fetchAllKeyValue();
     foreach ($searchConfigs as $id => $searchConfigJson) {
         $searchConfigSettings = json_decode($searchConfigJson, true) ?: [];
-        $filters = $searchConfigSettings['form']['filters'] ?? [];
-        // Only fix configs with empty filters but existing aliases.
+        $filters = $searchConfigSettings['form']['filters']
+            ?? $searchConfigSettings['form']['default']['filters']
+            ?? [];
+        $changed = false;
+        // If only form.default.filters exists, mirror it on form.filters so
+        // MainSearchForm::init() can read it.
+        if (empty($searchConfigSettings['form']['filters'])
+            && !empty($searchConfigSettings['form']['default']['filters'])
+        ) {
+            $searchConfigSettings['form']['filters'] = $searchConfigSettings['form']['default']['filters'];
+            $changed = true;
+        }
+        // Only rebuild from aliases when truly empty in both locations.
         if (empty($filters) && !empty($searchConfigSettings['index']['aliases'])) {
             foreach ($searchConfigSettings['index']['aliases'] as $aliasName => $alias) {
                 $name = mb_strtolower(strtr($aliasName, ['-' => '_', ':' => '_']));
@@ -2325,6 +2381,9 @@ if (version_compare($oldVersion, '3.4.58', '<')) {
                 ];
             }
             $searchConfigSettings['form']['filters'] = $filters;
+            $changed = true;
+        }
+        if ($changed) {
             $sql = 'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?';
             $connection->executeStatement($sql, [
                 json_encode($searchConfigSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
@@ -2529,6 +2588,14 @@ if (version_compare($oldVersion, '3.4.59', '<')) {
             || $queryString === ''
         ) {
             return null;
+        }
+        // Guard against double-encoded values (e.g. `%255B` for `%5B`):
+        // urldecode once before parsing so the parser sees the real string.
+        if (preg_match(
+            '/%25(5B|5D|3D|26|3F|2F|22|27|20|2B|3A|3B)/i',
+            $queryString
+        )) {
+            $queryString = rawurldecode($queryString);
         }
         parse_str($queryString, $query);
         if (!is_array($query) || empty($query)) {
@@ -3116,4 +3183,383 @@ if (version_compare($oldVersion, '3.4.59', '<')) {
         'New options are available for standard and module search filters: configurable query types, joiner "not" (simplifies negative operators), and autocompletion on filter values (requires module Reference or SearchSolr). Check main settings and site settings.' // @translate
     );
     $messenger->addSuccess($message);
+}
+
+if (version_compare($oldVersion, '3.4.61', '<')) {
+    // Fix double-encoded url-encoded query strings introduced by upgrade
+    // 3.4.59 when a value already encoded once (e.g.
+    // `property%5B0%5D%5Bproperty%5D=…`) was processed a second time, producing
+    // sequences like `%255B`, `%255D`, `%253D`, `%2526`. Detection: presence of
+    // `%25` followed by hex matching reserved url chars. Fix: urldecode once,
+    // then re-encode to a clean canonical RFC3986 form.
+    $jsonFlags = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE;
+
+    $isDoubleEncoded = function (string $s): bool {
+        return (bool) preg_match(
+            '/%25(5B|5D|3D|26|3F|2F|22|27|20|2B|3A|3B)/i',
+            $s
+        );
+    };
+
+    $fixDoubleEncoded = function (string $s) use ($isDoubleEncoded): ?string {
+        if (!$isDoubleEncoded($s)) {
+            return null;
+        }
+        $decoded = rawurldecode($s);
+        if (!is_string($decoded) || $decoded === $s) {
+            return null;
+        }
+        parse_str($decoded, $arr);
+        if (!is_array($arr) || empty($arr)) {
+            return null;
+        }
+        return http_build_query($arr, '', '&', PHP_QUERY_RFC3986);
+    };
+
+    $fixWalker = function (&$data, &$modified) use (&$fixWalker, $fixDoubleEncoded): void {
+        if (is_string($data)) {
+            $n = $fixDoubleEncoded($data);
+            if ($n !== null) {
+                $data = $n;
+                $modified = true;
+            }
+            return;
+        }
+        if (!is_array($data)) {
+            return;
+        }
+        foreach ($data as &$v) {
+            $fixWalker($v, $modified);
+        }
+        unset($v);
+    };
+
+    $fixCount = 0;
+
+    // Json columns to walk recursively.
+    $jsonColumns = [
+        ['setting', 'id', 'value'],
+        ['site_setting', null, 'value'],
+        ['site_page_block', 'id', 'data'],
+        ['site', 'id', 'navigation'],
+        ['site', 'id', 'item_pool'],
+    ];
+    foreach ($jsonColumns as [$table, $idColumn, $column]) {
+        try {
+            $rows = $connection->executeQuery("SELECT * FROM `$table`")->fetchAllAssociative();
+        } catch (\Throwable $e) {
+            continue;
+        }
+        foreach ($rows as $row) {
+            $rawValue = $row[$column] ?? null;
+            if ($rawValue === null || $rawValue === '') {
+                continue;
+            }
+            $data = json_decode($rawValue, true);
+            if ($data === null) {
+                continue;
+            }
+            $rowModified = false;
+            $fixWalker($data, $rowModified);
+            if (!$rowModified) {
+                continue;
+            }
+            if ($table === 'site_setting') {
+                $connection->executeStatement(
+                    'UPDATE `site_setting` SET `value` = ? WHERE `id` = ? AND `site_id` = ?',
+                    [json_encode($data, $jsonFlags), $row['id'], $row['site_id']]
+                );
+            } else {
+                $connection->executeStatement(
+                    "UPDATE `$table` SET `$column` = ? WHERE `id` = ?",
+                    [json_encode($data, $jsonFlags), $row['id']]
+                );
+            }
+            ++$fixCount;
+        }
+    }
+
+    // Raw url-encoded query columns.
+    $rawQueryTables = [
+        ['collecting_prompt', 'id', 'resource_query'],
+        ['faceted_browse_category', 'id', 'query'],
+        ['datavis_vis', 'id', 'query'],
+        ['search_request', 'id', 'query'],
+    ];
+    foreach ($rawQueryTables as [$table, $idColumn, $column]) {
+        try {
+            $rows = $connection->executeQuery(
+                "SELECT `$idColumn`, `$column` FROM `$table` WHERE `$column` IS NOT NULL AND `$column` != ''"
+            )->fetchAllKeyValue();
+        } catch (\Throwable $e) {
+            continue;
+        }
+        foreach ($rows as $rowId => $rawValue) {
+            if (!is_string($rawValue)) {
+                continue;
+            }
+            $n = $fixDoubleEncoded($rawValue);
+            if ($n === null) {
+                continue;
+            }
+            $connection->executeStatement(
+                "UPDATE `$table` SET `$column` = ? WHERE `$idColumn` = ?",
+                [$n, $rowId]
+            );
+            ++$fixCount;
+        }
+    }
+
+    // Bulk export formatter.query.
+    foreach (['bulk_export' => 'params', 'bulk_exporter' => 'config'] as $table => $column) {
+        try {
+            $rows = $connection->executeQuery("SELECT `id`, `$column` FROM `$table`")->fetchAllKeyValue();
+        } catch (\Throwable $e) {
+            continue;
+        }
+        foreach ($rows as $rowId => $rowJson) {
+            $rowData = json_decode($rowJson, true);
+            if (!is_array($rowData)) {
+                continue;
+            }
+            $queryString = $rowData['formatter']['query'] ?? null;
+            if (!is_string($queryString) || $queryString === '') {
+                continue;
+            }
+            $n = $fixDoubleEncoded($queryString);
+            if ($n === null) {
+                continue;
+            }
+            $rowData['formatter']['query'] = $n;
+            $connection->executeStatement(
+                "UPDATE `$table` SET `$column` = ? WHERE `id` = ?",
+                [json_encode($rowData, $jsonFlags), $rowId]
+            );
+            ++$fixCount;
+        }
+    }
+
+    if ($fixCount) {
+        $message = new PsrMessage(
+            'Fixed {count} entries with double-encoded query strings introduced by the previous upgrade.', // @translate
+            ['count' => $fixCount]
+        );
+        $messenger->addSuccess($message);
+    }
+
+    // Initialize the new site setting used by the resource page block
+    // "Resource navigation (resourceNav)". This block displays a prev/next
+    // navigation on the item/show page within the first N ids of the last
+    // search, collection (item set) or user selection, stored in the user
+    // session. Listeners are attached to the AdvancedSearch search page, the
+    // Omeka item browse (item set show context) and the Selection show template
+    // via the standard view.browse.after event.
+    $siteIds = $api->search('sites', [], ['returnScalar' => 'id'])->getContent();
+    $renames = [
+        'advancedsearch_nav_resource_limit' => 'advancedsearch_resource_nav_limit',
+        'advancedsearch_nav_resource_types' => 'advancedsearch_resource_nav_types',
+        'advancedsearch_nav_resource_display' => 'advancedsearch_resource_nav_display',
+        'advancedsearch_nav_resource_fallback_item_set' => 'advancedsearch_resource_nav_fallback_item_set',
+    ];
+    foreach ($siteIds as $siteId) {
+        $siteSettings->setTargetId($siteId);
+        foreach ($renames as $oldKey => $newKey) {
+            $oldValue = $siteSettings->get($oldKey);
+            if ($oldValue !== null && $siteSettings->get($newKey) === null) {
+                $siteSettings->set($newKey, $oldValue);
+            }
+            if ($oldValue !== null) {
+                $siteSettings->delete($oldKey);
+            }
+        }
+        if ($siteSettings->get('advancedsearch_resource_nav_limit') === null) {
+            $siteSettings->set('advancedsearch_resource_nav_limit', 25);
+        }
+        if ($siteSettings->get('advancedsearch_resource_nav_types') === null) {
+            $siteSettings->set('advancedsearch_resource_nav_types', ['search', 'collection', 'selection']);
+        }
+        if ($siteSettings->get('advancedsearch_resource_nav_display') === null) {
+            $siteSettings->set('advancedsearch_resource_nav_display', ['type_label', 'context_label', 'position']);
+        }
+    }
+
+    $message = new PsrMessage(
+        'A new resource page block "Resource navigation" allows to display a previous/next navigation on the item page within the first results of the last search, item set or user selection.' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    // Re-enable filter types "resq" and "nresq" (resource with property
+    // having a specific value) in the admin filter types setting.
+    $filterTypes = $settings->get('advancedsearch_filter_types', []);
+    if (is_array($filterTypes) && $filterTypes) {
+        $added = false;
+        foreach (['resq', 'nresq'] as $type) {
+            if (!in_array($type, $filterTypes, true)) {
+                $filterTypes[] = $type;
+                $added = true;
+            }
+        }
+        if ($added) {
+            $settings->set('advancedsearch_filter_types', array_values($filterTypes));
+        }
+    }
+
+    // Keep legacy behavior for existing configs: filters with remove links.
+    // New configs default to "link_remove".
+    $sql = 'SELECT `id`, `settings` FROM `search_config`';
+    $searchConfigs = $connection->executeQuery($sql)->fetchAllKeyValue();
+    foreach ($searchConfigs as $scId => $scJson) {
+        $scSettings = json_decode($scJson, true) ?: [];
+        if (!isset($scSettings['results']['search_filters_mode'])) {
+            $scSettings['results']['search_filters_mode'] = 'links';
+            $connection->executeStatement(
+                'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?',
+                [
+                    json_encode($scSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+                    $scId,
+                ]
+            );
+        }
+    }
+
+    $message = new PsrMessage(
+        'A new option "Query filters display" is available in search page settings for results, that can be read only or with links (previous default).' // @translate
+    );
+    $messenger->addSuccess($message);
+
+    // Enable display of field labels in active filters and active facets for
+    // existing configs to keep the previous behavior.
+    $sql = 'SELECT `id`, `settings` FROM `search_config`';
+    $searchConfigs = $connection->executeQuery($sql)->fetchAllKeyValue();
+    foreach ($searchConfigs as $scId => $scJson) {
+        $scSettings = json_decode($scJson, true) ?: [];
+        $changed = false;
+        if (!isset($scSettings['results']['search_filters_field_label'])) {
+            $scSettings['results']['search_filters_field_label'] = '1';
+            $changed = true;
+        }
+        if (!isset($scSettings['results']['active_facets_field_label'])) {
+            $scSettings['results']['active_facets_field_label'] = '1';
+            $changed = true;
+        }
+        if ($changed) {
+            $connection->executeStatement(
+                'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?',
+                [
+                    json_encode($scSettings, $jsonFlags),
+                    $scId,
+                ]
+            );
+        }
+    }
+
+    $message = new PsrMessage(
+        'New options were added to display or hide the field label in active filters and active facets.' // @translate
+    );
+    $messenger->addSuccess($message);
+}
+
+/************************
+ * Fixes for old upgrades
+ */
+
+// Data integrity for search config references. Runs on every upgrade to repair
+// sites broken by stale `advancedsearch_all_configs` or by per-site
+// `advancedsearch_configs` not listing the ids referenced by main/items/media/
+// item_sets/item_sets_browse settings or by site navigation. Without this, a
+// search-page route may be missing while MvcListeners forces the matched route
+// to its slug on item set redirects, crashing the site.
+$allConfigs = $connection
+    ->executeQuery('SELECT `id`, `slug` FROM `search_config` ORDER BY `id` ASC')
+    ->fetchAllKeyValue();
+$allConfigs = array_map('strval', $allConfigs);
+$allConfigIds = array_map('intval', array_keys($allConfigs));
+
+// Refresh main settings: id => slug map used to register routes.
+$settings->set('advancedsearch_all_configs', $allConfigs);
+
+$listNavSearchConfigs = function (array $linksIn, array &$navSearchConfigs) use (&$listNavSearchConfigs) {
+    foreach ($linksIn as $data) {
+        if (($data['type'] ?? '') === 'searchingPage'
+            && !empty($data['data']['advancedsearch_config_id'])
+        ) {
+            $navSearchConfigs[] = (int) $data['data']['advancedsearch_config_id'];
+        }
+        if (!empty($data['links'])) {
+            $listNavSearchConfigs($data['links'], $navSearchConfigs);
+        }
+    }
+    return $navSearchConfigs;
+};
+
+$referenceKeys = [
+    'advancedsearch_main_config',
+    'advancedsearch_items_config',
+    'advancedsearch_media_config',
+    'advancedsearch_item_sets_config',
+    'advancedsearch_item_sets_browse_config',
+];
+
+$sites = $api->search('sites')->getContent();
+$repairedSites = [];
+foreach ($sites as $site) {
+    $siteSettings->setTargetId($site->id());
+    $current = $siteSettings->get('advancedsearch_configs', []) ?: [];
+    $current = array_values(array_unique(array_filter(array_map('intval', is_array($current) ? $current : []))));
+
+    $referenced = [];
+    foreach ($referenceKeys as $key) {
+        $value = (int) $siteSettings->get($key);
+        if ($value && in_array($value, $allConfigIds, true)) {
+            $referenced[] = $value;
+        } elseif ($value && !in_array($value, $allConfigIds, true)) {
+            // Stale reference to a deleted search_config: clear it.
+            $siteSettings->delete($key);
+        }
+    }
+
+    $navSearchConfigs = [];
+    $listNavSearchConfigs($site->navigation() ?: [], $navSearchConfigs);
+    foreach ($navSearchConfigs as $navId) {
+        if ($navId && in_array($navId, $allConfigIds, true)) {
+            $referenced[] = $navId;
+        }
+    }
+
+    // Drop ids that no longer exist in search_config.
+    $current = array_values(array_intersect($current, $allConfigIds));
+    $merged = array_values(array_unique(array_merge($current, $referenced)));
+    sort($merged);
+    sort($current);
+    if ($current !== $merged) {
+        $siteSettings->set('advancedsearch_configs', $merged);
+        $repairedSites[] = $site->slug();
+    }
+}
+
+if ($repairedSites) {
+    $message = new PsrMessage(
+        'Search config availability was repaired for sites referencing search pages absent from "Available search pages": {sites}.', // @translate
+        ['sites' => implode(', ', $repairedSites)]
+    );
+    $messenger->addWarning($message);
+}
+
+// Cleanup of dead settings written by historical upgrade blocks but never read
+// nor removed by any later block. Idempotent.
+$deadMainKeys = [
+    // Set at 3.4.37, never read in code, only "_property_improved",
+    // "_resource_metadata_improved" and "_media_type_improved" were deleted at
+    // 3.4.39, leaving "_metadata_improved" orphaned.
+    'advancedsearch_metadata_improved',
+];
+foreach ($deadMainKeys as $key) {
+    $settings->delete($key);
+}
+$siteIdsAll = $api->search('sites', [], ['returnScalar' => 'id'])->getContent();
+foreach ($siteIdsAll as $siteId) {
+    $siteSettings->setTargetId($siteId);
+    foreach ($deadMainKeys as $key) {
+        $siteSettings->delete($key);
+    }
 }

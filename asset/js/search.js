@@ -1339,12 +1339,13 @@ $(document).ready(function() {
      * Events.
      */
 
-    $('#search-reset, #facets-reset').on('click', function () {
+    $('#search-reset, #facets-reset').on('click', function (ev) {
+        ev.preventDefault();
         // The button may be outside the form.
         const form = $(this)[0].form;
         Search.smartClearForm(form);
-        // Reload page only when there is no button to apply.
-        if (!Search.facets.useApplyFacets) {
+        // Reload page only for facets form, when facets apply immediately.
+        if (this.id === 'facets-reset' && !Search.facets.useApplyFacets) {
             const url = new URL(window.location.href);
             const params = new URLSearchParams(url.search);
             for (const key of params.keys()) {

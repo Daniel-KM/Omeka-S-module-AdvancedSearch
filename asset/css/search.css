@@ -689,3 +689,13 @@
 .search-map-popup .popup-link {
     margin-top: 0.5em;
 }
+
+/* Resource navigation (prev/next on item page). */
+.block-resource-nav .resource-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+.block-resource-nav .resource-nav-context {
+    margin-right: 0.5em;
+}

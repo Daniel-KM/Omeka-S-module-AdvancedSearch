@@ -230,6 +230,37 @@ class SiteSettingsFieldset extends Fieldset
                 ],
             ])
 
+            ->add([
+                'name' => 'advancedsearch_resource_nav_types',
+                'type' => CommonElement\OptionalMultiCheckbox::class,
+                'options' => [
+                    'element_group' => 'advanced_search',
+                    'label' => 'Block Resource navigation: active contexts', // @translate
+                    'value_options' => [
+                        'search' => 'Search results', // @translate
+                        'collection' => 'Item set', // @translate
+                        'selection' => 'User selection', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearch_resource_nav_types',
+                ],
+            ])
+            ->add([
+                'name' => 'advancedsearch_resource_nav_limit',
+                'type' => Element\Number::class,
+                'options' => [
+                    'element_group' => 'advanced_search',
+                    'label' => 'Block Resource navigation: max results', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearch_resource_nav_limit',
+                    'min' => '0',
+                    'step' => '1',
+                    'value' => '25',
+                ],
+            ])
+
             // Specific to sites.
             ->add([
                 'name' => 'advancedsearch_item_sets_browse_config',

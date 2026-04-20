@@ -274,6 +274,27 @@ class Module extends AbstractModule
             [$this, 'appendBrowseAfter']
         );
 
+        // Store the last browse context in session for prev/next navigation
+        // on the item page via the resource page block "resourceNav".
+        $sharedEventManager->attach(
+            \AdvancedSearch\Controller\SearchController::class,
+            'view.browse.after',
+            [$this, 'storeResourceNavFromSearch']
+        );
+        $sharedEventManager->attach(
+            \Omeka\Controller\Site\Item::class,
+            'view.browse.after',
+            [$this, 'storeResourceNavFromBrowse']
+        );
+        if (class_exists(\Selection\Controller\Site\SelectionController::class, false)) {
+            // Require selection show template to trigger view.browse.after.
+            $sharedEventManager->attach(
+                \Selection\Controller\Site\SelectionController::class,
+                'view.browse.after',
+                [$this, 'storeResourceNavFromSelection']
+            );
+        }
+
         // Listeners for the indexing of items, item sets and media.
         // Let other modules to update data before indexing.
 
@@ -1030,8 +1051,8 @@ class Module extends AbstractModule
          */
         $request = $event->getParam('request');
 
-        // Unlike module Bulk Edit, "append" was used, because a
-        // hidden element was added to manage indexation at the end.
+        // Unlike module Bulk Edit, "append" was used, because a hidden element
+        // was added to manage indexation at the end.
         // Nevertheless, it makes "remove" and "append" not indexed.
         // This process avoids doctrine issue on properties, reloaded to check
         // resource templates in the core.
@@ -1059,8 +1080,292 @@ class Module extends AbstractModule
     }
 
     /**
-     * @see \Omeka\Module::attachListeners().
+     * Store bounded list of the first search ids in session.
+     *
+     * It allows the resource page block "resourceNav" to display a prev/next
+     * navigation within the last search results on the item page.
+     *
+     * Called on the AdvancedSearch search page (Solr, Internal, …).
      */
+    public function storeResourceNavFromSearch(Event $event): void
+    {
+        $services = $this->getServiceLocator();
+        if (!$services->get('Omeka\Status')->isSiteRequest()) {
+            return;
+        }
+
+        [$siteSettings, $limit, $enabledTypes] = $this->resourceNavContext();
+        if (!$limit || !in_array('search', $enabledTypes, true)) {
+            return;
+        }
+
+        /**
+         * @var \AdvancedSearch\Response $response
+         * @var \AdvancedSearch\Query $query
+         * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
+         * @var \Omeka\Api\Representation\SiteRepresentation $site
+         */
+        $view = $event->getTarget();
+        $response = $view->response ?? null;
+        $query = $view->query ?? null;
+        $searchConfig = $view->searchConfig ?? null;
+        $site = $view->site ?? null;
+        if (!$response || !$query || !$searchConfig || !$site) {
+            return;
+        }
+
+        $request = $services->get('Request');
+        $httpQuery = method_exists($request, 'getQuery') ? $request->getQuery()->toArray() : [];
+        $label = '';
+        foreach (['q', 'fulltext_search'] as $k) {
+            if (!empty($httpQuery[$k]) && is_scalar($httpQuery[$k])) {
+                $label = trim((string) $httpQuery[$k]);
+                break;
+            }
+        }
+
+        try {
+            $clonedQuery = clone $query;
+            $clonedQuery->setLimitPage(1, $limit);
+            $limitedResponse = $searchConfig->searchEngine()
+                ->querier()
+                ->setQuery($clonedQuery)
+                ->query();
+        } catch (\Throwable $e) {
+            return;
+        }
+
+        $results = $limitedResponse->getResults('items') ?: [];
+        $ids = [];
+        foreach ($results as $result) {
+            if (isset($result['id'])) {
+                $ids[] = (int) $result['id'];
+            }
+        }
+        if (!$ids) {
+            return;
+        }
+
+        $this->saveResourceNavSession([
+            'site_id' => $site->id(),
+            'type' => 'search',
+            'subtype' => '',
+            'label' => $label,
+            'url' => $request->getRequestUri(),
+            'ids' => $ids,
+            'total' => (int) ($limitedResponse->getResourceTotalResults('items') ?: count($ids)),
+            'limit' => $limit,
+        ]);
+    }
+
+    /**
+     * Store browse context (item set or general browse) from Omeka core.
+     *
+     * The item browse controller is used for item set. Only item set contexts
+     * are stored; general browses without filter are ignored.
+     */
+    public function storeResourceNavFromBrowse(Event $event): void
+    {
+        $services = $this->getServiceLocator();
+        if (!$services->get('Omeka\Status')->isSiteRequest()) {
+            return;
+        }
+
+        [$siteSettings, $limit, $enabledTypes] = $this->resourceNavContext();
+        if (!$limit || !in_array('collection', $enabledTypes, true)) {
+            return;
+        }
+
+        $view = $event->getTarget();
+
+        /** @var \Omeka\Api\Representation\SiteRepresentation|null $site */
+        $site = $view->site ?? null;
+        if (!$site) {
+            $site = $services->get('ControllerPluginManager')->get('currentSite')();
+        }
+        if (!$site) {
+            return;
+        }
+
+        // Only store when an item set is displayed (item-set/show context).
+        /** @var \Omeka\Api\Representation\ItemSetRepresentation|null $itemSet */
+        $itemSet = $view->itemSet ?? null;
+        if (!$itemSet) {
+            return;
+        }
+
+        $request = $services->get('Request');
+        $httpQuery = method_exists($request, 'getQuery') ? $request->getQuery()->toArray() : [];
+
+        $apiQuery = $httpQuery;
+        $apiQuery['site_id'] = $site->id();
+        $apiQuery['item_set_id'] = $itemSet->id();
+        $apiQuery['limit'] = $limit;
+        $apiQuery['offset'] = 0;
+        unset($apiQuery['page'], $apiQuery['per_page']);
+
+        try {
+            /** @var \Omeka\Api\Manager $api */
+            $api = $services->get('Omeka\ApiManager');
+            $apiResponse = $api->search('items', $apiQuery, ['returnScalar' => 'id']);
+            $ids = array_values(array_map('intval', $apiResponse->getContent() ?: []));
+            $total = (int) $apiResponse->getTotalResults();
+        } catch (\Throwable $e) {
+            return;
+        }
+        if (!$ids) {
+            return;
+        }
+
+        $subtype = '';
+        try {
+            $val = $itemSet->value('curation:set');
+            if ($val) {
+                $subtype = strtolower((string) $val);
+            }
+        } catch (\Throwable $e) {
+        }
+
+        $this->saveResourceNavSession([
+            'site_id' => $site->id(),
+            'type' => 'collection',
+            'subtype' => $subtype,
+            'label' => $itemSet->displayTitle(),
+            'url' => $itemSet->siteUrl(),
+            'ids' => $ids,
+            'total' => $total,
+            'limit' => $limit,
+            'item_set_id' => $itemSet->id(),
+        ]);
+    }
+
+    /**
+     * Store selection show context, triggered from selection show template.
+     */
+    public function storeResourceNavFromSelection(Event $event): void
+    {
+        $services = $this->getServiceLocator();
+        if (!$services->get('Omeka\Status')->isSiteRequest()) {
+            return;
+        }
+
+        [$siteSettings, $limit, $enabledTypes] = $this->resourceNavContext();
+        if (!$limit || !in_array('selection', $enabledTypes, true)) {
+            return;
+        }
+
+        $view = $event->getTarget();
+
+        /** @var \Selection\Api\Representation\SelectionRepresentation|null $selection */
+        $selection = $view->selection ?? null;
+        if (!$selection) {
+            return;
+        }
+
+        $selectionId = (int) $selection->id();
+
+        // Visibility: public+validated, or owned by the current user, or user
+        // with view-all permission. Match the SelectionController rules.
+        $auth = $services->get('Omeka\AuthenticationService');
+        $user = $auth->hasIdentity() ? $auth->getIdentity() : null;
+        $acl = $services->get('Omeka\Acl');
+        $canViewAll = $user && class_exists(\Selection\Entity\Selection::class)
+            && $acl->userIsAllowed(\Selection\Entity\Selection::class, 'view-all');
+        if (!$canViewAll) {
+            $isOwner = $user
+                && method_exists($selection, 'owner')
+                && $selection->owner()
+                && $selection->owner()->id() === $user->getId();
+            $isPublicAndValidated = method_exists($selection, 'isPublicAndValidated')
+                ? (bool) $selection->isPublicAndValidated()
+                : false;
+            if (!$isOwner && !$isPublicAndValidated) {
+                return;
+            }
+        }
+
+        $site = $view->site ?? null;
+        if (!$site) {
+            $site = $services->get('ControllerPluginManager')->get('currentSite')();
+        }
+        if (!$site) {
+            return;
+        }
+
+        /** @var \Omeka\Api\Manager $api */
+        $api = $services->get('Omeka\ApiManager');
+        try {
+            $srResponse = $api->search('selection_resources', [
+                'selection_id' => $selectionId,
+                'limit' => $limit,
+                'offset' => 0,
+                'sort_by' => 'id',
+                'sort_order' => 'asc',
+            ]);
+            $selectionResources = $srResponse->getContent() ?: [];
+            $total = (int) $srResponse->getTotalResults();
+        } catch (\Throwable $e) {
+            return;
+        }
+
+        $ids = [];
+        foreach ($selectionResources as $sr) {
+            $resource = method_exists($sr, 'resource') ? $sr->resource() : null;
+            if ($resource && $resource->resourceName() === 'items') {
+                $ids[] = (int) $resource->id();
+            }
+        }
+        if (!$ids) {
+            return;
+        }
+
+        $request = $services->get('Request');
+        $url = method_exists($request, 'getRequestUri') ? $request->getRequestUri() : '';
+
+        $this->saveResourceNavSession([
+            'site_id' => $site->id(),
+            'type' => 'selection',
+            'subtype' => '',
+            'label' => method_exists($selection, 'displayTitle')
+                ? (string) $selection->displayTitle()
+                : (method_exists($selection, 'label') ? (string) $selection->label() : ''),
+            'url' => $url,
+            'ids' => $ids,
+            'total' => $total,
+            'limit' => $limit,
+            'selection_id' => $selectionId,
+        ]);
+    }
+
+    /**
+     * @return array{0: \Omeka\Settings\SiteSettings, 1: int, 2: array}
+     */
+    protected function resourceNavContext(): array
+    {
+        $services = $this->getServiceLocator();
+        $siteSettings = $services->get('Omeka\Settings\Site');
+        $limit = (int) $siteSettings->get('advancedsearch_resource_nav_limit', 25);
+        $enabledTypes = $siteSettings->get('advancedsearch_resource_nav_types', ['search', 'collection', 'selection']);
+        if (!is_array($enabledTypes)) {
+            $enabledTypes = [];
+        }
+        return [$siteSettings, $limit, $enabledTypes];
+    }
+
+    protected function saveResourceNavSession(array $data): void
+    {
+        $sessionManager = \Laminas\Session\Container::getDefaultManager();
+        if (!$sessionManager->sessionExists()) {
+            try {
+                $sessionManager->start();
+            } catch (\Throwable $e) {
+                return;
+            }
+        }
+        $session = new \Laminas\Session\Container('AdvancedSearch');
+        $session->resource_nav = $data;
+    }
+
     public function appendBrowseAfter(Event $event): void
     {
         /**

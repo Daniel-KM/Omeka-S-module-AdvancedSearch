@@ -159,6 +159,7 @@ return [
     'resource_page_block_layouts' => [
         'invokables' => [
             'searchingForm' => Site\ResourcePageBlockLayout\SearchingForm::class,
+            'resourceNav' => Site\ResourcePageBlockLayout\ResourceNav::class,
         ],
     ],
     'form_elements' => [
@@ -508,6 +509,12 @@ return [
             'advancedsearch_item_sets_redirect_page_url' => [],
             'advancedsearch_item_sets_browse_config' => 0,
             'advancedsearch_item_sets_browse_page' => '',
+            'advancedsearch_resource_nav_types' => [
+                'search',
+                'collection',
+                'selection',
+            ],
+            'advancedsearch_resource_nav_limit' => 25,
             // Hidden options.
             // This option is a merge of the previous ones for simplicity.
             'advancedsearch_item_sets_redirects' => [],

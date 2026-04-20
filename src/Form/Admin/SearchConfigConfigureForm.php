@@ -816,6 +816,36 @@ class SearchConfigConfigureForm extends Form
                 ],
             ])
             ->add([
+                'name' => 'search_filters_mode',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Query filters and active facets display', // @translate
+                    'label_attributes' => [
+                        'style' => 'display: inline; margin-right: 1em;',
+                    ],
+                    'value_options' => [
+                        'readonly' => 'Simple text', // @translate
+                        'link_remove' => 'Append a cross to remove the filter', // @translate
+                        'links' => 'Whole label removes the filter', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'search_filters_mode',
+                    'value' => 'link_remove',
+                ],
+            ])
+            ->add([
+                'name' => 'search_filters_field_label',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Display the field label in active filters', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'search_filters_field_label',
+                    'value' => '1',
+                ],
+            ])
+            ->add([
                 'name' => 'active_facets',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [
@@ -830,6 +860,17 @@ class SearchConfigConfigureForm extends Form
                 'attributes' => [
                     'id' => 'active_facets',
                     'value' => 'none',
+                ],
+            ])
+            ->add([
+                'name' => 'active_facets_field_label',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Display the field label in active facets', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'active_facets_field_label',
+                    'value' => '1',
                 ],
             ])
             ->add([

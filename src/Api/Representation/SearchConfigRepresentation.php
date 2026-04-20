@@ -352,8 +352,6 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
      */
     public function renderSearchFilters(Query $query, array $options = []): string
     {
-        $template = $options['template'] ?? null;
-
         // TODO Use the managed query to get a clean query.
 
         $params = $this->getViewHelper('params');
@@ -420,10 +418,24 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         $request['__searchConfig'] = $this;
         $request['__searchQuery'] = $query;
 
-        // The search filters trigger event "'view.search.filters", that calls
+        // Forward caller options (e.g. "show_field_label") to the partial via a
+        // sentinel key in $request. The view helper SearchFilters reads it
+        // before forwarding to the partial and removes it from the query used
+        // to build "remove this filter" urls, so it does not leak into URLs.
+        // The display mode (readonly | links | link_remove) is NOT passed here:
+        // it is read from the search config setting "search_filters_mode" by
+        // the helper itself, so themes do not need to forward it. The key
+        // "template" is also not accepted: the partial used for AdvancedSearch
+        // is fixed (SearchFilters::PARTIAL_NAME, override-able by theme) and
+        // injecting a "template" option in $request would have caused the
+        // sentinel to leak into filter-remove URLs as
+        // "?__partialOptions[template]=...".
+        $request['__partialOptions'] = $options;
+
+        // The search filters trigger event "view.search.filters", that calls
         // the method filterSearchingFilter(). This process allows to use the
         // standard filters.
-        return $this->getViewHelper('searchFilters')->__invoke($template, $request);
+        return $this->getViewHelper('searchFilters')->__invoke(null, $request);
     }
 
     /**

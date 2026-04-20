@@ -21,7 +21,7 @@ class SearchFilters extends AbstractHelper
     /**
      * The default partial view script.
      */
-    const PARTIAL_NAME = 'common/search-filters';
+    const PARTIAL_NAME = 'common/search-filters-links';
 
     /**
      * @var string
@@ -126,6 +126,7 @@ class SearchFilters extends AbstractHelper
             $this->query['submit'],
             $this->query['__searchConfig'],
             $this->query['__searchQuery'],
+            $this->query['__partialOptions'],
             $this->query['__original_query'],
         );
 
@@ -559,8 +560,22 @@ class SearchFilters extends AbstractHelper
         );
         $filters = $result['filters'];
 
+        $partialOptions = is_array($query['__partialOptions'] ?? null) ? $query['__partialOptions'] : [];
+        $mode = $this->searchConfig
+            ? $this->searchConfig->subSetting('results', 'search_filters_mode', 'link_remove')
+            : 'link_remove';
+        // Caller-provided "show_field_label" wins; otherwise read from the
+        // search config so callers do not have to forward it on every call.
+        $showFieldLabel = array_key_exists('show_field_label', $partialOptions)
+            ? (bool) $partialOptions['show_field_label']
+            : ($this->searchConfig
+                ? (bool) $this->searchConfig->subSetting('results', 'search_filters_field_label', true)
+                : true);
+
         return $view->partial($partialName, [
             'filters' => $filters,
+            'show_field_label' => $showFieldLabel,
+            'mode' => $mode,
         ]);
     }
 

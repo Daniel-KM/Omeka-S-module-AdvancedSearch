@@ -105,6 +105,7 @@ class SearchingFilters extends AbstractHelper
             '__original_query' => null,
             '__searchConfig' => null,
             '__searchQuery' => null,
+            '__partialOptions' => null,
         ];
 
         $this->query = array_diff_key($query, $skip);

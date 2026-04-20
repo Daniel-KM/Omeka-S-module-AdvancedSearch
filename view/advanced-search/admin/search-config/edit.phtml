@@ -43,6 +43,11 @@ $this->headScript()
 
 $this->htmlElement('body')->appendAttribute('class', 'search-admin search-config resource edit');
 
+if (empty($form)) {
+    echo $this->pageTitle(sprintf($translate('Search page "%1$s" (%2$s)'), $searchConfig->name(), $searchConfig->slug()), 1, $translate('Search manager'));
+    return;
+}
+
 $form->prepare();
 ?>
 

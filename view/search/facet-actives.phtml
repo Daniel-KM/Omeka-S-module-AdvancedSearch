@@ -21,16 +21,32 @@ $texts = [
 ];
 ?>
 
-<ul class="facets-active">
+<?php
+$mode = $options['mode'] ?? 'link_remove';
+$showFieldLabel = $options['show_field_label'] ?? true;
+?>
+<ul class="facets-active facets-active-mode-<?= $escapeAttr($mode) ?>">
     <?php foreach ($activeFacets as $name => $facetValues) foreach ($facetValues as $facetKey => $facetValue): ?>
     <li class="facet-active">
+        <?php if ($showFieldLabel): ?>
         <span class="facet-active-label"><?= $escape($translate($facetValue['fieldLabel'])) ?></span>
-        <?= sprintf('<a class="facet-active-value" href="%1$s" data-facet-name="facet[%2$s][%3$s]" data-facet-value="%4$s">%5$s</a>',
-            $escapeAttr($facetValue['url']),
+        <?php endif; ?>
+        <?php
+        $valueLabel = $escape(sprintf($texts[$facetKey] ?? $texts['default'], $facetValue['label']));
+        $dataAttrs = sprintf(' data-facet-name="facet[%1$s][%2$s]" data-facet-value="%3$s"',
             $escapeAttr($name),
             is_numeric($facetKey) ? '' : $escapeAttr($facetKey),
-            $escapeAttr($facetValue['value']),
-            $escape(sprintf($texts[$facetKey] ?? $texts['default'], $facetValue['label']))) ?>
+            $escapeAttr($facetValue['value'])
+        );
+        if ($mode === 'readonly'):
+        ?>
+        <span class="facet-active-value"<?= $dataAttrs ?>><?= $valueLabel ?></span>
+        <?php elseif ($mode === 'link_remove'): ?>
+        <span class="facet-active-value"<?= $dataAttrs ?>><?= $valueLabel ?></span>
+        <a class="facet-active-remove" href="<?= $escapeAttr($facetValue['url']) ?>" aria-label="<?= $escapeAttr($translate('Remove this facet')) ?>" title="<?= $escapeAttr($translate('Remove this facet')) ?>">×</a>
+        <?php else: ?>
+        <a class="facet-active-value" href="<?= $escapeAttr($facetValue['url']) ?>"<?= $dataAttrs ?>><?= $valueLabel ?></a>
+        <?php endif; ?>
     </li>
     <?php endforeach; ?>
 </ul>

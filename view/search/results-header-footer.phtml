@@ -46,17 +46,23 @@ $gridListMode ??= isset($displayParts['grid_list_mode']) ? $searchConfig->subSet
 $multiMode ??= isset($displayParts['grid_list']) && !in_array($gridListMode, ['list_only', 'grid_only']);
 ?>
 
+<?php
+$filtersMode = $searchConfig->subSetting('results', 'search_filters_mode', 'link_remove');
+$showFiltersFieldLabel = (bool) $searchConfig->subSetting('results', 'search_filters_field_label', true);
+$showFacetsFieldLabel = (bool) $searchConfig->subSetting('results', 'active_facets_field_label', true);
+?>
+
 <?php // Search filters. ?>
 
 <?php if (isset($displayParts['search_filters'])): ?>
-<?= $searchConfig->renderSearchFilters($query, ['template' => 'common/search-filters-links']) ?>
+<?= $searchConfig->renderSearchFilters($query, ['show_field_label' => $showFiltersFieldLabel]) ?>
 <?php endif; ?>
 
 <?php // Active Facets. ?>
 
 <?php if (isset($displayParts['active_facets']) && $activeFacets = $response->getActiveFacets()): ?>
 <?php $facetActives = $plugins->get('facetActives'); ?>
-<?= $facetActives(null, $activeFacets, $searchConfig->setting('facet', [])) ?>
+<?= $facetActives(null, $activeFacets, $searchConfig->setting('facet', []) + ['mode' => $filtersMode, 'show_field_label' => $showFacetsFieldLabel]) ?>
 <?php endif; ?>
 
 <?php // Total results. ?>

@@ -27,7 +27,7 @@ It can be extended in two ways:
 - Adapters that will do the real work (indexing and querying).
 
 The default form answers to most of the common needs. It can be configured in
-the admin interface to make it a basic form _à la_ Google, or to build a complex
+the admin interface to make it a basic form _à la Google_, or to build a complex
 form with or without auto-suggestion, advanced filters, sort fields,
 facets, collection selector, resource class selector, resource template
 selector, properties filters with various input elements, like numbers or date
@@ -131,12 +131,12 @@ Furthermore:
   when used with api. So it is recommenced to force it by adding `sort_order=asc`
   to avoid issues.
 
-Finally, an option allows to display only the used properties and classes in the
+Finally, an option allows to display only the used proper
+ties and classes in the
 advanced search form, with chosen-select.
 
 **IMPORTANT**: the improvements done on query argument "property" were moved to
-"filter" and will be removed in a future version. So use the key "filter"
-instead of "property" for future compatibility.
+"filter" and were removed. So use the key "filter" instead of "property" for future compatibility.
 
 
 Installation
@@ -436,20 +436,54 @@ $query['filter'][] = [
     'type' => 'in',
     'val' => "text to search",
 ];
-// With property (deprecated).
-$query['property'][] = [
-    'joiner' => 'and',
-    'property' => '',
-    'except' => $excludedFields,
-    'type' => 'in',
-    'text' => "text to search",
-];
 ```
 
 The excluded fields may be one or multiple property ids or terms.
 
 The title cannot be excluded currently, because it is automatically added by
 the core.
+
+### Resource navigation block
+
+The resource page block layout `Resource navigation` adds a `< prev / next >`
+navigation on an item show page, within the context of the last browse of the
+user: search results, item set (collection/album), user selection, or an
+arbitrary series of items (a `Browse preview` block on a site page).
+
+Four navigation contexts are supported, enabled via the site setting
+`Block Resource navigation: active contexts`:
+
+- `search`: last search results (auto-stored by a view listener on search
+  controllers).
+- `collection`: item set browse or an item set of the item (fallback, see site
+  setting `Block Resource navigation: fallback item set`).
+- `selection`: user selection of the module Selection.
+- `series`: an arbitrary list built from any `Browse preview` block, when the
+  block uses the dedicated template `Advanced Search: Browse preview with
+  resource navigation`. The series is recorded in session when the user views
+  the page containing the block.
+
+Series label is resolved in this order:
+
+1. If the block is placed inside a `block group` (module BlockPlus) with two
+   `heading` blocks, the first heading is used as the type label and the
+   second as the series name, rendered as `<heading 1> : <heading 2>`.
+2. Else if the block group contains a single `heading` block, it is used as
+   the series name.
+3. Else the heading of the `browse preview` block itself is used.
+4. Else a generic `Browse` label is displayed.
+
+The "back" link attached to the label points to the page that contains the
+block.
+
+To enable the series navigation from any theme, assign the block template
+`Advanced Search: Browse preview with resource navigation` on the `Browse
+preview` block. The template renders the default core browse preview and
+records the series in the session.
+
+To propagate context through shared URLs (for collections and selections),
+the block reads the query parameters `resource_nav_item_set=<id>` and
+`resource_nav_selection=<id>` and stores them on prev/next URLs.
 
 ### Visibility
 
@@ -506,11 +540,15 @@ be some minutes with Solr, according to your configuration).
 Deprecated improvements of the advanced search elements
 -------------------------------------------------------
 
-The default advanced search form is improved mainly for the element "property"
+The default advanced search form was improved mainly for the element "property"
 to support multiple properties, many more search types, and multiple values.
-For example you can search for dcterms:creator and dcterms:contributor at the
-same time, and search for strings that look like "bossuet" and "ralelais", and
-only for data type literal:
+This improvement was removed in order to keep standard queries without the
+module. The upgrade process of the module converted all these queries into
+"filter", but you may check if some remain.
+
+In previous versions, before version 3.4.59, it was possible to search for
+dcterms:creator and dcterms:contributor at the same time, and search for strings
+that look like "bossuet" and "ralelais", and only for data type literal:
 
 ```
 property[0] => [
@@ -521,6 +559,7 @@ property[0] => [
 ```
 
 Such a query should be replaced by this one:
+
 ```
 filter[0] => [
   field => [dcterms:creator, dcterms:contributor],
@@ -529,9 +568,8 @@ filter[0] => [
 ]
 ```
 
-The change should be done mainly in the site pages when there are queries, for
-example for the block Browse Preview. You can do it directly in the user
-interface. There will be an automatic upgrade when the feature will be removed.
+The change was done automatically in version 3.4.59, but you may have some
+remaining queries in site pages or some settings.
 
 
 Upgrade from module Search

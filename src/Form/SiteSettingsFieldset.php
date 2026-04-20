@@ -163,6 +163,21 @@ class SiteSettingsFieldset extends Fieldset
                     'id' => 'advancedsearch_item_sets_browse_page',
                 ],
             ])
+            ->add([
+                'name' => 'advancedsearch_items_browse_config',
+                'type' => CommonElement\OptionalSelect::class,
+                'options' => [
+                    'element_group' => 'advanced_search',
+                    'label' => 'Redirect page "browse items" to a search page', // @translate
+                    'value_options' => [
+                        '' => 'No redirect', // @translate
+                        'default' => 'Default search page', // @translate
+                    ] + $this->searchConfigs,
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearch_items_browse_config',
+                ],
+            ])
 
             // Resource blocks.
 

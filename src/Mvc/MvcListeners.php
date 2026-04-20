@@ -41,21 +41,68 @@ class MvcListeners extends AbstractListenerAggregate
         $matchedRouteName = $routeMatch->getMatchedRouteName();
 
         if ($matchedRouteName === 'site/resource') {
-            if ($routeMatch->getParam('action') !== 'browse'
-                // The name of the controller may be in __CONTROLLER__ or
-                // controller and can change randomly.
-                || !in_array($routeMatch->getParam('controller') ?: $routeMatch->getParam('__CONTROLLER__'), ['Omeka\Controller\Site\ItemSet', 'item-set'])
-            ) {
+            if ($routeMatch->getParam('action') !== 'browse') {
                 return;
             }
-
-            // Browse item sets.
+            // The name of the controller may be in __CONTROLLER__ or controller
+            // and can change randomly.
+            $controller = $routeMatch->getParam('controller') ?: $routeMatch->getParam('__CONTROLLER__');
+            $isItemSet = in_array($controller, ['Omeka\Controller\Site\ItemSet', 'item-set']);
+            $isItem = in_array($controller, ['Omeka\Controller\Site\Item', 'item']);
+            if (!$isItemSet && !$isItem) {
+                return;
+            }
 
             $services = $event->getApplication()->getServiceManager();
             $api = $services->get('Omeka\ApiManager');
             $siteSettings = $services->get('Omeka\Settings\Site');
 
             $siteSlug = $routeMatch->getParam('site-slug');
+
+            // Browse items is redirected to a search.
+            if ($isItem) {
+                $redirectTo = $siteSettings->get('advancedsearch_items_browse_config');
+                if (!$redirectTo) {
+                    return;
+                }
+                if ($redirectTo === 'default') {
+                    $redirectTo = (int) $siteSettings->get('advancedsearch_main_config');
+                } else {
+                    $redirectTo = (int) $redirectTo;
+                }
+                if (!$redirectTo) {
+                    return;
+                }
+                $searchConfigId = &$redirectTo;
+                try {
+                    $searchConfig = $api->read('search_configs', ['id' => $searchConfigId], [], ['responseContent' => 'resource'])->getContent();
+                    $searchConfigSlug = $searchConfig->getSlug();
+                } catch (\Throwable $e) {
+                    return;
+                }
+
+                $params = [
+                    '__NAMESPACE__' => 'AdvancedSearch\Controller',
+                    '__SITE__' => true,
+                    'controller' => \AdvancedSearch\Controller\SearchController::class,
+                    'action' => 'search',
+                    'site-slug' => $siteSlug,
+                    'id' => $searchConfigId,
+                    'page-slug' => $searchConfigSlug,
+                    'search-slug' => $searchConfigSlug,
+                    'redirected' => 'items',
+                ];
+                $routeMatch = new RouteMatch($params);
+                $routeMatch->setMatchedRouteName('search-page-' . $searchConfigSlug);
+                $event->setRouteMatch($routeMatch);
+
+                /** @var \Laminas\Stdlib\Parameters $query */
+                $query = $event->getRequest()->getQuery();
+                $query->set('resource_type', 'items');
+                return;
+            }
+
+            // Browse item sets.
 
             // Browse item sets is redirected to a page.
 

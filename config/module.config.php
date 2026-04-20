@@ -515,6 +515,7 @@ return [
             'advancedsearch_item_sets_redirect_page_url' => [],
             'advancedsearch_item_sets_browse_config' => 0,
             'advancedsearch_item_sets_browse_page' => '',
+            'advancedsearch_items_browse_config' => 0,
             'advancedsearch_resource_nav_types' => [
                 'search',
                 'collection',

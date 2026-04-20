@@ -568,6 +568,11 @@ class SearchConfigController extends AbstractActionController
             'more',
             'per_page',
             'display_count',
+            // Slider scale settings: dedicated form fields, must not be moved
+            // into "options" (which is the free-form IniTextarea).
+            'scale_mode',
+            'scale_breakpoints',
+            'scale_show_ticks',
         ];
         $settings['facet']['mode'] = in_array($settings['facet']['mode'] ?? null, ['button', 'link', 'js']) ? $settings['facet']['mode'] : 'button';
         foreach ($settings['facet']['facets'] ?? [] as $key => $facet) {
@@ -730,8 +735,14 @@ class SearchConfigController extends AbstractActionController
             // There can be only one mode for all facets, so add the mode to
             // each facet to simplify theme.
             $facet['mode'] = $facetMode;
-            // Move specific settings to the root of the array.
+            // Move specific settings to the root of the array. Slider scale
+            // keys have dedicated form fields; do not let stale entries from
+            // "options" (IniTextarea) override the explicit form values.
+            $scaleKeys = ['scale_mode', 'scale_breakpoints', 'scale_show_ticks'];
             foreach ($facet['options'] as $k => $v) {
+                if (in_array($k, $scaleKeys, true) && array_key_exists($k, $facet)) {
+                    continue;
+                }
                 $facet[$k] = $v;
             }
             unset($facet['options']);

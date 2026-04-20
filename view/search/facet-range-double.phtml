@@ -29,13 +29,50 @@ $minMaxStep = ($min === '' ? '' : ' min="' . $escapeAttr($min) . '"')
     . ($step === '' ? '' : ' step="' . $escapeAttr($step) . '"');
 
 $appendButton = $options['mode'] !== 'button';
+
+$scaleMode = $options['scale_mode'] ?? 'linear';
+$scaleBreakpoints = $options['scale_breakpoints'] ?? [];
+$scaleShowTicks = !empty($options['scale_show_ticks']);
+$isPiecewise = $scaleMode === 'piecewise' && is_array($scaleBreakpoints) && count($scaleBreakpoints) >= 2;
+
+$valueToPos = function ($val, array $bp): float {
+    if ($val <= $bp[0][0]) return $bp[0][1];
+    $last = count($bp) - 1;
+    if ($val >= $bp[$last][0]) return $bp[$last][1];
+    for ($i = 0; $i < $last; $i++) {
+        if ($val >= $bp[$i][0] && $val <= $bp[$i + 1][0]) {
+            return $bp[$i][1] + ($bp[$i + 1][1] - $bp[$i][1]) * ($val - $bp[$i][0]) / ($bp[$i + 1][0] - $bp[$i][0]);
+        }
+    }
+    return $bp[$last][1];
+};
+
+if ($isPiecewise) {
+    $sliderMinMaxStep = ' min="0" max="100" step="any"';
+    $valFromForSlider = is_numeric($from ?? $min) ? (string) $valueToPos((float) ($from ?? $min), $scaleBreakpoints) : '0';
+    $valToForSlider = is_numeric($to ?? $max) ? (string) $valueToPos((float) ($to ?? $max), $scaleBreakpoints) : '100';
+    $rangeDoubleData = ' data-scale-mode="piecewise" data-scale-breakpoints="' . $escapeAttr(json_encode($scaleBreakpoints)) . '"'
+        . ($scaleShowTicks ? ' data-scale-ticks="1"' : '');
+} else {
+    $sliderMinMaxStep = $minMaxStep;
+    $valFromForSlider = $from ?? $min;
+    $valToForSlider = $to ?? $max;
+    $rangeDoubleData = '';
+}
 ?>
 
-<div class="facet-items facet-range-double range-double">
+<div class="facet-items facet-range-double range-double"<?= $rangeDoubleData ?>>
     <div class="range-sliders">
         <div class="range-progress"></div>
-        <input class="range-slider-from" type="range" name="facet[<?= $name ?>][from]" value="<?= $escapeAttr($from ?? $min) ?>"<?= $minMaxStep ?><?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($fromUrl ?? '') . '"' : '' ?>/>
-        <input class="range-slider-to" type="range" name="facet[<?= $name ?>][to]" value="<?= $escapeAttr($to ?? $max) ?>"<?= $minMaxStep ?><?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($toUrl ?? '') . '"' : '' ?>/>
+        <input class="range-slider-from" type="range" name="facet[<?= $name ?>][from]" value="<?= $escapeAttr((string) $valFromForSlider) ?>"<?= $sliderMinMaxStep ?><?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($fromUrl ?? '') . '"' : '' ?>/>
+        <input class="range-slider-to" type="range" name="facet[<?= $name ?>][to]" value="<?= $escapeAttr((string) $valToForSlider) ?>"<?= $sliderMinMaxStep ?><?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($toUrl ?? '') . '"' : '' ?>/>
+        <?php if ($isPiecewise && $scaleShowTicks): ?>
+        <div class="range-ticks">
+            <?php foreach ($scaleBreakpoints as [$tickValue, $tickPos]): ?>
+            <span class="range-tick" style="left:<?= $escapeAttr((string) $tickPos) ?>%" title="<?= $escapeAttr((string) $tickValue) ?>"><?= $this->escapeHtml((string) $tickValue) ?></span>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
     </div>
     <div class="range-numerics<?= $appendButton ? ' range-numerics-button' : '' ?>">
         <div class="range-numeric">

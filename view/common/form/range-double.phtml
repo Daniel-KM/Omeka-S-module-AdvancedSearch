@@ -26,17 +26,76 @@ $keyFrom = $element->getKeyFrom();
 $keyTo = $element->getKeyTo();
 $useInputRange = $element->getUseInputRange();
 $useInputNumber = $element->getUseInputNumber();
+
+// Defensive: methods may not exist on a stale Element class (opcache).
+$scaleMode = method_exists($element, 'getScaleMode') ? $element->getScaleMode() : 'linear';
+$scaleShowTicks = method_exists($element, 'getScaleShowTicks') ? $element->getScaleShowTicks() : false;
+$domainMin = isset($attributes['min']) && is_numeric($attributes['min']) ? (float) $attributes['min'] : null;
+$domainMax = isset($attributes['max']) && is_numeric($attributes['max']) ? (float) $attributes['max'] : null;
+$scaleBreakpoints = $scaleMode === 'piecewise' && method_exists($element, 'getResolvedScaleBreakpoints')
+    ? $element->getResolvedScaleBreakpoints($domainMin, $domainMax)
+    : [];
+$isPiecewise = $scaleMode === 'piecewise' && count($scaleBreakpoints) >= 2;
+
+$rangeDoubleAttrs = [
+    'class' => 'range-double' . (isset($attributes['class']) ? ' ' . $attributes['class'] : ''),
+];
+if ($isPiecewise) {
+    $rangeDoubleAttrs['data-scale-mode'] = 'piecewise';
+    $rangeDoubleAttrs['data-scale-breakpoints'] = json_encode($scaleBreakpoints);
+    if ($scaleShowTicks) {
+        $rangeDoubleAttrs['data-scale-ticks'] = '1';
+    }
+}
+
+$valueToPos = function ($val, array $bp): float {
+    if ($val <= $bp[0][0]) return $bp[0][1];
+    $last = count($bp) - 1;
+    if ($val >= $bp[$last][0]) return $bp[$last][1];
+    for ($i = 0; $i < $last; $i++) {
+        if ($val >= $bp[$i][0] && $val <= $bp[$i + 1][0]) {
+            return $bp[$i][1] + ($bp[$i + 1][1] - $bp[$i][1]) * ($val - $bp[$i][0]) / ($bp[$i + 1][0] - $bp[$i][0]);
+        }
+    }
+    return $bp[$last][1];
+};
+
+$min = $attributes['min'] ?? '';
+$max = $attributes['max'] ?? '';
+$valFrom = $value[$keyFrom] ?? $min;
+$valTo = $value[$keyTo] ?? $max;
 ?>
 
-<div class="range-double<?= isset($attributes['class']) ? $escapeAttr($attributes['class']) : '' ?>">
+<div <?= $formInput->createAttributesString($rangeDoubleAttrs) ?>>
     <?php if ($useInputRange):
-        $attributesFrom = ['name' => sprintf('%s[%s]', $name, $keyFrom), 'type' => 'range', 'value' => $value[$keyFrom] ?? $attributes['min'] ?? '', 'class' => 'range-slider-from'] + $attributes;
-        $attributesTo = ['name' => sprintf('%s[%s]', $name, $keyTo), 'type' => 'range', 'value' => $value[$keyTo] ?? $attributes['max'] ?? '', 'class' => 'range-slider-to'] + $attributes;
+        $sliderAttrsBase = $attributes;
+        if ($isPiecewise) {
+            $sliderAttrsBase['min'] = '0';
+            $sliderAttrsBase['max'] = '100';
+            $sliderAttrsBase['step'] = $sliderAttrsBase['step'] ?? 'any';
+            $sliderFromValue = $valFrom !== '' && is_numeric($valFrom) ? $valueToPos((float) $valFrom, $scaleBreakpoints) : 0;
+            $sliderToValue = $valTo !== '' && is_numeric($valTo) ? $valueToPos((float) $valTo, $scaleBreakpoints) : 100;
+        } else {
+            $sliderFromValue = $valFrom;
+            $sliderToValue = $valTo;
+        }
+        $attributesFrom = ['name' => sprintf('%s[%s]', $name, $keyFrom), 'type' => 'range', 'value' => $sliderFromValue, 'class' => 'range-slider-from'] + $sliderAttrsBase;
+        $attributesTo = ['name' => sprintf('%s[%s]', $name, $keyTo), 'type' => 'range', 'value' => $sliderToValue, 'class' => 'range-slider-to'] + $sliderAttrsBase;
+        // Sliders carry the position (0..100) in piecewise mode; numeric inputs
+        // carry the domain value and are submitted (numeric inputs are rendered
+        // after the sliders, so they win the duplicated name on submit).
         ?>
     <div class="range-sliders">
         <div class="range-progress"></div>
         <input <?= $formInput->createAttributesString($attributesFrom) ?>/>
         <input <?= $formInput->createAttributesString($attributesTo) ?>/>
+        <?php if ($isPiecewise && $scaleShowTicks): ?>
+        <div class="range-ticks">
+            <?php foreach ($scaleBreakpoints as [$tickValue, $tickPos]): ?>
+            <span class="range-tick" style="left:<?= $escapeAttr((string) $tickPos) ?>%" title="<?= $escapeAttr((string) $tickValue) ?>"><?= $escape((string) $tickValue) ?></span>
+            <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
     </div>
     <?php endif; ?>
     <?php if ($useInputNumber):

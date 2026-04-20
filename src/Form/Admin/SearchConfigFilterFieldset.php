@@ -6,6 +6,7 @@ use Common\Form\Element as CommonElement;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Laminas\InputFilter\InputFilterProviderInterface;
+use Omeka\Form\Element as OmekaElement;
 
 class SearchConfigFilterFieldset extends Fieldset implements InputFilterProviderInterface
 {
@@ -193,6 +194,57 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                     'value' => '100',
                 ],
             ])
+
+            // Slider scale (Range and RangeDouble only). Mode "linear" is the
+            // default and ignores breakpoints. Mode "piecewise" requires at
+            // least two breakpoints with values and positions strictly
+            // increasing from 0 to 100.
+            ->add([
+                'name' => 'scale_mode',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Slider scale (RangeDouble only)', // @translate
+                    'value_options' => [
+                        'linear' => 'Linear', // @translate
+                        'piecewise' => 'Piecewise (with breakpoints)', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_scale_mode',
+                    'value' => 'linear',
+                ],
+            ])
+            ->add([
+                'name' => 'scale_breakpoints',
+                'type' => OmekaElement\ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Scale breakpoints', // @translate
+                    'info' => 'One pair per line: value = position. Position is a percentage between 0 and 100.', // @translate
+                    'as_key_value' => true,
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_scale_breakpoints',
+                    'required' => false,
+                    'rows' => 5,
+                    'placeholder' => <<<TXT
+                        min = 0
+                        1 = 20
+                        1789 = 50
+                        max = 100
+                        TXT,
+                ],
+            ])
+            ->add([
+                'name' => 'scale_show_ticks',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Display ticks at breakpoints', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_scale_show_ticks',
+                ],
+            ])
+
             ->add([
                 'type' => CommonElement\IniTextarea::class,
                 'name' => 'options',

@@ -755,12 +755,24 @@ class MainSearchForm extends Form
         $filter['attributes']['min'] = $valueOptions['min'];
         $filter['attributes']['max'] = $valueOptions['max'];
         $element = new AdvancedSearchElement\RangeDouble($filter['field']);
+        $options = [
+            'label_from' => 'From', // @translate
+            'label_to' => 'To', // @translate
+        ] + $filter['options'];
+        // Forward scale options stored at the top of the filter config to the
+        // element so the form helper can render the piecewise slider.
+        if (isset($filter['scale_mode'])) {
+            $options['scale_mode'] = $filter['scale_mode'];
+        }
+        if (isset($filter['scale_breakpoints'])) {
+            $options['scale_breakpoints'] = $filter['scale_breakpoints'];
+        }
+        if (isset($filter['scale_show_ticks'])) {
+            $options['scale_show_ticks'] = $filter['scale_show_ticks'];
+        }
         $element
             ->setLabel($filter['label'])
-            ->setOptions([
-                'label_from' => 'From', // @translate
-                'label_to' => 'To', // @translate
-            ] + $filter['options'])
+            ->setOptions($options)
             ->setAttributes([
                 'placeholder' => $filter['attributes']['placeholder'] ?? 'YYYY', // @translate
             ] + $filter['attributes'])

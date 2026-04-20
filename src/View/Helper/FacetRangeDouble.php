@@ -43,6 +43,51 @@ class FacetRangeDouble extends AbstractFacet
             $options['max'] ??= max($vals);
         }
 
+        // Normalize scale breakpoints from ArrayTextarea storage (associative
+        // array value => position as strings) to a list of [value, position]
+        // pairs sorted by value. Resolve "min" / "max" placeholders to the
+        // domain extremes.
+        $scaleMode = $options['scale_mode'] ?? 'linear';
+        if ($scaleMode === 'piecewise' && !empty($options['scale_breakpoints']) && is_array($options['scale_breakpoints'])) {
+            $domainMin = is_numeric($options['min'] ?? null) ? (float) $options['min'] : null;
+            $domainMax = is_numeric($options['max'] ?? null) ? (float) $options['max'] : null;
+            $pairs = [];
+            foreach ($options['scale_breakpoints'] as $key => $value) {
+                if (is_array($value) && count($value) === 2) {
+                    $rawValue = $value[0];
+                    $pos = is_numeric($value[1]) ? (float) $value[1] : null;
+                } else {
+                    $rawValue = $key;
+                    $pos = is_numeric($value) ? (float) $value : null;
+                }
+                if ($pos === null) {
+                    continue;
+                }
+                if ($rawValue === 'min') {
+                    if ($domainMin === null) {
+                        continue;
+                    }
+                    $pairs[] = [$domainMin, $pos];
+                } elseif ($rawValue === 'max') {
+                    if ($domainMax === null) {
+                        continue;
+                    }
+                    $pairs[] = [$domainMax, $pos];
+                } elseif (is_numeric($rawValue)) {
+                    $pairs[] = [(float) $rawValue, $pos];
+                }
+            }
+            usort($pairs, fn ($a, $b) => $a[0] <=> $b[0]);
+            $options['scale_breakpoints'] = $pairs;
+            if (count($pairs) < 2) {
+                $options['scale_mode'] = 'linear';
+                $options['scale_breakpoints'] = [];
+            }
+        } else {
+            $options['scale_mode'] = 'linear';
+            $options['scale_breakpoints'] = [];
+        }
+
         // TODO Compute total of a numerical range when empty.
         $total = count($facetValues);
 

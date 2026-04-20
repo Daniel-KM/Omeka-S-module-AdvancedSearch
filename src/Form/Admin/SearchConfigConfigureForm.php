@@ -1494,6 +1494,145 @@ class SearchConfigConfigureForm extends Form
         return $this;
     }
 
+    public function isValid(): bool
+    {
+        $valid = parent::isValid();
+
+        // Validate piecewise scale on RangeDouble in filters and facets. Mode
+        // "linear" needs no validation. SelectRange is a pair of selects, not a
+        // slider; Range simple uses the native HTML5 input type=range without a
+        // numeric companion, so piecewise rendering is not
+        // supported there for now (TODO).
+        $data = $this->getData();
+        $scaleTypes = ['RangeDouble'];
+
+        $checks = [
+            ['form', 'filters', $scaleTypes],
+            ['facet', 'facets', $scaleTypes],
+        ];
+
+        foreach ($checks as [$top, $sub, $allowedTypes]) {
+            if (empty($data[$top][$sub]) || !is_array($data[$top][$sub])) {
+                continue;
+            }
+            foreach ($data[$top][$sub] as $name => $item) {
+                if (!is_array($item)) {
+                    continue;
+                }
+                if (($item['scale_mode'] ?? 'linear') !== 'piecewise') {
+                    continue;
+                }
+                $type = $item['type'] ?? '';
+                if (!in_array($type, $allowedTypes, true)) {
+                    $valid = false;
+                    $this->setMessages([
+                        $top => [$sub => [$name => ['scale_mode' => [
+                            sprintf(
+                                'Piecewise scale is only available for types %s.', // @translate
+                                implode(', ', $allowedTypes)
+                            ),
+                        ]]]],
+                    ]);
+                    continue;
+                }
+                $error = $this->validateScaleBreakpoints($item['scale_breakpoints'] ?? []);
+                if ($error !== null) {
+                    $valid = false;
+                    $this->setMessages([
+                        $top => [$sub => [$name => ['scale_breakpoints' => [
+                            sprintf('%s: %s', $name, $error), // @translate
+                        ]]]],
+                    ]);
+                }
+            }
+        }
+
+        return $valid;
+    }
+
+    protected function validateScaleBreakpoints(array $breakpoints): ?string
+    {
+        if (count($breakpoints) < 2) {
+            return 'At least 2 breakpoints are required.'; // @translate
+        }
+        // Keys "min" and "max" are placeholders resolved at render time from
+        // the field min/max (attributes or data). Internal values must be
+        // numeric.
+        $hasMin = false;
+        $hasMax = false;
+        $numericValues = [];
+        $numericPositions = [];
+        $minPosition = null;
+        $maxPosition = null;
+        foreach ($breakpoints as $v => $p) {
+            if (!is_numeric($p)) {
+                return 'Positions must be numeric.'; // @translate
+            }
+            $pos = (float) $p;
+            if ($pos < 0.0 || $pos > 100.0) {
+                return 'Positions must be between 0 and 100.'; // @translate
+            }
+            if ($v === 'min') {
+                if ($hasMin) {
+                    return 'Only one "min" placeholder is allowed.'; // @translate
+                }
+                $hasMin = true;
+                $minPosition = $pos;
+            } elseif ($v === 'max') {
+                if ($hasMax) {
+                    return 'Only one "max" placeholder is allowed.'; // @translate
+                }
+                $hasMax = true;
+                $maxPosition = $pos;
+            } elseif (is_numeric($v)) {
+                $numericValues[] = (float) $v;
+                $numericPositions[] = $pos;
+            } else {
+                return 'Keys must be numeric or one of "min" / "max".'; // @translate
+            }
+        }
+        if ($hasMin && $minPosition !== 0.0) {
+            return '"min" placeholder must have position 0.'; // @translate
+        }
+        if ($hasMax && $maxPosition !== 100.0) {
+            return '"max" placeholder must have position 100.'; // @translate
+        }
+        // First position must be 0 (either via "min" or first numeric). Last
+        // must be 100 (either via "max" or last numeric).
+        if (!$hasMin) {
+            // Smallest numeric position must be 0.
+            if ($numericPositions === [] || min($numericPositions) !== 0.0) {
+                return 'First position must be 0 (or use "min" placeholder).'; // @translate
+            }
+        }
+        if (!$hasMax) {
+            if ($numericPositions === [] || max($numericPositions) !== 100.0) {
+                return 'Last position must be 100 (or use "max" placeholder).'; // @translate
+            }
+        }
+        if ($numericValues) {
+            array_multisort($numericValues, $numericPositions);
+            $last = count($numericValues) - 1;
+            for ($i = 1; $i <= $last; $i++) {
+                if ($numericValues[$i] <= $numericValues[$i - 1]) {
+                    return 'Values must be strictly increasing.'; // @translate
+                }
+                if ($numericPositions[$i] <= $numericPositions[$i - 1]) {
+                    return 'Positions must be strictly increasing.'; // @translate
+                }
+            }
+            // Min/max placeholder positions must not overlap with numeric ones
+            // when both are used.
+            if ($hasMin && in_array(0.0, $numericPositions, true)) {
+                return 'A numeric breakpoint cannot share position 0 with "min".'; // @translate
+            }
+            if ($hasMax && in_array(100.0, $numericPositions, true)) {
+                return 'A numeric breakpoint cannot share position 100 with "max".'; // @translate
+            }
+        }
+        return null;
+    }
+
     protected function addFormFieldset(): self
     {
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */

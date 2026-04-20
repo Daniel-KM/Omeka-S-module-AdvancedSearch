@@ -935,6 +935,68 @@ var Search = (function() {
                 : [null, null, null, null];
         };
 
+        /**
+         * Read scale config from data attributes on .range-double. Returns {
+         * mode: 'linear'|'piecewise', breakpoints: [[v,p],...] }.
+         */
+        self.getScale = function(element) {
+            const rangeDouble = element ? element.closest('.range-double') : null;
+            if (!rangeDouble) {
+                return { mode: 'linear', breakpoints: [] };
+            }
+            const mode = rangeDouble.getAttribute('data-scale-mode') || 'linear';
+            if (mode !== 'piecewise') {
+                return { mode: 'linear', breakpoints: [] };
+            }
+            const raw = rangeDouble.getAttribute('data-scale-breakpoints') || '[]';
+            let bp;
+            try {
+                bp = JSON.parse(raw);
+            } catch (e) {
+                return { mode: 'linear', breakpoints: [] };
+            }
+            if (!Array.isArray(bp) || bp.length < 2) {
+                return { mode: 'linear', breakpoints: [] };
+            }
+            // Sort by value to be safe.
+            bp = bp.map(p => [parseFloat(p[0]), parseFloat(p[1])]).sort((a, b) => a[0] - b[0]);
+            return { mode: 'piecewise', breakpoints: bp };
+        };
+
+        /**
+         * Convert a domain value to a slider position (0..100).
+         */
+        self.valueToPos = function(val, bp) {
+            if (val <= bp[0][0]) return bp[0][1];
+            const last = bp.length - 1;
+            if (val >= bp[last][0]) return bp[last][1];
+            for (let i = 0; i < last; i++) {
+                const [v0, p0] = bp[i];
+                const [v1, p1] = bp[i + 1];
+                if (val >= v0 && val <= v1) {
+                    return p0 + (p1 - p0) * (val - v0) / (v1 - v0);
+                }
+            }
+            return bp[last][1];
+        };
+
+        /**
+         * Convert a slider position (0..100) to a domain value.
+         */
+        self.posToValue = function(pos, bp) {
+            if (pos <= bp[0][1]) return bp[0][0];
+            const last = bp.length - 1;
+            if (pos >= bp[last][1]) return bp[last][0];
+            for (let i = 0; i < last; i++) {
+                const [v0, p0] = bp[i];
+                const [v1, p1] = bp[i + 1];
+                if (pos >= p0 && pos <= p1) {
+                    return Math.round(v0 + (v1 - v0) * (pos - p0) / (p1 - p0));
+                }
+            }
+            return bp[last][0];
+        };
+
         self.controlNumericFrom = function(element) {
             const [inputFrom, inputTo, sliderFrom, sliderTo] = self.getRangeDoubleElements(element);
             // Let the user clear/edit the input freely; do not sync while the
@@ -942,12 +1004,12 @@ var Search = (function() {
             if (inputFrom.value === '' || isNaN(parseFloat(inputFrom.value))) {
                 return self;
             }
-            const [from, to] = self.parseTwoElementsToNumber(inputFrom, inputTo);
-            if (!isNaN(to) && from > to) {
-                sliderFrom.value = to;
-            } else {
-                sliderFrom.value = from;
-            }
+            const scale = self.getScale(element);
+            const [fromVal, toVal] = self.parseTwoElementsToNumber(inputFrom, inputTo);
+            const fromClamped = (!isNaN(toVal) && fromVal > toVal) ? toVal : fromVal;
+            sliderFrom.value = scale.mode === 'piecewise'
+                ? String(self.valueToPos(fromClamped, scale.breakpoints))
+                : String(fromClamped);
             self.fillSlider(inputFrom, inputTo, sliderTo);
             return self;
         };
@@ -957,12 +1019,12 @@ var Search = (function() {
             if (inputTo.value === '' || isNaN(parseFloat(inputTo.value))) {
                 return self;
             }
-            const [from, to] = self.parseTwoElementsToNumber(inputFrom, inputTo);
-            if (!isNaN(from) && from > to) {
-                sliderTo.value = from;
-            } else {
-                sliderTo.value = to;
-            }
+            const scale = self.getScale(element);
+            const [fromVal, toVal] = self.parseTwoElementsToNumber(inputFrom, inputTo);
+            const toClamped = (!isNaN(fromVal) && fromVal > toVal) ? fromVal : toVal;
+            sliderTo.value = scale.mode === 'piecewise'
+                ? String(self.valueToPos(toClamped, scale.breakpoints))
+                : String(toClamped);
             self.fillSlider(inputFrom, inputTo, sliderTo);
             self.toggleRangeSliderAccessible(sliderTo);
             return self;
@@ -970,24 +1032,34 @@ var Search = (function() {
 
         self.controlSliderFrom = function(element) {
             const [inputFrom, inputTo, sliderFrom, sliderTo] = self.getRangeDoubleElements(element);
-            const [from, to] = self.parseTwoElementsToNumber(sliderFrom, sliderTo);
-            [inputFrom.value, sliderFrom.value] = from > to ? [to, to] : [from, from];
+            const scale = self.getScale(element);
+            const [fromPos, toPos] = self.parseTwoElementsToNumber(sliderFrom, sliderTo);
+            const clampedPos = fromPos > toPos ? toPos : fromPos;
+            sliderFrom.value = String(clampedPos);
+            inputFrom.value = scale.mode === 'piecewise'
+                ? String(self.posToValue(clampedPos, scale.breakpoints))
+                : String(clampedPos);
             self.fillSlider(sliderFrom, sliderTo, sliderTo);
             return self;
         }
 
         self.controlSliderTo = function(element) {
             const [inputFrom, inputTo, sliderFrom, sliderTo] = self.getRangeDoubleElements(element);
-            const [from, to] = self.parseTwoElementsToNumber(sliderFrom, sliderTo);
-            [inputTo.value, sliderTo.value] = from <= to ? [to, to] : [from, from];
+            const scale = self.getScale(element);
+            const [fromPos, toPos] = self.parseTwoElementsToNumber(sliderFrom, sliderTo);
+            const clampedPos = fromPos > toPos ? fromPos : toPos;
+            sliderTo.value = String(clampedPos);
+            inputTo.value = scale.mode === 'piecewise'
+                ? String(self.posToValue(clampedPos, scale.breakpoints))
+                : String(clampedPos);
             self.fillSlider(sliderFrom, sliderTo, sliderTo);
             self.toggleRangeSliderAccessible(sliderTo);
             return self;
         }
 
         self.fillSlider = function(fromEl, toEl, controlSlider, colorSlider, colorRange) {
-            // Here, from and to may be the input or the slider.
-            // This is the main point to manage the double slider simply.
+            // Here, from and to may be the input or the slider. This is the
+            // main point to manage the double slider simply.
 
             const rangeDouble = controlSlider.closest('.range-double');
             if (!rangeDouble) {
@@ -998,22 +1070,35 @@ var Search = (function() {
                 return self;
             }
 
-            // Validate bounds.
-            const min = toEl.min !== '' && !isNaN(parseFloat(toEl.min)) ? parseFloat(toEl.min) : self.minDefault;
-            const max = toEl.max !== '' && !isNaN(parseFloat(toEl.max)) ? parseFloat(toEl.max) : self.maxDefault;
+            const scale = self.getScale(controlSlider);
+            let fromPct;
+            let toPct;
+            if (scale.mode === 'piecewise') {
+                // Slider value is the position (0..100); read directly from
+                // sliders to drive the progress bar regardless of which element
+                // pair (slider or numeric) was passed in.
+                const sliderFrom = rangeDouble.querySelector('.range-slider-from');
+                const sliderTo = rangeDouble.querySelector('.range-slider-to');
+                fromPct = sliderFrom && sliderFrom.value !== '' ? parseFloat(sliderFrom.value) : 0;
+                toPct = sliderTo && sliderTo.value !== '' ? parseFloat(sliderTo.value) : 100;
+            } else {
+                // Validate bounds (linear: slider min/max are domain extremes).
+                const min = toEl.min !== '' && !isNaN(parseFloat(toEl.min)) ? parseFloat(toEl.min) : self.minDefault;
+                const max = toEl.max !== '' && !isNaN(parseFloat(toEl.max)) ? parseFloat(toEl.max) : self.maxDefault;
 
-            // Parse current values.
-            const fromVal = fromEl.value !== '' && !isNaN(parseFloat(fromEl.value)) ? parseFloat(fromEl.value) : min;
-            const toVal = toEl.value !== '' && !isNaN(parseFloat(toEl.value)) ? parseFloat(toEl.value) : max;
+                // Parse current values.
+                const fromVal = fromEl.value !== '' && !isNaN(parseFloat(fromEl.value)) ? parseFloat(fromEl.value) : min;
+                const toVal = toEl.value !== '' && !isNaN(parseFloat(toEl.value)) ? parseFloat(toEl.value) : max;
 
-            const fromPct = ((Math.min(Math.max(fromVal, min), max) - min) / (max - min)) * 100;
-            const toPct = ((Math.min(Math.max(toVal, min), max) - min) / (max - min)) * 100;
+                fromPct = ((Math.min(Math.max(fromVal, min), max) - min) / (max - min)) * 100;
+                toPct = ((Math.min(Math.max(toVal, min), max) - min) / (max - min)) * 100;
+            }
 
-            const fromProgress= Math.min(fromPct, toPct);
+            const fromProgress = Math.min(fromPct, toPct);
             const toProgress = Math.max(fromPct, toPct);
 
-            // Drive CSS variables on the visible progress bar.
-            // Previous version used a linear-gradient on main range.
+            // Drive CSS variables on the visible progress bar. Previous version
+            // used a linear-gradient on main range.
             prog.style.setProperty('--from', fromProgress + '%');
             prog.style.setProperty('--to', toProgress + '%');
 
@@ -1093,28 +1178,39 @@ var Search = (function() {
             // Ensure valid bounds on all parts.
             [inputFrom, inputTo, sliderFrom, sliderTo].forEach(self.ensureValidBounds);
 
-            // Sync values: prefer the slider values if present; keep order from <= to.
-            const fromVal = parseFloat(sliderFrom && sliderFrom.value || inputFrom && inputFrom.value || self.minDefault);
-            const toVal = parseFloat(sliderTo && sliderTo.value || inputTo && inputTo.value || self.maxDefault);
-            const min = parseFloat(sliderTo ? sliderTo.min : self.minDefault);
-            const max = parseFloat(sliderTo ? sliderTo.max : self.maxDefault);
+            const scale = self.getScale(rangeDouble);
+            if (scale.mode === 'piecewise') {
+                // Numeric inputs hold domain values; sliders hold positions
+                // 0..100. Clamp domain values to scale extremes, then derive
+                // slider positions from domain values.
+                const minVal = scale.breakpoints[0][0];
+                const maxVal = scale.breakpoints[scale.breakpoints.length - 1][0];
+                const fromDomain = inputFrom && inputFrom.value !== '' && !isNaN(parseFloat(inputFrom.value))
+                    ? parseFloat(inputFrom.value) : minVal;
+                const toDomain = inputTo && inputTo.value !== '' && !isNaN(parseFloat(inputTo.value))
+                    ? parseFloat(inputTo.value) : maxVal;
+                const fromClampedVal = Math.min(Math.max(Math.min(fromDomain, toDomain), minVal), maxVal);
+                const toClampedVal = Math.min(Math.max(Math.max(fromDomain, toDomain), minVal), maxVal);
+                if (inputFrom) inputFrom.value = String(fromClampedVal);
+                if (inputTo) inputTo.value = String(toClampedVal);
+                if (sliderFrom) sliderFrom.value = String(self.valueToPos(fromClampedVal, scale.breakpoints));
+                if (sliderTo) sliderTo.value = String(self.valueToPos(toClampedVal, scale.breakpoints));
+            } else {
+                // Linear: slider value = domain value.
+                const fromVal = parseFloat(sliderFrom && sliderFrom.value || inputFrom && inputFrom.value || self.minDefault);
+                const toVal = parseFloat(sliderTo && sliderTo.value || inputTo && inputTo.value || self.maxDefault);
+                const min = parseFloat(sliderTo ? sliderTo.min : self.minDefault);
+                const max = parseFloat(sliderTo ? sliderTo.max : self.maxDefault);
 
-            const from = isNaN(fromVal) ? min : Math.min(Math.max(fromVal, min), max);
-            const to = isNaN(toVal) ? max : Math.min(Math.max(toVal, min), max);
-            const fromClamped = Math.min(from, to);
-            const toClamped = Math.max(from, to);
+                const from = isNaN(fromVal) ? min : Math.min(Math.max(fromVal, min), max);
+                const to = isNaN(toVal) ? max : Math.min(Math.max(toVal, min), max);
+                const fromClamped = Math.min(from, to);
+                const toClamped = Math.max(from, to);
 
-            if (inputFrom) {
-                inputFrom.value = String(fromClamped);
-            }
-            if (sliderFrom) {
-                sliderFrom.value = String(fromClamped);
-            }
-            if (inputTo) {
-                inputTo.value = String(toClamped);
-            }
-            if (sliderTo) {
-                sliderTo.value = String(toClamped);
+                if (inputFrom) inputFrom.value = String(fromClamped);
+                if (sliderFrom) sliderFrom.value = String(fromClamped);
+                if (inputTo) inputTo.value = String(toClamped);
+                if (sliderTo) sliderTo.value = String(toClamped);
             }
 
             // Render and adjust accessibility.
@@ -1477,10 +1573,19 @@ $(document).ready(function() {
 
             e.preventDefault();
 
-            // Get min/max from attributes.
+            // Get domain min/max (scale extremes in piecewise mode, else slider
+            // attribute values).
             const refEl = rangeDouble.find('.range-slider-from, .range-numeric-from')[0];
-            const min = parseFloat(refEl?.min);
-            const max = parseFloat(refEl?.max);
+            const scale = Search.rangeSliderDouble.getScale(refEl);
+            const isPiecewise = scale.mode === 'piecewise';
+            const numericFrom = rangeDouble.find('.range-numeric-from')[0];
+            const numericTo = rangeDouble.find('.range-numeric-to')[0];
+            const min = isPiecewise
+                ? scale.breakpoints[0][0]
+                : parseFloat(numericFrom?.min || refEl?.min);
+            const max = isPiecewise
+                ? scale.breakpoints[scale.breakpoints.length - 1][0]
+                : parseFloat(numericTo?.max || refEl?.max);
             const fromVal = parseFloat(rangeDouble.find('.range-numeric-from').val() || rangeDouble.find('.range-slider-from').val());
             const toVal = parseFloat(rangeDouble.find('.range-numeric-to').val() || rangeDouble.find('.range-slider-to').val());
 

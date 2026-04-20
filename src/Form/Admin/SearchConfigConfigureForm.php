@@ -819,7 +819,7 @@ class SearchConfigConfigureForm extends Form
                 'name' => 'search_filters_mode',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [
-                    'label' => 'Query filters and active facets display', // @translate
+                    'label' => 'Query filters display', // @translate
                     'label_attributes' => [
                         'style' => 'display: inline; margin-right: 1em;',
                     ],
@@ -831,6 +831,25 @@ class SearchConfigConfigureForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'search_filters_mode',
+                    'value' => 'link_remove',
+                ],
+            ])
+            ->add([
+                'name' => 'active_facets_mode',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Active facets display', // @translate
+                    'label_attributes' => [
+                        'style' => 'display: inline; margin-right: 1em;',
+                    ],
+                    'value_options' => [
+                        'readonly' => 'Simple text', // @translate
+                        'link_remove' => 'Append a cross to remove the facet', // @translate
+                        'links' => 'Whole label removes the facet', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'active_facets_mode',
                     'value' => 'link_remove',
                 ],
             ])
@@ -1269,6 +1288,18 @@ class SearchConfigConfigureForm extends Form
                     'id' => 'facet_display_active',
                     'required' => false,
                     'value' => true,
+                ],
+            ])
+            ->add([
+                'name' => 'display_active_field_label',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Display the field label in active facets (sidebar)', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'facet_display_active_field_label',
+                    'required' => false,
+                    'value' => false,
                 ],
             ])
             ->add([

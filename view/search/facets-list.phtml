@@ -55,7 +55,7 @@ if (!empty($itemSet)) {
     <?php if ($label = $searchConfig->subSetting('facet', 'label_active_facets', 'Active facets')): ?>
     <h4><?= $escape($translate($label)) ?></h4>
     <?php endif; ?>
-    <?= $facetActives(null, $activeFacets, $searchConfig->setting('facet')) ?>
+    <?= $facetActives(null, $activeFacets, ($searchConfig->setting('facet') ?: []) + ['facets_mode' => $searchConfig->subSetting('results', 'active_facets_mode', 'link_remove'), 'show_field_label' => (bool) $searchConfig->subSetting('facet', 'display_active_field_label', false)]) ?>
     <?php endif; ?>
 
     <form id="facets-form">

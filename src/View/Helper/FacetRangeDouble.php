@@ -54,16 +54,14 @@ class FacetRangeDouble extends AbstractFacet
         $urlTo = null;
 
         if ($isFacetModeDirect) {
-            if ($rangeFrom !== null) {
-                $queryFromOrTo = $this->queryBase;
-                unset($queryFromOrTo['facet'][$facetField]['from']);
-                $urlFrom = $this->urlHelper->__invoke($this->route, $this->params, ['query' => $queryFromOrTo]);
-            }
-            if ($rangeTo !== null) {
-                $queryFromOrTo = $this->queryBase;
-                unset($queryFromOrTo['facet'][$facetField]['to']);
-                $urlTo = $this->urlHelper->__invoke($this->route, $this->params, ['query' => $queryFromOrTo]);
-            }
+            // Always provide a base url (without current from/to) so the js
+            // submit handler can build a new query on first use.
+            $queryBaseRange = $this->queryBase;
+            unset($queryBaseRange['facet'][$facetField]['from']);
+            unset($queryBaseRange['facet'][$facetField]['to']);
+            $urlBase = $this->urlHelper->__invoke($this->route, $this->params, ['query' => $queryBaseRange]);
+            $urlFrom = $urlBase;
+            $urlTo = $urlBase;
         }
 
         return [

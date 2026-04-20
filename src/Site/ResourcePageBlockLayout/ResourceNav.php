@@ -49,7 +49,7 @@ class ResourceNav implements ResourcePageBlockLayoutInterface
             return '';
         }
 
-        $enabledTypes = $siteSetting('advancedsearch_resource_nav_types', ['search', 'collection', 'selection']);
+        $enabledTypes = $siteSetting('advancedsearch_resource_nav_types', ['search', 'collection', 'selection', 'series']);
         if (!is_array($enabledTypes) || !$enabledTypes) {
             return '';
         }

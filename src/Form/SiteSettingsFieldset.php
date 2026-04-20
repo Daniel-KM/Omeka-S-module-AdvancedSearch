@@ -240,6 +240,7 @@ class SiteSettingsFieldset extends Fieldset
                         'search' => 'Search results', // @translate
                         'collection' => 'Item set', // @translate
                         'selection' => 'User selection', // @translate
+                        'series' => 'Series in page blocks', // @translate
                     ],
                 ],
                 'attributes' => [

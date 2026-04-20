@@ -153,6 +153,7 @@ class AbstractFacet extends AbstractHelper
     {
         $isFacetModeDirect = in_array($options['mode'] ?? null, ['link', 'js']);
 
+        $skipped = [];
         foreach ($facetValues as $facetIndex => &$facetValue) {
             $facetValueValue = (string) $facetValue['value'];
 
@@ -164,12 +165,9 @@ class AbstractFacet extends AbstractHelper
                 // TODO Check item sets facets that are not filtered by site with module Search Solr.
                 // The facet value is not a real value; or not in the current
                 // site and there is a bad index.
-                // $active = false;
-                // $url = '';
-                $this->logger->__invoke()->warn(
-                    '[AdvancedSearch] The facet value "{value}" for field "{field}" is skipped because it has no label or it is not in the current site.', // @translate
-                    ['value' => $facetValueValue, 'field' => $facetField]
-                );
+                if (strlen($facetValueValue)) {
+                    $skipped[] = $facetValueValue;
+                }
                 unset($facetValues[$facetIndex]);
                 continue;
             }
@@ -180,6 +178,16 @@ class AbstractFacet extends AbstractHelper
             $facetValue['url'] = $url;
         }
         unset($facetValue);
+
+        // Aggregate to a single warning per field to avoid one log line per
+        // facet value (some indexes contain hundreds of unmatched values).
+        if ($skipped) {
+            $sample = array_slice($skipped, 0, 5);
+            $this->logger->__invoke()->warn(
+                '[AdvancedSearch] {count} facet values for field "{field}" were skipped because they have no label or are not in the current site (sample: {sample}).', // @translate
+                ['count' => count($skipped), 'field' => $facetField, 'sample' => implode(', ', $sample)]
+            );
+        }
 
         // The facets should be reordered when option is "total then alpha".
         $isTotalThenAlpha = strtok($options['order'] ?? '', ' ') === 'total_alpha' && !empty($options['more']);
@@ -242,11 +250,9 @@ class AbstractFacet extends AbstractHelper
         static $private;
         static $public;
 
-        if ($value === null || !strlen((string) $value)) {
-            return null;
-        }
-
-        // Boolean fields: translate 1/true/yes to Yes, 0/false/no to No.
+        // Boolean fields: translate 1/true/yes to Yes, anything else (including
+        // empty / missing bucket from Solr facet.missing) to No, since
+        // SearchSolr indexes the field only when the value is true.
         if (substr($facetField, -2) === '_b') {
             if (!$yes) {
                 $no = $this->translate->__invoke('No'); // @translate
@@ -255,6 +261,10 @@ class AbstractFacet extends AbstractHelper
             return in_array(strtolower((string) $value), ['1', 'true', 'yes'], true)
                 ? $yes
                 : $no;
+        }
+
+        if ($value === null || !strlen((string) $value)) {
+            return null;
         }
 
         switch ($facetField) {

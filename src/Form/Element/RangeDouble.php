@@ -276,7 +276,7 @@ class RangeDouble extends Element implements InputProviderInterface
 
     public function setScaleMode(string $mode): self
     {
-        $this->scaleMode = $mode === 'piecewise' ? 'piecewise' : 'linear';
+        $this->scaleMode = in_array($mode, ['piecewise', 'log', 'auto'], true) ? $mode : 'linear';
         return $this;
     }
 

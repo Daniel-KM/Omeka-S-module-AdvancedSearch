@@ -945,6 +945,14 @@ var Search = (function() {
                 return { mode: 'linear', breakpoints: [] };
             }
             const mode = rangeDouble.getAttribute('data-scale-mode') || 'linear';
+            if (mode === 'log') {
+                const lmin = parseFloat(rangeDouble.getAttribute('data-scale-min'));
+                const lmax = parseFloat(rangeDouble.getAttribute('data-scale-max'));
+                if (isNaN(lmin) || isNaN(lmax) || lmax <= lmin) {
+                    return { mode: 'linear', breakpoints: [] };
+                }
+                return { mode: 'log', min: lmin, max: lmax, breakpoints: [[lmin, 0], [lmax, 100]] };
+            }
             if (mode !== 'piecewise') {
                 return { mode: 'linear', breakpoints: [] };
             }
@@ -961,6 +969,32 @@ var Search = (function() {
             // Sort by value to be safe.
             bp = bp.map(p => [parseFloat(p[0]), parseFloat(p[1])]).sort((a, b) => a[0] - b[0]);
             return { mode: 'piecewise', breakpoints: bp };
+        };
+
+        self.logValueToPos = function(val, scale) {
+            if (val <= scale.min) return 0;
+            if (val >= scale.max) return 100;
+            const denom = Math.log10(scale.max - scale.min + 1);
+            return denom > 0 ? 100 * Math.log10(val - scale.min + 1) / denom : 0;
+        };
+
+        self.logPosToValue = function(pos, scale) {
+            if (pos <= 0) return scale.min;
+            if (pos >= 100) return scale.max;
+            const denom = Math.log10(scale.max - scale.min + 1);
+            return Math.round(scale.min + Math.pow(10, pos / 100 * denom) - 1);
+        };
+
+        self.domainToPos = function(val, scale) {
+            if (scale.mode === 'piecewise') return self.valueToPos(val, scale.breakpoints);
+            if (scale.mode === 'log') return self.logValueToPos(val, scale);
+            return val;
+        };
+
+        self.posToDomain = function(pos, scale) {
+            if (scale.mode === 'piecewise') return self.posToValue(pos, scale.breakpoints);
+            if (scale.mode === 'log') return self.logPosToValue(pos, scale);
+            return pos;
         };
 
         /**
@@ -1007,9 +1041,9 @@ var Search = (function() {
             const scale = self.getScale(element);
             const [fromVal, toVal] = self.parseTwoElementsToNumber(inputFrom, inputTo);
             const fromClamped = (!isNaN(toVal) && fromVal > toVal) ? toVal : fromVal;
-            sliderFrom.value = scale.mode === 'piecewise'
-                ? String(self.valueToPos(fromClamped, scale.breakpoints))
-                : String(fromClamped);
+            sliderFrom.value = scale.mode === 'linear'
+                ? String(fromClamped)
+                : String(self.domainToPos(fromClamped, scale));
             self.fillSlider(inputFrom, inputTo, sliderTo);
             return self;
         };
@@ -1022,9 +1056,9 @@ var Search = (function() {
             const scale = self.getScale(element);
             const [fromVal, toVal] = self.parseTwoElementsToNumber(inputFrom, inputTo);
             const toClamped = (!isNaN(fromVal) && fromVal > toVal) ? fromVal : toVal;
-            sliderTo.value = scale.mode === 'piecewise'
-                ? String(self.valueToPos(toClamped, scale.breakpoints))
-                : String(toClamped);
+            sliderTo.value = scale.mode === 'linear'
+                ? String(toClamped)
+                : String(self.domainToPos(toClamped, scale));
             self.fillSlider(inputFrom, inputTo, sliderTo);
             self.toggleRangeSliderAccessible(sliderTo);
             return self;
@@ -1036,9 +1070,9 @@ var Search = (function() {
             const [fromPos, toPos] = self.parseTwoElementsToNumber(sliderFrom, sliderTo);
             const clampedPos = fromPos > toPos ? toPos : fromPos;
             sliderFrom.value = String(clampedPos);
-            inputFrom.value = scale.mode === 'piecewise'
-                ? String(self.posToValue(clampedPos, scale.breakpoints))
-                : String(clampedPos);
+            inputFrom.value = scale.mode === 'linear'
+                ? String(clampedPos)
+                : String(self.posToDomain(clampedPos, scale));
             self.fillSlider(sliderFrom, sliderTo, sliderTo);
             return self;
         }
@@ -1049,9 +1083,9 @@ var Search = (function() {
             const [fromPos, toPos] = self.parseTwoElementsToNumber(sliderFrom, sliderTo);
             const clampedPos = fromPos > toPos ? fromPos : toPos;
             sliderTo.value = String(clampedPos);
-            inputTo.value = scale.mode === 'piecewise'
-                ? String(self.posToValue(clampedPos, scale.breakpoints))
-                : String(clampedPos);
+            inputTo.value = scale.mode === 'linear'
+                ? String(clampedPos)
+                : String(self.posToDomain(clampedPos, scale));
             self.fillSlider(sliderFrom, sliderTo, sliderTo);
             self.toggleRangeSliderAccessible(sliderTo);
             return self;
@@ -1073,7 +1107,7 @@ var Search = (function() {
             const scale = self.getScale(controlSlider);
             let fromPct;
             let toPct;
-            if (scale.mode === 'piecewise') {
+            if (scale.mode === 'piecewise' || scale.mode === 'log') {
                 // Slider value is the position (0..100); read directly from
                 // sliders to drive the progress bar regardless of which element
                 // pair (slider or numeric) was passed in.
@@ -1179,12 +1213,12 @@ var Search = (function() {
             [inputFrom, inputTo, sliderFrom, sliderTo].forEach(self.ensureValidBounds);
 
             const scale = self.getScale(rangeDouble);
-            if (scale.mode === 'piecewise') {
+            if (scale.mode === 'piecewise' || scale.mode === 'log') {
                 // Numeric inputs hold domain values; sliders hold positions
                 // 0..100. Clamp domain values to scale extremes, then derive
                 // slider positions from domain values.
-                const minVal = scale.breakpoints[0][0];
-                const maxVal = scale.breakpoints[scale.breakpoints.length - 1][0];
+                const minVal = scale.mode === 'log' ? scale.min : scale.breakpoints[0][0];
+                const maxVal = scale.mode === 'log' ? scale.max : scale.breakpoints[scale.breakpoints.length - 1][0];
                 const fromDomain = inputFrom && inputFrom.value !== '' && !isNaN(parseFloat(inputFrom.value))
                     ? parseFloat(inputFrom.value) : minVal;
                 const toDomain = inputTo && inputTo.value !== '' && !isNaN(parseFloat(inputTo.value))
@@ -1193,8 +1227,8 @@ var Search = (function() {
                 const toClampedVal = Math.min(Math.max(Math.max(fromDomain, toDomain), minVal), maxVal);
                 if (inputFrom) inputFrom.value = String(fromClampedVal);
                 if (inputTo) inputTo.value = String(toClampedVal);
-                if (sliderFrom) sliderFrom.value = String(self.valueToPos(fromClampedVal, scale.breakpoints));
-                if (sliderTo) sliderTo.value = String(self.valueToPos(toClampedVal, scale.breakpoints));
+                if (sliderFrom) sliderFrom.value = String(self.domainToPos(fromClampedVal, scale));
+                if (sliderTo) sliderTo.value = String(self.domainToPos(toClampedVal, scale));
             } else {
                 // Linear: slider value = domain value.
                 const fromVal = parseFloat(sliderFrom && sliderFrom.value || inputFrom && inputFrom.value || self.minDefault);
@@ -1577,15 +1611,15 @@ $(document).ready(function() {
             // attribute values).
             const refEl = rangeDouble.find('.range-slider-from, .range-numeric-from')[0];
             const scale = Search.rangeSliderDouble.getScale(refEl);
-            const isPiecewise = scale.mode === 'piecewise';
+            const isMapped = scale.mode === 'piecewise' || scale.mode === 'log';
             const numericFrom = rangeDouble.find('.range-numeric-from')[0];
             const numericTo = rangeDouble.find('.range-numeric-to')[0];
-            const min = isPiecewise
+            const min = scale.mode === 'piecewise'
                 ? scale.breakpoints[0][0]
-                : parseFloat(numericFrom?.min || refEl?.min);
-            const max = isPiecewise
+                : (scale.mode === 'log' ? scale.min : parseFloat(numericFrom?.min || refEl?.min));
+            const max = scale.mode === 'piecewise'
                 ? scale.breakpoints[scale.breakpoints.length - 1][0]
-                : parseFloat(numericTo?.max || refEl?.max);
+                : (scale.mode === 'log' ? scale.max : parseFloat(numericTo?.max || refEl?.max));
             const fromVal = parseFloat(rangeDouble.find('.range-numeric-from').val() || rangeDouble.find('.range-slider-from').val());
             const toVal = parseFloat(rangeDouble.find('.range-numeric-to').val() || rangeDouble.find('.range-slider-to').val());
 

@@ -34,6 +34,16 @@ $scaleMode = $options['scale_mode'] ?? 'linear';
 $scaleBreakpoints = $options['scale_breakpoints'] ?? [];
 $scaleShowTicks = !empty($options['scale_show_ticks']);
 $isPiecewise = $scaleMode === 'piecewise' && is_array($scaleBreakpoints) && count($scaleBreakpoints) >= 2;
+$isLog = $scaleMode === 'log' && is_numeric($min) && is_numeric($max) && (float) $max > (float) $min;
+
+$logValueToPos = function ($val) use ($min, $max): float {
+    $a = (float) $min;
+    $b = (float) $max;
+    if ($val <= $a) return 0.0;
+    if ($val >= $b) return 100.0;
+    $denom = log10($b - $a + 1.0);
+    return $denom > 0 ? 100.0 * log10($val - $a + 1.0) / $denom : 0.0;
+};
 
 $valueToPos = function ($val, array $bp): float {
     if ($val <= $bp[0][0]) return $bp[0][1];
@@ -52,6 +62,14 @@ if ($isPiecewise) {
     $valFromForSlider = is_numeric($from ?? $min) ? (string) $valueToPos((float) ($from ?? $min), $scaleBreakpoints) : '0';
     $valToForSlider = is_numeric($to ?? $max) ? (string) $valueToPos((float) ($to ?? $max), $scaleBreakpoints) : '100';
     $rangeDoubleData = ' data-scale-mode="piecewise" data-scale-breakpoints="' . $escapeAttr(json_encode($scaleBreakpoints)) . '"'
+        . ($scaleShowTicks ? ' data-scale-ticks="1"' : '');
+} elseif ($isLog) {
+    $sliderMinMaxStep = ' min="0" max="100" step="any"';
+    $valFromForSlider = is_numeric($from ?? $min) ? (string) $logValueToPos((float) ($from ?? $min)) : '0';
+    $valToForSlider = is_numeric($to ?? $max) ? (string) $logValueToPos((float) ($to ?? $max)) : '100';
+    $rangeDoubleData = ' data-scale-mode="log"'
+        . ' data-scale-min="' . $escapeAttr((string) $min) . '"'
+        . ' data-scale-max="' . $escapeAttr((string) $max) . '"'
         . ($scaleShowTicks ? ' data-scale-ticks="1"' : '');
 } else {
     $sliderMinMaxStep = $minMaxStep;

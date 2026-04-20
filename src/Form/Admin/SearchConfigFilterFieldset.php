@@ -222,7 +222,9 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                     'label' => 'Slider scale (RangeDouble only)', // @translate
                     'value_options' => [
                         'linear' => 'Linear', // @translate
+                        'log' => 'Logarithmic', // @translate
                         'piecewise' => 'Piecewise (with breakpoints)', // @translate
+                        'auto' => 'Auto (quartiles from data)', // @translate
                     ],
                 ],
                 'attributes' => [

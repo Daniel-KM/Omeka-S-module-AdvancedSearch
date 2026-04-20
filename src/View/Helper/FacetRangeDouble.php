@@ -48,7 +48,65 @@ class FacetRangeDouble extends AbstractFacet
         // pairs sorted by value. Resolve "min" / "max" placeholders to the
         // domain extremes.
         $scaleMode = $options['scale_mode'] ?? 'linear';
-        if ($scaleMode === 'piecewise' && !empty($options['scale_breakpoints']) && is_array($options['scale_breakpoints'])) {
+
+        // Auto mode: derive piecewise breakpoints from quartiles of the
+        // distribution of facet values, then process as "piecewise".
+        if ($scaleMode === 'auto') {
+            $domainMin = is_numeric($options['min'] ?? null) ? (float) $options['min'] : null;
+            $domainMax = is_numeric($options['max'] ?? null) ? (float) $options['max'] : null;
+            $vals = array_values(array_filter(array_map(
+                fn ($v) => is_numeric($v['value'] ?? null) ? (float) $v['value'] : null,
+                $facetValues
+            ), fn ($v) => $v !== null));
+            sort($vals);
+            $count = count($vals);
+            if ($count >= 4 && $domainMin !== null && $domainMax !== null && $domainMax > $domainMin) {
+                $quartile = function (array $sorted, float $p) use ($count): float {
+                    $i = (int) floor(($count - 1) * $p);
+                    return (float) $sorted[$i];
+                };
+                $q25 = $quartile($vals, 0.25);
+                $q50 = $quartile($vals, 0.50);
+                $q75 = $quartile($vals, 0.75);
+                $breakpoints = [
+                    [$domainMin, 0.0],
+                    [$q25, 25.0],
+                    [$q50, 50.0],
+                    [$q75, 75.0],
+                    [$domainMax, 100.0],
+                ];
+                $unique = [];
+                foreach ($breakpoints as $bp) {
+                    $unique[(string) $bp[0]] = $bp;
+                }
+                ksort($unique, SORT_NUMERIC);
+                $bps = array_values($unique);
+                $valid = count($bps) >= 2;
+                for ($k = 1; $k < count($bps) && $valid; $k++) {
+                    if ($bps[$k][0] <= $bps[$k - 1][0] || $bps[$k][1] <= $bps[$k - 1][1]) {
+                        $valid = false;
+                    }
+                }
+                if ($valid) {
+                    $options['scale_mode'] = 'piecewise';
+                    $options['scale_breakpoints'] = $bps;
+                    $scaleMode = 'piecewise';
+                } else {
+                    $options['scale_mode'] = 'linear';
+                    $options['scale_breakpoints'] = [];
+                    $scaleMode = 'linear';
+                }
+            } else {
+                $options['scale_mode'] = 'linear';
+                $options['scale_breakpoints'] = [];
+                $scaleMode = 'linear';
+            }
+        }
+
+        if ($scaleMode === 'log') {
+            $options['scale_mode'] = 'log';
+            $options['scale_breakpoints'] = [];
+        } elseif ($scaleMode === 'piecewise' && !empty($options['scale_breakpoints']) && is_array($options['scale_breakpoints'])) {
             $domainMin = is_numeric($options['min'] ?? null) ? (float) $options['min'] : null;
             $domainMax = is_numeric($options['max'] ?? null) ? (float) $options['max'] : null;
             $pairs = [];

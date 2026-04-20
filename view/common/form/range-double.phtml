@@ -36,6 +36,8 @@ $scaleBreakpoints = $scaleMode === 'piecewise' && method_exists($element, 'getRe
     ? $element->getResolvedScaleBreakpoints($domainMin, $domainMax)
     : [];
 $isPiecewise = $scaleMode === 'piecewise' && count($scaleBreakpoints) >= 2;
+$isLog = $scaleMode === 'log' && $domainMin !== null && $domainMax !== null && $domainMax > $domainMin;
+$isMapped = $isPiecewise || $isLog;
 
 $rangeDoubleAttrs = [
     'class' => 'range-double' . (isset($attributes['class']) ? ' ' . $attributes['class'] : ''),
@@ -43,6 +45,13 @@ $rangeDoubleAttrs = [
 if ($isPiecewise) {
     $rangeDoubleAttrs['data-scale-mode'] = 'piecewise';
     $rangeDoubleAttrs['data-scale-breakpoints'] = json_encode($scaleBreakpoints);
+    if ($scaleShowTicks) {
+        $rangeDoubleAttrs['data-scale-ticks'] = '1';
+    }
+} elseif ($isLog) {
+    $rangeDoubleAttrs['data-scale-mode'] = 'log';
+    $rangeDoubleAttrs['data-scale-min'] = (string) $domainMin;
+    $rangeDoubleAttrs['data-scale-max'] = (string) $domainMax;
     if ($scaleShowTicks) {
         $rangeDoubleAttrs['data-scale-ticks'] = '1';
     }
@@ -60,6 +69,14 @@ $valueToPos = function ($val, array $bp): float {
     return $bp[$last][1];
 };
 
+$logValueToPos = function ($val) use ($domainMin, $domainMax): float {
+    if ($domainMin === null || $domainMax === null || $domainMax <= $domainMin) return 0.0;
+    if ($val <= $domainMin) return 0.0;
+    if ($val >= $domainMax) return 100.0;
+    $denom = log10($domainMax - $domainMin + 1.0);
+    return $denom > 0 ? 100.0 * log10($val - $domainMin + 1.0) / $denom : 0.0;
+};
+
 $min = $attributes['min'] ?? '';
 $max = $attributes['max'] ?? '';
 $valFrom = $value[$keyFrom] ?? $min;
@@ -75,6 +92,12 @@ $valTo = $value[$keyTo] ?? $max;
             $sliderAttrsBase['step'] = $sliderAttrsBase['step'] ?? 'any';
             $sliderFromValue = $valFrom !== '' && is_numeric($valFrom) ? $valueToPos((float) $valFrom, $scaleBreakpoints) : 0;
             $sliderToValue = $valTo !== '' && is_numeric($valTo) ? $valueToPos((float) $valTo, $scaleBreakpoints) : 100;
+        } elseif ($isLog) {
+            $sliderAttrsBase['min'] = '0';
+            $sliderAttrsBase['max'] = '100';
+            $sliderAttrsBase['step'] = $sliderAttrsBase['step'] ?? 'any';
+            $sliderFromValue = $valFrom !== '' && is_numeric($valFrom) ? $logValueToPos((float) $valFrom) : 0;
+            $sliderToValue = $valTo !== '' && is_numeric($valTo) ? $logValueToPos((float) $valTo) : 100;
         } else {
             $sliderFromValue = $valFrom;
             $sliderToValue = $valTo;

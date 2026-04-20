@@ -178,6 +178,8 @@ return [
             Form\Admin\SearchConfigConfigureForm::class => Service\Form\SearchConfigConfigureFormFactory::class,
             Form\Admin\SearchConfigFacetFieldset::class => \Common\Service\Form\GenericFormFactory::class,
             Form\Admin\SearchConfigFilterFieldset::class => \Common\Service\Form\GenericFormFactory::class,
+            Form\Admin\SearchConfigSettingsFieldset::class => Service\Form\SearchConfigSettingsFieldsetFactory::class,
+            Form\Admin\SearchConfigSitesFieldset::class => Service\Form\SearchConfigSitesFieldsetFactory::class,
             Form\Admin\SearchConfigSortFieldset::class => \Common\Service\Form\GenericFormFactory::class,
             Form\Admin\SearchConfigForm::class => Service\Form\SearchConfigFormFactory::class,
             Form\Admin\SearchEngineConfigureForm::class => \Common\Service\Form\GenericFormFactory::class,
@@ -382,24 +384,6 @@ return [
                         ],
                     ],
                 ],
-            ],
-        ],
-        'AdvancedSearch\Config' => [
-            [
-                'label' => 'Settings', // @translate
-                'route' => 'admin/search-manager/config-id',
-                'resource' => Controller\Admin\SearchConfigController::class,
-                'action' => 'edit',
-                'privilege' => 'edit',
-                'useRouteMatch' => true,
-            ],
-            [
-                'label' => 'Configure', // @translate
-                'route' => 'admin/search-manager/config-id',
-                'resource' => Controller\Admin\SearchConfigController::class,
-                'action' => 'configure',
-                'privilege' => 'edit',
-                'useRouteMatch' => true,
             ],
         ],
     ],

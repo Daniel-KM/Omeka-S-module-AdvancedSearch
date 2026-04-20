@@ -134,7 +134,7 @@ class UserBarDelegator extends UserBar
             'resource' => 'advanced-search-config',
             'action' => 'browse',
             'text' => $translate('Search config', null, $locale), // @translate
-            'url' => $url('admin/search-manager/config-id', ['id' => $params['id'], 'action' => 'configure']),
+            'url' => $url('admin/search-manager/config-id', ['id' => $params['id'], 'action' => 'edit']),
         ];
 
         return $links;

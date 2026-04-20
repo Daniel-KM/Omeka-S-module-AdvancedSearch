@@ -172,14 +172,6 @@ $runningSuggesterJobs = $runningJobs['suggesters'] ?? [];
                                     'title' => $translate('Edit'),
                                 ]) ?>
                             </li>
-                            <?php if ($searchConfig->engineAdapter()): ?>
-                            <li>
-                                <?= $searchConfig->link('', 'configure', [
-                                    'class' => 'o-icon- fa fa-sliders fa-sliders-h',
-                                    'title' => $translate('Configure facets and sort fields'),
-                                ]) ?>
-                            </li>
-                            <?php endif; ?>
                             <li>
                                 <?= $searchConfig->link('', 'copy', [
                                     'class' => 'o-icon- far fa-copy copy-search-config',

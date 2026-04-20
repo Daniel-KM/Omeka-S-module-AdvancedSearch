@@ -81,7 +81,117 @@ class SearchConfigConfigureForm extends Form
         $this
             ->setAttribute('id', 'search-config-configure-form');
 
-        // Settings for the search engine. Can be overwritten by a specific form.
+        // Tab 1: general settings (name, slug, engine, form adapter).
+        $this->add([
+            'type' => \AdvancedSearch\Form\Admin\SearchConfigSettingsFieldset::class,
+            'name' => 'settings',
+            'options' => [
+                'label' => 'Settings', // @translate
+            ],
+        ]);
+
+        // Tab 2: sites usage (default + availability).
+        $this->add([
+            'type' => \AdvancedSearch\Form\Admin\SearchConfigSitesFieldset::class,
+            'name' => 'sites',
+            'options' => [
+                'label' => 'Sites', // @translate
+            ],
+        ]);
+
+        // Settings for the search engine. Can be overwritten by a specific
+        // form.
+
+        $this
+            ->add([
+                'name' => 'index',
+                'type' => Fieldset::class,
+                'options' => [
+                    'label' => 'Indexes', // @translate
+                ],
+            ])
+            ->get('index')
+
+            ->add([
+                'name' => 'aliases',
+                'type' => CommonElement\DataTextarea::class,
+                'options' => [
+                    'label' => 'Aliases and aggregated fields', // @translate
+                    'info' => 'List of fields that refers to one or multiple indexes (properties with internal search engine, native indexes with Solr), formatted "name = label", then the list of properties and an empty line. The name must not be a property term or a reserved keyword. With query args below, they can be seen as simple shortcuts of filters easy to implement in forms.', // @translate
+                    'documentation' => 'https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch/-/blob/master/data/configs/search_engine.internal.php',
+                    'as_key_value' => true,
+                    'key_value_separator' => '=',
+                    'data_options' => [
+                        'name' => null,
+                        'label' => null,
+                        'fields' => ',',
+                    ],
+                    'data_text_mode' => 'last_is_list',
+                ],
+                'attributes' => [
+                    'id' => 'index_aliases',
+                    'required' => false,
+                    'rows' => 12,
+                    'placeholder' => <<<'STRING'
+                            author = Author
+                            dcterms:creator
+                            dcterms:contributor
+
+                            title = Title
+                            dcterms:title
+                            dcterms:alternative
+
+                            date = Date
+                            dcterms:date
+                            dcterms:created
+                            dcterms:issued
+                            STRING,
+                ],
+            ])
+            ->add([
+                'type' => CommonElement\IniTextarea::class,
+                'name' => 'query_args',
+                'options' => [
+                    'label' => 'Query arguments for fields', // @translate
+                    'info' => 'Define the query arguments to use with simple fields. Defaults are "type" = "eq" and "join" = "and". Type may be any of the query type of filters. Join may be "and", "or", "not".', // @translate
+                    'documentation' => 'https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch',
+                    'ini_typed_mode' => true,
+                ],
+                'attributes' => [
+                    'id' => 'index_query_args',
+                    'required' => false,
+                    'rows' => 12,
+                    'placeholder' => <<<'STRING'
+                            [title]
+                            type = in
+
+                            [author]
+                            type = res
+                            STRING,
+                ],
+            ])
+            ->add([
+                'name' => 'field_boosts',
+                'type' => OmekaElement\ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Boost multipliers by index (Solr only)', // @translate
+                    'as_key_value' => true,
+                ],
+                'attributes' => [
+                    'id' => 'field_boosts',
+                    'required' => false,
+                    'rows' => 12,
+                    'placeholder' => <<<'STRING'
+                            dcterms_creator_ss = 100
+                            dcterms_creator_txt = 50
+                            dcterms_subject_ss = 10
+                            dcterms_subject_txt = 5
+                            dcterms_description_txt = 0.01
+                            bibo_content_txt = 0.001
+                            STRING,
+                ],
+            ])
+        ;
 
         $this
             ->add([
@@ -162,97 +272,6 @@ class SearchConfigConfigureForm extends Form
                 ],
                 'attributes' => [
                     'id' => 'query_default_field',
-                ],
-            ])
-        ;
-
-        $this
-            ->add([
-                'name' => 'index',
-                'type' => Fieldset::class,
-                'options' => [
-                    'label' => 'Indexes', // @translate
-                ],
-            ])
-            ->get('index')
-
-            ->add([
-                'name' => 'aliases',
-                'type' => CommonElement\DataTextarea::class,
-                'options' => [
-                    'label' => 'Aliases and aggregated fields', // @translate
-                    'info' => 'List of fields that refers to one or multiple indexes (properties with internal search engine, native indexes with Solr), formatted "name = label", then the list of properties and an empty line. The name must not be a property term or a reserved keyword. With query args below, they can be seen as simple shortcuts of filters easy to implement in forms.', // @translate
-                    'documentation' => 'https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch/-/blob/master/data/configs/search_engine.internal.php',
-                    'as_key_value' => true,
-                    'key_value_separator' => '=',
-                    'data_options' => [
-                        'name' => null,
-                        'label' => null,
-                        'fields' => ',',
-                    ],
-                    'data_text_mode' => 'last_is_list',
-                ],
-                'attributes' => [
-                    'id' => 'index_aliases',
-                    'required' => false,
-                    'rows' => 12,
-                    'placeholder' => <<<'STRING'
-                        author = Author
-                        dcterms:creator
-                        dcterms:contributor
-                        
-                        title = Title
-                        dcterms:title
-                        dcterms:alternative
-                        
-                        date = Date
-                        dcterms:date
-                        dcterms:created
-                        dcterms:issued
-                        STRING,
-                ],
-            ])
-            ->add([
-                'type' => CommonElement\IniTextarea::class,
-                'name' => 'query_args',
-                'options' => [
-                    'label' => 'Query arguments for fields', // @translate
-                    'info' => 'Define the query arguments to use with simple fields. Defaults are "type" = "eq" and "join" = "and". Type may be any of the query type of filters. Join may be "and", "or", "not".', // @translate
-                    'documentation' => 'https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch',
-                    'ini_typed_mode' => true,
-                ],
-                'attributes' => [
-                    'id' => 'index_query_args',
-                    'required' => false,
-                    'rows' => 12,
-                    'placeholder' => <<<'STRING'
-                        [title]
-                        type = in
-                        
-                        [author]
-                        type = res
-                        STRING,
-                ],
-            ])
-            ->add([
-                'name' => 'field_boosts',
-                'type' => OmekaElement\ArrayTextarea::class,
-                'options' => [
-                    'label' => 'Boost multipliers by index (Solr only)', // @translate
-                    'as_key_value' => true,
-                ],
-                'attributes' => [
-                    'id' => 'field_boosts',
-                    'required' => false,
-                    'rows' => 12,
-                    'placeholder' => <<<'STRING'
-                        dcterms_creator_ss = 100
-                        dcterms_creator_txt = 50
-                        dcterms_subject_ss = 10
-                        dcterms_subject_txt = 5
-                        dcterms_description_txt = 0.01
-                        bibo_content_txt = 0.001
-                        STRING,
                 ],
             ])
         ;

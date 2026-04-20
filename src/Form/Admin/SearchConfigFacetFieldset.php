@@ -235,6 +235,25 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
             ])
 
+            ->add([
+                'name' => 'boolean_filter',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Boolean buckets (fields ending with "_b")', // @translate
+                    'info' => 'Filter Solr facet buckets for boolean fields. Default shows all returned buckets (typically Yes and No).', // @translate
+                    'value_options' => [
+                        '' => 'Show all buckets', // @translate
+                        'truthy_only' => 'Show only "Yes" bucket', // @translate
+                        'falsy_only' => 'Show only "No" bucket', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'facet_boolean_filter',
+                    'required' => false,
+                    'value' => '',
+                ],
+            ])
+
             // Slider scale (RangeDouble and SelectRange only). Mode "linear" is
             // the default and ignores breakpoints. Mode "piecewise" requires at
             // least two breakpoints with values and positions strictly

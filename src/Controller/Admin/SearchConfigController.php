@@ -573,6 +573,8 @@ class SearchConfigController extends AbstractActionController
             'scale_mode',
             'scale_breakpoints',
             'scale_show_ticks',
+            // Boolean buckets filter: dedicated form field.
+            'boolean_filter',
         ];
         $settings['facet']['mode'] = in_array($settings['facet']['mode'] ?? null, ['button', 'link', 'js']) ? $settings['facet']['mode'] : 'button';
         foreach ($settings['facet']['facets'] ?? [] as $key => $facet) {
@@ -735,12 +737,18 @@ class SearchConfigController extends AbstractActionController
             // There can be only one mode for all facets, so add the mode to
             // each facet to simplify theme.
             $facet['mode'] = $facetMode;
-            // Move specific settings to the root of the array. Slider scale
-            // keys have dedicated form fields; do not let stale entries from
-            // "options" (IniTextarea) override the explicit form values.
-            $scaleKeys = ['scale_mode', 'scale_breakpoints', 'scale_show_ticks'];
+            // Move specific settings to the root of the array. Keys with
+            // dedicated form fields must not be overridden by stale entries
+            // coming from the "options" IniTextarea.
+            $reservedKeys = [
+                'boolean_filter',
+                'field_end',
+                'scale_mode',
+                'scale_breakpoints',
+                'scale_show_ticks',
+            ];
             foreach ($facet['options'] as $k => $v) {
-                if (in_array($k, $scaleKeys, true) && array_key_exists($k, $facet)) {
+                if (in_array($k, $reservedKeys, true) && array_key_exists($k, $facet)) {
                     continue;
                 }
                 $facet[$k] = $v;

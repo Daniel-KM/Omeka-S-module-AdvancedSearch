@@ -153,6 +153,19 @@ class AbstractFacet extends AbstractHelper
     {
         $isFacetModeDirect = in_array($options['mode'] ?? null, ['link', 'js']);
 
+        // Filter boolean buckets when "boolean_filter" is set on the facet.
+        // Applies to fields ending with "_b" (Solr dynamic field convention)
+        // and to non-Solr boolean fields named "is_public".
+        $boolFilter = $options['boolean_filter'] ?? '';
+        $isBoolField = substr($facetField, -2) === '_b' || $facetField === 'is_public';
+        if ($boolFilter && $isBoolField) {
+            $facetValues = array_filter($facetValues, function ($f) use ($boolFilter) {
+                $v = strtolower((string) ($f['value'] ?? ''));
+                $isTruthy = in_array($v, ['1', 'true', 'yes'], true);
+                return $boolFilter === 'truthy_only' ? $isTruthy : !$isTruthy;
+            });
+        }
+
         $skipped = [];
         foreach ($facetValues as $facetIndex => &$facetValue) {
             $facetValueValue = (string) $facetValue['value'];

@@ -708,6 +708,13 @@ return [
                 'default_site' => false,
             ],
 
+            // From module Data Type EDTF.
+            'common/data-type-edtf-advanced-search' => [
+                'module' => 'DataTypeEdtf',
+                'label' => 'Extended date time format', // @translate
+                'resource_type' => ['item_sets', 'items', 'media'],
+            ],
+
             // From module Data Type Geometry.
             'common/advanced-search/data-type-geography' => [
                 'module' => 'DataTypeGeometry',

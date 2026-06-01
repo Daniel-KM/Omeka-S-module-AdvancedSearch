@@ -461,32 +461,47 @@ class ApiSearch extends AbstractPlugin
      */
     protected function limitQuery(Query $searchQuery, array $query, array $options): void
     {
-        if (is_numeric($query['page'])) {
-            $searchPage = $query['page'] > 0 ? (int) $query['page'] : 1;
-            if (is_numeric($query['per_page']) && $query['per_page'] > 0) {
+        // Max results allowed by the search config (api form adapter setting),
+        // used as a cap. Null when not configured.
+        $maxResults = empty($options['max_results']) ? null : (int) $options['max_results'];
+
+        // Paginated request: a page and/or a per_page is provided. The page
+        // defaults to 1 so a per_page alone is honored, like a standard browse.
+        if (is_numeric($query['page']) || is_numeric($query['per_page'])) {
+            $searchPage = is_numeric($query['page']) && (int) $query['page'] > 0
+                ? (int) $query['page']
+                : 1;
+            if (is_numeric($query['per_page']) && (int) $query['per_page'] > 0) {
                 $perPage = (int) $query['per_page'];
                 $this->paginator->setPerPage($perPage);
             } else {
                 $perPage = $this->paginator->getPerPage();
             }
+            if ($maxResults && $perPage > $maxResults) {
+                $perPage = $maxResults;
+            }
             $searchQuery->setLimitPage($searchPage, $perPage);
             return;
         }
 
-        // Set the max limit.
-        $maxResults = empty($options['max_results']) ? 1 : (int) $options['max_results'];
+        $limit = is_numeric($query['limit']) && (int) $query['limit'] > 0 ? (int) $query['limit'] : null;
+        $offset = is_numeric($query['offset']) && (int) $query['offset'] > 0 ? (int) $query['offset'] : null;
+
+        // No pagination: return all results, like the core api. The search
+        // engine requires a positive row count, so the configured max results
+        // or a high value is used as "all".
+        if ($limit === null) {
+            $limit = $maxResults ?: 1000000;
+        } elseif ($maxResults && $limit > $maxResults) {
+            $limit = $maxResults;
+        }
 
         // TODO Offset is not really managed in apiSearch (but rarely used).
-        $limit = $query['limit'] > 0 ? min((int) $query['limit'], $maxResults) : $maxResults;
-        $offset = $query['offset'] > 0 ? (int) $query['offset'] : null;
-        if ($limit && $offset) {
-            // TODO Check the formule to convert offset and limit to page and per page (rarely used).
+        if ($offset) {
             $searchPage = $offset > $limit ? 1 + (int) (($offset - 1) / $limit) : 1;
             $searchQuery->setLimitPage($searchPage, $limit);
-        } elseif ($limit) {
+        } else {
             $searchQuery->setLimitPage(1, $limit);
-        } elseif ($offset) {
-            $searchQuery->setLimitPage($offset, 1);
         }
     }
 

@@ -35,7 +35,6 @@ if (typeof hasOmekaTranslate === 'undefined') {
     var hasOmekaTranslate = typeof Omeka !== 'undefined' && typeof Omeka.jsTranslate === 'function';
 }
 
-const $searchFiltersAdvanced = $('#search-filters');
 const $searchFacets = $('#search-facets');
 
 /**
@@ -250,7 +249,11 @@ var Search = (function() {
      * Advanced filters.
      */
 
-    self.filtersAdvanced = (function() {
+    // Factory: one controller per advanced filters fieldset, so the same form
+    // can be duplicated on a page (e.g. a sticky header search) without relying
+    // on a unique id. Each instance is scoped to its own
+    // ".search-filters-advanced" fieldset, passed as $searchFiltersAdvanced.
+    self.createFiltersAdvanced = function($searchFiltersAdvanced) {
         var self = {};
 
         // At least one default.
@@ -335,7 +338,7 @@ var Search = (function() {
         };
 
         return self;
-    })();
+    };
 
     /* Results */
 
@@ -1392,18 +1395,34 @@ $(document).ready(function() {
      * Init advanced search filters.
      */
 
-    Search.filtersAdvanced.init();
+    // Init one controller per advanced filters fieldset (there may be more than
+    // one on a page, e.g. a duplicated sticky header search). Each controller
+    // is stored on its fieldset so delegated handlers can reach the right
+    // instance.
+    $('.search-filters-advanced').each(function() {
+        var $fieldset = $(this);
+        var controller = Search.createFiltersAdvanced($fieldset);
+        $fieldset.data('filtersAdvanced', controller);
+        controller.init();
+    });
 
-    $searchFiltersAdvanced.on('click', '.search-filter-minus', function (ev) {
+    var getFiltersAdvanced = function(ev) {
+        return $(ev.target).closest('.search-filters-advanced').data('filtersAdvanced');
+    };
+
+    $(document).on('click', '.search-filters-advanced .search-filter-minus', function (ev) {
+        var controller = getFiltersAdvanced(ev);
+        if (!controller) return;
         const filter = $(ev.target).closest('fieldset.filter');
-        Search.filtersAdvanced
+        controller
             .removeFilter(filter)
             .updatePlus();
     });
 
-    $searchFiltersAdvanced.on('click', '.search-filter-plus', function (ev) {
-        // const index = fieldset.index('fieldset.filter');
-        Search.filtersAdvanced
+    $(document).on('click', '.search-filters-advanced .search-filter-plus', function (ev) {
+        var controller = getFiltersAdvanced(ev);
+        if (!controller) return;
+        controller
             .appendFilter()
             .updatePlus();
     });
@@ -1413,9 +1432,11 @@ $(document).ready(function() {
      *
      * Use search engine values endpoint to get field values with prefix filtering.
      */
-    var advFilterAutosuggestUrl = $searchFiltersAdvanced.data('autosuggest-url');
-    if (advFilterAutosuggestUrl && typeof $.fn.autocomplete === 'function') {
+    if (typeof $.fn.autocomplete === 'function') {
         var initAdvFilterAutosuggest = function(filterFieldset) {
+            var advFilterAutosuggestUrl = filterFieldset
+                .closest('.search-filters-advanced').data('autosuggest-url');
+            if (!advFilterAutosuggestUrl) return;
             var input = filterFieldset.find('input[name$="[val]"]');
             if (!input.length) return;
             if (input.data('autocomplete')) {
@@ -1438,17 +1459,17 @@ $(document).ready(function() {
             input.attr('autocomplete', 'off');
         };
 
-        $searchFiltersAdvanced.on('change', 'select[name$="[field]"]', function() {
+        $(document).on('change', '.search-filters-advanced select[name$="[field]"]', function() {
             initAdvFilterAutosuggest($(this).closest('fieldset.filter'));
         });
 
-        $searchFiltersAdvanced.on('o:advanced-search.filter.append', function() {
+        $(document).on('o:advanced-search.filter.append', '.search-filters-advanced', function() {
             $(this).find('> fieldset.filter').each(function() {
                 initAdvFilterAutosuggest($(this));
             });
         });
 
-        $searchFiltersAdvanced.find('> fieldset.filter').each(function() {
+        $('.search-filters-advanced > fieldset.filter').each(function() {
             initAdvFilterAutosuggest($(this));
         });
     }

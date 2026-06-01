@@ -163,7 +163,51 @@
     .search-results-footer {
         display: flex;
         justify-content: space-between;
+        align-items: center;
         flex-wrap: wrap;
+        gap: 12px 18px;
+    }
+    /* Each tool block (count, paginator, per-page, sort, grid/list) stays on
+       one line. flex-wrap on parent only breaks between blocks, never inside. */
+    .search-results-header > *,
+    .search-results-footer > * {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: nowrap;
+        white-space: nowrap;
+    }
+    /* Search filters chips block keeps multi-line wrapping (full row). */
+    .search-results-header .search-filters,
+    .search-results-footer .search-filters,
+    .search-results-header .facets-active,
+    .search-results-footer .facets-active {
+        display: block;
+        white-space: normal;
+        flex-wrap: wrap;
+    }
+    /* The label + control of per-page and sort selectors must not break apart
+       (avoid "Trier par" alone on first line, control on second). */
+    .search-pagination-per-page,
+    .search-sort {
+        flex-wrap: nowrap;
+        white-space: nowrap;
+    }
+    .search-pagination-per-page label,
+    .search-sort label {
+        white-space: nowrap;
+    }
+    /* Pagination arrows and page indicator stay aligned. */
+    .search-results-count {
+        flex-wrap: nowrap;
+        white-space: nowrap;
+    }
+    .search-results-count .pagination,
+    .search-results-count nav.pagination {
+        display: inline-flex;
+        align-items: center;
+        flex-wrap: nowrap;
+        gap: 4px;
     }
 
     .search-results .search-filters {

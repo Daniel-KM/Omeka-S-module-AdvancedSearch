@@ -3463,6 +3463,125 @@ if (version_compare($oldVersion, '3.4.61', '<')) {
     $messenger->addSuccess($message);
 }
 
+if (version_compare($oldVersion, '3.4.62', '<')) {
+    // Normalize stored "hidden_query_filters" of every search_config from the
+    // legacy URL format (property[N][property|type|text],
+    // filter[N][field|type|val]) to the flat format consumed by InternalQuerier
+    // and SolariumQuerier. The legacy format was silently ignored by
+    // AdvancedSearch (it iterates by field name and skips unknown top-level
+    // keys "property" and "filter"). Same fix for
+    // advancedsearch_hidden_query_filters_per_config in site settings.
+
+    // Class not yet visible via PSR-4 in some upgrade contexts: load it.
+    require_once dirname(__DIR__, 2) . '/src/Stdlib/SearchResources.php';
+
+    $migratedConfigs = 0;
+    $rows = $connection
+        ->executeQuery('SELECT `id`, `settings` FROM `search_config` ORDER BY `id` ASC')
+        ->fetchAllAssociative();
+    foreach ($rows as $row) {
+        $settingsConfig = json_decode($row['settings'] ?? '', true);
+        if (!is_array($settingsConfig)) {
+            continue;
+        }
+        $current = $settingsConfig['request']['hidden_query_filters'] ?? null;
+        if (!is_array($current) || !$current) {
+            continue;
+        }
+        $normalized = \AdvancedSearch\Stdlib\SearchResources::normalizeHiddenQueryFilters($current);
+        if ($normalized === $current) {
+            continue;
+        }
+        $settingsConfig['request']['hidden_query_filters'] = $normalized;
+        $connection->executeStatement(
+            'UPDATE `search_config` SET `settings` = :settings WHERE `id` = :id',
+            [
+                'settings' => json_encode($settingsConfig, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+                'id' => (int) $row['id'],
+            ]
+        );
+        ++$migratedConfigs;
+    }
+
+    $migratedSites = 0;
+    $siteIds = $api->search('sites', [], ['returnScalar' => 'id'])->getContent();
+    foreach ($siteIds as $siteId) {
+        $siteSettings->setTargetId($siteId);
+        $perConfig = $siteSettings->get('advancedsearch_hidden_query_filters_per_config', []);
+        if (!is_array($perConfig) || !$perConfig) {
+            continue;
+        }
+        $changed = false;
+        foreach ($perConfig as $slug => $filters) {
+            if (!is_array($filters) || !$filters) {
+                continue;
+            }
+            $normalized = \AdvancedSearch\Stdlib\SearchResources::normalizeHiddenQueryFilters($filters);
+            if ($normalized !== $filters) {
+                $perConfig[$slug] = $normalized;
+                $changed = true;
+            }
+        }
+        if ($changed) {
+            $siteSettings->set('advancedsearch_hidden_query_filters_per_config', $perConfig);
+            ++$migratedSites;
+        }
+    }
+
+    if ($migratedConfigs || $migratedSites) {
+        $message = new PsrMessage(
+            'Migrated hidden query filters to the flat format: {configs} search config(s) and {sites} site setting(s) updated. The legacy URL form (property[N][property|type|text]) was silently ignored by AdvancedSearch.', // @translate
+            ['configs' => $migratedConfigs, 'sites' => $migratedSites]
+        );
+        $messenger->addSuccess($message);
+    }
+
+    // The "per page" facet setting no longer enables pagination by itself: a
+    // new checkbox "Enable pagination" now controls it. To keep already
+    // paginated facets paginated after the upgrade, enable it for every facet
+    // that has a "per_page" greater than 0. The default "per_page" is now 10,
+    // so set it on facets that still have 0 (pagination stays disabled for them
+    // until the checkbox is set).
+    $rows = $connection
+        ->executeQuery('SELECT `id`, `settings` FROM `search_config` ORDER BY `id` ASC')
+        ->fetchAllAssociative();
+    foreach ($rows as $row) {
+        $settingsConfig = json_decode($row['settings'] ?? '', true);
+        if (!is_array($settingsConfig) || empty($settingsConfig['facet']['facets'])) {
+            continue;
+        }
+        $changed = false;
+        foreach ($settingsConfig['facet']['facets'] as $name => $facet) {
+            if (!is_array($facet)) {
+                continue;
+            }
+            if ((int) ($facet['per_page'] ?? 0) > 0) {
+                if (empty($facet['paginate'])) {
+                    $settingsConfig['facet']['facets'][$name]['paginate'] = true;
+                    $changed = true;
+                }
+            } else {
+                $settingsConfig['facet']['facets'][$name]['per_page'] = 10;
+                $changed = true;
+            }
+        }
+        if ($changed) {
+            $connection->executeStatement(
+                'UPDATE `search_config` SET `settings` = :settings WHERE `id` = :id',
+                [
+                    'settings' => json_encode($settingsConfig, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
+                    'id' => (int) $row['id'],
+                ]
+            );
+        }
+    }
+
+    $message = new PsrMessage(
+        'A new option allows to enable the pagination for facets. You may need to check your facets if you use a custom theme.' // @translate
+    );
+    $messenger->addWarning($message);
+}
+
 /************************
  * Fixes for old upgrades
  */

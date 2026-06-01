@@ -207,6 +207,14 @@ trait TraitFormAdapterClassic
 
                     // Specific fields.
 
+                case 'has_media':
+                case 'has_original':
+                case 'has_thumbnails':
+                    if (is_string($value) && strlen($value)) {
+                        $query->setApiArg($name, (bool) $value);
+                    }
+                    continue 2;
+
                 case 'is_public':
                 case 'is_open':
                     if (is_string($value)

@@ -246,7 +246,7 @@ class SearchFilters extends AbstractHelper
                         }
                         $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $noValue
                             ? $queryTypesLabels[$queryType]
-                            : implode(', ', $this->checkAndFlatArray($text));
+                            : implode(', ', array_filter($this->checkAndFlatArray($text), fn ($v) => $v !== '' && $v !== null));
                         ++$index;
                     }
                     break;
@@ -817,6 +817,7 @@ class SearchFilters extends AbstractHelper
             }
 
             $vals = array_filter($vals, fn ($v) => $v !== '' && $v !== null);
+
             // Skip filters that have no displayable value (empty pill avoid).
             if (!$vals && !$isWithoutValue) {
                 continue;

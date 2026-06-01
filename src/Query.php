@@ -174,6 +174,15 @@ class Query implements JsonSerializable
     protected $options = [];
 
     /**
+     * Extra raw API arguments forwarded as-is by the querier (e.g. has_media,
+     * has_original, has_thumbnails). Bypass the property-filter pipeline for
+     * top-level resource adapter args.
+     *
+     * @var array
+     */
+    protected $apiArgs = [];
+
+    /**
      * The querier allows to do some requests directly, lately or on demand.
      *
      * The querier should be the prepared one, with the prepared query stored.
@@ -714,6 +723,17 @@ class Query implements JsonSerializable
     public function getOption(string $key, $default = null)
     {
         return $this->options[$key] ?? $default;
+    }
+
+    public function setApiArg(string $key, $value): self
+    {
+        $this->apiArgs[$key] = $value;
+        return $this;
+    }
+
+    public function getApiArgs(): array
+    {
+        return $this->apiArgs;
     }
 
     /**

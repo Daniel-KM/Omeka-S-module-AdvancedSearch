@@ -701,6 +701,10 @@ class InternalQuerier extends AbstractQuerier
             $this->args['offset'] = $offset;
         }
 
+        foreach ($this->query->getApiArgs() as $apiArgName => $apiArgValue) {
+            $this->args[$apiArgName] = $apiArgValue;
+        }
+
         return $this->args;
     }
 

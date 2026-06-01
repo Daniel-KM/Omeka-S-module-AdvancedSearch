@@ -46,7 +46,6 @@ use Common\TraitModule;
 use Laminas\EventManager\Event;
 use Laminas\EventManager\SharedEventManagerInterface;
 use Laminas\Mvc\MvcEvent;
-use Omeka\Api\Representation\AbstractResourceRepresentation;
 use Omeka\Module\AbstractModule;
 
 class Module extends AbstractModule
@@ -59,6 +58,13 @@ class Module extends AbstractModule
      * @var bool
      */
     protected $isBatchUpdate;
+
+    /**
+     * Cache of indexable search engine ids by resource type for the request.
+     *
+     * @var array<string, int[]>
+     */
+    protected $indexableSearchEngineIds = [];
 
     public function getServiceConfig(): array
     {
@@ -1450,27 +1456,10 @@ class Module extends AbstractModule
     protected function runJobIndexSearch(string $resourceType, array $ids): void
     {
         $services = $this->getServiceLocator();
-        $api = $services->get('Omeka\ApiManager');
 
         // There is a single job for all engines, so quick check if needed.
-
-        /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
-        $searchEngines = $api->search('search_engines')->getContent();
-        $searchEngineIds = [];
-        foreach ($searchEngines as $searchEngine) {
-            $isIndexingEnabled = filter_var($searchEngine->setting('is_indexing_enabled', true), FILTER_VALIDATE_BOOLEAN);
-            if (!$isIndexingEnabled) {
-                continue;
-            }
-            $indexer = $searchEngine->indexer();
-            if ($indexer->canIndex($resourceType)
-                && in_array($resourceType, $searchEngine->setting('resource_types', []))
-            ) {
-                $searchEngineIds[] = $searchEngine->id();
-            }
-        }
-
-        if (!count($searchEngineIds)) {
+        $searchEngineIds = $this->indexableSearchEngineIds($resourceType);
+        if (!$searchEngineIds) {
             return;
         }
 
@@ -1519,9 +1508,6 @@ class Module extends AbstractModule
             return;
         }
 
-        $services = $this->getServiceLocator();
-        $api = $services->get('Omeka\ApiManager');
-
         /**
          * @var \Omeka\Api\Request $request
          * @var \Omeka\Api\Response $response
@@ -1535,26 +1521,32 @@ class Module extends AbstractModule
         $resource = $response->getContent();
         $resourceId = method_exists($resource, 'id') ? (int) $resource->id() : (int) $resource->getId();
         $resourceId = $resourceId ?: (int) $request->getId();
-        $representation = null;
 
-        /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
-        $searchEngines = $api->search('search_engines')->getContent();
-        foreach ($searchEngines as $searchEngine) {
-            $isIndexingEnabled = filter_var($searchEngine->setting('is_indexing_enabled', true), FILTER_VALIDATE_BOOLEAN);
-            if (!$isIndexingEnabled) {
-                continue;
-            }
-            if ($searchEngine->indexer()->canIndex($resourceType)
-                && in_array($resourceType, $searchEngine->setting('resource_types', []))
-            ) {
-                if ($request->getOperation() === 'delete') {
+        // Deletions are applied immediately: a deferred reindex job cannot
+        // remove a resource that no longer exists.
+        if ($request->getOperation() === 'delete') {
+            $api = $this->getServiceLocator()->get('Omeka\ApiManager');
+            /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
+            $searchEngines = $api->search('search_engines')->getContent();
+            foreach ($searchEngines as $searchEngine) {
+                $isIndexingEnabled = filter_var($searchEngine->setting('is_indexing_enabled', true), FILTER_VALIDATE_BOOLEAN);
+                if (!$isIndexingEnabled) {
+                    continue;
+                }
+                if ($searchEngine->indexer()->canIndex($resourceType)
+                    && in_array($resourceType, $searchEngine->setting('resource_types', []))
+                ) {
                     $this->deleteIndexResource($searchEngine, $resourceType, $resourceId);
-                } else {
-                    $representation ??= $api->read($resourceType, ['id' => $resourceId])->getContent();
-                    $this->updateIndexResource($searchEngine, $representation);
                 }
             }
+            return;
         }
+
+        // Creations and updates are deferred: when many resources are saved in
+        // a single request or job (batch create, import...), a single
+        // IndexSearch job is dispatched at shutdown over all accumulated ids,
+        // instead of indexing each resource synchronously.
+        $this->deferIndexResource($resourceType, $resourceId);
     }
 
     /**
@@ -1566,28 +1558,83 @@ class Module extends AbstractModule
             return;
         }
 
-        $services = $this->getServiceLocator();
-        $api = $services->get('Omeka\ApiManager');
-
         $request = $event->getParam('request');
         $response = $event->getParam('response');
         $itemId = $request->getValue('itemId')
             ?: $response->getContent()->getItem()->getId();
-        $item = $api->read('items', $itemId)->getContent();
 
+        // A media change is indexed through its parent item (deferred).
+        $this->deferIndexResource('items', (int) $itemId);
+    }
+
+    /**
+     * Defer the indexation of a resource to a single job at shutdown.
+     *
+     * When many resources are saved in a single request or job (batch create,
+     * import...), the per-resource events would index each resource
+     * synchronously, which is slow. Instead, ids are accumulated per resource
+     * type and one IndexSearch job is dispatched at shutdown over all of them.
+     */
+    protected function deferIndexResource(string $resourceType, int $resourceId): void
+    {
+        $engineIds = $this->indexableSearchEngineIds($resourceType);
+        if (!$engineIds) {
+            return;
+        }
+
+        /** @var \Common\Stdlib\DeferredJobDispatch $deferred */
+        $deferred = $this->getServiceLocator()->get('Common\DeferredJobDispatch');
+        $deferred->defer(
+            \AdvancedSearch\Job\IndexSearch::class,
+            'advancedsearch_index_search_' . $resourceType,
+            $resourceId,
+            function (string $key, array $ids) use ($resourceType, $engineIds): array {
+                $ids = array_values(array_unique(array_map('intval', $ids)));
+                if (!$ids) {
+                    return [];
+                }
+                return [
+                    'search_engine_ids' => $engineIds,
+                    'clear_index' => false,
+                    'resource_ids' => $ids,
+                    'resource_types' => [$resourceType],
+                    'force' => true,
+                ];
+            }
+        );
+    }
+
+    /**
+     * Ids of the search engines that index a resource type, with indexing
+     * enabled. Cached per request.
+     *
+     * @return int[]
+     */
+    protected function indexableSearchEngineIds(string $resourceType): array
+    {
+        if (array_key_exists($resourceType, $this->indexableSearchEngineIds)) {
+            return $this->indexableSearchEngineIds[$resourceType];
+        }
+
+        $api = $this->getServiceLocator()->get('Omeka\ApiManager');
         /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
         $searchEngines = $api->search('search_engines')->getContent();
+        $engineIds = [];
         foreach ($searchEngines as $searchEngine) {
             $isIndexingEnabled = filter_var($searchEngine->setting('is_indexing_enabled', true), FILTER_VALIDATE_BOOLEAN);
             if (!$isIndexingEnabled) {
                 continue;
             }
-            if ($searchEngine->indexer()->canIndex('items')
-                && in_array('items', $searchEngine->setting('resource_types', []))
+            $indexer = $searchEngine->indexer();
+            if ($indexer->canIndex($resourceType)
+                && in_array($resourceType, $searchEngine->setting('resource_types', []))
             ) {
-                $this->updateIndexResource($searchEngine, $item);
+                $engineIds[] = $searchEngine->id();
             }
         }
+        $engineIds = array_values(array_unique($engineIds));
+
+        return $this->indexableSearchEngineIds[$resourceType] = $engineIds;
     }
 
     /**
@@ -1615,65 +1662,6 @@ class Module extends AbstractModule
                 ['resource_id' => $id, 'name' => $searchEngine->name()]
             ));
         }
-    }
-
-    /**
-     * Update the index in search engine for a resource.
-     *
-     * @param SearchEngineRepresentation $searchEngine
-     * @param AbstractResourceRepresentation $resource
-     */
-    protected function updateIndexResource(SearchEngineRepresentation $searchEngine, AbstractResourceRepresentation $resource): void
-    {
-        $resourceToIndex = $this->filterVisibility($searchEngine, [$resource]);
-        if (!count($resourceToIndex)) {
-            return;
-        }
-
-        $indexer = $searchEngine->indexer();
-        try {
-            $indexer->indexResource($resource);
-        } catch (\Throwable $e) {
-            $services = $this->getServiceLocator();
-            $logger = $services->get('Omeka\Logger');
-            $logger->err(
-                'Unable to index metadata of resource #{resource_id} for search in search engine "{name}": {message}', // @translate
-                ['resource_id' => $resource->id(), 'name' => $searchEngine->name(), 'message' => $e->getMessage()]
-            );
-            $messenger = $services->get('ControllerPluginManager')->get('messenger');
-            $messenger->addWarning(new PsrMessage(
-                'Unable to update the search index for resource #{resource_id} in search engine "{name}": see log.', // @translate
-                ['resource_id' => $resource->id(), 'name' => $searchEngine->name()]
-            ));
-        }
-    }
-
-    /**
-     * @param SearchEngineRepresentation $searchEngine
-     * @param AbstractResourceRepresentation[] $resources
-     * @return array
-     */
-    protected function filterVisibility(SearchEngineRepresentation $searchEngine, array $resources): array
-    {
-        $visibility = $searchEngine->setting('visibility');
-        if (!in_array($visibility, ['public', 'private'])) {
-            return $resources;
-        }
-        /** @var \Omeka\Api\Representation\AbstractResourceRepresentation $resource */
-        if ($visibility === 'private') {
-            foreach ($resources as $key => $resource) {
-                if ($resource->isPublic()) {
-                    unset($resources[$key]);
-                }
-            }
-        } else {
-            foreach ($resources as $key => $resource) {
-                if (!$resource->isPublic()) {
-                    unset($resources[$key]);
-                }
-            }
-        }
-        return array_values($resources);
     }
 
     /**

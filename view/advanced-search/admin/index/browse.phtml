@@ -181,6 +181,7 @@ $runningSuggesterJobs = $runningJobs['suggesters'] ?? [];
                             <li>
                                 <?= $searchConfig->link('', 'edit', [
                                     'class' => 'o-icon-edit',
+                                    'aria-label' => $translate('Edit'),
                                     'title' => $translate('Edit'),
                                 ]) ?>
                             </li>
@@ -262,11 +263,14 @@ $runningSuggesterJobs = $runningJobs['suggesters'] ?? [];
                             <?php if ($engineAdapter): ?>
                                 <?= $suggester->link('', 'edit', [
                                     'class' => 'o-icon-edit',
+                                    'aria-label' => $translate('Edit'),
                                     'title' => $translate('Edit'),
                                 ]) ?>
                             <?php else: ?>
                                 <?= $this->hyperlink('', '#', [
                                     'class' => 'o-icon-edit disabled',
+                                    'aria-label' => $translate('Edit disabled: search adapter not available'),
+                                    'aria-disabled' => 'true',
                                     'title' => $translate('Edit disabled: search adapter not available'),
                                 ]) ?>
                             <?php endif; ?>
@@ -298,7 +302,7 @@ $runningSuggesterJobs = $runningJobs['suggesters'] ?? [];
 
 <?php $this->trigger('view.browse.after'); ?>
 
-<div class="sidebar">
+<div class="sidebar" role="dialog" aria-label="<?= $escape($translate('Confirmation')) ?>">
     <a href="#"
         class="sidebar-close o-icon-close"
         aria-label="<?= $escape($translate('Close')) ?>"

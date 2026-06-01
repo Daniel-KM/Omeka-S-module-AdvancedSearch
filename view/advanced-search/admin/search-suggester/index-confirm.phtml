@@ -19,12 +19,12 @@ $this->form->setButtonLabel($translate('Confirm reindex'));
 ?>
 
 <?php if ($this->wrapSidebar): ?>
-<div id="index" class="sidebar">
-    <?= $this->hyperlink('', '#', ['class' => 'sidebar-close o-icon-close', 'title' => $translate('Close')]) ?>
+<div id="index" class="sidebar" role="dialog" aria-labelledby="sidebar-suggester-confirm-title">
+    <?= $this->hyperlink('', '#', ['class' => 'sidebar-close o-icon-close', 'aria-label' => $translate('Close'), 'title' => $translate('Close')]) ?>
 <?php endif; ?>
 <?php if (count($resourceTypes)): ?>
     <div id="sidebar-confirm">
-        <h3><?= sprintf($translate('Reindex "%s"'), $resource->name()) ?></h3>
+        <h3 id="sidebar-suggester-confirm-title"><?= sprintf($translate('Reindex "%s"'), $resource->name()) ?></h3>
         <p><?= $translate('Are you sure you would like to reindex this suggester?') ?></p>
         <?php if ($isInternal): ?>
         <p>
@@ -39,7 +39,7 @@ $this->form->setButtonLabel($translate('Confirm reindex'));
         <p>
         <?php if ($listJobStatusesByIds): ?>
 	        <?= sprintf($translate('%1$d running indexings: #%2$s.'), count($listJobStatusesByIds), implode(', #', array_keys($listJobStatusesByIds))) ?><br />
-            <input form="<?= $form->getName() ?>" name="force" type="checkbox" /><?= $translate('Force indexing') ?><br />
+            <label><input form="<?= $form->getName() ?>" name="force" type="checkbox" /> <?= $translate('Force indexing') ?></label><br />
         <?php else: ?>
             <?= $translate('No running indexing: process can be launched.') ?>
         <?php endif; ?>

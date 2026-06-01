@@ -196,7 +196,7 @@ $(document).ready(function() {
      * Add a button to automap the closest field name for the api mapping.
      */
     $('#metadata')
-        .before('<button id="api_mapping_auto" title="Try to map automatically the metadata and the properties that are not mapped yet with the fields of the index">' + Omeka.jsTranslate('Automatic mapping of empty values') + '</button>')
+        .before('<button type="button" id="api_mapping_auto" title="' + Omeka.jsTranslate('Try to map automatically the metadata and the properties that are not mapped yet with the fields of the index') + '">' + Omeka.jsTranslate('Automatic mapping of empty values') + '</button>')
 
     $('#api_mapping_auto').on('click', function(event) {
         event.preventDefault();

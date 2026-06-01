@@ -30,16 +30,18 @@ $formName = $form->getName();
 ?>
 
 <?php if ($wrapSidebar): ?>
-<div id="index" class="sidebar">
-    <?= $this->hyperlink('', '#', ['class' => 'sidebar-close o-icon-close', 'title' => $translate('Close')]) ?>
+<div id="index" class="sidebar" role="dialog" aria-labelledby="sidebar-confirm-title">
+    <?= $this->hyperlink('', '#', ['class' => 'sidebar-close o-icon-close', 'aria-label' => $translate('Close'), 'title' => $translate('Close')]) ?>
 <?php endif; ?>
 <?php if (count($resourceTypes)): ?>
     <div id="sidebar-confirm">
-        <h3><?= sprintf($translate('Reindex "%s"'), $resource->name()) ?></h3>
+        <h3 id="sidebar-confirm-title"><?= sprintf($translate('Reindex "%s"'), $resource->name()) ?></h3>
 
         <p>
-            <input name="clear_index" value="1" type="checkbox" form="<?= $formName ?>" />
-            <?= $translate('Clear all indexes of this search engine') ?>
+            <label>
+                <input name="clear_index" value="1" type="checkbox" form="<?= $formName ?>" />
+                <?= $translate('Clear all indexes of this search engine') ?>
+            </label>
         </p>
         <div class="setting-info">
             <?= $translate('Clearing all indexes will make the search unavailable during reindexation, but it avoids the rare cases where indexes of deleted resources were not removed.') ?>
@@ -62,8 +64,10 @@ $formName = $form->getName();
 
         <p>
         <?php if ($listJobStatusesByIds): ?>
-            <input form="<?= $formName ?>" name="force" type="checkbox" />
-            <?= $translate('Force indexing') ?><br />
+            <label>
+                <input form="<?= $formName ?>" name="force" type="checkbox" />
+                <?= $translate('Force indexing') ?>
+            </label><br />
             <?= sprintf($translate('%1$d running indexings: #%2$s.'), count($listJobStatusesByIds), implode(', ', array_map(fn ($v) => sprintf('<a href="%1$s/%2$s">%2$s</a>', $baseUrlJob, $v), array_keys($listJobStatusesByIds)))) ?><br />
         <?php else: ?>
             <?= $translate('No running indexing: process can be launched.') ?>
@@ -73,16 +77,16 @@ $formName = $form->getName();
         <h3><?= $translate('Batch processing') ?></h3>
 
         <p>
-            <?= $translate('Number of resources processed by batch') ?>
-            <input name="resources_by_batch" placeholder="0" value="500" min="0" type="number" form="<?= $formName ?>" />
+            <label for="reindex-resources-by-batch"><?= $translate('Number of resources processed by batch') ?></label>
+            <input id="reindex-resources-by-batch" name="resources_by_batch" placeholder="0" value="500" min="0" type="number" form="<?= $formName ?>" />
         </p>
         <div class="setting-info">
             <?= $translate('This option may avoid overload when records are big or with many linked resources. Note: A greater value may reduce memory in some cases.') ?>
         </div>
 
         <p>
-            <?= $translate('Sleep between batchs') ?> (<?= $translate('seconds') ?>)
-            <input name="sleep_after_loop" placeholder="0" value="0" min="0" type="number" form="<?= $formName ?>" />
+            <label for="reindex-sleep-after-loop"><?= $translate('Sleep between batchs') ?> (<?= $translate('seconds') ?>)</label>
+            <input id="reindex-sleep-after-loop" name="sleep_after_loop" placeholder="0" value="0" min="0" type="number" form="<?= $formName ?>" />
         </p>
         <div class="setting-info">
             <?= $translate('When there are many errors "HTTP request failed", increase this limit to 10, 30, 60 seconds or check server.') ?>
@@ -91,37 +95,37 @@ $formName = $form->getName();
         <h3><?= $translate('Limit indexing') ?></h3>
 
         <p>
-            <?= $translate('First resource id to reindex') ?>
-            <input name="start_resource_id" placeholder="0" value="1" min="0" type="number" form="<?= $formName ?>" />
+            <label for="reindex-start-resource-id"><?= $translate('First resource id to reindex') ?></label>
+            <input id="reindex-start-resource-id" name="start_resource_id" placeholder="0" value="1" min="0" type="number" form="<?= $formName ?>" />
         </p>
 
         <p>
-            <?= $translate('Maximum number of resources to index') ?>
-            <input name="resources_limit" placeholder="" value="" min="1" type="number" form="<?= $formName ?>" />
+            <label for="reindex-resources-limit"><?= $translate('Maximum number of resources to index') ?></label>
+            <input id="reindex-resources-limit" name="resources_limit" placeholder="" value="" min="1" type="number" form="<?= $formName ?>" />
         </p>
 
         <p>
-            <?= $translate('Start offset') ?>
-            <input name="resources_offset" placeholder="0" value="0" min="0" type="number" form="<?= $formName ?>" />
+            <label for="reindex-resources-offset"><?= $translate('Start offset') ?></label>
+            <input id="reindex-resources-offset" name="resources_offset" placeholder="0" value="0" min="0" type="number" form="<?= $formName ?>" />
         </p>
 
-        <p>
-            <?= $translate('Limit indexing to a resource type') ?>
+        <fieldset>
+            <legend><?= $translate('Limit indexing to a resource type') ?></legend>
             <span class="inputs">
                 <?php foreach ($resourceTypes as $resourceType): ?>
                     <label><input name="resource_types[]" value="<?= $resourceType ?>" type="checkbox" checked="checked" form="<?= $formName ?>" /> <?= $translate($resourceType) ?></label>
                 <?php endforeach; ?>
             </span>
-        </p>
+        </fieldset>
         <?php if (!$visibility): ?>
-        <p>
-            <?= $translate('Limit indexing to a visibility') ?>
+        <fieldset>
+            <legend><?= $translate('Limit indexing to a visibility') ?></legend>
             <span class="inputs">
                 <label><input type="radio" name="visibility" form="<?= $formName ?>" value="all" checked="checked"> <?= $translate('Public and private') ?></label>
                 <label><input type="radio" name="visibility" form="<?= $formName ?>" value="public"> <?= $translate('Public only') ?></label>
                 <label><input type="radio" name="visibility" form="<?= $formName ?>" value="private"> <?= $translate('Private only') ?></label>
             </span>
-        </p>
+        </fieldset>
         <?php endif; ?>
 
         <?= $this->form($form) ?>

@@ -44,10 +44,10 @@ class FacetActives extends AbstractFacet
                 continue;
             }
             $facetFieldLabel = $options['facets'][$facetName]['label'] ?? $facetName;
-            $valueLabels = $options['facets'][$facetName]['value_labels'] ?? [];
-            if (!is_array($valueLabels)) {
-                $valueLabels = [];
-            }
+            $valueLabels = \AdvancedSearch\Stdlib\SearchResources::resolveValueLabels(
+                $options['facets'][$facetName] ?? [],
+                $this->api
+            );
             foreach ($facetValues as $facetKey => &$facetValue) {
                 $facetValueValue = (string) $facetValue;
                 if (array_key_exists($facetValueValue, $valueLabels) && $valueLabels[$facetValueValue] !== '') {

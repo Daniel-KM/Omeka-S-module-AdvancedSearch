@@ -585,6 +585,7 @@ class SearchFilters extends AbstractHelper
     {
         $view = $this->getView();
         $plugins = $view->getHelperPluginManager();
+        $api = $plugins->get('api');
         $translate = $plugins->get('translate');
         $dataTypeHelper = $plugins->get('dataType');
 
@@ -723,7 +724,19 @@ class SearchFilters extends AbstractHelper
         // to replace raw values (e.g. "1") with readable text (e.g. "Only with
         // image") in active filter chips, without touching the index or the
         // querier. Applied identically for InternalQuerier and SolariumQuerier.
-        $valueLabelsByField = array_filter(array_column($searchFormSettings['filters'] ?? [], 'value_labels', 'field'));
+        // Each filter config may carry inline value_labels and/or a
+        // value_labels_table (module Table) reference, both resolved here.
+        $valueLabelsByField = [];
+        foreach ($searchFormSettings['filters'] ?? [] as $filterConfig) {
+            $field = $filterConfig['field'] ?? null;
+            if (!is_string($field) || $field === '') {
+                continue;
+            }
+            $resolved = SearchResources::resolveValueLabels($filterConfig, $api);
+            if ($resolved) {
+                $valueLabelsByField[$field] = $resolved;
+            }
+        }
 
         $index = 0;
         foreach ($filterFilters as $subKey => $queryRow) {

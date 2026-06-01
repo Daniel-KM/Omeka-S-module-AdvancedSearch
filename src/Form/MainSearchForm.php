@@ -1261,8 +1261,8 @@ class MainSearchForm extends Form
      */
     protected function applyValueLabels(array $values, array $filter): array
     {
-        $valueLabels = $filter['value_labels'] ?? null;
-        if (!is_array($valueLabels) || !$valueLabels) {
+        $valueLabels = \AdvancedSearch\Stdlib\SearchResources::resolveValueLabels($filter, $this->api);
+        if (!$valueLabels) {
             return $values;
         }
         $translator = $this->getTranslator();

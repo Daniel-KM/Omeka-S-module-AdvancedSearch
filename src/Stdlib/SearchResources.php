@@ -703,6 +703,58 @@ class SearchResources
     }
 
     /**
+     * Resolve the per-value labels mapping for a facet or a filter config,
+     * combining an optional reference to a Table (module Table) and inline
+     * "value_labels" overrides. Inline keys take precedence over the table.
+     *
+     * @param array $options Facet or filter config; may carry "value_labels"
+     *   (associative array code => label) and/or "value_labels_table" (Table
+     *   slug or id).
+     * @param \Omeka\Api\Manager|\Omeka\View\Helper\Api|null $api Either the
+     *   ApiManager service or the equivalent view helper; both expose
+     *   search($resource, $query)->getContent(). Required only when
+     *   value_labels_table is used. When null, only inline value_labels are
+     *   returned.
+     * @return array Associative map code => label. Empty if nothing defined or
+     *   the referenced table is missing.
+     */
+    public static function resolveValueLabels(array $options, $api = null): array
+    {
+        static $tableCache = [];
+
+        $inline = $options['value_labels'] ?? [];
+        if (!is_array($inline)) {
+            $inline = [];
+        }
+
+        $tableRef = trim((string) ($options['value_labels_table'] ?? ''));
+        if ($tableRef === '' || $api === null || !is_object($api) || !method_exists($api, 'search')) {
+            return $inline;
+        }
+
+        if (!array_key_exists($tableRef, $tableCache)) {
+            $tableCache[$tableRef] = [];
+            try {
+                $query = is_numeric($tableRef) ? ['id' => (int) $tableRef] : ['slug' => $tableRef];
+                $results = $api->search('tables', $query)->getContent();
+                if ($results) {
+                    /** @var \Table\Api\Representation\TableRepresentation $table */
+                    $table = reset($results);
+                    if (method_exists($table, 'codesAssociative')) {
+                        $tableCache[$tableRef] = $table->codesAssociative();
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Module Table absent or table missing: silently fall back to
+                // inline mapping.
+            }
+        }
+
+        // Inline labels override the table entries.
+        return $inline + $tableCache[$tableRef];
+    }
+
+    /**
      * Normalize hidden query filters from the legacy Omeka URL shape to a flat
      * shape consumable by both InternalQuerier and SolariumQuerier.
      *

@@ -46,6 +46,20 @@ $formName = $form->getName();
             <?= $translate('You may redirect the users to a clone of the current index temporary.') ?>
         </div>
 
+        <?php // Display only for a multi-index (shared) core, where the option
+        // above clears only this engine. ?>
+        <?php if ($resource->settingEngineAdapter('index_name')): ?>
+        <p>
+            <label>
+                <input name="clear_full_index" value="1" type="checkbox" form="<?= $formName ?>" />
+                <?= $translate('Clear all indexes of the shared core, included external ones') ?>
+            </label>
+        </p>
+        <div class="setting-info">
+            <?= $translate('Warning: this core is shared (multi-index). This option clears all indexes, included indexes managed externally, not only the ones of this search engine.') ?>
+        </div>
+        <?php endif; ?>
+
         <p>
         <?php if ($listJobStatusesByIds): ?>
             <input form="<?= $formName ?>" name="force" type="checkbox" />

@@ -309,6 +309,7 @@ class IndexSearch extends AbstractJob
         $indexer = $searchEngine->indexer();
 
         $clearIndex = (bool) $this->getArg('clear_index');
+        $clearFullIndex = (bool) $this->getArg('clear_full_index');
 
         $engineResourceTypes = $searchEngine->setting('resource_types', []);
         $resourceTypes = $this->resourceTypes
@@ -347,7 +348,12 @@ class IndexSearch extends AbstractJob
             ['search_engine_id' => $searchEngine->id(), 'name' => $searchEngine->name()]
         );
 
-        if ($clearIndex) {
+        if ($clearFullIndex) {
+            $indexer->clearIndex(null, true);
+            $this->logger->info(
+                'All indexes of the shared core are cleared, included the ones managed externally.' // @translate
+            );
+        } elseif ($clearIndex) {
             $indexer->clearIndex();
             $this->logger->info(
                 'Search index is fully cleared.' // @translate

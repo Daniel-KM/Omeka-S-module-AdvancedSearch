@@ -13,7 +13,7 @@ class TestIndexer extends AbstractIndexer
         return true;
     }
 
-    public function clearIndex(?Query $query = null): self
+    public function clearIndex(?Query $query = null, bool $all = false): self
     {
     }
 

@@ -193,6 +193,7 @@ class SearchEngineController extends AbstractActionController
         $searchEngine = $this->api()->read('search_engines', $searchEngineId)->getContent();
 
         $clearIndex = (bool) $this->params()->fromPost('clear_index');
+        $clearFullIndex = (bool) $this->params()->fromPost('clear_full_index');
         $startResourceId = (int) $this->params()->fromPost('start_resource_id');
         $resourcesByBatch = (int) $this->params()->fromPost('resources_by_batch');
         $sleepAfterLoop = (int) $this->params()->fromPost('sleep_after_loop');
@@ -225,6 +226,7 @@ class SearchEngineController extends AbstractActionController
         $jobArgs = [];
         $jobArgs['search_engine_ids'] = [$searchEngine->id()];
         $jobArgs['clear_index'] = $clearIndex;
+        $jobArgs['clear_full_index'] = $clearFullIndex;
         $jobArgs['start_resource_id'] = $startResourceId;
         $jobArgs['resources_by_batch'] = $resourcesByBatch;
         $jobArgs['sleep_after_loop'] = $sleepAfterLoop;

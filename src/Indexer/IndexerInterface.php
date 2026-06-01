@@ -57,8 +57,11 @@ interface IndexerInterface extends LoggerAwareInterface
      * Reset the index.
      *
      * @param Query $query Allows to limit clearing to some resources.
+     * @param bool $all For a multi-index engine (shared core), clear all
+     * indexes, included the ones managed externally, instead of the current
+     * engine only. Ignored when there is no query.
      */
-    public function clearIndex(?Query $query = null): self;
+    public function clearIndex(?Query $query = null, bool $all = false): self;
 
     /**
      * Index a resource.

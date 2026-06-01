@@ -305,6 +305,7 @@ class SiteSettingsFieldset extends Fieldset
                         'collection' => 'Item set', // @translate
                         'selection' => 'User selection', // @translate
                         'series' => 'Series in page blocks', // @translate
+                        'featured' => 'Featured (browse preview page block)', // @translate
                     ],
                 ],
                 'attributes' => [

@@ -505,6 +505,8 @@ return [
                 'search',
                 'collection',
                 'selection',
+                'series',
+                'featured',
             ],
             'advancedsearch_resource_nav_limit' => 25,
             'advancedsearch_resource_nav_fallback_item_set' => '',

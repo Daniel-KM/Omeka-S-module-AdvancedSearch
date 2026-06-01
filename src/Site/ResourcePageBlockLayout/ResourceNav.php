@@ -10,7 +10,7 @@ use Omeka\Site\ResourcePageBlockLayout\ResourcePageBlockLayoutInterface;
 
 /**
  * Display a prev/next navigation on the item page within the context of the
- * last browse: search results, item set (collection/album) or user selection.
+ * last browse: search results, item set or user selection.
  *
  * Context is read first from URL query parameters (for shared/pasted links),
  * then from the session (populated by listeners during browse). The block
@@ -49,7 +49,7 @@ class ResourceNav implements ResourcePageBlockLayoutInterface
             return '';
         }
 
-        $enabledTypes = $siteSetting('advancedsearch_resource_nav_types', ['search', 'collection', 'selection', 'series']);
+        $enabledTypes = $siteSetting('advancedsearch_resource_nav_types', ['search', 'collection', 'selection', 'series', 'featured']);
         if (!is_array($enabledTypes) || !$enabledTypes) {
             return '';
         }
@@ -272,6 +272,10 @@ class ResourceNav implements ResourcePageBlockLayoutInterface
      * Supported params:
      * - ?resource_nav_item_set=ID
      * - ?resource_nav_selection=ID
+     * - ?resource_nav_block_id=BLOCK_ID
+     *   Rebuilds context from a page block's query (typically a browse preview
+     *   block, e.g. the "À la une" slider on the home page). The block id
+     *   carries the page reference implicitly via $block->page().
      */
     protected function contextFromQuery(
         PhpRenderer $view,
@@ -283,9 +287,15 @@ class ResourceNav implements ResourcePageBlockLayoutInterface
         $params = $view->params();
         $itemSetId = (int) $params->fromQuery('resource_nav_item_set');
         $selectionId = (int) $params->fromQuery('resource_nav_selection');
+        $pageBlockId = (int) $params->fromQuery('resource_nav_block_id');
+        $from = (string) $params->fromQuery('from');
 
-        if (!$itemSetId && !$selectionId) {
+        if (!$itemSetId && !$selectionId && !$pageBlockId) {
             return null;
+        }
+
+        if ($pageBlockId) {
+            return $this->contextFromPageBlock($view, $site, $limit, $enabledTypes, $pageBlockId, $from, $propagateQuery);
         }
 
         $api = $view->getHelperPluginManager()->get('api');
@@ -365,4 +375,109 @@ class ResourceNav implements ResourcePageBlockLayoutInterface
         return null;
     }
 
+    /**
+     * Rebuild navigation context from a page block (typically a browse preview
+     * block such as the "À la une" slider on the home page). Replays the
+     * block's stored query against the API to reproduce the same item list.
+     */
+    protected function contextFromPageBlock(
+        PhpRenderer $view,
+        \Omeka\Api\Representation\SiteRepresentation $site,
+        int $limit,
+        array $enabledTypes,
+        int $pageBlockId,
+        string $from,
+        array &$propagateQuery
+    ): ?array {
+        $type = ($from === 'featured' && in_array('featured', $enabledTypes, true))
+            ? 'featured'
+            : 'series';
+        if (!in_array($type, $enabledTypes, true)) {
+            return null;
+        }
+
+        $plugins = $view->getHelperPluginManager();
+        $api = $plugins->get('api');
+        $services = $plugins->getServiceLocator();
+        try {
+            $entityManager = $services->get('Omeka\EntityManager');
+            $blockEntity = $entityManager->find(\Omeka\Entity\SitePageBlock::class, $pageBlockId);
+            if (!$blockEntity) {
+                return null;
+            }
+            $pageId = (int) $blockEntity->getPage()->getId();
+            /** @var \Omeka\Api\Representation\SitePageRepresentation $page */
+            $page = $api->read('site_pages', $pageId)->getContent();
+        } catch (\Throwable $e) {
+            return null;
+        }
+        if ((int) $page->site()->id() !== (int) $site->id()) {
+            return null;
+        }
+        $block = null;
+        foreach ($page->blocks() as $b) {
+            if ((int) $b->id() === $pageBlockId) {
+                $block = $b;
+                break;
+            }
+        }
+        if (!$block) {
+            return null;
+        }
+
+        $resourceType = $block->dataValue('resource_type', 'items');
+        if ($resourceType !== 'items') {
+            return null;
+        }
+        $rawQuery = (string) $block->dataValue('query', '');
+        $query = [];
+        parse_str($rawQuery, $query);
+        $blockLimit = (int) $block->dataValue('limit', $limit);
+        if ($blockLimit <= 0 || $blockLimit > $limit) {
+            $blockLimit = $limit;
+        }
+        $query['site_id'] = $site->id();
+        $query['limit'] = $blockLimit;
+        $query['offset'] = 0;
+        $query['return_scalar'] = 'id';
+        if (!isset($query['sort_by'])) {
+            $query['sort_by'] = 'created';
+        }
+        if (!isset($query['sort_order'])) {
+            $query['sort_order'] = 'desc';
+        }
+
+        try {
+            $apiResponse = $api->search('items', $query);
+        } catch (\Throwable $e) {
+            return null;
+        }
+        $ids = array_values(array_map('intval', $apiResponse->getContent() ?: []));
+        if (!$ids) {
+            return null;
+        }
+
+        $propagateQuery['resource_nav_block_id'] = $pageBlockId;
+        if ($from !== '') {
+            $propagateQuery['from'] = $from;
+        }
+
+        $label = (string) $block->dataValue('heading', '');
+        if ($label === '') {
+            $label = $type === 'featured'
+                ? (string) $view->translate('Featured') // @translate
+                : (string) $page->title();
+        }
+
+        return [
+            'site_id' => $site->id(),
+            'type' => $type,
+            'subtype' => '',
+            'label' => $label,
+            'url' => $page->siteUrl(),
+            'ids' => $ids,
+            'total' => (int) $apiResponse->getTotalResults(),
+            'limit' => $blockLimit,
+        ];
+    }
 }

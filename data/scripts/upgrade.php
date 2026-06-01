@@ -180,7 +180,7 @@ if (version_compare($oldVersion, '3.3.6.7', '<')) {
         ->innerJoin('search_config', 'search_engine', 'search_engine', 'search_engine.id = search_config.engine_id')
         ->where('search_engine.adapter = "internal"')
         ->orderBy('search_config.id', 'asc');
-    $searchConfigsSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    $searchConfigsSettings = $connection->executeQuery($qb->getSQL())->fetchAllKeyValue();
     foreach ($searchConfigsSettings as $id => $searchConfigSettings) {
         $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
         foreach ($searchConfigSettings['form']['filters'] ?? [] as $key => $filter) {
@@ -226,7 +226,7 @@ if (version_compare($oldVersion, '3.3.6.7', '<')) {
         ->from('search_engine', 'search_engine')
         ->where('adapter = "internal"')
         ->orderBy('id', 'asc');
-    $searchEnginesSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    $searchEnginesSettings = $connection->executeQuery($qb->getSQL())->fetchAllKeyValue();
     foreach ($searchEnginesSettings as $id => $searchEngineSettings) {
         $searchEngineSettings = json_decode($searchEngineSettings, true) ?: [];
         $searchEngineSettings['adapter'] = array_replace(
@@ -372,7 +372,9 @@ if (version_compare($oldVersion, '3.4.11', '<')) {
         ALTER TABLE `search_engine` CHANGE `created` `created` datetime NOT NULL DEFAULT NOW() AFTER `settings`;
         ALTER TABLE `search_suggester` CHANGE `created` `created` datetime NOT NULL DEFAULT NOW() AFTER `settings`;
         SQL;
-    $connection->executeStatement($sql);
+    foreach (array_filter(array_map('trim', explode(";\n", $sql))) as $sql) {
+        $connection->executeStatement($sql);
+    }
 
     /** @var \Omeka\Module\Manager $moduleManager */
     $moduleManager = $services->get('Omeka\ModuleManager');
@@ -393,7 +395,9 @@ if (version_compare($oldVersion, '3.4.12', '<')) {
         ALTER TABLE `search_engine` CHANGE `created` `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `settings`;
         ALTER TABLE `search_suggester` CHANGE `created` `created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `settings`;
         SQL;
-    $connection->executeStatement($sql);
+    foreach (array_filter(array_map('trim', explode(";\n", $sql))) as $sql) {
+        $connection->executeStatement($sql);
+    }
 }
 
 if (version_compare($oldVersion, '3.4.14', '<')) {
@@ -1242,7 +1246,7 @@ if (version_compare($oldVersion, '3.4.29', '<')) {
         ->from('search_config', 'search_config')
         ->where('search_config.settings IS NOT NULL')
         ->orderBy('search_config.id', 'asc');
-    $searchConfigs = $connection->executeQuery($qb)->fetchAllKeyValue();
+    $searchConfigs = $connection->executeQuery($qb->getSQL())->fetchAllKeyValue();
     foreach ($searchConfigs as $id => $searchConfigSettings) {
         $searchConfigSettings = json_decode($searchConfigSettings, true);
         $facetConfig = $searchConfigSettings['facet'] ?? [];
@@ -1337,7 +1341,7 @@ if (version_compare($oldVersion, '3.4.29', '<')) {
         ->innerJoin('search_config', 'search_engine', 'search_engine', 'search_engine.id = search_config.engine_id')
         ->where($qb->expr()->eq('search_engine.adapter', ':adapter'))
         ->orderBy('search_engine.id', 'asc');
-    $searchConfigs = $connection->executeQuery($qb, ['adapter' => 'internal'])->fetchFirstColumn();
+    $searchConfigs = $connection->executeQuery($qb->getSQL(), ['adapter' => 'internal'])->fetchFirstColumn();
     if ($searchConfigs) {
         $message = new PsrMessage(
             'The option to display available or all facets was inverted and the same for the internal engine.' // @translate
@@ -1431,7 +1435,7 @@ if (version_compare($oldVersion, '3.4.31', '<')) {
         // Only upgrade internal options.
         ->where('adapter = "internal"')
         ->orderBy('id', 'asc');
-    $searchEngineSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    $searchEngineSettings = $connection->executeQuery($qb->getSQL())->fetchAllKeyValue();
     foreach ($searchEngineSettings as $key => $searchEngineSetting) {
         $searchEngineSettings[$key] = json_decode($searchEngineSetting, true) ?: [];
     }
@@ -1441,14 +1445,14 @@ if (version_compare($oldVersion, '3.4.31', '<')) {
         ->select('id', 'engine_id')
         ->from('search_config', 'search_config')
         ->orderBy('id', 'asc');
-    $searchConfigsEngines = $connection->executeQuery($qb)->fetchAllKeyValue();
+    $searchConfigsEngines = $connection->executeQuery($qb->getSQL())->fetchAllKeyValue();
 
     $qb = $connection->createQueryBuilder();
     $qb
         ->select('id', 'settings')
         ->from('search_config', 'search_config')
         ->orderBy('id', 'asc');
-    $searchConfigsSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    $searchConfigsSettings = $connection->executeQuery($qb->getSQL())->fetchAllKeyValue();
     foreach ($searchConfigsSettings as $id => $searchConfigSettings) {
         $searchEngineId = $searchConfigsEngines[$id] ?? null;
         // Renamed the main option for request.
@@ -1747,7 +1751,7 @@ if (version_compare($oldVersion, '3.4.32', '<')) {
         ->select('id', 'settings')
         ->from('search_config', 'search_config')
         ->orderBy('id', 'asc');
-    $searchConfigsSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    $searchConfigsSettings = $connection->executeQuery($qb->getSQL())->fetchAllKeyValue();
     foreach ($searchConfigsSettings as $id => $searchConfigSettings) {
         $searchEngineId = $searchConfigsEngines[$id] ?? null;
         $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
@@ -1780,7 +1784,7 @@ if (version_compare($oldVersion, '3.4.33', '<')) {
         ->select('id', 'settings')
         ->from('search_engine', 'search_engine')
         ->orderBy('id', 'asc');
-    $searchEngineSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    $searchEngineSettings = $connection->executeQuery($qb->getSQL())->fetchAllKeyValue();
     foreach ($searchEngineSettings as $id => $searchEngineSettings) {
         $searchEngineSettings = json_decode($searchEngineSettings, true) ?: [];
         $resourceTypes = $searchEngineSettings['resource_types'] ?? ['items'];
@@ -1950,7 +1954,7 @@ if (version_compare($oldVersion, '3.4.37', '<')) {
         ->select('id', 'settings')
         ->from('search_config', 'search_config')
         ->orderBy('id', 'asc');
-    $searchConfigsSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    $searchConfigsSettings = $connection->executeQuery($qb->getSQL())->fetchAllKeyValue();
     foreach ($searchConfigsSettings as $id => $searchConfigSettings) {
         $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
         if (!isset($searchConfigSettings['results'])) {
@@ -1980,7 +1984,7 @@ if (version_compare($oldVersion, '3.4.38', '<')) {
         ->select('id', 'settings')
         ->from('search_config', 'search_config')
         ->orderBy('id', 'asc');
-    $searchConfigsSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    $searchConfigsSettings = $connection->executeQuery($qb->getSQL())->fetchAllKeyValue();
     foreach ($searchConfigsSettings as $id => $searchConfigSettings) {
         $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
         $searchConfigSettings['form']['rft'] = $searchConfigSettings['q']['fulltext_search']
@@ -2037,7 +2041,7 @@ if (version_compare($oldVersion, '3.4.41', '<')) {
         ->select('id', 'settings')
         ->from('search_config', 'search_config')
         ->orderBy('id', 'asc');
-    $searchConfigsSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    $searchConfigsSettings = $connection->executeQuery($qb->getSQL())->fetchAllKeyValue();
     foreach ($searchConfigsSettings as $id => $searchConfigSettings) {
         $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
         $searchConfigSettings['resource_types'] = array_values(array_unique($searchConfigSettings['resource_types'] ?? []));
@@ -2075,7 +2079,7 @@ if (version_compare($oldVersion, '3.4.45', '<')) {
         ->select('id', 'settings')
         ->from('search_config', 'search_config')
         ->orderBy('id', 'asc');
-    $searchConfigsSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    $searchConfigsSettings = $connection->executeQuery($qb->getSQL())->fetchAllKeyValue();
     foreach ($searchConfigsSettings as $id => $searchConfigSettings) {
         $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
         $k = 0;
@@ -2201,7 +2205,7 @@ if (version_compare($oldVersion, '3.4.56', '<')) {
         ->select('id', 'settings')
         ->from('search_config', 'search_config')
         ->orderBy('id', 'asc');
-    $searchConfigsSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    $searchConfigsSettings = $connection->executeQuery($qb->getSQL())->fetchAllKeyValue();
     foreach ($searchConfigsSettings as $id => $searchConfigSettings) {
         $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
         $hasChange = false;
@@ -2234,7 +2238,7 @@ if (version_compare($oldVersion, '3.4.56', '<')) {
         ->select('id', 'settings')
         ->from('search_config', 'search_config')
         ->orderBy('id', 'asc');
-    $searchConfigsSettings = $connection->executeQuery($qb)->fetchAllKeyValue();
+    $searchConfigsSettings = $connection->executeQuery($qb->getSQL())->fetchAllKeyValue();
     foreach ($searchConfigsSettings as $id => $searchConfigSettings) {
         $searchConfigSettings = json_decode($searchConfigSettings, true) ?: [];
         $hasChange = false;

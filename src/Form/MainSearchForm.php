@@ -1222,6 +1222,39 @@ class MainSearchForm extends Form
      */
     protected function listValues(array $filter): array
     {
+        $values = $this->listValuesRaw($filter);
+        return $this->applyValueLabels($values, $filter);
+    }
+
+    /**
+     * Override raw [value => label] options with the admin-defined value_labels
+     * mapping when provided on the filter config. Supports flat and grouped
+     * (multi-level) option arrays. Labels are translated; raw values are kept
+     * for keys not present in the mapping.
+     */
+    protected function applyValueLabels(array $values, array $filter): array
+    {
+        $valueLabels = $filter['value_labels'] ?? null;
+        if (!is_array($valueLabels) || !$valueLabels) {
+            return $values;
+        }
+        $translator = $this->getTranslator();
+        $remap = function (array $options) use (&$remap, $valueLabels, $translator): array {
+            foreach ($options as $key => $value) {
+                if (is_array($value) && isset($value['options']) && is_array($value['options'])) {
+                    $options[$key]['options'] = $remap($value['options']);
+                } elseif (array_key_exists((string) $key, $valueLabels) && $valueLabels[(string) $key] !== '') {
+                    $label = $valueLabels[(string) $key];
+                    $options[$key] = $translator ? $translator->translate($label) : $label;
+                }
+            }
+            return $options;
+        };
+        return $remap($values);
+    }
+
+    protected function listValuesRaw(array $filter): array
+    {
         if ($this->skipValues) {
             return [];
         }

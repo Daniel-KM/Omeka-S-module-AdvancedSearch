@@ -864,7 +864,7 @@ var Search = (function() {
      * ?q=pont&submit=&filter[0][join]=and&filter[0][field]=...&filter[0][val]=
      *
      * Generic solution for any form structure:
-     * - Groups with empty value field (val, text) AND type requiring value → remove group
+     * - Groups with empty value field (val, text) AND type requiring value => remove group
      * - Types without value (ex, nex, etc.) are kept even if val is empty
      * - Empty simple inputs are removed directly
      * - "0" is kept as a valid value

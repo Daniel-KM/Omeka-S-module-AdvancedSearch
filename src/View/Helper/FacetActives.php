@@ -21,8 +21,17 @@ class FacetActives extends AbstractFacet
 
         foreach ($activeFacets as $facetName => &$facetValues) {
             $facetFieldLabel = $options['facets'][$facetName]['label'] ?? $facetName;
+            $valueLabels = $options['facets'][$facetName]['value_labels'] ?? [];
+            if (!is_array($valueLabels)) {
+                $valueLabels = [];
+            }
             foreach ($facetValues as $facetKey => &$facetValue) {
-                $facetValueLabel = (string) $this->facetValueLabel($facetName, $facetValue);
+                $facetValueValue = (string) $facetValue;
+                if (array_key_exists($facetValueValue, $valueLabels) && $valueLabels[$facetValueValue] !== '') {
+                    $facetValueLabel = (string) $this->translate->__invoke($valueLabels[$facetValueValue]);
+                } else {
+                    $facetValueLabel = (string) $this->facetValueLabel($facetName, $facetValue);
+                }
                 if (!strlen($facetValueLabel)) {
                     unset($activeFacets[$facetName][$facetKey]);
                     continue;

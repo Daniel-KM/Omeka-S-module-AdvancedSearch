@@ -81,6 +81,24 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
             ])
             ->add([
+                'name' => 'value_labels',
+                'type' => OmekaElement\ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Value labels', // @translate
+                    'info' => 'One pair per line: indexed_value = displayed_label. Replaces the raw value in select/radio/checkbox options and in active filter chips. Mainly useful for boolean fields (e.g. 1 = Only with image / 0 = Without image) and small enumerations.', // @translate
+                    'as_key_value' => true,
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_value_labels',
+                    'required' => false,
+                    'rows' => 3,
+                    'placeholder' => <<<'TXT'
+                        1 = Only with image
+                        0 = Without image
+                        TXT,
+                ],
+            ])
+            ->add([
                 'name' => 'type',
                 'type' => Element\Select::class,
                 'options' => [

@@ -66,6 +66,24 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
             ])
             ->add([
+                'name' => 'value_labels',
+                'type' => OmekaElement\ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Value labels', // @translate
+                    'info' => 'One pair per line: indexed_value = displayed_label. Replaces the raw value in facet items, "see more" buttons and active facets. Mainly useful for boolean fields (e.g. 1 = Only with image / 0 = Without image) and small enumerations.', // @translate
+                    'as_key_value' => true,
+                ],
+                'attributes' => [
+                    'id' => 'form_facet_value_labels',
+                    'required' => false,
+                    'rows' => 3,
+                    'placeholder' => <<<'TXT'
+                        1 = Only with image
+                        0 = Without image
+                        TXT,
+                ],
+            ])
+            ->add([
                 'name' => 'type',
                 'type' => Element\Select::class,
                 'options' => [

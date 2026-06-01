@@ -583,6 +583,10 @@ class SearchConfigController extends AbstractActionController
             'scale_show_ticks',
             // Boolean buckets filter: dedicated form field.
             'boolean_filter',
+            // Value labels: dedicated form fields, must not be moved into the
+            // free-form "options" IniTextarea (would create a duplicate entry).
+            'value_labels',
+            'value_labels_table',
         ];
         $settings['facet']['mode'] = in_array($settings['facet']['mode'] ?? null, ['button', 'link', 'js']) ? $settings['facet']['mode'] : 'button';
         foreach ($settings['facet']['facets'] ?? [] as $key => $facet) {
@@ -754,6 +758,8 @@ class SearchConfigController extends AbstractActionController
                 'scale_mode',
                 'scale_breakpoints',
                 'scale_show_ticks',
+                'value_labels',
+                'value_labels_table',
             ];
             foreach ($facet['options'] as $k => $v) {
                 if (in_array($k, $reservedKeys, true) && array_key_exists($k, $facet)) {

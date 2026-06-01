@@ -185,6 +185,18 @@ class AbstractFacet extends AbstractHelper
                 continue;
             }
 
+            // Allow admin-defined per-value labels to override the
+            // auto-computed one (boolean Yes/No, raw value, etc.). Applies to
+            // all facet types and is consumed identically by InternalQuerier
+            // and SolariumQuerier since the mapping happens at render time,
+            // after the querier returned its raw values.
+            if (!empty($options['value_labels']) && is_array($options['value_labels'])
+                && array_key_exists($facetValueValue, $options['value_labels'])
+                && $options['value_labels'][$facetValueValue] !== ''
+            ) {
+                $facetValueLabel = (string) $this->translate->__invoke($options['value_labels'][$facetValueValue]);
+            }
+
             $facetValue['value'] = $facetValueValue;
             $facetValue['label'] = $facetValueLabel;
             $facetValue['active'] = $active;

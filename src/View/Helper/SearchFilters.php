@@ -696,6 +696,12 @@ class SearchFilters extends AbstractHelper
         $searchFormAdvancedLabels = array_column($searchFormSettings['advanced']['fields'] ?? [], 'label', 'value');
         $fieldFiltersLabels = array_replace($fieldLabels, array_filter($searchFormAdvancedLabels));
 
+        // Map of indexed value => admin-defined display label, per field. Used
+        // to replace raw values (e.g. "1") with readable text (e.g. "Only with
+        // image") in active filter chips, without touching the index or the
+        // querier. Applied identically for InternalQuerier and SolariumQuerier.
+        $valueLabelsByField = array_filter(array_column($searchFormSettings['filters'] ?? [], 'value_labels', 'field'));
+
         $index = 0;
         foreach ($filterFilters as $subKey => $queryRow) {
             // Default query type is "in", unlike standard search.
@@ -787,7 +793,32 @@ class SearchFilters extends AbstractHelper
                 }
             }
 
-            $filters[$filterLabel][$this->urlQuery('filter', $subKey, !empty($queryRow['is_form_filter']))] = implode(', ', $vals);
+            $vals = array_filter($vals, fn ($v) => $v !== '' && $v !== null);
+            // Skip filters that have no displayable value (empty pill avoid).
+            if (!$vals && !$isWithoutValue) {
+                continue;
+            }
+
+            // Apply per-field value_labels mapping when defined. Multi-field
+            // filters merge labels of all referenced fields; first match wins.
+            $valueLabels = [];
+            foreach (is_array($queryFields) ? $queryFields : [$queryFields] as $qf) {
+                if ($qf !== null && $qf !== '' && !empty($valueLabelsByField[$qf]) && is_array($valueLabelsByField[$qf])) {
+                    $valueLabels += $valueLabelsByField[$qf];
+                }
+            }
+            if ($valueLabels) {
+                $vals = array_map(function ($v) use ($valueLabels, $translate) {
+                    $key = (string) $v;
+                    return array_key_exists($key, $valueLabels) && $valueLabels[$key] !== ''
+                        ? $translate($valueLabels[$key])
+                        : $v;
+                }, $vals);
+            }
+
+            $filters[$filterLabel][$this->urlQuery('filter', $subKey, !empty($queryRow['is_form_filter']))] = $isWithoutValue
+                ? ''
+                : implode(', ', $vals);
 
             if (!isset($queryRow['replaced_filter_key'])
                 && isset($queryRow['replaced_field'])

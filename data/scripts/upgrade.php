@@ -1725,7 +1725,7 @@ if (version_compare($oldVersion, '3.4.31', '<')) {
     $messenger->addSuccess($message);
 
     $message = new PsrMessage(
-        'it is now possible to display all resources (item sets, items, etc.) together in results or to separate them, like in previous versions.' // @translate
+        'It is now possible to display all resources (item sets, items, etc.) together in results or to separate them, like in previous versions.' // @translate
     );
     $messenger->addSuccess($message);
 

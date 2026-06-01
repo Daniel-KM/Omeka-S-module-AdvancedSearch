@@ -709,8 +709,7 @@ class IndexSearch extends AbstractJob
         $memory = round(memory_get_usage(true) / 1024 / 1024, 1);
 
         $this->logger->info(
-            'Indexing {resource_type}: {indexed}/{total} ({percent}%). ' // @translate
-                . 'Memory: {memory} MB.',
+            'Indexing {resource_type}: {indexed}/{total} ({percent}%). Memory: {memory} MB.', // @translate
             [
                 'resource_type' => $resourceType,
                 'indexed' => $indexed,

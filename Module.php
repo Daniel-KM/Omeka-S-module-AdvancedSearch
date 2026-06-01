@@ -2098,7 +2098,7 @@ class Module extends AbstractModule
                 'The internal search engine (sql) can be edited in the {link_url}search manager{link_end}.', // @translate
                 [
                     // Don't use the url helper, the route is not available during install.
-                    'link_url' => sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager/engine/' . $searchEngineId . '/edit'),
+                    'link_url' => sprintf('<a href="%s">', htmlspecialchars($urlHelper('admin') . '/search-manager/engine/' . $searchEngineId . '/edit')),
                     'link_end' => '</a>',
                 ]
             );
@@ -2134,7 +2134,7 @@ class Module extends AbstractModule
                 'The {link_url}internal suggester{link_end} (sql) will be available after indexation.', // @translate
                 [
                     // Don't use the url helper, the route is not available during install.
-                    'link_url' => sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager/suggester/' . $suggesterId . '/edit'),
+                    'link_url' => sprintf('<a href="%s">', htmlspecialchars($urlHelper('admin') . '/search-manager/suggester/' . $suggesterId . '/edit')),
                     'link_end' => '</a>',
                 ]
             );
@@ -2172,9 +2172,9 @@ class Module extends AbstractModule
                 [
                     // Don't use the module routes: they are not available during install.
                     'link_end' => '</a>',
-                    'link_1' => sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager/config/' . $searchConfigId . '/edit'),
-                    'link_2' => sprintf('<a href="%s">', $urlHelper('admin') . '/search-manager/config/' . $searchConfigId . '/configure'),
-                    'link_3' => sprintf('<a href="%s">', $urlHelper('admin') . '/setting#advancedsearch_main_config'),
+                    'link_1' => sprintf('<a href="%s">', htmlspecialchars($urlHelper('admin') . '/search-manager/config/' . $searchConfigId . '/edit')),
+                    'link_2' => sprintf('<a href="%s">', htmlspecialchars($urlHelper('admin') . '/search-manager/config/' . $searchConfigId . '/configure')),
+                    'link_3' => sprintf('<a href="%s">', htmlspecialchars($urlHelper('admin') . '/setting#advancedsearch_main_config')),
                 ]
             );
             $message->setEscapeHtml(false);

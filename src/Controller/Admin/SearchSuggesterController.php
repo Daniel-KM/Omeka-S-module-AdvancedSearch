@@ -157,12 +157,12 @@ class SearchSuggesterController extends AbstractActionController
                 'Indexing suggestions of suggester "{name}" started in job {link_job}#{job_id}{link_end} ({link_log}logs{link_end}).', // @translate
                 [
                     'name' => $suggester->name(),
-                    'link_job' => sprintf('<a href="%1$s">', $urlPlugin->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId()])),
+                    'link_job' => sprintf('<a href="%1$s">', htmlspecialchars($urlPlugin->fromRoute('admin/id', ['controller' => 'job', 'id' => $job->getId()]))),
                     'job_id' => $job->getId(),
                     'link_end' => '</a>',
                     'link_log' => class_exists('Log\Module', false)
-                        ? sprintf('<a href="%1$s">', $urlPlugin->fromRoute('admin/default', ['controller' => 'log'], ['query' => ['job_id' => $job->getId()]]))
-                        : sprintf('<a href="%1$s" target="_blank">', $urlPlugin->fromRoute('admin/id', ['controller' => 'job', 'action' => 'log', 'id' => $job->getId()])),
+                        ? sprintf('<a href="%1$s">', htmlspecialchars($urlPlugin->fromRoute('admin/default', ['controller' => 'log'], ['query' => ['job_id' => $job->getId()]])))
+                        : sprintf('<a href="%1$s" target="_blank" rel="noopener noreferrer">', htmlspecialchars($urlPlugin->fromRoute('admin/id', ['controller' => 'job', 'action' => 'log', 'id' => $job->getId()]))),
                 ]
             );
             $message->setEscapeHtml(false);

@@ -61,24 +61,24 @@
 
     /* Search form filters */
 
-    #search-filters {
+    .search-filters-advanced {
         display: flex;
         flex-direction: column;
         margin-bottom: 6px;
     }
-    #search-filters > .search-filter-action {
+    .search-filters-advanced > .search-filter-action {
         display: inline-block;
         align-self: flex-end;
         order: 2;
         width: fit-content;
         margin: 6px 6px 0 0;
     }
-    #search-filters > .search-filter-action::before {
+    .search-filters-advanced > .search-filter-action::before {
         content: "+";
         font-size: larger;
         font-size: bolder;
     }
-    #search-filters .filter {
+    .search-filters-advanced .filter {
         display: flex;
         justify-content: space-between;
         margin-bottom: 0;
@@ -89,53 +89,53 @@
         */
         padding: 6px;
     }
-    #search-filters .filter[hidden] {
+    .search-filters-advanced .filter[hidden] {
         display: none;
     }
-    #search-filters .filter:first-of-type {
+    .search-filters-advanced .filter:first-of-type {
         padding-top: 0.4em;
     }
-    #search-filters:not(.has-joiner-not) .filter:first-of-type select[name$="[join]"] {
+    .search-filters-advanced:not(.has-joiner-not) .filter:first-of-type select[name$="[join]"] {
         display: none;
     }
-    #search-filters .filter select,
-    #search-filters .filter input {
+    .search-filters-advanced .filter select,
+    .search-filters-advanced .filter input {
         margin-top: 0;
         margin-right: 6px;
         margin-left: 6px;
         min-width: 0;
     }
-    #search-filters .filter select:nth-of-type(1) {
+    .search-filters-advanced .filter select:nth-of-type(1) {
         min-width: 3.5em;
         margin-left: 0;
     }
-    #search-filters .filter select:nth-of-type(2) {
+    .search-filters-advanced .filter select:nth-of-type(2) {
         min-width: 8em;
     }
-    #search-filters .filter select:nth-of-type(3) {
+    .search-filters-advanced .filter select:nth-of-type(3) {
         min-width: 8em;
     }
-    #search-filters .filter input {
+    .search-filters-advanced .filter input {
         width: calc( 100% - 200px );
         margin-right: 0;
     }
     /* Buttons remove/add a filter. */
-    #search-filters .filter .field {
+    .search-filters-advanced .filter .field {
         background-color: inherit;
         padding: 0;
         margin: 0 0 0 6px;
         width: auto;
     }
-    #search-filters .filter .field .field-meta {
+    .search-filters-advanced .filter .field .field-meta {
         display: none;
     }
-    #search-filters .filter > input[type=text] {
+    .search-filters-advanced .filter > input[type=text] {
         margin-right: 6px;
     }
-    #search-filters .filter .field .inputs button {
+    .search-filters-advanced .filter .field .inputs button {
         margin: 0;
     }
-    #search-filters .filter .field .inputs button::before {
+    .search-filters-advanced .filter .field .inputs button::before {
         content: "−";
         font-size: larger;
         font-size: bolder;
@@ -713,10 +713,10 @@
     .range-double input[type=number] {
         border: none;
     }
-    #search-facets .range-double .range-numerics {
+    .facets .range-double .range-numerics {
         flex-wrap: nowrap;
     }
-    #search-facets .range-double .range-numeric input {
+    .facets .range-double .range-numeric input {
         width:  100%;
     }
 
@@ -741,7 +741,7 @@
     margin: 1em 0;
 }
 
-#search-map {
+.search-map {
     width: 100%;
     min-height: 500px;
     border: 1px solid #ddd;

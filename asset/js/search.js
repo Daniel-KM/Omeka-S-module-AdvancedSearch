@@ -494,6 +494,54 @@ var Search = (function() {
             return self;
         };
 
+        /**
+         * Expand or collapse all facets at once.
+         *
+         * @param {boolean} expand True to expand all, false to collapse all.
+         */
+        self.expandOrCollapseAll = function(expand) {
+            $searchFacets.find('.facet > .facet-button').each(function() {
+                const button = $(this);
+                const isExpanded = button.hasClass('collapse');
+                if (expand && !isExpanded) {
+                    button.removeClass('expand').addClass('collapse');
+                    self.expandOrCollapse(button);
+                } else if (!expand && isExpanded) {
+                    button.removeClass('collapse').addClass('expand');
+                    self.expandOrCollapse(button);
+                }
+            });
+            self.updateExpandAllButton();
+            return self;
+        };
+
+        /**
+         * Update the global expand/collapse toggle state from the current
+         * state of facet buttons.
+         */
+        self.updateExpandAllButton = function() {
+            const toggle = $searchFacets.find('.facets-expand-all');
+            if (!toggle.length) {
+                return self;
+            }
+            const buttons = $searchFacets.find('.facet > .facet-button');
+            if (!buttons.length) {
+                return self;
+            }
+            const allExpanded = buttons.filter('.collapse').length === buttons.length;
+            if (allExpanded) {
+                toggle.removeClass('expand').addClass('collapse');
+                toggle.attr('aria-expanded', 'true');
+                toggle.text(toggle.attr('data-label-collapse-all') || (hasOmekaTranslate ? Omeka.jsTranslate('Collapse all') : 'Collapse all'));
+            } else {
+                toggle.removeClass('collapse').addClass('expand');
+                toggle.attr('aria-expanded', 'false');
+                toggle.text(toggle.attr('data-label-expand-all') || (hasOmekaTranslate ? Omeka.jsTranslate('Expand all') : 'Expand all'));
+            }
+            return self;
+        };
+
+
         self.seeMoreOrLess = function(button) {
             button = $(button);
             if (button.hasClass('expand')) {
@@ -1480,7 +1528,13 @@ $(document).ready(function() {
                 Search.facets.seeMoreOrLess(button);
             } else {
                 Search.facets.expandOrCollapse(button);
+                Search.facets.updateExpandAllButton();
             }
+        });
+
+        $searchFacets.on('click', '.facets-expand-all', function() {
+            const button = $(this);
+            Search.facets.expandOrCollapseAll(button.hasClass('expand'));
         });
 
         $searchFacets.find('.facet-see-more-or-less').each((index, button) => Search.facets.seeMoreOrLess(button));

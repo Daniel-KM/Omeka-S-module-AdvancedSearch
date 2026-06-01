@@ -1395,6 +1395,23 @@ class SearchConfigConfigureForm extends Form
                 ],
             ])
             ->add([
+                'name' => 'display_expand_all',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Global "Expand all / Collapse all" toggle above facets', // @translate
+                    'value_options' => [
+                        'none' => 'None', // @translate
+                        'expand' => 'Display toggle, expand all by default', // @translate
+                        'collapse' => 'Display toggle, collapse all by default', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'facet_display_expand_all',
+                    'required' => false,
+                    'value' => 'none',
+                ],
+            ])
+            ->add([
                 'name' => 'display_refine',
                 'type' => Element\Checkbox::class,
                 'options' => [

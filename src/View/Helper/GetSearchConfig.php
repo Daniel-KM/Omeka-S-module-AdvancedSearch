@@ -41,6 +41,7 @@ class GetSearchConfig extends AbstractHelper
             'item_sets' => 'advancedsearch_item_sets_config',
             'annotations' => 'advancedsearch_annotations_config',
             'value_annotations' => 'advancedsearch_value_annotations_config',
+            'digital_objects' => 'advancedsearch_digital_objects_config',
         ];
 
         $originalCacheKey = $cacheKey;

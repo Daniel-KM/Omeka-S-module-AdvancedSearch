@@ -123,6 +123,7 @@ class SearchEngineConfigureForm extends Form
             // Value annotations are managed with resources.
             // 'value_annotations' => 'Value annotations',
             'annotations' => 'Annotations',
+            'digital_objects' => 'Digital objects',
             // Not managed for now.
             // 'site_pages' => 'Site pages',
         ];

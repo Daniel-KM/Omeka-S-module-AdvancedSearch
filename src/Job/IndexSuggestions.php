@@ -88,6 +88,7 @@ class IndexSuggestions extends AbstractJob
             'media' => \Omeka\Entity\Media::class,
             'value_annotations' => \Omeka\Entity\ValueAnnotation::class,
             'annotations' => \Annotate\Entity\Annotation::class,
+            'digital_objects' => \DigitalObject\Entity\DigitalObject::class,
         ];
         $resourceClasses = array_intersect_key($mapResources, array_flip($resourceTypes));
         if (!$resourceClasses) {
@@ -158,6 +159,7 @@ class IndexSuggestions extends AbstractJob
             'media' => \Omeka\Entity\Media::class,
             'value_annotations' => \Omeka\Entity\ValueAnnotation::class,
             'annotations' => \Annotate\Entity\Annotation::class,
+            'digital_objects' => \DigitalObject\Entity\DigitalObject::class,
         ];
         $resourceClasses = in_array('resources', $resourceTypes)
             ? []

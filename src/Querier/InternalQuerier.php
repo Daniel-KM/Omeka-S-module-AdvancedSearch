@@ -276,6 +276,7 @@ class InternalQuerier extends AbstractQuerier
             'media' => \Omeka\Entity\Media::class,
             'value_annotations' => \Omeka\Entity\ValueAnnotation::class,
             'annotations' => \Annotate\Entity\Annotation::class,
+            'digital_objects' => \DigitalObject\Entity\DigitalObject::class,
         ];
 
         /** @var \Doctrine\DBAL\Connection $connection */
@@ -494,23 +495,55 @@ class InternalQuerier extends AbstractQuerier
             $qb
                 ->select('valueResource.title AS v')
                 ->from(\Omeka\Entity\Value::class, 'value')
-                // This join allow to check visibility automatically too.
-                ->innerJoin(\Omeka\Entity\Item::class, 'resource', Join::WITH, $expr->eq('value.resource', 'resource'))
-                ->innerJoin(\Omeka\Entity\Item::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'))
+                // Join on Resource (STI root) instead of Item so suggestions
+                // also surface titles of value resources of any subclass
+                // (Item, ItemSet, Media, DigitalObject, Annotation). The join
+                // also checks visibility automatically.
+                ->innerJoin(\Omeka\Entity\Resource::class, 'resource', Join::WITH, $expr->eq('value.resource', 'resource'))
+                ->innerJoin(\Omeka\Entity\Resource::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'))
                 // Always return a non-empty string, not null.
                 ->where('valueResource.title IS NOT NULL')
                 ->andWhere('valueResource.title != ""');
         } else {
             $qb
-                // Always return a string, not null.
-                // Doctrine rejects empty string withy double quote.
+                // Always return a string, not null. Doctrine rejects empty
+                // string withy double quote.
                 ->select("COALESCE(value.value, valueResource.title, value.uri, '') AS v")
                 ->from(\Omeka\Entity\Value::class, 'value')
-                // This join allow to check visibility automatically too.
-                ->innerJoin(\Omeka\Entity\Item::class, 'resource', Join::WITH, $expr->eq('value.resource', 'resource'))
+                // Join on Resource (STI root); see note above.
+                ->innerJoin(\Omeka\Entity\Resource::class, 'resource', Join::WITH, $expr->eq('value.resource', 'resource'))
                 // The values should be distinct for each type.
-                ->leftJoin(\Omeka\Entity\Item::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'))
+                ->leftJoin(\Omeka\Entity\Resource::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'))
                 ->where("COALESCE(value.value, valueResource.title, value.uri, '') != ''");
+        }
+
+        // Restrict the suggestion scope to the resource types declared by the
+        // current SearchEngine (or narrowed by the query). The Resource-root
+        // join above lets any subclass match; INSTANCE OF re-applies the
+        // engine-level policy via the discriminator.
+        if ($this->resourceTypes && !in_array('resources', $this->resourceTypes, true)) {
+            $resourceMap = [
+                'items' => \Omeka\Entity\Item::class,
+                'item_sets' => \Omeka\Entity\ItemSet::class,
+                'media' => \Omeka\Entity\Media::class,
+                'value_annotations' => \Omeka\Entity\ValueAnnotation::class,
+            ];
+            if (class_exists(\Annotate\Entity\Annotation::class)) {
+                $resourceMap['annotations'] = \Annotate\Entity\Annotation::class;
+            }
+            if (class_exists(\DigitalObject\Entity\DigitalObject::class)) {
+                $resourceMap['digital_objects'] = \DigitalObject\Entity\DigitalObject::class;
+            }
+            $resourceClasses = array_values(array_intersect_key($resourceMap, array_flip($this->resourceTypes)));
+            if ($resourceClasses) {
+                $instanceOf = [];
+                foreach ($resourceClasses as $i => $class) {
+                    $param = 'resClass' . $i;
+                    $instanceOf[] = "resource INSTANCE OF :$param";
+                    $qb->setParameter($param, $class);
+                }
+                $qb->andWhere(implode(' OR ', $instanceOf));
+            }
         }
 
         if (!empty($fieldQueryArgs['lang'])) {

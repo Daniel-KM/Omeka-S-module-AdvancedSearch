@@ -1540,6 +1540,7 @@ class MainSearchForm extends Form
             'item_sets',
             'media',
             'annotations',
+            'digital_objects',
         ];
         if ($this->searchConfig) {
             $searchEngine = $this->searchConfig->searchEngine();
@@ -1588,6 +1589,7 @@ class MainSearchForm extends Form
             // Value annotations are not resources.
             // 'value_annotations' => 'Value annotations',
             'annotations' => 'Annotations',
+            'digital_objects' => 'Digital objects',
         ];
         if (!$this->searchConfig) {
             return ['resources'];

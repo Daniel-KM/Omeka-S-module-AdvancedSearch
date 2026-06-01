@@ -588,6 +588,15 @@ class SearchFilters extends AbstractHelper
         $translate = $plugins->get('translate');
         $dataTypeHelper = $plugins->get('dataType');
 
+        // Linked resource titles are displayed in the current site locale, so
+        // multilingual bounce-link filters show the right language. There is no
+        // site locale in admin, so the default title is kept there.
+        $status = $plugins->get('status');
+        $titleLocale = $status->isSiteRequest()
+            ? trim((string) $view->siteSetting('locale'))
+            : '';
+        $titleLocale = $titleLocale !== '' ? $titleLocale : null;
+
         $engineAdapter = $this->searchConfig ? $this->searchConfig->engineAdapter() : null;
         $availableFields = $engineAdapter
             ? $engineAdapter->getAvailableFields()
@@ -661,6 +670,20 @@ class SearchFilters extends AbstractHelper
             }
             // Do not store unknown ids (may be removed or private).
             $allResourceTitles = array_filter(array_column($qb->getQuery()->getScalarResult(), 'title', 'id'));
+
+            // Display linked resource titles in the site locale when available
+            // (fallback to the default title above), respecting each resource
+            // template title property.
+            if ($titleLocale) {
+                $defaultTitlePropertyId = (int) $plugins->get('easyMeta')()->propertyId('dcterms:title');
+                $allResourceTitles = $this->localizeResourceTitles(
+                    $entityManager->getConnection(),
+                    $allResourceTitles,
+                    $titleLocale,
+                    $defaultTitlePropertyId
+                );
+            }
+
             // Split results back into original variables.
             $linkIds = array_intersect_key($allResourceTitles, array_flip($linkIds));
             $vrIds = array_intersect_key($allResourceTitles, array_flip($vrIds));
@@ -830,6 +853,65 @@ class SearchFilters extends AbstractHelper
         }
 
         return $filters;
+    }
+
+    /**
+     * Replace resource titles with their value in a given language when it
+     * exists, respecting each resource template title property (default
+     * dcterms:title). Resources without a localized title are left unchanged.
+     *
+     * A single query is used for all ids.
+     *
+     * @param array $resourceTitles Map of resource id => default title.
+     * @return array Same map, with localized titles where available.
+     */
+    protected function localizeResourceTitles(
+        \Doctrine\DBAL\Connection $connection,
+        array $resourceTitles,
+        string $locale,
+        int $defaultTitlePropertyId
+    ): array {
+        if (!$resourceTitles || $locale === '' || !$defaultTitlePropertyId) {
+            return $resourceTitles;
+        }
+
+        $sql = <<<'SQL'
+SELECT `value`.resource_id AS id, `value`.value AS title
+FROM `value`
+INNER JOIN resource ON resource.id = `value`.resource_id
+LEFT JOIN resource_template ON resource_template.id = resource.resource_template_id
+WHERE `value`.resource_id IN (:ids)
+    AND `value`.lang = :lang
+    AND `value`.value IS NOT NULL
+    AND `value`.property_id = COALESCE(resource_template.title_property_id, :defaultProp)
+ORDER BY `value`.id ASC
+SQL;
+        $rows = $connection->executeQuery(
+            $sql,
+            [
+                'ids' => array_keys($resourceTitles),
+                'lang' => $locale,
+                'defaultProp' => $defaultTitlePropertyId,
+            ],
+            [
+                'ids' => \Doctrine\DBAL\Connection::PARAM_INT_ARRAY,
+            ]
+        )->fetchAllAssociative();
+
+        $seen = [];
+        foreach ($rows as $row) {
+            $id = (int) $row['id'];
+            if (isset($seen[$id]) || !isset($resourceTitles[$id])) {
+                continue;
+            }
+            $title = trim((string) $row['title']);
+            if ($title !== '') {
+                $seen[$id] = true;
+                $resourceTitles[$id] = $title;
+            }
+        }
+
+        return $resourceTitles;
     }
 
     /**

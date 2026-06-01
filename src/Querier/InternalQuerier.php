@@ -677,7 +677,15 @@ class InternalQuerier extends AbstractQuerier
 
         $sort = $this->query->getSort();
         if ($sort) {
-            [$sortField, $sortOrder] = explode(' ', $sort);
+            [$sortField, $sortOrder] = array_pad(explode(' ', $sort, 2), 2, 'asc');
+            // Convert a Solr-style field name (e.g. dcterms_title_s) back to
+            // the property term used by the internal engine, so a sort defined
+            // for another engine still works. Special sort keys (relevance,
+            // created...) are not terms and are kept as-is.
+            $sortField = $this->fieldToIndex($sortField) ?? $sortField;
+            if (is_array($sortField)) {
+                $sortField = (string) reset($sortField);
+            }
             $this->args['sort_by'] = $sortField;
             $this->args['sort_order'] = $sortOrder === 'desc' ? 'desc' : 'asc';
         }
@@ -879,7 +887,11 @@ class InternalQuerier extends AbstractQuerier
             // and "resource-type" by omeka main search engine in admin, with
             // the controller name, but it is a fake argument that redirect to
             // the controller.
-            // Anyway, "resource_name" is no more used.
+            // Anyway, "resource_name" is no more used. Solr field names are
+            // accepted too, so a config made for another engine still works
+            // after switching to the internal engine.
+            case 'resource_name':
+            case 'resource_name_s':
             case 'resource_type':
                 $values = $flatArray($values);
                 if (!$values) {
@@ -892,9 +904,12 @@ class InternalQuerier extends AbstractQuerier
 
             // "is_public" is automatically managed by this internal adapter
             // TODO Improve is_public to search public/private only.
+            case 'is_public_i':
+            case 'is_public_b':
             case 'is_public':
                 continue 2;
 
+            case 'id_i':
             case 'id':
                 $values = array_filter(array_map('intval', $flatArray($values)));
                 $this->args['id'] = empty($this->args['id'])
@@ -902,6 +917,7 @@ class InternalQuerier extends AbstractQuerier
                     : array_merge(is_array($this->args['id']) ? $this->args['id'] : [$this->args['id']], $values);
                 continue 2;
 
+            case 'owner_id_i':
             case 'owner_id':
                 $values = $flatArray($values);
                 $values = is_numeric(reset($values))
@@ -912,6 +928,7 @@ class InternalQuerier extends AbstractQuerier
                     : array_merge(is_array($this->args['owner_id']) ? $this->args['owner_id'] : [$this->args['owner_id']], $values);
                 continue 2;
 
+            case 'site_id_is':
             case 'site_id':
                 $values = $flatArray($values);
                 $values = is_numeric(reset($values))
@@ -922,6 +939,7 @@ class InternalQuerier extends AbstractQuerier
                     : array_merge(is_array($this->args['site_id']) ? $this->args['site_id'] : [$this->args['site_id']], $values);
                 continue 2;
 
+            case 'resource_class_s':
             case 'resource_class_id':
                 $values = $flatArray($values);
                 $values = is_numeric(reset($values))
@@ -932,6 +950,7 @@ class InternalQuerier extends AbstractQuerier
                     : array_merge(is_array($this->args['resource_class_id']) ? $this->args['resource_class_id'] : [$this->args['resource_class_id']], $values);
                 continue 2;
 
+            case 'resource_template_s':
             case 'resource_template_id':
                 $values = $flatArray($values);
                 $values = is_numeric(reset($values))
@@ -942,6 +961,7 @@ class InternalQuerier extends AbstractQuerier
                     : array_merge(is_array($this->args['resource_template_id']) ? $this->args['resource_template_id'] : [$this->args['resource_template_id']], $values);
                 continue 2;
 
+            case 'item_set_id_is':
             case 'item_set_id':
                 $values = array_filter(array_map('intval', $flatArray($values)));
                 $this->args['item_set_id'] = empty($this->args['item_set_id'])
@@ -1496,6 +1516,17 @@ class InternalQuerier extends AbstractQuerier
             'item_set_id' => 'o:item_set',
             'access' => 'access',
             'item_sets_tree' => 'o:item_set',
+            // Solr field names of the system fields, so a facet defined for
+            // another engine still resolves after switching to the internal
+            // engine.
+            'resource_name_s' => 'resource_type',
+            'is_public_i' => 'is_public',
+            'is_public_b' => 'is_public',
+            'owner_id_i' => 'o:owner',
+            'site_id_is' => 'o:site',
+            'resource_class_s' => 'o:resource_class',
+            'resource_template_s' => 'o:resource_template',
+            'item_set_id_is' => 'o:item_set',
         ];
 
         $facetOrders = [

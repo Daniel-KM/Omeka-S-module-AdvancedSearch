@@ -551,15 +551,11 @@ var Search = (function() {
                 const defaultCount = Number(button.attr('data-default-count')) + 1;
                 button.closest('.facet').find('.facet-items .facet-item:nth-child(n+' + defaultCount + ')').css('display', '').attr('hidden', 'hidden');
             } else {
-                // Expanding: check if pagination is enabled.
-                const perPage = Number(button.attr('data-per-page')) || 0;
-                if (perPage > 0) {
-                    button.text(button.attr('data-label-see-less') ? button.attr('data-label-see-less') : (hasOmekaTranslate ? Omeka.jsTranslate('See less') : 'See less'));
-                    self.initPagination(button, perPage);
-                } else {
-                    button.text(button.attr('data-label-see-less') ? button.attr('data-label-see-less') : (hasOmekaTranslate ? Omeka.jsTranslate('See less') : 'See less'));
-                    button.closest('.facet').find('.facet-items .facet-item').removeAttr('hidden');
-                }
+                // Expanding: show all items. Pagination is a separate mode,
+                // handled by ".facet-paginate-onload", not by "see more".
+                button.text(button.attr('data-label-see-less') ? button.attr('data-label-see-less') : (hasOmekaTranslate ? Omeka.jsTranslate('See less') : 'See less'));
+                button.closest('.facet').find('.facet-items .facet-item').removeAttr('hidden');
+                button.attr('aria-expanded', 'true');
             }
             $searchFacets.trigger('o:advanced-search.facet.see-more-or-less');
             return self;
@@ -595,10 +591,10 @@ var Search = (function() {
 
             var labelPage = button.attr('data-label-page') || 'Page';
             var indicatorHtml = totalPages > 4
-                ? '<span class="facet-page-indicator"><input type="number" class="facet-page-input" value="1" min="1" max="' + totalPages + '" title="' + labelPage + '"> / ' + totalPages + '</span>'
-                : '<span class="facet-page-indicator">1 / ' + totalPages + '</span>';
-            var paginationHtml = '<div class="facet-pagination">'
-                + '<button type="button" class="facet-page-first" title="' + labelPage + ' 1">&laquo;</button>'
+                ? '<span class="facet-page-indicator"><input type="number" class="facet-page-input page-input-top" value="1" min="1" max="' + totalPages + '" aria-label="' + labelPage + '" title="' + labelPage + '"><span class="page-count"> / ' + totalPages + '</span></span>'
+                : '<span class="facet-page-indicator"><span class="facet-page-current">1</span><span class="page-count"> / ' + totalPages + '</span></span>';
+            var paginationHtml = '<nav class="facet-pagination" aria-label="' + labelPage + '">'
+                + '<button type="button" class="facet-page-first" title="' + (button.attr('data-label-page-first') || 'First page') + '">&lsaquo;<
                 + '<button type="button" class="facet-page-prev" title="' + (button.attr('data-label-page-prev') || 'Previous page') + '">&lsaquo;</button>'
                 + indicatorHtml
                 + '<button type="button" class="facet-page-next" title="' + (button.attr('data-label-page-next') || 'Next page') + '">&rsaquo;</button>'
@@ -662,26 +658,12 @@ var Search = (function() {
                 }
             });
 
-            // Stabilize the container height so pagination buttons
-            // don't jump: fix max-height from the first page, then
-            // use overflow for pages with more content.
-            var facetItems = facet.find('.facet-items');
-            var fixedHeight = facet.data('facet-fixed-height');
-            if (!fixedHeight) {
-                fixedHeight = facetItems.outerHeight();
-                facet.data('facet-fixed-height', fixedHeight);
-            }
-            facetItems.css({
-                'height': fixedHeight + 'px',
-                'overflow-y': 'auto',
-            });
-
             // Update indicator.
             var pageInput = facet.find('.facet-page-input');
             if (pageInput.length) {
                 pageInput.val(page);
             } else {
-                facet.find('.facet-page-indicator').text(page + ' / ' + totalPages);
+                facet.find('.facet-page-indicator .facet-page-current').text(page);
             }
 
             // Update button states.
@@ -1537,7 +1519,14 @@ $(document).ready(function() {
             Search.facets.expandOrCollapseAll(button.hasClass('expand'));
         });
 
-        $searchFacets.find('.facet-see-more-or-less').each((index, button) => Search.facets.seeMoreOrLess(button));
+        $searchFacets.find('.facet-see-more-or-less:not(.facet-paginate-onload)').each((index, button) => Search.facets.seeMoreOrLess(button));
+
+        // Facets configured to paginate from load (more empty + per_page > 0):
+        // show the pagination immediately, without any "see more" button.
+        $searchFacets.find('.facet-paginate-onload').each(function() {
+            const button = $(this);
+            Search.facets.initPagination(button, Number(button.attr('data-per-page')) || 0);
+        });
 
         // Pagination navigation buttons.
         $searchFacets.on('click', '.facet-page-first', function() {

@@ -199,10 +199,21 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
             ])
             ->add([
+                'name' => 'paginate',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Enable pagination', // @translate
+                    'info' => 'Paginate the facet values with a per page navigation, instead of a "see more" button. Uses "per page" as the page size and ignores "display on load".', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'facet_paginate',
+                ],
+            ])
+            ->add([
                 'name' => 'more',
                 'type' => Element\Number::class,
                 'options' => [
-                    'label' => 'Number of facets to display on load', // @translate
+                    'label' => 'Number of facets to display on load (without pagination)', // @translate
                 ],
                 'attributes' => [
                     'id' => 'facet_more',
@@ -214,12 +225,12 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 'name' => 'per_page',
                 'type' => Element\Number::class,
                 'options' => [
-                    'label' => 'Number of facets per page on "see more"', // @translate
+                    'label' => 'Number of facets per page (with pagination)', // @translate
                 ],
                 'attributes' => [
                     'id' => 'facet_per_page',
                     'required' => false,
-                    'value' => '0',
+                    'value' => '10',
                     'min' => 0,
                 ],
             ])

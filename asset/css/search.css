@@ -497,9 +497,17 @@
         cursor: default;
     }
     .facet-page-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.15em;
         font-size: 0.9em;
         padding: 0 0.3em;
         white-space: nowrap;
+        line-height: 1;
+    }
+    .facet-page-indicator .page-count,
+    .facet-page-indicator .facet-page-current {
+        line-height: 1;
     }
     .facet-page-input {
         width: 3.5em;

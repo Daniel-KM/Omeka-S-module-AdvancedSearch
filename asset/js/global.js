@@ -278,9 +278,9 @@ var Omeka = {
             e.stopPropagation();
             var selectorRow = $(this);
             var selectorParent = selectorRow.parents('.selector-parent');
-            selectorParent.unbind('click');
+            selectorParent.off('click.selectorParent');
             appendRow(selectorRow.data('resource-id'));
-            selectorParent.bind('click', parentToggle);
+            selectorParent.on('click.selectorParent', parentToggle);
             Omeka.scrollTo(table.find('.resource-row:last-child'));
         });
 

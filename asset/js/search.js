@@ -232,9 +232,9 @@ var Search = (function() {
             transformResult: transformResult,
             onSearchError: function(query, jqXHR, textStatus, errorThrown) {
                 if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
-                    console.log(jqXHR.responseJSON.message);
+                    console.error(jqXHR.responseJSON.message);
                 } else if (errorThrown.length) {
-                    console.log(errorThrown)
+                    console.error(errorThrown);
                 }
             },
             onSelect: function (suggestion) {

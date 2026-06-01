@@ -447,8 +447,8 @@ the core.
 
 The resource page block layout `Resource navigation` adds a `< prev / next >`
 navigation on an item show page, within the context of the last browse of the
-user: search results, item set (collection/album), user selection, or an
-arbitrary series of items (a `Browse preview` block on a site page).
+user: search results, item set, user selection, or an arbitrary series of items
+(a `Browse preview` block on a site page).
 
 Four navigation contexts are supported, enabled via the site setting
 `Block Resource navigation: active contexts`:
@@ -535,6 +535,19 @@ a cron too (see your system cron).
 Furthermore, there may be an indexation delay between the moment when a resource
 is saved and the moment when it is fully available in the search engine (it may
 be some minutes with Solr, according to your configuration).
+
+Each search engine has an "Indexing enabled" option (except the internal one,
+which has no index). Disabling it suspends the automatic indexation of that
+engine while keeping it searchable. This is useful before a massive import with
+modules that does not use events. Don't forget to reenable indexation after
+import.
+
+When many resources are saved at once (batch edit, batch create, import), the
+automatic indexation is grouped into a single background job instead of indexing
+each resource individually, so large operations are not slowed down.
+
+Note: The modules [Bulk Import] and [CSV Import] don't need  this switch, and
+other ones may be implementing new processes to avoid it too.
 
 
 Deprecated improvements of the advanced search elements
@@ -711,10 +724,11 @@ This module is a merge of features from the deprecated modules [Advanced Search 
 [Search] and [Psl Search Form] and derivative ones.
 
 The Psl search form and the Solr modules were initially built by [BibLibre] and
-were used by the [digital library of PSL], a French university. Next improvements
-were done for various projects. The auto-completion was built for the future
-digital library of [Campus Condorcet]. The aggregated fields feature was built
-for the digital library [Corpus du Louvre].
+were initially used by the [digital library of PSL], a French university. Next
+improvements were done for various projects. The auto-completion was built for
+the future digital library of [Campus Condorcet]. The aggregated fields feature
+was built for the digital library [Corpus du Louvre]. Many performance
+improvements were done for the digital library [Musee de Bretagne].
 
 
 [Advanced Search]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch
@@ -731,6 +745,8 @@ for the digital library [Corpus du Louvre].
 [Psl Search Form]: https://gitlab.com/Daniel-KM/Omeka-S-module-PslSearchForm
 [Solr of Biblibre]: https://github.com/BibLibre/Omeka-S-module-Solr
 [Browse preview]: https://omeka.org/s/docs/user-manual/sites/site_pages/#browse-preview
+[Bulk Import]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkImport
+[CSV Import]: https://github.com/omeka-s-modules/CSVImport
 [module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch/issues
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
@@ -740,6 +756,7 @@ for the digital library [Corpus du Louvre].
 [BibLibre]: https://github.com/biblibre
 [GitLab]: https://gitlab.com/Daniel-KM
 [digital library of PSL]: https://bibnum.explore.univ-psl.fr
-[Campus Condorcet]: https://www.campus-condorcet.fr
+[Campus Condorcet]: https://bibnum.campus-condorcet.fr
 [Corpus du Louvre]: https://corpus.louvre.fr
+[Musee de Bretagne]: https://www.collections.musee-bretagne.fr
 [Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"

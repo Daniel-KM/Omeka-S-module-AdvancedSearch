@@ -486,6 +486,7 @@ return [
             'advancedsearch_filter_joiner_not' => true,
             'advancedsearch_configs' => [1],
             'advancedsearch_main_config' => 1,
+            'advancedsearch_hidden_query_filters_per_config' => [],
             'advancedsearch_items_config' => 1,
             'advancedsearch_items_template_form' => null,
             'advancedsearch_media_config' => 1,

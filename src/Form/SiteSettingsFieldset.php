@@ -63,6 +63,25 @@ class SiteSettingsFieldset extends Fieldset
                 ],
             ])
 
+            ->add([
+                'name' => 'advancedsearch_hidden_query_filters_per_config',
+                'type' => CommonElement\ArrayQueriesTextarea::class,
+                'options' => [
+                    'element_group' => 'advanced_search',
+                    'label' => 'Hidden query filters per search page', // @translate
+                    'info' => 'One filter per line, formatted as "search_config_slug = query_args" (e.g. "recherche = item_set_id[]=151"). Filters are merged with the search config "Hidden query filter" only on this site, so other sites sharing the same search page are unaffected.', // @translate
+                    'as_key_value' => true,
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearch_hidden_query_filters_per_config',
+                    'rows' => 4,
+                    'placeholder' => <<<'TXT'
+                        find = item_set_id[]=151
+                        bibliography = item_set_id[]=152
+                        TXT,
+                ],
+            ])
+
             // TODO Move these options to redirect item set to search page or a search page setting?
             ->add([
                 'name' => 'advancedsearch_item_sets_redirect_browse',

@@ -617,6 +617,28 @@ trait TraitFormAdapterClassic
 
         // Append hidden query if any (filter, date range filter, filter query).
         $hiddenFilters = $searchConfigSettings['request']['hidden_query_filters'] ?? [];
+
+        // Merge site-level hidden filters keyed by search config slug. This
+        // lets a site override or add filters to a search config shared with
+        // other sites without impacting them.
+        if ($site && $siteSettings) {
+            $perConfig = $siteSettings->get('advancedsearch_hidden_query_filters_per_config', [], $site->id());
+            $configSlug = $this->searchConfig->slug();
+            if (is_array($perConfig) && !empty($perConfig[$configSlug])) {
+                $extraFilters = $perConfig[$configSlug];
+                if (is_string($extraFilters)) {
+                    $parsed = [];
+                    parse_str(ltrim($extraFilters, "? \t\n\r\0\x0B"), $parsed);
+                    $extraFilters = $parsed;
+                }
+                if (is_array($extraFilters) && $extraFilters) {
+                    $hiddenFilters = $hiddenFilters
+                        ? array_merge_recursive($hiddenFilters, $extraFilters)
+                        : $extraFilters;
+                }
+            }
+        }
+
         if ($hiddenFilters) {
             // TODO Convert a generic hidden query filters into a specific one?
             // $hiddenFilters = $formAdapter->toQuery($hiddenFilters, $searchFormSettings);

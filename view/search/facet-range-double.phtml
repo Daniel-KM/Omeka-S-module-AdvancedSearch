@@ -30,6 +30,10 @@ $minMaxStep = ($min === '' ? '' : ' min="' . $escapeAttr($min) . '"')
 
 $appendButton = $options['mode'] !== 'button';
 
+$facetLabel = isset($options['label']) ? $translate($options['label']) : $name;
+$labelFrom = sprintf($translate('%s: from'), $facetLabel); // @translate
+$labelTo = sprintf($translate('%s: to'), $facetLabel); // @translate
+
 $scaleMode = $options['scale_mode'] ?? 'linear';
 $scaleBreakpoints = $options['scale_breakpoints'] ?? [];
 $scaleShowTicks = !empty($options['scale_show_ticks']);
@@ -82,8 +86,8 @@ if ($isPiecewise) {
 <div class="facet-items facet-range-double range-double"<?= $rangeDoubleData ?>>
     <div class="range-sliders">
         <div class="range-progress"></div>
-        <input class="range-slider-from" type="range" name="facet[<?= $name ?>][from]" value="<?= $escapeAttr((string) $valFromForSlider) ?>"<?= $sliderMinMaxStep ?><?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($fromUrl ?? '') . '"' : '' ?>/>
-        <input class="range-slider-to" type="range" name="facet[<?= $name ?>][to]" value="<?= $escapeAttr((string) $valToForSlider) ?>"<?= $sliderMinMaxStep ?><?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($toUrl ?? '') . '"' : '' ?>/>
+        <input class="range-slider-from" type="range" name="facet[<?= $name ?>][from]" aria-label="<?= $escapeAttr($labelFrom) ?>" value="<?= $escapeAttr((string) $valFromForSlider) ?>"<?= $sliderMinMaxStep ?><?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($fromUrl ?? '') . '"' : '' ?>/>
+        <input class="range-slider-to" type="range" name="facet[<?= $name ?>][to]" aria-label="<?= $escapeAttr($labelTo) ?>" value="<?= $escapeAttr((string) $valToForSlider) ?>"<?= $sliderMinMaxStep ?><?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($toUrl ?? '') . '"' : '' ?>/>
         <?php if ($isPiecewise && $scaleShowTicks): ?>
         <div class="range-ticks">
             <?php foreach ($scaleBreakpoints as [$tickValue, $tickPos]): ?>
@@ -97,13 +101,13 @@ if ($isPiecewise) {
             <?php /*
             <span class="range-numeric-label range-numeric-from-label"><?= $escape($translate('from')) ?></span>
             */ ?>
-            <input class="range-numeric-from" aria-label="<?= $escapeAttr($translate('from')) ?>" type="number" value="<?= $escapeAttr($from ?? $min) ?>"<?= $minMaxStep ?><?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($fromUrl ?? '') . '"' : '' ?>/>
+            <input class="range-numeric-from" aria-label="<?= $escapeAttr($labelFrom) ?>" type="number" value="<?= $escapeAttr($from ?? $min) ?>"<?= $minMaxStep ?><?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($fromUrl ?? '') . '"' : '' ?>/>
         </div>
         <div class="range-numeric">
             <?php /*
             <span class="range-numeric-label range-numeric-to-label"><?= $escape($translate('to')) ?></span>
             */ ?>
-            <input class="range-numeric-to" aria-label="<?= $escapeAttr($translate('to')) ?>" type="number" value="<?= $escapeAttr($to ?? $max) ?>"<?= $minMaxStep ?><?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($toUrl ?? '') . '"' : '' ?>/>
+            <input class="range-numeric-to" aria-label="<?= $escapeAttr($labelTo) ?>" type="number" value="<?= $escapeAttr($to ?? $max) ?>"<?= $minMaxStep ?><?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($toUrl ?? '') . '"' : '' ?>/>
         </div>
         <?php if ($options['mode'] !== 'button'): ?>
         <button type="submit" class="button-submit range-double-submit"><?= $translate('Ok') ?></button>

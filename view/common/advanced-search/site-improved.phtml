@@ -22,7 +22,7 @@ if (empty($query['site_id']) && isset($query['in_sites']) && ($query['in_sites']
 <div class="field">
     <div class="field-meta">
         <label for="site_id"><?= $translate('Search by site') ?></label>
-        <?= $hyperlink('', '#', ['class' => 'expand', 'title' => $this->translate('Expand')]) ?>
+        <?= $hyperlink('', '#', ['class' => 'expand', 'title' => $this->translate('Expand'), 'aria-label' => $this->translate('Expand')]) ?>
         <div class="collapsible">
             <div class="field-description"><?= $translate('Searches for items that are assigned to this site.') ?></div>
         </div>

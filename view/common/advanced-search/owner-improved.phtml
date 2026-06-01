@@ -18,8 +18,8 @@ $userSelect = $plugins->get('userSelect');
 <div class="field">
     <div class="field-meta">
         <label for="owner_id"><?= $translate('Search by owner') ?></label>
-        <?= $hyperlink('', '#', ['class' => 'expand', 'title' => $translate('Expand')]) ?>
-        <div class="collapsible">
+        <?= $hyperlink('', '#', ['class' => 'expand', 'role' => 'button', 'aria-expanded' => 'false', 'aria-controls' => 'owner-description', 'aria-label' => $translate('Expand'), 'title' => $translate('Expand')]) ?>
+        <div id="owner-description" class="collapsible">
             <div class="field-description"><?= $translate('Searches for resources that are owned by this user.') ?></div>
         </div>
     </div>

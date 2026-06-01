@@ -30,8 +30,8 @@ $ids = array_filter($ids) ?: [null];
 <div id="resource-templates" class="field removable multi-value" role="group">
     <div class="field-meta">
         <span id="by-resource-template-label" class="label"><?= $translate('Search by template') ?></span>
-        <?= $hyperlink('', '#', ['class' => 'expand', 'title' => $translate('Expand')]) ?>
-        <div class="collapsible">
+        <?= $hyperlink('', '#', ['class' => 'expand', 'role' => 'button', 'aria-expanded' => 'false', 'aria-controls' => 'resource-template-description', 'aria-label' => $translate('Expand'), 'title' => $translate('Expand')]) ?>
+        <div id="resource-template-description" class="collapsible">
             <div class="field-description"><?= $translate('Searches for resources that use any of these templates.') ?></div>
         </div>
         <button type="button" class="button add-value o-icon-add" aria-label="<?= $translate('Add new template') ?>" title="<?= $translate('Add new template') ?>"></button>

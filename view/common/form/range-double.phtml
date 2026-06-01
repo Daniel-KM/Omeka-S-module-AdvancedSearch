@@ -39,7 +39,12 @@ $isPiecewise = $scaleMode === 'piecewise' && count($scaleBreakpoints) >= 2;
 $isLog = $scaleMode === 'log' && $domainMin !== null && $domainMax !== null && $domainMax > $domainMin;
 $isMapped = $isPiecewise || $isLog;
 
+// A11y: outer wrapper carries the element name as `id` so the Laminas
+// formLabel-rendered `<label for="{name}">` resolves to an actual node
+// (pa11y H44.NonExistentFragment). The label semantically labels the whole
+// range, so a parent wrapper is the right target.
 $rangeDoubleAttrs = [
+    'id' => $name,
     'class' => 'range-double' . (isset($attributes['class']) ? ' ' . $attributes['class'] : ''),
 ];
 if ($isPiecewise) {
@@ -81,6 +86,12 @@ $min = $attributes['min'] ?? '';
 $max = $attributes['max'] ?? '';
 $valFrom = $value[$keyFrom] ?? $min;
 $valTo = $value[$keyTo] ?? $max;
+
+$elementLabel = $translate($element->getLabel() ?: $name);
+$ariaLabelFrom = $translate($element->getLabelFrom() ?: 'from'); // @translate
+$ariaLabelTo = $translate($element->getLabelTo() ?: 'to'); // @translate
+$ariaLabelFrom = sprintf('%1$s: %2$s', $elementLabel, $ariaLabelFrom);
+$ariaLabelTo = sprintf('%1$s: %2$s', $elementLabel, $ariaLabelTo);
 ?>
 
 <div <?= $formInput->createAttributesString($rangeDoubleAttrs) ?>>
@@ -102,8 +113,8 @@ $valTo = $value[$keyTo] ?? $max;
             $sliderFromValue = $valFrom;
             $sliderToValue = $valTo;
         }
-        $attributesFrom = ['name' => sprintf('%s[%s]', $name, $keyFrom), 'type' => 'range', 'value' => $sliderFromValue, 'class' => 'range-slider-from'] + $sliderAttrsBase;
-        $attributesTo = ['name' => sprintf('%s[%s]', $name, $keyTo), 'type' => 'range', 'value' => $sliderToValue, 'class' => 'range-slider-to'] + $sliderAttrsBase;
+        $attributesFrom = ['name' => sprintf('%s[%s]', $name, $keyFrom), 'type' => 'range', 'value' => $sliderFromValue, 'class' => 'range-slider-from', 'aria-label' => $ariaLabelFrom] + $sliderAttrsBase;
+        $attributesTo = ['name' => sprintf('%s[%s]', $name, $keyTo), 'type' => 'range', 'value' => $sliderToValue, 'class' => 'range-slider-to', 'aria-label' => $ariaLabelTo] + $sliderAttrsBase;
         // Sliders carry the position (0..100) in piecewise mode; numeric inputs
         // carry the domain value and are submitted (numeric inputs are rendered
         // after the sliders, so they win the duplicated name on submit).
@@ -124,8 +135,8 @@ $valTo = $value[$keyTo] ?? $max;
     <?php if ($useInputNumber):
         $labelFrom = $element->getLabelFrom();
         $labelTo = $element->getLabelTo();
-        $attributesFrom = ['name' => sprintf('%s[%s]', $name, $keyFrom), 'type' => 'number', 'value' => $value[$keyFrom] ?? $attributes['min'] ?? '', 'class' => 'range-numeric-from'] + $attributes;
-        $attributesTo = ['name' => sprintf('%s[%s]', $name, $keyTo), 'type' => 'number', 'value' => $value[$keyTo] ?? $attributes['max'] ?? '', 'class' => 'range-numeric-to'] + $attributes;
+        $attributesFrom = ['name' => sprintf('%s[%s]', $name, $keyFrom), 'type' => 'number', 'value' => $value[$keyFrom] ?? $attributes['min'] ?? '', 'class' => 'range-numeric-from', 'aria-label' => $ariaLabelFrom] + $attributes;
+        $attributesTo = ['name' => sprintf('%s[%s]', $name, $keyTo), 'type' => 'number', 'value' => $value[$keyTo] ?? $attributes['max'] ?? '', 'class' => 'range-numeric-to', 'aria-label' => $ariaLabelTo] + $attributes;
         ?>
     <div class="range-numerics">
         <div class="range-numeric">

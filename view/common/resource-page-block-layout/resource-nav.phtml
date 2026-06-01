@@ -63,20 +63,22 @@ $nextTitle = $escape($translate('Next')); // @translate
         </a>
         <?php endif; ?>
         <?php if ($showPos): ?>
-        <span class="page-input-top" aria-label="<?= $escape($translate('Position')) ?>"><?= $position ?></span>
-        /
-        <span class="page-count"><?= $totalResults ?></span>
+        <span class="page-position" aria-label="<?= $escape(sprintf($translate('Item %1$d of %2$d'), $position, $totalResults)) ?>">
+            <span class="page-input-top"><?= $position ?></span>
+            <span aria-hidden="true">/</span>
+            <span class="page-count"><?= $totalResults ?></span>
+        </span>
         <?php endif; ?>
         <div class="pagination-buttons">
             <?php if ($prev): ?>
-            <a class="previous o-icon-prev button" title="<?= $prevTitle ?>" aria-label="<?= $prevTitle ?>" href="<?= $escape($prevUrl) ?>"></a>
+            <a class="previous o-icon-prev button" aria-label="<?= $prevTitle ?>" href="<?= $escape($prevUrl) ?>"></a>
             <?php else: ?>
-            <span class="previous o-icon-prev button inactive"></span>
+            <span class="previous o-icon-prev button inactive" aria-hidden="true"></span>
             <?php endif; ?>
             <?php if ($next): ?>
-            <a class="next o-icon-next button" title="<?= $nextTitle ?>" aria-label="<?= $nextTitle ?>" href="<?= $escape($nextUrl) ?>"></a>
+            <a class="next o-icon-next button" aria-label="<?= $nextTitle ?>" href="<?= $escape($nextUrl) ?>"></a>
             <?php else: ?>
-            <span class="next o-icon-next button inactive"></span>
+            <span class="next o-icon-next button inactive" aria-hidden="true"></span>
             <?php endif; ?>
         </div>
     </nav>

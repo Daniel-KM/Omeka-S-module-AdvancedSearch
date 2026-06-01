@@ -203,12 +203,12 @@ if ($showMapView) {
 <div class="search-results-wrapper">
 
     <?php if ($displayFacets === 'before'): ?>
-    <aside class="search-facets">
+    <aside class="search-facets" aria-label="<?= $this->escapeHtmlAttr($translate('Facets')) ?>">
         <?= $partial('search/facets-list') ?>
     </aside>
     <?php endif; ?>
 
-    <div id="search-results" class="search-results"<?php if ($autoscroll && !empty($query)): ?> data-autoscroll="1"<?php endif; ?>>
+    <div id="search-results" class="search-results" role="region" aria-label="<?= $this->escapeHtmlAttr($translate('Search results')) ?>" aria-live="polite" aria-busy="false"<?php if ($autoscroll && !empty($query)): ?> data-autoscroll="1"<?php endif; ?>>
 
         <?php if ($displayPartsHeader): ?>
         <div class="search-results-part search-results-header">
@@ -283,7 +283,7 @@ if ($showMapView) {
     </div>
 
     <?php if ($displayFacets === 'after'): ?>
-    <aside class="search-facets">
+    <aside class="search-facets" aria-label="<?= $this->escapeHtmlAttr($translate('Facets')) ?>">
         <?= $partial('search/facets-list') ?>
     </aside>
     <?php endif; ?>

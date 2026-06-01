@@ -14,11 +14,15 @@ $escapeAttr = $plugins->get('escapeHtmlAttr');
 
 $isFacetModeDirect = in_array($options['mode'] ?? null, ['link', 'js']);
 $displayCount = !empty($options['display_count']);
+
+$facetLabel = isset($options['label']) ? $translate($options['label']) : $name;
+$labelFrom = sprintf($translate('%s: from'), $facetLabel); // @translate
+$labelTo = sprintf($translate('%s: to'), $facetLabel); // @translate
 ?>
 
-<div class="facet-select-range">
+<div class="facet-select-range" role="group" aria-label="<?= $escapeAttr($facetLabel) ?>">
     <span><?= $translate('Between') ?></span>
-    <select name="facet[<?= $name ?>][from]" class="facet-items chosen-select" data-placeholder="<?= $translate('Select below…') ?>">
+    <select name="facet[<?= $name ?>][from]" class="facet-items chosen-select" aria-label="<?= $escapeAttr($labelFrom) ?>" data-placeholder="<?= $translate('Select below…') ?>">
         <option value=""></option>
         <?php foreach ($facetValues as $facetValue): ?>
         <option value="<?= $escapeAttr($facetValue['value']) ?>"<?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($facetValue['url_from']) . '"' : '' ?><?= $facetValue['is_from'] ? ' selected="selected"' : '' ?>>
@@ -27,7 +31,7 @@ $displayCount = !empty($options['display_count']);
         <?php endforeach; ?>
     </select>
     <span><?= $translate('and') ?></span>
-    <select name="facet[<?= $name ?>][to]" class="facet-items chosen-select" data-placeholder="<?= $translate('Select below…') ?>">
+    <select name="facet[<?= $name ?>][to]" class="facet-items chosen-select" aria-label="<?= $escapeAttr($labelTo) ?>" data-placeholder="<?= $translate('Select below…') ?>">
         <option value=""></option>
         <?php foreach ($facetValues as $facetValue): ?>
         <option value="<?= $escapeAttr($facetValue['value']) ?>"<?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($facetValue['url_to']) . '"' : '' ?><?= $facetValue['is_to'] ? ' selected="selected"' : '' ?>>

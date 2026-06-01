@@ -529,10 +529,10 @@ class SearchFilters extends AbstractHelper
 
                 case 'rft':
                     // TODO Label for rft search filter depends on the search config.
-                    $filterLabel = $value === 'record'
+                    $filterLabel = $translate('Search type'); // @translate
+                    $filters[$filterLabel][$this->urlQuery($key)] = $value === 'record'
                         ? $translate('Record only') // @translate
                         : $translate('Full text'); // @translate
-                    $filters[$filterLabel][$this->urlQuery($key)] = '';
                     break;
 
                 default:

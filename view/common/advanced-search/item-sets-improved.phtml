@@ -68,7 +68,7 @@ if ($isSiteRequest) {
 <div id="item-sets" class="field removable multi-value" role="group" aria-labelledby="by-item-set-label">
     <div class="field-meta">
         <span id="by-item-set-label" class="label"><?= $translate('Search by item set') ?></span>
-        <?= $hyperlink('', '#', ['class' => 'expand', 'title' => $translate('Expand')]) ?>
+        <?= $hyperlink('', '#', ['class' => 'expand', 'title' => $translate('Expand'), 'aria-label' => $translate('Expand')]) ?>
         <div class="collapsible">
             <div class="field-description"><?= $translate('Searches for items that are assigned to any of these item sets.') ?></div>
         </div>

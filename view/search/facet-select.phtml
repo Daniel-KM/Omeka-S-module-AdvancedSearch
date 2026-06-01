@@ -13,9 +13,11 @@ $escapeAttr = $plugins->get('escapeHtmlAttr');
 
 $isFacetModeDirect = in_array($options['mode'] ?? null, ['link', 'js']);
 $displayCount = !empty($options['display_count']);
+
+$facetLabel = isset($options['label']) ? $translate($options['label']) : $name;
 ?>
 
-<select name="facet[<?= $name ?>][]" multiple="multiple" class="facet-items chosen-select" data-placeholder="<?= $translate('Select below…') ?>">
+<select name="facet[<?= $name ?>][]" multiple="multiple" class="facet-items chosen-select" aria-label="<?= $escapeAttr($facetLabel) ?>" data-placeholder="<?= $translate('Select below…') ?>">
     <?php foreach ($facetValues as $facetValue): ?>
     <option value="<?= $escapeAttr($facetValue['value']) ?>"<?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($facetValue['url']) . '"' : '' ?><?= $facetValue['active'] ? ' selected="selected"' : '' ?>>
         <?= $escape($facetValue['value']) ?>

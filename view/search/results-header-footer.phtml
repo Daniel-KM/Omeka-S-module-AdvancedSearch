@@ -114,13 +114,16 @@ $hasRefineActive = trim((string) $query->getQueryRefine()) !== '';
 <?php // Grid/list/map. // TODO Ideally, list/grid should be buttons but with a light design, like a link. Or a switch. ?>
 
 <?php if ($multiMode): ?>
-<div class="search-results-display">
-    <a class="search-view-type search-view-type-list<?= $gridListMode === 'list' ? ' active' : '' ?>" href="#"><?= $translate('list') ?></a>
-    |
-    <a class="search-view-type search-view-type-grid<?= in_array($gridListMode, ['grid', 'auto']) ? ' active' : '' ?>" href="#"><?= $translate('grid') ?></a>
+<?php $isList = $gridListMode === 'list'; ?>
+<?php $isGrid = in_array($gridListMode, ['grid', 'auto']); ?>
+<?php $isMap = $gridListMode === 'map'; ?>
+<div class="search-results-display" role="group" aria-label="<?= $this->escapeHtmlAttr($translate('Display mode')) ?>">
+    <a class="search-view-type search-view-type-list<?= $isList ? ' active' : '' ?>" href="#" role="button" aria-pressed="<?= $isList ? 'true' : 'false' ?>"><?= $translate('list') ?></a>
+    <span aria-hidden="true">|</span>
+    <a class="search-view-type search-view-type-grid<?= $isGrid ? ' active' : '' ?>" href="#" role="button" aria-pressed="<?= $isGrid ? 'true' : 'false' ?>"><?= $translate('grid') ?></a>
     <?php if ($showMapView): ?>
-    |
-    <a class="search-view-type search-view-type-map<?= $gridListMode === 'map' ? ' active' : '' ?>" href="#"><?= $translate('map') ?></a>
+    <span aria-hidden="true">|</span>
+    <a class="search-view-type search-view-type-map<?= $isMap ? ' active' : '' ?>" href="#" role="button" aria-pressed="<?= $isMap ? 'true' : 'false' ?>"><?= $translate('map') ?></a>
     <?php endif; ?>
 </div>
 <?php endif; ?>

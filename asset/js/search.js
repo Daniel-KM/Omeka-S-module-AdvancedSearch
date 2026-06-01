@@ -487,10 +487,10 @@ var Search = (function() {
         self.expandOrCollapse = function(button) {
             button = $(button);
             if (button.hasClass('expand')) {
-                button.attr('aria-label', button.attr('data-label-expand') ? button.attr('data-label-expand') : (hasOmekaTranslate ? Omeka.jsTranslate('Expand') : 'Expand'));
+                button.attr('aria-expanded', 'false');
                 button.closest('.facet').find('.facet-elements').attr('hidden', 'hidden');
             } else {
-                button.attr('aria-label', button.attr('data-label-collapse') ? button.attr('data-label-collapse') : (hasOmekaTranslate ? Omeka.jsTranslate('Collapse') : 'Collapse'));
+                button.attr('aria-expanded', 'true');
                 button.closest('.facet').find('.facet-elements').removeAttr('hidden');
             }
             $searchFacets.trigger('o:advanced-search.facet.expand-or-collapse');
@@ -551,6 +551,7 @@ var Search = (function() {
                 // Collapsing: remove pagination and show only default items.
                 self.removePagination(button);
                 button.text(button.attr('data-label-see-more') ? button.attr('data-label-see-more') : (hasOmekaTranslate ? Omeka.jsTranslate('See more') : 'See more'));
+                button.attr('aria-expanded', 'false');
                 const defaultCount = Number(button.attr('data-default-count')) + 1;
                 button.closest('.facet').find('.facet-items .facet-item:nth-child(n+' + defaultCount + ')').css('display', '').attr('hidden', 'hidden');
             } else {
@@ -593,16 +594,20 @@ var Search = (function() {
             }
 
             var labelPage = button.attr('data-label-page') || 'Page';
+            var labelPagePrev = button.attr('data-label-page-prev') || 'Previous page';
+            var labelPageNext = button.attr('data-label-page-next') || 'Next page';
+            var labelFirst = labelPage + ' 1';
+            var labelLast = labelPage + ' ' + totalPages;
             var indicatorHtml = totalPages > 4
                 ? '<span class="facet-page-indicator"><input type="number" class="facet-page-input page-input-top" value="1" min="1" max="' + totalPages + '" aria-label="' + labelPage + '" title="' + labelPage + '"><span class="page-count"> / ' + totalPages + '</span></span>'
                 : '<span class="facet-page-indicator"><span class="facet-page-current">1</span><span class="page-count"> / ' + totalPages + '</span></span>';
             var paginationHtml = '<nav class="facet-pagination" aria-label="' + labelPage + '">'
-                + '<button type="button" class="facet-page-first" title="' + (button.attr('data-label-page-first') || 'First page') + '">&lsaquo;<
-                + '<button type="button" class="facet-page-prev" title="' + (button.attr('data-label-page-prev') || 'Previous page') + '">&lsaquo;</button>'
+                + '<button type="button" class="facet-page-first" aria-label="' + labelFirst + '" title="' + labelFirst + '">&laquo;</button>'
+                + '<button type="button" class="facet-page-prev" aria-label="' + labelPagePrev + '" title="' + labelPagePrev + '">&lsaquo;</button>'
                 + indicatorHtml
-                + '<button type="button" class="facet-page-next" title="' + (button.attr('data-label-page-next') || 'Next page') + '">&rsaquo;</button>'
-                + '<button type="button" class="facet-page-last" title="' + labelPage + ' ' + totalPages + '">&raquo;</button>'
-                + '</div>';
+                + '<button type="button" class="facet-page-next" aria-label="' + labelPageNext + '" title="' + labelPageNext + '">&rsaquo;</button>'
+                + '<button type="button" class="facet-page-last" aria-label="' + labelLast + '" title="' + labelLast + '">&raquo;</button>'
+                + '</nav>';
             button.closest('.facet-see-more').before(paginationHtml);
 
             // Store pagination state on the facet element.
@@ -1359,11 +1364,14 @@ $(document).ready(function() {
     $('.advanced-search-form-toggle a').on('click', function(e) {
         e.preventDefault();
         $('.advanced-search-form, .advanced-search-form-toggle').toggleClass('open');
-        if ($('.advanced-search-form').hasClass('open')) {
-            $('.advanced-search-form-toggle a').text($('.advanced-search-form-toggle').data('msgOpen'));
+        const isOpen = $('.advanced-search-form').hasClass('open');
+        const toggleLink = $('.advanced-search-form-toggle a');
+        if (isOpen) {
+            toggleLink.text($('.advanced-search-form-toggle').data('msgOpen'));
         } else {
-            $('.advanced-search-form-toggle a').text($('.advanced-search-form-toggle').data('msgClosed'));
+            toggleLink.text($('.advanced-search-form-toggle').data('msgClosed'));
         }
+        toggleLink.attr('aria-expanded', isOpen ? 'true' : 'false');
         // TODO Don't open autosuggestion when toggle.
         // $('#search-form [name=q]').focus();
     });
@@ -1478,29 +1486,30 @@ $(document).ready(function() {
      * Results tools (sort, pagination, per-page).
      */
 
+    var setActiveViewType = function(activeClass) {
+        $('.search-view-type').removeClass('active').attr('aria-pressed', 'false');
+        $('.' + activeClass).addClass('active').attr('aria-pressed', 'true');
+    };
+
     $('.search-view-type-list').on('click', function(e) {
         e.preventDefault();
         Search.setViewType('list');
-        $('.search-view-type').removeClass('active');
-        $('.search-view-type-list').addClass('active');
+        setActiveViewType('search-view-type-list');
     });
 
     $('.search-view-type-grid').on('click', function(e) {
         e.preventDefault();
         Search.setViewType('grid');
-        $('.search-view-type').removeClass('active');
-        $('.search-view-type-grid').addClass('active');
+        setActiveViewType('search-view-type-grid');
     });
 
     /**
-     * Map view handler.
-     * Requires the Mapping module to be installed.
+     * Map view handler. Requires the Mapping module to be installed.
      */
     $('.search-view-type-map').on('click', function(e) {
         e.preventDefault();
         Search.setViewType('map');
-        $('.search-view-type').removeClass('active');
-        $('.search-view-type-map').addClass('active');
+        setActiveViewType('search-view-type-map');
     });
 
     $('.as-url select, select.as-url').on('change', function(e) {

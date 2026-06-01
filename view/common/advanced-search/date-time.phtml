@@ -34,8 +34,8 @@ $queryInputText = function (array $search, $engine) use ($translate, $escape) {
 <div id="datetime-queries" class="field removable multi-value" role="group" aria-labelledby="by-datetime-label">
     <div class="field-meta">
         <span id="by-datetime-label" class="label"><?= $translate('Search by date / time') // @translate ?></span>
-        <a class="expand" title="<?= $translate('Expand') ?>" href="#" aria-label="<?= $translate('Expand') // @translate ?>"></a>
-        <div class="collapsible">
+        <a class="expand" href="#" role="button" aria-expanded="false" aria-controls="by-datetime-description" title="<?= $translate('Expand') ?>" aria-label="<?= $translate('Expand') // @translate ?>"></a>
+        <div id="by-datetime-description" class="collapsible">
             <div class="field-description">
                 <?= $translate('Date / time can be full like "2018-01-23 12:34:56", or partial like "2018-12-25" or "2017-11".') // @translate ?>
             </div>

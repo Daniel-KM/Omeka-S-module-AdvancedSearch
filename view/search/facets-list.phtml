@@ -132,13 +132,13 @@ if (!empty($itemSet)) {
                 ?>
                 <button type="button" class="button facet-button <?= $stateExpand ? 'collapse' : 'expand' ?>" aria-expanded="<?= $stateExpand ? 'true' : 'false' ?>" aria-controls="<?= $facetElementsId ?>" data-label-expand="<?= $escapeAttr($translate('Expand')) ?>" data-label-collapse="<?= $escapeAttr($translate('Collapse')) ?>"><?= $escape($facetLabel) ?></button>
                 <?php else: ?>
-                <h4><?= $escape($translate($facetParams['label'] ?? $name)) ?></h4>
+                <h4><?= $escape($facetLabel) ?></h4>
                 <?php endif; ?>
                 <div id="<?= $facetElementsId ?>" class="facet-elements<?= $hasState ? ' collapsible' : '' ?>"<?= $hasState && !$stateExpand ? ' hidden="hidden"' : '' ?>>
                     <?= $facetElements($name, $facetValues, $facetParams) ?>
                     <?php if (empty($facetParams['paginate']) && ($facetParams['more'] ?? '') !== '' && in_array($facetParams['type'] ?? '', ['', 'Checkbox', 'CheckboxFilter', 'Link', 'Tree', 'TreeLink', 'Thesaurus', 'ThesaurusLink']) && count($facetValues) > (int) $facetParams['more']): ?>
                     <div class="facet-see-more">
-                        <button type="button" class="button facet-see-more-or-less expand" data-default-count="<?= (int) $facetParams['more'] ?>" data-more-count="<?= count($facetValues) - (int) $facetParams['more'] ?>" data-per-page="<?= (int) ($facetParams['per_page'] ?? 0) ?>" data-label-see-more="<?= $escapeAttr($translate('See more')) ?>" data-label-see-less="<?= $escapeAttr($translate('See less')) ?>" data-label-page="<?= $escapeAttr($translate('Page')) ?>" data-label-page-prev="<?= $escapeAttr($translate('Previous page')) ?>" data-label-page-next="<?= $escapeAttr($translate('Next page')) ?>"><?= $escape($translate('See more')) ?></button>
+                        <button type="button" class="button facet-see-more-or-less expand" aria-expanded="false" aria-controls="<?= $facetElementsId ?>" data-default-count="<?= (int) $facetParams['more'] ?>" data-more-count="<?= count($facetValues) - (int) $facetParams['more'] ?>" data-per-page="<?= (int) ($facetParams['per_page'] ?? 0) ?>" data-label-see-more="<?= $escapeAttr($translate('See more')) ?>" data-label-see-less="<?= $escapeAttr($translate('See less')) ?>" data-label-page="<?= $escapeAttr($translate('Page')) ?>" data-label-page-prev="<?= $escapeAttr($translate('Previous page')) ?>" data-label-page-next="<?= $escapeAttr($translate('Next page')) ?>"><?= $escape($translate('See more')) ?></button>
                     </div>
                     <?php elseif (!empty($facetParams['paginate']) && (int) ($facetParams['per_page'] ?? 0) > 0 && in_array($facetParams['type'] ?? '', ['', 'Checkbox', 'CheckboxFilter', 'Link', 'Tree', 'TreeLink', 'Thesaurus', 'ThesaurusLink']) && count($facetValues) > (int) $facetParams['per_page']): ?>
                     <?php // No "see more" button: paginate from load (pagination enabled). ?>

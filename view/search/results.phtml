@@ -53,7 +53,7 @@ $thumbnailMode = $searchConfig->subSetting('results', 'thumbnail_mode', 'default
 $noThumbnail = $thumbnailMode === 'none';
 $allThumbnail = $thumbnailMode === 'all';
 $defaultThumbnail = $allThumbnail
-    ? sprintf('<img loading="lazy" src="%1$s" title="%2$s"/>', $assetUrl('thumbnails/default.png', 'Omeka', true), $translate('No media'))
+    ? sprintf('<img loading="lazy" src="%1$s" alt="%2$s" title="%2$s"/>', $assetUrl('thumbnails/default.png', 'Omeka', true), $translate('No media'))
     : '';
 
 $thumbnailType = $searchConfig->subSetting('results', 'thumbnail_type', 'medium');
@@ -114,7 +114,7 @@ $showLocale = (bool) $setting('show_locale_label');
                         <?php endif; ?>
                         <span class="value-content"><?= $value->asHtml() ?></span>
                         <?php if (!$value->isPublic()): ?>
-                        <span class="o-icon-private" role="img" title="<?= $escapeAttr($translate('Private')) ?>" aria-label="<?= $escapeAttr($translate('Private')) ?>"></span>
+                        <span class="o-icon-private" role="img" aria-label="<?= $escapeAttr($translate('Private')) ?>"></span>
                         <?php endif; ?>
                     </dd>
                     <?php endforeach; ?>

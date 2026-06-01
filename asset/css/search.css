@@ -175,10 +175,7 @@
         color: inherit;
     }
     .search-results .search-filters .filter a::after {
-        content: "🗙";
-        color: inherit;
-        font-weight: bold;
-        margin: -3px 6px auto;
+        content: none;
     }
 
     .search-view-type.active {
@@ -297,11 +294,20 @@
         padding: 0 6px;
         color: inherit;
     }
-    .facets-active .facet-active .facet-active-value::after {
-        content: "🗙";
-        color: inherit;
+    .facets-active .facet-active .facet-active-remove,
+    .search-results .search-filters .filter a.filter-remove,
+    .search-results .search-filters .filter a.filter-value + a.filter-remove {
         font-weight: bold;
-        margin: -3px 6px auto;
+        margin-left: 6px;
+        padding: 6px;
+        color: inherit;
+        text-decoration: none;
+    }
+    /* The core admin SCSS adds ", " after every .filter-value:not(:last-child),
+        but the module may add a "x" to close the filter or facet, so fix it. */
+    .search-filters .filter .filter-value:not(:has(+ .filter-value))::after,
+    .facets-active .facet-active .facet-active-value:not(:has(+ .facet-active-value))::after {
+        content: none;
     }
 
     /* Search facets */

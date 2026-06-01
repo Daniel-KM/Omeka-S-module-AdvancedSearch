@@ -17,23 +17,31 @@ $showFieldLabel = $show_field_label ?? true;
 $mode = $mode ?? 'link_remove';
 
 $classes = 'search-filters search-filters-' . str_replace('_', '-', $mode);
+
+$translateRemove = $translate('Remove filter "%1$s: %2$s"'); // @translate
 ?>
 
-<ul class="<?= $escapeAttr($classes) ?>">
-    <?php foreach ($filters as $filterLabel => $filterValues): ?>
+<ul class="<?= $escapeAttr($classes) ?>" aria-label="<?= $escapeAttr($translate('Active search filters')) ?>">
+    <?php foreach ($filters as $filterLabel => $filterValues):
+        // Skip filter values that are empty strings (avoid phantom pills with
+        // only a remove cross, e.g. from rft or empty query parts).
+        $filterValues = array_filter($filterValues, fn ($v) => (string) $v !== '');
+        if (!$filterValues) continue;
+    ?>
     <li class="filter">
         <?php if ($showFieldLabel): ?>
         <span class="filter-label"><?= $escape($filterLabel) ?></span>
         <?php endif; ?>
         <?php foreach ($filterValues as $urlQuery => $filterValue):
             $hasUrl = is_string($urlQuery) && $urlQuery !== '' && !is_numeric($urlQuery);
+            $removeLabel = $escapeAttr(sprintf($translateRemove, $filterLabel, $filterValue));
         ?>
             <?php if ($mode === 'links' && $hasUrl): ?>
-            <a href="<?= $escapeAttr($urlQuery) ?>" class="filter-value"><?= $escape($filterValue) ?></a>
+            <a href="<?= $escapeAttr($urlQuery) ?>" class="filter-value filter-remove" aria-label="<?= $removeLabel ?>"><?= $escape($filterValue) ?></a>
             <?php else: ?>
             <span class="filter-value"><?= $escape($filterValue) ?></span>
                 <?php if ($mode === 'link_remove' && $hasUrl): ?>
-                <a href="<?= $escapeAttr($urlQuery) ?>" class="filter-remove" aria-label="<?= $escapeAttr($translate('Remove this filter')) ?>" title="<?= $escapeAttr($translate('Remove this filter')) ?>">×</a>
+                <a href="<?= $escapeAttr($urlQuery) ?>" class="filter-remove" aria-label="<?= $removeLabel ?>"><span aria-hidden="true">🗙</span></a>
                 <?php endif; ?>
             <?php endif; ?>
         <?php endforeach; ?>

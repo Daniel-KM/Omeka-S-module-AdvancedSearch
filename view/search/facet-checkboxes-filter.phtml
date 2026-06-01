@@ -16,9 +16,12 @@ $isFacetModeDirect = in_array($options['mode'] ?? null, ['link', 'js']);
 $displayCount = !empty($options['display_count']);
 
 $isTree = is_array($tree);
+
+$facetLabel = isset($options['label']) ? $translate($options['label']) : $name;
+$inputLabel = sprintf($translate('Filter values of %s'), $facetLabel); // @translate
 ?>
 
-<input type="text" class="facet-search-input" placeholder="<?= $escapeAttr($translate('Filter…')) ?>" aria-label="<?= $escapeAttr($translate('Filter values')) ?>"/>
+<input type="text" class="facet-search-input" placeholder="<?= $escapeAttr($translate('Filter…')) ?>" aria-label="<?= $escapeAttr($inputLabel) ?>"/>
 <ul class="facet-items">
     <?php foreach ($facetValues as $facetValue):
         $escapedValue = $escapeAttr($facetValue['value']);

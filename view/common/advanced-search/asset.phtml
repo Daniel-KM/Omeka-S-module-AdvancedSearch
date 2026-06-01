@@ -12,12 +12,12 @@ $hyperlink = $plugins->get('hyperlink');
 <div class="field">
     <div class="field-meta">
         <label for="asset_id"><?= $translate('Has a specific asset as thumbnail') ?></label>
-        <?= $hyperlink('', '#', ['class' => 'expand', 'title' => $translate('Expand')]) ?>
-        <div class="collapsible">
+        <?= $hyperlink('', '#', ['class' => 'expand', 'role' => 'button', 'aria-expanded' => 'false', 'aria-controls' => 'asset-description', 'aria-label' => $translate('Expand'), 'title' => $translate('Expand')]) ?>
+        <div id="asset-description" class="collapsible">
             <div class="field-description"><?= $translate('Searches for resources with a specific asset as thumbnail.') ?></div>
         </div>
     </div>
     <div class="inputs">
-        <input name="asset_id" value="<?= $query['asset_id'] ?? '' ?>" type="number" min="0"/>
+        <input id="asset_id" name="asset_id" value="<?= $query['asset_id'] ?? '' ?>" type="number" min="0"/>
     </div>
 </div>

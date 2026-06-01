@@ -124,18 +124,11 @@ $runningSuggesterJobs = $runningJobs['suggesters'] ?? [];
                                     aria-label="<?= $escape($translate('No reindex for internal engine')) ?>"
                                     title="<?= $escape($translate('No reindex for internal engine')) ?>"></span>
                                 <?php else: ?>
-                                    <?php if ($isIndexingEnabled): ?>
-                                        <a href="#"
-                                        data-sidebar-content-url="<?= $escape($searchEngine->url('index-confirm')) ?>"
-                                        class="o-icon- fa fa-refresh fa-sync sidebar-content"
-                                        aria-label="<?= $escape($translate('Reindex')) ?>"
-                                        title="<?= $escape($translate('Reindex')) ?>"></a>
-                                    <?php else: ?>
-                                        <span
-                                        class="o-icon- fa fa-refresh fa-sync sidebar-content disabled"
-                                        aria-label="<?= $escape($translate('Indexing is disabled for this search engine')) ?>"
-                                        title="<?= $escape($translate('Indexing is disabled for this search engine')) ?>"></span>
-                                    <?php endif; ?>
+                                    <a href="#"
+                                    data-sidebar-content-url="<?= $escape($searchEngine->url('index-confirm')) ?>"
+                                    class="o-icon- fa fa-refresh fa-sync sidebar-content"
+                                    aria-label="<?= $escape($translate('Reindex')) ?>"
+                                    title="<?= $escape($translate('Reindex')) ?>"></a>
                                 <?php endif; ?>
                                 </li>
                             <?php endif; ?>
@@ -157,7 +150,7 @@ $runningSuggesterJobs = $runningJobs['suggesters'] ?? [];
                                 title="<?= $escape($translate('Indexing is disabled for this search engine')) ?>">
                                 <?= $escape($translate('Indexing is disabled for this search engine')) ?>
                             </span>
-                        <?php endif; ?>          
+                        <?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>

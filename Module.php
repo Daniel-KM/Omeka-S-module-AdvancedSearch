@@ -1458,6 +1458,10 @@ class Module extends AbstractModule
         $searchEngines = $api->search('search_engines')->getContent();
         $searchEngineIds = [];
         foreach ($searchEngines as $searchEngine) {
+            $isIndexingEnabled = filter_var($searchEngine->setting('is_indexing_enabled', true), FILTER_VALIDATE_BOOLEAN);
+            if (!$isIndexingEnabled) {
+                continue;
+            }
             $indexer = $searchEngine->indexer();
             if ($indexer->canIndex($resourceType)
                 && in_array($resourceType, $searchEngine->setting('resource_types', []))
@@ -1518,9 +1522,6 @@ class Module extends AbstractModule
         $services = $this->getServiceLocator();
         $api = $services->get('Omeka\ApiManager');
 
-        $logger = $services->get('Omeka\Logger');
-        
-
         /**
          * @var \Omeka\Api\Request $request
          * @var \Omeka\Api\Response $response
@@ -1539,10 +1540,10 @@ class Module extends AbstractModule
         /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
         $searchEngines = $api->search('search_engines')->getContent();
         foreach ($searchEngines as $searchEngine) {
-            
             $isIndexingEnabled = filter_var($searchEngine->setting('is_indexing_enabled', true), FILTER_VALIDATE_BOOLEAN);
-            if (!$isIndexingEnabled) continue;
-
+            if (!$isIndexingEnabled) {
+                continue;
+            }
             if ($searchEngine->indexer()->canIndex($resourceType)
                 && in_array($resourceType, $searchEngine->setting('resource_types', []))
             ) {
@@ -1577,10 +1578,10 @@ class Module extends AbstractModule
         /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $searchEngines */
         $searchEngines = $api->search('search_engines')->getContent();
         foreach ($searchEngines as $searchEngine) {
-
             $isIndexingEnabled = filter_var($searchEngine->setting('is_indexing_enabled', true), FILTER_VALIDATE_BOOLEAN);
-            if (!$isIndexingEnabled) continue;
-
+            if (!$isIndexingEnabled) {
+                continue;
+            }
             if ($searchEngine->indexer()->canIndex('items')
                 && in_array('items', $searchEngine->setting('resource_types', []))
             ) {

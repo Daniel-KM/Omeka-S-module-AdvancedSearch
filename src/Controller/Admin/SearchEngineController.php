@@ -109,7 +109,7 @@ class SearchEngineController extends AbstractActionController
 
         $form = $this->getForm(SearchEngineConfigureForm::class, [
             'search_engine_id' => $id,
-            'is_adapter_internal' => $isAdapterInternal
+            'is_adapter_internal' => $isAdapterInternal,
         ]);
 
         $adapterFieldset = $adapter->getConfigFieldset();
@@ -131,9 +131,7 @@ class SearchEngineController extends AbstractActionController
         ]);
 
         if ($this->getRequest()->isPost()) {
-
             $form->setData($this->params()->fromPost());
-
             if (!$form->isValid()) {
                 $this->messenger()->addError('There was an error during validation'); // @translate
                 return $view;
@@ -298,8 +296,9 @@ class SearchEngineController extends AbstractActionController
         return $this->redirect()->toRoute('admin/search-manager');
     }
 
-   protected function isIndexingEnabled(SearchEngine $searchEngine) {
+    protected function isIndexingEnabled(SearchEngine $searchEngine): bool
+    {
         $settings = $searchEngine->getSettings();
         return filter_var($settings['is_indexing_enabled'] ?? true, FILTER_VALIDATE_BOOLEAN);
-   }
+    }
 }

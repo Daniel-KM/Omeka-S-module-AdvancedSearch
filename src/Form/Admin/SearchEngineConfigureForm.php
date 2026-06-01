@@ -32,15 +32,12 @@ namespace AdvancedSearch\Form\Admin;
 
 use Laminas\Form\Element;
 use Laminas\Form\Form;
-use Laminas\Filter\Callback;
 
 class SearchEngineConfigureForm extends Form
 {
     public function init(): void
     {
-
         $isAdapterInternal = $this->getOption('is_adapter_internal');
-
 
         $this
             ->add([
@@ -87,51 +84,27 @@ class SearchEngineConfigureForm extends Form
             ])
         ;
 
-        /**
-         * In the case of the internal search engine, the checkbox is always checked
-         */
+        // The internal engine cannot be disabled, so its checkbox is always
+        // checked and disabled. A disabled input is not posted, so the value is
+        // forced in setData() below.
+        $indexingEnabled = [
+            'name' => 'is_indexing_enabled',
+            'type' => Element\Checkbox::class,
+            'options' => [
+                'label' => 'Indexing enabled', // @translate
+                'checked_value' => 'true',
+                'unchecked_value' => 'false',
+            ],
+            'attributes' => [
+                'id' => 'is_indexing_enabled',
+                'value' => 'true',
+            ],
+        ];
         if ($isAdapterInternal) {
-
-            $this->add([
-                'name' => 'is_indexing_enabled_display_checkbox',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'label' => 'Indexing enabled', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'is_indexing_enabled_display_checkbox',
-                    'value' => 'true',
-                    'checked' => true,
-                    'disabled' => true
-                ],
-            ])
-            ->add([
-                'name' => 'is_indexing_enabled',
-                'type' => Element\Hidden::class,
-                'attributes' => [
-                    'id' => 'is_indexing_enabled',
-                    'value' => 'true',
-                ]
-            ]);
-
-            $this->getInputFilter()->get('is_indexing_enabled_display_checkbox')->setRequired(false);
-
-        } else {
-
-            $this->add([
-                'name' => 'is_indexing_enabled',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'label' => 'Indexing enabled', // @translate
-                    'checked_value' => 'true',
-                    'unchecked_value' => 'false',
-                ],
-                'attributes' => [
-                    'id' => 'is_indexing_enabled',
-                    'value' => 'true'
-                ],
-            ]);
+            $indexingEnabled['attributes']['checked'] = true;
+            $indexingEnabled['attributes']['disabled'] = true;
         }
+        $this->add($indexingEnabled);
     }
 
     /**
@@ -157,15 +130,9 @@ class SearchEngineConfigureForm extends Form
 
     public function setData($data)
     {
-        // Si l'adapter est interne, on force la valeur et on enlève le champ d'affichage du filtre
+        // A disabled checkbox is not posted, so force the value for the
+        // internal engine, which cannot be disabled.
         if ($this->getOption('is_adapter_internal')) {
-            $inputFilter = $this->getInputFilter();
-
-            if ($inputFilter->has('is_indexing_enabled_display_checkbox')) {
-                $inputFilter->remove('is_indexing_enabled_display_checkbox');
-            }
-
-            // On force la valeur interne, même si le champ n'est pas posté
             $data['is_indexing_enabled'] = 'true';
         }
 

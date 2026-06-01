@@ -725,6 +725,7 @@ class Query implements JsonSerializable
     public function isBrowse(): bool
     {
         return $this->getQuery() === ''
+            && trim((string) $this->getQueryRefine()) === ''
             && $this->getFilters() === []
             && $this->getFiltersRange() === []
             && $this->getFiltersQuery() === []
@@ -741,6 +742,7 @@ class Query implements JsonSerializable
     public function isSearchQuery(): bool
     {
         return $this->getQuery() !== ''
+            || trim((string) $this->getQueryRefine()) !== ''
             || $this->getFilters() !== []
             || $this->getFiltersRange() !== []
             || $this->getFiltersQuery() !== []

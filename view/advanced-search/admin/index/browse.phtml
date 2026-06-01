@@ -78,12 +78,14 @@ $runningSuggesterJobs = $runningJobs['suggesters'] ?? [];
             <tr>
                 <th><?= $translate('Name') ?></th>
                 <th><?= $translate('Engine adapter') ?></th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($searchEngines as $searchEngine): ?>
                 <?php $engineAdapter = $searchEngine->engineAdapter();
-                $isInternal = $engineAdapter && $engineAdapter instanceof \AdvancedSearch\EngineAdapter\Internal;
+                    $isInternal = $engineAdapter && $engineAdapter instanceof \AdvancedSearch\EngineAdapter\Internal;
+                    $isIndexingEnabled = filter_var($searchEngine->setting('is_indexing_enabled', true), FILTER_VALIDATE_BOOLEAN);
                 ?>
                 <tr>
                     <td>
@@ -122,11 +124,18 @@ $runningSuggesterJobs = $runningJobs['suggesters'] ?? [];
                                     aria-label="<?= $escape($translate('No reindex for internal engine')) ?>"
                                     title="<?= $escape($translate('No reindex for internal engine')) ?>"></span>
                                 <?php else: ?>
-                                    <a href="#"
-                                    data-sidebar-content-url="<?= $escape($searchEngine->url('index-confirm')) ?>"
-                                    class="o-icon- fa fa-refresh fa-sync sidebar-content"
-                                    aria-label="<?= $escape($translate('Reindex')) ?>"
-                                    title="<?= $escape($translate('Reindex')) ?>"></a>
+                                    <?php if ($isIndexingEnabled): ?>
+                                        <a href="#"
+                                        data-sidebar-content-url="<?= $escape($searchEngine->url('index-confirm')) ?>"
+                                        class="o-icon- fa fa-refresh fa-sync sidebar-content"
+                                        aria-label="<?= $escape($translate('Reindex')) ?>"
+                                        title="<?= $escape($translate('Reindex')) ?>"></a>
+                                    <?php else: ?>
+                                        <span
+                                        class="o-icon- fa fa-refresh fa-sync sidebar-content disabled"
+                                        aria-label="<?= $escape($translate('Indexing is disabled for this search engine')) ?>"
+                                        title="<?= $escape($translate('Indexing is disabled for this search engine')) ?>"></span>
+                                    <?php endif; ?>
                                 <?php endif; ?>
                                 </li>
                             <?php endif; ?>
@@ -140,6 +149,16 @@ $runningSuggesterJobs = $runningJobs['suggesters'] ?? [];
                         </ul>
                     </td>
                     <td><?= $escape($searchEngine->engineAdapterLabel()) ?></td>
+                    <td>
+                        <?php if (!$isIndexingEnabled): ?>
+                            <span
+                                class="o-icon- fa fa-exclamation-triangle warning-notice"
+                                aria-label="<?= $escape($translate('Indexing is disabled for this search engine')) ?>"
+                                title="<?= $escape($translate('Indexing is disabled for this search engine')) ?>">
+                                <?= $escape($translate('Indexing is disabled for this search engine')) ?>
+                            </span>
+                        <?php endif; ?>          
+                    </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

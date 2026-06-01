@@ -31,6 +31,7 @@
 namespace AdvancedSearch\Controller\Admin;
 
 use AdvancedSearch\EngineAdapter\Manager as EngineAdapterManager;
+use AdvancedSearch\Entity\SearchEngine;
 use AdvancedSearch\Form\Admin\SearchEngineConfigureForm;
 use AdvancedSearch\Form\Admin\SearchEngineForm;
 use Common\Stdlib\PsrMessage;
@@ -104,8 +105,11 @@ class SearchEngineController extends AbstractActionController
 
         // Passing option requires a factory to avoids the error in laminas.
         $adapter = $this->engineAdapterManager->get($engineAdapterName);
+        $isAdapterInternal = $adapter instanceof \AdvancedSearch\EngineAdapter\Internal;
+
         $form = $this->getForm(SearchEngineConfigureForm::class, [
             'search_engine_id' => $id,
+            'is_adapter_internal' => $isAdapterInternal
         ]);
 
         $adapterFieldset = $adapter->getConfigFieldset();
@@ -119,6 +123,7 @@ class SearchEngineController extends AbstractActionController
         }
         $data = $searchEngine->getSettings() ?: [];
         $data['o:name'] = $searchEngine->getName();
+
         $form->setData($data);
 
         $view = new ViewModel([
@@ -126,7 +131,9 @@ class SearchEngineController extends AbstractActionController
         ]);
 
         if ($this->getRequest()->isPost()) {
+
             $form->setData($this->params()->fromPost());
+
             if (!$form->isValid()) {
                 $this->messenger()->addError('There was an error during validation'); // @translate
                 return $view;
@@ -144,8 +151,15 @@ class SearchEngineController extends AbstractActionController
                 'Search index "{name}" successfully configured.',  // @translate
                 ['name' => $searchEngine->getName()]
             ));
-            $this->messenger()->addWarning('Don’t forget to run the indexation of the search engine.'); // @translate
+
+            if ($this->isIndexingEnabled($searchEngine)) {
+                $this->messenger()->addWarning('Don’t forget to run the indexation of the search engine.'); // @translate
+            }
             return $this->redirect()->toRoute('admin/search-manager', ['action' => 'browse'], true);
+        }
+
+        if (!$this->isIndexingEnabled($searchEngine)) {
+            $this->messenger()->addWarning('Indexing is disabled for this search engine'); // @translate
         }
 
         return $view;
@@ -283,4 +297,9 @@ class SearchEngineController extends AbstractActionController
         }
         return $this->redirect()->toRoute('admin/search-manager');
     }
+
+   protected function isIndexingEnabled(SearchEngine $searchEngine) {
+        $settings = $searchEngine->getSettings();
+        return filter_var($settings['is_indexing_enabled'] ?? true, FILTER_VALIDATE_BOOLEAN);
+   }
 }

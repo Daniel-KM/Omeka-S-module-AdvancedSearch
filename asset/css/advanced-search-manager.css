@@ -28,6 +28,14 @@
     .search-admin .actions .system-state-icon.fa-spin {
         margin-left: 8px;
     }
+
+    .search-admin td .warning-notice {
+        background-color: #fff6e6;
+        color: orange;
+        font-family: inherit;
+        font-weight: normal;
+    }
+
     .search-admin #sidebar-confirm .inputs label {
         margin-bottom: 0;
         padding-bottom: 0;

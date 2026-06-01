@@ -52,6 +52,8 @@ $(document).ready(function () {
         const query = selectingElement.find('.query-form-query').val();
         $.get(`${url}?${query}`, function(data) {
             selectingElement.find('.query-form-search-filters').html(data);
+        }).fail(function(xhr) {
+            console.error('Failed to load search filters:', xhr.status, xhr.statusText);
         });
         selectingElement.find('.query-form-query').prop('type', 'hidden').val(query);
         show('.query-form-edit');
@@ -72,6 +74,8 @@ $(document).ready(function () {
         const query = currentQuery;
         $.get(`${url}?${query}`, function(data) {
             selectingElement.find('.query-form-search-filters').html(data);
+        }).fail(function(xhr) {
+            console.error('Failed to load search filters:', xhr.status, xhr.statusText);
         });
         selectingElement.find('.query-form-query').prop('type', 'hidden').val(currentQuery).trigger('input');
         show('.query-form-edit');
@@ -95,6 +99,8 @@ $(document).ready(function () {
         const query = selectingElement.data('query');
         $.get(`${url}?${query}`, function(data) {
             selectingElement.find('.query-form-search-filters').html(data);
+        }).fail(function(xhr) {
+            console.error('Failed to load search filters:', xhr.status, xhr.statusText);
         });
         selectingElement.find('.query-form-query').val(query).prop('type', 'hidden').trigger('input');
         selectingElement.find('.query-form-edit').prop('disabled', false);
@@ -115,6 +121,8 @@ $(document).ready(function () {
         const query = '';
         $.get(`${url}?${query}`, function(data) {
             selectingElement.find('.query-form-search-filters').html(data);
+        }).fail(function(xhr) {
+            console.error('Failed to load search filters:', xhr.status, xhr.statusText);
         });
         selectingElement.find('.query-form-query').val('').prop('type', 'hidden').trigger('input');
         selectingElement.find('.query-form-edit').prop('disabled', false);
@@ -133,6 +141,8 @@ $(document).ready(function () {
         const query = form.serialize();
         $.get(`${url}?${query}`, function(data) {
             selectingElement.find('.query-form-search-filters').html(data);
+        }).fail(function(xhr) {
+            console.error('Failed to load search filters:', xhr.status, xhr.statusText);
         });
         selectingElement.find('.query-form-query').val(query).trigger('input');
         (query === selectingElement.data('query'))

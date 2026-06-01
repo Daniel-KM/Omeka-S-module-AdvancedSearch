@@ -1853,6 +1853,19 @@ class Module extends AbstractModule
             return;
         }
 
+        // Always load advanced-search-form assets in admin: the FormQuery
+        // delegator only loads them when an Omeka\Form\Element\Query is
+        // rendered server-side, so blocks added dynamically via XHR
+        // (BrowsePreview, etc.) would otherwise miss the chosen-select init and
+        // the sidebar handlers (o:sidebar-content-loaded).
+        if ($status->isAdminRequest()) {
+            $assetUrl = $plugins->get('assetUrl');
+            $plugins->get('headLink')
+                ->appendStylesheet($assetUrl('css/advanced-search-form.css', 'AdvancedSearch'));
+            $plugins->get('headScript')
+                ->appendFile($assetUrl('js/advanced-search-form.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
+        }
+
         if (!$searchConfig) {
             return;
         }

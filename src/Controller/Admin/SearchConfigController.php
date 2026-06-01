@@ -34,6 +34,7 @@ use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use AdvancedSearch\Form\Admin\SearchConfigConfigureForm;
 use AdvancedSearch\Form\Admin\SearchConfigFilterFieldset;
 use AdvancedSearch\Form\Admin\SearchConfigForm;
+use AdvancedSearch\Stdlib\SearchResources;
 use Common\Stdlib\PsrMessage;
 use Doctrine\ORM\EntityManager;
 use Laminas\Form\FormElementManager;
@@ -657,6 +658,14 @@ class SearchConfigController extends AbstractActionController
 
         if (isset($params['search']['default_query_post'])) {
             $params['search']['default_query_post'] = trim($params['search']['default_query_post'] ?? '', "? \t\n\r\0\x0B");
+        }
+
+        // Normalize hidden query filters from the legacy URL format (e.g.
+        // property[N][property|type|text]) to the flat format consumable by
+        // InternalQuerier::filterQueryAny(). Stored once at save-time so the
+        // runtime path stays simple.
+        if (!empty($params['request']['hidden_query_filters']) && is_array($params['request']['hidden_query_filters'])) {
+            $params['request']['hidden_query_filters'] = SearchResources::normalizeHiddenQueryFilters($params['request']['hidden_query_filters']);
         }
 
         // Set name as key and move all specific types to options.

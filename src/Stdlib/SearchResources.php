@@ -703,6 +703,95 @@ class SearchResources
     }
 
     /**
+     * Normalize hidden query filters from the legacy Omeka URL shape to a flat
+     * shape consumable by both InternalQuerier and SolariumQuerier.
+     *
+     * Two output shapes are produced per field, both supported by both queriers:
+     * - Shape A: [<field> => [val1, val2, ...]] for simple "eq" filters with
+     *   default join, no except/lang/datatype. Consumed by
+     *   InternalQuerier::filterQueryAny() default case and by
+     *   SolariumQuerier::processFilters().
+     * - Shape B: [<field> => [{join, type, val, ...}, ...]] for any other type
+     *   or when extra options are set. Consumed by
+     *   InternalQuerier::filterQueryAny() case "!isSimpleValue" and by
+     *   SolariumQuerier::processAdvancedFilters() (via the dispatch added in
+     *   SolariumQuerier::appendHiddenFilters()).
+     *
+     * Inputs converted:
+     * - property[N][property|type|text|joiner|except|lang|datatype]
+     * - filter[N][field|type|val|join|except|lang|datatype]
+     *
+     * Other top-level keys (resource_type, direct field names, etc.) are kept
+     * as-is. Idempotent on already-normalized inputs.
+     */
+    public static function normalizeHiddenQueryFilters(array $filters): array
+    {
+        $convertRows = function (array $rows, string $fieldKey, string $valKey) use (&$filters): void {
+            foreach ($rows as $row) {
+                if (!is_array($row) || empty($row[$fieldKey]) || empty($row['type'])) {
+                    continue;
+                }
+                $type = $row['type'];
+                $join = $row['join'] ?? $row['joiner'] ?? 'and';
+                $val = $row[$valKey] ?? null;
+                $fields = is_array($row[$fieldKey]) ? $row[$fieldKey] : [$row[$fieldKey]];
+
+                $isSimple = $type === 'eq'
+                    && $join === 'and'
+                    && empty($row['except'])
+                    && empty($row['lang'])
+                    && empty($row['datatype']);
+
+                if ($isSimple) {
+                    if (is_array($val)) {
+                        $vals = array_values(array_filter(array_map(fn ($v) => is_scalar($v) ? trim((string) $v) : '', $val), 'strlen'));
+                    } else {
+                        $vals = is_scalar($val) && strlen((string) $val) ? [(string) $val] : [];
+                    }
+                    if (!$vals) {
+                        continue;
+                    }
+                    foreach ($fields as $field) {
+                        if (!is_string($field) || $field === '') {
+                            continue;
+                        }
+                        $existing = isset($filters[$field]) && is_array($filters[$field]) ? $filters[$field] : [];
+                        $filters[$field] = array_values(array_unique(array_merge($existing, $vals)));
+                    }
+                } else {
+                    $entry = ['join' => $join, 'type' => $type, 'val' => $val];
+                    if (!empty($row['except'])) {
+                        $entry['except'] = $row['except'];
+                    }
+                    if (!empty($row['lang'])) {
+                        $entry['lang'] = $row['lang'];
+                    }
+                    if (!empty($row['datatype'])) {
+                        $entry['datatype'] = $row['datatype'];
+                    }
+                    foreach ($fields as $field) {
+                        if (!is_string($field) || $field === '') {
+                            continue;
+                        }
+                        $filters[$field][] = $entry;
+                    }
+                }
+            }
+        };
+
+        if (!empty($filters['property']) && is_array($filters['property'])) {
+            $convertRows($filters['property'], 'property', 'text');
+            unset($filters['property']);
+        }
+        if (!empty($filters['filter']) && is_array($filters['filter'])) {
+            $convertRows($filters['filter'], 'field', 'val');
+            unset($filters['filter']);
+        }
+
+        return $filters;
+    }
+
+    /**
      * Clear useless keys of a query.
      *
      * The advanced search form returns all keys, so clear useless ones and

@@ -491,6 +491,11 @@ class Module extends AbstractModule
             'form.add_elements',
             [$this, 'handleSiteSettings']
         );
+        $sharedEventManager->attach(
+            \Omeka\Form\SiteSettingsForm::class,
+            'form.add_input_filters',
+            [$this, 'handleSiteSettingsInputFilter']
+        );
     }
 
     protected function addAclRules(): void
@@ -741,6 +746,41 @@ class Module extends AbstractModule
     {
         $this->handleAnySettings($event, 'site_settings');
         $this->finalizeSiteSettings();
+    }
+
+    /**
+     * Normalize the per-site hidden query filters when the site settings form
+     * is submitted, so the stored value is already in the flat shape consumed
+     * by both InternalQuerier and SolariumQuerier. The textarea element parses
+     * each "slug = url-query" line into an array, which may still contain the
+     * legacy "property[N][property|type|text]" / "filter[N][field|type|val]"
+     * keys; convert them once at save-time instead of at every request.
+     */
+    public function handleSiteSettingsInputFilter(Event $event): void
+    {
+        $inputFilter = $event->getParam('inputFilter');
+        if (!$inputFilter) {
+            return;
+        }
+        $name = 'advancedsearch_hidden_query_filters_per_config';
+        if (!$inputFilter->has($name)) {
+            return;
+        }
+        $inputFilter->get($name)->getFilterChain()->attach(
+            new \Laminas\Filter\Callback([
+                'callback' => function ($value) {
+                    if (!is_array($value) || !$value) {
+                        return $value;
+                    }
+                    foreach ($value as $slug => $filters) {
+                        if (is_array($filters) && $filters) {
+                            $value[$slug] = \AdvancedSearch\Stdlib\SearchResources::normalizeHiddenQueryFilters($filters);
+                        }
+                    }
+                    return $value;
+                },
+            ])
+        );
     }
 
     protected function finalizeSiteSettings(): void

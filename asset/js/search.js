@@ -1742,7 +1742,12 @@ $(document).ready(function() {
      */
     var view_type = localStorage.getItem('search_view_type');
     if (!view_type) {
-        view_type = 'list';
+        // No stored preference: honour the server default view, i.e. the
+        // view-type button rendered active from the "grid_list_mode" setting,
+        // and only fall back to list when none is marked active.
+        var $activeViewType = $('.search-view-type.active').first();
+        view_type = $activeViewType.hasClass('search-view-type-grid') ? 'grid'
+            : ($activeViewType.hasClass('search-view-type-map') ? 'map' : 'list');
     }
     $('.search-view-type-' + view_type).click();
 

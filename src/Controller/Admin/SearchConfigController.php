@@ -114,6 +114,8 @@ class SearchConfigController extends AbstractActionController
 
         $searchEngine = $searchConfig->searchEngine();
         $engineAdapter = $searchEngine ? $searchEngine->engineAdapter() : null;
+        // Adapter of the engine before save, to warn when it changes.
+        $previousAdapterClass = $engineAdapter ? get_class($engineAdapter) : null;
         if (empty($engineAdapter)) {
             $message = new PsrMessage(
                 'The engine adapter "{label}" is unavailable.', // @translate
@@ -211,6 +213,23 @@ class SearchConfigController extends AbstractActionController
             'Search page {name} saved.', // @translate
             ['name' => $searchConfig->link($searchConfig->name(), 'edit')]
         ))->setEscapeHtml(false));
+
+        // Warn when the engine adapter changed: filter, sort and facet field
+        // names follow different naming conventions per engine (property terms
+        // like "dcterms:subject" versus index names like "dcterms_subject_ss").
+        // They are converted automatically when querying, so the configuration
+        // keeps working, but it should be reviewed.
+        $newAdapter = $searchConfig->searchEngine()
+            ? $searchConfig->searchEngine()->engineAdapter()
+            : null;
+        $newAdapterClass = $newAdapter ? get_class($newAdapter) : null;
+        if ($previousAdapterClass && $newAdapterClass
+            && $previousAdapterClass !== $newAdapterClass
+        ) {
+            $this->messenger()->addWarning(new PsrMessage(
+                'The search engine type changed: filter, sort and facet field names use different naming conventions between engines (for example "dcterms:subject" versus "dcterms_subject_ss"). They are converted automatically when querying, but please review the configuration.' // @translate
+            ));
+        }
 
         // For Solr engines, warn about new maps to sync.
         if ($searchEngine

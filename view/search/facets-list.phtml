@@ -55,7 +55,8 @@ if (!empty($itemSet)) {
     <h3><?= $escape($translate($label)) ?></h3>
     <?php endif; ?>
 
-    <?php if ($displayActive && count($activeFacets)): ?>
+    <?php $hasRefineActive = $displayActive && trim((string) $query->getQueryRefine()) !== ''; ?>
+    <?php if ($displayActive && (count($activeFacets) || $hasRefineActive)): ?>
     <?php if ($label = $searchConfig->subSetting('facet', 'label_active_facets', 'Active facets')): ?>
     <h4><?= $escape($translate($label)) ?></h4>
     <?php endif; ?>

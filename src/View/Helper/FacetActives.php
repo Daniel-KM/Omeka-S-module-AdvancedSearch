@@ -17,9 +17,32 @@ class FacetActives extends AbstractFacet
      */
     protected function prepareActiveFacetData(array $activeFacets, array $options): array
     {
-        // $isFacetModeDirect = in_array($options['mode'] ?? null, ['link', 'js']);
+        // $isFacetModeDirect = in_array($options['mode'] ?? null, ['link',
+        // 'js']);
+
+        // Prepend the "Refine search" query as an active facet so users can see
+        // and clear it like any other filter.
+        $refineValue = isset($this->queryBase['refine']) ? trim((string) $this->queryBase['refine']) : '';
+        if ($refineValue !== '') {
+            $refineQuery = $this->queryBase;
+            unset($refineQuery['refine']);
+            $refineLabel = !empty($options['label_refine'])
+                ? (string) $this->translate->__invoke($options['label_refine'])
+                : (string) $this->translate->__invoke('Refine search'); // @translate
+            $activeFacets = ['refine' => ['' => [
+                'value' => $refineValue,
+                'count' => null,
+                'label' => $refineValue,
+                'active' => true,
+                'url' => $this->urlHelper->__invoke($this->route, $this->params, ['query' => $refineQuery]),
+                'fieldLabel' => $refineLabel,
+            ]]] + $activeFacets;
+        }
 
         foreach ($activeFacets as $facetName => &$facetValues) {
+            if ($facetName === 'refine') {
+                continue;
+            }
             $facetFieldLabel = $options['facets'][$facetName]['label'] ?? $facetName;
             $valueLabels = $options['facets'][$facetName]['value_labels'] ?? [];
             if (!is_array($valueLabels)) {

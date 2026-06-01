@@ -61,7 +61,11 @@ $showFacetsFieldLabel = (bool) $searchConfig->subSetting('results', 'active_face
 
 <?php // Active Facets. ?>
 
-<?php if (isset($displayParts['active_facets']) && $activeFacets = $response->getActiveFacets()): ?>
+<?php
+$activeFacets = $response->getActiveFacets();
+$hasRefineActive = trim((string) $query->getQueryRefine()) !== '';
+?>
+<?php if (isset($displayParts['active_facets']) && ($activeFacets || $hasRefineActive)): ?>
 <?php $facetActives = $plugins->get('facetActives'); ?>
 <?= $facetActives(null, $activeFacets, $searchConfig->setting('facet', []) + ['facets_mode' => $facetsMode, 'show_field_label' => $showFacetsFieldLabel]) ?>
 <?php endif; ?>

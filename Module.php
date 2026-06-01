@@ -338,6 +338,12 @@ class Module extends AbstractModule
             [$this, 'postBatchUpdateSearchEngine'],
             -100
         );
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\ItemAdapter::class,
+            'api.batch_create.post',
+            [$this, 'postBatchCreateSearchEngine'],
+            -100
+        );
 
         // Item sets.
         $sharedEventManager->attach(
@@ -370,9 +376,14 @@ class Module extends AbstractModule
             [$this, 'postBatchUpdateSearchEngine'],
             -100
         );
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\ItemSetAdapter::class,
+            'api.batch_create.post',
+            [$this, 'postBatchCreateSearchEngine'],
+            -100
+        );
 
-        // Medias.
-        // There is no api.create.post for medias.
+        // Medias. There is no api.create.post for medias.
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\MediaAdapter::class,
             'api.update.post',
@@ -433,6 +444,12 @@ class Module extends AbstractModule
             \Annotate\Api\Adapter\AnnotationAdapter::class,
             'api.batch_update.post',
             [$this, 'postBatchUpdateSearchEngine'],
+            -100
+        );
+        $sharedEventManager->attach(
+            \Annotate\Api\Adapter\AnnotationAdapter::class,
+            'api.batch_create.post',
+            [$this, 'postBatchCreateSearchEngine'],
             -100
         );
 
@@ -1101,6 +1118,43 @@ class Module extends AbstractModule
         }
 
         $this->isBatchUpdate = false;
+    }
+
+    /**
+     * Index multiple resources created through a batch create.
+     *
+     * The core batchCreate() runs sub-creates with "finalize" disabled, so the
+     * per-resource "api.create.post" event is not triggered: this listener is
+     * required to index resources imported via api->batchCreate (e.g. CSV
+     * Import). Indexation is deferred to a single job (see deferIndexResource).
+     */
+    public function postBatchCreateSearchEngine(Event $event): void
+    {
+        /**
+         * @var \Omeka\Api\Request $request
+         * @var \Omeka\Api\Response $response
+         * @var string $resourceType
+         */
+        $request = $event->getParam('request');
+        $response = $event->getParam('response');
+        $resourceType = $request->getResource();
+
+        $content = $response->getContent();
+        if (!is_array($content)) {
+            return;
+        }
+        foreach ($content as $resource) {
+            if (is_object($resource)) {
+                $resourceId = method_exists($resource, 'id')
+                    ? (int) $resource->id()
+                    : (method_exists($resource, 'getId') ? (int) $resource->getId() : 0);
+            } else {
+                $resourceId = (int) $resource;
+            }
+            if ($resourceId) {
+                $this->deferIndexResource($resourceType, $resourceId);
+            }
+        }
     }
 
     /**

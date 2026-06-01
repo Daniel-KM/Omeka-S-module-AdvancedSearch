@@ -148,6 +148,33 @@ class MainSearchForm extends Form
      */
     protected $variant = null;
 
+    /**
+     * Normalize advanced filter "val" from query array form to scalar.
+     *
+     * The URL contract supports "filter[i][val][]=a&filter[i][val][]=b" for
+     * multi-value queries (used by the "in", "eq", "list" operators in
+     * SearchResources). The form element "filter[i][val]" is a Text input
+     * (single scalar), so binding raw query data triggers an "Array to string
+     * conversion" warning and renders value="Array" without this flattening.
+     *
+     * @todo Move this to a dedicated request-to-form normalizer (upstream of
+     * setData) once a single entry point exists for query => form data
+     * conversion. The query semantics (multi-value val[]) and the form display
+     * semantics (single text) legitimately diverge; the bridge belongs to that
+     * normalizer, not to setData itself.
+     */
+    public function setData($data)
+    {
+        if (is_array($data) && !empty($data['filter']) && is_array($data['filter'])) {
+            foreach ($data['filter'] as $k => $f) {
+                if (isset($f['val']) && is_array($f['val'])) {
+                    $data['filter'][$k]['val'] = implode(' ', array_filter(array_map('strval', $f['val']), 'strlen'));
+                }
+            }
+        }
+        return parent::setData($data);
+    }
+
     public function init(): void
     {
         $this->searchConfig = $this->getOption('search_config');

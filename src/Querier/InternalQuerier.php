@@ -277,6 +277,7 @@ class InternalQuerier extends AbstractQuerier
             'value_annotations' => \Omeka\Entity\ValueAnnotation::class,
             'annotations' => \Annotate\Entity\Annotation::class,
             'digital_objects' => \DigitalObject\Entity\DigitalObject::class,
+            'concepts' => \Thesaurus\Entity\Concept::class,
         ];
 
         /** @var \Doctrine\DBAL\Connection $connection */
@@ -531,6 +532,9 @@ class InternalQuerier extends AbstractQuerier
             }
             if (class_exists(\DigitalObject\Entity\DigitalObject::class)) {
                 $resourceMap['digital_objects'] = \DigitalObject\Entity\DigitalObject::class;
+            }
+            if (class_exists('Thesaurus\Module', false)) {
+                $resourceMap['concepts'] = \Thesaurus\Entity\Concept::class;
             }
             $resourceClasses = array_values(array_intersect_key($resourceMap, array_flip($this->resourceTypes)));
             if ($resourceClasses) {

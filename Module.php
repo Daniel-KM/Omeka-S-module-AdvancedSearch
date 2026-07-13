@@ -453,6 +453,28 @@ class Module extends AbstractModule
             -100
         );
 
+        // Specific resource types of modules: concepts and digital objects.
+        foreach ([
+            \Thesaurus\Api\Adapter\ConceptAdapter::class,
+            \DigitalObject\Api\Adapter\DigitalObjectAdapter::class,
+        ] as $adapter) {
+            foreach ([
+                'api.create.post' => 'updateSearchEngine',
+                'api.update.post' => 'updateSearchEngine',
+                'api.delete.post' => 'updateSearchEngine',
+                'api.batch_update.pre' => 'preBatchUpdateSearchEngine',
+                'api.batch_update.post' => 'postBatchUpdateSearchEngine',
+                'api.batch_create.post' => 'postBatchCreateSearchEngine',
+            ] as $eventName => $method) {
+                $sharedEventManager->attach(
+                    $adapter,
+                    $eventName,
+                    [$this, $method],
+                    -100
+                );
+            }
+        }
+
         // Listeners for sites.
 
         $sharedEventManager->attach(

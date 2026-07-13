@@ -136,6 +136,7 @@ class SearchEngineConfigureForm extends Form
             // 'value_annotations' => 'Value annotations',
             'annotations' => 'Annotations',
             'digital_objects' => 'Digital objects',
+            'concepts' => 'Concepts', // @translate
             // Not managed for now.
             // 'site_pages' => 'Site pages',
         ];

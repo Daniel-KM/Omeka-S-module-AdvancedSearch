@@ -648,6 +648,7 @@ class IndexSearch extends AbstractJob
             'item_sets' => 'item_set',
             'media' => 'media',
             'digital_objects' => 'digital_object',
+            'concepts' => 'concept',
         ];
 
         $table = $resourceTypeToTable[$resourceType] ?? null;

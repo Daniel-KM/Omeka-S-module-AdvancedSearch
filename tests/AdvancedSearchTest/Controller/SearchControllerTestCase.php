@@ -15,7 +15,7 @@ abstract class SearchControllerTestCase extends AbstractHttpControllerTestCase
      * CommonTest\AbstractHttpControllerTestCase::dispatch() resets the application,
      * which clears our test engine adapter registration. We need to re-register it.
      */
-    public function dispatch($url, $method = null, $params = [], $isXmlHttpRequest = false)
+    public function dispatch($url, $method = null, $params = [], $isXmlHttpRequest = false): void
     {
         // Reset and get fresh application (this is what parent::dispatch does first).
         $this->reset();

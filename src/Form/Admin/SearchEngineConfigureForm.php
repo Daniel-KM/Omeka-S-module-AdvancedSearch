@@ -84,27 +84,24 @@ class SearchEngineConfigureForm extends Form
             ])
         ;
 
-        // The internal engine cannot be disabled, so its checkbox is always
-        // checked and disabled. A disabled input is not posted, so the value is
-        // forced in setData() below.
-        $indexingEnabled = [
-            'name' => 'is_indexing_enabled',
-            'type' => Element\Checkbox::class,
-            'options' => [
-                'label' => 'Indexing enabled', // @translate
-                'checked_value' => 'true',
-                'unchecked_value' => 'false',
-            ],
-            'attributes' => [
-                'id' => 'is_indexing_enabled',
-                'value' => 'true',
-            ],
-        ];
-        if ($isAdapterInternal) {
-            $indexingEnabled['attributes']['checked'] = true;
-            $indexingEnabled['attributes']['disabled'] = true;
+        // The internal engine queries the database live: indexing cannot be
+        // disabled and the option is irrelevant, so it is hidden. When the
+        // setting is absent, the controller defaults it to enabled.
+        if (!$isAdapterInternal) {
+            $this->add([
+                'name' => 'is_indexing_enabled',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Indexing enabled', // @translate
+                    'checked_value' => 'true',
+                    'unchecked_value' => 'false',
+                ],
+                'attributes' => [
+                    'id' => 'is_indexing_enabled',
+                    'value' => 'true',
+                ],
+            ]);
         }
-        $this->add($indexingEnabled);
     }
 
     /**
@@ -129,14 +126,4 @@ class SearchEngineConfigureForm extends Form
         ];
     }
 
-    public function setData($data)
-    {
-        // A disabled checkbox is not posted, so force the value for the
-        // internal engine, which cannot be disabled.
-        if ($this->getOption('is_adapter_internal')) {
-            $data['is_indexing_enabled'] = 'true';
-        }
-
-        return parent::setData($data);
-    }
 }

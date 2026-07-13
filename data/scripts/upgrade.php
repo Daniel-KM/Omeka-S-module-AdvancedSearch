@@ -71,6 +71,19 @@ if (PHP_VERSION_ID < 80100) {
     $hasError = true;
 }
 
+// The module Thesaurus, when present, should be up to date, else the maps and
+// the queries on thesaurus fields may not work.
+if ($services->get('Omeka\ModuleManager')->getModule('Thesaurus')
+    && !$this->checkModuleActiveVersion('Thesaurus', '3.4.26')
+) {
+    $message = new \Omeka\Stdlib\Message(
+        $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
+        'Thesaurus', '3.4.26'
+    );
+    $messenger->addError($message);
+    $hasError = true;
+}
+
 if ($hasError) {
     throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $translate('Missing requirement. Unable to upgrade.')); // @translate
 }
@@ -3684,5 +3697,32 @@ foreach ($siteIdsAll as $siteId) {
     $siteSettings->setTargetId($siteId);
     foreach ($deadMainKeys as $key) {
         $siteSettings->delete($key);
+    }
+}
+
+if (version_compare($oldVersion, '3.4.63', '<')) {
+    // Ensure the internal engines exist: a public-capped one and an admin
+    // one. The call is idempotent (each engine is created only when missing
+    // by name), so it adds the engines absent from installs predating the
+    // public/admin split, without touching any legacy engine, suggester or
+    // default search config.
+    $this->createDefaultSearchConfig();
+
+    // The form adapter "api" was removed: the api queries are normalized
+    // generically (Query::fromApiQuery), without any config, so the specific
+    // adapter and its conversion settings are useless. The configs using it are
+    // switched to the standard form adapter; they keep their engine, so the api
+    // redirection (main setting "advancedsearch_api_config") still works as is.
+    $apiConfigs = $connection->fetchAllKeyValue(
+        "SELECT `id`, `name` FROM `search_config` WHERE `form_adapter` = 'api'"
+    );
+    if ($apiConfigs) {
+        $connection->executeStatement(
+            "UPDATE `search_config` SET `form_adapter` = 'main' WHERE `form_adapter` = 'api'"
+        );
+        $messenger->addWarning(new PsrMessage(
+            'The form adapter "api" was removed: api queries are now handled natively by every engine. The search configs using it were switched to the standard form adapter and keep their engine: {names}. The api redirection of the main settings is unchanged.', // @translate
+            ['names' => implode(', ', $apiConfigs)]
+        ));
     }
 }

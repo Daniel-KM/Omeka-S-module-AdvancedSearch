@@ -779,6 +779,18 @@ class SearchResources
     public static function normalizeHiddenQueryFilters(array $filters): array
     {
         $convertRows = function (array $rows, string $fieldKey, string $valKey) use (&$filters): void {
+            // When any row chains with "or" or "not", the whole list is kept as
+            // rows: flattening one of them into a simple filter would detach it
+            // from the linear accumulation and change the logic ("A or B" would
+            // become "A and B").
+            $hasChain = false;
+            foreach ($rows as $row) {
+                $rowJoin = is_array($row) ? ($row['join'] ?? $row['joiner'] ?? 'and') : 'and';
+                if ($rowJoin === 'or' || $rowJoin === 'not') {
+                    $hasChain = true;
+                    break;
+                }
+            }
             foreach ($rows as $row) {
                 if (!is_array($row) || empty($row[$fieldKey]) || empty($row['type'])) {
                     continue;
@@ -788,7 +800,8 @@ class SearchResources
                 $val = $row[$valKey] ?? null;
                 $fields = is_array($row[$fieldKey]) ? $row[$fieldKey] : [$row[$fieldKey]];
 
-                $isSimple = $type === 'eq'
+                $isSimple = !$hasChain
+                    && $type === 'eq'
                     && $join === 'and'
                     && empty($row['except'])
                     && empty($row['lang'])

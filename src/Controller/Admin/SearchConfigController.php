@@ -566,6 +566,10 @@ class SearchConfigController extends AbstractActionController
     /**
      * For a Solr config, recommend syncing the core maps then reindexing, so
      * the fields used by the config are indexed.
+     *
+     * A one-shot session flag: the search manager page, loaded after the
+     * redirect, displays the recommendation in a sidebar with the sync and
+     * reindex actions.
      */
     protected function recommendSolrSyncMaps(SearchConfigRepresentation $searchConfig): void
     {
@@ -579,21 +583,12 @@ class SearchConfigController extends AbstractActionController
         if (!$solrCoreId) {
             return;
         }
-        $message = new PsrMessage(
-            'If new fields were added, run {link}Sync maps{link_end} on the Solr core page, then reindex.', // @translate
-            [
-                'link' => sprintf(
-                    '<a href="%s">',
-                    htmlspecialchars($this->url()->fromRoute(
-                        'admin/search/solr/core-id',
-                        ['id' => $solrCoreId, 'action' => 'sync-maps']
-                    ))
-                ),
-                'link_end' => '</a>',
-            ]
-        );
-        $message->setEscapeHtml(false);
-        $this->messenger()->addWarning($message);
+        $session = new \Laminas\Session\Container('AdvancedSearch');
+        $session->recommendSync = [
+            'solr_core_id' => (int) $solrCoreId,
+            'search_engine_id' => $searchEngine->id(),
+            'search_config_name' => $searchConfig->name(),
+        ];
     }
 
     /**

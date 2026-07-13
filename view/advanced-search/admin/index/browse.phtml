@@ -309,3 +309,39 @@ $runningSuggesterJobs = $runningJobs['suggesters'] ?? [];
         title="<?= $escape($translate('Close')) ?>"></a>
     <div class="sidebar-content"></div>
 </div>
+
+<?php
+// One-shot recommendation after saving a config bound to a Solr engine: sync
+// the core maps then reindex, so the fields used by the config are indexed.
+$sessionAdvancedSearch = new \Laminas\Session\Container('AdvancedSearch');
+$recommendSync = $sessionAdvancedSearch->recommendSync ?? null;
+unset($sessionAdvancedSearch->recommendSync);
+if ($recommendSync && class_exists(\SearchSolr\Module::class, false)):
+    $syncUrl = $url('admin/search/solr/core-id', ['id' => $recommendSync['solr_core_id'], 'action' => 'sync-maps']);
+    $reindexUrl = $url('admin/search-manager/engine-id', ['id' => $recommendSync['search_engine_id'], 'action' => 'index-confirm']);
+?>
+<div class="sidebar active" id="recommend-sync-sidebar" role="dialog" aria-label="<?= $escape($translate('Recommendation')) ?>">
+    <a href="#"
+        class="sidebar-close o-icon-close"
+        aria-label="<?= $escape($translate('Close')) ?>"
+        title="<?= $escape($translate('Close')) ?>"></a>
+    <div class="sidebar-content">
+        <h3><?= $escape($translate('Search index to update')) ?></h3>
+        <p><?= $escape(sprintf($translate('The page "%s" was saved. If fields were added or removed, synchronize the maps of the Solr core, then reindex.'), $recommendSync['search_config_name'])) ?></p>
+        <form method="get" action="<?= $escape($syncUrl) ?>">
+            <div class="field">
+                <label>
+                    <input type="checkbox" name="clean" value="1">
+                    <?= $escape($translate('Remove unused maps')) ?>
+                </label>
+            </div>
+            <button type="submit" class="button"><?= $escape($translate('Synchronize maps')) ?></button>
+        </form>
+        <p>
+            <a href="#"
+                class="button sidebar-content"
+                data-sidebar-content-url="<?= $escape($reindexUrl) ?>"><?= $escape($translate('Reindex…')) ?></a>
+        </p>
+    </div>
+</div>
+<?php endif; ?>

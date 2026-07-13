@@ -2070,19 +2070,13 @@ class Module extends AbstractModule
         /** @var \Doctrine\DBAL\Connection $connection */
         $connection = $services->get('Omeka\Connection');
 
-        // Repurpose the legacy single internal engine as the public one,
-        // keeping its id, so the search configs already pointing at it keep
-        // working and point to the public engine, instead of leaving it as a
-        // leftover engine next to the new ones.
-        $this->repurposeLegacyInternalEngineAsPublic($connection);
-
-        // Create the two internal engines (public-capped and admin), idempotent
-        // by name. The public engine never exposes private resources, even to
-        // an admin; the admin engine follows the user rights through the acl.
-        // The suggester and the default search config are attached to the
-        // public engine, used for the public site search.
-        $searchEngineId = $this->createInternalSearchEngine($connection, $messenger, $urlHelper, 'Internal (public)', 'public');
-        $this->createInternalSearchEngine($connection, $messenger, $urlHelper, 'Internal (admin)', 'all');
+        // Create the single internal engine: an engine is a real backend, and
+        // there is one sql database, so there is one internal engine. The
+        // visibility (public on sites, user rights in admin and api) is a
+        // property of the query context, applied by the querier, not of the
+        // engine. The suggester and the default search config are attached to
+        // it.
+        $searchEngineId = $this->createInternalSearchEngine($connection, $messenger, $urlHelper, 'Internal');
 
         // Check if the internal suggester exists.
         $sqlSuggesterId = <<<SQL
@@ -2168,52 +2162,16 @@ class Module extends AbstractModule
      * name. Visibility "public" caps the engine to public resources (even for
      * an admin), "all" follows the user rights, "private" limits to private.
      */
-    /**
-     * Rename the legacy single internal engine as "Internal (public)", keeping
-     * its id.
-     *
-     * On the split into public/admin engines, the original engine must become
-     * the public one so the configs referencing it keep working, rather than
-     * staying as a leftover engine next to the new ones. It matches the exact
-     * legacy default name (see search_engine.internal.php), so a user-created
-     * engine is never repurposed. Idempotent once "Internal (public)" exists.
-     */
-    protected function repurposeLegacyInternalEngineAsPublic(
-        \Doctrine\DBAL\Connection $connection
-    ): void {
-        $hasPublic = (int) $connection->fetchOne(
-            'SELECT `id` FROM `search_engine` WHERE `adapter` = "internal" AND `name` = "Internal (public)"'
-        );
-        if ($hasPublic) {
-            return;
-        }
-        $legacyId = (int) $connection->fetchOne(
-            'SELECT `id` FROM `search_engine` WHERE `adapter` = "internal" AND `name` = "Internal (sql)" ORDER BY `id` ASC LIMIT 1'
-        );
-        if (!$legacyId) {
-            return;
-        }
-        $settings = json_decode(
-            (string) $connection->fetchOne('SELECT `settings` FROM `search_engine` WHERE `id` = ?', [$legacyId]),
-            true
-        ) ?: [];
-        $settings['visibility'] = 'public';
-        $connection->executeStatement(
-            'UPDATE `search_engine` SET `name` = "Internal (public)", `settings` = ?, `modified` = NOW() WHERE `id` = ?',
-            [json_encode($settings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), $legacyId]
-        );
-    }
-
     protected function createInternalSearchEngine(
         \Doctrine\DBAL\Connection $connection,
         $messenger,
         $urlHelper,
-        string $name,
-        string $visibility
+        string $name
     ): int {
+        // The internal engine is a singleton: there is one sql database, so
+        // any existing internal engine is reused, whatever its name.
         $existingId = (int) $connection->fetchOne(
-            'SELECT `id` FROM `search_engine` WHERE `adapter` = "internal" AND `name` = ? ORDER BY `id` ASC',
-            [$name]
+            'SELECT `id` FROM `search_engine` WHERE `adapter` = "internal" ORDER BY `id` ASC'
         );
         if ($existingId) {
             return $existingId;
@@ -2221,7 +2179,6 @@ class Module extends AbstractModule
 
         $searchEngineConfig = require __DIR__ . '/data/configs/search_engine.internal.php';
         $settings = $searchEngineConfig['o:settings'];
-        $settings['visibility'] = $visibility;
         $connection->executeStatement(
             'INSERT INTO `search_engine` (`name`, `adapter`, `settings`, `created`) VALUES (?, ?, ?, NOW());',
             [$name, $searchEngineConfig['o:engine_adapter'], json_encode($settings)]

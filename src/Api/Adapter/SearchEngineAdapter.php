@@ -108,5 +108,17 @@ class SearchEngineAdapter extends AbstractEntityAdapter
         if (!$entity->getName()) {
             $errorStore->addError('o:name', 'The name cannot be empty.'); // @translate
         }
+
+        // An engine is a real backend. There is one sql database, so the
+        // internal engine is a singleton; the visibility is a property of the
+        // query context, not of the engine.
+        if ($entity->getAdapter() === 'internal') {
+            foreach ($this->getEntityManager()->getRepository(\AdvancedSearch\Entity\SearchEngine::class)->findBy(['adapter' => 'internal']) as $other) {
+                if ($other->getId() !== $entity->getId()) {
+                    $errorStore->addError('o:engine_adapter', 'An internal search engine already exists: an engine is a real backend and there is only one sql database.'); // @translate
+                    break;
+                }
+            }
+        }
     }
 }

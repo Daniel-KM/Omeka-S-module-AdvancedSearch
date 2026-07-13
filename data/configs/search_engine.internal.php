@@ -12,7 +12,7 @@ return [
     '@id' => null,
     '@type' => 'o:SearchEngine',
     'o:id' => null,
-    'o:name' => 'Internal (sql)',
+    'o:name' => 'Internal',
     'o:engine_adapter' => 'internal',
     'o:settings' => [
         'resource_types' => [

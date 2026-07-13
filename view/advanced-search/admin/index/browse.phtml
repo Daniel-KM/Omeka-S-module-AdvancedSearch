@@ -77,21 +77,6 @@ $runningSuggesterJobs = $runningJobs['suggesters'] ?? [];
 // it.
 $hasSolr = class_exists(\SearchSolr\Module::class, false);
 
-// Count how many engines use each Solr core, to flag a shared core: several
-// engines on one core differ only by their query-time visibility, so the core
-// holds private data and the public engine is protected only by the filter.
-$solrCoreUsage = [];
-if ($hasSolr) {
-    foreach ($searchEngines as $se) {
-        if ($se->engineAdapterName() === 'solarium') {
-            $cid = (int) $se->settingEngineAdapter('solr_core_id');
-            if ($cid) {
-                $solrCoreUsage[$cid] = ($solrCoreUsage[$cid] ?? 0) + 1;
-            }
-        }
-    }
-}
-
 // Group the search pages and the suggesters by their engine, so the relation to
 // the engine is readable at a glance in the tables below.
 $byEngineName = fn ($a, $b) => [$a->searchEngine()->name(), $a->name()] <=> [$b->searchEngine()->name(), $b->name()];
@@ -193,16 +178,11 @@ usort($suggesters, $byEngineName);
                         ?>
                         <a href="<?= $escape($url('admin/search-manager/solr/core-id', ['id' => $solrCoreId, 'action' => 'show'])) ?>"><?= $escape($solrCoreName) ?></a>
                         <?php
-                            // The visibility is the real differentiator between
-                            // engines sharing a core: public, all (admin, per
-                            // rights) or private.
+                            // The indexing visibility of the core, when capped.
                             $visibility = (string) $searchEngine->setting('visibility');
-                            $visibilityLabel = in_array($visibility, ['public', 'private'], true) ? $visibility : 'all';
                         ?>
-                        <span class="field-generic"><?= $escape($translate($visibilityLabel)) ?></span>
-                        <?php if (($solrCoreUsage[$solrCoreId] ?? 0) > 1): ?>
-                        <span class="field-generic o-icon-warning"
-                            title="<?= $escapeAttr(sprintf($translate('This core is shared by %d engines, which differ only by their visibility. The public engine is then protected only by the query filter; a dedicated core per engine is recommended.'), $solrCoreUsage[$solrCoreId])) ?>"><?= $escape($translate('shared')) ?></span>
+                        <?php if (in_array($visibility, ['public', 'private'], true)): ?>
+                        <span class="field-generic"><?= $escape($translate($visibility)) ?></span>
                         <?php endif; ?>
                         <?php else: ?>
                         <span class="warning-notice"><?= $escape($translate('No core selected')) ?></span>

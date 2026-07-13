@@ -813,13 +813,18 @@ class SearchResources
                 }
             }
             foreach ($rows as $row) {
-                if (!is_array($row) || empty($row[$fieldKey]) || empty($row['type'])) {
+                if (!is_array($row) || empty($row['type'])) {
                     continue;
                 }
                 $type = $row['type'];
                 $join = $row['join'] ?? $row['joiner'] ?? 'and';
                 $val = $row[$valKey] ?? null;
-                $fields = is_array($row[$fieldKey]) ? $row[$fieldKey] : [$row[$fieldKey]];
+                // A row without field means "any property" (like the api arg
+                // "search"): route it to the pseudo-field "property_values",
+                // resolved by each querier (aggregated values index in Solr).
+                $fields = empty($row[$fieldKey])
+                    ? ['property_values']
+                    : (is_array($row[$fieldKey]) ? $row[$fieldKey] : [$row[$fieldKey]]);
 
                 $fields = array_values(array_filter($fields, fn ($v) => is_string($v) && $v !== ''));
                 if (!$fields) {

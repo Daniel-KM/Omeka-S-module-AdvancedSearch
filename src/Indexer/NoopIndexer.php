@@ -46,4 +46,9 @@ class NoopIndexer implements IndexerInterface
     {
         return $this;
     }
+
+    public function onFullReindexed(): self
+    {
+        return $this;
+    }
 }

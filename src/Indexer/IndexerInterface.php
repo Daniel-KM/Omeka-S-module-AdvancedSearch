@@ -82,4 +82,13 @@ interface IndexerInterface extends LoggerAwareInterface
      * @param int $id
      */
     public function deleteResource(string $resourceType, $id): self;
+
+    /**
+     * Hook called once by the indexing job after a full reindex completed.
+     *
+     * Lets an indexer finalize a pending migration of its engine, for instance
+     * dropping a renamed field once every document carries the new one. The
+     * default implementation does nothing.
+     */
+    public function onFullReindexed(): self;
 }

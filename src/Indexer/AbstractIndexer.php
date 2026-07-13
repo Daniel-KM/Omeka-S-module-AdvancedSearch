@@ -64,4 +64,9 @@ abstract class AbstractIndexer implements IndexerInterface
         $this->searchEngine = $searchEngine;
         return $this;
     }
+
+    public function onFullReindexed(): self
+    {
+        return $this;
+    }
 }

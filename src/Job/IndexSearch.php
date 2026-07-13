@@ -543,6 +543,20 @@ class IndexSearch extends AbstractJob
                 // 'memory_usage' => round(memory_get_usage(true) / 1024 / 1024, 2),
             ]
         );
+
+        // After a full reindex, let the indexer finalize any pending migration
+        // (e.g. drop a renamed field once every document carries the new one).
+        // The default implementation does nothing.
+        if ($clearFullIndex) {
+            try {
+                $indexer->onFullReindexed();
+            } catch (\Throwable $e) {
+                $this->logger->warn(
+                    'Post-reindex finalization failed: {message}', // @translate
+                    ['message' => $e->getMessage()]
+                );
+            }
+        }
     }
 
     protected function logStopMessage(

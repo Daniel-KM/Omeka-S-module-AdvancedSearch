@@ -1,27 +1,23 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) 2026 THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
-#
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version:  \n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-01 00:00+0000\n"
-"PO-Revision-Date: 2026-06-01 00:00+0000\n"
+"POT-Creation-Date: 2026-07-13 00:00+0000\n"
+"PO-Revision-Date: 2026-07-13 00:00+0000\n"
 "Last-Translator: Daniel Berthereau <Daniel.fr@Berthereau.net>\n"
-"Language: br\n"
 "Language-Team: br <LL@li.org>\n"
-"Plural-Forms: nplurals=6; plural=(n==1 ? 0 : n%10==1 && n%100!=11 && "
-"n%100!=71 && n%100!=91 ? 1 : n%10==2 && n%100!=12 && n%100!=72 && n%100!=92 "
-"? 2 : (n%10==3 || n%10==4 || n%10==9) && n%100!=13 && n%100!=14 && n%100!=19"
-" && n%100!=73 && n%100!=74 && n%100!=79 && n%100!=93 && n%100!=94 && "
-"n%100!=99 ? 3 : n%1000000==0 ? 4 : 5);\n"
+"Language: br\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=(n==1 ? 0 : n%10==1 && n%100!=11 && n%100!"
+"=71 && n%100!=91 ? 1 : n%10==2 && n%100!=12 && n%100!=72 && n%100!=92 ? 2 : "
+"(n%10==3 || n%10==4 || n%10==9) && n%100!=13 && n%100!=14 && n%100!=19 && "
+"n%100!=73 && n%100!=74 && n%100!=79 && n%100!=93 && n%100!=94 && n%100!=99 ? "
+"3 : n%1000000==0 ? 4 : 5);\n"
 "Generated-By: Babel 2.18.0\n"
+"X-Generator: Poedit 3.6\n"
 
 #: data/configs/search_config.default.php:411
 msgid "Date range"
@@ -44,7 +40,7 @@ msgid "No results"
 msgstr "Disoc'h ebet"
 
 #: data/configs/search_config.default.php:567
-#, php-format, python-format
+#, php-format
 msgid "Results by %d"
 msgstr "Disoc'hoù dre %d"
 
@@ -98,16 +94,17 @@ msgstr "Adlañsañ an tuioù"
 msgid "Refine search"
 msgstr "Finaat ar c'hlask"
 
-#: Module.php:112 data/scripts/upgrade.php:56
+#: data/scripts/upgrade.php:56 Module.php:116
 #, php-format
 msgid "The module %1$s should be upgraded to version %2$s or later."
-msgstr "Ar modul %1$s a zlefe bezañ hizivaet d'ar stumm %2$s pe unan nevesoc'h."
+msgstr ""
+"Ar modul %1$s a zlefe bezañ hizivaet d'ar stumm %2$s pe unan nevesoc'h."
 
 #: data/scripts/upgrade.php:60 data/scripts/upgrade.php:75
 msgid "Missing requirement. Unable to upgrade."
 msgstr "Rekizadenn a vank. N'haller ket hizivaat."
 
-#: Module.php:105 data/scripts/upgrade.php:67
+#: data/scripts/upgrade.php:67 Module.php:109
 #, php-format
 msgid "The module %1$s requires PHP %2$s or later."
 msgstr "Ezhomm en deus ar modul %1$s eus PHP %2$s pe un doare nevesoc'h."
@@ -117,7 +114,7 @@ msgstr "Ezhomm en deus ar modul %1$s eus PHP %2$s pe un doare nevesoc'h."
 msgid "Facets"
 msgstr "Tresoù"
 
-#: Module.php:2120 data/scripts/upgrade.php:1688
+#: data/scripts/upgrade.php:1688 Module.php:2096
 msgid "Main index"
 msgstr "Meneger pennañ"
 
@@ -126,12 +123,12 @@ msgid "Full text"
 msgstr "Testenn glok"
 
 #: src/Api/Representation/SearchEngineRepresentation.php:160
-#, php-format, python-format
+#, php-format
 msgid "[Missing engine adapter \"%s\"]"
 msgstr "[Adapter keflusker \"%s\" a vank]"
 
-#: src/Controller/Admin/SearchConfigController.php:316
-#, php-format, python-format
+#: src/Controller/Admin/SearchConfigController.php:292
+#, php-format
 msgid "%s (copy)"
 msgstr "%s (eilskrid)"
 
@@ -139,7 +136,8 @@ msgstr "%s (eilskrid)"
 msgid "No query."
 msgstr "Goulenn ebet."
 
-#: src/Controller/SearchController.php:197 src/Controller/SearchController.php:304
+#: src/Controller/SearchController.php:197
+#: src/Controller/SearchController.php:304
 msgid "An error occurred."
 msgstr "Ur fazi zo c'hoarvezet."
 
@@ -174,17 +172,14 @@ msgid "descendant"
 msgstr "diskennad"
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:578
-#, python-brace-format
 msgid "Filter {index}"
 msgstr "Sil {index}"
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:1202
-#, python-brace-format
 msgid "Sort {index}"
 msgstr "Renkañ {index}"
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:1457
-#, python-brace-format
 msgid "Facet {index}"
 msgstr "Gefell {index}"
 
@@ -192,8 +187,8 @@ msgstr "Gefell {index}"
 msgid "Add a filter"
 msgstr "Ouzhpennañ ur sil"
 
-#: src/Mvc/Controller/Plugin/ApiSearch.php:179
-#, php-format, python-format
+#: src/Mvc/Controller/Plugin/ApiSearch.php:171
+#, php-format
 msgid "Permission denied for the current user to %s the %s resource."
 msgstr "Aotreet n'eo ket d'an implijer a-vremañ %s an danvez %s."
 
@@ -275,7 +270,7 @@ msgid "Has asset as thumbnail"
 msgstr "Ur madoù evel bihantres"
 
 #: src/View/Helper/SearchFilters.php:494
-#, php-format, python-format
+#, php-format
 msgid "#%d"
 msgstr "#%d"
 
@@ -308,17 +303,17 @@ msgid "is"
 msgstr "eo"
 
 #: src/View/Helper/SearchingFilters.php:308
-#, php-format, python-format
+#, php-format
 msgid "from %s to %s"
 msgstr "eus %s da %s"
 
 #: src/View/Helper/SearchingFilters.php:310
-#, php-format, python-format
+#, php-format
 msgid "since %s"
 msgstr "abaoe %s"
 
 #: src/View/Helper/SearchingFilters.php:312
-#, php-format, python-format
+#, php-format
 msgid "until %s"
 msgstr "betek %s"
 
@@ -349,8 +344,9 @@ msgid "Add search engine"
 msgstr "Ouzhpennañ keflusker enklask"
 
 #: view/advanced-search/admin/index/browse.phtml:60
-msgid "Add page"
-msgstr "Ouzhpennañ pajenn"
+#: view/advanced-search/admin/search-config/add.phtml:49
+msgid "Add search page"
+msgstr "Ouzhpennañ pajenn glask"
 
 #: view/advanced-search/admin/index/browse.phtml:61
 #: view/advanced-search/admin/search-suggester/add.phtml:21
@@ -369,7 +365,7 @@ msgstr "Azasaer keflusker"
 #: view/advanced-search/admin/index/browse.phtml:108
 #: view/advanced-search/admin/index/browse.phtml:252
 #: view/advanced-search/admin/index/browse.phtml:258
-#, php-format, python-format
+#, php-format
 msgid "Indexing in progress (job #%d)"
 msgstr "Endeksadur war-raok (labour #%d)"
 
@@ -401,8 +397,8 @@ msgid "No search engines created yet."
 msgstr "C'hoazh n'eus bet krouet keflusker enklask ebet."
 
 #: view/advanced-search/admin/index/browse.phtml:163
-msgid "Page configs"
-msgstr "Kefluniadurioù ar bajenn"
+msgid "Search pages"
+msgstr "Pajennoù klask"
 
 #: view/advanced-search/admin/index/browse.phtml:171
 #: view/advanced-search/admin/index/browse.phtml:232
@@ -423,8 +419,8 @@ msgid "Are you sure you want to copy this search page?"
 msgstr "Ha sur oc'h e fell deoc'h eilañ ar bajenn glask-mañ ?"
 
 #: view/advanced-search/admin/index/browse.phtml:222
-msgid "No search page configs created yet."
-msgstr "N'eus bet krouet kefluniadur pajenn glask ebet c'hoazh."
+msgid "No search pages created yet."
+msgstr "N'eus bet krouet pajenn glask ebet c'hoazh."
 
 #: view/advanced-search/admin/index/browse.phtml:225
 msgid "Suggesters"
@@ -443,9 +439,34 @@ msgstr "Kinniger ebet evit ar c'hlask krouet c'hoazh."
 msgid "Confirmation"
 msgstr "Kadarnadenn"
 
-#: view/advanced-search/admin/search-config/add.phtml:49
-msgid "Add search page"
-msgstr "Ouzhpennañ pajenn glask"
+#: view/advanced-search/admin/index/browse.phtml:323
+msgid "Recommendation"
+msgstr "Erbedadenn"
+
+#: view/advanced-search/admin/index/browse.phtml:329
+msgid "Search index to update"
+msgstr "Klask en deizlevr evit hizivaat"
+
+#: view/advanced-search/admin/index/browse.phtml:330
+#, php-format
+msgid ""
+"The page \"%s\" was saved. If fields were added or removed, synchronize the "
+"maps of the Solr core, then reindex."
+msgstr ""
+"Sakret eo bet ar bajenn \"%s\". Ma'z eus bet ouzhpennet pe lamet maeziennoù, "
+"sinkronel kartennoù kalon Solr, ha da c'houde adindeksit."
+
+#: view/advanced-search/admin/index/browse.phtml:335
+msgid "Remove unused maps"
+msgstr "Lakaat kuit ar c'hartennoù n'int ket implijet"
+
+#: view/advanced-search/admin/index/browse.phtml:338
+msgid "Synchronize maps"
+msgstr "Kenlinennañ ar c'hartennoù"
+
+#: view/advanced-search/admin/index/browse.phtml:343
+msgid "Reindex…"
+msgstr "Adindeksekaat…"
 
 #: view/advanced-search/admin/search-config/add.phtml:54
 #: view/advanced-search/admin/search-engine/add.phtml:53
@@ -469,7 +490,7 @@ msgstr "Kadarnaat an adindeksadur"
 
 #: view/advanced-search/admin/search-engine/index-confirm.phtml:38
 #: view/advanced-search/admin/search-suggester/index-confirm.phtml:27
-#, php-format, python-format
+#, php-format
 msgid "Reindex \"%s\""
 msgstr "Adindekset \"%s\""
 
@@ -484,8 +505,8 @@ msgid ""
 "removed."
 msgstr ""
 "Goulskoude, goulloiñ an holl menegerioù a lakaio ar c'hlask da vezañ diduüs "
-"e-pad an admenegadur, met evel-se e vez evitet an degouezhioù ral ma ne vefe"
-" ket bet diverket menegerioù ar mammennoù diverket."
+"e-pad an admenegadur, met evel-se e vez evitet an degouezhioù ral ma ne vefe "
+"ket bet diverket menegerioù ar mammennoù diverket."
 
 #: view/advanced-search/admin/search-engine/index-confirm.phtml:48
 msgid "You may redirect the users to a clone of the current index temporary."
@@ -495,13 +516,13 @@ msgstr ""
 
 #: view/advanced-search/admin/search-engine/index-confirm.phtml:57
 msgid "Clear all indexes of the shared core, included external ones"
-msgstr "Glanit an holl menegerioù eus ar galonenn rannet, en o zouez ar re diavaez"
+msgstr ""
+"Glanit an holl menegerioù eus ar galonenn rannet, en o zouez ar re diavaez"
 
 #: view/advanced-search/admin/search-engine/index-confirm.phtml:61
 msgid ""
 "Warning: this core is shared (multi-index). This option clears all indexes, "
-"included indexes managed externally, not only the ones of this search "
-"engine."
+"included indexes managed externally, not only the ones of this search engine."
 msgstr ""
 "Diwallit : rannet eo ar galon-mañ (lies-meneger). Gant an dibab-mañ e vez "
 "diverket an holl venegerioù, en o zouez ar re veret en diavaez, ha n'eo ket "
@@ -536,8 +557,8 @@ msgid ""
 "This option may avoid overload when records are big or with many linked "
 "resources. Note: A greater value may reduce memory in some cases."
 msgstr ""
-"An dibab-mañ a c'hall mirout ouzh an dreistkarg pa vez bras an enrolladennoù"
-" pe pa vez kalz a vammennoù liammet ganto. Notenn : Ur gwerzh uheloc'h a "
+"An dibab-mañ a c'hall mirout ouzh an dreistkarg pa vez bras an enrolladennoù "
+"pe pa vez kalz a vammennoù liammet ganto. Notenn : Ur gwerzh uheloc'h a "
 "c'hall digreskiñ ar vemor e degouezhioù zo."
 
 #: view/advanced-search/admin/search-engine/index-confirm.phtml:88
@@ -553,8 +574,8 @@ msgid ""
 "When there are many errors \"HTTP request failed\", increase this limit to "
 "10, 30, 60 seconds or check server."
 msgstr ""
-"Pa vez kalz a fazioù \"Goulenn HTTP c'hwitet\", kreskit ar vevenn-mañ da 10,"
-" 30, 60 eilenn pe gwiriekait ar servijer."
+"Pa vez kalz a fazioù \"Goulenn HTTP c'hwitet\", kreskit ar vevenn-mañ da 10, "
+"30, 60 eilenn pe gwiriekait ar servijer."
 
 #: view/advanced-search/admin/search-engine/index-confirm.phtml:95
 msgid "Limit indexing"
@@ -607,8 +628,7 @@ msgid ""
 "external suggesters, use the direct url in the search config."
 msgstr ""
 "N'en deus ket an azasaer keflusker klask-mañ arventennoù kinniger resis. "
-"Evit ar c'hinnigerien diavaez, implijit an URL eeun e kefluniadur ar "
-"c'hlask."
+"Evit ar c'hinnigerien diavaez, implijit an URL eeun e kefluniadur ar c'hlask."
 
 #: view/advanced-search/admin/search-suggester/index-confirm.phtml:28
 msgid "Are you sure you would like to reindex this suggester?"
@@ -616,17 +636,18 @@ msgstr "Ha sur oc'h e fell deoc'h adindekset ar c'hinniger-mañ ?"
 
 #: view/advanced-search/admin/search-suggester/index-confirm.phtml:31
 msgid ""
-"All the suggestions will be cleared first, so the search will be unavailable"
-" for a while."
+"All the suggestions will be cleared first, so the search will be unavailable "
+"for a while."
 msgstr ""
-"An holl ginnigoù a vo skubet kuit da gentañ, neuze ne vo ket tu ober gant ar"
-" c'hlask e-pad ur pennadig."
+"An holl ginnigoù a vo skubet kuit da gentañ, neuze ne vo ket tu ober gant ar "
+"c'hlask e-pad ur pennadig."
 
 #: view/advanced-search/admin/search-suggester/index-confirm.phtml:32
-msgid "You may redirect the users to a clone of the current suggester temporarily."
+msgid ""
+"You may redirect the users to a clone of the current suggester temporarily."
 msgstr ""
-"Gallout a rit adheñchañ an implijerien war-du ur skouerenn eus ar c'hinniger"
-" a-vremañ, da c'hortoz."
+"Gallout a rit adheñchañ an implijerien war-du ur skouerenn eus ar c'hinniger "
+"a-vremañ, da c'hortoz."
 
 #: view/advanced-search/admin/search-suggester/index-confirm.phtml:36
 msgid ""
@@ -1092,7 +1113,7 @@ msgid "Remove facet \"%1$s: %2$s\""
 msgstr "Lemel ar fasadenn \"%1$s: %2$s\""
 
 #: view/search/facet-checkboxes-filter.phtml:21
-#, php-format, python-format
+#, php-format
 msgid "Filter values of %s"
 msgstr "Filtriñ talvoudoù %s"
 
@@ -1100,13 +1121,15 @@ msgstr "Filtriñ talvoudoù %s"
 msgid "Filter…"
 msgstr "Sil…"
 
-#: view/search/facet-range-double.phtml:34 view/search/facet-select-range.phtml:19
-#, php-format, python-format
+#: view/search/facet-range-double.phtml:34
+#: view/search/facet-select-range.phtml:19
+#, php-format
 msgid "%s: from"
 msgstr "%s: eus"
 
-#: view/search/facet-range-double.phtml:35 view/search/facet-select-range.phtml:20
-#, php-format, python-format
+#: view/search/facet-range-double.phtml:35
+#: view/search/facet-select-range.phtml:20
+#, php-format
 msgid "%s: to"
 msgstr "%s: da"
 
@@ -1118,8 +1141,8 @@ msgstr "Mat eo"
 msgid "Between"
 msgstr "Etre"
 
-#: view/search/facet-select-range.phtml:25 view/search/facet-select-range.phtml:34
-#: view/search/facet-select.phtml:20
+#: view/search/facet-select-range.phtml:25
+#: view/search/facet-select-range.phtml:34 view/search/facet-select.phtml:20
 msgid "Select below…"
 msgstr "Diuzit a-is…"
 
@@ -1140,12 +1163,12 @@ msgid "Next page"
 msgstr "Pajenn da heul"
 
 #: view/search/results-header-footer.phtml:78
-#, php-format, python-format
+#, php-format
 msgid "%s resource"
 msgstr "Danvez %s"
 
 #: view/search/results-header-footer.phtml:78
-#, php-format, python-format
+#, php-format
 msgid "%s resources"
 msgstr "Danvezioù %s"
 
@@ -1195,7 +1218,6 @@ msgid "The query returned no results"
 msgstr "N'eus bet disoc'h ebet gant ar goulenn"
 
 #: data/scripts/upgrade.php:257
-#, python-brace-format
 msgid "The module {module} should be updated to version {version}."
 msgstr "Ar modul {module} a rank bezañ hizivaet d'ar stumm {version}."
 
@@ -1209,15 +1231,18 @@ msgstr ""
 
 #: data/scripts/upgrade.php:269
 msgid "It is now possible to add a pagination per-page to the search page."
-msgstr "Bremañ eo posupl ouzhpennañ ur pajennaerezh dre bajenn d'ar bajenn glask."
+msgstr ""
+"Bremañ eo posupl ouzhpennañ ur pajennaerezh dre bajenn d'ar bajenn glask."
 
 #: data/scripts/upgrade.php:274
 msgid "It is now possible to use \"not\" in advanced filters."
 msgstr "Posupl eo bremañ implijout \"not\" er siloù araokaet."
 
 #: data/scripts/upgrade.php:279
-msgid "It is now possible to display the used search filters in the results header."
-msgstr "Bremañ eo posupl diskouez ar siloù klask implijet e talbenn an disoc'hoù."
+msgid ""
+"It is now possible to display the used search filters in the results header."
+msgstr ""
+"Bremañ eo posupl diskouez ar siloù klask implijet e talbenn an disoc'hoù."
 
 #: data/scripts/upgrade.php:284
 msgid ""
@@ -1257,8 +1282,8 @@ msgstr "Ouzhpennet ez eus bet un harpañ evit pajennaat bep pajenn."
 
 #: data/scripts/upgrade.php:313
 msgid ""
-"It’s now possible to search resources by multiples properties, and resources"
-" without class, template, item set, site or owner."
+"It’s now possible to search resources by multiples properties, and resources "
+"without class, template, item set, site or owner."
 msgstr ""
 "Bremañ e c'haller klask danvezioù dre veur a berzh, ha danvezioù hep klas, "
 "patrom, strollad elfennoù, lec'hienn pe perc'henn."
@@ -1271,12 +1296,12 @@ msgid ""
 "dates. With Solr, only numbers and dates are supported. The theme may need "
 "to be updated."
 msgstr ""
-"Posupl eo bremañ ober gant ar skalfad fasadennoù gant un dibab doubl "
-"(eus/betek). Gant ar c'heflusker SQL diabarzh, n'eo alifabetek nemet an urzh"
-" evit ar poent : mont a ra en-dro evit ar c'henennoù ha bloavezhioù eeun "
-"pevar sifr pe deiziadoù standard, met n'eo ket evit an deiziadoù entier pe "
-"kemmus. Gant Solr, n'eus nemet an niverennoù hag an deiziadoù a zo kemeret e"
-" karg. Marteze e vo ezhomm hizivaat an tem."
+"Posupl eo bremañ ober gant ar skalfad fasadennoù gant un dibab doubl (eus/"
+"betek). Gant ar c'heflusker SQL diabarzh, n'eo alifabetek nemet an urzh evit "
+"ar poent : mont a ra en-dro evit ar c'henennoù ha bloavezhioù eeun pevar "
+"sifr pe deiziadoù standard, met n'eo ket evit an deiziadoù entier pe kemmus. "
+"Gant Solr, n'eus nemet an niverennoù hag an deiziadoù a zo kemeret e karg. "
+"Marteze e vo ezhomm hizivaat an tem."
 
 #: data/scripts/upgrade.php:324
 msgid ""
@@ -1284,9 +1309,9 @@ msgid ""
 "order, no more date-time only. For integer and date-time, use numeric data "
 "types."
 msgstr ""
-"An doareoù reked perzh \"bihanoc'h/brasoc'h\" zo bet hizivaet evit implijout"
-" an urzh alifabetek, ha n'eo ket mui an deiziad-eur nemetken. Evit an "
-"niveriñ klok hag an deiziad-eur, implijit doareoù roadennoù niverel."
+"An doareoù reked perzh \"bihanoc'h/brasoc'h\" zo bet hizivaet evit implijout "
+"an urzh alifabetek, ha n'eo ket mui an deiziad-eur nemetken. Evit an niveriñ "
+"klok hag an deiziad-eur, implijit doareoù roadennoù niverel."
 
 #: data/scripts/upgrade.php:328
 msgid ""
@@ -1294,39 +1319,42 @@ msgid ""
 "apply facets with id=\"apply-facets\", list of facet values)."
 msgstr ""
 "Hizivaat ho tem evit ma vo kemeret e karg ar perzhioù nevez evit ar "
-"fasetennoù (fasetennoù oberiant, bouton da lakaat ar fasetennoù gant id"
-"=\"apply-facets\", roll talvoudoù ar fasetennoù)."
+"fasetennoù (fasetennoù oberiant, bouton da lakaat ar fasetennoù gant "
+"id=\"apply-facets\", roll talvoudoù ar fasetennoù)."
 
 #: data/scripts/upgrade.php:345
-#, python-brace-format
 msgid ""
-"It’s now possible to search values similar other ones (via "
-"{link}Soundex{link_end}, designed for British English phonetic)."
+"It’s now possible to search values similar other ones (via {link}"
+"Soundex{link_end}, designed for British English phonetic)."
 msgstr ""
-"Bremañ e c'haller klask talvoudoù heñvel ouzh re all (dre "
-"{link}Soundex{link_end}, savet evit fonetik saozneg Breizh-Veur)."
+"Bremañ e c'haller klask talvoudoù heñvel ouzh re all (dre {link}"
+"Soundex{link_end}, savet evit fonetik saozneg Breizh-Veur)."
 
 #: data/scripts/upgrade.php:354
 msgid "Some new options were added to manage facets."
-msgstr "Ouzhpennet ez eus bet un nebeud dibaboù nevez evit merañ ar fasadennoù."
+msgstr ""
+"Ouzhpennet ez eus bet un nebeud dibaboù nevez evit merañ ar fasadennoù."
 
 #: data/scripts/upgrade.php:386 data/scripts/upgrade.php:2196
-msgid "It is recommended to upgrade the module \"Reference\" to improve performance."
-msgstr "Erbedet e vez hizivaat ar modul \"Reference\" evit gwellaat an efedusted."
+msgid ""
+"It is recommended to upgrade the module \"Reference\" to improve performance."
+msgstr ""
+"Erbedet e vez hizivaat ar modul \"Reference\" evit gwellaat an efedusted."
 
 #: data/scripts/upgrade.php:437
 msgid ""
 "A new settings allows to skip indexing after a batch process because an "
 "issue can occurs in some cases."
-msgstr "Erbedet e vez hizivaat ar modul \"Reference\" evit gwellaat an efedusted."
+msgstr ""
+"Erbedet e vez hizivaat ar modul \"Reference\" evit gwellaat an efedusted."
 
 #: data/scripts/upgrade.php:450
 msgid ""
 "The performance was improved in many places, in particular for large "
 "databases."
 msgstr ""
-"Gwellaet eo bet ar perzhded e meur a lec'h, dreist-holl evit an "
-"diazoù-roadennoù bras."
+"Gwellaet eo bet ar perzhded e meur a lec'h, dreist-holl evit an diazoù-"
+"roadennoù bras."
 
 #: data/scripts/upgrade.php:455
 msgid ""
@@ -1341,8 +1369,8 @@ msgid ""
 "It is now possible to do a standard search with a sub-query, for example to "
 "get all items with creators born in 1789."
 msgstr ""
-"Bremañ eo posupl ober un enklask standart gant un is-goulenn, da skouer evit"
-" kaout an holl elfennoù gant krouerien ganet e 1789."
+"Bremañ eo posupl ober un enklask standart gant un is-goulenn, da skouer evit "
+"kaout an holl elfennoù gant krouerien ganet e 1789."
 
 #: data/scripts/upgrade.php:479
 msgid ""
@@ -1363,15 +1391,14 @@ msgstr ""
 #: data/scripts/upgrade.php:491
 msgid ""
 "The speed of the derivative forms were improved and can be called directly "
-"from the search config with option \"variant\". Upgrade your theme if it was"
-" customized."
+"from the search config with option \"variant\". Upgrade your theme if it was "
+"customized."
 msgstr ""
-"Gwellaet eo bet tizh ar stummoù deveriañ ha gallout a reont bezañ galvet "
-"war-eeun adalek ar c'hefluniadur klask gant an dibarzh \"variant\". Hizivaat"
-" ho tem ma oa bet personelaet."
+"Gwellaet eo bet tizh ar stummoù deveriañ ha gallout a reont bezañ galvet war-"
+"eeun adalek ar c'hefluniadur klask gant an dibarzh \"variant\". Hizivaat ho "
+"tem ma oa bet personelaet."
 
 #: data/scripts/upgrade.php:528
-#, python-brace-format
 msgid ""
 "View helpers \"FacetActive\", \"FacetCheckbox\" and \"FacetLink\" and "
 "associate theme files were removed in favor of plural view helpers. Check "
@@ -1383,18 +1410,16 @@ msgstr ""
 "personelaet anezhañ. Restroù a glot : {json}"
 
 #: data/scripts/upgrade.php:579
-#, python-brace-format
 msgid ""
 "The variables \"$heading\", \"$html\" and \"$cssClass\" were removed from "
 "block Searching Form. Remove them in the following files before upgrade and "
 "automatic conversion: {json}"
 msgstr ""
-"Lakaet eo bet an argemmennoù \"$heading\", \"$html\" ha \"$cssClass\" "
-"a-gostez er bloc'h \"Searching Form\". Lakit anezho a-gostez er restroù da-"
+"Lakaet eo bet an argemmennoù \"$heading\", \"$html\" ha \"$cssClass\" a-"
+"gostez er bloc'h \"Searching Form\". Lakit anezho a-gostez er restroù da-"
 "heul a-raok an hizivadur hag an treuzfurmadur emgefre : {json}"
 
 #: data/scripts/upgrade.php:686
-#, python-brace-format
 msgid ""
 "The settings \"heading\" and \"html\" were removed from block Searching "
 "Form. New blocks \"Heading\" or \"Html\" were prepended to all blocks that "
@@ -1406,7 +1431,6 @@ msgstr ""
 "gwiriañ ar pajennoù evit ar stiloù : {json}"
 
 #: data/scripts/upgrade.php:696
-#, python-brace-format
 msgid ""
 "The setting \"template\" was moved to the new block layout settings "
 "available since Omeka S v4.1. You may check pages for styles: {json}"
@@ -1416,11 +1440,10 @@ msgstr ""
 "gwiriañ ar pajennoù evit ar stiloù : {json}"
 
 #: data/scripts/upgrade.php:703
-#, python-brace-format
 msgid ""
-"The template files for the block Searching Form should be moved from "
-"\"view/common/block-layout\" to \"view/common/block-template\" in your "
-"themes. You may check your themes for pages: {json}"
+"The template files for the block Searching Form should be moved from \"view/"
+"common/block-layout\" to \"view/common/block-template\" in your themes. You "
+"may check your themes for pages: {json}"
 msgstr ""
 "Rankout a raio restroù patrom ar bloc'h \"Searching Form\" bezañ dilec'hiet "
 "eus \"view/common/block-layout\" da \"view/common/block-template\" en ho "
@@ -1431,17 +1454,17 @@ msgid ""
 "New options were added in search config: the choice of the theme template "
 "(search/search) and an option to display the breadcrumbs."
 msgstr ""
-"Ozalc'hioù nevez a zo bet ouzhpennet e kefluniadur ar c'hlask : dibab patrom"
-" an tem (search/search) hag un ozalc'h evit diskouez ar roudennoù-hent."
+"Ozalc'hioù nevez a zo bet ouzhpennet e kefluniadur ar c'hlask : dibab patrom "
+"an tem (search/search) hag un ozalc'h evit diskouez ar roudennoù-hent."
 
 #: data/scripts/upgrade.php:746
-msgid "The option to redirect item set to search was improved to manage all pages."
+msgid ""
+"The option to redirect item set to search was improved to manage all pages."
 msgstr ""
 "Gwellaet eo bet an dibab da adheñchañ an elfenn lakaet da glask evit merañ "
 "an holl bajennoù."
 
 #: data/scripts/upgrade.php:805 data/scripts/upgrade.php:1221
-#, python-brace-format
 msgid ""
 "The template for facets was simplified. See view/search/facets-list.phtml. "
 "Matching templates: {json}"
@@ -1450,16 +1473,14 @@ msgstr ""
 "list.phtml. Patromoù klotañ : {json}"
 
 #: data/scripts/upgrade.php:876 data/scripts/upgrade.php:908
-#, python-brace-format
 msgid ""
 "Command \"{name}\" #{index}/{total} for {key}: file #{count}/{count_total} "
 "{file} partially updated."
 msgstr ""
-"Kementad \"{name}\" #{index}/{total} evit {key}: restr "
-"#{count}/{count_total} {file} hizivaet evit un darn."
+"Kementad \"{name}\" #{index}/{total} evit {key}: restr #{count}/"
+"{count_total} {file} hizivaet evit un darn."
 
 #: data/scripts/upgrade.php:886
-#, python-brace-format
 msgid ""
 "The option \"facet_filters\" was removed. Update the theme to use facets "
 "instead. Matching templates: {json}"
@@ -1468,7 +1489,6 @@ msgstr ""
 "facets e-lec'h. Patromoù a glot : {json}"
 
 #: data/scripts/upgrade.php:894
-#, python-brace-format
 msgid ""
 "The view helper \"facetLabel()\" was removed. Update the theme and get the "
 "label directly from the each facet config: replace `$facetLabel($name)` by "
@@ -1480,7 +1500,6 @@ msgstr ""
 "glot : {json}"
 
 #: data/scripts/upgrade.php:921
-#, python-brace-format
 msgid ""
 "The view helper `searchForm()` was removed. You should replace it with "
 "`$searchConfig->renderForm([])`. Matching templates: {json}"
@@ -1489,25 +1508,22 @@ msgstr ""
 "`$searchConfig->renderForm([])` e tlefac'h ober. Patromoù a glot : {json}"
 
 #: data/scripts/upgrade.php:929
-#, python-brace-format
 msgid ""
-"The template \"search/facets\" was renamed \"search/facets-list\". Update it"
-" in your theme. Matching templates: {json}"
+"The template \"search/facets\" was renamed \"search/facets-list\". Update it "
+"in your theme. Matching templates: {json}"
 msgstr ""
 "An arload \"search/facets\" zo bet adanvet \"search/facets-list\". Hizivaat "
 "anezhañ en ho tem. Arloadoù klotañ: {json}"
 
 #: data/scripts/upgrade.php:949
-#, python-brace-format
 msgid ""
-"The template \"search/resource-list\" was renamed \"search/results\". Update"
-" your theme. Matching templates: {json}"
+"The template \"search/resource-list\" was renamed \"search/results\". Update "
+"your theme. Matching templates: {json}"
 msgstr ""
 "An arload \"search/resource-list\" zo bet adanvet \"search/results\". "
 "Hizivaat ho tem. Arloadoù klotañ: {json}"
 
 #: data/scripts/upgrade.php:970
-#, python-brace-format
 msgid ""
 "The templates \"search/results-header\" and \"search/results-footer\" were "
 "replaced by \"search/results-header-footer\". Remove them in your theme. "
@@ -1518,7 +1534,6 @@ msgstr ""
 "Patromoù a glot : {json}"
 
 #: data/scripts/upgrade.php:978
-#, python-brace-format
 msgid ""
 "The key \"per_pages\" was renamed \"per_page\". Update your theme. Matching "
 "templates: {json}"
@@ -1527,7 +1542,6 @@ msgstr ""
 "Patromoù a glot : {json}"
 
 #: data/scripts/upgrade.php:1019
-#, python-brace-format
 msgid ""
 "Command \"{name}\" #{index}/{total} for {key}: file #{count}/{count_total} "
 "{file} failed to be renamed {file_new}."
@@ -1536,40 +1550,36 @@ msgstr ""
 "adanvout ar restr #{count}/{count_total} {file} da {file_new}."
 
 #: data/scripts/upgrade.php:1026
-#, python-brace-format
 msgid ""
 "Command \"{name}\" #{index}/{total} for {key}: file #{count}/{count_total} "
 "{file} successfully renamed {file_new}."
 msgstr ""
-"Kementad \"{name}\" #{index}/{total} evit {key}: restr "
-"#{count}/{count_total} {file} adanvet gant berzh da {file_new}."
+"Kementad \"{name}\" #{index}/{total} evit {key}: restr #{count}/"
+"{count_total} {file} adanvet gant berzh da {file_new}."
 
 #: data/scripts/upgrade.php:1046
-#, python-brace-format
 msgid ""
 "Command \"{name}\" #{index}/{total} for {key}: file #{count}/{count_total}  "
 "{file} unwriteable."
 msgstr ""
-"Kementad \"{name}\" #{index}/{total} evit {key}: restr "
-"#{count}/{count_total} {file} n'haller ket skrivañ warnañ."
+"Kementad \"{name}\" #{index}/{total} evit {key}: restr #{count}/"
+"{count_total} {file} n'haller ket skrivañ warnañ."
 
 #: data/scripts/upgrade.php:1053
-#, python-brace-format
 msgid ""
 "Command \"{name}\" #{index}/{total} for {key}: file #{count}/{count_total}  "
 "{file} updated."
 msgstr ""
-"Kementad \"{name}\" #{index}/{total} evit {key}: restr "
-"#{count}/{count_total} {file} hizivaet."
+"Kementad \"{name}\" #{index}/{total} evit {key}: restr #{count}/"
+"{count_total} {file} hizivaet."
 
 #: data/scripts/upgrade.php:1061
-#, python-brace-format
 msgid ""
 "Command \"{name}\" #{index}/{total} for {key}: file #{count}/{count_total} "
 "{file} unreadable."
 msgstr ""
-"Kementad \"{name}\" #{index}/{total} evit {key}: restr "
-"#{count}/{count_total} {file} n'haller ket lenn."
+"Kementad \"{name}\" #{index}/{total} evit {key}: restr #{count}/"
+"{count_total} {file} n'haller ket lenn."
 
 #: data/scripts/upgrade.php:1074
 msgid ""
@@ -1580,7 +1590,6 @@ msgstr ""
 "evit ar fasadoù."
 
 #: data/scripts/upgrade.php:1101
-#, python-brace-format
 msgid ""
 "The view helper `searchingForm()` is deprecated. Replace it with "
 "`$searchConfig->renderForm([])`. Matching templates: {json}"
@@ -1589,10 +1598,9 @@ msgstr ""
 "`$searchConfig->renderForm([])`. Patromoù a glot : {json}"
 
 #: data/scripts/upgrade.php:1112
-#, python-brace-format
 msgid ""
-"The title of the result part is no more appended in template \"search"
-"/resource-list\" or \"search/results\", but in main search template. Update "
+"The title of the result part is no more appended in template \"search/"
+"resource-list\" or \"search/results\", but in main search template. Update "
 "your theme. Matching templates: {json}"
 msgstr ""
 "Titl al lodenn disoc'hoù n'eo ket staget ken e patrom \"search/resource-"
@@ -1605,7 +1613,8 @@ msgstr "Ouzhpennet ez eus bet dibaboù nevez evit termeniñ ar bihanenn."
 
 #: data/scripts/upgrade.php:1181
 msgid "It is now possible to sort by relevance with the internal querier."
-msgstr "Posupl eo bremañ urzhiañ dre ar pouezusted gant ar goulennerez diabarzh."
+msgstr ""
+"Posupl eo bremañ urzhiañ dre ar pouezusted gant ar goulennerez diabarzh."
 
 #: data/scripts/upgrade.php:1186
 msgid ""
@@ -1616,19 +1625,18 @@ msgstr ""
 "css flex. Gwiriit ho tem."
 
 #: data/scripts/upgrade.php:1192 data/scripts/upgrade.php:1199
-#, python-brace-format
 msgid "The key \"{key}\" can be removed from the file config/local.config.php."
 msgstr ""
-"Gallout a reer tennañ an alc'hwez \"{key}\" eus ar restr "
-"config/local.config.php."
+"Gallout a reer tennañ an alc'hwez \"{key}\" eus ar restr config/"
+"local.config.php."
 
 #: data/scripts/upgrade.php:1210
 msgid ""
 "The html/css class names were simplified in the search page, in particular "
 "for facets. You should check your theme if you customized it."
 msgstr ""
-"Simpliet eo bet anvioù ar c'hlasoù html/css e pajenn ar c'hlask, dreist-holl"
-" evit an tuelloù. Gwiriekait ho tem ma hoc'h eus personelaet anezhañ."
+"Simpliet eo bet anvioù ar c'hlasoù html/css e pajenn ar c'hlask, dreist-holl "
+"evit an tuelloù. Gwiriekait ho tem ma hoc'h eus personelaet anezhañ."
 
 #: data/scripts/upgrade.php:1332
 msgid ""
@@ -1647,7 +1655,6 @@ msgstr ""
 "heñvel evit ar c'heflusker diabarzh."
 
 #: data/scripts/upgrade.php:1362
-#, python-brace-format
 msgid ""
 "The search config setting \"search\" was renamed \"request\". Check your "
 "theme. Matching templates: {json}"
@@ -1656,36 +1663,32 @@ msgstr ""
 "Gwiriit ho tem. Patromoù a glot : {json}"
 
 #: data/scripts/upgrade.php:1370
-#, python-brace-format
 msgid ""
-"The search config setting \"autosuggest\" was renamed \"q\" and sub-settings"
-" too. Check your theme. Matching templates: {json}"
+"The search config setting \"autosuggest\" was renamed \"q\" and sub-settings "
+"too. Check your theme. Matching templates: {json}"
 msgstr ""
-"Arventenn kefluniadur ar c'hlask \"autosuggest\" zo bet adanvet \"q\", koulz"
-" hag an is-arventennoù. Gwiriit ho tem. Patromoù a glot : {json}"
+"Arventenn kefluniadur ar c'hlask \"autosuggest\" zo bet adanvet \"q\", koulz "
+"hag an is-arventennoù. Gwiriit ho tem. Patromoù a glot : {json}"
 
 #: data/scripts/upgrade.php:1378
-#, python-brace-format
 msgid ""
-"The search config setting \"pagination/per_page\" was renamed "
-"\"display/per_page_list\". Check your theme. Matching templates: {json}"
+"The search config setting \"pagination/per_page\" was renamed \"display/"
+"per_page_list\". Check your theme. Matching templates: {json}"
 msgstr ""
 "Arventenn ar c'hefluniadur klask \"pagination/per_page\" zo bet adanvet "
 "\"display/per_page_list\". Gwiriit ho tem. Patromoù a glot : {json}"
 
 #: data/scripts/upgrade.php:1386
-#, python-brace-format
 msgid ""
 "The search config setting \"sort/fields\" was renamed \"display/sort_list\" "
 "and label \"sort/label\" was renamed \"display/label_sort\". Check your "
 "theme. Matching templates: {json}"
 msgstr ""
-"Arventenn kefluniadur ar glask \"sort/fields\" a zo bet adanvet "
-"\"display/sort_list\" hag an etikedenn \"sort/label\" a zo bet adanvet "
-"\"display/label_sort\". Gwiriit ho tem. Patromoù a glot : {json}"
+"Arventenn kefluniadur ar glask \"sort/fields\" a zo bet adanvet \"display/"
+"sort_list\" hag an etikedenn \"sort/label\" a zo bet adanvet \"display/"
+"label_sort\". Gwiriit ho tem. Patromoù a glot : {json}"
 
 #: data/scripts/upgrade.php:1394
-#, python-brace-format
 msgid ""
 "The variable \"$resourceName\" was renamed \"$resourceType\". Check your "
 "theme. Matching templates: {json}"
@@ -1694,16 +1697,14 @@ msgstr ""
 "tem. Patromoù a glot : {json}"
 
 #: data/scripts/upgrade.php:1402
-#, python-brace-format
 msgid ""
 "The template for sort-selector was simplified. See view/search/sort-"
 "selector.phtml. Check your theme. Matching templates: {json}"
 msgstr ""
-"Simplennet eo bet ar patrom evit sort-selector. Sellit ouzh view/search"
-"/sort-selector.phtml. Gwiriit ho tem. Patromoù a glot : {json}"
+"Simplennet eo bet ar patrom evit sort-selector. Sellit ouzh view/search/sort-"
+"selector.phtml. Gwiriit ho tem. Patromoù a glot : {json}"
 
 #: data/scripts/upgrade.php:1410
-#, python-brace-format
 msgid ""
 "The use of the view helper searchingFilters() is deprecated. Use "
 "$searchConfig->renderSearchFilters() instead. Check your theme. Matching "
@@ -1714,7 +1715,6 @@ msgstr ""
 "glot : {json}"
 
 #: data/scripts/upgrade.php:1573
-#, python-brace-format
 msgid ""
 "The search type \"{type}\" is no more managed and should be migrated "
 "manually in search config #{search_config_id}."
@@ -1742,8 +1742,7 @@ msgid ""
 "attributes can be passed from the config."
 msgstr ""
 "Ar siloù a zo bremañ elfennoù html standard Omeka pe Laminas, neuze e "
-"c'haller tremen an holl zibaboù hag an holl berzhioù adalek ar "
-"c'hefluniadur."
+"c'haller tremen an holl zibaboù hag an holl berzhioù adalek ar c'hefluniadur."
 
 #: data/scripts/upgrade.php:1713
 msgid ""
@@ -1763,7 +1762,8 @@ msgstr ""
 "skodenn ha chom war ar furmskrid)."
 
 #: data/scripts/upgrade.php:1723
-msgid "The autosuggester can be enabled for any filter in advanced search form."
+msgid ""
+"The autosuggester can be enabled for any filter in advanced search form."
 msgstr ""
 "Gallout a reer gweredekaat an emc'hinniger evit forzh peseurt sil e "
 "furmskrid ar c'hlask araokaet."
@@ -1773,8 +1773,8 @@ msgid ""
 "It is now possible to display all resources (item sets, items, etc.) "
 "together in results or to separate them, like in previous versions."
 msgstr ""
-"Bremañ e c'haller diskouez an holl danvezioù (strolladoù elfennoù, elfennoù,"
-" hag all) a-gevret en disoc'hoù pe o zispartiañ, evel er stummoù kent."
+"Bremañ e c'haller diskouez an holl danvezioù (strolladoù elfennoù, elfennoù, "
+"hag all) a-gevret en disoc'hoù pe o zispartiañ, evel er stummoù kent."
 
 #: data/scripts/upgrade.php:1733
 msgid ""
@@ -1819,17 +1819,17 @@ msgid ""
 "It is now possible to configure the redirect to search for each item set "
 "separately in site settings."
 msgstr ""
-"Bremañ e c'haller kefluniañ an adkas evit klask pep strollad elfennoù "
-"a-zisrann e keflunioù al lec'hienn."
+"Bremañ e c'haller kefluniañ an adkas evit klask pep strollad elfennoù a-"
+"zisrann e keflunioù al lec'hienn."
 
 #: data/scripts/upgrade.php:1843
-msgid "Any item set can be redirected to the search page or any site page or url."
+msgid ""
+"Any item set can be redirected to the search page or any site page or url."
 msgstr ""
 "Gallout a reer adheñchañ forzh peseurt strollad traezoù war-du pajenn ar "
 "c'hlask, pe war-du forzh peseurt pajenn lec'hienn pe URL."
 
 #: data/scripts/upgrade.php:1857
-#, python-brace-format
 msgid ""
 "The form element \"reset\" was renamed \"form-reset\" to avoid issues with "
 "javascript. You should fix your theme first: {json}"
@@ -1839,7 +1839,6 @@ msgstr ""
 "{json}"
 
 #: data/scripts/upgrade.php:1896
-#, python-brace-format
 msgid ""
 "Some search page configs were enabled for site \"{site_slug}\", because the "
 "navigation uses them."
@@ -1848,7 +1847,6 @@ msgstr ""
 "\"{site_slug}\", peogwir e ra ar merdeiñ ganto."
 
 #: data/scripts/upgrade.php:1913
-#, python-brace-format
 msgid ""
 "The search config setting \"display\" was renamed \"results\". Check your "
 "theme. Matching templates: {json}"
@@ -1872,24 +1870,25 @@ msgstr ""
 "An dibab \"Enrollañ pe Testenn glok\" a c'haller kefluniañ bremañ gant an "
 "anv all \"full_text\" evit termeniñ perzhioù gant testenn glok."
 
-#: Module.php:130 data/scripts/upgrade.php:2028
+#: data/scripts/upgrade.php:2028 Module.php:134
 msgid ""
-"The module Reference is required to use the facets with the default internal"
-" adapter, but not for the Solr adapter."
+"The module Reference is required to use the facets with the default internal "
+"adapter, but not for the Solr adapter."
 msgstr ""
 "Ret eo ar modul Reference evit implijout ar facetennoù gant an adapter "
 "diabarzh dre ziouer, met n'eo ket evit adapter Solr."
 
-#: Module.php:133 Module.php:148 data/scripts/upgrade.php:2031
-#, python-brace-format
+#: data/scripts/upgrade.php:2031 Module.php:137 Module.php:152
 msgid "The module {module} should be upgraded to version {version} or later."
 msgstr ""
 "Ar modul {module} a rank bezañ hizivaet d'ar stumm {version} pe d'ur stumm "
 "nevesoc'h."
 
 #: data/scripts/upgrade.php:2055
-msgid "It is now possible to limit filters and facets to the language of the site."
-msgstr "Bremañ e c'haller bevenniñ ar siloù hag an tuelloù da yezh al lec'hienn."
+msgid ""
+"It is now possible to limit filters and facets to the language of the site."
+msgstr ""
+"Bremañ e c'haller bevenniñ ar siloù hag an tuelloù da yezh al lec'hienn."
 
 #: data/scripts/upgrade.php:2071
 msgid ""
@@ -1909,23 +1908,23 @@ msgstr ""
 
 #: data/scripts/upgrade.php:2153
 msgid ""
-"A resource page block has been added, in particular to search inside an item"
-" set."
+"A resource page block has been added, in particular to search inside an item "
+"set."
 msgstr ""
-"Ouzhpennet ez eus bet ur bloc'had pajenn danvezioù, dreist-holl evit klask "
-"e-barzh un hollad elfennoù."
+"Ouzhpennet ez eus bet ur bloc'had pajenn danvezioù, dreist-holl evit klask e-"
+"barzh un hollad elfennoù."
 
 #: data/scripts/upgrade.php:2157
 msgid ""
 "The css of the sidebar for facets and the css for structure of a thesaurus "
-"or a a hierarchy of item sets were simplified. You may check the search "
-"page."
+"or a a hierarchy of item sets were simplified. You may check the search page."
 msgstr ""
 "Simpliet eo bet CSS barrenn-gostez ar facetennoù ha CSS framm un tezaour pe "
 "ur renkad a strolladoù elfennoù. Gallout a rit gwiriañ pajenn ar c'hlask."
 
 #: data/scripts/upgrade.php:2164
-msgid "It is now possible to redirect the page to browse item sets to a search page."
+msgid ""
+"It is now possible to redirect the page to browse item sets to a search page."
 msgstr ""
 "Bremañ e c'haller adkas ar bajenn evit merdeiñ an holladadoù da ur bajenn "
 "glask."
@@ -1939,7 +1938,8 @@ msgstr ""
 "daolenn-wel `search/results`. Gwiriit an dra-se ma'z eo personelaet an tem."
 
 #: data/scripts/upgrade.php:2176
-msgid "It is now possible to add boost multiplier for specific index (Solr only)."
+msgid ""
+"It is now possible to add boost multiplier for specific index (Solr only)."
 msgstr ""
 "Posupl eo bremañ ouzhpennañ ur liesaer boost evit un indeks resis (Solr "
 "hepken)."
@@ -1979,11 +1979,10 @@ msgid ""
 "your suggesters to enable site-specific suggestions."
 msgstr ""
 "Optimiset e oa bet indeksadur ar c'hinniger evit ar c'hlask dre lec'hienn. "
-"Adindekset ho kinnigerien, mar plij, evit gallout kinnig erbedadennoù diouzh"
-" al lec'hienn."
+"Adindekset ho kinnigerien, mar plij, evit gallout kinnig erbedadennoù diouzh "
+"al lec'hienn."
 
 #: data/scripts/upgrade.php:3090
-#, python-brace-format
 msgid "{count} stored queries have been normalized to standard Omeka format."
 msgstr "{count} reked stoket zo bet reizhet hervez ar furmad standard Omeka."
 
@@ -1994,11 +1993,10 @@ msgid ""
 "sites."
 msgstr ""
 "Tennet eo bet ar vaezienn glask \"properties-improved\", a zo dilezet, ha "
-"kemeret eo bet he lec'h gant \"properties\" ha \"filters\" en admin, pe gant"
-" \"filters\" hepken er sites."
+"kemeret eo bet he lec'h gant \"properties\" ha \"filters\" en admin, pe gant "
+"\"filters\" hepken er sites."
 
 #: data/scripts/upgrade.php:3133
-#, python-brace-format
 msgid ""
 "The rss/atom feed feature for search pages has been moved to the module "
 "{link}Feed{link_end}. Install it to keep feed urls on search pages."
@@ -2024,11 +2022,10 @@ msgid ""
 msgstr ""
 "Dibaboù nevez zo hegerz evit ar siloù klask standart ha modul : seurtadoù "
 "rekedoù keflunius, an ereer \"not\" (a eeuna an oberierien negativel), hag "
-"emleunadur an talvoudoù sil (goulenn a ra ar modul Reference pe SearchSolr)."
-" Gwiriit arventennoù pennañ ha re al lec'hienn."
+"emleunadur an talvoudoù sil (goulenn a ra ar modul Reference pe SearchSolr). "
+"Gwiriit arventennoù pennañ ha re al lec'hienn."
 
 #: data/scripts/upgrade.php:3348
-#, python-brace-format
 msgid ""
 "Fixed {count} entries with double-encoded query strings introduced by the "
 "previous upgrade."
@@ -2064,28 +2061,25 @@ msgstr ""
 "vaezienn er siloù oberiant hag er fasadoù oberiant."
 
 #: data/scripts/upgrade.php:3533
-#, python-brace-format
 msgid ""
-"Migrated hidden query filters to the flat format: {configs} search config(s)"
-" and {sites} site setting(s) updated. The legacy URL form "
-"(property[N][property|type|text]) was silently ignored by AdvancedSearch."
+"Migrated hidden query filters to the flat format: {configs} search config(s) "
+"and {sites} site setting(s) updated. The legacy URL form (property[N]"
+"[property|type|text]) was silently ignored by AdvancedSearch."
 msgstr ""
 "Dilec'hiet eo bet ar siloù rekedoù kuzh d'ar furmad plat : {configs} klask "
-"ar c'hefluniad(où) ha {sites} arventenn(où) al lec'hienn hizivaet. Ar furmad"
-" URL kozh (property[N][property|type|text]) a oa bet lezet a-gostez didrouz "
+"ar c'hefluniad(où) ha {sites} arventenn(où) al lec'hienn hizivaet. Ar furmad "
+"URL kozh (property[N][property|type|text]) a oa bet lezet a-gostez didrouz "
 "gant AdvancedSearch."
 
-#: data/scripts/upgrade.php:3573
+#: data/scripts/upgrade.php:3580
 msgid ""
 "A new option allows to enable the pagination for facets. You may need to "
 "check your facets if you use a custom theme."
 msgstr ""
 "Un dibab nevez a ro an tu da gweredekaat ar pajennañ evit an tuelloù. "
-"Marteze e vo ret deoc'h gwiriañ hoc'h tuelloù ma implijit un tem "
-"personelaet."
+"Marteze e vo ret deoc'h gwiriañ hoc'h tuelloù ma implijit un tem personelaet."
 
-#: data/scripts/upgrade.php:3658
-#, python-brace-format
+#: data/scripts/upgrade.php:3665
 msgid ""
 "Search config availability was repaired for sites referencing search pages "
 "absent from \"Available search pages\": {sites}."
@@ -2093,22 +2087,32 @@ msgstr ""
 "Dreset eo bet hegerzhded ar c'hefluniadur klask evit al lec'hiennoù a rae "
 "dave da bajennoù klask a oa ezvezant eus \"Pajennoù klask hegerz\": {sites}."
 
-#: Module.php:153
-#, python-brace-format
+#: data/scripts/upgrade.php:3711
+msgid ""
+"The form adapter \"api\" was removed: api queries are now handled natively "
+"by every engine. The search configs using it were switched to the standard "
+"form adapter and keep their engine: {names}. The api redirection of the main "
+"settings is unchanged."
+msgstr ""
+"Lamet eo bet an azasaer furmskrid \"api\" : bremañ e vez meret ar goulennoù "
+"api ent-genidik gant pep keflusker. Ar c'hefluniadurioù klask a rae gantañ "
+"zo bet treuzkaset d'an azasaer furmskrid standard ha mirout a reont o "
+"c'heflusker : {names}. Adheñchadenn api an arventennoù pennañ n'eo ket "
+"cheñchet."
+
+#: Module.php:157
 msgid "The module {module} can be reenabled."
 msgstr "Gallout a reer adweredekaat ar modul {module}."
 
-#: Module.php:1577
-#, python-brace-format
+#: Module.php:1581
 msgid "Unable to launch indexing metadata: {message}"
 msgstr "N'haller ket loc'hañ ar metaroadennoù endeksadur: {message}"
 
-#: Module.php:1581
+#: Module.php:1585
 msgid "Unable to launch indexing metadata: see log."
 msgstr "N'haller ket loc'hañ ar metaroadennoù endeksadur : sellit ouzh al log."
 
-#: Module.php:1750
-#, python-brace-format
+#: Module.php:1754
 msgid ""
 "Unable to delete the search index for resource #{resource_id} in search "
 "engine \"{name}\": {message}"
@@ -2116,31 +2120,19 @@ msgstr ""
 "N'haller ket diverkañ meneger an enklask evit ar vammenn #{resource_id} er "
 "c'heflusker enklask \"{name}\": {message}"
 
-#: Module.php:1755
-#, python-brace-format
+#: Module.php:1759
 msgid ""
-"Unable to delete the search index for the deleted resource #{resource_id} in"
-" search engine \"{name}\": see log."
+"Unable to delete the search index for the deleted resource #{resource_id} in "
+"search engine \"{name}\": see log."
 msgstr ""
 "N'haller ket diverkañ meneger an enklask evit ar vammenn ziverket "
 "#{resource_id} er c'heflusker enklask \"{name}\": sellit ouzh al log."
 
-#: Module.php:1856
-#, python-brace-format
+#: Module.php:1860
 msgid "AdvancedSearch cron: unable to launch reindexation: {message}"
 msgstr "AdvancedSearch cron: n'haller ket loc'hañ an adindeksadur: {message}"
 
-#: Module.php:2098
-#, python-brace-format
-msgid ""
-"The internal search engine (sql) can be edited in the {link_url}search "
-"manager{link_end}."
-msgstr ""
-"Gallout a reer kemmañ ar c'heflusker enklask diabarzh (sql) e "
-"{link_url}merer an enklaskoù{link_end}."
-
-#: Module.php:2134
-#, python-brace-format
+#: Module.php:2110
 msgid ""
 "The {link_url}internal suggester{link_end} (sql) will be available after "
 "indexation."
@@ -2148,18 +2140,24 @@ msgstr ""
 "Ar {link_url}kinniger diabarzh{link_end} (sql) a vo hegerz goude an "
 "endeksadur."
 
-#: Module.php:2171
-#, python-brace-format
+#: Module.php:2148
 msgid ""
-"The default search config can be {link_1}edited{link_end}, "
-"{link_2}configured{link_end} and defined in the {link_3}main "
-"settings{link_end} for admin search and in each site settings for public "
-"search."
+"The default search config can be {link_1}edited{link_end}, {link_2}"
+"configured{link_end} and defined in the {link_3}main settings{link_end} for "
+"admin search and in each site settings for public search."
 msgstr ""
 "Gallout a reer {link_1}kemmañ{link_end}, {link_2}kefluniañ{link_end} ha "
 "termeniñ ar gefluniadur klask dre ziouer e {link_3}arventennoù "
 "pennañ{link_end} evit ar c'hlask merour, hag e arventennoù pep lec'hienn "
 "evit ar c'hlask foran."
+
+#: Module.php:2197
+msgid ""
+"The internal search engine \"{name}\" (sql) can be edited in the {link_url}"
+"search manager{link_end}."
+msgstr ""
+"Gallout a reer kemmañ ar c'heflusker enklask diabarzh \"{name}\" (sql) e "
+"{link_url}merer an enklaskoù{link_end}."
 
 #: view/common/advanced-search/has-thumbnails.phtml:13
 msgid "Presence of thumbnails"
@@ -2169,10 +2167,10 @@ msgstr "Bezañs bihan-skeudennoù"
 msgid "Has no thumbnails"
 msgstr "N'eus bihan-skeudenn ebet"
 
-#: view/common/advanced-search/has-asset.phtml:19
-#: view/common/advanced-search/has-media-radio.phtml:24
-#: view/common/advanced-search/has-original.phtml:19
 #: view/common/advanced-search/has-thumbnails.phtml:19
+#: view/common/advanced-search/has-media-radio.phtml:24
+#: view/common/advanced-search/has-asset.phtml:19
+#: view/common/advanced-search/has-original.phtml:19
 #: view/common/advanced-search/visibility-radio.phtml:24
 msgid "Any"
 msgstr "Forzh peseurt"
@@ -2193,7 +2191,8 @@ msgstr "N'en deus madoù ebet"
 msgid "Presence of original file"
 msgstr "Bezañs ar restr orin"
 
-#: config/module.config.php:685 view/common/advanced-search/has-original.phtml:16
+#: view/common/advanced-search/has-original.phtml:16
+#: config/module.config.php:683
 msgid "Has original file"
 msgstr "Gant ar restr orin"
 
@@ -2201,13 +2200,13 @@ msgstr "Gant ar restr orin"
 msgid "Has no original file"
 msgstr "N'eus ket a restr orin"
 
-#: view/common/advanced-search/media-type-improved.phtml:19
 #: view/common/advanced-search/media-types.phtml:19
+#: view/common/advanced-search/media-type-improved.phtml:19
 msgid "Search by media type"
 msgstr "Klask dre seurt media"
 
-#: view/common/advanced-search/media-type-improved.phtml:28
 #: view/common/advanced-search/media-types.phtml:28
+#: view/common/advanced-search/media-type-improved.phtml:28
 msgid "Select media types…"
 msgstr "Diuzit seurtadoù media…"
 
@@ -2230,9 +2229,9 @@ msgstr "Diuzit ar seurt roadenn bennañ…"
 msgid "[any metadata]"
 msgstr "[metaroadennoù forzh peseurt]"
 
+#: view/common/advanced-search/media-item-sets.phtml:27
 #: src/Form/SiteSettingsFieldset.php:102 src/Form/SiteSettingsFieldset.php:121
 #: src/Form/SiteSettingsFieldset.php:140
-#: view/common/advanced-search/media-item-sets.phtml:27
 msgid "Select item sets…"
 msgstr "Diuzit an hollad traezoù…"
 
@@ -2266,21 +2265,15 @@ msgid "[Undefined]"
 msgstr "[Dizifinet]"
 
 #: src/FormAdapter/AbstractFormAdapter.php:133
-#: src/FormAdapter/ApiFormAdapter.php:71
 msgid "Not implemented in this form adapter."
 msgstr "N'eo ket lakaet e pleustr en azasaer furmskrid-mañ."
 
-#: src/FormAdapter/ApiFormAdapter.php:21
-msgid "Api"
-msgstr "Gwenan"
-
 #: src/FormAdapter/TraitFormAdapterClassic.php:528
-#, python-brace-format
 msgid "The search config {search_config} has no form adapter."
-msgstr "N'eus adapter furmskrid ebet gant ar c'hefluniadur klask {search_config}."
+msgstr ""
+"N'eus adapter furmskrid ebet gant ar c'hefluniadur klask {search_config}."
 
 #: src/FormAdapter/TraitFormAdapterClassic.php:541
-#, python-brace-format
 msgid ""
 "The search config {search_config} has a unavailable form adapter "
 "{form_adapter}."
@@ -2289,7 +2282,6 @@ msgstr ""
 "{form_adapter} n'eo ket hegerz."
 
 #: src/FormAdapter/TraitFormAdapterClassic.php:784
-#, python-brace-format
 msgid ""
 "Query error: {message}\n"
 "Query: {json_query}"
@@ -2297,14 +2289,13 @@ msgstr ""
 "Fazi en reked : {message}\n"
 "Reked : {json_query}"
 
-#: src/Mvc/Controller/Plugin/ApiSearch.php:562
-#, python-brace-format
+#: src/Mvc/Controller/Plugin/ApiSearch.php:476
 msgid ""
 "The \"{field}\" field is not available for returnScalar in resource type "
 "\"{type}\"."
 msgstr ""
-"N'eo ket hegerz ar park \"{field}\" evit returnScalar e seurt danvez "
-"\"{type}\"."
+"N'eo ket hegerz ar park \"{field}\" evit returnScalar e seurt danvez \"{type}"
+"\"."
 
 #: src/View/Helper/FieldSelect.php:32
 msgid "Select metadata…"
@@ -2319,18 +2310,15 @@ msgstr ""
 "$searchConfig->renderSearchFilters() en e lec'h."
 
 #: src/View/Helper/AbstractFacet.php:214
-#, python-brace-format
 msgid ""
 "[AdvancedSearch] {count} facet values for field \"{field}\" were skipped "
-"because they have no label or are not in the current site (sample: "
-"{sample})."
+"because they have no label or are not in the current site (sample: {sample})."
 msgstr ""
 "[AdvancedSearch] Talvoudoù ar fasadenn {count} evit ar park \"{field}\" zo "
-"bet lamet rak n'o deus etikedenn ebet pe n'emaint ket war al lec'hienn "
-"a-vremañ (skouer: {sample})."
+"bet lamet rak n'o deus etikedenn ebet pe n'emaint ket war al lec'hienn a-"
+"vremañ (skouer: {sample})."
 
 #: src/View/Helper/AbstractFacetTree.php:287
-#, python-brace-format
 msgid ""
 "For facet \"{field}\", the thesaurus is not defined. Set it as option "
 "thesaurus = id."
@@ -2339,26 +2327,22 @@ msgstr ""
 "anezhañ evel un dibab : thesaurus = id."
 
 #: src/View/Helper/SearchingUrl.php:36
-#, python-brace-format
 msgid "Search engine #{search_config} does not exist."
 msgstr "N'eus ket eus ar c'heflusker enklask #{search_config}."
 
 #: src/View/Helper/SearchingUrl.php:41
-#, python-brace-format
 msgid "Search engine {name} (#{search_config}) is not available."
 msgstr "N'eo ket hegerz ar c'heflusker enklask {name} (#{search_config})."
 
 #: src/Job/IndexSuggestions.php:77
-#, python-brace-format
 msgid ""
 "Suggester #{search_suggester_id} (\"{name}\"): Only search engine with the "
 "internal adapter (sql) can be indexed."
 msgstr ""
-"Kinniger #{search_suggester_id} (\"{name}\"): N'hall nemet al lusker enklask"
-" gant an azaser diabarzh (sql) bezañ menegeret."
+"Kinniger #{search_suggester_id} (\"{name}\"): N'hall nemet al lusker enklask "
+"gant an azaser diabarzh (sql) bezañ menegeret."
 
 #: src/Job/IndexSuggestions.php:96
-#, python-brace-format
 msgid ""
 "Suggester #{search_suggester_id} (\"{name}\"): there is no resource type to "
 "index."
@@ -2367,7 +2351,6 @@ msgstr ""
 "endeksañ."
 
 #: src/Job/IndexSuggestions.php:108
-#, python-brace-format
 msgid ""
 "Suggester #{search_suggester_id} (\"{name}\"): There are already {total} "
 "other jobs \"Index Suggestion\" and the current one is not forced."
@@ -2376,7 +2359,6 @@ msgstr ""
 "{total} labour all \"Index Suggestion\" ha n'eo ket rediet an hini a-vremañ."
 
 #: src/Job/IndexSuggestions.php:118
-#, python-brace-format
 msgid ""
 "There are already {total} other jobs \"Index Suggestions\". Slowdowns may "
 "occur."
@@ -2385,7 +2367,6 @@ msgstr ""
 "gorrekadurioù c'hoarvezout."
 
 #: src/Job/IndexSuggestions.php:127
-#, python-brace-format
 msgid ""
 "Suggester #{search_suggester_id} (\"{name}\"): start of indexing (mode: "
 "{mode})."
@@ -2394,7 +2375,6 @@ msgstr ""
 "{mode})."
 
 #: src/Job/IndexSuggestions.php:137
-#, python-brace-format
 msgid ""
 "Suggester #{search_suggester_id} (\"{name}\"): end of indexing. {total} "
 "suggestions indexed. Execution time: {duration} seconds."
@@ -2409,11 +2389,10 @@ msgstr "N'eus keflusker klask ebet termenet da vezañ menegeret."
 #: src/Job/IndexSearch.php:182
 msgid "No search engine is defined to index the specified resource types."
 msgstr ""
-"N'eus keflusker enklask ebet termenet evit menegeriañ ar seurtadoù danvezioù"
-" spisaet."
+"N'eus keflusker enklask ebet termenet evit menegeriañ ar seurtadoù danvezioù "
+"spisaet."
 
 #: src/Job/IndexSearch.php:193
-#, python-brace-format
 msgid ""
 "Search index #{search_engine_id} (\"{name}\"): the list of resource ids "
 "contains invalid ids."
@@ -2422,7 +2401,6 @@ msgstr ""
 "danvezioù ez eus IDoù direizh."
 
 #: src/Job/IndexSearch.php:206
-#, python-brace-format
 msgid ""
 "Search index #{search_engine_id} (\"{name}\"): There are already {total} "
 "other jobs \"Index Search\" (#{list}) and the current one is not forced."
@@ -2431,7 +2409,6 @@ msgstr ""
 "labour all \"Index Search\" (#{list}) hag an hini a-vremañ n'eo ket rediet."
 
 #: src/Job/IndexSearch.php:217
-#, python-brace-format
 msgid ""
 "There are already {total} other jobs \"Index Search\". Slowdowns may occur "
 "on the site."
@@ -2440,7 +2417,6 @@ msgstr ""
 "gorrekadurioù c'hoarvezout war al lec'hienn."
 
 #: src/Job/IndexSearch.php:227
-#, python-brace-format
 msgid "Reindexing starts at resource #{resource_id}."
 msgstr "Adindeksadur a grog gant ar vammenn #{resource_id}."
 
@@ -2453,7 +2429,6 @@ msgid "Process done with a new entity manager"
 msgstr "Argerzh graet gant ur merour ensavadurioù nevez"
 
 #: src/Job/IndexSearch.php:298
-#, python-brace-format
 msgid ""
 "End of indexing. Execution time: {duration} seconds. Max memory: {memory}. "
 "Failed indexed resources should be checked manually."
@@ -2462,7 +2437,6 @@ msgstr ""
 "{memory}. An danvezioù endekset c'hwitet a rank bezañ gwiriet gant an dorn."
 
 #: src/Job/IndexSearch.php:322
-#, python-brace-format
 msgid ""
 "Search index #{search_engine_id} (\"{name}\"): there is no resource type to "
 "index or the indexation is not needed."
@@ -2471,7 +2445,6 @@ msgstr ""
 "zindeksiñ pe n'eus ket ezhomm eus an dindeksiñ."
 
 #: src/Job/IndexSearch.php:339
-#, python-brace-format
 msgid ""
 "Search index #{search_engine_id} (\"{name}\"): Only {visibility} resources "
 "will be indexed."
@@ -2480,7 +2453,6 @@ msgstr ""
 "{visibility} a vo indexet."
 
 #: src/Job/IndexSearch.php:347
-#, python-brace-format
 msgid "Search index #{search_engine_id} (\"{name}\"): start of indexing"
 msgstr "Klask en deiz #{search_engine_id} (\"{name}\"): deroù an deizadur"
 
@@ -2497,12 +2469,11 @@ msgid "Search index is fully cleared."
 msgstr "Goullonderet eo bet ar meneger enklask penn-da-benn."
 
 #: src/Job/IndexSearch.php:432
-#, python-brace-format
 msgid "Error loading batch #{number} of {resource_type}: {message}. Skipping."
-msgstr "Fazi o kargañ ar strollad #{number} eus {resource_type}: {message}. Lamet."
+msgstr ""
+"Fazi o kargañ ar strollad #{number} eus {resource_type}: {message}. Lamet."
 
 #: src/Job/IndexSearch.php:445
-#, python-brace-format
 msgid ""
 "Batch #{number} of {resource_type}: {count} resources skipped (private, "
 "deleted, or filtered by module)."
@@ -2511,7 +2482,6 @@ msgstr ""
 "diverket, pe silet gant ur modul)."
 
 #: src/Job/IndexSearch.php:470
-#, python-brace-format
 msgid "Indexing of {resource_type} #{resource_id} failed: {message}"
 msgstr "C'hwitet war endeksadur {resource_type} #{resource_id} : {message}"
 
@@ -2520,33 +2490,32 @@ msgid "message"
 msgstr "kemennadenn"
 
 #: src/Job/IndexSearch.php:519
-#, python-brace-format
 msgid "Final commit failed for {resource_type}: {message}"
 msgstr "C'hwitet eo ar c'hommit diwezhañ evit {resource_type}: {message}"
 
-#: src/Job/IndexSearch.php:529 src/Job/IndexSearch.php:558
-#, python-brace-format
+#: src/Job/IndexSearch.php:529 src/Job/IndexSearch.php:572
 msgid "{resource_type}: {count} indexed"
 msgstr "{resource_type} : {count} menegeret"
 
 #: src/Job/IndexSearch.php:537
-#, python-brace-format
 msgid ""
 "Search index #{search_engine_id} (\"{name}\"): end of indexing. {results}. "
 "Execution time: {duration} seconds. Failed indexed resources should be "
 "checked manually."
 msgstr ""
-"Klask en deiz #{search_engine_id} (\"{name}\"): fin an deiziadur. {results}."
-" Amzer seveniñ: {duration} eilenn. An danvezioù deiziet c'hwitet a rank "
-"bezañ gwiriet gant an dorn."
+"Klask en deiz #{search_engine_id} (\"{name}\"): fin an deiziadur. {results}. "
+"Amzer seveniñ: {duration} eilenn. An danvezioù deiziet c'hwitet a rank bezañ "
+"gwiriet gant an dorn."
 
-#: src/Job/IndexSearch.php:568
-#, python-brace-format
+#: src/Job/IndexSearch.php:555
+msgid "Post-reindex finalization failed: {message}"
+msgstr "C'hwitet eo bet ar peurglokaat goude an adindeksadur : {message}"
+
+#: src/Job/IndexSearch.php:582
 msgid "Last indexed resource: {resource_type} #{resource_id}."
 msgstr "Mammenn diwezhañ menegeret : {resource_type} #{resource_id}."
 
-#: src/Job/IndexSearch.php:577
-#, python-brace-format
+#: src/Job/IndexSearch.php:591
 msgid ""
 "Search index #{search_engine_id} (\"{name}\"): the indexing was stopped. "
 "{results}. Execution time: {duration} seconds."
@@ -2554,32 +2523,29 @@ msgstr ""
 "Furchadenn meneger #{search_engine_id} (\"{name}\"): paouezet eo bet an "
 "indexadur. {results}. Amzer seveniñ: {duration} eilenn."
 
-#: src/Job/IndexSearch.php:712
-#, python-brace-format
+#: src/Job/IndexSearch.php:726
 msgid ""
 "Indexing {resource_type}: {indexed}/{total} ({percent}%). Memory: {memory} "
 "MB."
 msgstr ""
-"Endeksadur {resource_type}: {indexed}/{total} ({percent}%). Memor : {memory}"
-" MB."
+"Endeksadur {resource_type}: {indexed}/{total} ({percent}%). Memor : {memory} "
+"MB."
 
-#: src/Job/IndexSearch.php:756
-#, python-brace-format
+#: src/Job/IndexSearch.php:770
 msgid "Dispatched reindex of internal suggester \"{name}\"."
 msgstr "Kaset adindeksadur ar c'hinniger diabarzh \"{name}\"."
 
-#: src/Job/IndexSearch.php:767
-#, python-brace-format
-msgid "Skipped suggester \"{name}\": build on commit is disabled."
-msgstr "Lammet ar c'hinniger \"{name}\": dizurzhiet eo ar sevel diwar ar commit."
-
 #: src/Job/IndexSearch.php:781
-#, python-brace-format
+msgid "Skipped suggester \"{name}\": build on commit is disabled."
+msgstr ""
+"Lammet ar c'hinniger \"{name}\": dizurzhiet eo ar sevel diwar ar commit."
+
+#: src/Job/IndexSearch.php:795
 msgid "Dispatched reindex of Solr suggester \"{name}\"."
 msgstr "Kaset adindeksadur ar c'hinniger Solr \"{name}\"."
 
-#: src/Form/SettingsFieldset.php:27 src/Form/SiteSettingsFieldset.php:24
-#: src/Form/SiteSettingsFieldset.php:28
+#: src/Form/SiteSettingsFieldset.php:24 src/Form/SiteSettingsFieldset.php:28
+#: src/Form/SettingsFieldset.php:27
 #: src/Site/ResourcePageBlockLayout/SearchingForm.php:13
 msgid "Advanced Search (module)"
 msgstr "Klask araokaet (modul)"
@@ -2605,11 +2571,11 @@ msgstr "Siloù goulenn kuzhet dre bajenn glask"
 msgid ""
 "One filter per line, formatted as \"search_config_slug = query_args\" (e.g. "
 "\"recherche = item_set_id[]=151\"). Filters are merged with the search "
-"config \"Hidden query filter\" only on this site, so other sites sharing the"
-" same search page are unaffected."
+"config \"Hidden query filter\" only on this site, so other sites sharing the "
+"same search page are unaffected."
 msgstr ""
-"Ur sil dre linenn, furmadet evel \"search_config_slug = query_args\" (da sk."
-" \"recherche = item_set_id[]=151\"). N'eo kevreet ar siloù gant kefluniadur "
+"Ur sil dre linenn, furmadet evel \"search_config_slug = query_args\" (da sk. "
+"\"recherche = item_set_id[]=151\"). N'eo kevreet ar siloù gant kefluniadur "
 "ar c'hlask \"Hidden query filter\" nemet war al lec'hienn-mañ, neuze n'eus "
 "ket a levezon war al lec'hiennoù all a rann an hevelep pajenn glask."
 
@@ -2652,7 +2618,8 @@ msgstr "151 = darvoudoù"
 
 #: src/Form/SiteSettingsFieldset.php:164
 msgid "Redirect page \"browse item sets\" to a search page"
-msgstr "Adheñchañ ar bajenn \"furchal en strolladoù elfennoù\" war-du ur bajenn glask"
+msgstr ""
+"Adheñchañ ar bajenn \"furchal en strolladoù elfennoù\" war-du ur bajenn glask"
 
 #: src/Form/SiteSettingsFieldset.php:166 src/Form/SiteSettingsFieldset.php:192
 msgid "No redirect"
@@ -2660,7 +2627,8 @@ msgstr "Tamm adkas ebet"
 
 #: src/Form/SiteSettingsFieldset.php:179
 msgid "Redirect page \"browse item sets\" to a site page or a url"
-msgstr "Adheñchañ ar bajenn \"browse item sets\" war-du ur bajenn lec'hienn pe un URL"
+msgstr ""
+"Adheñchañ ar bajenn \"browse item sets\" war-du ur bajenn lec'hienn pe un URL"
 
 #: src/Form/SiteSettingsFieldset.php:190
 msgid "Redirect page \"browse items\" to a search page"
@@ -2752,14 +2720,15 @@ msgstr "Post (n / hollad)"
 
 #: src/Form/SiteSettingsFieldset.php:351
 msgid "Block Resource navigation: fall back to an item set on direct access"
-msgstr "Merdeiñ danvez ar bloc'h : distreiñ war un elfenn lakaet dre ziraez eeun"
+msgstr ""
+"Merdeiñ danvez ar bloc'h : distreiñ war un elfenn lakaet dre ziraez eeun"
 
 #: src/Form/SiteSettingsFieldset.php:352
 msgid ""
 "When no browse context exists (no URL param, no session), show a navigation "
 "within an item set of the item. \"First\" picks the first item set; a "
-"property sorts the item sets by that property value and picks the first with"
-" a non-empty value."
+"property sorts the item sets by that property value and picks the first with "
+"a non-empty value."
 msgstr ""
 "Pa ne vez ket a gendestenn merdeiñ (parametreg URL ebet, sesion ebet), "
 "diskouez ur merdeiñ e-barzh un hollad elfennoù eus an elfenn. \"First\" a "
@@ -2795,7 +2764,8 @@ msgstr "Ouzhpennañ testenn alt XML d'ar c'hlask war an destenn klok"
 msgid ""
 "Allow to search text stored in xml alto files without including it in a "
 "property."
-msgstr "Aotren klask testenn stoket e restroù alto xml hep he lakaat en ur perzh."
+msgstr ""
+"Aotren klask testenn stoket e restroù alto xml hep he lakaat en ur perzh."
 
 #: src/Form/SettingsFieldset.php:66
 msgid "Default search page in admin side bar"
@@ -2825,22 +2795,24 @@ msgstr "Diuzit ar c'hefluniadur evit ur c'hlask API prim…"
 msgid "Metadata field"
 msgstr "Park roadennoù-stur"
 
-#: src/Form/Admin/SearchConfigFilterFieldset.php:351
 #: src/Form/SearchFilter/Advanced.php:159
+#: src/Form/Admin/SearchConfigFilterFieldset.php:351
 msgid "Remove this filter"
 msgstr "Lemel ar sil-mañ"
 
-#: src/Controller/Admin/SearchConfigController.php:913
 #: src/Form/SearchFilter/Advanced.php:211
-msgid "The indexes of the advanced filters are not present in the search engine."
+#: src/Controller/Admin/SearchConfigController.php:1102
+msgid ""
+"The indexes of the advanced filters are not present in the search engine."
 msgstr "N'emañ ket menegerioù ar siloù araokaet er c'heflusker enklask."
 
 #: src/Form/SearchFilter/Advanced.php:215
-msgid "Some indexes of the advanced filters are not present in the search engine."
+msgid ""
+"Some indexes of the advanced filters are not present in the search engine."
 msgstr "N'eus ket lod eus menegerioù ar siloù araokaet er c'heflusker enklask."
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:708
 #: src/Form/Element/FieldSelect.php:185
+#: src/Form/Admin/SearchConfigConfigureForm.php:708
 msgid "Fields"
 msgstr "Parkoù"
 
@@ -2851,86 +2823,6 @@ msgstr "A-berzh"
 #: src/Form/Element/RangeDouble.php:37 src/Form/MainSearchForm.php:787
 msgid "To"
 msgstr "Da"
-
-#: src/Form/Admin/ApiFormConfigFieldset.php:26
-msgid "Specific settings"
-msgstr "Arventennoù resis"
-
-#: src/Form/Admin/ApiFormConfigFieldset.php:35
-msgid "All options should be updated when the search engine is updated"
-msgstr "An holl zibaboù a zlefe bezañ hizivaet pa vez hizivaet ar c'heflusker enklask"
-
-#: src/Form/Admin/ApiFormConfigFieldset.php:46
-msgid "Maximum number of results by response"
-msgstr "Niver brasañ a zisoc'hoù dre respont"
-
-#: src/Form/Admin/ApiFormConfigFieldset.php:47
-msgid ""
-"It is recommended to keep the value low (under 100 or 1000) to avoid "
-"overload of the server, or to use a paginator."
-msgstr ""
-"Erbedet e vez derc'hel an talvoud izel (dindan 100 pe 1000) evit mirout ouzh"
-" ar servijer a vezañ re beleket, pe implijout ur pajenner."
-
-#: src/Form/Admin/ApiFormConfigFieldset.php:62
-msgid "Mapping metadata to search fields"
-msgstr "Kevreañ ar metaroadennoù ouzh ar maeziennoù klask"
-
-#: src/Form/Admin/ApiFormConfigFieldset.php:73
-msgid "Internal id"
-msgstr "ID diabarzh"
-
-#: src/Form/Admin/ApiFormConfigFieldset.php:87
-msgid "Is Public"
-msgstr "Foran"
-
-#: src/Form/Admin/ApiFormConfigFieldset.php:101
-msgid "Owner id"
-msgstr "ID ar perc'henn"
-
-#: src/Form/Admin/ApiFormConfigFieldset.php:115
-msgid "Site id"
-msgstr "ID al lec'hienn"
-
-#: src/Form/Admin/ApiFormConfigFieldset.php:157
-msgid "Resource class label"
-msgstr "Etikedenn klas danvez"
-
-#: src/Form/Admin/ApiFormConfigFieldset.php:171
-msgid "Resource class id"
-msgstr "ID klas ar resurs"
-
-#: src/Form/Admin/ApiFormConfigFieldset.php:185
-msgid "Resource template id"
-msgstr "ID patrom ar vammenn"
-
-#: src/Form/Admin/ApiFormConfigFieldset.php:199
-msgid "Item set id"
-msgstr "ID an hollad elfennoù"
-
-#: src/Form/Admin/ApiFormConfigFieldset.php:276
-msgid "Mapping between source (omeka) and destination (search engine)"
-msgstr "Kartaerezh etre ar vammenn (Omeka) hag an termen (keflusker enklask)"
-
-#: src/Form/Admin/ApiFormConfigFieldset.php:291
-msgid "Available source fields for mapping"
-msgstr "Maeziennoù mammenn hegerz evit ar c'hartaouiñ"
-
-#: src/Form/Admin/ApiFormConfigFieldset.php:292
-msgid "List of all available properties to use above."
-msgstr "Roll an holl berzhioù hegerz da implijout a-us."
-
-#: src/Form/Admin/ApiFormConfigFieldset.php:306
-msgid "Available destination fields for mapping"
-msgstr "Maeziennoù pal hegerz evit ar gartennadur"
-
-#: src/Form/Admin/ApiFormConfigFieldset.php:307
-msgid "List of all available fields to use above."
-msgstr "Roll an holl dachennoù hegerz da implijout a-us."
-
-#: src/Form/Admin/ApiFormConfigFieldset.php:328
-msgid "Sort (for internal use only, don’t modify it)"
-msgstr "Renkañ (evit un implij diabarzh hepken, na gemmit ket anezhañ)"
 
 #: src/Form/Admin/SearchConfigForm.php:86
 #: src/Form/Admin/SearchConfigSettingsFieldset.php:63
@@ -2971,9 +2863,9 @@ msgstr "etikedenn-stumm-diazez"
 msgid "Sort field"
 msgstr "Tachenn rummañ"
 
+#: src/Form/Admin/SearchConfigSortFieldset.php:81
 #: src/Form/Admin/SearchConfigFacetFieldset.php:30
 #: src/Form/Admin/SearchConfigFilterFieldset.php:42
-#: src/Form/Admin/SearchConfigSortFieldset.php:81
 msgid ""
 "The field is an index available in the search engine. The internal search "
 "engine supports property terms and aggregated fields (date, author, etc)."
@@ -2999,7 +2891,8 @@ msgid "Move this sort option down"
 msgstr "Diskennit an dibab seurt-mañ"
 
 #: src/Form/Admin/SearchConfigSettingsFieldset.php:50
-msgid "The slug to the search form. The site slug will be automatically prepended."
+msgid ""
+"The slug to the search form. The site slug will be automatically prepended."
 msgstr ""
 "Ar slug evit ar furmskrid klask. Ouzhpennet e vo slug al lec'hienn ent "
 "emgefreek."
@@ -3017,8 +2910,8 @@ msgstr "Pajenn glask dre ziouer evit ar poellgor mererezh"
 msgid "Field"
 msgstr "Park"
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:518
 #: src/Form/Admin/SearchConfigFacetFieldset.php:38
+#: src/Form/Admin/SearchConfigConfigureForm.php:518
 #: src/Form/Admin/SearchConfigFilterFieldset.php:52
 msgid "Set field or index…"
 msgstr "Termeniñ ar maez pe an indeks…"
@@ -3035,8 +2928,8 @@ msgid ""
 "resources whose [start, end] overlaps the queried [from, to]."
 msgstr ""
 "Evit RangeDouble : arvezioù evit deiziadoù diasur : pa vez lakaet, e vez "
-"implijet \"Field\" evel penn-kentañ an etrefas hag ar maezon-mañ evel e "
-"benn-dibenn. Klask a ra kenglotadennoù gant danvezioù a zo o [start, end] o "
+"implijet \"Field\" evel penn-kentañ an etrefas hag ar maezon-mañ evel e benn-"
+"dibenn. Klask a ra kenglotadennoù gant danvezioù a zo o [start, end] o "
 "treuziñ [from, to] ar goulenn."
 
 #: src/Form/Admin/SearchConfigFacetFieldset.php:54
@@ -3056,8 +2949,8 @@ msgid ""
 "mapping. Inline \"Value labels\" below override the table entries when both "
 "are defined."
 msgstr ""
-"Balizenn pe ID dibarek un daolenn (modul Table) a dalvez da gevreañ ar c'hod"
-" diazez gant al labelioù. An \"etikedadoù talvoud\" lakaet e linenn a-is a "
+"Balizenn pe ID dibarek un daolenn (modul Table) a dalvez da gevreañ ar c'hod "
+"diazez gant al labelioù. An \"etikedadoù talvoud\" lakaet e linenn a-is a "
 "laka a-gostez enkefioù an daolenn pa vez an daou anezho termenet."
 
 #: src/Form/Admin/SearchConfigFacetFieldset.php:85
@@ -3075,8 +2968,8 @@ msgstr ""
 "Ur c'houblad dre linenn : indexed_value = displayed_label. A erlec'h an "
 "talvoud kriz en elfennoù talvez, er boutonnoù \"gwelet muioc'h\" hag en "
 "talvezoù oberiant. Talvoudus dreist-holl evit ar maeziennoù boolean (da sk. "
-"1 = Gant ar skeudenn hepken / 0 = Hep skeudenn) hag an enuñsadennoù bihan. A"
-" laka a-gostez mammenn an daolenn a-us evit ar c'hodoù listennet."
+"1 = Gant ar skeudenn hepken / 0 = Hep skeudenn) hag an enuñsadennoù bihan. A "
+"laka a-gostez mammenn an daolenn a-us evit ar c'hodoù listennet."
 
 #: src/Form/Admin/SearchConfigFacetFieldset.php:103
 #: src/Form/Admin/SearchConfigFilterFieldset.php:118
@@ -3092,8 +2985,8 @@ msgid ""
 "#\"></a><div class=\"field-description no-link\">\n"
 "- Input types may be Checkbox (default), RangeDouble, Select, SelectRange, "
 "Thesaurus, Tree and specific templates for mode \"direct\" if wanted.\n"
-"- For \"RangeDouble\" and \"SelectRange\", the minimum and maximum should be"
-" set as \"min\" and \"max\" in \"Html attributes\", and \"step\" too. The "
+"- For \"RangeDouble\" and \"SelectRange\", the minimum and maximum should be "
+"set as \"min\" and \"max\" in \"Html attributes\", and \"step\" too. The "
 "option \"first_digits\" is enabled by default to extract the year from "
 "dates. Set \"first_digits = false\" in \"Options\" to disable it. Set "
 "\"first_digits = 3\" to group by decade (first 3 digits), \"first_digits = "
@@ -3115,11 +3008,11 @@ msgstr ""
 "dizgweredekaat anezhañ. Lakait \"first_digits = 3\" evit rummata dre "
 "zekvloaziad (an 3 sifr kentañ), \"first_digits = 2\" evit ar c'hantved, "
 "\"first_digits = 1\" evit ar milved.\n"
-"- Gant an doare \"Thesaurus\", e rank an dibab \"thesaurus\" bezañ kefluniet"
-" gant an id. Rekis eo ar modul Thesaurus.\n"
+"- Gant an doare \"Thesaurus\", e rank an dibab \"thesaurus\" bezañ kefluniet "
+"gant an id. Rekis eo ar modul Thesaurus.\n"
 "- Gallout a reer ober gant \"Gwezenn\" evit an holladoù traezoù pa vez "
-"gweredekaet ar modul \"Gwezenn an holladoù traezoù\" ha pa vez endeksadet an"
-" roadennoù en un doare adkrenn.\n"
+"gweredekaet ar modul \"Gwezenn an holladoù traezoù\" ha pa vez endeksadet an "
+"roadennoù en un doare adkrenn.\n"
 "</div><a href=\"#"
 
 #: src/Form/Admin/SearchConfigFacetFieldset.php:116
@@ -3201,8 +3094,8 @@ msgid ""
 "without language (like date) are facets, the empty language must be set to "
 "get results."
 msgstr ""
-"Implijit \"|\" evit dispartiañ meur a yezh. Implijit un \"|\" en diwezh evit"
-" an talvoudoù hep yezh. Pa vez talvoudus an tachennoù gant yezh (evel an "
+"Implijit \"|\" evit dispartiañ meur a yezh. Implijit un \"|\" en diwezh evit "
+"an talvoudoù hep yezh. Pa vez talvoudus an tachennoù gant yezh (evel an "
 "danvezioù) hag an tachennoù hep yezh (evel an deiziad), e ranker lakaat an "
 "tachenn yezh goullo evit kaout disoc'hoù."
 
@@ -3278,9 +3171,9 @@ msgid ""
 "more\" button. Uses \"per page\" as the page size and ignores \"display on "
 "load\"."
 msgstr ""
-"Pajennañ talvoudoù ar fasadenn gant ur merdeiñ dre bajenn, e-lec'h ur bouton"
-" \"gwelet muioc'h\". Ober a ra gant \"dre bajenn\" evel ment ar bajenn ha ne"
-" ra ket van ouzh \"diskouez pa garg\"."
+"Pajennañ talvoudoù ar fasadenn gant ur merdeiñ dre bajenn, e-lec'h ur bouton "
+"\"gwelet muioc'h\". Ober a ra gant \"dre bajenn\" evel ment ar bajenn ha ne "
+"ra ket van ouzh \"diskouez pa garg\"."
 
 #: src/Form/Admin/SearchConfigFacetFieldset.php:247
 msgid "Number of facets to display on load (without pagination)"
@@ -3381,8 +3274,8 @@ msgstr ""
 "`first_digits = false`.\n"
 "Notenn : \"min\", \"max\", \"step\" a rank bezañ lakaet en \"Perzhioù HTML\"."
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:401
 #: src/Form/Admin/SearchConfigFacetFieldset.php:380
+#: src/Form/Admin/SearchConfigConfigureForm.php:401
 #: src/Form/Admin/SearchConfigFilterFieldset.php:325
 msgid "Html attributes"
 msgstr "Perzhioù HTML"
@@ -3474,8 +3367,8 @@ msgid ""
 "With the internal search engine, it is not recommended to use full text "
 "content."
 msgstr ""
-"Gant ar c'heflusker enklask diabarzh, n'eo ket erbedet implijout an danvez e"
-" testenn glok."
+"Gant ar c'heflusker enklask diabarzh, n'eo ket erbedet implijout an danvez e "
+"testenn glok."
 
 #: src/Form/Admin/SearchSuggesterForm.php:212
 #: src/Form/Admin/SearchSuggesterForm.php:228
@@ -3487,7 +3380,8 @@ msgid "Exclude fields"
 msgstr "Ezklozañ ar maeziennoù"
 
 #: src/Form/Admin/SearchSuggesterForm.php:220
-msgid "Allow to skip the full text content, that may be useless for suggestions."
+msgid ""
+"Allow to skip the full text content, that may be useless for suggestions."
 msgstr ""
 "Aotren lammat an danvez testenn klok, a c'hall bezañ didalvez evit ar "
 "c'hinnigoù."
@@ -3528,15 +3422,15 @@ msgstr "Menegerioù"
 msgid ""
 "List of fields that refers to one or multiple indexes (properties with "
 "internal search engine, native indexes with Solr), formatted \"name = "
-"label\", then the list of properties and an empty line. The name must not be"
-" a property term or a reserved keyword. With query args below, they can be "
+"label\", then the list of properties and an empty line. The name must not be "
+"a property term or a reserved keyword. With query args below, they can be "
 "seen as simple shortcuts of filters easy to implement in forms."
 msgstr ""
 "Roll maeziennoù a ra dave da un meneger pe da veur a hini (perzhioù gant ur "
 "c'heflusker enklask diabarzh, menegerioù genidik gant Solr), furmadet \"anv "
-"= etikedenn\", heuliet gant roll ar perzhioù hag ul linenn goullo. An anv ne"
-" rank ket bezañ un termen perzh pe ur ger-alc'hwez miret. Gant an arguzennoù"
-" reked a-is e c'haller o gwelet evel berradurioù eeun evit siloù aes da "
+"= etikedenn\", heuliet gant roll ar perzhioù hag ul linenn goullo. An anv ne "
+"rank ket bezañ un termen perzh pe ur ger-alc'hwez miret. Gant an arguzennoù "
+"reked a-is e c'haller o gwelet evel berradurioù eeun evit siloù aes da "
 "lakaat e pleustr e furmskridoù."
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:155
@@ -3549,10 +3443,10 @@ msgid ""
 "= \"eq\" and \"join\" = \"and\". Type may be any of the query type of "
 "filters. Join may be \"and\", \"or\", \"not\"."
 msgstr ""
-"Termeniñ an arguzennoù reked da implijout gant maeziennoù eeun. An talvoudoù"
-" dre ziouer eo \"type\" = \"eq\" ha \"join\" = \"and\". Gallout a ra "
-"\"type\" bezañ forzh pehini eus seurtadoù siloù ar reked. Gallout a ra "
-"\"join\" bezañ \"and\", \"or\", \"not\"."
+"Termeniñ an arguzennoù reked da implijout gant maeziennoù eeun. An talvoudoù "
+"dre ziouer eo \"type\" = \"eq\" ha \"join\" = \"and\". Gallout a ra \"type\" "
+"bezañ forzh pehini eus seurtadoù siloù ar reked. Gallout a ra \"join\" bezañ "
+"\"and\", \"or\", \"not\"."
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:177
 msgid "Boost multipliers by index (Solr only)"
@@ -3583,8 +3477,10 @@ msgid "Default query"
 msgstr "Dre ziouer"
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:228
-msgid "The format of the query depends on the search form and the search engine."
-msgstr "Stumm ar goulenn a zo diouzh ar furmskrid klask hag ar c'heflusker klask."
+msgid ""
+"The format of the query depends on the search form and the search engine."
+msgstr ""
+"Stumm ar goulenn a zo diouzh ar furmskrid klask hag ar c'heflusker klask."
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:238
 msgid "Complementary default query"
@@ -3669,7 +3565,8 @@ msgid "Process request without diacritic"
 msgstr "Prosesiñ ar goulenn hep diakritik"
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:371
-msgid "Partial word search for main field (instead of standard full text search)"
+msgid ""
+"Partial word search for main field (instead of standard full text search)"
 msgstr ""
 "Klask gerioù darnel evit ar park pennañ (e-lec'h ar c'hlask testenn klok "
 "standart)"
@@ -3767,11 +3664,11 @@ msgstr "Diskouez ur siler prim war ar furmskrid araokaet"
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:565
 msgid ""
-"List of filters that will be displayed in the search form, formatted as ini."
-" The section is a unique name. Main keys are: field, label and type."
+"List of filters that will be displayed in the search form, formatted as ini. "
+"The section is a unique name. Main keys are: field, label and type."
 msgstr ""
-"Roll ar siloù a vo diskouezet er furmskrid klask, furmadet evel un restr "
-".ini. Un anv dibar eo ar rann. Ar c'hemennoù pennañ eo: ar park, an "
+"Roll ar siloù a vo diskouezet er furmskrid klask, furmadet evel un "
+"restr .ini. Un anv dibar eo ar rann. Ar c'hemennoù pennañ eo: ar park, an "
 "etiketenn hag ar seurt."
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:605
@@ -3800,7 +3697,8 @@ msgstr "Ouzhpennañ an ereer \"not\" d'ar siloù araokaet"
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:666
 msgid "Add the operator (\"equal\", \"in\", etc.) to the advanced filters"
-msgstr "Ouzhpennañ an oberier (\"heñvel\", \"e-barzh\", hag all) d'ar siloù araokaet"
+msgstr ""
+"Ouzhpennañ an oberier (\"heñvel\", \"e-barzh\", hag all) d'ar siloù araokaet"
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:676
 msgid "List of operators"
@@ -3811,8 +3709,8 @@ msgid ""
 "The default list is the full list available in advanced standard search "
 "form. Negative operators are removed when the joiner \"not\" is used."
 msgstr ""
-"Al listenn dre ziouer eo al listenn glok a c'haller kaout er furmskrid klask"
-" araokaet standard. Lamet e vez an oberierien negativel pa vez implijet an "
+"Al listenn dre ziouer eo al listenn glok a c'haller kaout er furmskrid klask "
+"araokaet standard. Lamet e vez an oberierien negativel pa vez implijet an "
 "ereer \"not\"."
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:685
@@ -3832,7 +3730,8 @@ msgid "Enable autocompletion on filter values"
 msgstr "Gweredekaat an emleunadur evit talvoudoù ar sil"
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:698
-msgid "Requires module Reference (database values) or SearchSolr (indexed values)."
+msgid ""
+"Requires module Reference (database values) or SearchSolr (indexed values)."
 msgstr ""
 "Goulenn a ra ar modul Reference (talvoudoù diaz-roadennoù) pe SearchSolr "
 "(talvoudoù endeksiet)."
@@ -4103,7 +4002,8 @@ msgstr "Kas ar goulenn war-eeun (implijit ar voest da askañ hag ar js)"
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:1274
 msgid "Send request directly (use a link looking like a checkbox)"
-msgstr "Kas ar goulenn war-eeun (implijit ul liamm a denn da un ti-bihan da askañ)"
+msgstr ""
+"Kas ar goulenn war-eeun (implijit ul liamm a denn da un ti-bihan da askañ)"
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:1287
 msgid "List of facets"
@@ -4158,7 +4058,8 @@ msgstr "Lec'hiadur ar bouton \"Adsevel an tuioù\""
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:1401
 msgid "Global \"Expand all / Collapse all\" toggle above facets"
-msgstr "Bouton bedel \"Diskouez pep tra / Kuzhat pep tra\" a-us d'ar facetennoù"
+msgstr ""
+"Bouton bedel \"Diskouez pep tra / Kuzhat pep tra\" a-us d'ar facetennoù"
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:1404
 msgid "Display toggle, expand all by default"
@@ -4184,8 +4085,8 @@ msgid ""
 "specific options, like thesaurus, min and max."
 msgstr ""
 "Roll an arvezioù a vo diskouezet war bajenn ar c'hlask, furmadet evel un "
-"restr .ini. Un anv dibar eo ar rann. An alc'hwezioù eo : field, label, type,"
-" order, limit, state, more, languages, data_types, main_types, values, "
+"restr .ini. Un anv dibar eo ar rann. An alc'hwezioù eo : field, label, type, "
+"order, limit, state, more, languages, data_types, main_types, values, "
 "display_count, hag opsiñsoù spesius, evel thesaurus, min ha max."
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:1475
@@ -4193,21 +4094,22 @@ msgid "Add a facet"
 msgstr "Ouzhpennañ un arvez"
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:1566
-#, php-format, python-format
+#, php-format
 msgid "Interval end field is only available for types %s."
 msgstr "N'eo hegerz ar maezenn dibenn prantad nemet evit ar seurtadoù %s."
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:1575
 msgid "Interval end field requires a start field (\"Field\")."
-msgstr "Emaezienn fin an etrefas a c'houlenn un emaezienn deroù (\"Emaezienn\")."
+msgstr ""
+"Emaezienn fin an etrefas a c'houlenn un emaezienn deroù (\"Emaezienn\")."
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:1588
-#, php-format, python-format
+#, php-format
 msgid "Piecewise scale is only available for types %s."
 msgstr "N'eo hegerz ar skeul tammoù-ha-tamm nemet evit an doareoù %s."
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:1600
-#, php-format, python-format
+#, php-format
 msgid "%s: %s"
 msgstr "%s : %s"
 
@@ -4249,7 +4151,8 @@ msgstr "Ar plas kentañ a rank bezañ 0 (pe implijit an elfenner plas \"min\")."
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:1667
 msgid "Last position must be 100 (or use \"max\" placeholder)."
-msgstr "Ar plas diwezhañ a rank bezañ 100 (pe implijit an elfenner plas \"max\")."
+msgstr ""
+"Ar plas diwezhañ a rank bezañ 100 (pe implijit an elfenner plas \"max\")."
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:1675
 msgid "Values must be strictly increasing."
@@ -4271,11 +4174,11 @@ msgstr "Ne c'hall ket ur poent-ehan niverel rannañ ar plas 100 gant \"max\"."
 msgid "Resources indexed and searchable"
 msgstr "Danvezioù menegeret ha klaskadus"
 
-#: src/Form/Admin/SearchEngineConfigureForm.php:94
+#: src/Form/Admin/SearchEngineConfigureForm.php:95
 msgid "Indexing enabled"
 msgstr "Endeksadur war-raok"
 
-#: src/Form/Admin/SearchEngineConfigureForm.php:119
+#: src/Form/Admin/SearchEngineConfigureForm.php:116
 msgid "Resources (mixed)"
 msgstr "Danvezioù (kemmesket)"
 
@@ -4293,8 +4196,8 @@ msgid ""
 "used as the interval start and this field as the interval end. Search "
 "matches resources whose [start, end] overlaps the queried [from, to]."
 msgstr ""
-"Evit ar siloù Range/RangeDouble evit deiziadoù diasur : pa vez lakaet, e vez"
-" implijet \"Field\" evel penn-kentañ an etrekadenn hag ar maezon-mañ evel e "
+"Evit ar siloù Range/RangeDouble evit deiziadoù diasur : pa vez lakaet, e vez "
+"implijet \"Field\" evel penn-kentañ an etrekadenn hag ar maezon-mañ evel e "
 "benn-dibenn. Klask a ra kenglotadurioù gant danvezioù a zo o [penn-kentañ, "
 "penn-dibenn] o treuziñ an [adalek, betek] goulennet."
 
@@ -4308,8 +4211,8 @@ msgstr ""
 "Ur c'houblad dre linenn : indexed_value = displayed_label. A erlec'h an "
 "talvoud kriz en dibaboù select/radio/checkbox hag er filtredoù oberiant. "
 "Talvoudus dreist-holl evit ar maeziennoù boolean (da sk. 1 = Gant ar "
-"skeudenn hepken / 0 = Hep skeudenn) hag an enuñvadennoù bihan. A laka "
-"a-gostez mammenn an daolenn a-us evit ar c'hodoù listennet."
+"skeudenn hepken / 0 = Hep skeudenn) hag an enuñvadennoù bihan. A laka a-"
+"gostez mammenn an daolenn a-us evit ar c'hodoù listennet."
 
 #: src/Form/Admin/SearchConfigFilterFieldset.php:119
 msgid "The type of filter that will be displayed in the search form."
@@ -4318,8 +4221,8 @@ msgstr "Ar seurt sil a vo diskouezet er furmskrid klask."
 #: src/Form/Admin/SearchConfigFilterFieldset.php:121
 msgid ""
 "#\"></a><div class=\"field-description no-link\">\n"
-"- The types are html input types: Text (default), Advanced (list of advanced"
-" filters), Checkbox, Hidden, Number, Radio, Range, RangeDouble, Select, "
+"- The types are html input types: Text (default), Advanced (list of advanced "
+"filters), Checkbox, Hidden, Number, Radio, Range, RangeDouble, Select, "
 "SelectFlat, SelectGroup, MultiCheckbox, MultiSelect, MultiSelectFlat, "
 "MultiSelectGroup, MultiText, and, for modules, Access, Thesaurus, and Tree "
 "(item sets tree).\n"
@@ -4336,12 +4239,12 @@ msgid ""
 "Min and max are extracted from data if not set as attributes.\n"
 "- For Number, Range and RangeDouble, the option \"first_digits\" is enabled "
 "by default to extract the year from dates. Set \"first_digits = false\" to "
-"disable it. It is recommended to use an index with the year to avoid strange"
-" results when casting and sorting non-normalized data.\n"
+"disable it. It is recommended to use an index with the year to avoid strange "
+"results when casting and sorting non-normalized data.\n"
 "- MultiSelectFlat and SelectFlat may be used to be sure that values are "
 "flatten.\n"
-"- MultiSelectGroup and SelectGroup may be used for some specific fields that"
-" group options by default (resource classes, resource templates), in which "
+"- MultiSelectGroup and SelectGroup may be used for some specific fields that "
+"group options by default (resource classes, resource templates), in which "
 "case the options labels are removed.\n"
 "- Tree can be used for item sets when module ItemSetsTree is enabled and "
 "data indexed recursively.\n"
@@ -4353,9 +4256,9 @@ msgstr ""
 "#\"></a><div class=\"field-description no-link\">\n"
 "- Ar seurtadoù a zo seurtadoù enankañ HTML : Testenn (dre ziouer), Araokaet "
 "(roll siloù araokaet), Kased da asantiñ, Kuzh, Niverenn, Radio, Tachenn, "
-"TachennDouble, Dibab, DibabPlat, DibabStrollad, Kased da asantiñ lies, Dibab"
-" lies, Dibab lies plat, Dibab lies strollad, Dibab lies testenn, ha, evit ar"
-" moduloù, Moned, Tesor, ha Gwezenn (gwezenn strolladoù elfennoù).\n"
+"TachennDouble, Dibab, DibabPlat, DibabStrollad, Kased da asantiñ lies, Dibab "
+"lies, Dibab lies plat, Dibab lies strollad, Dibab lies testenn, ha, evit ar "
+"moduloù, Moned, Tesor, ha Gwezenn (gwezenn strolladoù elfennoù).\n"
 "- Testenn: gallout a reer gwellaat ar vaezienn enankañ html dre ziouer gant "
 "un em-alier. Gweredekaat anezhañ gant an dibarzh \"autosuggest\" hag an "
 "talvoud \"true\". Gallout a reer termeniñ un url diavaez dre an atribut "
@@ -4365,8 +4268,8 @@ msgstr ""
 "- Kuzhet: gallout a reer tremen an talvoud gant an alc'hwez \"value\". Ma "
 "n'eo ket an talvoud ur skalar, e vez heuliataet evel json.\n"
 "- Niverenn: gallout a reer lakaat an alc'hwezioù \"min\", \"max\" ha "
-"\"step\" evel perzhioù, a-hend-all e vint tennet eus an roadennoù. Evel-just"
-" e rank an roadennoù bezañ niverennoù.\n"
+"\"step\" evel perzhioù, a-hend-all e vint tennet eus an roadennoù. Evel-just "
+"e rank an roadennoù bezañ niverennoù.\n"
 "- Gallout a reer ober gant MultiSelectGroup ha SelectGroup evit maeziennoù "
 "spesius zo a stroll an dibarzhioù dre ziouer (klasadoù danvezioù, patromoù "
 "danvezioù), hag en degouezh-se e vez lamet etikedennoù an dibarzhioù.\n"
@@ -4449,7 +4352,8 @@ msgstr "Testenn (liesseurt, gant un dispaker)"
 msgid "Specific (set as option)"
 msgstr "Spesifek (lakaet evel un dibarzh)"
 
-#: config/module.config.php:707 src/Form/Admin/SearchConfigFilterFieldset.php:162
+#: src/Form/Admin/SearchConfigFilterFieldset.php:162
+#: config/module.config.php:705
 msgid "Access"
 msgstr "Moned"
 
@@ -4513,14 +4417,14 @@ msgstr "Diskennañ ar sil-mañ"
 msgid "Select an engine adapter below…"
 msgstr "Diuzit un azasaer keflusker a-is…"
 
-#: src/Form/View/Helper/FormMultiText.php:22
 #: src/Form/View/Helper/FormRangeDouble.php:27
+#: src/Form/View/Helper/FormMultiText.php:22
 #, php-format
 msgid "Method %1$s requires that the element is of type %2$s"
 msgstr "An doare %1$s a c'houlenn ma vo an elfenn eus ar seurt %2$s"
 
 #: src/Form/View/Helper/FormRangeDouble.php:43
-#, php-format, python-format
+#, php-format
 msgid "Method %s requires that the value be an associative array"
 msgstr "An hentenn %s a c'houlenn e vefe an talvoud un arnodenn gevreata"
 
@@ -4564,7 +4468,8 @@ msgstr "Perzhioù hep emleunadur emgefreek evit talvoudoù ar sil (listenn du)"
 
 #: src/Form/TraitCommonSettings.php:84
 msgid "Add joiner \"not\" to filters and simplify query types"
-msgstr "Ouzhpennañ an negouer \"not\" d'ar siloù ha simplaat seurtadoù ar rekedoù"
+msgstr ""
+"Ouzhpennañ an negouer \"not\" d'ar siloù ha simplaat seurtadoù ar rekedoù"
 
 #: src/Form/TraitCommonSettings.php:85
 msgid ""
@@ -4620,11 +4525,11 @@ msgstr "Goulenn sil kuzh"
 
 #: src/Form/SearchingFormFieldset.php:91
 msgid ""
-"Limit the search to a specific subset of the resources. This query is merged"
-" with the default block query and with the user one."
+"Limit the search to a specific subset of the resources. This query is merged "
+"with the default block query and with the user one."
 msgstr ""
-"Bevennit ar c'hlask d'un is-strollad resis eus ar mammennoù. Kendeuzet e vez"
-" ar reked-mañ gant reked bloc'hañ dre ziouer ha gant hini an implijer."
+"Bevennit ar c'hlask d'un is-strollad resis eus ar mammennoù. Kendeuzet e vez "
+"ar reked-mañ gant reked bloc'hañ dre ziouer ha gant hini an implijer."
 
 #: src/Form/SearchingFormFieldset.php:101
 msgid "Link to display"
@@ -4665,17 +4570,15 @@ msgid ""
 "future version."
 msgstr ""
 "Ur reked evit kefluniadur ar c'hlask a implij an hentad arguzenn, a zo bet "
-"erlec'hiet gant \"slug\". Ret e vefe deoc'h hizivaat ho reked. Un nemedenn a"
-" vo bannet en ur stumm da zont."
+"erlec'hiet gant \"slug\". Ret e vefe deoc'h hizivaat ho reked. Un nemedenn a "
+"vo bannet en ur stumm da zont."
 
 #: src/Api/Adapter/SearchConfigAdapter.php:176
-#, python-brace-format
 msgid "The slug \"{search_slug}\" is already taken."
 msgstr "An slug \"{search_slug}\" zo dija kemeret."
 
-#: src/Api/Representation/SearchConfigRepresentation.php:590
 #: src/Api/Representation/SearchSuggesterRepresentation.php:191
-#, python-brace-format
+#: src/Api/Representation/SearchConfigRepresentation.php:590
 msgid ""
 "Query error: {message}\n"
 "Query:{query}"
@@ -4688,41 +4591,34 @@ msgstr ""
 #: src/Api/Representation/SearchConfigRepresentation.php:252
 #: src/Api/Representation/SearchConfigRepresentation.php:261
 #: src/Api/Representation/SearchConfigRepresentation.php:275
-#, python-brace-format
 msgid ""
-"The search config setting \"{old}\" was renamed \"{new}\". You should update"
-" your theme."
+"The search config setting \"{old}\" was renamed \"{new}\". You should update "
+"your theme."
 msgstr ""
 "Arventenn kefluniadur ar c'hlask \"{old}\" zo bet adanvet \"{new}\". "
 "Hizivaat ho tem a rankit ober."
 
 #: src/Api/Representation/SearchConfigRepresentation.php:480
-#, python-brace-format
 msgid "The search page \"{search_page}\" has no suggester."
 msgstr "N'eus kinniger ebet evit ar bajenn glask \"{search_page}\"."
 
 #: src/Api/Representation/SearchConfigRepresentation.php:493
-#, python-brace-format
 msgid "The search page \"{search_page}\" has no more suggester."
 msgstr "N'eus mui a ginniger war ar bajenn glask \"{search_page}\"."
 
 #: src/Api/Representation/SearchConfigRepresentation.php:510
-#, python-brace-format
 msgid "The search page \"{search_page}\" has no search engine."
 msgstr "N'eus keflusker klask ebet gant ar bajenn glask \"{search_page}\"."
 
 #: src/Controller/Admin/SearchSuggesterController.php:44
-#, python-brace-format
 msgid "Search suggester \"{name}\" created."
 msgstr "Krouet an alier \"{name}\"."
 
 #: src/Controller/Admin/SearchSuggesterController.php:61
-#, python-brace-format
 msgid "The search adapter for engine \"{name}\" is not available."
 msgstr "An azasaer klask evit ar c'heflusker \"{name}\" n'eo ket hegerz."
 
 #: src/Controller/Admin/SearchSuggesterController.php:96
-#, python-brace-format
 msgid "Suggester \"{name}\" successfully configured."
 msgstr "Kemerer \"{name}\" kefluniet gant berzh."
 
@@ -4731,21 +4627,19 @@ msgid "Don’t forget to run the indexation of the suggester."
 msgstr "Na zisoñjit ket lakaat an indexadur ar c'hinniger da vont en-dro."
 
 #: src/Controller/Admin/SearchSuggesterController.php:157
-#, python-brace-format
 msgid ""
-"Indexing suggestions of suggester \"{name}\" started in job "
-"{link_job}#{job_id}{link_end} ({link_log}logs{link_end})."
+"Indexing suggestions of suggester \"{name}\" started in job {link_job}"
+"#{job_id}{link_end} ({link_log}logs{link_end})."
 msgstr ""
-"Kroget gant alioù indeksadur ar c'hinniger \"{name}\" er post "
-"{link_job}#{job_id}{link_end} ({link_log}logs{link_end})."
+"Kroget gant alioù indeksadur ar c'hinniger \"{name}\" er post {link_job}"
+"#{job_id}{link_end} ({link_log}logs{link_end})."
 
 #: src/Controller/Admin/SearchSuggesterController.php:208
-#, python-brace-format
 msgid "Search suggester \"{name}\" successfully deleted"
-msgstr "Anv an hini a ginnig an enklaskoù \"{name}\" a zo bet diverket gant berzh"
+msgstr ""
+"Anv an hini a ginnig an enklaskoù \"{name}\" a zo bet diverket gant berzh"
 
 #: src/Controller/Admin/SearchSuggesterController.php:213
-#, python-brace-format
 msgid "Search suggester \"{name}\" could not be deleted"
 msgstr "N'haller ket diverkañ ar c'hinniger klask \"{name}\""
 
@@ -4754,20 +4648,18 @@ msgstr "N'haller ket diverkañ ar c'hinniger klask \"{name}\""
 msgid "The name should be unique."
 msgstr "An anv a rank bezañ dibar."
 
-#: src/Controller/Admin/SearchConfigController.php:410
+#: src/Controller/Admin/SearchSuggesterController.php:264
 #: src/Controller/Admin/SearchEngineController.php:73
 #: src/Controller/Admin/SearchEngineController.php:136
-#: src/Controller/Admin/SearchSuggesterController.php:264
+#: src/Controller/Admin/SearchConfigController.php:386
 msgid "There was an error during validation"
 msgstr "Ur fazi zo bet e-pad ar gwiriekadur"
 
 #: src/Controller/Admin/SearchEngineController.php:79
-#, python-brace-format
 msgid "Search index \"{name}\" created."
 msgstr "Endeks \"{name}\" krouet."
 
 #: src/Controller/Admin/SearchEngineController.php:100
-#, python-brace-format
 msgid "The engine adapter \"{name}\" is not available."
 msgstr "An azasaer keflusker \"{name}\" n'eo ket hegerz."
 
@@ -4776,7 +4668,6 @@ msgid "Engine adapter settings"
 msgstr "Arventennoù azasaer ar c'heflusker"
 
 #: src/Controller/Admin/SearchEngineController.php:149
-#, python-brace-format
 msgid "Search index \"{name}\" successfully configured."
 msgstr "Endeks ar c'hlask \"{name}\" kefluniet gant berzh."
 
@@ -4785,12 +4676,10 @@ msgid "Don’t forget to run the indexation of the search engine."
 msgstr "Na zisoñjit ket lakaat an endeksadur da vont en-dro."
 
 #: src/Controller/Admin/SearchEngineController.php:219
-#, python-brace-format
 msgid "The search engine \"{name}\" has nothing to index."
 msgstr "N'en deus ar c'heflusker enklask \"{name}\" netra da indeksañ."
 
 #: src/Controller/Admin/SearchEngineController.php:245
-#, python-brace-format
 msgid ""
 "Indexing of \"{name}\" started in job {link_job}#{job_id}{link_end} "
 "({link_log}logs{link_end})."
@@ -4799,17 +4688,14 @@ msgstr ""
 "({link_log}logs{link_end})."
 
 #: src/Controller/Admin/SearchEngineController.php:288
-#, python-brace-format
 msgid "Search index \"{name}\" successfully deleted"
 msgstr "Furcher an endeks \"{name}\" diverket gant berzh"
 
 #: src/Controller/Admin/SearchEngineController.php:293
-#, python-brace-format
 msgid "Search index \"{name}\" could not be deleted"
 msgstr "N'haller ket diverkañ an endeks klask \"{name}\""
 
 #: src/Controller/Admin/SearchConfigController.php:82
-#, python-brace-format
 msgid "Search page {name} created."
 msgstr "Pajenn glask {name} krouet."
 
@@ -4819,21 +4705,15 @@ msgstr ""
 "Gallout a rit gweredekaat ar bajenn-mañ e parañoù ho lec'hienn pe e parañoù "
 "ar merour."
 
-#: src/Controller/Admin/SearchConfigController.php:98
-msgid "The api adapter should be selected in the main settings."
-msgstr "An azaser API a rank bezañ dibabet er pennaenstummoù."
-
-#: src/Controller/Admin/SearchConfigController.php:122
-#, python-brace-format
+#: src/Controller/Admin/SearchConfigController.php:118
 msgid "The engine adapter \"{label}\" is unavailable."
 msgstr "An azasaer keflusker \"{label}\" n'eo ket hegerz."
 
-#: src/Controller/Admin/SearchConfigController.php:132
-#, python-brace-format
+#: src/Controller/Admin/SearchConfigController.php:128
 msgid "This engine adapter \"{label}\" has no config form."
 msgstr "N'eus furmskrid kefluniañ ebet evit an azasaer keflusker \"{label}\"."
 
-#: src/Controller/Admin/SearchConfigController.php:185
+#: src/Controller/Admin/SearchConfigController.php:181
 msgid ""
 "The mode for facets is \"Button\", but the button \"Apply facets\" is "
 "hidden, so it should be added in the theme."
@@ -4841,86 +4721,101 @@ msgstr ""
 "Ar mod evit ar gwaregoù eo \"Bouton\", met kuzhet eo ar bouton \"Lakaat ar "
 "gwaregoù\", neuze e rank bezañ ouzhpennet en tem."
 
-#: src/Controller/Admin/SearchConfigController.php:214
-#, python-brace-format
+#: src/Controller/Admin/SearchConfigController.php:222
 msgid "Search page {name} saved."
 msgstr "Pajenn glask {name} enrollet."
 
-#: src/Controller/Admin/SearchConfigController.php:231
-msgid ""
-"The search engine type changed: filter, sort and facet field names use "
-"different naming conventions between engines (for example "
-"\"dcterms:subject\" versus \"dcterms_subject_ss\"). They are converted "
-"automatically when querying, but please review the configuration."
-msgstr ""
-"Cheñchet eo ar seurt keflusker klask : anvioù maeziennoù ar sil, an urzhiañ "
-"hag ar fasetennoù a implij reolennoù anviñ disheñvel hervez ar "
-"c'hefluskerioù (da skouer \"dcterms:subject\" e-skoaz "
-"\"dcterms_subject_ss\"). Treuzfurmet e vezont ent emgefreek pa vez graet ur "
-"goulenn, met adwelit ar gefluniadur mar plij."
-
-#: src/Controller/Admin/SearchConfigController.php:242
-#, python-brace-format
-msgid ""
-"If new fields were added, run {link}Sync maps{link_end} on the Solr core "
-"page, then reindex."
-msgstr ""
-"Ma'z eus bet ouzhpennet maeziennoù nevez, lañsit {link}Sync maps{link_end} "
-"war bajenn kalon Solr, ha da c'houde adindeksit."
-
-#: src/Controller/Admin/SearchConfigController.php:286
-#, python-brace-format
+#: src/Controller/Admin/SearchConfigController.php:262
 msgid "Search page \"{name}\" successfully deleted"
 msgstr "Pajenn glask \"{name}\" diverket gant berzh"
 
-#: src/Controller/Admin/SearchConfigController.php:291
-#, python-brace-format
+#: src/Controller/Admin/SearchConfigController.php:267
 msgid "Search page \"{name}\" could not be deleted"
 msgstr "N'haller ket diverkañ pajenn glask \"{name}\""
 
-#: src/Controller/Admin/SearchConfigController.php:333
-#, python-brace-format
+#: src/Controller/Admin/SearchConfigController.php:309
 msgid "Search page \"{name}\" successfully copied as \"{new_name}\"."
 msgstr "Pajenn glask \"{name}\" eiladet gant berzh evel \"{new_name}\"."
 
-#: src/Controller/Admin/SearchConfigController.php:382
-#: src/Controller/Admin/SearchConfigController.php:391
+#: src/Controller/Admin/SearchConfigController.php:358
+#: src/Controller/Admin/SearchConfigController.php:367
 msgid "The slug should be unique."
 msgstr "An eilenn a zlefe bezañ dibar."
 
-#: src/Controller/Admin/SearchConfigController.php:397
+#: src/Controller/Admin/SearchConfigController.php:373
 msgid "The slug should be relative to the root of the site, like \"search\"."
 msgstr "Ar slug a rank bezañ e-keñver gwrizienn al lec'hienn, evel \"search\"."
 
-#: src/Controller/Admin/SearchConfigController.php:489
+#: src/Controller/Admin/SearchConfigController.php:530
+msgid ""
+"The search engine type changed. Field names use different conventions per "
+"engine (for example \"dcterms:subject\" versus \"dcterms_subject_ss\"); the "
+"configuration was adapted automatically, but please review facets, sorts and "
+"filters."
+msgstr ""
+"Cheñchet eo bet seurt ar c'heflusker enklask. Implijet e vez reolennoù "
+"disheñvel evit anvioù ar maezioù hervez pep keflusker (da skouer "
+"\"dcterms:subject\" e-skoaz \"dcterms_subject_ss\"); azasaet eo bet ar "
+"c'hefluniadur ent emgefre, met adwelit ar fasadoù, an urzhioù hag ar siloù "
+"mar plij."
+
+#: src/Controller/Admin/SearchConfigController.php:534
+msgid "Fields renamed to their property term: {list}."
+msgstr "Anvioù an tachennoù adanvet diouzh o dermen perc'henniezh : {list}."
+
+#: src/Controller/Admin/SearchConfigController.php:540
+msgid ""
+"These special Solr fields have no direct equivalent in the other engine and "
+"need manual review: {list}."
+msgstr ""
+"An maeziennoù Solr ispisial-mañ n'o deus kevatal ebet eeun en keflusker all "
+"ha ret eo o adwelet gant an dorn : {list}."
+
+#: src/Controller/Admin/SearchConfigController.php:546
+msgid ""
+"These fields have no Solr map and return nothing until you run \"Sync maps "
+"from search configs\" on the core: {list}."
+msgstr ""
+"N'o deus ket ar maeziennoù-mañ a gartenn Solr ha ne zistroont netra keit ha "
+"ma ne verrit ket \"Sync maps from search configs\" war ar c'hreizenn: {list}."
+
+#: src/Controller/Admin/SearchConfigController.php:552
+msgid ""
+"The autocompletion suggester did not belong to the new engine and was reset; "
+"select a suggester of the new engine."
+msgstr ""
+"Ne oa ket ar c'hinniger emc'hwekaat perzh eus ar c'heflusker nevez hag "
+"adlañset eo bet ; dibabit ur c'hinniger eus ar c'heflusker nevez."
+
+#: src/Controller/Admin/SearchConfigController.php:678
 msgid "The page has been set by default in admin board."
 msgstr "Ar bajenn a zo bet lakaet dre ziouer er panell-merañ."
 
-#: src/Controller/Admin/SearchConfigController.php:492
+#: src/Controller/Admin/SearchConfigController.php:681
 msgid "The page has been unset in admin board."
 msgstr "N'eo ket bet lakaet ar bajenn er c'huzul-merañ."
 
-#: src/Controller/Admin/SearchConfigController.php:544
-#, python-brace-format
+#: src/Controller/Admin/SearchConfigController.php:733
 msgid "This search config is the default one in sites: {site_slugs}."
-msgstr "Ar c'hemenn-mañ a zo an hini dre ziouer war al lec'hiennoù : {site_slugs}."
+msgstr ""
+"Ar c'hemenn-mañ a zo an hini dre ziouer war al lec'hiennoù : {site_slugs}."
 
-#: src/Controller/Admin/SearchConfigController.php:549
+#: src/Controller/Admin/SearchConfigController.php:738
 msgid "This search config is not used as default in any site."
 msgstr ""
-"Ne vez ket implijet ar c'hemenn-mañ evit an enklask dre ziouer war lec'hienn"
-" ebet."
+"Ne vez ket implijet ar c'hemenn-mañ evit an enklask dre ziouer war lec'hienn "
+"ebet."
 
-#: src/Controller/Admin/SearchConfigController.php:555
-#, python-brace-format
+#: src/Controller/Admin/SearchConfigController.php:744
 msgid "This search config is available in sites: {site_slugs}."
-msgstr "Ar c'hefluniadur klask-mañ a zo hegerz war al lec'hiennoù: {site_slugs}."
+msgstr ""
+"Ar c'hefluniadur klask-mañ a zo hegerz war al lec'hiennoù: {site_slugs}."
 
-#: src/Controller/Admin/SearchConfigController.php:560
+#: src/Controller/Admin/SearchConfigController.php:749
 msgid "This search config is not available in any site."
 msgstr "N'eo ket hegerz ar c'hefluniadur klask-mañ war lec'hienn ebet."
 
-#: src/Controller/Admin/SearchConfigController.php:840
+#: src/Controller/Admin/SearchConfigController.php:1029
 msgid ""
 "Note that you didn’t set an empty language for some facets, so all values "
 "without language will be skipped in the facet."
@@ -4928,28 +4823,27 @@ msgstr ""
 "Notit n'hoc'h eus ket lakaet ur yezh goullo evit fasadennoù zo, neuze an "
 "holl dalvoudoù hep yezh a vo lamet er fasadenn."
 
-#: src/Controller/Admin/SearchConfigController.php:883
+#: src/Controller/Admin/SearchConfigController.php:1072
 msgid "The indexes of the filters are not present in the search engine."
 msgstr "N'emañ ket indeksoù ar siloù er c'heflusker enklask."
 
-#: src/Controller/Admin/SearchConfigController.php:888
-#, python-brace-format
-msgid "Some indexes of the filters are not present in the search engine: {list}"
+#: src/Controller/Admin/SearchConfigController.php:1077
+msgid ""
+"Some indexes of the filters are not present in the search engine: {list}"
 msgstr "N'eus ket lod eus indeksoù ar siloù er c'heflusker enklask : {list}"
 
-#: src/Controller/Admin/SearchConfigController.php:904
+#: src/Controller/Admin/SearchConfigController.php:1093
 msgid "The list of fields of the advanced filters is not configured."
 msgstr "N'eo ket kefluniet roll an tachennoù evit ar siloù araokaet."
 
-#: src/Controller/Admin/SearchConfigController.php:918
-#, python-brace-format
+#: src/Controller/Admin/SearchConfigController.php:1107
 msgid ""
 "Some indexes of the advanced filters are not present in the search engine: "
 "{list}"
-msgstr "N'emañ ket lod eus indeksoù ar siloù araokaet er c'heflusker enklask : {list}"
+msgstr ""
+"N'emañ ket lod eus indeksoù ar siloù araokaet er c'heflusker enklask : {list}"
 
 #: src/Controller/SearchController.php:63
-#, python-brace-format
 msgid ""
 "The search engine {search_slug} is not available in site {site_slug}. Check "
 "site settings or search config."
@@ -4958,7 +4852,6 @@ msgstr ""
 "{site_slug}. Gwiriit arventennoù al lec'hienn pe kefluniadur an enklask."
 
 #: src/Controller/SearchController.php:68
-#, python-brace-format
 msgid ""
 "The search engine {search_slug} is not available for admin. Check main "
 "settings or search config."
@@ -4979,7 +4872,6 @@ msgid "Search form (module Advanced Search)"
 msgstr "Furmskrid klask (modul Klask araokaet)"
 
 #: src/Site/BlockLayout/SearchingForm.php:102
-#, python-brace-format
 msgid ""
 "No search config \"{value}\" specified for this block or not available for "
 "site {site_slug}."
@@ -4988,9 +4880,9 @@ msgstr ""
 "hegerz evit al lec'hienn {site_slug}."
 
 #: src/Site/BlockLayout/SearchingForm.php:111
-#, python-brace-format
 msgid "The search config \"{search_slug}\" has no form associated."
-msgstr "N'eus furmskrid ebet stag ouzh ar c'hefluniadur klask \"{search_slug}\"."
+msgstr ""
+"N'eus furmskrid ebet stag ouzh ar c'hefluniadur klask \"{search_slug}\"."
 
 #: src/Stdlib/SearchResources.php:63
 msgid "is not"
@@ -5026,8 +4918,7 @@ msgstr ""
 msgid "An internal issue occurred."
 msgstr "Ur gudenn diabarzh zo c'hoarvezet."
 
-#: src/Querier/InternalQuerier.php:700
-#, python-brace-format
+#: src/Querier/InternalQuerier.php:710
 msgid ""
 "The query \"{query}\" uses {count} properties or filters, that is more than "
 "the {total} supported currently. The query should be simplified."
@@ -5036,8 +4927,7 @@ msgstr ""
 "a zo muioc'h eget an {total} a zo harpet bremañ. Dleet e vefe eeunaat ar "
 "reked."
 
-#: src/Querier/InternalQuerier.php:705
-#, python-brace-format
+#: src/Querier/InternalQuerier.php:715
 msgid ""
 "A user tried a query with {count} arguments. The config or theme should be "
 "checked to forbid them earlier. Query: {query}"
@@ -5046,8 +4936,7 @@ msgstr ""
 "c'hefluniadur pe an tem a zlefe bezañ gwiriet evit berzañ anezho abretoc'h. "
 "Reked: {query}"
 
-#: src/Querier/InternalQuerier.php:1638
-#, python-brace-format
+#: src/Querier/InternalQuerier.php:1648
 msgid "The field for the facet \"{name}\" is not set."
 msgstr "N'eo ket bet lakaet ar park evit ar fasadenn \"{name}\"."
 
@@ -5055,131 +4944,209 @@ msgstr "N'eo ket bet lakaet ar park evit ar fasadenn \"{name}\"."
 msgid "Advanced Search: Browse preview with resource navigation"
 msgstr "Klask araokaet : Merdeiñ ar rakwelet gant merdeiñ ar mammennoù"
 
-#: config/module.config.php:398
+#: config/module.config.php:397
 msgid "Automatic mapping of empty values"
 msgstr "Kartennadur emgefre an talvouzhioù goullo"
 
-#: config/module.config.php:399
+#: config/module.config.php:398
 msgid "Available"
 msgstr "Hegerz"
 
-#: config/module.config.php:400
+#: config/module.config.php:399
 msgid "Enabled"
 msgstr "Gweredekaet"
 
-#: config/module.config.php:401
+#: config/module.config.php:400
 msgid "Find"
 msgstr "Kavout"
 
-#: config/module.config.php:402
+#: config/module.config.php:401
 msgid "Find resources…"
 msgstr "Kavout danvezioù…"
 
-#: config/module.config.php:403
+#: config/module.config.php:402
 msgid "Processing…"
 msgstr "O tretiñ…"
 
-#: config/module.config.php:404
+#: config/module.config.php:403
 msgid ""
-"Try to map automatically the metadata and the properties that are not mapped"
-" yet with the fields of the index"
+"Try to map automatically the metadata and the properties that are not mapped "
+"yet with the fields of the index"
 msgstr ""
-"Klaskit kartenniñ ent emgefre ar metaroadennoù hag ar perzhioù n'int ket bet"
-" kartennet c'hoazh gant maeziennoù an meneger"
+"Klaskit kartenniñ ent emgefre ar metaroadennoù hag ar perzhioù n'int ket bet "
+"kartennet c'hoazh gant maeziennoù an meneger"
 
-#: config/module.config.php:570
+#: config/module.config.php:568
 msgid "Classes *"
 msgstr "Kentelioù"
 
-#: config/module.config.php:581
+#: config/module.config.php:579
 msgid "Templates *"
 msgstr "Patromoù"
 
-#: config/module.config.php:588
+#: config/module.config.php:586
 msgid "Templates (specific option \"restricted\")"
 msgstr "Patromoù (an dibab resis \"bevennet\")"
 
-#: config/module.config.php:600
+#: config/module.config.php:598
 msgid "Item sets *"
 msgstr "Steredennoù traezoù *"
 
-#: config/module.config.php:606
+#: config/module.config.php:604
 msgid "default_site"
 msgstr "lec'hienn dre ziouer"
 
-#: config/module.config.php:612
+#: config/module.config.php:610
 msgid "Site *"
 msgstr "Lec'hienn *"
 
-#: config/module.config.php:619
+#: config/module.config.php:617
 msgid "Has media (select)"
 msgstr "Ennañ media (diuzet)"
 
-#: config/module.config.php:626
+#: config/module.config.php:624
 msgid "Has media (radio)"
 msgstr "Ha mediaoù (skingomz)"
 
-#: config/module.config.php:636
+#: config/module.config.php:634
 msgid "Media type (single)"
 msgstr "Seurt media (unel)"
 
-#: config/module.config.php:641
+#: config/module.config.php:639
 msgid "Media types *"
 msgstr "Seurtoù mediaoù *"
 
-#: config/module.config.php:657
+#: config/module.config.php:655
 msgid "Owner *"
 msgstr "Perc'henn *"
 
-#: config/module.config.php:664
+#: config/module.config.php:662
 msgid "Visibility (select)"
 msgstr "Gwelusted (diuzit)"
 
-#: config/module.config.php:670
+#: config/module.config.php:668
 msgid "Visibility (radio)"
 msgstr "Gwelusted (radio)"
 
-#: config/module.config.php:674
+#: config/module.config.php:672
 msgid "Id"
 msgstr "Me"
 
-#: config/module.config.php:680
+#: config/module.config.php:678
 msgid "Date time"
 msgstr "Deiziad eur"
 
-#: config/module.config.php:700
+#: config/module.config.php:698
 msgid "Has a specific asset"
 msgstr "Ur madoù ispisial"
 
-#: config/module.config.php:716
+#: config/module.config.php:714
 msgid "Extended date time format"
 msgstr "Stumm astennet an deiziad hag an eur"
 
-#: config/module.config.php:723
+#: config/module.config.php:721
 msgid "Geography"
 msgstr "Douaroniezh"
 
-#: config/module.config.php:729
+#: config/module.config.php:727
 msgid "Is dynamic item set"
 msgstr "Setad elfennoù dinamek"
 
-#: config/module.config.php:739
+#: config/module.config.php:737
 msgid "Numeric"
 msgstr "Niverel"
 
-#: config/module.config.php:746
+#: config/module.config.php:744
 msgid "OAI-PMH harvests"
 msgstr "Eostadennoù OAI-PMH"
 
-#: config/module.config.php:755
+#: config/module.config.php:753
 msgid "Selections"
 msgstr "Diuzadennoù"
 
-#: config/module.config.php:764
+#: config/module.config.php:762
 msgid "🖒"
 msgstr "🖒"
 
-#: config/module.config.php:774
+#: config/module.config.php:772
 msgid "Reindex search engines"
 msgstr "Adindeksañ ar c'hefluskerioù enklask"
 
+#~ msgid "Add page"
+#~ msgstr "Ouzhpennañ pajenn"
+
+#~ msgid "Page configs"
+#~ msgstr "Kefluniadurioù ar bajenn"
+
+#~ msgid "No search page configs created yet."
+#~ msgstr "N'eus bet krouet kefluniadur pajenn glask ebet c'hoazh."
+
+#~ msgid "Api"
+#~ msgstr "Gwenan"
+
+#~ msgid "Specific settings"
+#~ msgstr "Arventennoù resis"
+
+#~ msgid "All options should be updated when the search engine is updated"
+#~ msgstr ""
+#~ "An holl zibaboù a zlefe bezañ hizivaet pa vez hizivaet ar c'heflusker "
+#~ "enklask"
+
+#~ msgid "Maximum number of results by response"
+#~ msgstr "Niver brasañ a zisoc'hoù dre respont"
+
+#~ msgid ""
+#~ "It is recommended to keep the value low (under 100 or 1000) to avoid "
+#~ "overload of the server, or to use a paginator."
+#~ msgstr ""
+#~ "Erbedet e vez derc'hel an talvoud izel (dindan 100 pe 1000) evit mirout "
+#~ "ouzh ar servijer a vezañ re beleket, pe implijout ur pajenner."
+
+#~ msgid "Mapping metadata to search fields"
+#~ msgstr "Kevreañ ar metaroadennoù ouzh ar maeziennoù klask"
+
+#~ msgid "Internal id"
+#~ msgstr "ID diabarzh"
+
+#~ msgid "Is Public"
+#~ msgstr "Foran"
+
+#~ msgid "Owner id"
+#~ msgstr "ID ar perc'henn"
+
+#~ msgid "Site id"
+#~ msgstr "ID al lec'hienn"
+
+#~ msgid "Resource class label"
+#~ msgstr "Etikedenn klas danvez"
+
+#~ msgid "Resource class id"
+#~ msgstr "ID klas ar resurs"
+
+#~ msgid "Resource template id"
+#~ msgstr "ID patrom ar vammenn"
+
+#~ msgid "Item set id"
+#~ msgstr "ID an hollad elfennoù"
+
+#~ msgid "Mapping between source (omeka) and destination (search engine)"
+#~ msgstr ""
+#~ "Kartaerezh etre ar vammenn (Omeka) hag an termen (keflusker enklask)"
+
+#~ msgid "Available source fields for mapping"
+#~ msgstr "Maeziennoù mammenn hegerz evit ar c'hartaouiñ"
+
+#~ msgid "List of all available properties to use above."
+#~ msgstr "Roll an holl berzhioù hegerz da implijout a-us."
+
+#~ msgid "Available destination fields for mapping"
+#~ msgstr "Maeziennoù pal hegerz evit ar gartennadur"
+
+#~ msgid "List of all available fields to use above."
+#~ msgstr "Roll an holl dachennoù hegerz da implijout a-us."
+
+#~ msgid "Sort (for internal use only, don’t modify it)"
+#~ msgstr "Renkañ (evit un implij diabarzh hepken, na gemmit ket anezhañ)"
+
+#~ msgid "The api adapter should be selected in the main settings."
+#~ msgstr "An azaser API a rank bezañ dibabet er pennaenstummoù."

@@ -784,6 +784,7 @@ class SearchResources
             // from the linear accumulation and change the logic ("A or B" would
             // become "A and B").
             $hasChain = false;
+            $chainBucket = null;
             foreach ($rows as $row) {
                 $rowJoin = is_array($row) ? ($row['join'] ?? $row['joiner'] ?? 'and') : 'and';
                 if ($rowJoin === 'or' || $rowJoin === 'not') {
@@ -844,11 +845,20 @@ class SearchResources
                         $entry['datatype'] = $row['datatype'];
                     }
                     // One predicate: registered once, with the full field list
-                    // carried by the entry for the querier.
-                    if (count($fields) > 1) {
+                    // carried by the entry for the querier. A chained list is
+                    // kept in a single ordered bucket (keyed by the first
+                    // field of the chain): grouping by field would lose the
+                    // order of the rows across fields, so "(A and B) or C"
+                    // would become "A and (B or C)" when B is another field.
+                    if ($hasChain || count($fields) > 1) {
                         $entry['fields'] = $fields;
                     }
-                    $filters[reset($fields)][] = $entry;
+                    if ($hasChain) {
+                        $chainBucket ??= reset($fields);
+                        $filters[$chainBucket][] = $entry;
+                    } else {
+                        $filters[reset($fields)][] = $entry;
+                    }
                 }
             }
         };

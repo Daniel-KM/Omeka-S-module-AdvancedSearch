@@ -28,6 +28,10 @@
     .search-admin .actions .system-state-icon.fa-spin {
         margin-left: 8px;
     }
+    .search-admin .actions a.fa-spin,
+    .search-admin .actions a.fa-spin::before {
+        text-align: center;
+    }
 
     .search-admin td .warning-notice {
         background-color: #fff6e6;

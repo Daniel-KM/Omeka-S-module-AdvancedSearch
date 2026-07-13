@@ -495,10 +495,8 @@ class InternalQuerier extends AbstractQuerier
             $qb
                 ->select('valueResource.title AS v')
                 ->from(\Omeka\Entity\Value::class, 'value')
-                // Join on Resource (STI root) instead of Item so suggestions
-                // also surface titles of value resources of any subclass
-                // (Item, ItemSet, Media, DigitalObject, Annotation). The join
-                // also checks visibility automatically.
+                // Join on Resource instead of Item so suggestions get titles of
+                // value resources. Join checks visibility automatically too.
                 ->innerJoin(\Omeka\Entity\Resource::class, 'resource', Join::WITH, $expr->eq('value.resource', 'resource'))
                 ->innerJoin(\Omeka\Entity\Resource::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'))
                 // Always return a non-empty string, not null.
@@ -507,10 +505,10 @@ class InternalQuerier extends AbstractQuerier
         } else {
             $qb
                 // Always return a string, not null. Doctrine rejects empty
-                // string withy double quote.
+                // string with double quote.
                 ->select("COALESCE(value.value, valueResource.title, value.uri, '') AS v")
                 ->from(\Omeka\Entity\Value::class, 'value')
-                // Join on Resource (STI root); see note above.
+                // Join on Resource; see note above.
                 ->innerJoin(\Omeka\Entity\Resource::class, 'resource', Join::WITH, $expr->eq('value.resource', 'resource'))
                 // The values should be distinct for each type.
                 ->leftJoin(\Omeka\Entity\Resource::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'))
@@ -571,9 +569,13 @@ class InternalQuerier extends AbstractQuerier
 
         $siteId = $this->query->getSiteId();
         if ($siteId) {
-            $siteAlias = 'site';
+            // The STI root Resource has no "sites" association, so scope
+            // through Item, which carries the site attachment (item_site).
+            // Suggestions are thereby limited to values of items attached to
+            // the site.
             $qb
-                ->innerJoin('resource.sites', $siteAlias, 'WITH', $expr->eq("$siteAlias.id", ':site_id'))
+                ->innerJoin(\Omeka\Entity\Item::class, 'siteItem', Join::WITH, $expr->eq('siteItem.id', 'resource.id'))
+                ->innerJoin('siteItem.sites', 'site', Join::WITH, $expr->eq('site.id', ':site_id'))
                 ->setParameter('site_id', $siteId);
             // TODO Manage settings site_attachements_only. See ItemAdapter.
         }

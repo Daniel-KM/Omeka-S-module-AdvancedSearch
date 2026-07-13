@@ -2070,41 +2070,13 @@ class Module extends AbstractModule
         /** @var \Doctrine\DBAL\Connection $connection */
         $connection = $services->get('Omeka\Connection');
 
-        // Check if the internal index exists.
-        $sqlSearchEngineId = <<<'SQL'
-            SELECT `id`
-            FROM `search_engine`
-            WHERE `adapter` = "internal"
-            ORDER BY `id` ASC;
-            SQL;
-        $searchEngineId = (int) $connection->fetchOne($sqlSearchEngineId);
-
-        if (!$searchEngineId) {
-            // Create the internal adapter.
-            $sql = <<<'SQL'
-                INSERT INTO `search_engine`
-                (`name`, `adapter`, `settings`, `created`)
-                VALUES
-                (?, ?, ?, NOW());
-                SQL;
-            $searchEngineConfig = require __DIR__ . '/data/configs/search_engine.internal.php';
-            $connection->executeStatement($sql, [
-                $searchEngineConfig['o:name'],
-                $searchEngineConfig['o:engine_adapter'],
-                json_encode($searchEngineConfig['o:settings']),
-            ]);
-            $searchEngineId = $connection->fetchOne($sqlSearchEngineId);
-            $message = new PsrMessage(
-                'The internal search engine (sql) can be edited in the {link_url}search manager{link_end}.', // @translate
-                [
-                    // Don't use the url helper, the route is not available during install.
-                    'link_url' => sprintf('<a href="%s">', htmlspecialchars($urlHelper('admin') . '/search-manager/engine/' . $searchEngineId . '/edit')),
-                    'link_end' => '</a>',
-                ]
-            );
-            $message->setEscapeHtml(false);
-            $messenger->addSuccess($message);
-        }
+        // Create the two internal engines (public-capped and admin), idempotent
+        // by name. The public engine never exposes private resources, even to
+        // an admin; the admin engine follows the user rights through the acl.
+        // The suggester and the default search config are attached to the
+        // public engine, used for the public site search.
+        $searchEngineId = $this->createInternalSearchEngine($connection, $messenger, $urlHelper, 'Internal (public)', 'public');
+        $this->createInternalSearchEngine($connection, $messenger, $urlHelper, 'Internal (admin)', 'all');
 
         // Check if the internal suggester exists.
         $sqlSuggesterId = <<<SQL
@@ -2142,14 +2114,13 @@ class Module extends AbstractModule
             $messenger->addSuccess($message);
         }
 
-        // Check if the default search config exists.
-        $sqlSearchConfigId = <<<SQL
-            SELECT `id`
-            FROM `search_config`
-            WHERE `engine_id` = $searchEngineId
-            ORDER BY `id` ASC;
-            SQL;
-        $searchConfigId = (int) $connection->fetchOne($sqlSearchConfigId);
+        // Check if the default search config exists, by slug and globally, so a
+        // legacy install keeping its previous engine is not given a duplicate.
+        $searchConfigConfig = require __DIR__ . '/data/configs/search_config.default.php';
+        $searchConfigId = (int) $connection->fetchOne(
+            'SELECT `id` FROM `search_config` WHERE `slug` = ? ORDER BY `id` ASC',
+            [$searchConfigConfig['o:slug']]
+        );
 
         if (!$searchConfigId) {
             $sql = <<<SQL
@@ -2158,7 +2129,6 @@ class Module extends AbstractModule
                 VALUES
                 ($searchEngineId, ?, ?, ?, ?, NOW());
                 SQL;
-            $searchConfigConfig = require __DIR__ . '/data/configs/search_config.default.php';
             $connection->executeStatement($sql, [
                 $searchConfigConfig['o:name'],
                 $searchConfigConfig['o:slug'],
@@ -2166,7 +2136,10 @@ class Module extends AbstractModule
                 json_encode($searchConfigConfig['o:settings']),
             ]);
 
-            $searchConfigId = $connection->fetchOne($sqlSearchConfigId);
+            $searchConfigId = (int) $connection->fetchOne(
+                'SELECT `id` FROM `search_config` WHERE `slug` = ? ORDER BY `id` ASC',
+                [$searchConfigConfig['o:slug']]
+            );
             $message = new PsrMessage(
                 'The default search config can be {link_1}edited{link_end}, {link_2}configured{link_end} and defined in the {link_3}main settings{link_end} for admin search and in each site settings for public search.', // @translate
                 [
@@ -2182,5 +2155,53 @@ class Module extends AbstractModule
         }
 
         return (int) $searchConfigId;
+    }
+
+    /**
+     * Create an internal (sql) search engine with a visibility, idempotent by
+     * name. Visibility "public" caps the engine to public resources (even for
+     * an admin), "all" follows the user rights, "private" limits to private.
+     */
+    protected function createInternalSearchEngine(
+        \Doctrine\DBAL\Connection $connection,
+        $messenger,
+        $urlHelper,
+        string $name,
+        string $visibility
+    ): int {
+        $existingId = (int) $connection->fetchOne(
+            'SELECT `id` FROM `search_engine` WHERE `adapter` = "internal" AND `name` = ? ORDER BY `id` ASC',
+            [$name]
+        );
+        if ($existingId) {
+            return $existingId;
+        }
+
+        $searchEngineConfig = require __DIR__ . '/data/configs/search_engine.internal.php';
+        $settings = $searchEngineConfig['o:settings'];
+        $settings['visibility'] = $visibility;
+        $connection->executeStatement(
+            'INSERT INTO `search_engine` (`name`, `adapter`, `settings`, `created`) VALUES (?, ?, ?, NOW());',
+            [$name, $searchEngineConfig['o:engine_adapter'], json_encode($settings)]
+        );
+        $searchEngineId = (int) $connection->fetchOne(
+            'SELECT `id` FROM `search_engine` WHERE `adapter` = "internal" AND `name` = ? ORDER BY `id` ASC',
+            [$name]
+        );
+
+        $message = new PsrMessage(
+            'The internal search engine "{name}" (sql) can be edited in the {link_url}search manager{link_end}.', // @translate
+            [
+                'name' => $name,
+                // Don't use the url helper, the route is not available during
+                // install.
+                'link_url' => sprintf('<a href="%s">', htmlspecialchars($urlHelper('admin') . '/search-manager/engine/' . $searchEngineId . '/edit')),
+                'link_end' => '</a>',
+            ]
+        );
+        $message->setEscapeHtml(false);
+        $messenger->addSuccess($message);
+
+        return $searchEngineId;
     }
 }

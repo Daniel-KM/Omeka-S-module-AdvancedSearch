@@ -99,6 +99,8 @@ class SearchConfigController extends AbstractActionController
             );
         }
 
+        $this->recommendSolrSyncMaps($searchConfig);
+
         return $this->redirect()->toUrl($searchConfig->adminUrl('edit'));
     }
 
@@ -196,6 +198,18 @@ class SearchConfigController extends AbstractActionController
             ->update('search_configs', $id, $scalarData, [], ['isPartial' => true])
             ->getContent();
 
+        // Adapt field references and suggester when the engine changed, so the
+        // configuration stays consistent with the new engine's naming.
+        $newAdapter = $searchConfig->searchEngine()
+            ? $searchConfig->searchEngine()->engineAdapter()
+            : null;
+        $newAdapterClass = $newAdapter ? get_class($newAdapter) : null;
+        $engineChanged = $previousAdapterClass && $newAdapterClass
+            && $previousAdapterClass !== $newAdapterClass;
+        $adaptReport = $engineChanged
+            ? $this->adaptConfigToEngine($settings, $searchEngine, $searchConfig->searchEngine())
+            : [];
+
         $searchConfigEntity = $searchConfig->getEntity();
         $searchConfigEntity->setSettings($settings);
         $this->entityManager->flush();
@@ -215,46 +229,14 @@ class SearchConfigController extends AbstractActionController
             ['name' => $searchConfig->link($searchConfig->name(), 'edit')]
         ))->setEscapeHtml(false));
 
-        // Warn when the engine adapter changed: filter, sort and facet field
-        // names follow different naming conventions per engine (property terms
-        // like "dcterms:subject" versus index names like "dcterms_subject_ss").
-        // They are converted automatically when querying, so the configuration
-        // keeps working, but it should be reviewed.
-        $newAdapter = $searchConfig->searchEngine()
-            ? $searchConfig->searchEngine()->engineAdapter()
-            : null;
-        $newAdapterClass = $newAdapter ? get_class($newAdapter) : null;
-        if ($previousAdapterClass && $newAdapterClass
-            && $previousAdapterClass !== $newAdapterClass
-        ) {
-            $this->messenger()->addWarning(new PsrMessage(
-                'The search engine type changed: filter, sort and facet field names use different naming conventions between engines (for example "dcterms:subject" versus "dcterms_subject_ss"). They are converted automatically when querying, but please review the configuration.' // @translate
-            ));
+        // Report the engine change and its automatic adaptation.
+        if ($engineChanged) {
+            $this->warnEngineChanged($adaptReport);
         }
 
-        // For Solr engines, warn about new maps to sync.
-        if ($searchEngine
-            && $searchEngine->engineAdapter() instanceof \SearchSolr\EngineAdapter\Solarium
-        ) {
-            $solrCoreId = $searchEngine->settingEngineAdapter('solr_core_id');
-            if ($solrCoreId) {
-                $message = new PsrMessage(
-                    'If new fields were added, run {link}Sync maps{link_end} on the Solr core page, then reindex.', // @translate
-                    [
-                        'link' => sprintf(
-                            '<a href="%s">',
-                            htmlspecialchars($this->url()->fromRoute(
-                                'admin/search/solr/core-id',
-                                ['id' => $solrCoreId, 'action' => 'sync-maps']
-                            ))
-                        ),
-                        'link_end' => '</a>',
-                    ]
-                );
-                $message->setEscapeHtml(false);
-                $this->messenger()->addWarning($message);
-            }
-        }
+        // For a Solr engine (including after a switch to Solr), recommend
+        // syncing maps for the new fields, then reindexing.
+        $this->recommendSolrSyncMaps($searchConfig);
 
         return $this->redirect()->toRoute('admin/search-manager');
     }
@@ -413,13 +395,231 @@ class SearchConfigController extends AbstractActionController
     }
 
     /**
+     * Adapt a config to a new engine: rename field references and reset a
+     * suggester that no longer belongs to the engine.
+     *
+     * The reliable translation is Solr → internal: a raw Solr index name is
+     * mapped back to its property term (understood by every engine) via the
+     * previous core maps. A list of Solr fields for one alias becomes the list
+     * of aggregated properties, and vice versa. The other direction only checks
+     * that the target Solr core can index the property (else it is reported as
+     * unresolved, to be fixed with "Sync maps"). Settings are passed by
+     * reference; the returned report lists what was renamed, what stays
+     * unresolved, and whether the suggester was reset.
+     */
+    protected function adaptConfigToEngine(
+        array &$settings,
+        ?\AdvancedSearch\Api\Representation\SearchEngineRepresentation $previousEngine,
+        ?\AdvancedSearch\Api\Representation\SearchEngineRepresentation $newEngine
+    ): array {
+        $report = ['renamed' => [], 'review' => [], 'unresolved' => [], 'suggester_reset' => false];
+
+        $solrFieldToProperty = $this->solrFieldToProperty($previousEngine);
+        $newSolrProperties = $this->solrSourceProperties($newEngine);
+
+        $adapt = function ($field) use ($solrFieldToProperty, $newSolrProperties, &$report) {
+            if (!is_string($field) || $field === '') {
+                return $field;
+            }
+            // Solr index name → its source. Only remap to a plain property term
+            // (prefix:local), understood by every engine. A structured source
+            // such as "item_set/o:id" or "resource_class/o:term" differs
+            // between engines, so it is reported for manual review, not renamed
+            // blindly.
+            if ($solrFieldToProperty !== null && isset($solrFieldToProperty[$field])) {
+                $source = $solrFieldToProperty[$field];
+                if ($source !== '' && $source !== $field) {
+                    if ($this->isPropertyTerm($source)) {
+                        $report['renamed'][$field] = $source;
+                        $field = $source;
+                    } else {
+                        $report['review'][$field] = $source;
+                        return $field;
+                    }
+                }
+            }
+            // A property term the target Solr core cannot index yet.
+            if ($newSolrProperties !== null
+                && $this->isPropertyTerm($field)
+                && !isset($newSolrProperties[$field])
+            ) {
+                $report['unresolved'][$field] = true;
+            }
+            return $field;
+        };
+
+        foreach ($settings['index']['aliases'] ?? [] as $name => $alias) {
+            if (!empty($alias['fields']) && is_array($alias['fields'])) {
+                $settings['index']['aliases'][$name]['fields'] = array_values(array_unique(array_map($adapt, $alias['fields'])));
+            }
+        }
+        foreach ($settings['facet']['facets'] ?? [] as $name => $facet) {
+            if (!empty($facet['field'])) {
+                $settings['facet']['facets'][$name]['field'] = $adapt($facet['field']);
+            }
+        }
+
+        // Reset a suggester that does not belong to the new engine.
+        $suggesterId = (int) ($settings['q']['suggester'] ?? 0);
+        if ($suggesterId && $newEngine) {
+            $owned = $this->api()->search('search_suggesters', [
+                'id' => $suggesterId,
+                'engine_id' => $newEngine->id(),
+            ], ['returnScalar' => 'id'])->getContent();
+            if (!$owned) {
+                $settings['q']['suggester'] = null;
+                $report['suggester_reset'] = true;
+            }
+        }
+
+        return $report;
+    }
+
+    /**
+     * Map of Solr index name => property term for a Solr engine core, or null
+     * when the engine is not Solr.
+     */
+    protected function solrFieldToProperty(?\AdvancedSearch\Api\Representation\SearchEngineRepresentation $engine): ?array
+    {
+        $coreId = $engine ? $engine->settingEngineAdapter('solr_core_id') : null;
+        if (!$coreId) {
+            return null;
+        }
+        try {
+            $maps = $this->api()->search('solr_maps', ['solr_core_id' => $coreId])->getContent();
+        } catch (\Exception $e) {
+            return null;
+        }
+        $result = [];
+        foreach ($maps as $map) {
+            $result[$map->fieldName()] = $map->source();
+        }
+        return $result;
+    }
+
+    /**
+     * Set of property terms a Solr engine core can index (source and property
+     * aliases), or null when the engine is not Solr.
+     */
+    protected function solrSourceProperties(?\AdvancedSearch\Api\Representation\SearchEngineRepresentation $engine): ?array
+    {
+        $coreId = $engine ? $engine->settingEngineAdapter('solr_core_id') : null;
+        if (!$coreId) {
+            return null;
+        }
+        try {
+            $maps = $this->api()->search('solr_maps', ['solr_core_id' => $coreId])->getContent();
+        } catch (\Exception $e) {
+            return [];
+        }
+        $result = [];
+        foreach ($maps as $map) {
+            $source = $map->source();
+            if ($this->isPropertyTerm($source)) {
+                $result[$source] = true;
+            }
+            $alias = (string) $map->alias();
+            if ($this->isPropertyTerm($alias)) {
+                $result[$alias] = true;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Emit the messenger warnings after an engine change adaptation.
+     */
+    protected function warnEngineChanged(array $report): void
+    {
+        $messenger = $this->messenger();
+        $messenger->addWarning(new PsrMessage(
+            'The search engine type changed. Field names use different conventions per engine (for example "dcterms:subject" versus "dcterms_subject_ss"); the configuration was adapted automatically, but please review facets, sorts and filters.' // @translate
+        ));
+        if (!empty($report['renamed'])) {
+            $messenger->addNotice(new PsrMessage(
+                'Fields renamed to their property term: {list}.', // @translate
+                ['list' => implode(', ', array_map(fn ($k, $v) => $k . ' → ' . $v, array_keys($report['renamed']), $report['renamed']))]
+            ));
+        }
+        if (!empty($report['review'])) {
+            $messenger->addWarning(new PsrMessage(
+                'These special Solr fields have no direct equivalent in the other engine and need manual review: {list}.', // @translate
+                ['list' => implode(', ', array_map(fn ($k, $v) => $k . ' (' . $v . ')', array_keys($report['review']), $report['review']))]
+            ));
+        }
+        if (!empty($report['unresolved'])) {
+            $messenger->addWarning(new PsrMessage(
+                'These fields have no Solr map and return nothing until you run "Sync maps from search configs" on the core: {list}.', // @translate
+                ['list' => implode(', ', array_keys($report['unresolved']))]
+            ));
+        }
+        if (!empty($report['suggester_reset'])) {
+            $messenger->addWarning(new PsrMessage(
+                'The autocompletion suggester did not belong to the new engine and was reset; select a suggester of the new engine.' // @translate
+            ));
+        }
+    }
+
+    /**
+     * Whether a value is a plain property term "prefix:local" (e.g.
+     * "dcterms:subject"), excluding structured sources like "item_set/o:id".
+     */
+    protected function isPropertyTerm(string $value): bool
+    {
+        return (bool) preg_match('~^[a-zA-Z][\w-]*:[a-zA-Z][\w-]*$~', $value);
+    }
+
+    /**
+     * For a Solr config, recommend syncing the core maps then reindexing, so
+     * the fields used by the config are indexed.
+     */
+    protected function recommendSolrSyncMaps(SearchConfigRepresentation $searchConfig): void
+    {
+        $searchEngine = $searchConfig->searchEngine();
+        if (!$searchEngine
+            || !($searchEngine->engineAdapter() instanceof \SearchSolr\EngineAdapter\Solarium)
+        ) {
+            return;
+        }
+        $solrCoreId = $searchEngine->settingEngineAdapter('solr_core_id');
+        if (!$solrCoreId) {
+            return;
+        }
+        $message = new PsrMessage(
+            'If new fields were added, run {link}Sync maps{link_end} on the Solr core page, then reindex.', // @translate
+            [
+                'link' => sprintf(
+                    '<a href="%s">',
+                    htmlspecialchars($this->url()->fromRoute(
+                        'admin/search/solr/core-id',
+                        ['id' => $solrCoreId, 'action' => 'sync-maps']
+                    ))
+                ),
+                'link_end' => '</a>',
+            ]
+        );
+        $message->setEscapeHtml(false);
+        $this->messenger()->addWarning($message);
+    }
+
+    /**
      * Check if the configuration should use simple or visual form and get it.
      */
     protected function getConfigureForm(SearchConfigRepresentation $searchConfig): ?\AdvancedSearch\Form\Admin\SearchConfigConfigureForm
     {
-        return $searchConfig->searchEngine()
-            ? $this->getForm(SearchConfigConfigureForm::class, ['search_config' => $searchConfig])
-            : null;
+        $searchEngine = $searchConfig->searchEngine();
+        if (!$searchEngine) {
+            return null;
+        }
+        // Only the suggesters of the config engine are valid for it.
+        $suggesters = [];
+        foreach ($this->api()->search('search_suggesters', ['engine_id' => $searchEngine->id()])->getContent() as $suggester) {
+            $suggesters[$suggester->id()] = $suggester->name();
+        }
+        return $this->getForm(SearchConfigConfigureForm::class, [
+            'search_config' => $searchConfig,
+            'suggesters' => $suggesters,
+        ]);
     }
 
     protected function sitesWithSearchConfigAsDefault(SearchConfigRepresentation $searchConfig): array

@@ -304,7 +304,7 @@ class SearchConfigConfigureForm extends Form
                 'type' => CommonElement\OptionalSelect::class,
                 'options' => [
                     'label' => 'Suggester', // @translate
-                    'value_options' => $this->suggesters,
+                    'value_options' => $this->getOption('suggesters') ?: $this->suggesters,
                     'empty_option' => '',
                 ],
                 'attributes' => [

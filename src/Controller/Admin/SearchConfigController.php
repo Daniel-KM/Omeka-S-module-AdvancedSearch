@@ -543,7 +543,7 @@ class SearchConfigController extends AbstractActionController
         }
         if (!empty($report['unresolved'])) {
             $messenger->addWarning(new PsrMessage(
-                'These fields have no Solr map and return nothing until you run "Sync maps from search configs" on the core: {list}.', // @translate
+                'These fields have no Solr map and return nothing until you align the maps on the core: {list}.', // @translate
                 ['list' => implode(', ', array_keys($report['unresolved']))]
             ));
         }

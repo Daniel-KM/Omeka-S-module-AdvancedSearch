@@ -84,6 +84,33 @@ class SearchEngineController extends AbstractActionController
         return $view;
     }
 
+    /**
+     * Create a ready-to-use internal engine in one click, for the guided empty
+     * state of the search manager. The internal adapter needs no external
+     * service, so no configuration is required.
+     */
+    public function addInternalAction()
+    {
+        foreach ($this->api()->search('search_engines')->getContent() as $engine) {
+            if ($engine->engineAdapterName() === 'internal') {
+                $this->messenger()->addNotice('An internal search engine already exists.'); // @translate
+                return $this->redirect()->toRoute('admin/search-manager');
+            }
+        }
+        $searchEngine = $this->api()->create('search_engines', [
+            'o:name' => 'Internal', // @translate
+            'o:engine_adapter' => 'internal',
+            'o:settings' => [
+                'resource_types' => ['items', 'item_sets'],
+            ],
+        ])->getContent();
+        $this->messenger()->addSuccess(new PsrMessage(
+            'Search index "{name}" created. You can now add a search page.', // @translate
+            ['name' => $searchEngine->name()]
+        ));
+        return $this->redirect()->toRoute('admin/search-manager');
+    }
+
     public function editAction()
     {
         $id = $this->params('id');

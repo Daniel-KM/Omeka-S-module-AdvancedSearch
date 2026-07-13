@@ -225,7 +225,16 @@ usort($suggesters, $byEngineName);
         </tbody>
     </table>
 <?php else: ?>
-    <p><?= $translate('No search engines created yet.') ?></p>
+    <div class="no-resources">
+        <p><?= $translate('A search engine indexes your resources; every search page and suggester relies on one.') ?></p>
+        <p>
+            <a class="button" href="<?= $escape($url('admin/search-manager/engine', ['action' => 'add-internal'])) ?>"><?= $translate('Create an internal engine') ?></a>
+            <span><?= $translate('SQL based, no configuration.') ?></span>
+        </p>
+        <p>
+            <a href="<?= $escape($url('admin/search-manager/engine', ['action' => 'add'])) ?>"><?= $translate('Or add another search engine (e.g. Solr)…') ?></a>
+        </p>
+    </div>
 <?php endif; ?>
 
 <h2 id="table-caption-configs"><?= $translate('Page configs') ?></h2>
@@ -418,16 +427,12 @@ if ($recommendSync && class_exists(\SearchSolr\Module::class, false)):
         title="<?= $escape($translate('Close')) ?>"></a>
     <div class="sidebar-content">
         <h2><?= $escape($translate('Search index to update')) ?></h2>
-        <p><?= $escape(sprintf($translate('The page "%s" was saved. If fields were added or removed, synchronize the maps of the Solr core, then reindex.'), $recommendSync['search_config_name'])) ?></p>
-        <form method="get" action="<?= $escape($syncUrl) ?>">
-            <div class="field">
-                <label>
-                    <input type="checkbox" name="clean" value="1">
-                    <?= $escape($translate('Remove unused maps')) ?>
-                </label>
-            </div>
-            <button type="submit" class="button"><?= $escape($translate('Synchronize maps')) ?></button>
-        </form>
+        <p><?= $escape(sprintf($translate('The page "%s" was saved. If fields were added or removed, align the maps of the Solr core, then reindex.'), $recommendSync['search_config_name'])) ?></p>
+        <p>
+            <a href="#"
+                class="button sidebar-content"
+                data-sidebar-content-url="<?= $escape($syncUrl) ?>"><?= $escape($translate('Align the maps…')) ?></a>
+        </p>
         <p>
             <a href="#"
                 class="button sidebar-content"

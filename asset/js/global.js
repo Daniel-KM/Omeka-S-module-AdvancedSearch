@@ -68,7 +68,11 @@ var Omeka = {
     },
 
     filterSelector : function() {
-        var filter = $(this).val().toLowerCase();
+        // Ignore the case and the diacritics, so "createur" matches "Créateur".
+        var normalize = function(string) {
+            return String(string).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        };
+        var filter = normalize($(this).val());
         var selector = $(this).closest('.selector');
         var totalCount = 0;
         selector.find('li.selector-parent').each(function() {
@@ -76,7 +80,7 @@ var Omeka = {
             var count = 0;
             parent.find('li.selector-child').each(function() {
                 var child = $(this);
-                var label = child.data('child-search').toLowerCase();
+                var label = normalize(child.data('child-search'));
                 if ((label.indexOf(filter) < 0) || (child.hasClass('added'))) {
                     // Label doesn't contain the filter string. Hide the child.
                     child.addClass('filter-hidden');

@@ -183,6 +183,47 @@ class Query implements JsonSerializable
     protected $apiArgs = [];
 
     /**
+     * Build a query from a standard Omeka api query.
+     *
+     * The standard api query is the pivot of the search: the scalar args are
+     * carried as they are through the hidden filters and resolved natively by
+     * each querier; the property[] and filter[] rows are normalized once,
+     * without any config. The caller sets the resource types, the pagination
+     * and the specific options (aliases, boosts, visibility).
+     */
+    public static function fromApiQuery(array $apiQuery): self
+    {
+        $query = new self();
+        if (isset($apiQuery['fulltext_search'])
+            && trim((string) $apiQuery['fulltext_search']) !== ''
+        ) {
+            $query->setQuery((string) $apiQuery['fulltext_search']);
+        }
+        if (!empty($apiQuery['sort_by']) && is_string($apiQuery['sort_by'])) {
+            $sortOrder = strtolower((string) ($apiQuery['sort_order'] ?? ''));
+            $query->setSort($apiQuery['sort_by'] . ($sortOrder === 'desc' ? ' desc' : ' asc'));
+        }
+        unset(
+            $apiQuery['fulltext_search'],
+            $apiQuery['sort_by'],
+            $apiQuery['sort_order'],
+            $apiQuery['page'],
+            $apiQuery['per_page'],
+            $apiQuery['limit'],
+            $apiQuery['offset'],
+            $apiQuery['index'],
+            $apiQuery['submit'],
+            $apiQuery['csrf'],
+            $apiQuery['return_scalar'],
+            $apiQuery['__original_query']
+        );
+        $apiQuery = array_filter($apiQuery, fn ($v) => $v !== null && $v !== '' && $v !== []);
+        $apiQuery = \AdvancedSearch\Stdlib\SearchResources::normalizeHiddenQueryFilters($apiQuery);
+        $query->setFiltersQueryHidden($apiQuery);
+        return $query;
+    }
+
+    /**
      * The querier allows to do some requests directly, lately or on demand.
      *
      * The querier should be the prepared one, with the prepared query stored.

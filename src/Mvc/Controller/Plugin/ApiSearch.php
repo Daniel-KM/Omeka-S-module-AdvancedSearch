@@ -4,7 +4,6 @@ namespace AdvancedSearch\Mvc\Controller\Plugin;
 
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
-use AdvancedSearch\FormAdapter\ApiFormAdapter;
 use AdvancedSearch\Querier\Exception\QuerierException;
 use AdvancedSearch\Query;
 use AdvancedSearch\Response as SearchResponse;
@@ -39,11 +38,6 @@ class ApiSearch extends AbstractPlugin
      * @var \Omeka\Api\Manager
      */
     protected $api;
-
-    /**
-     * @var \AdvancedSearch\FormAdapter\ApiFormAdapter
-     */
-    protected $apiFormAdapter;
 
     /**
      * @var \Common\Stdlib\EasyMeta
@@ -84,7 +78,6 @@ class ApiSearch extends AbstractPlugin
         ApiManager $api,
         ?Acl $acl = null,
         ?AdapterManager $adapterManager = null,
-        ?ApiFormAdapter $apiFormAdapter = null,
         ?EasyMeta $easyMeta = null,
         ?EntityManager $entityManager = null,
         ?LoggerInterface $logger = null,
@@ -96,7 +89,6 @@ class ApiSearch extends AbstractPlugin
         $this->api = $api;
         $this->acl = $acl;
         $this->adapterManager = $adapterManager;
-        $this->apiFormAdapter = $apiFormAdapter;
         $this->easyMeta = $easyMeta;
         $this->entityManager = $entityManager;
         $this->logger = $logger;
@@ -269,37 +261,16 @@ class ApiSearch extends AbstractPlugin
 
         // There is no form validation/filter.
 
-        /** @see \AdvancedSearch\Form\Admin\ApiFormConfigFieldset */
-
-        // Begin building the search query.
+        // Begin building the search query. The standard api query is the pivot:
+        // normalized generically, without any config, and resolved natively by
+        // the querier.
         $resourceType = $request->getResource();
-        $searchConfigSettings = $this->searchConfig->settings();
-        $searchConfigSettingsDefault = [
-            'options' => [],
-            'metadata' => [],
-            'properties' => [],
-            'sort_fields' => [],
-        ];
-        $searchFormSettings = empty($searchConfigSettings['form'])
-            ? $searchConfigSettingsDefault
-            : $searchConfigSettings['form'] + $searchConfigSettingsDefault;
-        $searchFormSettings['resource'] = $resourceType;
-        // Fix to be removed.
-        $engineAdapter = $this->searchConfig->engineAdapter();
-        if ($engineAdapter) {
-            $availableFields = $engineAdapter->getAvailableFields();
-            $searchFormSettings['available_fields'] = array_combine(array_keys($availableFields), array_keys($availableFields));
-        } else {
-            $searchFormSettings['available_fields'] = [];
-        }
-
-        $searchFormSettings['aliases'] = $this->searchConfig->subSetting('index', 'aliases', []);
-        $searchFormSettings['fields_query_args'] = $this->searchConfig->subSetting('index', 'query_args', []);
-        $searchFormSettings['remove_diacritics'] = (bool) $this->searchConfig->subSetting('q', 'remove_diacritics', false);
-        $searchFormSettings['default_search_partial_word'] = (bool) $this->searchConfig->subSetting('q', 'default_search_partial_word', false);
-
-        $searchQuery = $this->apiFormAdapter->toQuery($query, $searchFormSettings);
+        $searchQuery = Query::fromApiQuery($query);
         $searchQuery->setResourceTypes([$resourceType]);
+
+        // Keep the aliases of the config, so a filter on an aggregated field
+        // stays usable through the api.
+        $searchQuery->setAliases($this->searchConfig->subSetting('index', 'aliases', []));
 
         $fieldBoosts = $this->searchConfig->subSetting('index', 'field_boosts', []);
         $searchQuery->setFieldBoosts($fieldBoosts);
@@ -314,12 +285,9 @@ class ApiSearch extends AbstractPlugin
 
         // No site by default for the api (added by controller only).
 
-        // Finish building the search query.
-        // The default sort is the one of the search engine, so it is not added,
-        // except if it is specifically set.
-        $this->sortQuery($searchQuery, $query, $searchFormSettings['metadata'] ?? [], $searchFormSettings['sort_fields'] ?? []);
-        $this->limitQuery($searchQuery, $query, $searchFormSettings['options'] ?? []);
-        // $searchQuery->addOrderBy("$entityClass.id", $query['sort_order']);
+        // Finish building the search query. The sort is set by fromApiQuery()
+        // when specified; the default sort stays the one of the search engine.
+        $this->limitQuery($searchQuery, $query, []);
 
         // No filter for specific limits.
 
@@ -393,60 +361,6 @@ class ApiSearch extends AbstractPlugin
         $response = new Response($entities);
         $response->setTotalResults($totalResults);
         return $response;
-    }
-
-    /**
-     * Set sort_by and sort_order conditions to the query builder.
-     *
-     * @see \Omeka\Api\Adapter\AbstractResourceEntityAdapter::sortQuery()
-     * @see \Omeka\Api\Adapter\AbstractEntityAdapter::sortQuery()
-     *
-     * @param Query $searchQuery
-     * @param array $query
-     * @param array $metadata
-     * @param array $sortFields
-     */
-    protected function sortQuery(Query $searchQuery, array $query, array $metadata, array $sortFields): void
-    {
-        if (empty($metadata) || empty($sortFields)) {
-            return;
-        }
-        if (!is_string($query['sort_by'])) {
-            return;
-        }
-        if (empty($metadata[$query['sort_by']])) {
-            return;
-        }
-        $sortBy = $metadata[$query['sort_by']];
-
-        if (isset($query['sort_order'])) {
-            $sortOrder = strtolower((string) $query['sort_order']);
-            $sortOrder = $sortOrder === 'desc' ? 'desc' : 'asc';
-        } else {
-            $sortOrder = null;
-        }
-
-        $property = $this->easyMeta->propertyTerm($sortBy);
-        if ($property) {
-            $sort = $sortOrder ? $property . ' ' . $sortOrder : $property;
-        } elseif (in_array($sortBy, ['resource_class_label', 'owner_name'])) {
-            $sort = $sortOrder ? $sortBy . ' ' . $sortOrder : $sortBy;
-        } elseif (in_array($sortBy, ['id', 'is_public', 'created', 'modified'])) {
-            $sort = $sortOrder ? $sortBy . ' ' . $sortOrder : $sortBy;
-        } else {
-            // Indicate that the sort is checked and that it will be default.
-            $searchQuery->setSort(null);
-            return;
-        }
-
-        // Check if the sort order is managed.
-        if (in_array($sort, $sortFields)) {
-            $searchQuery->setSort($sort);
-        }
-
-        // TODO Sort randomly is not managed (can be done partially in the view).
-        // TODO Sort by item count is not managed.
-        // Else sort by relevance (score) or by id?
     }
 
     /**

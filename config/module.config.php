@@ -174,7 +174,6 @@ return [
             Form\Element\TextExact::class => Form\Element\TextExact::class,
         ],
         'factories' => [
-            Form\Admin\ApiFormConfigFieldset::class => Service\Form\ApiFormConfigFieldsetFactory::class,
             Form\Admin\SearchConfigConfigureForm::class => Service\Form\SearchConfigConfigureFormFactory::class,
             Form\Admin\SearchConfigFacetFieldset::class => \Common\Service\Form\GenericFormFactory::class,
             Form\Admin\SearchConfigFilterFieldset::class => \Common\Service\Form\GenericFormFactory::class,
@@ -414,7 +413,6 @@ return [
             'main' => FormAdapter\MainFormAdapter::class,
         ],
         'factories' => [
-            'api' => Service\FormAdapter\ApiFormAdapterFactory::class,
         ],
     ],
     'advancedsearch' => [

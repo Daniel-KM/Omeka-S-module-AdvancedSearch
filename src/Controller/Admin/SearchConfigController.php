@@ -93,12 +93,6 @@ class SearchConfigController extends AbstractActionController
             $this->messenger()->addWarning('You can enable this page in your site settings or in admin settings.'); // @translate
         }
 
-        if ($searchConfig->formAdapter() instanceof \AdvancedSearch\FormAdapter\ApiFormAdapter) {
-            $this->messenger()->addWarning(
-                'The api adapter should be selected in the main settings.' // @translate
-            );
-        }
-
         $this->recommendSolrSyncMaps($searchConfig);
 
         return $this->redirect()->toUrl($searchConfig->adminUrl('edit'));

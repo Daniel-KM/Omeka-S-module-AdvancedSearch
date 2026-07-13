@@ -13,14 +13,13 @@ class SettingsFieldsetFactory implements FactoryInterface
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation[] $searchConfigs */
         $searchConfigs = $services->get('Omeka\ApiManager')->search('search_configs')->getContent();
         $valueOptions = [];
-        $apiOptions = [];
         foreach ($searchConfigs as $searchConfig) {
             $labelSearchConfig = sprintf('%s (/%s)', $searchConfig->name(), $searchConfig->slug());
             $valueOptions[$searchConfig->id()] = $labelSearchConfig;
-            if ($searchConfig->formAdapter() instanceof \AdvancedSearch\FormAdapter\ApiFormAdapter) {
-                $apiOptions[$searchConfig->id()] = $labelSearchConfig;
-            }
         }
+        // Any search config points to an engine, which is the only thing the
+        // api redirection needs since the query is normalized generically.
+        $apiOptions = $valueOptions;
 
         $config = $services->get('Config');
 

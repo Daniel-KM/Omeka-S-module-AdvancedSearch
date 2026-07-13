@@ -55,7 +55,12 @@ class SearchEngineConfigureForm extends Form
                 'name' => 'resource_types',
                 'type' => Element\MultiCheckbox::class,
                 'options' => [
-                    'label' => 'Resources indexed and searchable', // @translate
+                    // The internal engine queries the database live: nothing
+                    // is indexed, the setting only limits the searchable
+                    // types.
+                    'label' => $isAdapterInternal
+                        ? 'Resources searchable' // @translate
+                        : 'Resources indexed and searchable', // @translate
                     'label_attributes' => ['style' => 'display: block'],
                     'value_options' => $this->getResourcesTypes(),
                 ],
@@ -66,11 +71,21 @@ class SearchEngineConfigureForm extends Form
                     ],
                 ],
             ])
-            ->add([
+        ;
+
+        // The visibility of the query (public on sites, user rights in admin
+        // and api) is a property of the query context, applied by the querier.
+        // This setting caps what gets indexed: a dedicated core indexed from
+        // public resources only is the strong protection against private
+        // metadata leak. Irrelevant for the internal engine, which queries the
+        // live database.
+        if (!$isAdapterInternal) {
+            $this->add([
                 'name' => 'visibility',
                 'type' => Element\Radio::class,
                 'options' => [
-                    'label' => 'Visibility', // @translate
+                    'label' => 'Indexing visibility', // @translate
+                    'info' => 'Resources indexed in this engine. "Public only" makes the index itself safe for the public search, independently of the query filters.', // @translate
                     'value_options' => [
                         'all' => 'Public and private', // @translate
                         'public' => 'Public only', // @translate
@@ -81,8 +96,8 @@ class SearchEngineConfigureForm extends Form
                     'id' => 'visibility',
                     'value' => 'all',
                 ],
-            ])
-        ;
+            ]);
+        }
 
         // The internal engine queries the database live: indexing cannot be
         // disabled and the option is irrelevant, so it is hidden. When the

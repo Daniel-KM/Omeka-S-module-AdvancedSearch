@@ -483,6 +483,26 @@ class SearchResources
     ];
 
     /**
+     * Resource-level fields usable in a filter row like a property, so the
+     * filter is not limited to properties: collections, owners, classes,
+     * templates, etc. (design intent of filter[]).
+     *
+     * @see self::buildSystemFieldClause()
+     */
+    const FIELD_QUERY_SYSTEM_FIELDS = [
+        'id',
+        'owner_id',
+        'site_id',
+        'item_set_id',
+        'resource_class_id',
+        'resource_class_term',
+        'resource_template_id',
+        'resource_template_label',
+        'is_public',
+        'has_media',
+    ];
+
+    /**
      * The adapter used to build the query.
      *
      * @var \Omeka\Api\Adapter\AbstractResourceEntityAdapter
@@ -2268,6 +2288,132 @@ class SearchResources
      * linked with a public and a private resource.
      * A private linked resource is not linked for an anonymous.
      */
+    /**
+     * Build the dql clause of a filter row on a resource-level field.
+     *
+     * The clause is the positive form ($queryType is already reciprocal for a
+     * negative row; the caller wraps with NOT). Returns null when the query
+     * type has no meaning for the field, in which case the clause matches
+     * nothing. The supported types are eq/list (membership), ex (existence)
+     * and, for the id, the numeric comparisons.
+     */
+    protected function buildSystemFieldClause(QueryBuilder $qb, string $field, string $queryType, $value): ?string
+    {
+        $expr = $qb->expr();
+        $values = is_array($value) ? array_values($value) : ($value === null ? [] : [$value]);
+
+        $isMembership = in_array($queryType, ['eq', 'list'], true);
+        $isExistence = $queryType === 'ex';
+        $isComparison = in_array($queryType, ['lt', 'lte', 'gte', 'gt', '<', '≤', '≥', '>'], true);
+
+        // Membership on ids, with conversion of terms and labels.
+        $idsFor = function (array $values, ?callable $mapper) {
+            $ids = $mapper
+                ? array_values(array_filter($mapper($values)))
+                : array_values(array_unique(array_map('intval', array_filter($values, 'is_numeric'))));
+            return $ids ?: null;
+        };
+
+        switch ($field) {
+            case 'id':
+                if ($isExistence) {
+                    return '1 = 1';
+                }
+                if ($isComparison) {
+                    $val = reset($values);
+                    if (!is_numeric($val)) {
+                        return null;
+                    }
+                    $operators = ['lt' => '<', 'lte' => '<=', 'gte' => '>=', 'gt' => '>', '<' => '<', '≤' => '<=', '≥' => '>=', '>' => '>'];
+                    return 'omeka_root.id ' . $operators[$queryType] . ' ' . $this->adapter->createNamedParameter($qb, (int) $val);
+                }
+                $ids = $isMembership ? $idsFor($values, null) : null;
+                return $ids
+                    ? (string) $expr->in('omeka_root.id', $this->adapter->createNamedParameter($qb, $ids))
+                    : null;
+
+            case 'owner_id':
+                if ($isExistence) {
+                    return 'omeka_root.owner IS NOT NULL';
+                }
+                $ids = $isMembership ? $idsFor($values, null) : null;
+                return $ids
+                    ? (string) $expr->in('omeka_root.owner', $this->adapter->createNamedParameter($qb, $ids))
+                    : null;
+
+            case 'resource_class_id':
+            case 'resource_class_term':
+                if ($isExistence) {
+                    return 'omeka_root.resourceClass IS NOT NULL';
+                }
+                $ids = $isMembership ? $idsFor($values, fn ($v) => $this->easyMeta->resourceClassIds($v)) : null;
+                return $ids
+                    ? (string) $expr->in('omeka_root.resourceClass', $this->adapter->createNamedParameter($qb, $ids))
+                    : null;
+
+            case 'resource_template_id':
+            case 'resource_template_label':
+                if ($isExistence) {
+                    return 'omeka_root.resourceTemplate IS NOT NULL';
+                }
+                $ids = $isMembership ? $idsFor($values, fn ($v) => $this->easyMeta->resourceTemplateIds($v)) : null;
+                return $ids
+                    ? (string) $expr->in('omeka_root.resourceTemplate', $this->adapter->createNamedParameter($qb, $ids))
+                    : null;
+
+            case 'item_set_id':
+                $alias = $this->adapter->createAlias();
+                $aliasSet = $this->adapter->createAlias();
+                $subQuery = "SELECT $alias.id FROM " . \Omeka\Entity\Item::class . " $alias JOIN $alias.itemSets $aliasSet";
+                if ($isExistence) {
+                    return "omeka_root.id IN ($subQuery)";
+                }
+                $ids = $isMembership ? $idsFor($values, null) : null;
+                return $ids
+                    ? "omeka_root.id IN ($subQuery WHERE $aliasSet.id IN (" . $this->adapter->createNamedParameter($qb, $ids) . '))'
+                    : null;
+
+            case 'site_id':
+                $alias = $this->adapter->createAlias();
+                $aliasSite = $this->adapter->createAlias();
+                $subQuery = "SELECT $alias.id FROM " . \Omeka\Entity\Item::class . " $alias JOIN $alias.sites $aliasSite";
+                if ($isExistence) {
+                    return "omeka_root.id IN ($subQuery)";
+                }
+                $ids = $isMembership ? $idsFor($values, null) : null;
+                return $ids
+                    ? "omeka_root.id IN ($subQuery WHERE $aliasSite.id IN (" . $this->adapter->createNamedParameter($qb, $ids) . '))'
+                    : null;
+
+            case 'is_public':
+                if ($isExistence) {
+                    return '1 = 1';
+                }
+                if (!$isMembership || !count($values)) {
+                    return null;
+                }
+                $bool = filter_var(reset($values), FILTER_VALIDATE_BOOLEAN);
+                return 'omeka_root.isPublic = ' . ($bool ? 'true' : 'false');
+
+            case 'has_media':
+                $alias = $this->adapter->createAlias();
+                $subQuery = 'SELECT IDENTITY(' . $alias . '.item) FROM ' . \Omeka\Entity\Media::class . " $alias";
+                if ($isExistence) {
+                    return "omeka_root.id IN ($subQuery)";
+                }
+                if (!$isMembership || !count($values)) {
+                    return null;
+                }
+                $bool = filter_var(reset($values), FILTER_VALIDATE_BOOLEAN);
+                return $bool
+                    ? "omeka_root.id IN ($subQuery)"
+                    : "omeka_root.id NOT IN ($subQuery)";
+
+            default:
+                return null;
+        }
+    }
+
     protected function buildQueryForRow(QueryBuilder $qb, array $vars, bool $isPropertyQuery): ?array
     {
         /**
@@ -2383,6 +2529,44 @@ class SearchResources
             $queryType = self::FIELD_QUERY['reciprocal'][$queryType];
         } else {
             $positive = true;
+        }
+
+        // A filter is not limited to properties (design intent): a row whose
+        // fields are resource-level metadata (collections, owners, classes,
+        // templates…) filters them like the api args do. The clause joins the
+        // same linear where, so it composes with or/and like any row. A row
+        // mixing properties and system fields is not managed and falls through
+        // to the property logic.
+        $rowFields = is_array($propertyIds)
+            ? array_values(array_filter($propertyIds, 'strlen'))
+            : (strlen((string) $propertyIds) ? [(string) $propertyIds] : []);
+        if ($rowFields
+            && !array_diff($rowFields, self::FIELD_QUERY_SYSTEM_FIELDS)
+        ) {
+            $clauses = [];
+            foreach ($rowFields as $rowField) {
+                $clauses[] = $this->buildSystemFieldClause($qb, $rowField, $queryType, $value)
+                    // An unbuildable clause matches nothing, so a negative row
+                    // matches everything, like the solr querier.
+                    ?? '1 = 0';
+            }
+            $clause = count($clauses) > 1
+                ? '(' . implode(' OR ', $clauses) . ')'
+                : reset($clauses);
+            if (!$positive) {
+                $clause = 'NOT (' . $clause . ')';
+            }
+            $whereClause = '(' . $clause . ')';
+            if ($where == '') {
+                $where = $whereClause;
+            } elseif ($joiner === 'or') {
+                $where .= " OR $whereClause";
+            } else {
+                $where .= " AND $whereClause";
+            }
+            // Reset the consecutive OR optimization: the next row cannot reuse
+            // a values join alias through a system clause.
+            return [$where, null, null, null, false];
         }
 
         // Narrow to specific properties, if one or more are selected.

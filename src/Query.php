@@ -689,10 +689,6 @@ class Query implements JsonSerializable
         return $this->activeFacets;
     }
 
-    public function getActiveFacet(string $facetName): ?array
-    {
-        return $this->activeFacets[$facetName] ?? null;
-    }
 
     /**
      * Available options for suggestions:

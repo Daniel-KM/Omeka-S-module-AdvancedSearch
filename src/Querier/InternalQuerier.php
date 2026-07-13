@@ -530,7 +530,7 @@ class InternalQuerier extends AbstractQuerier
             if (class_exists(\Annotate\Entity\Annotation::class)) {
                 $resourceMap['annotations'] = \Annotate\Entity\Annotation::class;
             }
-            if (class_exists(\DigitalObject\Entity\DigitalObject::class)) {
+            if (class_exists('DigitalObject\Module', false)) {
                 $resourceMap['digital_objects'] = \DigitalObject\Entity\DigitalObject::class;
             }
             if (class_exists('Thesaurus\Module', false)) {

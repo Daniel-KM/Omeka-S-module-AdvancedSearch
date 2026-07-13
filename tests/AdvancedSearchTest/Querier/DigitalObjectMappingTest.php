@@ -23,7 +23,7 @@ class DigitalObjectMappingTest extends AbstractHttpControllerTestCase
     public function setUp(): void
     {
         parent::setUp();
-        if (!class_exists(\DigitalObject\Entity\DigitalObject::class)) {
+        if (!class_exists('DigitalObject\Module', false)) {
             $this->markTestSkipped('Module DigitalObject not installed.');
         }
     }

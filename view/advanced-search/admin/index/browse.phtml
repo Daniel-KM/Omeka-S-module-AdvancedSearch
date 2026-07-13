@@ -420,7 +420,7 @@ $sessionAdvancedSearch = new \Laminas\Session\Container('AdvancedSearch');
 $recommendSync = $sessionAdvancedSearch->recommendSync ?? null;
 unset($sessionAdvancedSearch->recommendSync);
 if ($recommendSync && class_exists(\SearchSolr\Module::class, false)):
-    $syncUrl = $url('admin/search/solr/core-id', ['id' => $recommendSync['solr_core_id'], 'action' => 'sync-maps']);
+    $syncUrl = $url('admin/search-manager/solr/core-id', ['id' => $recommendSync['solr_core_id'], 'action' => 'sync-maps']);
     $reindexUrl = $url('admin/search-manager/engine-id', ['id' => $recommendSync['search_engine_id'], 'action' => 'index-confirm']);
 ?>
 <div class="sidebar active" id="recommend-sync-sidebar" role="dialog" aria-label="<?= $escape($translate('Recommendation')) ?>">

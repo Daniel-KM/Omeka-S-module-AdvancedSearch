@@ -800,7 +800,16 @@ class SearchResources
                 $val = $row[$valKey] ?? null;
                 $fields = is_array($row[$fieldKey]) ? $row[$fieldKey] : [$row[$fieldKey]];
 
+                $fields = array_values(array_filter($fields, fn ($v) => is_string($v) && $v !== ''));
+                if (!$fields) {
+                    continue;
+                }
+
+                // A multi-field row is one predicate (OR on the fields, like
+                // the api "in" on several properties), so it must stay a single
+                // row: duplicating it per field would join the fields with AND.
                 $isSimple = !$hasChain
+                    && count($fields) === 1
                     && $type === 'eq'
                     && $join === 'and'
                     && empty($row['except'])
@@ -834,12 +843,12 @@ class SearchResources
                     if (!empty($row['datatype'])) {
                         $entry['datatype'] = $row['datatype'];
                     }
-                    foreach ($fields as $field) {
-                        if (!is_string($field) || $field === '') {
-                            continue;
-                        }
-                        $filters[$field][] = $entry;
+                    // One predicate: registered once, with the full field list
+                    // carried by the entry for the querier.
+                    if (count($fields) > 1) {
+                        $entry['fields'] = $fields;
                     }
+                    $filters[reset($fields)][] = $entry;
                 }
             }
         };

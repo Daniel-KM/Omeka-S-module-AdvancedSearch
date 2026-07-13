@@ -672,9 +672,17 @@ class InternalQuerier extends AbstractQuerier
             $this->mainQuery();
         }
 
-        // "is_public" is automatically managed by the api, but there may be an
-        // option in the form.
-        // TODO Manage an option "is_public".
+        // "is_public" is automatically managed by the api through the acl, so
+        // it follows the user rights by default (an admin sees private). The
+        // engine visibility caps that scope: a "public" engine only returns
+        // public resources (even for an admin, as a protection against private
+        // metadata leak), a "private" engine only private ones.
+        $visibility = $this->searchEngine->setting('visibility');
+        if ($visibility === 'public') {
+            $this->args['is_public'] = 1;
+        } elseif ($visibility === 'private') {
+            $this->args['is_public'] = 0;
+        }
 
         // The site is a specific filter that can be used as part of main query.
         $siteId = $this->query->getSiteId();

@@ -77,6 +77,14 @@ abstract class AbstractQuerier implements QuerierInterface
     {
         $query->setQuerier($this);
         $this->query = $query;
+        // The engine visibility caps the searchable scope, as a protection
+        // against private metadata leak: a "public" engine never exposes
+        // private resources, even to an admin, whatever the acl-based query
+        // visibility set by the form adapter. The "private" cap is applied by
+        // each querier, since there is no public/private flag for it here.
+        if ($this->searchEngine && $this->searchEngine->setting('visibility') === 'public') {
+            $query->setIsPublic(true);
+        }
         return $this;
     }
 

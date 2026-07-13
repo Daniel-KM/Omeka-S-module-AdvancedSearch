@@ -475,12 +475,14 @@ class SearchConfigController extends AbstractActionController
      */
     protected function solrFieldToProperty(?\AdvancedSearch\Api\Representation\SearchEngineRepresentation $engine): ?array
     {
-        $coreId = $engine ? $engine->settingEngineAdapter('solr_core_id') : null;
+        // A core is a facet of its solarium engine: the core id is the
+        // engine id.
+        $coreId = $engine && $engine->engineAdapterName() === 'solarium' ? $engine->id() : null;
         if (!$coreId) {
             return null;
         }
         try {
-            $maps = $this->api()->search('solr_maps', ['solr_core_id' => $coreId])->getContent();
+            $maps = $this->api()->search('solr_maps', ['engine_id' => $coreId])->getContent();
         } catch (\Exception $e) {
             return null;
         }
@@ -497,12 +499,12 @@ class SearchConfigController extends AbstractActionController
      */
     protected function solrSourceProperties(?\AdvancedSearch\Api\Representation\SearchEngineRepresentation $engine): ?array
     {
-        $coreId = $engine ? $engine->settingEngineAdapter('solr_core_id') : null;
+        $coreId = $engine && $engine->engineAdapterName() === 'solarium' ? $engine->id() : null;
         if (!$coreId) {
             return null;
         }
         try {
-            $maps = $this->api()->search('solr_maps', ['solr_core_id' => $coreId])->getContent();
+            $maps = $this->api()->search('solr_maps', ['engine_id' => $coreId])->getContent();
         } catch (\Exception $e) {
             return [];
         }
@@ -579,13 +581,11 @@ class SearchConfigController extends AbstractActionController
         ) {
             return;
         }
-        $solrCoreId = $searchEngine->settingEngineAdapter('solr_core_id');
-        if (!$solrCoreId) {
-            return;
-        }
+        // A core is a facet of its solarium engine: the core id is the
+        // engine id.
         $session = new \Laminas\Session\Container('AdvancedSearch');
         $session->recommendSync = [
-            'solr_core_id' => (int) $solrCoreId,
+            'solr_core_id' => $searchEngine->id(),
             'search_engine_id' => $searchEngine->id(),
             'search_config_name' => $searchConfig->name(),
         ];

@@ -28,6 +28,18 @@
     .search-admin .actions .system-state-icon.fa-spin {
         margin-left: 8px;
     }
+
+    .search-admin .tablesaw-cell-content {
+        flex-wrap: wrap;
+    }
+    .search-admin td .actions + .actions {
+        flex-basis: 100%;
+        justify-content: flex-end;
+    }
+    .search-admin td .engine-status,
+    .search-admin td .warning-notice {
+        flex-basis: 100%;
+    }
     .search-admin .actions a.fa-spin,
     .search-admin .actions a.fa-spin::before {
         text-align: center;

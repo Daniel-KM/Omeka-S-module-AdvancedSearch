@@ -57,8 +57,25 @@ $this->htmlElement('body')->appendAttribute('class', 'search-admin resource brow
 
 <?= $this->pageTitle($translate('Search'), 1, $translate('Search manager')) ?>
 
+<?php
+// An engine is a real backend: the sql database (single internal engine) or a
+// Solr core (adding a core creates its engine).
+$hasSolrForActions = class_exists(\SearchSolr\Module::class, false);
+$hasInternalEngine = false;
+foreach ($searchEngines as $engineRow) {
+    if ($engineRow->engineAdapterName() === 'internal') {
+        $hasInternalEngine = true;
+        break;
+    }
+}
+?>
 <div id="page-actions">
-    <a class="button" href="<?= $url('admin/search-manager/engine', ['action' => 'add']) ?>"><?= $translate('Add search engine') ?></a>
+    <?php if (!$hasInternalEngine): ?>
+    <a class="button" href="<?= $url('admin/search-manager/engine', ['action' => 'add-internal']) ?>"><?= $translate('Create an internal engine') ?></a>
+    <?php endif; ?>
+    <?php if ($hasSolrForActions): ?>
+    <a class="button" href="<?= $url('admin/search-manager/solr/core', ['action' => 'add']) ?>" title="<?= $translate('A new Solr backend: the core is created with its engine.') ?>"><?= $translate('Add Solr core') ?></a>
+    <?php endif; ?>
     <?php if (!empty($searchEngines)): ?>
         <a class="button" href="<?= $url('admin/search-manager/config', ['action' => 'add']) ?>"><?= $translate('Add page') ?></a>
         <a class="button" href="<?= $url('admin/search-manager/suggester', ['action' => 'add']) ?>"><?= $translate('Add suggester') ?></a>
@@ -82,12 +99,18 @@ $hasSolr = class_exists(\SearchSolr\Module::class, false);
 $byEngineName = fn ($a, $b) => [$a->searchEngine()->name(), $a->name()] <=> [$b->searchEngine()->name(), $b->name()];
 usort($searchConfigs, $byEngineName);
 usort($suggesters, $byEngineName);
+
+// Modules fill columns (url, status) and actions of each engine, without a
+// dependency of this module on them (e.g. SearchSolr for solarium engines).
+// Structure: engine id => ['url' => html, 'status' => html, 'actions' => html
+// "<li>" list].
+$engineDetails = $this->trigger('view.browse.engine_details', ['searchEngines' => $searchEngines, 'details' => []], true)['details'] ?? [];
 ?>
 
-<h2 id="table-caption-engines"><?= $translate('Search engines') ?></h2>
+<h2><?= $translate('Indexing') ?></h2>
 
 <?php if (count($searchEngines) > 0): ?>
-    <table aria-labelledby="table-caption-engines" class="tablesaw" data-tablesaw-mode="stack">
+    <table aria-label="<?= $escapeAttr($translate('Search engines')) ?>" class="tablesaw" data-tablesaw-mode="stack">
         <thead>
             <tr>
                 <th><?= $translate('Name') ?></th>
@@ -95,7 +118,7 @@ usort($suggesters, $byEngineName);
                 <?php if ($hasSolr): ?>
                 <th><?= $translate('Solr core') ?></th>
                 <?php endif; ?>
-                <th></th>
+                <th><?= $translate('Status') ?></th>
             </tr>
         </thead>
         <tbody>
@@ -157,26 +180,20 @@ usort($suggesters, $byEngineName);
                                 title="<?= $escape($translate('Delete')) ?>"></a>
                             </li>
                         </ul>
+                        <?php if (!empty($engineDetails[$searchEngine->id()]['actions'])): ?>
+                        <ul class="actions">
+                            <?= implode("\n", $engineDetails[$searchEngine->id()]['actions']) ?>
+                        </ul>
+                        <?php endif; ?>
                     </td>
                     <td><?= $escape($searchEngine->engineAdapterLabel()) ?></td>
                     <?php if ($hasSolr): ?>
                     <td>
-                        <?php
-                        if ($searchEngine->engineAdapterName() === 'solarium'):
-                            $solrCoreId = (int) $searchEngine->settingEngineAdapter('solr_core_id');
-                            $solrCoreName = null;
-                            if ($solrCoreId):
-                                try {
-                                    $solrCoreName = $this->api()->read('solr_cores', $solrCoreId)->getContent()->name();
-                                } catch (\Exception $e) {
-                                    // The core was removed: show the id as a
-                                    // fallback.
-                                    $solrCoreName = sprintf($translate('#%d (missing)'), $solrCoreId);
-                                }
-                            endif;
-                            if ($solrCoreId):
+                        <?php if ($searchEngine->engineAdapterName() === 'solarium'):
+                            $solrClient = (array) ($searchEngine->setting('solr')['client'] ?? []);
+                            $physicalCore = (string) ($solrClient['core'] ?? '');
                         ?>
-                        <a href="<?= $escape($url('admin/search-manager/solr/core-id', ['id' => $solrCoreId, 'action' => 'show'])) ?>"><?= $escape($solrCoreName) ?></a>
+                        <a href="<?= $escape($url('admin/search-manager/solr/core-id', ['id' => $searchEngine->id(), 'action' => 'show'])) ?>"><?= $escape($physicalCore !== '' ? $physicalCore : $translate('(connection not configured)')) ?></a>
                         <?php
                             // The indexing visibility of the core, when capped.
                             $visibility = (string) $searchEngine->setting('visibility');
@@ -184,13 +201,14 @@ usort($suggesters, $byEngineName);
                         <?php if (in_array($visibility, ['public', 'private'], true)): ?>
                         <span class="field-generic"><?= $escape($translate($visibility)) ?></span>
                         <?php endif; ?>
-                        <?php else: ?>
-                        <span class="warning-notice"><?= $escape($translate('No core selected')) ?></span>
-                        <?php endif; ?>
                         <?php endif; ?>
                     </td>
                     <?php endif; ?>
                     <td>
+                        <?= $engineDetails[$searchEngine->id()]['url'] ?? '' ?>
+                        <?php if (!empty($engineDetails[$searchEngine->id()]['status'])): ?>
+                        <div class="engine-status"><?= sprintf($translate('Status: %s'), $engineDetails[$searchEngine->id()]['status']) ?></div>
+                        <?php endif; ?>
                         <?php if (!$isIndexingEnabled): ?>
                             <span
                                 class="o-icon- fa fa-exclamation-triangle warning-notice"
@@ -217,7 +235,12 @@ usort($suggesters, $byEngineName);
     </div>
 <?php endif; ?>
 
-<h2 id="table-caption-configs"><?= $translate('Page configs') ?></h2>
+<?php // Modules can append content inside the Indexing section here. ?>
+<?php $this->trigger('view.browse.engines.after'); ?>
+
+<h2><?= $translate('Search') ?></h2>
+
+<h3 id="table-caption-configs"><?= $translate('Search pages') ?></h3>
 
 <?php if (count($searchConfigs) > 0): ?>
     <table aria-labelledby="table-caption-configs" class="tablesaw" data-tablesaw-mode="stack">
@@ -302,7 +325,7 @@ usort($suggesters, $byEngineName);
     <p><?= $translate('No search page configs created yet.') ?></p>
 <?php endif; ?>
 
-<h2 id="table-caption-suggesters"><?= $translate('Suggesters') ?></h2>
+<h3 id="table-caption-suggesters"><?= $translate('Suggesters') ?></h3>
 
 <?php if (count($suggesters) > 0): ?>
     <table aria-labelledby="table-caption-suggesters" class="tablesaw" data-tablesaw-mode="stack">

@@ -58,3 +58,107 @@ $this->headScript()
 <?php $this->trigger('view.add.form.after'); ?>
 <?= $this->form()->closeTag() ?>
 <?php $this->trigger('view.add.after'); ?>
+
+<?php
+// Quick creation of an engine without leaving the form: the available backends
+// are the sql database (when no internal engine exists yet) and the Solr cores
+// without engine (when module SearchSolr is present).
+$escape = $plugins->get('escapeHtml');
+$escapeAttr = $plugins->get('escapeHtmlAttr');
+$url = $plugins->get('url');
+$api = $plugins->get('api');
+
+$backends = [];
+$hasInternal = false;
+foreach ($api->search('search_engines')->getContent() as $engine) {
+    if ($engine->engineAdapterName() === 'internal') {
+        $hasInternal = true;
+        break;
+    }
+}
+if (!$hasInternal) {
+    $backends['internal'] = $translate('Sql database (internal)');
+}
+// A new Solr backend needs a connection: it is created on the core add page,
+// linked from the dialog.
+$hasSolrModule = class_exists(\SearchSolr\Module::class, false);
+
+$csrfHash = (new \Laminas\Validator\Csrf(['name' => 'quick_engine_csrf', 'timeout' => 3600]))->getHash();
+$quickUrl = $url('admin/search-manager/engine', ['action' => 'add-quick']);
+?>
+<?php if ($backends): ?>
+<dialog id="quick-engine-dialog">
+    <h3><?= $escape($translate('Create a search engine')) ?></h3>
+    <p class="explanation"><?= $escape($translate('An engine is a real backend: the sql database or a Solr core without engine.')) ?></p>
+    <div class="field">
+        <label for="quick-engine-backend"><?= $escape($translate('Backend')) ?></label>
+        <select id="quick-engine-backend">
+            <?php foreach ($backends as $value => $label): ?>
+            <option value="<?= $escapeAttr($value) ?>"><?= $escape($label) ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div class="field">
+        <label for="quick-engine-name"><?= $escape($translate('Name')) ?></label>
+        <input id="quick-engine-name" type="text" value="">
+    </div>
+    <?php if ($hasSolrModule): ?>
+    <p class="explanation"><?= $escape($translate('For a new Solr backend, add a Solr core: its engine is created with it.')) ?>
+        <a href="<?= $escapeAttr($url('admin/search-manager/solr/core', ['action' => 'add'])) ?>"><?= $escape($translate('Add Solr core')) ?></a>
+    </p>
+    <?php endif; ?>
+    <p id="quick-engine-error" class="error" hidden></p>
+    <p>
+        <button type="button" class="button" id="quick-engine-submit"><?= $escape($translate('Create')) ?></button>
+        <button type="button" class="button" id="quick-engine-cancel"><?= $escape($translate('Cancel')) ?></button>
+    </p>
+</dialog>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const select = document.getElementById('search_engine');
+    if (!select) {
+        return;
+    }
+    const dialog = document.getElementById('quick-engine-dialog');
+    const opener = document.createElement('button');
+    opener.type = 'button';
+    opener.className = 'button';
+    opener.textContent = <?= json_encode($translate('Create an engine…'), JSON_UNESCAPED_UNICODE) ?>;
+    select.insertAdjacentElement('afterend', opener);
+    opener.addEventListener('click', () => dialog.showModal());
+    document.getElementById('quick-engine-cancel').addEventListener('click', () => dialog.close());
+    document.getElementById('quick-engine-submit').addEventListener('click', () => {
+        const error = document.getElementById('quick-engine-error');
+        error.hidden = true;
+        const body = new URLSearchParams({
+            backend: document.getElementById('quick-engine-backend').value,
+            'o:name': document.getElementById('quick-engine-name').value,
+            quick_engine_csrf: <?= json_encode($csrfHash) ?>,
+        });
+        fetch(<?= json_encode($quickUrl) ?>, {
+            method: 'POST',
+            body: body,
+            headers: {'X-Requested-With': 'XMLHttpRequest'},
+        })
+            .then(response => response.json().then(json => ({ok: response.ok, json: json})))
+            .then(({ok, json}) => {
+                if (!ok || json.status !== 'success') {
+                    error.textContent = json.data && json.data.message ? json.data.message : 'Error';
+                    error.hidden = false;
+                    return;
+                }
+                const option = document.createElement('option');
+                option.value = json.data.id;
+                option.textContent = json.data.name;
+                option.selected = true;
+                select.appendChild(option);
+                dialog.close();
+            })
+            .catch(() => {
+                error.textContent = 'Error';
+                error.hidden = false;
+            });
+    });
+});
+</script>
+<?php endif; ?>

@@ -37,6 +37,7 @@ use AdvancedSearch\Form\Admin\SearchEngineForm;
 use Common\Stdlib\PsrMessage;
 use Doctrine\ORM\EntityManager;
 use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 use Omeka\Form\ConfirmForm;
 
@@ -111,6 +112,67 @@ class SearchEngineController extends AbstractActionController
         return $this->redirect()->toRoute('admin/search-manager');
     }
 
+    /**
+     * Create an engine from the search page form, without leaving it (json).
+     *
+     * The backend is "internal" or "solarium:{coreId}". The engine is created
+     * with minimal settings; the api validations (single internal engine, one
+     * engine per core) apply and their messages are returned on failure.
+     */
+    public function addQuickAction()
+    {
+        if (!$this->getRequest()->isPost()) {
+            return $this->jsonError($this->translate('Method not allowed.'), 405); // @translate
+        }
+        $csrf = new \Laminas\Validator\Csrf(['name' => 'quick_engine_csrf', 'timeout' => 3600]);
+        if (!$csrf->isValid((string) $this->params()->fromPost('quick_engine_csrf'))) {
+            return $this->jsonError($this->translate('Invalid or missing CSRF token.'), 400); // @translate
+        }
+
+        $backend = (string) $this->params()->fromPost('backend');
+        $name = trim((string) $this->params()->fromPost('o:name'));
+        $data = [
+            'o:settings' => ['resource_types' => ['items', 'item_sets']],
+        ];
+        // A new Solr backend is created on the core add page (it needs a
+        // connection): only the internal engine is quick-creatable here.
+        if ($backend === 'internal') {
+            $data['o:name'] = $name ?: 'Internal';
+            $data['o:engine_adapter'] = 'internal';
+        } else {
+            return $this->jsonError($this->translate('Select a backend.'), 400); // @translate
+        }
+
+        try {
+            $searchEngine = $this->api()->create('search_engines', $data)->getContent();
+        } catch (\Omeka\Api\Exception\ValidationException $e) {
+            $messages = [];
+            foreach ($e->getErrorStore()->getErrors() as $errors) {
+                foreach ($errors as $error) {
+                    $messages[] = $this->translate((string) $error);
+                }
+            }
+            return $this->jsonError(implode(' ', $messages) ?: $this->translate('Invalid data.'), 422); // @translate
+        }
+
+        return new JsonModel([
+            'status' => 'success',
+            'data' => [
+                'id' => $searchEngine->id(),
+                'name' => $searchEngine->name(),
+            ],
+        ]);
+    }
+
+    protected function jsonError(string $message, int $statusCode): JsonModel
+    {
+        $this->getResponse()->setStatusCode($statusCode);
+        return new JsonModel([
+            'status' => 'fail',
+            'data' => ['message' => $message],
+        ]);
+    }
+
     public function editAction()
     {
         $id = $this->params('id');
@@ -155,6 +217,8 @@ class SearchEngineController extends AbstractActionController
 
         $view = new ViewModel([
             'form' => $form,
+            'searchEngineId' => (int) $id,
+            'engineAdapterName' => $engineAdapterName,
         ]);
 
         if ($this->getRequest()->isPost()) {
@@ -167,6 +231,9 @@ class SearchEngineController extends AbstractActionController
             $formData = $form->getData();
             $name = $formData['o:name'];
             unset($formData['csrf'], $formData['o:name']);
+            // Keep the settings managed outside of this form, in particular the
+            // solr connection of a solarium engine.
+            $formData = array_replace($searchEngine->getSettings() ?: [], $formData);
             $searchEngine
                 ->setName($name)
                 ->setSettings($formData);

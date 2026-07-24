@@ -26,7 +26,7 @@ $labelTo = sprintf($translate('%s: to'), $facetLabel); // @translate
         <option value=""></option>
         <?php foreach ($facetValues as $facetValue): ?>
         <option value="<?= $escapeAttr($facetValue['value']) ?>"<?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($facetValue['url_from']) . '"' : '' ?><?= $facetValue['is_from'] ? ' selected="selected"' : '' ?>>
-            <?= $displayCount ? sprintf('%1$s (<span class="count">%2$s</span>)', $escape($facetValue['value']), $facetValue['count']) : $escape($facetValue['value']) ?>
+            <?= $displayCount ? sprintf('%1$s (<span class="count">%2$s</span>)', $escape($facetValue['value']), number_format($facetValue['count'])) : $escape($facetValue['value']) ?>
         </option>
         <?php endforeach; ?>
     </select>
@@ -35,7 +35,7 @@ $labelTo = sprintf($translate('%s: to'), $facetLabel); // @translate
         <option value=""></option>
         <?php foreach ($facetValues as $facetValue): ?>
         <option value="<?= $escapeAttr($facetValue['value']) ?>"<?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($facetValue['url_to']) . '"' : '' ?><?= $facetValue['is_to'] ? ' selected="selected"' : '' ?>>
-            <?= $displayCount ? sprintf('%1$s (<span class="count">%2$s</span>)', $escape($facetValue['value']), $facetValue['count']) : $escape($facetValue['value']) ?>
+            <?= $displayCount ? sprintf('%1$s (<span class="count">%2$s</span>)', $escape($facetValue['value']), number_format($facetValue['count'])) : $escape($facetValue['value']) ?>
         </option>
         <?php endforeach; ?>
     </select>

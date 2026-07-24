@@ -75,7 +75,7 @@ $hasRefineActive = trim((string) $query->getQueryRefine()) !== '';
 <?php if (isset($displayParts['total_results'])): ?>
 <div class="search-results-count-total">
     <?php $totalResults = $response->getTotalResults(); ?>
-    <?= sprintf($totalResults <= 1 ? $translate('%s resource') : $translate('%s resources'), $totalResults) ?>
+    <?= sprintf($totalResults <= 1 ? $translate('%s resource') : $translate('%s resources'), number_format($totalResults)) ?>
 </div>
 <?php endif; ?>
 

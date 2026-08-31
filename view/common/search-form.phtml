@@ -31,6 +31,18 @@ if ($siteSetting('advancedsearch_main_config_replace_quick')) {
             'template' => 'search/search-form-simple',
             'variant' => 'simple',
         ]);
+        // The link is a standard link to the search page: without javascript,
+        // or when the dialog cannot be loaded, the filters remain reachable.
+        // The attribute data-search-form-url turns it into a dialog.
+        $advancedLink = $siteSetting('advancedsearch_main_config_advanced_link', 'dialog');
+        if ($advancedLink):
+            ?>
+        <a href="<?= $escape($searchConfig->siteUrl()) ?>"
+            class="advanced-search-link"
+            <?= $advancedLink === 'dialog' ? sprintf('data-search-form-url="%s"', $escape($searchConfig->formUrl())) : '' ?>
+            data-dialog-heading="<?= $escape($translate('Advanced search')) ?>"><?= $translate('Advanced search') ?></a>
+            <?php
+        endif;
         return;
     }
 }

@@ -235,6 +235,32 @@ class SearchController extends AbstractActionController
             ->setVariables($vars, true);
     }
 
+    /**
+     * Render the search form alone, without running any query.
+     *
+     * The form is loaded on demand, generally inside a dialog opened from the
+     * quick search of the layout: it avoids to output the full form, that may
+     * be very large, in each page of the site.
+     */
+    public function formAction()
+    {
+        $searchConfigId = (int) $this->params()->fromRoute('id');
+
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
+        $searchConfig = $this->viewHelpers()->get('getSearchConfig')($searchConfigId);
+        if ($searchConfig === null) {
+            return $this->notFoundAction();
+        }
+
+        $view = new ViewModel([
+            'searchConfig' => $searchConfig,
+        ]);
+
+        return $view
+            ->setTemplate('search/form')
+            ->setTerminal(true);
+    }
+
     public function suggestAction()
     {
         if (!$this->getRequest()->isXmlHttpRequest()) {

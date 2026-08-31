@@ -113,6 +113,25 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         return $url('search-page-' . $this->slug(), $params, $options);
     }
 
+    /**
+     * Url to the search form alone, used to load it on demand in a dialog.
+     *
+     * @see \AdvancedSearch\Controller\SearchController::formAction()
+     */
+    public function formUrl($siteSlug = null): string
+    {
+        $url = $this->getViewHelper('Url');
+        $status = $this->getServiceLocator()->get('Omeka\Status');
+        if ($status->isAdminRequest()) {
+            return $url('search-admin-page-' . $this->slug() . '/form', [], []);
+        }
+        if (!$siteSlug) {
+            $siteSlug = $this->getServiceLocator()->get('Application')
+                ->getMvcEvent()->getRouteMatch()->getParam('site-slug');
+        }
+        return $url('search-page-' . $this->slug() . '/form', ['site-slug' => $siteSlug], []);
+    }
+
     public function name(): string
     {
         return $this->resource->getName();

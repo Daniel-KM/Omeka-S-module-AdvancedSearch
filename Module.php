@@ -755,6 +755,21 @@ class Module extends AbstractModule
                                     ],
                                 ],
                             ],
+                            'form' => [
+                                'type' => \Laminas\Router\Http\Literal::class,
+                                'options' => [
+                                    'route' => '/form',
+                                    'defaults' => [
+                                        '__NAMESPACE__' => 'AdvancedSearch\Controller',
+                                        '__ADMIN__' => true,
+                                        'controller' => \AdvancedSearch\Controller\SearchController::class,
+                                        'action' => 'form',
+                                        'id' => $searchConfigId,
+                                        'page-slug' => $searchConfigSlug,
+                                        'search-slug' => $searchConfigSlug,
+                                    ],
+                                ],
+                            ],
                         ],
                     ]
                 );
@@ -801,6 +816,21 @@ class Module extends AbstractModule
                             '__SITE__' => true,
                             'controller' => \AdvancedSearch\Controller\SearchController::class,
                             'action' => 'suggest',
+                            'id' => $searchConfigId,
+                            'page-slug' => $searchConfigSlug,
+                            'search-slug' => $searchConfigSlug,
+                        ],
+                    ],
+                ],
+                'form' => [
+                    'type' => \Laminas\Router\Http\Literal::class,
+                    'options' => [
+                        'route' => '/form',
+                        'defaults' => [
+                            '__NAMESPACE__' => 'AdvancedSearch\Controller',
+                            '__SITE__' => true,
+                            'controller' => \AdvancedSearch\Controller\SearchController::class,
+                            'action' => 'form',
                             'id' => $searchConfigId,
                             'page-slug' => $searchConfigSlug,
                             'search-slug' => $searchConfigSlug,
@@ -2032,6 +2062,20 @@ class Module extends AbstractModule
                 ->appendStylesheet($assetUrl('css/advanced-search-form.css', 'AdvancedSearch'));
             $plugins->get('headScript')
                 ->appendFile($assetUrl('js/advanced-search-form.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
+        }
+
+        // The quick search may be replaced by the main search form, with a
+        // link opening the full form in a dialog, loaded on demand.
+        if ($status->isSiteRequest()
+            && $plugins->get('siteSetting')('advancedsearch_main_config_replace_quick')
+            && $plugins->get('siteSetting')('advancedsearch_main_config_advanced_link', 'dialog') === 'dialog'
+        ) {
+            $assetUrl = $plugins->get('assetUrl');
+            $plugins->get('headLink')
+                ->appendStylesheet($assetUrl('css/common-dialog.css', 'Common'));
+            $plugins->get('headScript')
+                ->appendFile($assetUrl('js/common-dialog.js', 'Common'), 'text/javascript', ['defer' => 'defer'])
+                ->appendFile($assetUrl('js/advanced-search-dialog.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
         }
 
         if (!$searchConfig) {

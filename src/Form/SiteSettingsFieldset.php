@@ -96,6 +96,24 @@ class SiteSettingsFieldset extends Fieldset
                     'id' => 'advancedsearch_main_config_replace_quick',
                 ],
             ])
+            ->add([
+                'name' => 'advancedsearch_main_config_advanced_link',
+                'type' => Element\Radio::class,
+                'options' => [
+                    'element_group' => 'advanced_search',
+                    'label' => 'Link to the advanced search below the search form', // @translate
+                    'info' => 'The dialog loads the form only at the first click, so it does not slow down the pages. A theme that displays its own panel in the header can keep "no" and fetch the url of the form itself.', // @translate
+                    'value_options' => [
+                        'dialog' => 'Yes, in a dialog', // @translate
+                        'page' => 'Yes, to the search page', // @translate
+                        '' => 'No', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearch_main_config_advanced_link',
+                    'value' => 'dialog',
+                ],
+            ])
 
             ->add([
                 'name' => 'advancedsearch_hidden_query_filters_per_config',

@@ -180,6 +180,7 @@ return [
             Form\Admin\SearchConfigSettingsFieldset::class => Service\Form\SearchConfigSettingsFieldsetFactory::class,
             Form\Admin\SearchConfigSitesFieldset::class => Service\Form\SearchConfigSitesFieldsetFactory::class,
             Form\Admin\SearchConfigForm::class => Service\Form\SearchConfigFormFactory::class,
+            Form\Admin\SearchConfigImportForm::class => \Common\Service\Form\GenericFormFactory::class,
             Form\Admin\SearchEngineConfigureForm::class => \Common\Service\Form\GenericFormFactory::class,
             Form\Admin\SearchEngineForm::class => Service\Form\SearchEngineFormFactory::class,
             Form\Admin\SearchSuggesterForm::class => Service\Form\SearchSuggesterFormFactory::class,

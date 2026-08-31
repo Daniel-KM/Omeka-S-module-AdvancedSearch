@@ -35,6 +35,7 @@ use AdvancedSearch\Form\Admin\SearchConfigConfigureForm;
 use AdvancedSearch\Form\Admin\SearchConfigFacetFieldset;
 use AdvancedSearch\Form\Admin\SearchConfigFilterFieldset;
 use AdvancedSearch\Form\Admin\SearchConfigForm;
+use AdvancedSearch\Form\Admin\SearchConfigImportForm;
 use AdvancedSearch\Stdlib\SearchResources;
 use Common\Stdlib\PsrMessage;
 use Doctrine\ORM\EntityManager;
@@ -42,6 +43,8 @@ use Laminas\Form\FormElementManager;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\ViewModel;
 use Omeka\Form\ConfirmForm;
+use Symfony\Component\Yaml\Exception\ParseException;
+use Symfony\Component\Yaml\Yaml;
 
 class SearchConfigController extends AbstractActionController
 {
@@ -106,8 +109,12 @@ class SearchConfigController extends AbstractActionController
         /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
         $searchConfig = $this->api()->read('search_configs', ['id' => $id])->getContent();
 
+        $importForm = $this->getForm(SearchConfigImportForm::class);
+        $importForm->setAttribute('action', $searchConfig->adminUrl('import'));
+
         $view = new ViewModel([
             'searchConfig' => $searchConfig,
+            'importForm' => $importForm,
         ]);
 
         $searchEngine = $searchConfig->searchEngine();
@@ -271,6 +278,147 @@ class SearchConfigController extends AbstractActionController
             }
         }
         return $this->redirect()->toRoute('admin/search-manager');
+    }
+
+    /**
+     * Export the settings of a search page as yaml.
+     */
+    public function exportAction()
+    {
+        $id = $this->params('id');
+
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
+        $searchConfig = $this->api()->read('search_configs', ['id' => $id])->getContent();
+
+        $moduleIni = (array) parse_ini_file(dirname(__DIR__, 3) . '/config/module.ini');
+        $engine = $searchConfig->searchEngine();
+        $header = sprintf(
+            "# Search page \"%s\" (%s)\n# Engine: %s\n# Exported on %s with module AdvancedSearch %s.\n",
+            $searchConfig->name(),
+            $searchConfig->slug(),
+            $engine ? sprintf('%s (%s)', $engine->name(), $engine->engineAdapterLabel()) : '',
+            date('Y-m-d H:i:s'),
+            $moduleIni['version'] ?? ''
+        );
+        $yaml = Yaml::dump(
+            $searchConfig->settings() ?: [],
+            8,
+            2,
+            Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK
+        );
+
+        /** @var \Laminas\Http\Response $response */
+        $response = $this->getResponse();
+        $response->setContent($header . $yaml);
+        $response->getHeaders()
+            ->addHeaderLine('Content-Type', 'application/yaml; charset=utf-8')
+            ->addHeaderLine('Content-Disposition', sprintf('attachment; filename="search-config-%s.yaml"', $searchConfig->slug()));
+        return $response;
+    }
+
+    /**
+     * Import the settings of a search page from a yaml or json file or text.
+     */
+    public function importAction()
+    {
+        $id = $this->params('id');
+
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
+        $searchConfig = $this->api()->read('search_configs', ['id' => $id])->getContent();
+
+        if (!$this->getRequest()->isPost()) {
+            return $this->redirect()->toUrl($searchConfig->adminUrl('edit'));
+        }
+
+        $form = $this->getForm(SearchConfigImportForm::class);
+        $post = array_merge_recursive(
+            $this->getRequest()->getPost()->toArray(),
+            $this->getRequest()->getFiles()->toArray()
+        );
+        $form->setData($post);
+        if (!$form->isValid()) {
+            $this->messenger()->addFormErrors($form);
+            return $this->redirect()->toUrl($searchConfig->adminUrl('edit'));
+        }
+
+        $data = $form->getData();
+        $file = $data['import_file'] ?? null;
+        $content = $file && !empty($file['tmp_name']) && empty($file['error'])
+            ? (string) file_get_contents($file['tmp_name'])
+            : (string) ($data['import_text'] ?? '');
+        $content = trim($content);
+        if ($content === '') {
+            $this->messenger()->addError(new PsrMessage(
+                'No config to import: provide a file or paste it.' // @translate
+            ));
+            return $this->redirect()->toUrl($searchConfig->adminUrl('edit'));
+        }
+
+        $settings = $this->parseImportedConfig($content);
+        if ($settings === null) {
+            return $this->redirect()->toUrl($searchConfig->adminUrl('edit'));
+        }
+
+        // The general parameters (name, slug, engine, sites) are never
+        // imported: they are specific to each page and each install.
+        unset($settings['settings'], $settings['sites']);
+
+        // Normalize the settings like a save of the form, so a partial or
+        // hand-written config is completed and cleaned.
+        $settings = $this->prepareDataToSave($this->prepareDataForForm($settings));
+
+        $this->validateFilters($searchConfig, $settings);
+
+        $searchConfigEntity = $searchConfig->getEntity();
+        $searchConfigEntity->setSettings($settings);
+        $this->entityManager->flush();
+
+        $this->messenger()->addSuccess(new PsrMessage(
+            'The config was imported: {count_filters} filters, {count_facets} facets, {count_sorts} sorts.', // @translate
+            [
+                'count_filters' => count($settings['form']['filters'] ?? []),
+                'count_facets' => count($settings['facet']['facets'] ?? []),
+                'count_sorts' => count($settings['results']['sort_list'] ?? []),
+            ]
+        ));
+
+        $this->recommendSolrSyncMaps($searchConfig);
+
+        return $this->redirect()->toUrl($searchConfig->adminUrl('edit'));
+    }
+
+    /**
+     * Parse an imported config, as json (first char "{" or "[") or yaml.
+     */
+    protected function parseImportedConfig(string $content): ?array
+    {
+        if (in_array(mb_substr($content, 0, 1), ['{', '['])) {
+            $settings = json_decode($content, true);
+            if (!is_array($settings)) {
+                $this->messenger()->addError(new PsrMessage(
+                    'The config is not a valid json: {message}', // @translate
+                    ['message' => json_last_error_msg()]
+                ));
+                return null;
+            }
+            return $settings;
+        }
+        try {
+            $settings = Yaml::parse($content);
+        } catch (ParseException $e) {
+            $this->messenger()->addError(new PsrMessage(
+                'The config is not a valid yaml: {message}', // @translate
+                ['message' => $e->getMessage()]
+            ));
+            return null;
+        }
+        if (!is_array($settings)) {
+            $this->messenger()->addError(new PsrMessage(
+                'The config should be a key-value structure.' // @translate
+            ));
+            return null;
+        }
+        return $settings;
     }
 
     public function copyAction()
@@ -1295,6 +1443,10 @@ class SearchConfigController extends AbstractActionController
 
         $availableFields = $engineAdapter->getAvailableFields();
 
+        // The aliases of the settings to save are indexes too. The adapter
+        // does not know them: it is the one of the engine, not of the config.
+        $availableFields += $params['index']['aliases'] ?? [];
+
         // Check standard filters.
 
         $fields = $params['form']['filters'] ?? [];
@@ -1332,7 +1484,7 @@ class SearchConfigController extends AbstractActionController
             return;
         }
 
-        $fieldsAdvanced = $advanced['fields'] ?? [];
+        $fieldsAdvanced = $advanced['options']['fields'] ?? [];
         if (!$fieldsAdvanced) {
             $this->messenger()->addError(
                 'The list of fields of the advanced filters is not configured.' // @translate

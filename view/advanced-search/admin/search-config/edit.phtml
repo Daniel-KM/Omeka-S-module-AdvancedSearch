@@ -3,10 +3,12 @@
  * @var \Laminas\View\Renderer\PhpRenderer $this
  * @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig
  * @var \AdvancedSearch\Form\Admin\SearchConfigConfigureForm $form
+ * @var \AdvancedSearch\Form\Admin\SearchConfigImportForm|null $importForm
  */
 
 $plugins = $this->getHelperPluginManager();
 $translate = $plugins->get('translate');
+$escape = $plugins->get('escapeHtml');
 $assetUrl = $plugins->get('assetUrl');
 
 $this->headLink()
@@ -134,6 +136,8 @@ foreach ($groups as $groupId => $group) {
 <?= $this->form()->openTag($form) ?>
 
 <div id="page-actions">
+    <a class="button" href="<?= $escape($searchConfig->adminUrl('export')) ?>" download><?= $translate('Export') ?></a>
+    <button type="button" class="button" id="button-import-config"><?= $translate('Import') ?></button>
     <button type="submit" class="button"><?= $translate('Save') ?></button>
 </div>
 
@@ -173,4 +177,44 @@ foreach ($groups as $groupId => $group) {
 
 <?php $this->trigger('view.edit.form.after'); ?>
 <?= $this->form()->closeTag() ?>
+
+<?php if (isset($importForm)): $importForm->prepare(); ?>
+<dialog class="dialog-common dialog-import-config" aria-labelledby="dialog-import-config-heading">
+    <div class="dialog-background">
+        <div class="dialog-panel">
+            <div class="dialog-header">
+                <button type="button" class="dialog-header-close-button" autofocus="autofocus">
+                    <span class="dialog-close" aria-hidden="true">🗙</span>
+                    <span class="dialog-close-label"><?= $translate('Close') ?></span>
+                </button>
+            </div>
+            <div class="dialog-contents">
+                <div class="dialog-heading"><h2 id="dialog-import-config-heading"><?= $translate('Import a search page config') ?></h2></div>
+                <?= $this->form()->openTag($importForm) ?>
+                <div class="dialog-body">
+                    <p><?= $translate('The imported config replaces all the settings of this page, except the parameters of the tab General (name, slug, engine, sites).') ?></p>
+                    <?= $this->formCollection($importForm, false) ?>
+                </div>
+                <div class="dialog-footer">
+                    <button type="button" class="dialog-button dialog-cancel"><?= $translate('Cancel') ?></button>
+                    <button type="submit" class="dialog-button dialog-ok"><?= $translate('Import') ?></button>
+                </div>
+                <?= $this->form()->closeTag() ?>
+            </div>
+        </div>
+    </div>
+</dialog>
+<script>
+(function () {
+    const dialog = document.querySelector('dialog.dialog-import-config');
+    const button = document.getElementById('button-import-config');
+    if (!dialog || !button) return;
+    button.addEventListener('click', () => dialog.showModal());
+    dialog.querySelectorAll('.dialog-header-close-button, .dialog-cancel').forEach(
+        (closer) => closer.addEventListener('click', () => dialog.close())
+    );
+})();
+</script>
+<?php endif; ?>
+
 <?php $this->trigger('view.edit.after'); ?>

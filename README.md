@@ -658,6 +658,9 @@ TODO
 - [x] Updated index in batch, not one by one.
 - [ ] Add an option to replace the default Omeka search form.
 - [ ] Improve the internal autosuggester to return the list of next words when space.
+- [ ] Use all features of engine instead forcing from advanced search (facets, query, see the case of `resq` in site settings). And hide the ones that are not supported.
+- [ ] Allow nested groups of filters with parentheses (`(a or b) and c`).
+- [ ] Add the highlighting of the results.
 - [x] Use a "or" for facets of each group.
 - [x] Manage pagination when item set is redirected to search.
 - [ ] Reorder items in items set (from module Next, see MvcListeners).
@@ -761,6 +764,7 @@ improvements were done for the digital library [Musee de Bretagne].
 
 
 [Advanced Search]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch
+[AdvancedSearch.zip]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch/-/releases
 [Omeka S]: https://omeka.org/s
 [Solr]: https://solr.apache.org/
 [Search Solr]: https://gitlab.com/Daniel-KM/Omeka-S-module-SearchSolr

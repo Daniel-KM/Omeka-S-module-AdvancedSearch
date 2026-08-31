@@ -419,6 +419,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'button_submit',
+                    'data-common' => '1',
+                    'data-inline' => 'submit',
                     'value' => true,
                 ],
             ])
@@ -430,6 +432,9 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'label_submit',
+                    'data-common' => '1',
+                    'data-inline' => 'submit',
+                    'data-show-if' => 'button_submit',
                     'required' => false,
                     'value' => 'Search', // @translate
                     'placeholder' => 'Search', // @translate
@@ -443,6 +448,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'button_reset',
+                    'data-common' => '1',
+                    'data-inline' => 'reset',
                 ],
             ])
             ->add([
@@ -453,6 +460,9 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'label_reset',
+                    'data-common' => '1',
+                    'data-inline' => 'reset',
+                    'data-show-if' => 'button_reset',
                     'required' => false,
                     'value' => 'Reset fields', // @translate
                     'placeholder' => 'Reset fields', // @translate
@@ -466,6 +476,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'attribute_form',
+                    'data-advanced-section' => $this->translator->translate('Technical'), // @translate
                 ],
             ])
             // TODO Make option "rft" a standard filter.
@@ -484,6 +495,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'rft',
+                    'data-advanced-section' => $this->translator->translate('Buttons'), // @translate
                     'value' => '',
                 ],
             ])
@@ -499,6 +511,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'form_quick_filter',
+                    'data-advanced-section' => $this->translator->translate('Quick filter'), // @translate
                     'class' => 'chosen-select',
                     'data-placeholder' => 'Set field or index…', // @translate
                 ],
@@ -511,18 +524,25 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'form_quick_filter_label',
+                    'data-advanced-section' => $this->translator->translate('Quick filter'), // @translate
                 ],
             ])
             ->add([
                 'name' => 'quick_filter_values',
-                'type' => OmekaElement\ArrayTextarea::class,
+                'type' => CommonElement\ArrayTextarea::class,
                 'options' => [
                     'label' => 'Quick filter predefined values', // @translate
                     'info' => 'If empty, all values are fetched from the index.', // @translate
                     'as_key_value' => true,
+                    'key_value_separator' => '=',
+                    'pairs_editor' => [
+                        'key_label' => $this->translator->translate('Value'), // @translate
+                        'value_label' => $this->translator->translate('Label'), // @translate
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'form_quick_filter_values',
+                    'data-advanced-section' => $this->translator->translate('Quick filter'), // @translate
                     'rows' => 5,
                     'placeholder' => <<<TXT
                         = All
@@ -540,6 +560,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'form_quick_filter_advanced',
+                    'data-advanced-section' => $this->translator->translate('Quick filter'), // @translate
                 ],
             ])
             ->add([
@@ -587,11 +608,6 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
 
         // Settings for the results.
 
-        /** @var \AdvancedSearch\Form\Admin\SearchConfigSortFieldset $sortFieldset */
-        $sortFieldset = $this->formElementManager->get(SearchConfigSortFieldset::class, [
-            'search_config' => $searchConfig,
-        ]);
-
         $this
             ->add([
                 'name' => 'results',
@@ -609,6 +625,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'results_label_default',
+                    'data-subtab' => 'general',
+                    'data-advanced-section' => $this->translator->translate('Labels'), // @translate
                     'value' => 'Search', // @translate
                     'required' => false,
                 ],
@@ -621,6 +639,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'results_label_results',
+                    'data-subtab' => 'general',
+                    'data-advanced-section' => $this->translator->translate('Labels'), // @translate
                     'value' => 'Search results', // @translate
                     'required' => false,
                 ],
@@ -633,6 +653,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'results_label_no_results',
+                    'data-subtab' => 'general',
+                    'data-advanced-section' => $this->translator->translate('Labels'), // @translate
                     'value' => 'No results', // @translate
                     'required' => false,
                 ],
@@ -645,17 +667,21 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'by_resource_type',
+                    'data-subtab' => 'general',
+                    'data-common' => '1',
                 ],
             ])
             ->add([
                 'name' => 'template',
                 'type' => Element\Text::class,
                 'options' => [
-                    'label' => 'Template', // @translate
-                    'info' => 'The template to use in your theme. Default is search/search.', // @translate
+                    'label' => 'Theme template (phtml file)', // @translate
+                    'info' => 'The template of the theme used to render the page. Default is search/search. Rarely used.', // @translate
                 ],
                 'attributes' => [
                     'id' => 'template',
+                    'data-subtab' => 'general',
+                    'data-advanced-section' => $this->translator->translate('Technical'), // @translate
                 ],
             ])
             ->add([
@@ -667,6 +693,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'autoscroll',
+                    'data-subtab' => 'general',
+                    'data-advanced-section' => $this->translator->translate('Technical'), // @translate
                 ],
             ])
             ->add([
@@ -677,6 +705,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'breadcrumbs',
+                    'data-subtab' => 'general',
+                    'data-common' => '1',
                 ],
             ])
             ->add([
@@ -693,6 +723,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'search_filters',
+                    'data-subtab' => 'header',
+                    'data-common' => '1',
                     'value' => 'header',
                 ],
             ])
@@ -712,6 +744,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'search_filters_mode',
+                    'data-subtab' => 'header',
+                    'data-advanced-section' => $this->translator->translate('Used filters'), // @translate
                     'value' => 'link_remove',
                 ],
             ])
@@ -731,6 +765,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'active_facets_mode',
+                    'data-subtab' => 'header',
+                    'data-advanced-section' => $this->translator->translate('Used facets'), // @translate
                     'value' => 'link_remove',
                 ],
             ])
@@ -742,6 +778,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'search_filters_field_label',
+                    'data-subtab' => 'header',
+                    'data-advanced-section' => $this->translator->translate('Used filters'), // @translate
                     'value' => '1',
                 ],
             ])
@@ -759,6 +797,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'active_facets',
+                    'data-subtab' => 'header',
+                    'data-common' => '1',
                     'value' => 'none',
                 ],
             ])
@@ -770,6 +810,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'active_facets_field_label',
+                    'data-subtab' => 'header',
+                    'data-advanced-section' => $this->translator->translate('Used facets'), // @translate
                     'value' => '1',
                 ],
             ])
@@ -787,6 +829,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'total_results',
+                    'data-subtab' => 'header',
+                    'data-common' => '1',
                     'value' => 'header',
                 ],
             ])
@@ -804,6 +848,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'search_form_simple',
+                    'data-subtab' => 'header',
+                    'data-common' => '1',
                     'value' => 'none',
                 ],
             ])
@@ -821,6 +867,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'search_form_quick',
+                    'data-subtab' => 'header',
+                    'data-common' => '1',
                     'value' => 'none',
                 ],
             ])
@@ -838,6 +886,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'paginator',
+                    'data-subtab' => 'header',
+                    'data-common' => '1',
                     'value' => 'header',
                 ],
             ])
@@ -855,6 +905,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'per_page',
+                    'data-subtab' => 'header',
+                    'data-common' => '1',
                     'value' => 'header',
                 ],
             ])
@@ -872,6 +924,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'sort',
+                    'data-subtab' => 'header',
+                    'data-common' => '1',
                     'value' => 'header',
                 ],
             ])
@@ -889,6 +943,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'grid_list',
+                    'data-subtab' => 'header',
+                    'data-common' => '1',
                     'value' => 'header',
                 ],
             ])
@@ -907,6 +963,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'grid_list_mode',
+                    'data-subtab' => 'header',
+                    'data-common' => '1',
                     'value' => 'auto',
                 ],
             ])
@@ -919,6 +977,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'map_display',
+                    'data-subtab' => 'general',
+                    'data-common' => '1',
                 ],
             ])
             ->add([
@@ -934,6 +994,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'thumbnail_mode',
+                    'data-subtab' => 'card',
+                    'data-common' => '1',
                     'value' => 'default',
                 ],
             ])
@@ -946,6 +1008,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'thumbnail_type',
+                    'data-subtab' => 'card',
+                    'data-common' => '1',
                     'value' => 'medium',
                 ],
             ])
@@ -957,17 +1021,31 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'allow_html',
+                    'data-subtab' => 'card',
+                    'data-common' => '1',
                 ],
             ])
             ->add([
                 'name' => 'properties',
-                'type' => OmekaElement\ArrayTextarea::class,
+                'type' => CommonElement\ArrayTextarea::class,
                 'options' => [
                     'label' => 'Properties to display for each result', // @translate
-                    'info' => 'List of property terms to display below each result, one by line.', // @translate
+                    'info' => 'The values of these properties are displayed below each result, in this order. The label of the property is used when no label is set.', // @translate
+                    'as_key_value' => true,
+                    'key_value_separator' => '=',
+                    'pairs_editor' => [
+                        'key_source' => '#form_filter_field',
+                        'key_skip' => ['advanced'],
+                        'key_pattern' => '^[a-zA-Z][a-zA-Z0-9]*:[a-zA-Z][a-zA-Z0-9]*$',
+                        'key_label' => $this->translator->translate('Property'), // @translate
+                        'value_label' => $this->translator->translate('Label (optional)'), // @translate
+                        'key_fill' => false,
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'properties',
+                    'data-subtab' => 'card',
+                    'data-common' => '1',
                     'rows' => 5,
                     'placeholder' => <<<'TXT'
                         dcterms:creator
@@ -977,23 +1055,6 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
             ])
             ->add([
-                'name' => 'facets',
-                'type' => CommonElement\OptionalRadio::class,
-                'options' => [
-                    'label' => 'Block of facets', // @translate
-                    'value_options' => [
-                        'none' => 'No', // @translate
-                        'before' => 'Before results', // @translate
-                        'after' => 'After results', // @translate
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'facets',
-                    'value' => 'before',
-                ],
-            ])
-
-            ->add([
                 'name' => 'pagination_per_page',
                 'type' => CommonElement\OptionalNumber::class,
                 'options' => [
@@ -1001,6 +1062,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'pagination_per_page',
+                    'data-subtab' => 'header',
+                    'data-advanced-section' => $this->translator->translate('Pagination'), // @translate
                     'required' => false,
                     'value' => '0',
                     'min' => '0',
@@ -1013,14 +1076,20 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
 
             ->add([
                 'name' => 'per_page_list',
-                'type' => OmekaElement\ArrayTextarea::class,
+                'type' => CommonElement\ArrayTextarea::class,
                 'options' => [
                     'label' => 'Labels for results per page', // @translate
                     'as_key_value' => true,
                     'key_value_separator' => '=',
+                    'pairs_editor' => [
+                        'key_label' => $this->translator->translate('Number'), // @translate
+                        'value_label' => $this->translator->translate('Label'), // @translate
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'per_page_list',
+                    'data-subtab' => 'header',
+                    'data-advanced-section' => $this->translator->translate('Pagination'), // @translate
                     'placeholder' => <<<'STRING'
                         10 = Results by 10
                         25 = Results by 25
@@ -1040,47 +1109,31 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'label_sort',
+                    'data-subtab' => 'header',
+                    'data-advanced-section' => $this->translator->translate('Sort'), // @translate
                 ],
             ])
 
             ->add([
-                'type' => Element\Collection::class,
                 'name' => 'sort_list',
+                'type' => CommonElement\ArrayTextarea::class,
                 'options' => [
-                    'label' => 'Sort', // @translate
-                    'info' => 'The sort options offered in the results.', // @translate
-                    'count' => 0,
-                    'allow_add' => true,
-                    'allow_remove' => true,
-                    'should_create_template' => true,
-                    'template_placeholder' => '__index__',
-                    'create_new_objects' => true,
-                    'target_element' => $sortFieldset,
+                    'label' => 'Sort selector', // @translate
+                    'info' => 'The sort options offered to the visitor, in this order. Format is "field direction = label".', // @translate
+                    'as_key_value' => true,
+                    'key_value_separator' => '=',
+                    'pairs_editor' => [
+                        'keys' => $this->availableSortFieldsFlat($searchConfig),
+                        'key_label' => $this->translator->translate('Sort field'), // @translate
+                        'value_label' => $this->translator->translate('Label'), // @translate
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'sort_list',
-                    'required' => false,
-                    'class' => 'form-fieldset-collection',
-                    'data-label-index' => $this->translator->translate('Sort {index}'), // @ŧranslate
-                    'data-label-new' => $this->translator->translate('New sort'), // @translate
-                ],
-            ])
-            ->add([
-                'name' => 'plus',
-                'type' => Element\Button::class,
-                'options' => [
-                    'label' => ' ',
-                    'label_options' => [
-                        'disable_html_escape' => true,
-                    ],
-                    'label_attributes' => [
-                        'class' => 'config-fieldset-action-label',
-                    ],
-                ],
-                'attributes' => [
-                    // Don't use o-icon-add.
-                    'class' => 'config-fieldset-action config-fieldset-plus fa fa-plus add-value button',
-                    'aria-label' => 'Add a sort option', // @translate
+                    'data-subtab' => 'header',
+                    'data-advanced-section' => $this->translator->translate('Sort'), // @translate
+                    'rows' => 6,
+                    'placeholder' => 'dcterms:date asc = Date',
                 ],
             ])
         ;
@@ -1111,6 +1164,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'facet_label_facets',
+                    'data-common' => '1',
                     'value' => 'Facets',
                     'required' => false,
                 ],
@@ -1123,8 +1177,26 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'facet_label_no_facets',
+                    'data-advanced-section' => $this->translator->translate('Display'), // @translate
                     'value' => 'No facets', // @translate
                     'required' => false,
+                ],
+            ])
+            ->add([
+                'name' => 'position',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Position of the block of facets', // @translate
+                    'value_options' => [
+                        'none' => 'No', // @translate
+                        'before' => 'Left of the results', // @translate
+                        'after' => 'Right of the results', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'facet_position',
+                    'data-common' => '1',
+                    'value' => 'before',
                 ],
             ])
             ->add([
@@ -1140,6 +1212,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'facet_mode',
+                    'data-common' => '1',
                     'required' => false,
                     'value' => 'button',
                 ],
@@ -1157,6 +1230,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'facet_list',
+                    'data-advanced-section' => $this->translator->translate('Display'), // @translate
                     'required' => false,
                     'value' => 'available',
                 ],
@@ -1169,6 +1243,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'facet_display_active',
+                    'data-advanced-section' => $this->translator->translate('Used facets'), // @translate
                     'required' => false,
                     'value' => true,
                 ],
@@ -1181,6 +1256,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'facet_display_active_field_label',
+                    'data-advanced-section' => $this->translator->translate('Used facets'), // @translate
                     'required' => false,
                     'value' => false,
                 ],
@@ -1193,6 +1269,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'facet_label_active_facets',
+                    'data-advanced-section' => $this->translator->translate('Used facets'), // @translate
                     'value' => 'Active facets', // @translate
                 ],
             ])
@@ -1210,6 +1287,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'facet_display_submit',
+                    'data-common' => '1',
                     'required' => false,
                     'value' => 'above',
                 ],
@@ -1222,6 +1300,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'facet_label_submit',
+                    'data-advanced-section' => $this->translator->translate('Display'), // @translate
                     'required' => false,
                     'value' => 'Apply facets', // @translate
                     'placeholder' => 'Apply facets', // @translate
@@ -1241,6 +1320,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'facet_display_reset',
+                    'data-common' => '1',
                     'required' => false,
                     'value' => 'above',
                 ],
@@ -1253,6 +1333,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'facet_label_reset',
+                    'data-advanced-section' => $this->translator->translate('Display'), // @translate
                     'required' => false,
                     'value' => 'Reset facets', // @translate
                     'placeholder' => 'Reset facets', // @translate
@@ -1271,6 +1352,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'facet_display_expand_all',
+                    'data-advanced-section' => $this->translator->translate('Display'), // @translate
                     'required' => false,
                     'value' => 'none',
                 ],
@@ -1283,6 +1365,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'facet_display_refine',
+                    'data-advanced-section' => $this->translator->translate('Refine'), // @translate
                     'required' => false,
                     'value' => true,
                 ],
@@ -1295,6 +1378,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'facet_label_refine',
+                    'data-advanced-section' => $this->translator->translate('Refine'), // @translate
+                    'data-show-if' => 'facet_display_refine',
                     'required' => false,
                     'value' => 'Refine search', // @translate
                     'placeholder' => 'Refine search', // @translate
@@ -1610,6 +1695,30 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
     {
         $this->thumbnailTypes = $thumbnailTypes;
         return $this;
+    }
+
+    /**
+     * The available sort fields as a flat list "name => default label".
+     */
+    protected function availableSortFieldsFlat($searchConfig): array
+    {
+        $engineAdapter = $searchConfig ? $searchConfig->engineAdapter() : null;
+        if (!$engineAdapter) {
+            return [];
+        }
+        $result = [];
+        foreach ($engineAdapter->getAvailableSortFields() as $name => $labelOrGroup) {
+            if (is_array($labelOrGroup) && isset($labelOrGroup['options'])) {
+                foreach ($labelOrGroup['options'] as $optionName => $optionLabel) {
+                    $optionLabel = is_array($optionLabel) ? ($optionLabel['label'] ?? $optionName) : $optionLabel;
+                    $result[$optionName] = $this->translator->translate((string) $optionLabel);
+                }
+                continue;
+            }
+            $label = is_array($labelOrGroup) ? ($labelOrGroup['label'] ?? $name) : $labelOrGroup;
+            $result[$name] = $this->translator->translate((string) $label);
+        }
+        return $result;
     }
 
     public function setTranslator(Translator $translator): self

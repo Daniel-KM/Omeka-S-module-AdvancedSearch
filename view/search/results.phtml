@@ -92,11 +92,17 @@ $showLocale = (bool) $setting('show_locale_label');
             <?php endif; ?>
             <?php if ($showProperties): ?>
             <dl class="properties">
-                <?php foreach ($properties as $property):
+                <?php foreach ($properties as $property => $propertyLabel):
+                    // The properties may be a simple list or a map with an
+                    // optional label ("term => label").
+                    if (is_int($property)) {
+                        $property = $propertyLabel;
+                        $propertyLabel = '';
+                    }
                     $values = $resource->value($property, ['all' => true, 'lang' => $langValue]);
                     if ($values): ?>
                 <div class="property">
-                    <dt><?= $escape($translate($easyMeta->propertyLabel($property))) ?></dt>
+                    <dt><?= $escape($translate($propertyLabel === '' ? $easyMeta->propertyLabel($property) : $propertyLabel)) ?></dt>
                     <?php foreach ($values as $value):
                         $valueType = $value->type();
                         $valueLang = $value->lang();

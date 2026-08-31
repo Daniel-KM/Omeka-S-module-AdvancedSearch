@@ -60,14 +60,6 @@ $(document).ready(function() {
             // list of the collection (advanced-search-collection.js).
             $formConfig.on('click', '.config-fieldset-plus', self.fieldsetAppend);
 
-            $formConfig.on('change', '#search-config-sort-form select', function() {
-                const select = $(this);
-                const fieldset = select.closest('fieldset');
-                const optionSelected = $('option:selected', select);
-                const label = optionSelected.data('label-default');
-                fieldset.find('input[type=text]').val(label);
-            });
-
             return self;
         };
 

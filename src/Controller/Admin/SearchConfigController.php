@@ -818,6 +818,21 @@ class SearchConfigController extends AbstractActionController
         }
         $settings['form']['filters'] = array_values($settings['form']['filters'] ?? []);
 
+        // The sort selector is stored with the name and the label, edited as
+        // pairs "name => label".
+        $sortList = [];
+        foreach ($settings['results']['sort_list'] ?? [] as $name => $sort) {
+            $sortList[$name] = is_array($sort) ? (string) ($sort['label'] ?? '') : (string) $sort;
+        }
+        $settings['results']['sort_list'] = $sortList;
+
+        // The properties to display may be a simple list (no labels) or a
+        // map "term => label" for the form.
+        $properties = $settings['results']['properties'] ?? [];
+        if ($properties && array_is_list($properties)) {
+            $settings['results']['properties'] = array_fill_keys($properties, '');
+        }
+
         $facetInputs = [
             'field',
             'field_end',
@@ -905,6 +920,16 @@ class SearchConfigController extends AbstractActionController
     protected function prepareDataToSave(array $params): array
     {
         unset($params['csrf']);
+
+        // The properties to display are stored as a simple list when no
+        // custom label is set.
+        $properties = $params['results']['properties'] ?? [];
+        if (is_array($properties)) {
+            $properties = array_filter($properties, fn ($v, $k) => trim((string) $k) !== '', ARRAY_FILTER_USE_BOTH);
+            $params['results']['properties'] = array_filter(array_map('trim', $properties), 'strlen')
+                ? array_map('trim', $properties)
+                : array_keys($properties);
+        }
 
         $params = $this->removeUselessFields($params);
 
@@ -1069,10 +1094,20 @@ class SearchConfigController extends AbstractActionController
         // The settings of the advanced filter are stored with it now.
         unset($params['form']['advanced']);
 
+        // The sort selector is a list of pairs "name => label" in the form,
+        // stored with the name and the label.
         $sortList = [];
-        foreach ($params['results']['sort_list'] ?? [] as $sort) {
-            if (!empty($sort['name'])) {
-                $sortList[$sort['name']] = $sort;
+        foreach ($params['results']['sort_list'] ?? [] as $name => $sort) {
+            if (is_array($sort)) {
+                // Legacy fieldsets of the collection.
+                if (!empty($sort['name'])) {
+                    $sortList[$sort['name']] = $sort;
+                }
+                continue;
+            }
+            $name = trim((string) $name);
+            if ($name !== '') {
+                $sortList[$name] = ['name' => $name, 'label' => trim((string) $sort)];
             }
         }
         $params['results']['sort_list'] = $sortList;

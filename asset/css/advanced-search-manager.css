@@ -136,6 +136,125 @@
         margin: 0.5em 0 0;
         width: 100%;
     }
+    /* The long radios are displayed one by line. */
+    .search-admin .field:has(#facet_mode) .inputs > label {
+        display: block;
+        margin: 0;
+        padding: 0.25em 0;
+        line-height: 1.5;
+    }
+    /* The preview of the page of results. */
+    #page-actions .collection-preview-results {
+        margin-right: 0.5em;
+    }
+    .preview-results-page {
+        font-size: 0.9em;
+    }
+    .preview-breadcrumbs {
+        color: #676767;
+        margin-bottom: 0.5em;
+    }
+    .preview-search-form {
+        display: flex;
+        gap: 0.5em;
+        margin-bottom: 0.5em;
+    }
+    .preview-active-filters {
+        margin-bottom: 0.5em;
+    }
+    .preview-chip {
+        display: inline-block;
+        padding: 0.1em 0.6em;
+        margin-right: 0.4em;
+        background: #efefef;
+        border: 1px solid #dfdfdf;
+        border-radius: 1em;
+    }
+    .preview-results-bar {
+        display: flex;
+        align-items: center;
+        gap: 1em;
+        flex-wrap: wrap;
+        padding: 0.4em 0;
+        border-top: 1px solid #dfdfdf;
+        border-bottom: 1px solid #dfdfdf;
+        margin-bottom: 0.75em;
+    }
+    .preview-results-bar select {
+        min-width: 0 !important;
+        width: auto !important;
+    }
+    .preview-grid-list {
+        letter-spacing: 0.25em;
+        color: #676767;
+    }
+    .preview-results-layout {
+        display: flex;
+        gap: 1.25em;
+        align-items: flex-start;
+    }
+    .preview-results-layout.preview-facets-after {
+        flex-direction: row-reverse;
+    }
+    .preview-facets {
+        flex: 0 0 30%;
+        padding: 0.5em;
+        background: #f7f7f7;
+        border: 1px solid #dfdfdf;
+        border-radius: 3px;
+    }
+    .preview-facets .input-type-preview-item {
+        margin-bottom: 0.75em;
+    }
+    .preview-results-list {
+        flex: 1;
+        min-width: 0;
+    }
+    .preview-result {
+        display: flex;
+        gap: 0.75em;
+        margin-bottom: 1em;
+    }
+    .preview-thumb {
+        flex: none;
+        width: 56px;
+        height: 56px;
+        background: #dfdfdf;
+        border-radius: 3px;
+        position: relative;
+    }
+    .preview-thumb::before {
+        content: "🖼";
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0.5;
+    }
+    .preview-result-title {
+        font-weight: bold;
+        text-decoration: underline;
+    }
+    .preview-result-description {
+        margin: 0.25em 0 0;
+        color: #4d4d4d;
+    }
+    .preview-result dl {
+        margin: 0.25em 0 0;
+    }
+    .preview-result dl > div {
+        display: flex;
+        gap: 0.5em;
+    }
+    .preview-result dt {
+        font-weight: bold;
+        min-width: 6em;
+    }
+    .preview-result dd {
+        margin: 0;
+        color: #4d4d4d;
+    }
     /* The global preview uses the dialog of Common. */
     .dialog-common .input-type-preview-all {
         width: 560px;

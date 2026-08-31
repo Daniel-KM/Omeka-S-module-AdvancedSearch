@@ -282,7 +282,7 @@
 
     // The preview depends on the label and on some options too.
     const refresh = function (e) {
-        if (!e.target.name || !/\[(label|as_link|display_count|multiple|value_layout|values|fields|value_label|autosuggest|min|max|scale_show_ticks|paginate|default_number|field_elements)\](\[\])?$/.test(e.target.name)) return;
+        if (!e.target.name || !/\[(label|as_link|display_count|multiple|value_layout|values|fields|value_label|autosuggest|min|max|scale_show_ticks|paginate|default_number|field_elements|position)\](\[\])?$/.test(e.target.name)) return;
         const fieldset = e.target.closest('fieldset.form-fieldset-element');
         if (!fieldset) return;
         const collection = fieldset.closest('.form-fieldset-collection');
@@ -291,9 +291,110 @@
     document.addEventListener('input', refresh);
     document.addEventListener('change', refresh);
 
+    // A modal preview of the page of results, built from the general
+    // settings of the tab Results and from the mocks of the first facets.
+    const showResultsPage = function (title) {
+        if (!window.CommonDialog) return;
+        const rv = function (name) {
+            const checked = document.querySelector('input[type=radio][name="results[' + name + ']"]:checked');
+            return checked ? checked.value : '';
+        };
+        const cv = function (name) {
+            const control = document.querySelector('input[type=checkbox][name="results[' + name + ']"]');
+            return !!(control && control.checked);
+        };
+        const tv = function (name) {
+            const control = document.querySelector('[name="results[' + name + ']"]');
+            return control ? control.value.trim() : '';
+        };
+        const inHeader = function (v) { return v === 'header' || v === 'both'; };
+        const inFooter = function (v) { return v === 'footer' || v === 'both'; };
+
+        // The labels of the properties to display, from the textarea.
+        const propertyLabels = [];
+        const fieldSource = document.getElementById('form_filter_field');
+        (tv('properties') || '').split(/\r?\n/).forEach(function (line) {
+            if (!line.trim()) return;
+            const pos = line.indexOf('=');
+            const term = (pos === -1 ? line : line.substring(0, pos)).trim();
+            let label = pos === -1 ? '' : line.substring(pos + 1).trim();
+            if (!label && fieldSource) {
+                const opt = fieldSource.querySelector('option[value="' + CSS.escape(term) + '"]');
+                if (opt) label = opt.textContent.trim();
+            }
+            propertyLabels.push(label || term.split(':').pop());
+        });
+
+        const bar = function () {
+            let html = '<div class="preview-results-bar">';
+            html += '<span>' + escapeHtml(t('results12', '12 results')) + '</span>';
+            if (rv('sort') && rv('sort') !== 'none') html += select([t('sortRelevance', 'Relevance'), t('title', 'Title')], {empty: t('sortRelevance', 'Relevance')});
+            if (rv('per_page') && rv('per_page') !== 'none') html += select(['10', '25', '50'], {empty: '10'});
+            if (rv('grid_list') && rv('grid_list') !== 'none') html += '<span class="preview-grid-list">▦ ≣</span>';
+            if (rv('paginator') && rv('paginator') !== 'none') html += '<span class="preview-pagination"><span class="current">1</span> <a href="#">2</a> <a href="#">3</a> <a href="#">›</a></span>';
+            return html + '</div>';
+        };
+
+        const result = function (n) {
+            const thumb = rv('thumbnail_mode') !== 'none'
+                ? '<span class="preview-thumb" aria-hidden="true"></span>'
+                : '';
+            let body = '';
+            if (propertyLabels.length) {
+                body = '<dl>' + propertyLabels.slice(0, 3).map(function (label, i) {
+                    return '<div><dt>' + escapeHtml(label) + '</dt><dd>' + escapeHtml([t('value1', 'First value'), t('value2', 'Second value'), t('value3', 'Third value')][i]) + '</dd></div>';
+                }).join('') + '</dl>';
+            } else {
+                // The default card displays the title and the description.
+                body = '<p class="preview-result-description">' + escapeHtml(t('resultDescription', 'Description of the resource, on a few lines…')) + '</p>';
+            }
+            return '<div class="preview-result">' + thumb
+                + '<div class="preview-result-body"><a href="#" class="preview-result-title">' + escapeHtml(t('resultTitle', 'Title of the resource') + ' ' + n) + '</a>' + body + '</div>'
+                + '</div>';
+        };
+
+        // The facets: the mocks of the two first facets of the tab Facets.
+        let facetsHtml = '';
+        const positionControl = document.querySelector('input[type=radio][name="facet[position]"]:checked');
+        const facetsPosition = positionControl ? positionControl.value : '';
+        if (facetsPosition && facetsPosition !== 'none') {
+            const facetCollection = document.getElementById('facet_facets');
+            if (facetCollection) {
+                const mocks = Array.from(facetCollection.querySelectorAll('.collection-main > fieldset, :scope > fieldset'))
+                    .slice(0, 2)
+                    .map(function (fieldset) { return buildMock(fieldset, 'facet'); })
+                    .filter(Boolean)
+                    .map(function (built) { return '<div class="input-type-preview-item">' + built.html + '</div>'; });
+                if (mocks.length) {
+                    facetsHtml = '<aside class="preview-facets">' + mocks.join('') + '</aside>';
+                }
+            }
+        }
+
+        let html = '<div class="preview-results-page">';
+        if (cv('breadcrumbs')) html += '<div class="preview-breadcrumbs">' + escapeHtml(t('home', 'Home')) + ' › ' + escapeHtml(t('searchTitle', 'Search')) + '</div>';
+        if (inHeader(rv('search_form_simple'))) html += '<div class="preview-search-form">' + text('', 'lorem') + '<button type="button" class="preview-button">' + escapeHtml(t('searchTitle', 'Search')) + '</button></div>';
+        if (rv('search_filters') && rv('search_filters') !== 'none') html += '<div class="preview-active-filters"><span class="preview-chip">lorem ✕</span><span class="preview-chip">' + escapeHtml(t('value1', 'First value')) + ' ✕</span></div>';
+        html += bar();
+        html += '<div class="preview-results-layout' + (facetsPosition === 'after' ? ' preview-facets-after' : '') + '">' + facetsHtml
+            + '<div class="preview-results-list">' + result(1) + result(2) + '</div></div>';
+        const footParts = [];
+        if (inFooter(rv('paginator'))) footParts.push('<span class="preview-pagination"><span class="current">1</span> <a href="#">2</a> <a href="#">3</a> <a href="#">›</a></span>');
+        if (footParts.length) html += '<div class="preview-results-bar">' + footParts.join('') + '</div>';
+        html += '</div>';
+
+        window.CommonDialog.dialogGeneric({
+            heading: title,
+            body: '<div class="input-type-preview-all input-type-preview-body" inert>' + html + '</div>',
+            textOk: null,
+            textCancel: null,
+        });
+    };
+
     window.AdvancedSearchInputPreview = {
         render: render,
         buildMock: buildMock,
         showAll: showAll,
+        showResultsPage: showResultsPage,
     };
 })();

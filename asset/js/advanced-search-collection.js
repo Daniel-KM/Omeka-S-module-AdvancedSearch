@@ -317,21 +317,17 @@
                 const control = field.querySelector('[data-advanced-section]');
                 return control ? control.dataset.advancedSection : '';
             };
-            const done = [];
             advanced.forEach(function (field) {
-                const section = sectionOf(field);
-                if (section && done.indexOf(section) === -1) {
-                    done.push(section);
-                    const heading = document.createElement('div');
-                    heading.className = 'collection-advanced-section';
-                    heading.textContent = section;
-                    details.appendChild(heading);
-                    advanced.forEach(function (other) {
-                        if (sectionOf(other) === section) details.appendChild(other);
-                    });
-                } else if (!section) {
-                    details.appendChild(field);
-                }
+                if (!sectionOf(field)) details.appendChild(field);
+            });
+            orderedSections(advanced, sectionOf).forEach(function (sectionName) {
+                const heading = document.createElement('div');
+                heading.className = 'collection-advanced-section';
+                heading.textContent = sectionName;
+                details.appendChild(heading);
+                advanced.forEach(function (field) {
+                    if (sectionOf(field) === sectionName) details.appendChild(field);
+                });
             });
             fieldset.appendChild(details);
         };
@@ -514,16 +510,128 @@
         rebuild();
     };
 
+    // Consecutive fields flagged with the same data-inline are laid out side
+    // by side (shared with the general panels).
+    const groupInlineFields = function (container) {
+        let group = null;
+        let key = null;
+        Array.from(container.querySelectorAll(':scope > .field')).forEach(function (field) {
+            const control = field.querySelector('[data-inline]');
+            const current = control ? control.dataset.inline : null;
+            if (current && current === key) {
+                group.appendChild(field);
+                return;
+            }
+            if (current) {
+                group = document.createElement('div');
+                group.className = 'collection-inline';
+                field.parentNode.insertBefore(group, field);
+                group.appendChild(field);
+            }
+            key = current;
+        });
+    };
+
+    // The names of the sections in their order of appearance, with the
+    // technical section always last.
+    const orderedSections = function (parts, sectionOf) {
+        const names = [];
+        parts.forEach(function (part) {
+            const name = sectionOf(part);
+            if (name && names.indexOf(name) === -1) names.push(name);
+        });
+        const technical = t('technical', 'Technical');
+        const index = names.indexOf(technical);
+        if (index !== -1) {
+            names.splice(index, 1);
+            names.push(technical);
+        }
+        return names;
+    };
+
+    // A field flagged data-show-if="id" is displayed only when the checkbox
+    // of this id is checked.
+    const applyShowIf = function (root) {
+        root.querySelectorAll('[data-show-if]').forEach(function (control) {
+            const field = control.closest('.field');
+            const master = document.getElementById(control.dataset.showIf);
+            if (!field || !master) return;
+            const apply = function () { field.style.display = master.checked ? '' : 'none'; };
+            if (!master.dataset.showIfReady) {
+                master.dataset.showIfReady = '1';
+                master.addEventListener('change', apply);
+            }
+            apply();
+        });
+    };
+
+    // Fold the fields of a general panel: the fields flagged data-common stay
+    // visible, the others move into a closed details, grouped by section.
+    const foldGeneral = function (container) {
+        if (container.dataset.folded || !container.querySelector('[data-common]')) return;
+        container.dataset.folded = '1';
+        groupInlineFields(container);
+        const parts = Array.from(container.querySelectorAll(':scope > .field, :scope > .collection-inline'))
+            .filter(function (part) {
+                // A leftover empty wrapper (moved button) is hidden.
+                if (!part.querySelector('input, select, textarea, button')) {
+                    part.style.display = 'none';
+                    return false;
+                }
+                return true;
+            });
+        const advanced = parts.filter(function (part) { return !part.querySelector('[data-common]'); });
+        if (!advanced.length) return;
+        const details = document.createElement('details');
+        details.className = 'collection-advanced';
+        const summaryEl = document.createElement('summary');
+        summaryEl.textContent = t('advanced', 'Advanced settings');
+        details.appendChild(summaryEl);
+        const sectionOf = function (part) {
+            const control = part.querySelector('[data-advanced-section]');
+            return control ? control.dataset.advancedSection : '';
+        };
+        advanced.forEach(function (part) {
+            if (!sectionOf(part)) details.appendChild(part);
+        });
+        orderedSections(advanced, sectionOf).forEach(function (sectionName) {
+            const heading = document.createElement('div');
+            heading.className = 'collection-advanced-section';
+            heading.textContent = sectionName;
+            details.appendChild(heading);
+            advanced.forEach(function (part) {
+                if (sectionOf(part) === sectionName) details.appendChild(part);
+            });
+        });
+        container.appendChild(details);
+        applyShowIf(container);
+    };
+
     // The tab of a collection gets two sub tabs: the general settings of the
     // section and the list of the items.
     const initSubTabs = function (section) {
         const collection = section.querySelector('.form-fieldset-collection');
-        if (!collection || section.dataset.subTabsReady) return;
+        // Without collection, sub tabs are created only when a field asks for
+        // a specific one.
+        if (section.dataset.subTabsReady || (!collection && !section.querySelector('[data-subtab]'))) return;
         section.dataset.subTabsReady = '1';
-        // The general settings are every direct child before the collection,
-        // except the legend; the collection and its "+" go to the list.
-        const general = document.createElement('div');
-        general.className = 'collection-subtab collection-subtab-general';
+        // The fields are spread between sub tabs: the collection and its "+"
+        // go to the list, a field flagged data-subtab goes to this sub tab,
+        // the others to the general one.
+        const panels = {
+            general: {label: t('general', 'General'), element: null},
+            header: {label: t('headerFooter', 'Header and footer'), element: null},
+            card: {label: t('resourceCard', 'Resource card'), element: null},
+        };
+        const panelOf = function (key) {
+            if (!panels[key]) key = 'general';
+            if (!panels[key].element) {
+                const div = document.createElement('div');
+                div.className = 'collection-subtab collection-subtab-' + key;
+                panels[key].element = div;
+            }
+            return panels[key].element;
+        };
         const listPart = document.createElement('div');
         listPart.className = 'collection-subtab collection-subtab-list';
         const legend = section.querySelector(':scope > legend');
@@ -531,18 +639,24 @@
             if (child === legend) return;
             const isCollectionPart = child === collection
                 || child.classList.contains('config-fieldset-plus');
-            (isCollectionPart ? listPart : general).appendChild(child);
+            if (isCollectionPart) {
+                listPart.appendChild(child);
+                return;
+            }
+            const control = child.querySelector ? child.querySelector('[data-subtab]') : null;
+            panelOf(control ? control.dataset.subtab : 'general').appendChild(child);
         });
+        const general = panelOf('general');
         // The legend of the collection duplicates the tab: useless in the list.
-        const collectionLegend = collection.querySelector(':scope > legend');
+        const collectionLegend = collection ? collection.querySelector(':scope > legend') : null;
         if (collectionLegend) collectionLegend.style.display = 'none';
         const listLabel = collectionLegend && collectionLegend.textContent.trim()
             ? collectionLegend.textContent.trim()
             : t('list', 'List');
-        // A "+" caught in the general part (moved there by the manager) goes
-        // back under its list.
+        // A "+" caught in a panel (moved there by the manager) goes back
+        // under its list.
         general.querySelectorAll('.config-fieldset-plus').forEach(function (plus) {
-            const side = collection.querySelector('.collection-side');
+            const side = collection ? collection.querySelector('.collection-side') : null;
             if (side) {
                 plus.dataset.collectionId = collection.id;
                 plus.classList.add('collection-add');
@@ -552,38 +666,80 @@
         const nav = document.createElement('nav');
         nav.className = 'section-nav collection-subnav';
         const ul = document.createElement('ul');
+        const allPanels = [];
         const mk = function (label, target, active) {
             const li = document.createElement('li');
             if (active) li.className = 'active';
             const a = document.createElement('a');
-            a.href = '#';
+            // No href: the global handler of the admin binds the anchors of
+            // the section navs with a href.
+            a.tabIndex = 0;
+            a.setAttribute('role', 'tab');
             a.textContent = label;
+            a.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); a.click(); }
+            });
             a.addEventListener('click', function (e) {
                 e.preventDefault();
                 ul.querySelectorAll('li').forEach(function (x) { x.classList.remove('active'); });
                 li.classList.add('active');
-                general.style.display = target === general ? '' : 'none';
-                listPart.style.display = target === listPart ? '' : 'none';
+                allPanels.forEach(function (panel) {
+                    panel.style.display = panel === target ? '' : 'none';
+                });
             });
             li.appendChild(a);
             ul.appendChild(li);
             return li;
         };
-        mk(t('general', 'General'), general, false);
-        const liList = mk(listLabel, listPart, true);
+        // A panel is displayed only when it holds a visible field.
+        Object.keys(panels).forEach(function (key) {
+            const panel = panels[key].element;
+            if (!panel || !panel.querySelector('input, select, textarea')) return;
+            allPanels.push(panel);
+            mk(panels[key].label, panel, false);
+        });
+        let liList = null;
+        if (collection) {
+            allPanels.push(listPart);
+            liList = mk(listLabel, listPart, true);
+        } else if (ul.firstElementChild) {
+            ul.firstElementChild.classList.add('active');
+            const first = allPanels[0];
+            allPanels.forEach(function (panel) { panel.style.display = panel === first ? '' : 'none'; });
+        }
         nav.appendChild(ul);
         section.insertBefore(nav, legend ? legend.nextSibling : section.firstChild);
-        section.appendChild(general);
-        section.appendChild(listPart);
-        // The list first: it is the common case.
-        general.style.display = 'none';
+        allPanels.forEach(function (panel) {
+            section.appendChild(panel);
+            if (panel !== listPart) {
+                // The settings are folded like the items: common fields
+                // visible, the others in sections of a details.
+                foldGeneral(panel);
+                if (collection) panel.style.display = 'none';
+            }
+        });
+        // A preview of the page of results, next to the save button.
+        if (section.id === 'results' && window.AdvancedSearchInputPreview) {
+            const pageActions = document.getElementById('page-actions');
+            if (pageActions && !pageActions.querySelector('.collection-preview-results')) {
+                const previewButton = document.createElement('button');
+                previewButton.type = 'button';
+                previewButton.className = 'button collection-preview-results';
+                previewButton.textContent = t('previewResults', 'Preview the page of results');
+                previewButton.addEventListener('click', function () {
+                    window.AdvancedSearchInputPreview.showResultsPage(previewButton.textContent);
+                });
+                pageActions.insertBefore(previewButton, pageActions.firstChild);
+            }
+        }
         // Omeka clears the active tab of every section nav when a main tab is
         // opened: restore the current sub tab.
         if (window.jQuery) {
             window.jQuery(section).on('o:section-opened', function () {
                 if (ul.querySelector('li.active')) return;
-                const current = general.style.display === 'none' ? liList : ul.firstElementChild;
-                current.classList.add('active');
+                const items = Array.from(ul.children);
+                const current = items[allPanels.findIndex(function (panel) { return panel.style.display !== 'none'; })] || liList || items[0];
+                if (current) current.classList.add('active');
             });
         }
     };

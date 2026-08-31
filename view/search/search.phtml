@@ -69,7 +69,10 @@ $documentCount = $response->getTotalResults();
 $displayParts = $searchConfig->setting('results', []);
 $displayPartsHeader = array_filter($displayParts, fn ($v) => in_array($v, ['header', 'both']));
 $displayPartsFooter = array_filter($displayParts, fn ($v) => in_array($v, ['footer', 'both']));
-$displayFacets = $displayParts ? $displayParts['facets'] ?? 'before' : 'none';
+// The position of the block of facets ("facet.position", formerly
+// "results.facets").
+$displayFacets = $searchConfig->subSetting('facet', 'position')
+    ?: ($displayParts ? $displayParts['facets'] ?? 'before' : 'none');
 $autoscroll = !empty($searchConfig->subSetting('results', 'autoscroll'));
 
 if ($itemSet && $site) {

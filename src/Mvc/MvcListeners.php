@@ -106,7 +106,16 @@ class MvcListeners extends AbstractListenerAggregate
 
             // Browse item sets is redirected to a page.
 
+            // The setting of the redirection accepts the slug of a page of the
+            // site too, so the admin has a single select, and the url remains
+            // in the dedicated setting, that takes precedence.
             $redirectTo = $siteSettings->get('advancedsearch_item_sets_browse_page');
+            if (!$redirectTo) {
+                $redirectToConfig = (string) $siteSettings->get('advancedsearch_item_sets_browse_config');
+                if ($redirectToConfig !== '' && $redirectToConfig !== 'default' && !is_numeric($redirectToConfig)) {
+                    $redirectTo = $redirectToConfig;
+                }
+            }
             if ($redirectTo) {
                 if (mb_substr($redirectTo, 0, 1) === '/'
                     || mb_substr($redirectTo, 0, 8) === 'https://'

@@ -28,6 +28,17 @@ class SiteSettingsFieldset extends Fieldset
     }
 
     /**
+     * @var array
+     */
+    protected $sitePages = [];
+
+    public function setSitePages(array $sitePages): self
+    {
+        $this->sitePages = $sitePages;
+        return $this;
+    }
+
+    /**
      * Warning: there is a core fieldset "Search" (before Omeka v4).
      *
      * @var string
@@ -130,14 +141,24 @@ class SiteSettingsFieldset extends Fieldset
                 'type' => CommonElement\OptionalSelect::class,
                 'options' => [
                     'element_group' => 'advanced_search',
-                    'label' => 'Redirect page "browse item sets" to a search page', // @translate
+                    'label' => 'Redirect page "browse item sets"', // @translate
+                    'info' => 'The page that lists the item sets may be replaced by a search page or by any page of the site. Use the setting below for an external url.', // @translate
                     'value_options' => [
                         '' => 'No redirect', // @translate
                         'default' => 'Default search page', // @translate
-                    ] + $this->searchConfigs,
+                        'Search pages' => [ // @translate
+                            'label' => 'Search pages', // @translate
+                            'options' => $this->searchConfigs,
+                        ],
+                        'Pages of the site' => [ // @translate
+                            'label' => 'Pages of the site', // @translate
+                            'options' => $this->sitePages,
+                        ],
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'advancedsearch_item_sets_browse_config',
+                    'class' => 'chosen-select',
                 ],
             ])
             ->add([
@@ -145,10 +166,12 @@ class SiteSettingsFieldset extends Fieldset
                 'type' => Element\Text::class,
                 'options' => [
                     'element_group' => 'advanced_search',
-                    'label' => 'Redirect page "browse item sets" to a site page or a url', // @translate
+                    'label' => 'Redirect page "browse item sets" to an external url', // @translate
+                    'info' => 'An absolute url, that takes precedence on the setting above.', // @translate
                 ],
                 'attributes' => [
                     'id' => 'advancedsearch_item_sets_browse_page',
+                    'placeholder' => 'https://example.org/collections',
                 ],
             ])
             ->add([
@@ -156,14 +179,19 @@ class SiteSettingsFieldset extends Fieldset
                 'type' => CommonElement\OptionalSelect::class,
                 'options' => [
                     'element_group' => 'advanced_search',
-                    'label' => 'Redirect page "browse items" to a search page', // @translate
+                    'label' => 'Redirect page "browse items"', // @translate
                     'value_options' => [
                         '' => 'No redirect', // @translate
                         'default' => 'Default search page', // @translate
-                    ] + $this->searchConfigs,
+                        'Search pages' => [ // @translate
+                            'label' => 'Search pages', // @translate
+                            'options' => $this->searchConfigs,
+                        ],
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'advancedsearch_items_browse_config',
+                    'class' => 'chosen-select',
                 ],
             ])
 

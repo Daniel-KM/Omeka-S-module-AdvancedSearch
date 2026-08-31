@@ -279,6 +279,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'q_label',
+                    'data-common' => '1',
                     'required' => false,
                     'value' => 'Search', // @translate
                 ],
@@ -293,6 +294,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'q_suggester',
+                    'data-advanced-section' => $this->translator->translate('Autosuggestion'), // @translate
                     'multiple' => false,
                     'class' => 'chosen-select',
                     'data-placeholder' => ' ',
@@ -308,6 +310,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'q_suggest_url',
+                    'data-advanced-section' => $this->translator->translate('Autosuggestion'), // @translate
                 ],
             ])
             ->add([
@@ -319,6 +322,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'q_suggest_url_param_name',
+                    'data-advanced-section' => $this->translator->translate('Autosuggestion'), // @translate
                 ],
             ])
             ->add([
@@ -329,6 +333,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'q_suggest_fill_input',
+                    'data-advanced-section' => $this->translator->translate('Autosuggestion'), // @translate
                 ],
             ])
             ->add([
@@ -339,6 +344,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'q_remove_diacritics',
+                    'data-advanced-section' => $this->translator->translate('Query processing'), // @translate
                 ],
             ])
         ;
@@ -357,6 +363,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                     ],
                     'attributes' => [
                         'id' => 'q_default_search_partial_word',
+                    'data-advanced-section' => $this->translator->translate('Query processing'), // @translate
                     ],
                 ])
             ;
@@ -371,23 +378,35 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                     'label' => 'Options', // @translate
                     'info' => 'List of specific Omeka and Laminas options.', // @translate
                     'ini_typed_mode' => true,
+                    'pairs_editor' => [
+                        'key_label' => $this->translator->translate('Option'), // @translate
+                        'value_label' => $this->translator->translate('Value'), // @translate
+                        'sortable' => false,
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'q_options',
+                    'data-advanced-section' => $this->translator->translate('Advanced'), // @translate
                     'required' => false,
                     'placeholder' => '',
                 ],
             ])
             ->add([
-                'type' => CommonElement\IniTextarea::class,
+                'type' => CommonElement\ArrayTextarea::class,
                 'name' => 'attributes',
                 'options' => [
                     'label' => 'Html attributes', // @translate
                     'info' => 'Attributes to add to the input field, for example `class = "my-specific-class"`, data, etc.', // @translate
-                    'ini_typed_mode' => true,
+                    'as_key_value' => true,
+                    'key_value_separator' => '=',
+                    'pairs_editor' => [
+                        'key_label' => $this->translator->translate('Attribute'), // @translate
+                        'value_label' => $this->translator->translate('Value'), // @translate
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'q_attributes',
+                    'data-advanced-section' => $this->translator->translate('Advanced'), // @translate
                     'required' => false,
                     'placeholder' => '',
                 ],
@@ -476,93 +495,10 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'attribute_form',
-                    'data-advanced-section' => $this->translator->translate('Technical'), // @translate
+                    'data-advanced-section' => $this->translator->translate('Advanced'), // @translate
                 ],
             ])
             // TODO Make option "rft" a standard filter.
-            ->add([
-                'name' => 'rft',
-                'type' => CommonElement\OptionalRadio::class,
-                'options' => [
-                    'label' => 'Add a button to search record or full text (for content not stored in a property)', // @translate
-                    'value_options' => [
-                        '' => 'None', // @translate
-                        'fulltext_checkbox' => 'Check box "Search full text"', // @translate
-                        'record_checkbox' => 'Check box "Record only"', // @translate
-                        'fulltext_radio' => 'Radio "Full text" and "Record only"', // @translate
-                        'record_radio' => 'Radio "Record only" and "Full text"', // @translate
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'rft',
-                    'data-advanced-section' => $this->translator->translate('Buttons'), // @translate
-                    'value' => '',
-                ],
-            ])
-            ->add([
-                'name' => 'quick_filter',
-                'type' => CommonElement\OptionalSelect::class,
-                'options' => [
-                    'label' => 'Quick filter next to main search field', // @translate
-                    'value_options' => $engineAdapter
-                        ? $engineAdapter->getAvailableFieldsForSelect()
-                        : [],
-                    'empty_option' => '',
-                ],
-                'attributes' => [
-                    'id' => 'form_quick_filter',
-                    'data-advanced-section' => $this->translator->translate('Quick filter'), // @translate
-                    'class' => 'chosen-select',
-                    'data-placeholder' => 'Set field or index…', // @translate
-                ],
-            ])
-            ->add([
-                'name' => 'quick_filter_label',
-                'type' => Element\Text::class,
-                'options' => [
-                    'label' => 'Quick filter label', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'form_quick_filter_label',
-                    'data-advanced-section' => $this->translator->translate('Quick filter'), // @translate
-                ],
-            ])
-            ->add([
-                'name' => 'quick_filter_values',
-                'type' => CommonElement\ArrayTextarea::class,
-                'options' => [
-                    'label' => 'Quick filter predefined values', // @translate
-                    'info' => 'If empty, all values are fetched from the index.', // @translate
-                    'as_key_value' => true,
-                    'key_value_separator' => '=',
-                    'pairs_editor' => [
-                        'key_label' => $this->translator->translate('Value'), // @translate
-                        'value_label' => $this->translator->translate('Label'), // @translate
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'form_quick_filter_values',
-                    'data-advanced-section' => $this->translator->translate('Quick filter'), // @translate
-                    'rows' => 5,
-                    'placeholder' => <<<TXT
-                        = All
-                        Object = Objects
-                        Person = Persons
-                        Place = Places
-                        TXT,
-                ],
-            ])
-            ->add([
-                'name' => 'quick_filter_advanced',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'label' => 'Display quick filter on advanced form', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'form_quick_filter_advanced',
-                    'data-advanced-section' => $this->translator->translate('Quick filter'), // @translate
-                ],
-            ])
             ->add([
                 'name' => 'filters',
                 'type' => Element\Collection::class,
@@ -681,7 +617,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 'attributes' => [
                     'id' => 'template',
                     'data-subtab' => 'general',
-                    'data-advanced-section' => $this->translator->translate('Technical'), // @translate
+                    'data-advanced-section' => $this->translator->translate('Advanced'), // @translate
                 ],
             ])
             ->add([
@@ -694,7 +630,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 'attributes' => [
                     'id' => 'autoscroll',
                     'data-subtab' => 'general',
-                    'data-advanced-section' => $this->translator->translate('Technical'), // @translate
+                    'data-advanced-section' => $this->translator->translate('Advanced'), // @translate
                 ],
             ])
             ->add([
@@ -838,7 +774,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 'name' => 'search_form_simple',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [
-                    'label' => 'Search form simple', // @translate
+                    'label' => 'Simple search form (main field only)', // @translate
                     'value_options' => [
                         'none' => 'No', // @translate
                         'header' => 'Results header', // @translate
@@ -857,7 +793,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 'name' => 'search_form_quick',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [
-                    'label' => 'Search form quick', // @translate
+                    'label' => 'Quick search form (main field only, alternative style)', // @translate
                     'value_options' => [
                         'none' => 'No', // @translate
                         'header' => 'Results header', // @translate
@@ -1034,6 +970,10 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                     'as_key_value' => true,
                     'key_value_separator' => '=',
                     'pairs_editor' => [
+                        'keys' => [
+                            'header' => $this->translator->translate('Title (heading)'), // @translate
+                            'body' => $this->translator->translate('Description (body)'), // @translate
+                        ],
                         'key_source' => '#form_filter_field',
                         'key_skip' => ['advanced'],
                         'key_pattern' => '^[a-zA-Z][a-zA-Z0-9]*:[a-zA-Z][a-zA-Z0-9]*$',
@@ -1052,6 +992,34 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                         dcterms:date
                         dcterms:subject
                         TXT,
+                ],
+            ])
+            ->add([
+                'name' => 'properties_grid',
+                'type' => CommonElement\ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Properties to display in grid mode, when different', // @translate
+                    'info' => 'A grid card is smaller: it may display fewer properties. Leave empty to use the same list.', // @translate
+                    'as_key_value' => true,
+                    'key_value_separator' => '=',
+                    'pairs_editor' => [
+                        'keys' => [
+                            'header' => $this->translator->translate('Title (heading)'), // @translate
+                            'body' => $this->translator->translate('Description (body)'), // @translate
+                        ],
+                        'key_source' => '#form_filter_field',
+                        'key_skip' => ['advanced'],
+                        'key_pattern' => '^[a-zA-Z][a-zA-Z0-9]*:[a-zA-Z][a-zA-Z0-9]*$',
+                        'key_label' => $this->translator->translate('Property'), // @translate
+                        'value_label' => $this->translator->translate('Label (optional)'), // @translate
+                        'key_fill' => false,
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'properties_grid',
+                    'data-subtab' => 'card',
+                    'data-common' => '1',
+                    'rows' => 5,
                 ],
             ])
             ->add([

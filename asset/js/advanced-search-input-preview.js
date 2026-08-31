@@ -144,6 +144,13 @@
         Hidden: function () { return note(t('hidden', 'Hidden field: nothing is displayed, the value is sent with the query.')); },
         Number: function (o) { const min = o.min !== '' && o.min != null ? Number(o.min) : 1800; const max = o.max !== '' && o.max != null ? Number(o.max) : 1950; return '<input type="number" value="' + Math.round((min + max) / 2) + '">'; },
         Radio: function () { return radios(samples()); },
+        Rft: function (o) {
+            const style = o.rftStyle || 'fulltext_checkbox';
+            if (style === 'fulltext_checkbox') return '<label><input type="checkbox"> ' + escapeHtml(t('fullText', 'Search full text')) + '</label>';
+            if (style === 'record_checkbox') return '<label><input type="checkbox"> ' + escapeHtml(t('recordOnly', 'Record only')) + '</label>';
+            const list = style === 'record_radio' ? [t('recordOnly', 'Record only'), t('fullTextShort', 'Full text')] : [t('fullTextShort', 'Full text'), t('recordOnly', 'Record only')];
+            return radios(list);
+        },
         Range: function (o) { return slider(false, o); },
         RangeDouble: function (o) { return slider(true, o); },
         Select: function (o) { return select(samples(), {multiple: o.multiple, group: o.layoutGroup}); },
@@ -223,6 +230,7 @@
             joinerNot: elements.indexOf('joiner_not') !== -1,
             operator: elements.indexOf('operator') !== -1,
             filterAutosuggest: elements.indexOf('autosuggest') !== -1,
+            rftStyle: fieldValue(fieldset, 'rft'),
             checked: false,
         };
         if (!mock) return null;
@@ -390,8 +398,6 @@
         if (inHeader(rv('search_form_simple'))) {
             // The simple form follows the main options of the tab Filters.
             html += '<div class="preview-search-form">' + text('', 'lorem');
-            const quickFilter = document.querySelector('select[name="form[quick_filter]"]');
-            if (quickFilter && quickFilter.value) html += select([t('value1', 'First value'), t('value2', 'Second value')], {empty: textValue('form[quick_filter_label]') || t('quickFilterTitle', 'Quick filter')});
             if (checkboxValue('form[button_submit]')) html += '<button type="button" class="preview-button">' + escapeHtml(textValue('form[label_submit]') || t('searchTitle', 'Search')) + '</button>';
             if (checkboxValue('form[button_reset]')) html += '<button type="button" class="preview-button">' + escapeHtml(textValue('form[label_reset]') || t('resetFields', 'Reset fields')) + '</button>';
             html += '</div>';
@@ -412,6 +418,28 @@
             textCancel: null,
         });
     };
+
+    // The preview depends on the label and on some options too.
+    const refresh = function (e) {
+        if (!e.target.name || !/\[(label|as_link|display_count|multiple|value_layout|values|fields|value_label|autosuggest|min|max|scale_show_ticks|paginate|default_number|field_elements|position|rft)\](\[\])?$/.test(e.target.name)) return;
+        const fieldset = e.target.closest('fieldset.form-fieldset-element');
+        if (!fieldset) return;
+        const collection = fieldset.closest('.form-fieldset-collection');
+        render(fieldset, collection && collection.id === 'facet_facets' ? 'facet' : 'filter');
+    };
+    document.addEventListener('input', refresh);
+    document.addEventListener('change', refresh);
+
+    // Chosen may be initialized after the first render, so the icon of the
+    // selected type cannot be set before it is ready.
+    if (window.jQuery) {
+        window.jQuery(document).on('chosen:ready', 'select[name$="[type]"]', function () {
+            const fieldset = this.closest('fieldset.form-fieldset-element');
+            if (!fieldset) return;
+            const collection = fieldset.closest('.form-fieldset-collection');
+            render(fieldset, collection && collection.id === 'facet_facets' ? 'facet' : 'filter');
+        });
+    }
 
     window.AdvancedSearchInputPreview = {
         render: render,

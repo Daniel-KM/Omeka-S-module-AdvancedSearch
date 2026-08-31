@@ -30,6 +30,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
     const SETTINGS_LIST = ['values', 'value_labels_table', 'value_labels', 'language_site', 'languages', 'order', 'limit'];
     const SETTINGS_TEXT = ['autosuggest'];
     const SETTINGS_HIDDEN = ['value'];
+    const SETTINGS_RFT = ['rft'];
     const SETTINGS_CHECKBOX = ['checked_value', 'unchecked_value'];
     const SETTINGS_HAS_VALUE = ['checked_value', 'query_type', 'value_label'];
     const SETTINGS_THESAURUS = ['thesaurus'];
@@ -78,7 +79,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 'attributes' => [
                     'id' => 'form_filter_field',
                     'data-common' => '1',
-                    'data-filter-types-not' => 'Advanced',
+                    'data-filter-types-not' => 'Advanced Rft',
                     'required' => false,
                     'class' => 'chosen-select',
                     'data-placeholder' => 'Set field or index…', // @translate
@@ -365,6 +366,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                         // A space is added to avoid an issue with translation.
                         'Select' => 'Select ', // @translate
                         'MultiText' => 'Text (multiple, with a separator)', // @translate
+                        'Rft' => 'Record or full text', // @translate
                         'Specific' => 'Specific (set as option)', // @translate
                         'modules' => [
                             'label' => 'Modules', // @translate
@@ -388,6 +390,45 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
             ])
             // Settings of the advanced filter (type Advanced), stored with the
             // filter itself.
+            ->add([
+                'name' => 'rft',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Style of the button', // @translate
+                    'value_options' => [
+                        'fulltext_checkbox' => 'Check box "Search full text"', // @translate
+                        'record_checkbox' => 'Check box "Record only"', // @translate
+                        'fulltext_radio' => 'Radio "Full text" and "Record only"', // @translate
+                        'record_radio' => 'Radio "Record only" and "Full text"', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_rft',
+                    'data-filter-types' => 'Rft',
+                    'data-common' => '1',
+                    'required' => false,
+                    'value' => 'fulltext_checkbox',
+                ],
+            ])
+            ->add([
+                'name' => 'display_in',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Displayed in', // @translate
+                    'value_options' => [
+                        'advanced' => 'Advanced search (default)', // @translate
+                        'simple' => 'Simple search', // @translate
+                        'both' => 'Both', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_display_in',
+                    'data-filter-types-not' => 'Advanced',
+                    'data-common' => '1',
+                    'required' => false,
+                    'value' => 'advanced',
+                ],
+            ])
             ->add([
                 'name' => 'multiple',
                 'type' => Element\Checkbox::class,
@@ -682,10 +723,10 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filter_name',
-                    'data-advanced-section' => $tr('Technical'), // @translate
+                    'data-advanced-section' => $tr('Advanced'), // @translate
                     'required' => false,
                     'pattern' => '[a-zA-Z0-9_:\-]+',
-                    'data-filter-types-not' => 'Advanced',
+                    'data-filter-types-not' => 'Advanced Rft',
                 ],
             ])
             ->add([
@@ -693,13 +734,9 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 'name' => 'options',
                 'options' => [
                     'label' => 'Options', // @translate
-                    'info' => <<<'HTML'
-                        List of rarely used options, in ini format, for
-                        example `empty_option = ""` or `select = true` for the
-                        access filter. Omeka and Laminas options are accepted.
-                        A key set here takes precedence over the dedicated
-                        fields above.
-                        HTML, // @translate
+                    'info' => <<<'TXT'
+                        List of rarely used options, in ini format, for example `empty_option = ""` or `select = true` for the access filter. Omeka and Laminas options are accepted. A key set here takes precedence over the dedicated fields above.
+                        TXT, // @translate
                     'ini_typed_mode' => true,
                     'pairs_editor' => [
                         'key_label' => $tr('Option'), // @translate
@@ -709,27 +746,27 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filters_options',
-                    'data-advanced-section' => $tr('Technical'), // @translate
+                    'data-advanced-section' => $tr('Advanced'), // @translate
                     'required' => false,
                     'placeholder' => '',
                 ],
             ])
             ->add([
-                'type' => CommonElement\IniTextarea::class,
+                'type' => CommonElement\ArrayTextarea::class,
                 'name' => 'attributes',
                 'options' => [
                     'label' => 'Html attributes', // @translate
-                    'info' => 'Rarely used attributes to add to the input field, for example `class = "my-specific-class"`, or placeholder, data, etc. A key set here takes precedence over the dedicated fields above.', // @translate
-                    'ini_typed_mode' => true,
+                    'info' => 'Specific attributes to add to the input field, for example `class = "my-specific-class"`, or placeholder, data, etc. A key set here takes precedence over the dedicated fields above.', // @translate
+                    'as_key_value' => true,
+                    'key_value_separator' => '=',
                     'pairs_editor' => [
                         'key_label' => $tr('Attribute'), // @translate
                         'value_label' => $tr('Value'), // @translate
-                        'sortable' => false,
                     ],
                 ],
                 'attributes' => [
                     'id' => 'form_filters_attributes',
-                    'data-advanced-section' => $tr('Technical'), // @translate
+                    'data-advanced-section' => $tr('Advanced'), // @translate
                     'required' => false,
                     'placeholder' => '',
                 ],

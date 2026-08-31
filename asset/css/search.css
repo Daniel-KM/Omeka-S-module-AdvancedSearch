@@ -46,19 +46,6 @@
         height: 36px;
     }
 
-    /* Quick filter next to main search field */
-    .form-search select.quick-filter {
-        max-width: 100%;
-    }
-    .form-search .quick-filter,
-    .form-search .quick-filter + .chosen-container {
-        min-width: 120px;
-        max-width: 200px;
-    }
-    .form-search .quick-filter + .chosen-container .chosen-single {
-        height: 36px;
-    }
-
     /* Search form filters */
 
     .search-filters-advanced {
@@ -167,8 +154,6 @@
         flex-wrap: wrap;
         gap: 12px 18px;
     }
-    /* Each tool block (count, paginator, per-page, sort, grid/list) stays on
-       one line. flex-wrap on parent only breaks between blocks, never inside. */
     .search-results-header > *,
     .search-results-footer > * {
         display: flex;
@@ -186,8 +171,6 @@
         white-space: normal;
         flex-wrap: wrap;
     }
-    /* The label + control of per-page and sort selectors must not break apart
-       (avoid "Trier par" alone on first line, control on second). */
     .search-pagination-per-page,
     .search-sort {
         flex-wrap: nowrap;
@@ -266,6 +249,12 @@
     .search-results .resource-list.list .resource-body {
         flex-basis: 100%;
     }
+    .search-results .resource-list.grid .only-list,
+    .search-results .resource-list.list .only-grid,
+    .search-results .resource-list .hidden-both {
+        display: none;
+    }
+
     /* Search results (grid) */
     .search-results .resource-list.grid {
         display: flex;

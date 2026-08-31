@@ -522,27 +522,27 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
                 'attributes' => [
                     'id' => 'form_facet_options',
-                    'data-advanced-section' => $tr('Technical'), // @translate
+                    'data-advanced-section' => $tr('Advanced'), // @translate
                     'required' => false,
                     'placeholder' => '',
                 ],
             ])
             ->add([
-                'type' => CommonElement\IniTextarea::class,
+                'type' => CommonElement\ArrayTextarea::class,
                 'name' => 'attributes',
                 'options' => [
                     'label' => 'Html attributes', // @translate
                     'info' => 'Rarely used attributes to add to the input field, for example `class = "my-specific-class"`, or placeholder, data, etc. A key set here takes precedence over the dedicated fields above.', // @translate
-                    'ini_typed_mode' => true,
+                    'as_key_value' => true,
+                    'key_value_separator' => '=',
                     'pairs_editor' => [
                         'key_label' => $tr('Attribute'), // @translate
                         'value_label' => $tr('Value'), // @translate
-                        'sortable' => false,
                     ],
                 ],
                 'attributes' => [
                     'id' => 'form_facet_attributes',
-                    'data-advanced-section' => $tr('Technical'), // @translate
+                    'data-advanced-section' => $tr('Advanced'), // @translate
                     'required' => false,
                     'placeholder' => '',
                 ],

@@ -42,7 +42,7 @@ $this->headScript()->appendScript(sprintf(
         'list' => $translate('List'),
         'headerFooter' => $translate('Infos and actions'),
         'resourceCard' => $translate('Display of a result'),
-        'technical' => $translate('Technical'),
+        'technical' => $translate('Advanced'),
         'previewResults' => $translate('Preview'),
     ], JSON_UNESCAPED_UNICODE)
 ));
@@ -84,8 +84,10 @@ $this->headScript()->appendScript(sprintf(
         'resetFacets' => $translate('Reset facets'),
         'facetsTitle' => $translate('Facets'),
         'refineSearch' => $translate('Refine search'),
-        'quickFilterTitle' => $translate('Quick filter'),
         'resetFields' => $translate('Reset fields'),
+        'fullText' => $translate('Search full text'),
+        'fullTextShort' => $translate('Full text'),
+        'recordOnly' => $translate('Record only'),
         'home' => $translate('Home'),
         'searchTitle' => $translate('Search'),
     ], JSON_UNESCAPED_UNICODE)
@@ -93,9 +95,37 @@ $this->headScript()->appendScript(sprintf(
 
 $form->prepare();
 
-$navTab = [];
+// The eight fieldsets are grouped in six tabs, ordered by frequency of use;
+// a group with several fieldsets gets sub tabs. Fieldsets added by modules
+// (like "engine" of SearchSolr) join the advanced group.
+$groups = [
+    'general-tab' => ['label' => $translate('General'), 'sections' => ['settings', 'sites']],
+    'simple-tab' => ['label' => $translate('Simple search'), 'sections' => ['q', 'request']],
+    'form' => ['label' => $translate('Advanced search'), 'sections' => ['form']],
+    'results' => ['label' => $translate('Results'), 'sections' => ['results']],
+    'facet' => ['label' => $translate('Facets'), 'sections' => ['facet']],
+    'advanced-tab' => ['label' => $translate('Advanced settings'), 'sections' => ['index']],
+];
+$grouped = array_merge(...array_column($groups, 'sections'));
 foreach ($form->getFieldsets() as $fieldset) {
-    $navTab[$fieldset->getName()] = $translate($fieldset->getLabel());
+    if (!in_array($fieldset->getName(), $grouped)) {
+        $groups['advanced-tab']['sections'][] = $fieldset->getName();
+    }
+}
+// The labels of the sub tabs of the groups.
+$subTabLabels = [
+    'settings' => $translate('Settings'),
+    'sites' => $translate('Sites'),
+    'q' => $translate('Search field'),
+    'request' => $translate('Default search'),
+];
+
+$navTab = [];
+foreach ($groups as $groupId => $group) {
+    $sections = array_filter($group['sections'], fn ($name) => $form->has($name));
+    if ($sections) {
+        $navTab[$groupId] = $group['label'];
+    }
 }
 ?>
 
@@ -112,8 +142,29 @@ foreach ($form->getFieldsets() as $fieldset) {
 </nav>
 
 <?php $next = -1; ?>
-<?php foreach ($form->getFieldsets() as $name => $fieldset): ?>
-<?= $this->formCollection($fieldset->setAttributes(['id' => $name, 'class' => 'section' . (++$next ? '' : ' active'), 'aria-labelledby' => $name . '-label'])) ?>
+<?php foreach ($groups as $groupId => $group):
+    $sections = array_values(array_filter($group['sections'], fn ($n) => $form->has($n)));
+    if (!$sections) continue;
+    $isGroup = count($sections) > 1;
+    ++$next;
+?>
+<?php if ($isGroup): ?>
+<div id="<?= $groupId ?>" class="section<?= $next ? '' : ' active' ?>" aria-labelledby="<?= $groupId ?>-label">
+    <?php foreach ($sections as $name):
+        $fieldset = $form->get($name);
+        $label = $subTabLabels[$name] ?? $translate($fieldset->getLabel());
+    ?>
+    <?= $this->formCollection($fieldset->setAttributes(['id' => $name, 'class' => 'group-section', 'data-group-label' => $label, 'aria-labelledby' => $name . '-label'])) ?>
+    <?php endforeach; ?>
+</div>
+<?php else:
+    $fieldset = $form->get($sections[0]);
+    if ($groupId !== $sections[0]) {
+        $fieldset->setAttribute('id', $groupId);
+    }
+?>
+<?= $this->formCollection($fieldset->setAttributes(['id' => $groupId, 'class' => 'section' . ($next ? '' : ' active'), 'aria-labelledby' => $groupId . '-label'])) ?>
+<?php endif; ?>
 <?php endforeach; ?>
 
 <?php foreach ($form->getElements() as $element): ?>

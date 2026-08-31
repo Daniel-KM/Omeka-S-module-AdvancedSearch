@@ -241,16 +241,20 @@ class MainSearchForm extends Form
 
             $type = ucfirst(strtolower(basename($filter['type'])));
 
-            // Don't create useless elements.
-            // In particular, it allows to skip creation of selects, that is
-            // slow for now in big databases.
+            // Each filter declares the forms it is displayed in: the
+            // advanced search (default), the simple search or both.
+            $displayIn = $filter['display_in'] ?? 'advanced';
             if ($hasVariant
                 // The type may be missing.
                 && !in_array($type, ['Hidden', 'Csrf'])
                 // No need to check the field name here: "q", "rft" and "submit"
                 // are managed separately.
-                // TODO Required elements for "quick" cannot be checked for now.
+                && ($this->variant === 'csrf' || !in_array($displayIn, ['simple', 'both']))
             ) {
+                continue;
+            }
+            // The advanced form skips the filters of the simple search only.
+            if (!$this->variant && $displayIn === 'simple') {
                 continue;
             }
 
@@ -324,6 +328,9 @@ class MainSearchForm extends Form
                 case 'Radio':
                     $values = $this->listValues($filter);
                     $element = $this->searchRadio($filter, $values);
+                    break;
+                case 'Rft':
+                    $element = $this->searchRft($filter);
                     break;
                 case 'Range':
                     $values = $this->listValuesAttributesMinMax($filter);
@@ -412,9 +419,11 @@ class MainSearchForm extends Form
     /**
      * Add a simple filter to limit search to record or not.
      */
-    protected function appendRecordOrFullText(?string $recordOrFullText): self
+    protected function searchRft(array $filter): ?ElementInterface
     {
-        switch ($recordOrFullText) {
+        // The style of the button: checkbox or radios, record or full text
+        // first.
+        switch ($filter['rft'] ?? 'fulltext_checkbox') {
             case 'fulltext_checkbox':
                 $element = new Element\Checkbox('rft');
                 $element
@@ -425,7 +434,7 @@ class MainSearchForm extends Form
                     ])
                     ->setAttribute('id', 'rft')
                 ;
-                return $this->add($element);
+                return $element;
             case 'record_checkbox':
                 $element = new Element\Checkbox('rft');
                 $element
@@ -436,7 +445,7 @@ class MainSearchForm extends Form
                     ])
                     ->setAttribute('id', 'rft')
                 ;
-                return $this->add($element);
+                return $element;
             case 'fulltext_radio':
                 $element = new CommonElement\OptionalRadio('rft');
                 $element
@@ -449,7 +458,7 @@ class MainSearchForm extends Form
                     ->setAttribute('id', 'rft')
                     ->setValue('all')
                 ;
-                return $this->add($element);
+                return $element;
             case 'record_radio':
                 $element = new CommonElement\OptionalRadio('rft');
                 $element
@@ -462,55 +471,12 @@ class MainSearchForm extends Form
                     ->setAttribute('id', 'rft')
                     ->setValue('record')
                 ;
-                return $this->add($element);
+                return $element;
             default:
-                return $this;
+                return null;
         }
     }
 
-    /**
-     * Add a quick filter select next to the main search field.
-     */
-    protected function appendQuickFilter(string $field, ?string $label = null, ?array $predefinedValues = null): self
-    {
-        // Use predefined values or fetch from search engine.
-        if ($predefinedValues) {
-            $values = $predefinedValues;
-        } else {
-            $filter = [
-                'field' => $field,
-                'label' => $label ?: ' ',
-                'type' => 'Select',
-                'options' => [],
-                'attributes' => $this->elementAttributes,
-            ];
-            $values = $this->listValues($filter);
-        }
-
-        if (!$values) {
-            return $this;
-        }
-
-        $element = new CommonElement\OptionalSelect($field);
-        $element
-            ->setLabel($label ?: ' ')
-            ->setOptions([
-                'value_options' => $values + ['' => ''],
-                'empty_option' => $values[''] ?? '',
-            ])
-            ->setAttributes([
-                'id' => 'quick-filter',
-                // No chosen select here: it should be a short filter.
-                'class' => 'quick-filter',
-                'data-placeholder' => $label ?: ' ',
-            ] + $this->elementAttributes)
-        ;
-
-        // Simplify css.
-        $this->setAttribute('class', trim($this->getAttribute('class') . ' with-quick-filter'));
-
-        return $this->add($element);
-    }
 
     /**
      * Add a default input element, represented as a text input.
@@ -835,30 +801,6 @@ class MainSearchForm extends Form
             }
             if (empty($suggester) && !empty($filter['suggest_url_param_name'])) {
                 $filter['attributes']['data-autosuggest-param-name'] = $filter['suggest_url_param_name'];
-            }
-        }
-
-        // Add the button for record or full text search.
-        $recordOrFullText = in_array($this->variant, ['simple', 'csrf'])
-            ? null
-            // Key "fulltext_search" is normally removed.
-            : ($filter['rft'] ?? $filter['fulltext_search'] ?? null);
-        $this->appendRecordOrFullText($recordOrFullText);
-
-        // Add the quick filter select next to the main search field.
-        // Include quick filter in 'simple' variant, but not 'csrf'.
-        // For advanced form, check the option 'quick_filter_advanced'.
-        $quickFilter = $this->variant === 'csrf'
-            ? null
-            : ($filter['quick_filter'] ?? $this->formSettings['form']['quick_filter'] ?? null);
-        if ($quickFilter) {
-            // On advanced form (no variant), only show if option is enabled.
-            $skipOnAdvanced = !$this->variant
-                && empty($this->formSettings['form']['quick_filter_advanced']);
-            if (!$skipOnAdvanced) {
-                $quickFilterLabel = $filter['quick_filter_label'] ?? $this->formSettings['form']['quick_filter_label'] ?? null;
-                $quickFilterValues = $filter['quick_filter_values'] ?? $this->formSettings['form']['quick_filter_values'] ?? null;
-                $this->appendQuickFilter($quickFilter, $quickFilterLabel, $quickFilterValues);
             }
         }
 
@@ -1310,8 +1252,9 @@ class MainSearchForm extends Form
             return array_combine($valueOptions, $valueOptions);
         }
 
-        // For speed, don't get available fields with variants "simple" and "csrf".
-        $availableFields = in_array($this->variant, ['simple', 'csrf']) ? [] : $this->getAvailableFields();
+        // For speed, don't get available fields with the variant "csrf"; the
+        // variant "simple" may display some filters now.
+        $availableFields = $this->variant === 'csrf' ? [] : $this->getAvailableFields();
         if (!$availableFields) {
             return [];
         }

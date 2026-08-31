@@ -60,8 +60,74 @@ $thumbnailType = $searchConfig->subSetting('results', 'thumbnail_type', 'medium'
 
 // Allow block to override properties from search config.
 $properties = !empty($properties) ? $properties : $searchConfig->subSetting('results', 'properties', []);
-$showProperties = !empty($properties);
+// The grid card may display its own properties; empty means the same list.
+$propertiesGrid = $searchConfig->subSetting('results', 'properties_grid', []) ?: $properties;
+$showProperties = !empty($properties) || !empty($propertiesGrid);
+
+// The pseudo-properties "header" and "body" allow to control the display of
+// the heading and of the description by mode. When a list uses neither, the
+// heading and the description are always displayed (previous behavior).
+$termsOf = fn (array $list): array => array_map(fn ($k, $v) => is_int($k) ? $v : $k, array_keys($list), array_values($list));
+$listTerms = $termsOf($properties);
+$gridTerms = $termsOf($propertiesGrid);
+$metaVisibility = function (string $meta) use ($listTerms, $gridTerms): string {
+    $hasMetaList = array_intersect(['header', 'body'], $listTerms) !== [];
+    $hasMetaGrid = array_intersect(['header', 'body'], $gridTerms) !== [];
+    $inList = !$hasMetaList || in_array($meta, $listTerms);
+    $inGrid = !$hasMetaGrid || in_array($meta, $gridTerms);
+    if ($inList && $inGrid) {
+        return '';
+    }
+    if ($inList) {
+        return ' only-list';
+    }
+    return $inGrid ? ' only-grid' : ' hidden-both';
+};
+$headingVisibility = $metaVisibility('header');
+$bodyVisibility = $metaVisibility('body');
+
 $showLocale = (bool) $setting('show_locale_label');
+
+// Render the properties of a resource as a definition list.
+$renderProperties = function ($resource, array $propertiesList, string $classes) use ($escape, $escapeAttr, $translate, $easyMeta, $langValue, $showLocale): string {
+    $html = '';
+    foreach ($propertiesList as $property => $propertyLabel) {
+        // The properties may be a simple list or a map with an optional label
+        // ("term => label").
+        if (is_int($property)) {
+            $property = $propertyLabel;
+            $propertyLabel = '';
+        }
+        // The heading and the body are rendered at their standard place.
+        if ($property === 'header' || $property === 'body') {
+            continue;
+        }
+        $values = $resource->value($property, ['all' => true, 'lang' => $langValue]);
+        if (!$values) {
+            continue;
+        }
+        $html .= '<div class="property">'
+            . '<dt>' . $escape($translate($propertyLabel === '' ? $easyMeta->propertyLabel($property) : $propertyLabel)) . '</dt>';
+        foreach ($values as $value) {
+            $valueType = $value->type();
+            $valueLang = $value->lang();
+            $class = ['value'];
+            if ('resource' === $valueType || strpos($valueType, 'resource') !== false) {
+                $class[] = 'resource';
+                $class[] = $escape($value->valueResource()->resourceName());
+            } elseif ('uri' === $valueType) {
+                $class[] = 'uri';
+            }
+            $html .= '<dd class="' . implode(' ', $class) . '"' . ($valueLang ? ' lang="' . $escapeAttr($valueLang) . '"' : '') . '>'
+                . ($showLocale && $valueLang ? '<span class="language">' . $escape($valueLang) . '</span>' : '')
+                . '<span class="value-content">' . $value->asHtml() . '</span>'
+                . (!$value->isPublic() ? '<span class="o-icon-private" role="img" aria-label="' . $escapeAttr($translate('Private')) . '"></span>' : '')
+                . '</dd>';
+        }
+        $html .= '</div>';
+    }
+    return $html === '' ? '' : '<dl class="properties' . ($classes === '' ? '' : ' ' . $classes) . '">' . $html . '</dl>';
+};
 ?>
 
 <ul class="resource-list search-result-list<?= $gridListMode === 'list_only' ? ' list only-mode' : ($gridListMode === 'grid_only' ? ' grid only-mode' : ' grid') ?>">
@@ -74,7 +140,7 @@ $showLocale = (bool) $setting('show_locale_label');
         $resourceThumbnail = $noThumbnail ? null : $thumbnail($resource, $thumbnailType);
         ?>
     <li class="resource <?= $resourceType ?><?= $resourceThumbnail || $allThumbnail ? '' : ' no-thumbnail' ?>" data-id="<?= $resource->id() ?>">
-        <div class="resource-heading">
+        <div class="resource-heading<?= $headingVisibility ?>">
             <?= $hyperlink->raw($escapeValueOrGetHtml($heading), $resourceUrl, ['class' => 'resource-link']) ?>
         </div>
         <?php if (!$noThumbnail): ?>
@@ -86,48 +152,17 @@ $showLocale = (bool) $setting('show_locale_label');
         <?php endif; ?>
         <div class="resource-body resource-metadata">
             <?php if (strlen($body)): ?>
-            <div class="description">
+            <div class="description<?= $bodyVisibility ?>">
                 <?= $escapeValueOrGetHtml($body, $allowHtml) ?>
             </div>
             <?php endif; ?>
             <?php if ($showProperties): ?>
-            <dl class="properties">
-                <?php foreach ($properties as $property => $propertyLabel):
-                    // The properties may be a simple list or a map with an
-                    // optional label ("term => label").
-                    if (is_int($property)) {
-                        $property = $propertyLabel;
-                        $propertyLabel = '';
-                    }
-                    $values = $resource->value($property, ['all' => true, 'lang' => $langValue]);
-                    if ($values): ?>
-                <div class="property">
-                    <dt><?= $escape($translate($propertyLabel === '' ? $easyMeta->propertyLabel($property) : $propertyLabel)) ?></dt>
-                    <?php foreach ($values as $value):
-                        $valueType = $value->type();
-                        $valueLang = $value->lang();
-                        $class = ['value'];
-                        if ('resource' === $valueType || strpos($valueType, 'resource') !== false) {
-                            $class[] = 'resource';
-                            $class[] = $escape($value->valueResource()->resourceName());
-                        } elseif ('uri' === $valueType) {
-                            $class[] = 'uri';
-                        }
-                    ?>
-                    <dd class="<?= implode(' ', $class) ?>"<?= $valueLang ? ' lang="' . $escapeAttr($valueLang) . '"' : '' ?>>
-                        <?php if ($showLocale && $valueLang): ?>
-                        <span class="language"><?= $escape($valueLang) ?></span>
-                        <?php endif; ?>
-                        <span class="value-content"><?= $value->asHtml() ?></span>
-                        <?php if (!$value->isPublic()): ?>
-                        <span class="o-icon-private" role="img" aria-label="<?= $escapeAttr($translate('Private')) ?>"></span>
-                        <?php endif; ?>
-                    </dd>
-                    <?php endforeach; ?>
-                </div>
-                <?php endif; ?>
-                <?php endforeach; ?>
-            </dl>
+            <?php if ($propertiesGrid === $properties): ?>
+            <?= $renderProperties($resource, $properties, '') ?>
+            <?php else: ?>
+            <?= $renderProperties($resource, $properties, 'only-list') ?>
+            <?= $renderProperties($resource, $propertiesGrid, 'only-grid') ?>
+            <?php endif; ?>
             <?php endif; ?>
         </div>
         <?php if ($selectionButton): ?>

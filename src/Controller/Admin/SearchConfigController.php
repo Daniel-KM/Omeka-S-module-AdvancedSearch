@@ -828,9 +828,11 @@ class SearchConfigController extends AbstractActionController
 
         // The properties to display may be a simple list (no labels) or a
         // map "term => label" for the form.
-        $properties = $settings['results']['properties'] ?? [];
-        if ($properties && array_is_list($properties)) {
-            $settings['results']['properties'] = array_fill_keys($properties, '');
+        foreach (['properties', 'properties_grid'] as $key) {
+            $properties = $settings['results'][$key] ?? [];
+            if ($properties && array_is_list($properties)) {
+                $settings['results'][$key] = array_fill_keys($properties, '');
+            }
         }
 
         $facetInputs = [
@@ -923,12 +925,14 @@ class SearchConfigController extends AbstractActionController
 
         // The properties to display are stored as a simple list when no
         // custom label is set.
-        $properties = $params['results']['properties'] ?? [];
-        if (is_array($properties)) {
-            $properties = array_filter($properties, fn ($v, $k) => trim((string) $k) !== '', ARRAY_FILTER_USE_BOTH);
-            $params['results']['properties'] = array_filter(array_map('trim', $properties), 'strlen')
-                ? array_map('trim', $properties)
-                : array_keys($properties);
+        foreach (['properties', 'properties_grid'] as $key) {
+            $properties = $params['results'][$key] ?? [];
+            if (is_array($properties)) {
+                $properties = array_filter($properties, fn ($v, $k) => trim((string) $k) !== '', ARRAY_FILTER_USE_BOTH);
+                $params['results'][$key] = array_filter(array_map('trim', $properties), 'strlen')
+                    ? array_map('trim', $properties)
+                    : array_keys($properties);
+            }
         }
 
         $params = $this->removeUselessFields($params);
@@ -956,6 +960,10 @@ class SearchConfigController extends AbstractActionController
         foreach ($params['form']['filters'] ?? [] as $filter) {
             $name = trim($filter['name'] ?? '');
             unset($filter['name']);
+            // The record or full text filter has no field in the select.
+            if (($filter['type'] ?? '') === 'Rft') {
+                $filter['field'] = 'rft';
+            }
             if (empty($filter['field']) && !$name) {
                 continue;
             }
@@ -984,6 +992,16 @@ class SearchConfigController extends AbstractActionController
             // The type is a key of the list of types, else a specific one.
             $type = $filter['type'] ?? '';
             $type = isset($filterTypes[$type]) ? $type : ucfirst($type);
+
+            // Key is always "rft" for the record or full text filter.
+            if ($type === 'Rft') {
+                $name = 'rft';
+                $filter = [
+                    'field' => 'rft',
+                    'label' => $filter['label'] ?? '',
+                    'type' => 'Rft',
+                ] + $filter;
+            }
 
             // Key is always "advanced" for advanced filters, so no duplicate.
             // Its settings are stored with the filter.
@@ -1025,6 +1043,7 @@ class SearchConfigController extends AbstractActionController
                 [['Advanced'], SearchConfigFilterFieldset::SETTINGS_ADVANCED],
                 [['text'], SearchConfigFilterFieldset::SETTINGS_TEXT],
                 [['Hidden'], SearchConfigFilterFieldset::SETTINGS_HIDDEN],
+                [['Rft'], SearchConfigFilterFieldset::SETTINGS_RFT],
                 [['Checkbox', 'HasValue'], array_unique(array_merge(SearchConfigFilterFieldset::SETTINGS_CHECKBOX, SearchConfigFilterFieldset::SETTINGS_HAS_VALUE))],
                 [['Thesaurus'], SearchConfigFilterFieldset::SETTINGS_THESAURUS],
                 [['Number', 'Range', 'RangeDouble'], SearchConfigFilterFieldset::SETTINGS_NUMBER],
@@ -1065,6 +1084,11 @@ class SearchConfigController extends AbstractActionController
                 }
             }
 
+            // The default display of a filter is the advanced search only.
+            if (($filter['display_in'] ?? '') === 'advanced' || $type === 'Advanced') {
+                unset($filter['display_in']);
+            }
+
             // The type Select is recomposed with its two options.
             if ($type === 'Select') {
                 $layout = $filter['value_layout'] ?? '';
@@ -1083,7 +1107,7 @@ class SearchConfigController extends AbstractActionController
             $name = is_numeric($name) ? $field : $name;
             // Name is no more forcet to lower case, only slugified.
             $name = $this->slugify($name);
-            if ($name !== 'advanced' && isset($filters[$name])) {
+            if (!in_array($name, ['advanced', 'rft']) && isset($filters[$name])) {
                 $name .= '_' . ++$i;
             }
 

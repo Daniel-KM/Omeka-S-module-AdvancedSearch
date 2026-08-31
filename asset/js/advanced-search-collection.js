@@ -725,11 +725,59 @@
         }
     };
 
+    // A grouped section holds several fieldsets displayed as sub tabs.
+    const initGroupSection = function (section) {
+        const parts = Array.from(section.querySelectorAll(':scope > fieldset.group-section'));
+        if (parts.length < 2 || section.dataset.groupReady) return;
+        section.dataset.groupReady = '1';
+        const nav = document.createElement('nav');
+        nav.className = 'section-nav collection-subnav';
+        const ul = document.createElement('ul');
+        nav.appendChild(ul);
+        parts.forEach(function (part, i) {
+            const legend = part.querySelector(':scope > legend');
+            if (legend) legend.style.display = 'none';
+            // The fields of the part may be folded by sections too.
+            foldGeneral(part);
+            const li = document.createElement('li');
+            if (!i) li.className = 'active';
+            const a = document.createElement('a');
+            a.tabIndex = 0;
+            a.setAttribute('role', 'tab');
+            a.textContent = part.dataset.groupLabel || (legend ? legend.textContent.trim() : '');
+            a.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); a.click(); }
+            });
+            a.addEventListener('click', function (e) {
+                e.preventDefault();
+                ul.querySelectorAll('li').forEach(function (x) { x.classList.remove('active'); });
+                li.classList.add('active');
+                parts.forEach(function (other) {
+                    other.style.display = other === part ? '' : 'none';
+                });
+            });
+            li.appendChild(a);
+            ul.appendChild(li);
+            part.style.display = i ? 'none' : '';
+        });
+        section.insertBefore(nav, section.firstChild);
+        // Omeka clears the active tab of every section nav when a main tab
+        // is opened: restore the current sub tab.
+        if (window.jQuery) {
+            window.jQuery(section).on('o:section-opened', function () {
+                if (ul.querySelector('li.active')) return;
+                const index = parts.findIndex(function (part) { return part.style.display !== 'none'; });
+                (ul.children[index === -1 ? 0 : index] || ul.firstElementChild).classList.add('active');
+            });
+        }
+    };
+
     const init = function () {
         const form = document.getElementById('search-config-configure-form');
         if (!form) return;
         form.querySelectorAll('.form-fieldset-collection').forEach(initCollection);
         form.querySelectorAll('fieldset.section').forEach(initSubTabs);
+        form.querySelectorAll('div.section').forEach(initGroupSection);
     };
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);

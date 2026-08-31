@@ -86,6 +86,9 @@
         if (Search.initFiltersAdvanced) {
             Search.initFiltersAdvanced(dialog);
         }
+        if (Search.initAutosuggest) {
+            Search.initAutosuggest(dialog);
+        }
     }
 
     function openDialog(html, heading) {

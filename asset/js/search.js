@@ -1492,6 +1492,8 @@ $(document).ready(function() {
         $('.search-filters-advanced > fieldset.filter').each(function() {
             initAdvFilterAutosuggest($(this));
         });
+
+        Search.initFilterAutosuggest = initAdvFilterAutosuggest;
     }
 
     /**
@@ -1793,14 +1795,34 @@ $(document).ready(function() {
     /**
      * Init autocompletion/autosuggestion of all specified input fields.
      */
-    if (hasAutocomplete) {
-        $('input[type=search].autosuggest, input[type=text].autosuggest').each(function(index, element) {
+    Search.initAutosuggest = function(context) {
+        if (typeof $.fn.autocomplete !== 'function') {
+            return Search;
+        }
+        var $context = context ? $(context) : $(document);
+        var selector = 'input[type=search].autosuggest, input[type=text].autosuggest';
+        $context.find(selector).addBack(selector).each(function(index, element) {
             element = $(element);
+            // The input may have been initialized in a previous call.
+            if (element.data('autocomplete')) {
+                return;
+            }
             let autosuggestOptions = Search.autosuggestOptions(element);
             if (autosuggestOptions) {
                 element.autocomplete(autosuggestOptions);
             }
         });
+        // The values of the advanced filters have their own endpoint.
+        if (Search.initFilterAutosuggest) {
+            $context.find('.search-filters-advanced > fieldset.filter').each(function() {
+                Search.initFilterAutosuggest($(this));
+            });
+        }
+        return Search;
+    };
+
+    if (hasAutocomplete) {
+        Search.initAutosuggest(document);
     }
 
 });

@@ -47,11 +47,26 @@ trait TraitFormAdapterClassic
             'skip_form_action' => false,
             'skip_partial_headers' => false,
             'variant' => null,
+            'skip_elements' => [],
         ];
 
         $form = $this->getForm($options);
         if (!$form) {
             return '';
+        }
+
+        // A theme may render the main field apart from the filters, for example
+        // a quick search in the header and the filters in a panel below it. So
+        // the same element is not output twice, that would duplicate ids.
+        // The form is shared between the renderings of a page, so it is cloned:
+        // removing an element would remove it for the next renderings too.
+        if ($options['skip_elements']) {
+            $form = clone $form;
+            foreach ($options['skip_elements'] as $skipElement) {
+                if ($form->has($skipElement)) {
+                    $form->remove($skipElement);
+                }
+            }
         }
 
         if (!$options['template']) {

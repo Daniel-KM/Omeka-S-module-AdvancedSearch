@@ -1084,7 +1084,7 @@ class Module extends AbstractModule
         $isSite = $status->isSiteRequest();
         if ($isSite) {
             $headLink
-                ->prependStylesheet($assetUrl('vendor/chosen-js/chosen.min.css', 'Omeka'));
+                ->prependStylesheet($assetUrl('vendor/chosen-js/chosen.css', 'Omeka'));
             $headScript
                 ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.js', 'Omeka'), 'text/javascript', ['defer' => 'defer']);
         }
@@ -2123,7 +2123,7 @@ class Module extends AbstractModule
                             ->appendStylesheet($assetUrl('css/common-dialog-admin.css', 'Common'))
                             ->appendStylesheet($assetUrl('css/search.css', 'AdvancedSearch'));
                         $plugins->get('headScript')
-                            ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.min.js', 'Omeka'), 'text/javascript', ['defer' => 'defer'])
+                            ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.js', 'Omeka'), 'text/javascript', ['defer' => 'defer'])
                             ->appendFile($assetUrl('vendor/jquery-autocomplete/jquery.autocomplete.min.js', 'Common'), 'text/javascript', ['defer' => 'defer'])
                             ->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer'])
                             ->appendFile($assetUrl('js/common-dialog.js', 'Common'), 'text/javascript', ['defer' => 'defer'])

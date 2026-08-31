@@ -20,6 +20,71 @@
         flex-wrap: nowrap;
     }
 
+    /* Omeka 4.2 sets the flex layout on .inputs, but not Omeka 4.1, where the
+       fields of the module would not be justified. */
+    #advanced-search .inputs,
+    #advanced-search .inputs .value {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    /* A row fills the column of the inputs: it is a flex item, so it does not
+       grow by itself and the fields stopped before the right edge. */
+    #advanced-search .inputs > .value {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    /* The fields added by the module fill the column too: a lone input takes
+       the full width, and the fields of a row share it. */
+    #advanced-search .inputs > input[type=text],
+    #advanced-search .inputs > input[type=number] {
+        width: 100%;
+    }
+    #advanced-search #sort_field .inputs,
+    #advanced-search .inputs > .field-geo {
+        display: flex;
+        gap: .25rem;
+    }
+    #advanced-search .inputs > .field-geo {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+    #advanced-search #sort_field .inputs > select,
+    #advanced-search .inputs [name^="geo["] {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    /* The close of a choice is a button since 4.2. */
+    .chosen-container .search-choice-close {
+        min-width: 0;
+        min-height: 0;
+        padding: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    /* The radios and the checkboxes are inline by default. */
+    #advanced-search .inputs label {
+        width: auto;
+    }
+
+    #advanced-search .chosen-container-multi .chosen-choices {
+        min-height: 36px;
+        padding: 0 5px;
+    }
+    #advanced-search .chosen-container-multi .chosen-choices .search-field input[type=text] {
+        height: 34px;
+        min-height: 0;
+        margin: 0;
+        padding: 0;
+    }
+    #advanced-search .chosen-container-single .chosen-single {
+        height: 36px;
+        line-height: 34px;
+    }
+
     /* Make chosen behave like native selects in flex:
        block display + shrinkable. */
     #advanced-search .chosen-container {

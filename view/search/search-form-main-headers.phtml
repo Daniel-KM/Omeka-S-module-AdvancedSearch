@@ -30,7 +30,7 @@ if (!$status->isAdminRequest()) {
     $headLink
         ->prependStylesheet($assetUrl('vendor/chosen-js/chosen.css', 'Omeka'));
     $headScript
-        ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.min.js', 'Omeka'), 'text/javascript', ['defer' => 'defer']);
+        ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.js', 'Omeka'), 'text/javascript', ['defer' => 'defer']);
 }
 
 $headLink

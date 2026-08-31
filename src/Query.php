@@ -73,6 +73,16 @@ class Query implements JsonSerializable
     protected $fieldBoosts = [];
 
     /**
+     * @var string
+     */
+    protected $minimumMatch = '';
+
+    /**
+     * @var string
+     */
+    protected $tieBreaker = '';
+
+    /**
      * @var array
      */
     protected $fieldsQueryArgs = [];
@@ -381,6 +391,38 @@ class Query implements JsonSerializable
     public function getFieldBoosts(): array
     {
         return $this->fieldBoosts;
+    }
+
+    /**
+     * Set the eDisMax minimum match ("1" is "or", "100%" is "and"…).
+     *
+     * An empty value means the default of the engine (solrconfig.xml).
+     */
+    public function setMinimumMatch(string $minimumMatch): self
+    {
+        $this->minimumMatch = $minimumMatch;
+        return $this;
+    }
+
+    public function getMinimumMatch(): string
+    {
+        return $this->minimumMatch;
+    }
+
+    /**
+     * Set the eDisMax tie breaker, a float between 0 and 1.
+     *
+     * An empty value means the default of the engine (solrconfig.xml).
+     */
+    public function setTieBreaker(string $tieBreaker): self
+    {
+        $this->tieBreaker = $tieBreaker;
+        return $this;
+    }
+
+    public function getTieBreaker(): string
+    {
+        return $this->tieBreaker;
     }
 
     /**

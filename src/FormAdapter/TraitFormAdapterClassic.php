@@ -655,6 +655,8 @@ trait TraitFormAdapterClassic
 
         $fieldBoosts = $this->searchConfig->subSetting('index', 'field_boosts', []);
         $query->setFieldBoosts($fieldBoosts);
+        $query->setMinimumMatch(trim((string) $this->searchConfig->subSetting('index', 'minimum_match', '')));
+        $query->setTieBreaker(trim((string) $this->searchConfig->subSetting('index', 'tie_breaker', '')));
 
         // Set query default field if provided
         // $searchConfigSettings['request']['query_default_field'] = 'public_property_values_txt'; // Fake retrieval

@@ -191,6 +191,35 @@ class SearchConfigConfigureForm extends Form
                             STRING,
                 ],
             ])
+            ->add([
+                'name' => 'minimum_match',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Minimum match (or/and) (Solr only)', // @translate
+                    'info' => 'Integer "1" means "OR", "100%" means "AND". Complex expressions are possible, like "3<80%". If empty, the solrconfig.xml config is used.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'index_minimum_match',
+                    'required' => false,
+                    'placeholder' => '3<80%',
+                ],
+            ])
+            ->add([
+                'name' => 'tie_breaker',
+                'type' => CommonElement\OptionalNumber::class,
+                'options' => [
+                    'label' => 'Tie breaker (Solr only)', // @translate
+                    'info' => 'Increase score according to the number of matched fields. If empty, the solrconfig.xml config is used.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'index_tie_breaker',
+                    'required' => false,
+                    'placeholder' => '0.15',
+                    'min' => '0.0',
+                    'max' => '1.0',
+                    'step' => '0.01',
+                ],
+            ])
         ;
 
         $this

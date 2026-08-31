@@ -274,6 +274,8 @@ class ApiSearch extends AbstractPlugin
 
         $fieldBoosts = $this->searchConfig->subSetting('index', 'field_boosts', []);
         $searchQuery->setFieldBoosts($fieldBoosts);
+        $searchQuery->setMinimumMatch(trim((string) $this->searchConfig->subSetting('index', 'minimum_match', '')));
+        $searchQuery->setTieBreaker(trim((string) $this->searchConfig->subSetting('index', 'tie_breaker', '')));
 
         // Note: the event search.query is not triggered.
 

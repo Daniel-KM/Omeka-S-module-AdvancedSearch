@@ -264,49 +264,25 @@
         }
     };
 
-    // A modal preview of the whole form or facets, built from the mocks of
-    // every item of the collection, in their order, in the dialog of Common.
-    const showAll = function (collection, kind, title) {
-        if (!window.CommonDialog) return;
-        const parts = Array.from(collection.querySelectorAll('.collection-main > fieldset, :scope > fieldset'))
-            .map(function (fieldset) { return buildMock(fieldset, kind); })
-            .filter(Boolean)
-            .map(function (built) { return '<div class="input-type-preview-item">' + built.html + '</div>'; });
-        window.CommonDialog.dialogGeneric({
-            heading: title,
-            body: '<div class="input-type-preview-all input-type-preview-body" inert>' + parts.join('') + '</div>',
-            textOk: null,
-            textCancel: null,
-        });
-    };
-
-    // The preview depends on the label and on some options too.
-    const refresh = function (e) {
-        if (!e.target.name || !/\[(label|as_link|display_count|multiple|value_layout|values|fields|value_label|autosuggest|min|max|scale_show_ticks|paginate|default_number|field_elements|position)\](\[\])?$/.test(e.target.name)) return;
-        const fieldset = e.target.closest('fieldset.form-fieldset-element');
-        if (!fieldset) return;
-        const collection = fieldset.closest('.form-fieldset-collection');
-        render(fieldset, collection && collection.id === 'facet_facets' ? 'facet' : 'filter');
-    };
-    document.addEventListener('input', refresh);
-    document.addEventListener('change', refresh);
-
     // A modal preview of the page of results, built from the general
     // settings of the tab Results and from the mocks of the first facets.
     const showResultsPage = function (title) {
         if (!window.CommonDialog) return;
-        const rv = function (name) {
-            const checked = document.querySelector('input[type=radio][name="results[' + name + ']"]:checked');
+        const radioValue = function (fullName) {
+            const checked = document.querySelector('input[type=radio][name="' + fullName + '"]:checked');
             return checked ? checked.value : '';
         };
-        const cv = function (name) {
-            const control = document.querySelector('input[type=checkbox][name="results[' + name + ']"]');
+        const checkboxValue = function (fullName) {
+            const control = document.querySelector('input[type=checkbox][name="' + fullName + '"]');
             return !!(control && control.checked);
         };
-        const tv = function (name) {
-            const control = document.querySelector('[name="results[' + name + ']"]');
+        const textValue = function (fullName) {
+            const control = document.querySelector('input[type=text][name="' + fullName + '"], textarea[name="' + fullName + '"]');
             return control ? control.value.trim() : '';
         };
+        const rv = function (name) { return radioValue('results[' + name + ']'); };
+        const cv = function (name) { return checkboxValue('results[' + name + ']'); };
+        const tv = function (name) { return textValue('results[' + name + ']'); };
         const inHeader = function (v) { return v === 'header' || v === 'both'; };
         const inFooter = function (v) { return v === 'footer' || v === 'both'; };
 
@@ -353,31 +329,77 @@
                 + '</div>';
         };
 
-        // The facets: the mocks of the two first facets of the tab Facets.
+        // The facets: the mocks of the two first facets of the tab Facets,
+        // with the main options of the block (label, refine, buttons).
         let facetsHtml = '';
-        const positionControl = document.querySelector('input[type=radio][name="facet[position]"]:checked');
-        const facetsPosition = positionControl ? positionControl.value : '';
+        const facetsPosition = radioValue('facet[position]');
         if (facetsPosition && facetsPosition !== 'none') {
             const facetCollection = document.getElementById('facet_facets');
             if (facetCollection) {
                 const mocks = Array.from(facetCollection.querySelectorAll('.collection-main > fieldset, :scope > fieldset'))
-                    .slice(0, 2)
                     .map(function (fieldset) { return buildMock(fieldset, 'facet'); })
                     .filter(Boolean)
                     .map(function (built) { return '<div class="input-type-preview-item">' + built.html + '</div>'; });
                 if (mocks.length) {
-                    facetsHtml = '<aside class="preview-facets">' + mocks.join('') + '</aside>';
+                    const facetMode = radioValue('facet[mode]') || 'button';
+                    const submitPosition = radioValue('facet[display_submit]');
+                    const resetPosition = radioValue('facet[display_reset]');
+                    const buttons = function (place) {
+                        let html = '';
+                        if (facetMode === 'button' && (submitPosition === place || submitPosition === 'both')) {
+                            html += '<button type="button" class="preview-button">' + escapeHtml(textValue('facet[label_submit]') || t('applyFacets', 'Apply facets')) + '</button>';
+                        }
+                        if (resetPosition === place || resetPosition === 'both') {
+                            html += '<button type="button" class="preview-button">' + escapeHtml(textValue('facet[label_reset]') || t('resetFacets', 'Reset facets')) + '</button>';
+                        }
+                        return html ? '<div class="preview-facets-buttons">' + html + '</div>' : '';
+                    };
+                    facetsHtml = '<aside class="preview-facets">'
+                        + '<div class="preview-facets-label">' + escapeHtml(textValue('facet[label_facets]') || t('facetsTitle', 'Facets')) + '</div>'
+                        + (checkboxValue('facet[display_refine]') ? text(textValue('facet[label_refine]') || t('refineSearch', 'Refine search')) : '')
+                        + buttons('above')
+                        + mocks.join('')
+                        + buttons('below')
+                        + '</aside>';
                 }
             }
         }
 
+        // The results are displayed as a grid when it is the default mode.
+        const gridListMode = rv('grid_list_mode');
+        const asGrid = ['grid', 'grid_only'].indexOf(gridListMode) !== -1;
+
         let html = '<div class="preview-results-page">';
         if (cv('breadcrumbs')) html += '<div class="preview-breadcrumbs">' + escapeHtml(t('home', 'Home')) + ' › ' + escapeHtml(t('searchTitle', 'Search')) + '</div>';
-        if (inHeader(rv('search_form_simple'))) html += '<div class="preview-search-form">' + text('', 'lorem') + '<button type="button" class="preview-button">' + escapeHtml(t('searchTitle', 'Search')) + '</button></div>';
+        // The search form with every filter, like on the real page.
+        const filterCollection = document.getElementById('form_filters');
+        if (filterCollection) {
+            const filterMocks = Array.from(filterCollection.querySelectorAll('.collection-main > fieldset, :scope > fieldset'))
+                .map(function (fieldset) { return buildMock(fieldset, 'filter'); })
+                .filter(Boolean)
+                .map(function (built) { return '<div class="input-type-preview-item">' + built.html + '</div>'; });
+            if (filterMocks.length) {
+                let formButtons = '';
+                if (checkboxValue('form[button_submit]')) formButtons += '<button type="button" class="preview-button">' + escapeHtml(textValue('form[label_submit]') || t('searchTitle', 'Search')) + '</button>';
+                if (checkboxValue('form[button_reset]')) formButtons += '<button type="button" class="preview-button">' + escapeHtml(textValue('form[label_reset]') || t('resetFields', 'Reset fields')) + '</button>';
+                html += '<div class="preview-search-full">' + filterMocks.join('')
+                    + (formButtons ? '<div class="preview-facets-buttons">' + formButtons + '</div>' : '')
+                    + '</div>';
+            }
+        }
+        if (inHeader(rv('search_form_simple'))) {
+            // The simple form follows the main options of the tab Filters.
+            html += '<div class="preview-search-form">' + text('', 'lorem');
+            const quickFilter = document.querySelector('select[name="form[quick_filter]"]');
+            if (quickFilter && quickFilter.value) html += select([t('value1', 'First value'), t('value2', 'Second value')], {empty: textValue('form[quick_filter_label]') || t('quickFilterTitle', 'Quick filter')});
+            if (checkboxValue('form[button_submit]')) html += '<button type="button" class="preview-button">' + escapeHtml(textValue('form[label_submit]') || t('searchTitle', 'Search')) + '</button>';
+            if (checkboxValue('form[button_reset]')) html += '<button type="button" class="preview-button">' + escapeHtml(textValue('form[label_reset]') || t('resetFields', 'Reset fields')) + '</button>';
+            html += '</div>';
+        }
         if (rv('search_filters') && rv('search_filters') !== 'none') html += '<div class="preview-active-filters"><span class="preview-chip">lorem ✕</span><span class="preview-chip">' + escapeHtml(t('value1', 'First value')) + ' ✕</span></div>';
         html += bar();
         html += '<div class="preview-results-layout' + (facetsPosition === 'after' ? ' preview-facets-after' : '') + '">' + facetsHtml
-            + '<div class="preview-results-list">' + result(1) + result(2) + '</div></div>';
+            + '<div class="preview-results-list' + (asGrid ? ' preview-results-grid' : '') + '">' + result(1) + result(2) + (asGrid ? result(3) : '') + '</div></div>';
         const footParts = [];
         if (inFooter(rv('paginator'))) footParts.push('<span class="preview-pagination"><span class="current">1</span> <a href="#">2</a> <a href="#">3</a> <a href="#">›</a></span>');
         if (footParts.length) html += '<div class="preview-results-bar">' + footParts.join('') + '</div>';
@@ -394,7 +416,6 @@
     window.AdvancedSearchInputPreview = {
         render: render,
         buildMock: buildMock,
-        showAll: showAll,
         showResultsPage: showResultsPage,
     };
 })();

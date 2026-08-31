@@ -1221,11 +1221,11 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 'name' => 'list',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [
-                    'label' => 'List of facets', // @translate
-                    'info' => 'With the internal search engine, the option "all facets" may be slow when there are facets and filters for item sets or sites.', // @translate
+                    'label' => 'Values displayed in each facet', // @translate
+                    'info' => 'With the internal search engine, the option "all values" may be slow when there are facets and filters for item sets or sites.', // @translate
                     'value_options' => [
-                        'available' => 'Available facets only', // @translate
-                        'all' => 'All facets, even with 0 results (see info)', // @translate
+                        'available' => 'Values with results only', // @translate
+                        'all' => 'All values, even with 0 results (see info)', // @translate
                     ],
                 ],
                 'attributes' => [
@@ -1300,7 +1300,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'facet_label_submit',
-                    'data-advanced-section' => $this->translator->translate('Display'), // @translate
+                    'data-common' => '1',
                     'required' => false,
                     'value' => 'Apply facets', // @translate
                     'placeholder' => 'Apply facets', // @translate
@@ -1333,7 +1333,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
                 'attributes' => [
                     'id' => 'facet_label_reset',
-                    'data-advanced-section' => $this->translator->translate('Display'), // @translate
+                    'data-common' => '1',
                     'required' => false,
                     'value' => 'Reset facets', // @translate
                     'placeholder' => 'Reset facets', // @translate

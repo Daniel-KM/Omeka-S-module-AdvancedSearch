@@ -277,7 +277,7 @@ $engineDetails = $this->trigger('view.browse.engine_details', ['searchEngines' =
                     <td>
                         <span><?= $searchConfig->name() ?></span>
                         <?php foreach ($defaults as $role): ?>
-                        <span class="field-generic" title="<?= $escapeAttr($translate('Default search page for this scope')) ?>"><?= $escape($translate($role)) ?></span>
+                        <span class="search-config-default" title="<?= $escapeAttr($translate('Default search page for this scope')) ?>"><?= $escape(sprintf($translate('default: %s'), $translate($role))) ?></span>
                         <?php endforeach; ?>
                         <ul class="actions">
                             <?php if ($openUrl): ?>

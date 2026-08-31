@@ -198,25 +198,6 @@
                 // The "+" stays above the preview button.
                 side.insertBefore(plus, side.querySelector('.collection-preview-all'));
             }
-            // A global preview of the form or the facets, from the mocks.
-            const kinds = {form_filters: 'filter', facet_facets: 'facet'};
-            if (kinds[collection.id] && window.AdvancedSearchInputPreview
-                && !side.querySelector('.collection-preview-all')
-            ) {
-                const previewButton = document.createElement('button');
-                previewButton.type = 'button';
-                previewButton.className = 'button collection-preview-all';
-                previewButton.textContent = collection.id === 'facet_facets'
-                    ? t('previewFacets', 'Preview the facets')
-                    : t('previewForm', 'Preview the form');
-                previewButton.addEventListener('click', function () {
-                    window.AdvancedSearchInputPreview.showAll(collection, kinds[collection.id], previewButton.textContent);
-                });
-                side.appendChild(previewButton);
-            }
-            // The preview button stays last, under the "+".
-            const preview = side.querySelector('.collection-preview-all');
-            if (preview && preview !== side.lastElementChild) side.appendChild(preview);
         };
         attachPlus();
         window.setTimeout(attachPlus, 0);

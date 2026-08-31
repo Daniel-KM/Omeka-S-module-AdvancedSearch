@@ -99,6 +99,10 @@
     .search-admin .collection-subnav {
         margin-bottom: 1em;
     }
+    /* The sub tabs have no href: keep the pointer. */
+    .search-admin .collection-subnav a {
+        cursor: pointer;
+    }
     .search-admin .collection-wrapper {
         display: flex;
         align-items: flex-start;
@@ -131,10 +135,17 @@
         margin: 0.5em 0 0;
         width: 100%;
     }
-    .search-admin .collection-side > .collection-preview-all {
-        flex: none;
-        margin: 0.5em 0 0;
-        width: 100%;
+    /* The badge of the default search page in the list of the pages. */
+    .search-admin .search-config-default {
+        display: inline-block;
+        margin-left: 0.5em;
+        padding: 0.05em 0.6em;
+        background: #efefef;
+        border: 1px solid #dfdfdf;
+        border-radius: 1em;
+        font-size: 0.8em;
+        color: #4d4d4d;
+        vertical-align: middle;
     }
     /* The long radios are displayed one by line. */
     .search-admin .field:has(#facet_mode) .inputs > label {
@@ -149,6 +160,16 @@
     }
     .preview-results-page {
         font-size: 0.9em;
+    }
+    .preview-search-full {
+        padding: 0.75em;
+        margin-bottom: 0.75em;
+        background: #f7f7f7;
+        border: 1px solid #dfdfdf;
+        border-radius: 3px;
+    }
+    .preview-search-full .input-type-preview-item {
+        margin-bottom: 0.75em;
     }
     .preview-breadcrumbs {
         color: #676767;
@@ -206,6 +227,21 @@
     .preview-facets .input-type-preview-item {
         margin-bottom: 0.75em;
     }
+    .preview-facets-label {
+        font-weight: bold;
+        margin-bottom: 0.5em;
+    }
+    .preview-facets input[type="text"] {
+        margin-bottom: 0.5em;
+    }
+    .preview-facets-buttons {
+        display: flex;
+        gap: 0.5em;
+        margin: 0.25em 0 0.75em;
+    }
+    .preview-facets-buttons .preview-button {
+        padding: 0.2em 0.8em;
+    }
     .preview-results-list {
         flex: 1;
         min-width: 0;
@@ -214,6 +250,26 @@
         display: flex;
         gap: 0.75em;
         margin-bottom: 1em;
+    }
+    /* The grid mode: cards side by side, thumbnail above. */
+    .preview-results-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75em;
+    }
+    .preview-results-grid .preview-result {
+        flex: 1 1 30%;
+        min-width: 8em;
+        flex-direction: column;
+        margin-bottom: 0;
+        padding: 0.5em;
+        border: 1px solid #dfdfdf;
+        border-radius: 3px;
+        background: #fff;
+    }
+    .preview-results-grid .preview-thumb {
+        width: 100%;
+        height: 64px;
     }
     .preview-thumb {
         flex: none;

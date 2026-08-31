@@ -606,6 +606,15 @@ class Module extends AbstractModule
             return;
         }
 
+        // During a rest api request on any resource, the module may read the
+        // search config internally, so check the requested resource, else the
+        // rest api would be broken for all resources.
+        $resourceName = $event->getTarget()->getResourceName();
+        $routeMatch = $services->get('Application')->getMvcEvent()->getRouteMatch();
+        if (!$routeMatch || $routeMatch->getParam('resource') !== $resourceName) {
+            return;
+        }
+
         $user = $services->get('Omeka\AuthenticationService')->getIdentity();
         if ($user && $services->get('Omeka\Acl')->isAdminRole($user->getRole())) {
             return;
@@ -614,7 +623,7 @@ class Module extends AbstractModule
         throw new \Omeka\Api\Exception\PermissionDeniedException(
             (string) new PsrMessage(
                 'The resource "{resource}" is not available through the rest api.', // @translate
-                ['resource' => $event->getTarget()->getResourceName()]
+                ['resource' => $resourceName]
             )
         );
     }

@@ -108,6 +108,9 @@ class GetSearchConfig extends AbstractHelper
             $searchConfigs[$originalCacheKey] = $searchConfigs[$cacheKey];
         } catch (\Omeka\Api\Exception\NotFoundException $e) {
             return null;
+        } catch (\Omeka\Api\Exception\PermissionDeniedException $e) {
+            // The search config may be unavailable during a rest api request.
+            return null;
         }
 
         return $searchConfigs[$cacheKey];

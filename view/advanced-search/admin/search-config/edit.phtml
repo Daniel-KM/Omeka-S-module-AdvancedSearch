@@ -12,7 +12,8 @@ $assetUrl = $plugins->get('assetUrl');
 $this->headLink()
     ->appendStylesheet($assetUrl('css/advanced-search-manager.css', 'AdvancedSearch'));
 $this->headScript()
-    ->appendFile($assetUrl('js/advanced-search-manager.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
+    ->appendFile($assetUrl('js/advanced-search-manager.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer'])
+    ->appendFile($assetUrl('js/advanced-search-collection.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
 
 $this->htmlElement('body')->appendAttribute('class', 'search-admin search-config resource edit');
 
@@ -20,6 +21,22 @@ if (empty($form)) {
     echo $this->pageTitle(sprintf($translate('Search page "%1$s" (%2$s)'), $searchConfig->name(), $searchConfig->slug()), 1, $translate('Search manager'));
     return;
 }
+
+$this->headScript()->appendScript(sprintf(
+    'window.AdvancedSearch = window.AdvancedSearch || {}; window.AdvancedSearch.collection = %s;',
+    json_encode([
+        'empty' => $translate('No item yet: use the button + to add one.'),
+        'newItem' => $translate('New item'),
+        'advanced' => $translate('Advanced settings'),
+        'add' => $translate('Add'),
+        'remove' => $translate('Remove'),
+        'up' => $translate('Move up'),
+        'down' => $translate('Move down'),
+        'drag' => $translate('Drag to reorder'),
+        'general' => $translate('General'),
+        'list' => $translate('List'),
+    ], JSON_UNESCAPED_UNICODE)
+));
 
 $form->prepare();
 

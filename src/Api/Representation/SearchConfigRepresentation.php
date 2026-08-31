@@ -209,6 +209,26 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         return $this->resource->getSettings()[$mainName][$name] ?? $default;
     }
 
+    /**
+     * The settings of the advanced filter, stored with the filter of type
+     * "Advanced" (legacy: a separate section "form.advanced").
+     */
+    public function advancedFilterSettings(): array
+    {
+        $settings = $this->resource->getSettings();
+        $filters = $settings['form']['filters'] ?? [];
+        $advanced = [];
+        foreach ($filters as $key => $filter) {
+            if ($key === 'advanced' || ($filter['type'] ?? '') === 'Advanced' || ($filter['field'] ?? '') === 'advanced') {
+                $advanced = $filter;
+                break;
+            }
+        }
+        // Legacy section, merged under the filter keys.
+        $legacy = $settings['form']['advanced'] ?? [];
+        return $advanced ? $advanced + $legacy : $legacy;
+    }
+
     public function subSubSetting(string $mainName, string $name, string $subName, $default = null)
     {
         [$mainName, $name, $subName] = $this->settingCheckName($mainName, $name, $subName);

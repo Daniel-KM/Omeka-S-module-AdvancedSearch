@@ -546,7 +546,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 'type' => Element\Collection::class,
                 'options' => [
                     'label' => 'Filters', // @ŧranslate
-                    'info' => 'List of filters that will be displayed in the search form, formatted as ini. The section is a unique name. Main keys are: field, label and type.', // @translate
+                    'info' => 'The filters are the fields of the search form, used before the search, in this order. Select a filter in the list to edit it: the field to search, its label, the type of input, and the specific options.', // @translate
                     'count' => 0,
                     'allow_add' => true,
                     'allow_remove' => true,
@@ -560,6 +560,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                     'required' => false,
                     'class' => 'form-fieldset-collection',
                     'data-label-index' => $this->translator->translate('Filter {index}'), // @ŧranslate
+                    'data-label-new' => $this->translator->translate('New filter'), // @translate
                 ],
             ])
             ->add([
@@ -581,130 +582,6 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ],
             ])
 
-            // Advanced is a sub-fieldset of form.
-            ->add([
-                'name' => 'advanced',
-                'type' => Fieldset::class,
-                'options' => [
-                    'label' => 'Configuration of the element "Advanced filters"', // @translate
-                ],
-            ])
-            ->get('advanced')
-            ->add([
-                'name' => 'default_number',
-                'type' => Element\Number::class,
-                'options' => [
-                    'label' => 'Number of advanced filters to display', // @translate
-                    'info' => 'The filters may be managed via js for a better display.', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'default_number',
-                    'required' => false,
-                    'value' => '1',
-                    'min' => '0',
-                    // A mysql query supports 61 arguments maximum.
-                    'max' => '49',
-                    'step' => '1',
-                ],
-            ])
-            ->add([
-                'name' => 'max_number',
-                'type' => Element\Number::class,
-                'options' => [
-                    'label' => 'Maximum number of advanced filters to display', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'max_number',
-                    'required' => false,
-                    'value' => '10',
-                    'min' => '0',
-                    // A mysql query supports 61 arguments maximum.
-                    'max' => '49',
-                    'step' => '1',
-                ],
-            ])
-            ->add([
-                'name' => 'field_joiner',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'label' => 'Add the joiner ("and" or "or") to the advanced filters', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'field_joiner',
-                ],
-            ])
-            ->add([
-                'name' => 'field_joiner_not',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'label' => 'Add the joiner "not" to the advanced filters', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'field_joiner_not',
-                ],
-            ])
-            ->add([
-                'name' => 'field_operator',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'label' => 'Add the operator ("equal", "in", etc.) to the advanced filters', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'field_operator',
-                ],
-            ])
-            ->add([
-                'name' => 'field_operators',
-                'type' => OmekaElement\ArrayTextarea::class,
-                'options' => [
-                    'label' => 'List of operators', // @translate
-                    'info' => 'The default list is the full list available in advanced standard search form. Negative operators are removed when the joiner "not" is used.', // @translate
-                    'as_key_value' => true,
-                    'key_value_separator' => '=',
-                ],
-                'attributes' => [
-                    'id' => 'field_operators',
-                    'rows' => 12,
-                    // This placeholder does not contain all query types.
-                    'placeholder' => <<<'STRING'
-                        eq = is exactly
-                        in = contains
-                        sw = starts with
-                        ew = ends with
-                        STRING, // @translate
-                ],
-            ])
-            ->add([
-                'name' => 'field_value_autosuggest',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'label' => 'Enable autocompletion on filter values', // @translate
-                    'info' => 'Requires module Reference (database values) or SearchSolr (indexed values).', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'field_value_autosuggest',
-                ],
-            ])
-            ->add([
-                'name' => 'fields',
-                'type' => CommonElement\DataTextarea::class,
-                'options' => [
-                    'label' => 'Fields', // @translate
-                    'info' => 'List of filters that will be displayed in the search form. Format is "term or field = Label".', // @translate
-                    'as_key_value' => true,
-                    'key_value_separator' => '=',
-                    'data_options' => [
-                        'value' => null,
-                        'label' => null,
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'fields',
-                    // field (term) = label (order means weight).
-                    'placeholder' => 'dcterms:title = Title',
-                    'rows' => 12,
-                ],
-            ])
         ;
 
         // Settings for the results.
@@ -1169,8 +1046,8 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 'type' => Element\Collection::class,
                 'name' => 'sort_list',
                 'options' => [
-                    'label' => 'Sort selector', // @ŧranslate
-                    'info' => 'List of sort field that will be displayed in the results.', // @translate
+                    'label' => 'Sort', // @translate
+                    'info' => 'The sort options offered in the results, in this order. Select one in the list to edit its field and label.', // @translate
                     'count' => 0,
                     'allow_add' => true,
                     'allow_remove' => true,
@@ -1184,6 +1061,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                     'required' => false,
                     'class' => 'form-fieldset-collection',
                     'data-label-index' => $this->translator->translate('Sort {index}'), // @ŧranslate
+                    'data-label-new' => $this->translator->translate('New sort'), // @translate
                 ],
             ])
             ->add([
@@ -1425,7 +1303,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 'type' => Element\Collection::class,
                 'options' => [
                     'label' => 'Facets', // @ŧranslate
-                    'info' => 'List of facets that will be displayed in the search page, formatted as ini. The section is a unique name. Keys are: field, label, type, order, limit, state, more, languages, data_types, main_types, values, display_count, and specific options, like thesaurus, min and max.', // @translate
+                    'info' => 'The facets are displayed in the page of results, after the search, to refine it, in this order. Select a facet in the list to edit it: the indexed field, its label, the type of display, and the specific options.', // @translate
                     'count' => 0,
                     'allow_add' => true,
                     'allow_remove' => true,
@@ -1439,6 +1317,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                     'required' => false,
                     'class' => 'form-fieldset-collection',
                     'data-label-index' => $this->translator->translate('Facet {index}'), // @ŧranslate
+                    'data-label-new' => $this->translator->translate('New facet'), // @translate
                 ],
             ])
             ->add([

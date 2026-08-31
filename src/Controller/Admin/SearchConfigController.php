@@ -32,6 +32,7 @@ namespace AdvancedSearch\Controller\Admin;
 
 use AdvancedSearch\Api\Representation\SearchConfigRepresentation;
 use AdvancedSearch\Form\Admin\SearchConfigConfigureForm;
+use AdvancedSearch\Form\Admin\SearchConfigFacetFieldset;
 use AdvancedSearch\Form\Admin\SearchConfigFilterFieldset;
 use AdvancedSearch\Form\Admin\SearchConfigForm;
 use AdvancedSearch\Stdlib\SearchResources;
@@ -762,9 +763,26 @@ class SearchConfigController extends AbstractActionController
     {
         $filterTypes = $this->getFormFilterTypes();
 
+        // Legacy: the settings of the advanced filter were a separate section.
+        if (!empty($settings['form']['advanced']) && isset($settings['form']['filters']['advanced'])) {
+            $settings['form']['filters']['advanced'] += $settings['form']['advanced'];
+        }
+        unset($settings['form']['advanced']);
+
         foreach ($settings['form']['filters'] ?? [] as $key => $fieldset) {
             // The name of filters are used as key and should be unique.
             $settings['form']['filters'][$key]['name'] = $key;
+            // The elements of a row of the advanced filter are a multi
+            // checkbox in the form and booleans in the settings.
+            if (($fieldset['type'] ?? '') === 'Advanced') {
+                $elements = [];
+                foreach (['field_joiner' => 'joiner', 'field_joiner_not' => 'joiner_not', 'field_operator' => 'operator', 'field_value_autosuggest' => 'autosuggest'] as $k => $v) {
+                    if (!empty($fieldset[$k])) {
+                        $elements[] = $v;
+                    }
+                }
+                $settings['form']['filters'][$key]['field_elements'] = $elements;
+            }
             // Set specific types options.
             $type = $fieldset['type'] ?? '';
             if ($type && !isset($filterTypes[$type])) {
@@ -777,14 +795,20 @@ class SearchConfigController extends AbstractActionController
 
         $facetInputs = [
             'field',
+            'field_end',
             'label',
             'type',
+            'language_site',
+            'languages',
             'order',
             'limit',
             'state',
+            'paginate',
             'more',
             'per_page',
             'display_count',
+            'options',
+            'attributes',
             // Slider scale settings: dedicated form fields, must not be moved
             // into "options" (which is the free-form IniTextarea).
             'scale_mode',
@@ -857,19 +881,23 @@ class SearchConfigController extends AbstractActionController
             $params['request']['hidden_query_filters'] = SearchResources::normalizeHiddenQueryFilters($params['request']['hidden_query_filters']);
         }
 
-        // Set name as key and move all specific types to options.
+        // Set name as key and move all specific types to options. The name is
+        // optional: it is derived from the field below when empty.
         $filters = [];
+        $j = 0;
         foreach ($params['form']['filters'] ?? [] as $filter) {
             $name = trim($filter['name'] ?? '');
-            if ($name) {
-                unset($filter['name']);
-                $type = $filter['type'] ?? '';
-                if ($type === 'Specific') {
-                    $filter['type'] = $filter['options']['type'] ?? '';
-                    unset($filter['options']['type']);
-                }
-                $filters[$name] = $filter;
+            unset($filter['name']);
+            if (empty($filter['field']) && !$name) {
+                continue;
             }
+            $type = $filter['type'] ?? '';
+            if ($type === 'Specific') {
+                $filter['type'] = $filter['options']['type'] ?? '';
+                unset($filter['options']['type']);
+            }
+            // A numeric key is replaced by the field below.
+            $filters[$name !== '' ? $name : $j++] = $filter;
         }
         $params['form']['filters'] = $filters;
 
@@ -885,10 +913,12 @@ class SearchConfigController extends AbstractActionController
 
             $field = $filter['field'];
 
+            // The type is a key of the list of types, else a specific one.
             $type = $filter['type'] ?? '';
-            $type = $filterTypes[$type] ?? ucfirst($type);
+            $type = isset($filterTypes[$type]) ? $type : ucfirst($type);
 
             // Key is always "advanced" for advanced filters, so no duplicate.
+            // Its settings are stored with the filter.
             if ($type === 'Advanced') {
                 $name = 'advanced';
                 $filter = [
@@ -896,9 +926,30 @@ class SearchConfigController extends AbstractActionController
                     'label' => $filter['label'] ?? '',
                     'type' => 'Advanced',
                 ] + $filter;
+                $filter['default_number'] = isset($filter['default_number']) ? (int) $filter['default_number'] : 1;
+                $filter['max_number'] = isset($filter['max_number']) ? (int) $filter['max_number'] : 10;
+                $elements = isset($filter['field_elements']) ? (array) $filter['field_elements'] : [];
+                unset($filter['field_elements']);
+                $filter['field_joiner'] = in_array('joiner', $elements);
+                $filter['field_joiner_not'] = in_array('joiner_not', $elements);
+                $filter['field_operator'] = in_array('operator', $elements);
+                $filter['field_operators'] = isset($filter['field_operators']) ? (array) $filter['field_operators'] : [];
+                $filter['field_value_autosuggest'] = in_array('autosuggest', $elements);
+                // Move the fields as last key for end user.
+                $advancedFields = $filter['fields'] ?? [];
+                unset($filter['fields']);
+                $filter['fields'] = $advancedFields;
             } elseif ($type === '') {
                 unset($filter['type']);
             }
+
+            // The settings of the groups the type does not use are removed.
+            $filter = $this->cleanSettingsByType($filter, $type, [
+                [SearchConfigFilterFieldset::TYPES_LIST, SearchConfigFilterFieldset::SETTINGS_LIST],
+                [SearchConfigFilterFieldset::TYPES_RANGE, SearchConfigFilterFieldset::SETTINGS_RANGE],
+                [SearchConfigFilterFieldset::TYPES_SLIDER, SearchConfigFilterFieldset::SETTINGS_SLIDER],
+                [['Advanced'], SearchConfigFilterFieldset::SETTINGS_ADVANCED],
+            ]);
 
             foreach ($filter as $k => $v) {
                 if ($v === null || $v === '' || $v === []) {
@@ -916,23 +967,9 @@ class SearchConfigController extends AbstractActionController
             $filters[$name] = $filter;
         }
 
-        $advanced = $params['form']['advanced'] ?? [];
-        if ($advanced) {
-            // Normalize some keys.
-            $advanced['default_number'] = isset($advanced['default_number']) ? (int) $advanced['default_number'] : 1;
-            $advanced['max_number'] = isset($advanced['max_number']) ? (int) $advanced['max_number'] : 10;
-            $advanced['field_joiner'] = isset($advanced['field_joiner']) ? !empty($advanced['field_joiner']) : true;
-            $advanced['field_joiner_not'] = isset($advanced['field_joiner_not']) ? !empty($advanced['field_joiner_not']) : true;
-            $advanced['field_operator'] = isset($advanced['field_operator']) ? !empty($advanced['field_operator']) : true;
-            $advanced['field_operators'] = isset($advanced['field_operators']) ? (array) $advanced['field_operators'] : [];
-            // Move advanced fields as last key for end user.
-            $advancedFields = $advanced['fields'] ?? [];
-            unset($advanced['fields']);
-            $advanced['fields'] = $advancedFields;
-        }
-
         $params['form']['filters'] = $filters;
-        $params['form']['advanced'] = $advanced;
+        // The settings of the advanced filter are stored with it now.
+        unset($params['form']['advanced']);
 
         $sortList = [];
         foreach ($params['results']['sort_list'] ?? [] as $sort) {
@@ -972,6 +1009,9 @@ class SearchConfigController extends AbstractActionController
             $reservedKeys = [
                 'boolean_filter',
                 'field_end',
+                'paginate',
+                'language_site',
+                'languages',
                 'scale_mode',
                 'scale_breakpoints',
                 'scale_show_ticks',
@@ -985,9 +1025,17 @@ class SearchConfigController extends AbstractActionController
                 $facet[$k] = $v;
             }
             unset($facet['options']);
+            // The settings of the groups the type does not use are removed.
+            $facet = $this->cleanSettingsByType($facet, $facet['type'] ?? 'Checkbox', [
+                [SearchConfigFacetFieldset::TYPES_LIST, SearchConfigFacetFieldset::SETTINGS_LIST],
+                [SearchConfigFacetFieldset::TYPES_VALUES, SearchConfigFacetFieldset::SETTINGS_VALUES],
+                [SearchConfigFacetFieldset::TYPES_SLIDER, SearchConfigFacetFieldset::SETTINGS_SLIDER],
+            ]);
             // Simplify some values (empty string, integer and boolean).
-            if (isset($facet['display_count'])) {
-                $facet['display_count'] = (bool) $facet['display_count'];
+            foreach (['display_count', 'paginate'] as $k) {
+                if (isset($facet[$k])) {
+                    $facet[$k] = (bool) $facet[$k];
+                }
             }
             foreach (['limit', 'more', 'per_page', 'min', 'max'] as $k) {
                 if (isset($facet[$k])) {
@@ -1087,7 +1135,7 @@ class SearchConfigController extends AbstractActionController
             return;
         }
 
-        $fieldsAdvanced = $params['form']['advanced']['fields'] ?? [];
+        $fieldsAdvanced = $advanced['fields'] ?? [];
         if (!$fieldsAdvanced) {
             $this->messenger()->addError(
                 'The list of fields of the advanced filters is not configured.' // @translate
@@ -1190,6 +1238,24 @@ class SearchConfigController extends AbstractActionController
      * @see \AdvancedSearch\Controller\Admin\SearchConfigController::slugify()
      * @see \BlockPlus\Module::slugify()
      */
+    /**
+     * Remove the settings of the groups that the type does not use.
+     *
+     * @param array $groups List of [types, settings]: the settings are kept
+     * only when the type is one of the types.
+     */
+    protected function cleanSettingsByType(array $settings, string $type, array $groups): array
+    {
+        foreach ($groups as [$types, $keys]) {
+            if (!in_array($type, $types, true)) {
+                foreach ($keys as $key) {
+                    unset($settings[$key]);
+                }
+            }
+        }
+        return $settings;
+    }
+
     protected function slugify($input): string
     {
         if (extension_loaded('intl')) {

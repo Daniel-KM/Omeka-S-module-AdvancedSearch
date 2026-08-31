@@ -94,3 +94,216 @@
         font-size: smaller;
     }
 }
+
+@media all {
+    .search-admin .collection-subnav {
+        margin-bottom: 1em;
+    }
+    .search-admin .collection-wrapper {
+        display: flex;
+        align-items: flex-start;
+        gap: 1.5em;
+    }
+    .search-admin .collection-side {
+        flex: 0 0 30%;
+        max-width: 360px;
+        position: sticky;
+        top: 1em;
+        display: flex;
+        flex-direction: column;
+        max-height: calc(100vh - 6em);
+    }
+    .search-admin .collection-main {
+        flex: 1;
+        min-width: 0;
+    }
+    .search-admin .collection-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        min-height: 0;
+        overflow-y: auto;
+    }
+    /* The "+" button under the list. */
+    .search-admin .collection-side > .collection-add {
+        display: block;
+        flex: none;
+        margin: 0.5em 0 0;
+        width: 100%;
+    }
+    .search-admin .collection-empty {
+        margin: 0.5em 0;
+        color: #676767;
+    }
+    /* Only the selected item is displayed; the others stay in the form. */
+    .search-admin .collection-main > fieldset {
+        display: none;
+        margin-top: 0;
+    }
+    .search-admin .collection-main > fieldset.collection-item-active {
+        display: block;
+    }
+    /* The list identifies the item: its numbered legend is useless. */
+    .search-admin .collection-main > fieldset > legend {
+        display: none;
+    }
+    .search-admin .collection-list > li {
+        display: flex;
+        align-items: center;
+        gap: 0.4em;
+        position: relative;
+        padding: 0.3em 2em 0.3em 0;
+        margin-bottom: 0.5em;
+        border: 1px solid #dfdfdf;
+        border-radius: 2px;
+        background-color: #fff;
+        cursor: pointer;
+    }
+    .search-admin .collection-list > li:last-child {
+        margin-bottom: 0;
+    }
+    .search-admin .collection-list > li:hover {
+        background-color: rgba(0, 0, 0, 0.03);
+    }
+    .search-admin .collection-list > li.active {
+        background-color: rgba(0, 0, 0, 0.06);
+        font-weight: bold;
+    }
+    /* The handle: same design as the values of the resource form. */
+    .search-admin .collection-item-handle {
+        align-self: stretch;
+        width: 12px;
+        margin: -0.3em 0;
+        background-color: #f0f0f0;
+        border-right: 1px solid #dfdfdf;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: move;
+    }
+    .search-admin .collection-item-handle::before {
+        font-size: 10px;
+        line-height: 1;
+    }
+    /* Accessible move buttons, stacked next to the handle. */
+    .search-admin .collection-item-moves {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .search-admin .collection-item-moves button,
+    .search-admin .collection-item-remove {
+        background: none;
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        margin: 0;
+        min-height: 0;
+        width: 24px;
+        height: 24px;
+        line-height: 24px;
+        color: #676767;
+        font-size: 1.15em;
+        cursor: pointer;
+    }
+    .search-admin .collection-item-moves button:hover,
+    .search-admin .collection-item-moves button:focus-visible {
+        color: #000;
+        background-color: rgba(0, 0, 0, 0.08);
+        border-radius: 3px;
+    }
+    .search-admin .collection-item-remove:hover,
+    .search-admin .collection-item-remove:focus-visible {
+        color: #e11717;
+        background-color: rgba(169, 25, 25, 0.08);
+        border-radius: 3px;
+    }
+    .search-admin .collection-item-moves button:disabled,
+    .search-admin .collection-item-moves button:disabled:hover {
+        color: #676767;
+        opacity: 0.25;
+        background: none;
+        cursor: default;
+    }
+    .search-admin .collection-item-remove {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 2em;
+        height: 2em;
+        line-height: 2em;
+        text-align: center;
+        color: #a91919;
+        font-size: 0.85em;
+    }
+    .search-admin .collection-item-summary {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25em 0.6em;
+        min-width: 0;
+        flex: 1;
+    }
+    .search-admin .collection-item-field,
+    .search-admin .collection-item-type,
+    .search-admin .collection-item-new {
+        font-weight: normal;
+        color: #676767;
+        font-size: 0.85em;
+    }
+    .search-admin .collection-item-type {
+        flex-basis: 100%;
+    }
+    /* Fields laid out side by side. */
+    .search-admin .collection-inline {
+        display: flex;
+        gap: 1em;
+    }
+    .search-admin .collection-inline > .field {
+        flex: 1;
+        min-width: 0;
+    }
+    .search-admin .collection-inline > .field > .field-meta {
+        width: auto;
+        flex: none;
+        margin-right: 1em;
+    }
+    .search-admin .collection-inline > .field > .field-meta label {
+        max-width: none;
+        white-space: nowrap;
+    }
+    .search-admin .collection-inline > .field > .inputs {
+        width: auto;
+        flex: 1;
+    }
+    .search-admin .collection-inline input[type="number"] {
+        width: 6em;
+    }
+    /* One element by line. */
+    .search-admin .field:has([name$="[field_elements][]"]) .inputs > label {
+        display: block;
+        margin: 0;
+        padding: 0.25em 0;
+        line-height: 1.5;
+    }
+    /* The advanced fields of an item are folded. */
+    .search-admin .collection-advanced {
+        margin: 0.5em 0 1em;
+    }
+    .search-admin .collection-advanced > summary {
+        display: list-item;
+        cursor: pointer;
+        font-weight: bold;
+        margin-bottom: 0.5em;
+    }
+}
+@media only screen and (max-width: 39.9375em) {
+    .search-admin .collection-wrapper {
+        display: block;
+    }
+    .search-admin .collection-side {
+        position: static;
+        max-width: none;
+        max-height: none;
+        margin-bottom: 1em;
+    }
+}

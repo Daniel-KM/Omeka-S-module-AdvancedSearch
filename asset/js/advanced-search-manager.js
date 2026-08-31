@@ -56,10 +56,9 @@ $(document).ready(function() {
                 $(button).appendTo($(button).prev('fieldset'));
             });
 
-            $formConfig.on('click', '.config-fieldset-minus', self.fieldsetRemove);
+            // The removal and the reordering of the items are managed by the
+            // list of the collection (advanced-search-collection.js).
             $formConfig.on('click', '.config-fieldset-plus', self.fieldsetAppend);
-            $formConfig.on('click', '.config-fieldset-up', self.fieldsetMoveUp);
-            $formConfig.on('click', '.config-fieldset-down', self.fieldsetMoveDown);
 
             $formConfig.on('change', '#search-config-sort-form select', function() {
                 const select = $(this);
@@ -72,22 +71,17 @@ $(document).ready(function() {
             return self;
         };
 
-        self.fieldsetRemove = function(ev) {
-            $(ev.currentTarget).closest('fieldset').remove();
-            self.fieldsetUpdateButtons();
-            self.fieldsetUpdateLabels();
-            return self;
-        };
-
         self.fieldsetAppend = function(ev) {
             const $fieldset = $(ev.currentTarget).closest('fieldset');
             const template = $fieldset.find('> span[data-template]').attr('data-template');
             if (template) {
-                var maxIndex = 0;
-                $fieldset.find('> fieldset').each(function(no, item) {
+                // The items may be moved in a sub-element by the list of the
+                // collection, so search them by their class.
+                var maxIndex = -1;
+                $fieldset.find('fieldset.form-fieldset-element[name]').each(function(no, item) {
                     const fieldsetName = $(item).attr('name');
-                    const fieldsetIndex = fieldsetName.replace(/\D+/g, '');
-                    maxIndex = Math.max(maxIndex, fieldsetIndex);
+                    const fieldsetIndex = parseInt(fieldsetName.replace(/^.*\[(\d+)\]$/, '$1'), 10);
+                    if (!isNaN(fieldsetIndex)) maxIndex = Math.max(maxIndex, fieldsetIndex);
                 });
                 $fieldset.append(template.split('__index__').join(++maxIndex));
                 // Move the button plus and the hidden span at last to simplify
@@ -103,24 +97,6 @@ $(document).ready(function() {
             return self;
         };
 
-        self.fieldsetMoveUp = function(ev) {
-            const current = $(ev.currentTarget).closest('fieldset');
-            const previous = current.prev('fieldset');
-            current.insertBefore(previous);
-            self.fieldsetUpdateButtons();
-            self.fieldsetUpdateLabels();
-            return self;
-        };
-
-        self.fieldsetMoveDown = function(ev) {
-            const current = $(ev.currentTarget).closest('fieldset');
-            const next = current.next('fieldset');
-            current.insertAfter(next);
-            self.fieldsetUpdateButtons();
-            self.fieldsetUpdateLabels();
-            return self;
-        };
-
         self.fieldsetUpdateButtons = function() {
             // Remove the field wrapping new buttons.
             $('.config-fieldset-action').each(function(no, button) {
@@ -128,28 +104,6 @@ $(document).ready(function() {
                 if (field) {
                     $(button).insertBefore(field);
                     field.remove();
-                }
-            });
-            // Enable or disable up/down buttons in each fieldset.
-            var buttons = $formConfig.find('.config-fieldset-up');
-            $formConfig.find('.config-fieldset-up').each(function(no, button) {
-                button = $(button);
-                const index = self.fieldsetIndex(button.closest('fieldset'));
-                if (index <= 1) {
-                    button.attr('disabled', 'disabled');
-                } else {
-                    button.removeAttr('disabled');
-                }
-            });
-            buttons = $formConfig.find('.config-fieldset-down');
-            $formConfig.find('.config-fieldset-down').each(function(no, button) {
-                button = $(button);
-                const index = self.fieldsetIndex(button.closest('fieldset'));
-                const fieldset = button.closest('fieldset');
-                if (index >= self.fieldsetCount(fieldset)) {
-                    button.attr('disabled', 'disabled');
-                } else {
-                    button.removeAttr('disabled');
                 }
             });
             return self;

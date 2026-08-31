@@ -526,12 +526,11 @@ class MainSearchForm extends Form
 
     protected function searchAdvanced(array $filter): ?ElementInterface
     {
-        // TODO Use the advanced settings directly from the search config.
-        if (empty($this->formSettings['form']['advanced'])) {
+        // The settings of the advanced filter are stored with the filter.
+        $advanced = $this->searchConfig ? $this->searchConfig->advancedFilterSettings() : [];
+        if (empty($advanced)) {
             return null;
         }
-
-        $advanced = $this->formSettings['form']['advanced'];
 
         $defaultNumber = isset($advanced['default_number']) ? (int) $advanced['default_number'] : 1;
         $maxNumber = isset($advanced['max_number']) ? (int) $advanced['max_number'] : 10;

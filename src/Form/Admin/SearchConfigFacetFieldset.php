@@ -10,6 +10,21 @@ use Laminas\InputFilter\InputFilterProviderInterface;
 
 class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderInterface
 {
+    /**
+     * The types of facet by group of settings, used by the form and to clean
+     * the settings on save.
+     */
+    const TYPES_LIST = ['Checkbox', 'CheckboxFilter', 'Select', 'Link', 'Tree', 'TreeLink', 'Thesaurus', 'ThesaurusLink'];
+    const TYPES_VALUES = ['Checkbox', 'CheckboxFilter', 'Select', 'Link', 'Tree', 'TreeLink', 'Thesaurus', 'ThesaurusLink', 'HasValue'];
+    const TYPES_SLIDER = ['RangeDouble'];
+
+    /**
+     * The settings by group, cleaned when the type does not use them.
+     */
+    const SETTINGS_LIST = ['language_site', 'languages', 'order', 'limit', 'state', 'paginate', 'more', 'per_page'];
+    const SETTINGS_VALUES = ['value_labels_table', 'value_labels', 'display_count'];
+    const SETTINGS_SLIDER = ['field_end', 'scale_mode', 'scale_breakpoints', 'scale_show_ticks'];
+
     public function init(): void
     {
         // These fields may be overridden by the available fields.
@@ -33,6 +48,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
                 'attributes' => [
                     'id' => 'form_facet_field',
+                    'data-common' => '1',
                     'required' => false,
                     'class' => 'chosen-select',
                     'data-placeholder' => 'Set field or index…', // @translate
@@ -49,6 +65,8 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
                 'attributes' => [
                     'id' => 'form_facet_field_end',
+                    'data-filter-types' => implode(' ', self::TYPES_SLIDER),
+                    'data-common' => '1',
                     'required' => false,
                     'class' => 'chosen-select',
                     'data-placeholder' => 'Set interval end field…', // @translate
@@ -62,6 +80,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
                 'attributes' => [
                     'id' => 'form_facet_label',
+                    'data-common' => '1',
                     'required' => false,
                 ],
             ])
@@ -74,6 +93,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
                 'attributes' => [
                     'id' => 'form_facet_value_labels_table',
+                    'data-filter-types' => implode(' ', self::TYPES_VALUES),
                     'required' => false,
                     'placeholder' => 'my-table-slug',
                 ],
@@ -88,6 +108,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
                 'attributes' => [
                     'id' => 'form_facet_value_labels',
+                    'data-filter-types' => implode(' ', self::TYPES_VALUES),
                     'required' => false,
                     'rows' => 3,
                     'placeholder' => <<<'TXT'
@@ -135,6 +156,8 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
                 'attributes' => [
                     'id' => 'form_facet_type',
+                    'data-common' => '1',
+                    'data-type-default' => 'Checkbox',
                     'class' => 'chosen-select',
                     'required' => false,
                     'data-placeholder' => 'Set facet type…', // @translate
@@ -154,6 +177,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
                 'attributes' => [
                     'id' => 'facet_language_site',
+                    'data-filter-types' => implode(' ', self::TYPES_LIST),
                     'required' => false,
                     'value' => '',
                 ],
@@ -170,6 +194,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
                 'attributes' => [
                     'id' => 'facet_languages',
+                    'data-filter-types' => implode(' ', self::TYPES_LIST),
                     'placeholder' => 'fra|way|apy|',
                 ],
             ])
@@ -191,6 +216,8 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
                 'attributes' => [
                     'id' => 'facet_order',
+                    'data-filter-types' => implode(' ', self::TYPES_LIST),
+                    'data-common' => '1',
                     'multiple' => false,
                     'class' => 'chosen-select',
                     'data-placeholder' => 'Select order…', // @translate
@@ -204,6 +231,8 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
                 'attributes' => [
                     'id' => 'facet_limit',
+                    'data-filter-types' => implode(' ', self::TYPES_LIST),
+                    'data-common' => '1',
                     'required' => false,
                     'value' => '100',
                 ],
@@ -225,6 +254,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
                 'attributes' => [
                     'id' => 'facet_state',
+                    'data-filter-types' => implode(' ', self::TYPES_LIST),
                     'required' => false,
                     'value' => 'static',
                 ],
@@ -238,16 +268,19 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
                 'attributes' => [
                     'id' => 'facet_paginate',
+                    'data-filter-types' => implode(' ', self::TYPES_LIST),
                 ],
             ])
             ->add([
                 'name' => 'more',
                 'type' => Element\Number::class,
                 'options' => [
-                    'label' => 'Number of facets to display on load (without pagination)', // @translate
+                    'label' => 'Values displayed on load', // @translate
                 ],
                 'attributes' => [
                     'id' => 'facet_more',
+                    'data-inline' => 'pages',
+                    'data-filter-types' => implode(' ', self::TYPES_LIST),
                     'required' => false,
                     'value' => '10',
                 ],
@@ -256,10 +289,12 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 'name' => 'per_page',
                 'type' => Element\Number::class,
                 'options' => [
-                    'label' => 'Number of facets per page (with pagination)', // @translate
+                    'label' => 'Values per page (with pagination)', // @translate
                 ],
                 'attributes' => [
                     'id' => 'facet_per_page',
+                    'data-inline' => 'pages',
+                    'data-filter-types' => implode(' ', self::TYPES_LIST),
                     'required' => false,
                     'value' => '10',
                     'min' => 0,
@@ -273,6 +308,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
                 'attributes' => [
                     'id' => 'facet_display_count',
+                    'data-filter-types' => implode(' ', self::TYPES_VALUES),
                     'required' => false,
                 ],
             ])
@@ -314,6 +350,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
                 'attributes' => [
                     'id' => 'form_facet_scale_mode',
+                    'data-filter-types' => implode(' ', self::TYPES_SLIDER),
                     'value' => 'linear',
                 ],
             ])
@@ -327,6 +364,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
                 'attributes' => [
                     'id' => 'form_facet_scale_breakpoints',
+                    'data-filter-types' => implode(' ', self::TYPES_SLIDER),
                     'required' => false,
                     'rows' => 5,
                     'placeholder' => <<<TXT
@@ -345,6 +383,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
                 'attributes' => [
                     'id' => 'form_facet_scale_show_ticks',
+                    'data-filter-types' => implode(' ', self::TYPES_SLIDER),
                 ],
             ])
 
@@ -389,61 +428,6 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
             ])
 
             // Action buttons.
-
-            ->add([
-                'name' => 'minus',
-                'type' => Element\Button::class,
-                'options' => [
-                    'label' => ' ',
-                    'label_options' => [
-                        'disable_html_escape' => true,
-                    ],
-                    'label_attributes' => [
-                        'class' => 'config-fieldset-action-label',
-                    ],
-                ],
-                'attributes' => [
-                    // Don't use o-icon-delete.
-                    'class' => 'config-fieldset-action config-fieldset-minus fa fa-minus remove-value button',
-                    'aria-label' => 'Remove this facet', // @translate
-                ],
-            ])
-            ->add([
-                'name' => 'up',
-                'type' => Element\Button::class,
-                'options' => [
-                    'label' => ' ',
-                    'label_options' => [
-                        'disable_html_escape' => true,
-                    ],
-                    'label_attributes' => [
-                        'class' => 'config-fieldset-action-label',
-                    ],
-                ],
-                'attributes' => [
-                    // Don't use o-icon-delete.
-                    'class' => 'config-fieldset-action config-fieldset-up fa fa-arrow-up button',
-                    'aria-label' => 'Move this facet up', // @translate
-                ],
-            ])
-            ->add([
-                'name' => 'down',
-                'type' => Element\Button::class,
-                'options' => [
-                    'label' => ' ',
-                    'label_options' => [
-                        'disable_html_escape' => true,
-                    ],
-                    'label_attributes' => [
-                        'class' => 'config-fieldset-action-label',
-                    ],
-                ],
-                'attributes' => [
-                    // Don't use o-icon-delete.
-                    'class' => 'config-fieldset-action config-fieldset-down fa fa-arrow-down button',
-                    'aria-label' => 'Move this facet down', // @translate
-                ],
-            ])
         ;
     }
 

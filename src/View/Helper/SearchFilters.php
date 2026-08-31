@@ -717,7 +717,8 @@ class SearchFilters extends AbstractHelper
         }
 
         $queryTypesLabels = $this->getQueryTypesLabels();
-        $searchFormAdvancedLabels = array_column($searchFormSettings['advanced']['fields'] ?? [], 'label', 'value');
+        $searchFormAdvanced = $this->searchConfig ? $this->searchConfig->advancedFilterSettings() : [];
+        $searchFormAdvancedLabels = array_column($searchFormAdvanced['fields'] ?? [], 'label', 'value');
         $fieldFiltersLabels = array_replace($fieldLabels, array_filter($searchFormAdvancedLabels));
 
         // Map of indexed value => admin-defined display label, per field. Used

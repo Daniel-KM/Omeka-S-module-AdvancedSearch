@@ -604,6 +604,8 @@ trait TraitFormAdapterClassic
         // default value should be skipped.
         $searchFormSettings['facet'] = $searchConfigSettings['facet'] ?? [];
 
+        // The settings of the advanced filter are stored with the filter.
+        $searchFormSettings['advanced'] = $this->searchConfig->advancedFilterSettings();
         $searchFormSettings['aliases'] = $this->searchConfig->subSetting('index', 'aliases', []);
         $searchFormSettings['fields_query_args'] = $this->searchConfig->subSetting('index', 'query_args', []);
 

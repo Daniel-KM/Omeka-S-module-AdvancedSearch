@@ -340,8 +340,7 @@ class SearchController extends AbstractActionController
         if ($site) {
             $query->setSiteId($site->id());
         }
-        $formSettings = $searchConfig->settings()['form'] ?? [];
-        $aliases = $formSettings['advanced']['fields'] ?? [];
+        $aliases = $searchConfig->advancedFilterSettings()['fields'] ?? [];
         $query->setAliases($aliases);
         $querier->setQuery($query);
 

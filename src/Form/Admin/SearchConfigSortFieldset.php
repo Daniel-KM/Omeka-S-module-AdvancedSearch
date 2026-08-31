@@ -100,61 +100,6 @@ class SearchConfigSortFieldset extends Fieldset implements InputFilterProviderIn
                     'required' => false,
                 ],
             ])
-
-            ->add([
-                'name' => 'minus',
-                'type' => Element\Button::class,
-                'options' => [
-                    'label' => ' ',
-                    'label_options' => [
-                        'disable_html_escape' => true,
-                    ],
-                    'label_attributes' => [
-                        'class' => 'config-fieldset-action-label',
-                    ],
-                ],
-                'attributes' => [
-                    // Don't use o-icon-delete.
-                    'class' => 'config-fieldset-action config-fieldset-minus fa fa-minus remove-value button',
-                    'aria-label' => 'Remove this sort option', // @translate
-                ],
-            ])
-            ->add([
-                'name' => 'up',
-                'type' => Element\Button::class,
-                'options' => [
-                    'label' => ' ',
-                    'label_options' => [
-                        'disable_html_escape' => true,
-                    ],
-                    'label_attributes' => [
-                        'class' => 'config-fieldset-action-label',
-                    ],
-                ],
-                'attributes' => [
-                    // Don't use o-icon-delete.
-                    'class' => 'config-fieldset-action config-fieldset-up fa fa-arrow-up button',
-                    'aria-label' => 'Move this sort option up', // @translate
-                ],
-            ])
-            ->add([
-                'name' => 'down',
-                'type' => Element\Button::class,
-                'options' => [
-                    'label' => ' ',
-                    'label_options' => [
-                        'disable_html_escape' => true,
-                    ],
-                    'label_attributes' => [
-                        'class' => 'config-fieldset-action-label',
-                    ],
-                ],
-                'attributes' => [
-                    // Don't use o-icon-delete.
-                    'class' => 'config-fieldset-action config-fieldset-down fa fa-arrow-down button',
-                    'aria-label' => 'Move this sort option down', // @translate
-                ],
-            ])
         ;
     }
 

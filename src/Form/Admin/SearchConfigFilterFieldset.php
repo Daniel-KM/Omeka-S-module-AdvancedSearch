@@ -10,6 +10,22 @@ use Omeka\Form\Element as OmekaElement;
 
 class SearchConfigFilterFieldset extends Fieldset implements InputFilterProviderInterface
 {
+    /**
+     * The types of filter by group of settings, used by the form and to clean
+     * the settings on save.
+     */
+    const TYPES_LIST = ['Select', 'SelectFlat', 'SelectGroup', 'MultiSelect', 'MultiSelectFlat', 'MultiSelectGroup', 'Radio', 'Checkbox', 'MultiCheckbox', 'Tree', 'Thesaurus'];
+    const TYPES_RANGE = ['Range', 'RangeDouble'];
+    const TYPES_SLIDER = ['RangeDouble'];
+
+    /**
+     * The settings by group, cleaned when the type does not use them.
+     */
+    const SETTINGS_LIST = ['value_labels_table', 'value_labels', 'language_site', 'languages', 'order', 'limit'];
+    const SETTINGS_RANGE = ['field_end'];
+    const SETTINGS_SLIDER = ['scale_mode', 'scale_breakpoints', 'scale_show_ticks'];
+    const SETTINGS_ADVANCED = ['default_number', 'max_number', 'field_elements', 'field_joiner', 'field_joiner_not', 'field_operator', 'field_operators', 'field_value_autosuggest', 'fields'];
+
     public function init(): void
     {
         // These fields may be overridden by the available fields.
@@ -27,11 +43,13 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 'type' => Element\Text::class,
                 'options' => [
                     'label' => 'Name (alphanumeric)', // @translate
+                    'info' => 'The technical key of the filter, used in the url of the query. Leave empty to derive it from the field; set it to distinguish two filters on the same field, or for a short url.', // @translate
                 ],
                 'attributes' => [
                     'id' => 'form_filter_name',
                     'required' => false,
                     'pattern' => '[a-zA-Z0-9_:\-]+',
+                    'data-filter-types-not' => 'Advanced',
                 ],
             ])
             ->add([
@@ -47,6 +65,8 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filter_field',
+                    'data-common' => '1',
+                    'data-filter-types-not' => 'Advanced',
                     'required' => false,
                     'class' => 'chosen-select',
                     'data-placeholder' => 'Set field or index…', // @translate
@@ -63,6 +83,8 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filter_field_end',
+                    'data-common' => '1',
+                    'data-filter-types' => implode(' ', self::TYPES_RANGE),
                     'required' => false,
                     'class' => 'chosen-select',
                     'data-placeholder' => 'Set interval end field…', // @translate
@@ -74,9 +96,11 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 'type' => Element\Text::class,
                 'options' => [
                     'label' => 'Label', // @translate
+                    'info' => 'The label displayed to the visitor. Leave empty to use the label of the field.', // @translate
                 ],
                 'attributes' => [
                     'id' => 'form_filter_label',
+                    'data-common' => '1',
                     'required' => false,
                 ],
             ])
@@ -89,6 +113,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filter_value_labels_table',
+                    'data-filter-types' => implode(' ', self::TYPES_LIST),
                     'required' => false,
                     'placeholder' => 'my-table-slug',
                 ],
@@ -103,6 +128,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filter_value_labels',
+                    'data-filter-types' => implode(' ', self::TYPES_LIST),
                     'required' => false,
                     'rows' => 3,
                     'placeholder' => <<<'TXT'
@@ -136,7 +162,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                     /** @see \AdvancedSearch\Form\MainSearchForm::init() */
                     'value_options' => [
                         'text' => 'Text (default)', // @ŧranslate
-                        'Advanced' => 'Advanced filter (configured below)', // @translate
+                        'Advanced' => 'Advanced filter', // @translate
                         'Checkbox' => 'Checkbox', // @translate
                         'HasValue' => 'Checkbox: has a value / has no value', // @translate
                         // 'Date' => 'Date',
@@ -168,10 +194,115 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                     'empty_option' => '',
                 ],
                 'attributes' => [
-                    'id' => 'form_filter_name',
+                    'id' => 'form_filter_type',
                     'class' => 'chosen-select',
                     'required' => false,
+                    'data-common' => '1',
+                    'data-type-default' => 'text',
                     'data-placeholder' => 'Set filter type…', // @translate
+                ],
+            ])
+            // Settings of the advanced filter (type Advanced), stored with the
+            // filter itself.
+            ->add([
+                'name' => 'fields',
+                'type' => CommonElement\DataTextarea::class,
+                'options' => [
+                    'label' => 'Fields proposed to the visitor', // @translate
+                    'info' => 'One field by line, in this order: "term or field = Label".', // @translate
+                    'as_key_value' => true,
+                    'key_value_separator' => '=',
+                    'data_options' => [
+                        'value' => null,
+                        'label' => null,
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_fields',
+                    'data-filter-types' => 'Advanced',
+                    'data-common' => '1',
+                    // field (term) = label (order means weight).
+                    'placeholder' => 'dcterms:title = Title',
+                    'rows' => 6,
+                ],
+            ])
+            ->add([
+                'name' => 'default_number',
+                'type' => Element\Number::class,
+                'options' => [
+                    'label' => 'Rows displayed by default', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_default_number',
+                    'data-filter-types' => 'Advanced',
+                    'data-common' => '1',
+                    'data-inline' => 'rows',
+                    'required' => false,
+                    'value' => '1',
+                    'min' => '0',
+                    // A mysql query supports 61 arguments maximum.
+                    'max' => '49',
+                    'step' => '1',
+                ],
+            ])
+            ->add([
+                'name' => 'max_number',
+                'type' => Element\Number::class,
+                'options' => [
+                    'label' => 'Maximum rows', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_max_number',
+                    'data-filter-types' => 'Advanced',
+                    'data-common' => '1',
+                    'data-inline' => 'rows',
+                    'required' => false,
+                    'value' => '10',
+                    'min' => '0',
+                    // A mysql query supports 61 arguments maximum.
+                    'max' => '49',
+                    'step' => '1',
+                ],
+            ])
+            ->add([
+                'name' => 'field_elements',
+                'type' => CommonElement\OptionalMultiCheckbox::class,
+                'options' => [
+                    'label' => 'Elements of a row', // @translate
+                    'value_options' => [
+                        'joiner' => 'Joiner ("and" / "or")', // @translate
+                        'joiner_not' => 'Joiner "not"', // @translate
+                        'operator' => 'Operator ("is exactly", "contains", etc.)', // @translate
+                        'autosuggest' => 'Autocompletion of values (requires module Reference or SearchSolr)', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_field_elements',
+                    'data-filter-types' => 'Advanced',
+                    'data-common' => '1',
+                    'value' => ['joiner', 'operator'],
+                ],
+            ])
+            ->add([
+                'name' => 'field_operators',
+                'type' => OmekaElement\ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Available operators', // @translate
+                    'info' => 'By default, all the operators of the standard advanced search form. Negative operators are removed when the joiner "not" is used.', // @translate
+                    'as_key_value' => true,
+                    'key_value_separator' => '=',
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_field_operators',
+                    'data-filter-types' => 'Advanced',
+                    'rows' => 12,
+                    // This placeholder does not contain all query types.
+                    'placeholder' => <<<'STRING'
+                        eq = is exactly
+                        in = contains
+                        sw = starts with
+                        ew = ends with
+                        STRING, // @translate
                 ],
             ])
             ->add([
@@ -187,6 +318,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filter_language_site',
+                    'data-filter-types' => implode(' ', self::TYPES_LIST),
                     'required' => false,
                     'value' => '',
                 ],
@@ -203,6 +335,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filter_languages',
+                    'data-filter-types' => implode(' ', self::TYPES_LIST),
                     'placeholder' => 'fra|way|apy|',
                 ],
             ])
@@ -224,6 +357,8 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filter_order',
+                    'data-common' => '1',
+                    'data-filter-types' => implode(' ', self::TYPES_LIST),
                     'multiple' => false,
                     'class' => 'chosen-select',
                     'data-placeholder' => 'Select order…', // @translate
@@ -237,6 +372,8 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filter_limit',
+                    'data-common' => '1',
+                    'data-filter-types' => implode(' ', self::TYPES_LIST),
                     'required' => false,
                     'value' => '100',
                 ],
@@ -260,6 +397,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filter_scale_mode',
+                    'data-filter-types' => implode(' ', self::TYPES_SLIDER),
                     'value' => 'linear',
                 ],
             ])
@@ -273,6 +411,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filter_scale_breakpoints',
+                    'data-filter-types' => implode(' ', self::TYPES_SLIDER),
                     'required' => false,
                     'rows' => 5,
                     'placeholder' => <<<TXT
@@ -291,6 +430,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filter_scale_show_ticks',
+                    'data-filter-types' => implode(' ', self::TYPES_SLIDER),
                 ],
             ])
 
@@ -330,61 +470,6 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                     'id' => 'form_filters_attributes',
                     'required' => false,
                     'placeholder' => '',
-                ],
-            ])
-
-            ->add([
-                'name' => 'minus',
-                'type' => Element\Button::class,
-                'options' => [
-                    'label' => ' ',
-                    'label_options' => [
-                        'disable_html_escape' => true,
-                    ],
-                    'label_attributes' => [
-                        'class' => 'config-fieldset-action-label',
-                    ],
-                ],
-                'attributes' => [
-                    // Don't use o-icon-delete.
-                    'class' => 'config-fieldset-action config-fieldset-minus fa fa-minus remove-value button',
-                    'aria-label' => 'Remove this filter', // @translate
-                ],
-            ])
-            ->add([
-                'name' => 'up',
-                'type' => Element\Button::class,
-                'options' => [
-                    'label' => ' ',
-                    'label_options' => [
-                        'disable_html_escape' => true,
-                    ],
-                    'label_attributes' => [
-                        'class' => 'config-fieldset-action-label',
-                    ],
-                ],
-                'attributes' => [
-                    // Don't use o-icon-delete.
-                    'class' => 'config-fieldset-action config-fieldset-up fa fa-arrow-up button',
-                    'aria-label' => 'Move this filter up', // @translate
-                ],
-            ])
-            ->add([
-                'name' => 'down',
-                'type' => Element\Button::class,
-                'options' => [
-                    'label' => ' ',
-                    'label_options' => [
-                        'disable_html_escape' => true,
-                    ],
-                    'label_attributes' => [
-                        'class' => 'config-fieldset-action-label',
-                    ],
-                ],
-                'attributes' => [
-                    // Don't use o-icon-delete.
-                    'class' => 'config-fieldset-action config-fieldset-down fa fa-arrow-down button',
-                    'aria-label' => 'Move this filter down', // @translate
                 ],
             ])
         ;

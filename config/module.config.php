@@ -27,15 +27,19 @@ $allFilterTypes = [
 ];
 
 /** @see \AdvancedSearch\Stdlib\SearchResources::FIELD_QUERY['default'] */
+/**
+ * The types displayed by default in the sites, that is a simple list for the
+ * visitors: the technical ones (data type, count of values, resource by id)
+ * remain available, but they are enabled by the admin of the site.
+ *
+ * The main settings, used in the admin board, keep all the types.
+ */
 $defaultFilterTypes = [
     'eq', 'neq', 'in', 'nin',
     'sw', 'nsw', 'ew', 'new',
     'lt', 'lte', 'gte', 'gt',
     'yreq', 'nyreq', 'yrgte', 'yrlte',
-    'res', 'nres',
-    'lex', 'nlex',
-    'ex', 'nex', 'exs', 'nexs', 'exm', 'nexm',
-    'dtp', 'ndtp', 'tp', 'ntp',
+    'ex', 'nex',
 ];
 
 $defaultAutosuggestBlacklist = [
@@ -442,7 +446,7 @@ return [
                 'common/advanced-search/data-type-geography',
                 'common/numeric-data-types-advanced-search',
             ],
-            'advancedsearch_filter_types' => $allFilterTypes,
+            'advancedsearch_filter_types' => \AdvancedSearch\Stdlib\SearchResources::filterTypesDisplayed(),
             'advancedsearch_filter_value_autosuggest_whitelist' => ['all'],
             'advancedsearch_filter_value_autosuggest_blacklist' => $defaultAutosuggestBlacklist,
             'advancedsearch_filter_joiner_not' => true,
@@ -478,7 +482,7 @@ return [
                 'common/advanced-search/data-type-geography',
                 'common/numeric-data-types-advanced-search',
             ],
-            'advancedsearch_filter_types' => $defaultFilterTypes,
+            'advancedsearch_filter_types' => \AdvancedSearch\Stdlib\SearchResources::collapseFilterTypes($defaultFilterTypes),
             'advancedsearch_filter_value_autosuggest_whitelist' => ['all'],
             'advancedsearch_filter_value_autosuggest_blacklist' => $defaultAutosuggestBlacklist,
             'advancedsearch_filter_joiner_not' => true,

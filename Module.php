@@ -1987,6 +1987,27 @@ class Module extends AbstractModule
         $plugins = $view->getHelperPluginManager();
         /** @var \Omeka\Mvc\Status $status */
         $status = $plugins->get('status');
+
+        // The settings pages display many grouped checkboxes, so the groups
+        // are collapsible.
+        if ($status->isAdminRequest()) {
+            $params = $view->params()->fromRoute();
+            // The settings of a site are edited by the action "edit".
+            $controller = $params['controller'] ?? null;
+            $isSettings = $controller === 'Omeka\Controller\Admin\Setting'
+                || $controller === \Omeka\Controller\Admin\SettingController::class
+                || (($controller === 'Omeka\Controller\SiteAdmin\Index'
+                        || $controller === \Omeka\Controller\SiteAdmin\IndexController::class)
+                    && in_array($params['action'] ?? null, ['edit', 'settings'], true));
+            if ($isSettings) {
+                $assetUrl = $plugins->get('assetUrl');
+                $plugins->get('headLink')
+                    ->appendStylesheet($assetUrl('css/advanced-search-settings.css', 'AdvancedSearch'));
+                $plugins->get('headScript')
+                    ->appendFile($assetUrl('js/advanced-search-settings.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
+            }
+        }
+
         if ($status->isSiteRequest()) {
             $params = $view->params()->fromRoute();
             if ($params['controller'] === \AdvancedSearch\Controller\SearchController::class) {

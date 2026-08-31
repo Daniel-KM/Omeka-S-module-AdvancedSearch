@@ -911,6 +911,130 @@ class SearchResources
      *
      * @todo Improve cleaning query.
      */
+    /**
+     * The families of duplicate types and their variants, that are a product.
+     *
+     * The 32 curation types are the combination of four families, four
+     * variants and the negative form, so they are managed as 4 + 3 checkboxes.
+     */
+    const FILTER_TYPE_DUPLICATES = [
+        'families' => [
+            'dup' => 'values', // @translate
+            'dupv' => 'simple values', // @translate
+            'dupr' => 'linked resources', // @translate
+            'dupu' => 'uris', // @translate
+        ],
+        'variants' => [
+            't' => 'with type', // @translate
+            'l' => 'with language', // @translate
+            'tl' => 'with type and language', // @translate
+        ],
+    ];
+
+    /**
+     * List the filter types displayed in the settings: 39 instead of 84.
+     *
+     * The negative types are derived and the duplicates are families and
+     * variants.
+     */
+    public static function filterTypesDisplayed(): array
+    {
+        $negative = array_flip(self::FIELD_QUERY['negative']);
+        $families = self::FILTER_TYPE_DUPLICATES['families'];
+        $variants = self::FILTER_TYPE_DUPLICATES['variants'];
+
+        $result = [];
+        foreach (array_keys(self::FIELD_QUERY['labels']) as $type) {
+            if (isset($negative[$type])) {
+                continue;
+            }
+            $isVariant = false;
+            foreach (array_keys($families) as $family) {
+                $variant = mb_substr($type, mb_strlen($family));
+                if (mb_strpos($type, $family) === 0 && isset($variants[$variant])) {
+                    $isVariant = true;
+                    break;
+                }
+            }
+            if (!$isVariant) {
+                $result[] = $type;
+            }
+        }
+
+        return array_merge($result, array_keys($variants));
+    }
+
+    /**
+     * Expand the filter types selected in the settings into all real types.
+     *
+     * The negative types are derived from their positive one, and the four
+     * families of duplicates are combined with the selected variants, so the
+     * settings store a short list instead of the 84 types.
+     */
+    public static function expandFilterTypes(array $types): array
+    {
+        $families = array_keys(self::FILTER_TYPE_DUPLICATES['families']);
+        $variants = array_keys(self::FILTER_TYPE_DUPLICATES['variants']);
+
+        // The variants are selected once for all the families.
+        $selectedVariants = array_values(array_intersect($variants, $types));
+        $types = array_diff($types, $variants);
+
+        $result = [];
+        foreach ($types as $type) {
+            $result[] = $type;
+            if (in_array($type, $families, true)) {
+                foreach ($selectedVariants as $variant) {
+                    $result[] = $type . $variant;
+                }
+            }
+        }
+
+        // Each positive type implies its negative one.
+        $reciprocal = self::FIELD_QUERY['reciprocal'];
+        foreach ($result as $type) {
+            if (isset($reciprocal[$type])) {
+                $result[] = $reciprocal[$type];
+            }
+        }
+
+        $labels = self::FIELD_QUERY['labels'];
+        return array_values(array_intersect(array_keys($labels), array_unique($result)));
+    }
+
+    /**
+     * Reduce all real filter types to the ones displayed in the settings.
+     */
+    public static function collapseFilterTypes(array $types): array
+    {
+        $families = array_keys(self::FILTER_TYPE_DUPLICATES['families']);
+        $variants = array_keys(self::FILTER_TYPE_DUPLICATES['variants']);
+        $negative = array_flip(self::FIELD_QUERY['negative']);
+
+        $result = [];
+        $usedVariants = [];
+        foreach ($types as $type) {
+            if (isset($negative[$type])) {
+                continue;
+            }
+            foreach ($families as $family) {
+                if ($type === $family) {
+                    $result[] = $family;
+                    continue 2;
+                }
+                $variant = mb_substr($type, mb_strlen($family));
+                if ($family . $variant === $type && in_array($variant, $variants, true)) {
+                    $result[] = $family;
+                    $usedVariants[] = $variant;
+                    continue 2;
+                }
+            }
+            $result[] = $type;
+        }
+
+        return array_values(array_unique(array_merge($result, $usedVariants)));
+    }
+
     public function cleanQuery(array $query): array
     {
         // Most of the time, there is only one query, but it can be used for

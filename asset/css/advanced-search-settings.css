@@ -1,0 +1,48 @@
+/* Collapsible groups of the grouped checkboxes of the settings pages. */
+
+.grouped-checkboxes-group {
+    clear: both;
+    margin-top: 0.5em;
+}
+
+.grouped-checkboxes-heading {
+    display: block;
+    width: 100%;
+    min-height: 0;
+    min-width: 0;
+    padding: 0.3em 0;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    color: inherit;
+    font-weight: bold;
+    text-align: left;
+    cursor: pointer;
+}
+
+.grouped-checkboxes-heading:hover,
+.grouped-checkboxes-heading:focus {
+    background: none;
+    box-shadow: none;
+}
+
+.grouped-checkboxes-heading::before {
+    display: inline-block;
+    width: 1em;
+    content: '\25b8';
+}
+
+.grouped-checkboxes-heading[aria-expanded='true']::before {
+    content: '\25be';
+}
+
+.grouped-checkboxes-count {
+    margin-left: 0.5em;
+    font-weight: normal;
+    color: #4d4d4d;
+}
+
+.grouped-checkboxes-content {
+    padding: 0.3em 0 0 1em;
+}

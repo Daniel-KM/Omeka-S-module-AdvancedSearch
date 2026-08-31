@@ -31,7 +31,9 @@ $applyTemplates = $isSiteRequest ? $siteSetting('search_apply_templates') : fals
 $usedTerms = !$isSiteRequest;
 
 $setting = $isSiteRequest ? $siteSetting : $plugins->get('setting');
-$allowedFilterTypes = $setting('advancedsearch_filter_types') ?: [];
+// The settings store the enabled types, reduced: the negative ones are derived
+// and the duplicates are families and variants.
+$allowedFilterTypes = \AdvancedSearch\Stdlib\SearchResources::expandFilterTypes($setting('advancedsearch_filter_types') ?: []);
 if (!$allowedFilterTypes) {
     // Empty: only "in" as hidden input, no select.
     $allowedFilterTypes = ['in'];

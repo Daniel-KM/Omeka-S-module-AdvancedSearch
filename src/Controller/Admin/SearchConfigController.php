@@ -948,11 +948,16 @@ class SearchConfigController extends AbstractActionController
         if (!$searchEngine) {
             return null;
         }
-        // Only the suggesters of the config engine are valid for it.
+        // Any suggester can be used by any search config: an internal suggester
+        // is common for a solr engine and vice-versa. So group them by engine
+        // to make the list readable.
         $suggesters = [];
-        foreach ($this->api()->search('search_suggesters', ['engine_id' => $searchEngine->id()])->getContent() as $suggester) {
-            $suggesters[$suggester->id()] = $suggester->name();
+        foreach ($this->api()->search('search_suggesters')->getContent() as $suggester) {
+            $engineName = $suggester->searchEngine()->name();
+            $suggesters[$engineName]['label'] = $engineName;
+            $suggesters[$engineName]['options'][$suggester->id()] = $suggester->name();
         }
+        ksort($suggesters);
         return $this->getForm(SearchConfigConfigureForm::class, [
             'search_config' => $searchConfig,
             'suggesters' => $suggesters,

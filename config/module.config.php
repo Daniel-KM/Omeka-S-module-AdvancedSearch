@@ -122,6 +122,7 @@ return [
             'hiddenInputsFromFilteredQuery' => View\Helper\HiddenInputsFromFilteredQuery::class,
             'searchFilters' => View\Helper\SearchFilters::class,
             'searchingFilters' => View\Helper\SearchingFilters::class,
+            'searchQuickReplacement' => View\Helper\SearchQuickReplacement::class,
             'searchingForm' => View\Helper\SearchingForm::class,
             'searchingUrl' => View\Helper\SearchingUrl::class,
             'searchingValue' => View\Helper\SearchingValue::class,

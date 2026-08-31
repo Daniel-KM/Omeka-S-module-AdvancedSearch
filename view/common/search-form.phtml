@@ -7,10 +7,10 @@
  * displayed instead, with its filters and its autosuggestion. Else the standard
  * form is rendered, exactly like the core one.
  *
- * The helper "searchingForm" is not used here: it falls back to this partial,
- * so it would loop.
+ * A theme that overrides this partial should call the helper too, else the
+ * option has no effect on it.
  *
- * @see \AdvancedSearch\View\Helper\SearchingForm
+ * @see \AdvancedSearch\View\Helper\SearchQuickReplacement
  *
  * @var \Laminas\View\Renderer\PhpRenderer $this
  */
@@ -20,31 +20,10 @@ $translate = $plugins->get('translate');
 $escape = $plugins->get('escapeHtml');
 $siteSetting = $plugins->get('siteSetting');
 
-if ($siteSetting('advancedsearch_main_config_replace_quick')) {
-    /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
-    $searchConfig = $plugins->has('getSearchConfig') ? $this->getSearchConfig() : null;
-    if ($searchConfig) {
-        // The simple variant keeps the main field, the hidden elements and the
-        // button: it replaces a quick search, not the advanced search form,
-        // whose filters remain available on the search page itself.
-        echo $searchConfig->renderForm([
-            'template' => 'search/search-form-simple',
-            'variant' => 'simple',
-        ]);
-        // The link is a standard link to the search page: without javascript,
-        // or when the dialog cannot be loaded, the filters remain reachable.
-        // The attribute data-search-form-url turns it into a dialog.
-        $advancedLink = $siteSetting('advancedsearch_main_config_advanced_link', 'dialog');
-        if ($advancedLink):
-            ?>
-        <a href="<?= $escape($searchConfig->siteUrl()) ?>"
-            class="advanced-search-link"
-            <?= $advancedLink === 'dialog' ? sprintf('data-search-form-url="%s"', $escape($searchConfig->formUrl())) : '' ?>
-            data-dialog-heading="<?= $escape($translate('Advanced search')) ?>"><?= $translate('Advanced search') ?></a>
-            <?php
-        endif;
-        return;
-    }
+$replacement = $this->searchQuickReplacement();
+if ($replacement) {
+    echo $replacement;
+    return;
 }
 
 $searchType = $siteSetting('search_type', 'sitewide');

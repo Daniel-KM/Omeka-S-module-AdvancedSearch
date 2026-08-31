@@ -26,16 +26,8 @@ class SearchSuggesterFormTest extends AbstractHttpControllerTestCase
         parent::setUp();
         $this->loginAdmin();
 
-        // Create search engine with internal adapter.
-        $response = $this->api()->create('search_engines', [
-            'o:name' => 'TestEngine',
-            'o:engine_adapter' => 'internal',
-            'o:settings' => [
-                'resource_types' => ['items'],
-            ],
-        ]);
-        $this->searchEngine = $response->getContent();
-        $this->createdSearchEngines[] = $this->searchEngine->id();
+        // The internal engine is a singleton: reuse the installed one.
+        $this->searchEngine = $this->internalSearchEngine(['resource_types' => ['items']]);
     }
 
     public function tearDown(): void

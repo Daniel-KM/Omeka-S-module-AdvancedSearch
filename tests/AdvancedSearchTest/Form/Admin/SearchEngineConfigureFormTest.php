@@ -28,21 +28,12 @@ class SearchEngineConfigureFormTest extends TestCase
         $this->assertSame('false', $form->get('is_indexing_enabled')->getValue());
     }
 
-    public function testInternalEngineCheckboxIsCheckedAndDisabled(): void
+    public function testInternalEngineHasNoIndexingCheckbox(): void
     {
+        // The internal engine queries the database directly, so there is no
+        // indexation to enable or to disable.
         $form = $this->form(true);
-        $element = $form->get('is_indexing_enabled');
-        $this->assertTrue((bool) $element->getAttribute('disabled'));
-        $this->assertTrue((bool) $element->getAttribute('checked'));
-    }
-
-    public function testInternalEngineForcesEnabledEvenWhenNotPosted(): void
-    {
-        // A disabled checkbox is not posted: the value must be forced to
-        // "true".
-        $form = $this->form(true);
-        $form->setData([]);
-        $this->assertSame('true', $form->get('is_indexing_enabled')->getValue());
+        $this->assertFalse($form->has('is_indexing_enabled'));
     }
 
     private function form(bool $isInternal): SearchEngineConfigureForm

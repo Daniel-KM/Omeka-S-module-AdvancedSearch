@@ -142,13 +142,44 @@ trait AdvancedSearchTestTrait
     {
         $response = $this->api()->create('search_engines', [
             'o:name' => $name,
-            'o:adapter' => $adapter,
+            'o:engine_adapter' => $adapter,
             'o:settings' => $settings,
         ]);
         $engine = $response->getContent();
         $this->createdSearchEngines[] = $engine->id();
 
         return $engine;
+    }
+
+    /**
+     * Get the internal search engine, or create it when missing.
+     *
+     * An engine is a real backend and there is one sql database, so the
+     * internal engine is a singleton: a test reuses the one installed by the
+     * module instead of creating another one.
+     *
+     * @see \AdvancedSearch\Api\Adapter\SearchEngineAdapter::validateEntity()
+     *
+     * @return \AdvancedSearch\Api\Representation\SearchEngineRepresentation
+     */
+    protected function internalSearchEngine(array $settings = [])
+    {
+        /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation[] $engines */
+        $engines = $this->api()->search('search_engines')->getContent();
+        foreach ($engines as $engine) {
+            if ($engine->engineAdapterName() === 'internal') {
+                if ($settings) {
+                    $engine = $this->api()->update('search_engines', $engine->id(), [
+                        'o:name' => $engine->name(),
+                        'o:engine_adapter' => 'internal',
+                        'o:settings' => $settings + ($engine->settings() ?: []),
+                    ])->getContent();
+                }
+                return $engine;
+            }
+        }
+
+        return $this->createSearchEngine('Internal', 'internal', $settings);
     }
 
     /**

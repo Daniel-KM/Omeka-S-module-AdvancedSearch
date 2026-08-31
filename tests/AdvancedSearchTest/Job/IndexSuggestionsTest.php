@@ -2,6 +2,7 @@
 
 namespace AdvancedSearchTest\Job;
 
+use AdvancedSearchTest\AdvancedSearchTestTrait;
 use AdvancedSearch\Query;
 use Omeka\Test\AbstractHttpControllerTestCase;
 
@@ -20,6 +21,8 @@ use Omeka\Test\AbstractHttpControllerTestCase;
  */
 class IndexSuggestionsTest extends AbstractHttpControllerTestCase
 {
+    use AdvancedSearchTestTrait;
+
     /**
      * @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation
      */
@@ -66,14 +69,8 @@ class IndexSuggestionsTest extends AbstractHttpControllerTestCase
         $this->createTestItems();
 
         // Create search engine with internal adapter
-        $response = $this->api()->create('search_engines', [
-            'o:name' => 'TestSuggesterEngine',
-            'o:engine_adapter' => 'internal',
-            'o:settings' => [
-                'resource_types' => ['items'],
-            ],
-        ]);
-        $this->searchEngine = $response->getContent();
+        // The internal engine is a singleton: reuse the installed one.
+        $this->searchEngine = $this->internalSearchEngine(['resource_types' => ['items']]);
 
         // Create suggester
         $response = $this->api()->create('search_suggesters', [
@@ -101,13 +98,9 @@ class IndexSuggestionsTest extends AbstractHttpControllerTestCase
                 // Ignore
             }
         }
-        if ($this->searchEngine) {
-            try {
-                $this->api()->delete('search_engines', $this->searchEngine->id());
-            } catch (\Exception $e) {
-                // Ignore
-            }
-        }
+        // The internal engine is shared: it is installed by the module and it
+        // is a singleton, so it is not deleted with the data of the test.
+
 
         // Delete test items
         foreach ($this->items as $item) {

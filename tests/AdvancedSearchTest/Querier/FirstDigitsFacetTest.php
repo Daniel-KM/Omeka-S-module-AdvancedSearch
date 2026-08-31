@@ -2,6 +2,7 @@
 
 namespace AdvancedSearchTest\Querier;
 
+use AdvancedSearchTest\AdvancedSearchTestTrait;
 use AdvancedSearch\Query;
 use AdvancedSearch\Querier\InternalQuerier;
 use Omeka\Test\AbstractHttpControllerTestCase;
@@ -16,6 +17,8 @@ use Omeka\Test\AbstractHttpControllerTestCase;
  */
 class FirstDigitsFacetTest extends AbstractHttpControllerTestCase
 {
+    use AdvancedSearchTestTrait;
+
     /**
      * @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation
      */
@@ -36,12 +39,9 @@ class FirstDigitsFacetTest extends AbstractHttpControllerTestCase
 
     public function tearDown(): void
     {
-        if ($this->searchEngine) {
-            try {
-                $this->api()->delete('search_engines', $this->searchEngine->id());
-            } catch (\Exception $e) {
-            }
-        }
+        // The internal engine is shared: it is installed by the module and it
+        // is a singleton, so it is not deleted with the data of the test.
+
         foreach ($this->items as $item) {
             try {
                 $this->api()->delete('items', $item->id());
@@ -102,14 +102,8 @@ class FirstDigitsFacetTest extends AbstractHttpControllerTestCase
 
     protected function createSearchEngine(): void
     {
-        $response = $this->api()->create('search_engines', [
-            'o:name' => 'TestFirstDigitsEngine',
-            'o:engine_adapter' => 'internal',
-            'o:settings' => [
-                'resource_types' => ['items'],
-            ],
-        ]);
-        $this->searchEngine = $response->getContent();
+        // The internal engine is a singleton: reuse the installed one.
+        $this->searchEngine = $this->internalSearchEngine(['resource_types' => ['items']]);
     }
 
     protected function hasFacetSupport(): bool

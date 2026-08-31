@@ -2,6 +2,7 @@
 
 namespace AdvancedSearchTest\Querier;
 
+use AdvancedSearchTest\AdvancedSearchTestTrait;
 use Omeka\Test\AbstractHttpControllerTestCase;
 
 /**
@@ -16,6 +17,8 @@ use Omeka\Test\AbstractHttpControllerTestCase;
  */
 class InternalQuerierParityTest extends AbstractHttpControllerTestCase
 {
+    use AdvancedSearchTestTrait;
+
     protected $itemSets = [];
     protected $items = [];
     protected $searchEngine;
@@ -91,11 +94,8 @@ class InternalQuerierParityTest extends AbstractHttpControllerTestCase
             ]],
         ], [], ['isPartial' => true, 'collectionAction' => 'append']);
 
-        $this->searchEngine = $api->create('search_engines', [
-            'o:name' => 'ParityInternalEngine',
-            'o:engine_adapter' => 'internal',
-            'o:settings' => ['resource_types' => ['items', 'item_sets']],
-        ])->getContent();
+        // The internal engine is a singleton: reuse the installed one.
+        $this->searchEngine = $this->internalSearchEngine(['resource_types' => ['items', 'item_sets']]);
 
         $this->fixture = [
             'word' => 'Golden',

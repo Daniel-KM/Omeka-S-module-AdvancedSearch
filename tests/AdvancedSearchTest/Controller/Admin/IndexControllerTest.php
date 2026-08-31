@@ -18,8 +18,8 @@ class IndexControllerTest extends \AdvancedSearchTest\Controller\SearchControlle
         $this->assertXpathQueryContentRegex('//table[1]//td[1]', '/TestIndex/');
         $this->assertXpathQueryContentRegex('//table[1]//td[2]', '/TestEngineAdapter/');
 
-        // Check that test config is listed.
+        // Check that test config is listed: name, engine, then slug.
         $this->assertXpathQueryContentRegex('//table[2]//td[1]', '/TestPage/');
-        $this->assertXpathQueryContentRegex('//table[2]//td[2]', '/testsearch/');
+        $this->assertXpathQueryContentRegex('//table[2]//td[3]', '/testsearch/');
     }
 }

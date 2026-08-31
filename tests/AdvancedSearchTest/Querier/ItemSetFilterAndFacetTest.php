@@ -2,6 +2,7 @@
 
 namespace AdvancedSearchTest\Querier;
 
+use AdvancedSearchTest\AdvancedSearchTestTrait;
 use AdvancedSearch\Query;
 use AdvancedSearch\Querier\InternalQuerier;
 use Omeka\Test\AbstractHttpControllerTestCase;
@@ -18,6 +19,8 @@ use Omeka\Test\AbstractHttpControllerTestCase;
  */
 class ItemSetFilterAndFacetTest extends AbstractHttpControllerTestCase
 {
+    use AdvancedSearchTestTrait;
+
     /**
      * @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation
      */
@@ -50,18 +53,13 @@ class ItemSetFilterAndFacetTest extends AbstractHttpControllerTestCase
         // Create test items in those item sets
         $this->createTestItems();
 
-        // Create search engine with internal adapter
-        $response = $this->api()->create('search_engines', [
-            'o:name' => 'TestInternalEngine',
-            'o:engine_adapter' => 'internal',
-            'o:settings' => [
-                'resource_types' => [
-                    'items',
-                    'item_sets',
-                ],
+        // The internal engine is a singleton: reuse the installed one.
+        $this->searchEngine = $this->internalSearchEngine([
+            'resource_types' => [
+                'items',
+                'item_sets',
             ],
         ]);
-        $this->searchEngine = $response->getContent();
 
         // Create search config with item_set_id filter and facet
         $response = $this->api()->create('search_configs', [
@@ -114,13 +112,9 @@ class ItemSetFilterAndFacetTest extends AbstractHttpControllerTestCase
                 // Ignore
             }
         }
-        if ($this->searchEngine) {
-            try {
-                $this->api()->delete('search_engines', $this->searchEngine->id());
-            } catch (\Exception $e) {
-                // Ignore
-            }
-        }
+        // The internal engine is shared: it is installed by the module and it
+        // is a singleton, so it is not deleted with the data of the test.
+
 
         // Delete test items
         foreach ($this->items as $item) {

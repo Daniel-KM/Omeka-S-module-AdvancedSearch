@@ -53,14 +53,17 @@ $form->prepare();
 <?= $this->pageTitle($translate('Edit search engine'), 1, $translate('Search manager')) ?>
 
 <?php // The connection of a solarium engine is edited on a separate page. ?>
-<?php if ($engineAdapterName === 'solarium' && class_exists(\SearchSolr\Module::class, false)): ?>
+<?php $hasSolrTabs = $engineAdapterName === 'solarium' && class_exists(\SearchSolr\Module::class, false); ?>
 <nav class="section-nav">
     <ul>
-        <li class="active"><a href="<?= $escape($url('admin/search-manager/engine-id', ['id' => $searchEngineId, 'action' => 'edit'])) ?>" aria-current="page"><?= $translate('Search engine') ?></a></li>
+        <li class="active"><a href="<?= $escape($url('admin/search-manager/engine-id', ['id' => $searchEngineId, 'action' => 'edit'])) ?>" aria-current="page"><?= $hasSolrTabs ? $translate('General') : $translate('Internal engine') ?></a></li>
+        <?php if ($hasSolrTabs): ?>
         <li><a href="<?= $escape($url('admin/search-manager/solr/core-id', ['id' => $searchEngineId, 'action' => 'edit'])) ?>"><?= $translate('Solr core') ?></a></li>
+        <li><a href="<?= $escape($url('admin/search-manager/solr/core-id', ['id' => $searchEngineId, 'action' => 'show'])) ?>"><?= $translate('Indexes') ?></a></li>
+        <li><a href="<?= $escape($url('admin/search-manager/solr/core-id', ['id' => $searchEngineId, 'action' => 'show-indexing-stats'])) ?>"><?= $translate('Stats') ?></a></li>
+        <?php endif; ?>
     </ul>
 </nav>
-<?php endif; ?>
 
 <?= $this->form()->openTag($form) ?>
 <div id="page-actions">

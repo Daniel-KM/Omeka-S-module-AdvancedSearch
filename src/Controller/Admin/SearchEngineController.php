@@ -183,6 +183,13 @@ class SearchEngineController extends AbstractActionController
          * @var \AdvancedSearch\Form\Admin\SearchEngineConfigureForm $form
          */
         $searchEngine = $this->entityManager->find(\AdvancedSearch\Entity\SearchEngine::class, $id);
+        if (!$searchEngine) {
+            $this->messenger()->addError(new PsrMessage(
+                'The search engine #{search_engine_id} does not exist.', // @translate
+                ['search_engine_id' => $id]
+            ));
+            return $this->redirect()->toRoute('admin/search-manager', ['action' => 'browse'], true);
+        }
         $engineAdapterName = $searchEngine->getAdapter();
         if (!$this->engineAdapterManager->has($engineAdapterName)) {
             $this->messenger()->addError(new PsrMessage(

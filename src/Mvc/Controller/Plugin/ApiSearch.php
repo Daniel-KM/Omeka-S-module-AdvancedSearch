@@ -272,10 +272,12 @@ class ApiSearch extends AbstractPlugin
         // stays usable through the api.
         $searchQuery->setAliases($this->searchConfig->subSetting('index', 'aliases', []));
 
-        $fieldBoosts = $this->searchConfig->subSetting('index', 'field_boosts', []);
+        // The section "engine" is filled by the module of the engine of the
+        // config (e.g. SearchSolr), through the event of the configure form.
+        $fieldBoosts = $this->searchConfig->subSetting('engine', 'field_boosts', []);
         $searchQuery->setFieldBoosts($fieldBoosts);
-        $searchQuery->setMinimumMatch(trim((string) $this->searchConfig->subSetting('index', 'minimum_match', '')));
-        $searchQuery->setTieBreaker(trim((string) $this->searchConfig->subSetting('index', 'tie_breaker', '')));
+        $searchQuery->setMinimumMatch(trim((string) $this->searchConfig->subSetting('engine', 'minimum_match', '')));
+        $searchQuery->setTieBreaker(trim((string) $this->searchConfig->subSetting('engine', 'tie_breaker', '')));
 
         // Note: the event search.query is not triggered.
 

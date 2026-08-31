@@ -32,14 +32,19 @@ namespace AdvancedSearch\Form\Admin;
 
 use AdvancedSearch\EngineAdapter\Internal;
 use Common\Form\Element as CommonElement;
+use Laminas\EventManager\Event;
+use Laminas\EventManager\EventManagerAwareInterface;
+use Laminas\EventManager\EventManagerAwareTrait;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
 use Laminas\Form\Form;
 use Laminas\Mvc\I18n\Translator;
 use Omeka\Form\Element as OmekaElement;
 
-class SearchConfigConfigureForm extends Form
+class SearchConfigConfigureForm extends Form implements EventManagerAwareInterface
 {
+    use EventManagerAwareTrait;
+
     /**
      * @var \Laminas\Form\FormElementManager
      */
@@ -168,56 +173,6 @@ class SearchConfigConfigureForm extends Form
                             [author]
                             type = res
                             STRING,
-                ],
-            ])
-            ->add([
-                'name' => 'field_boosts',
-                'type' => OmekaElement\ArrayTextarea::class,
-                'options' => [
-                    'label' => 'Boost multipliers by index (Solr only)', // @translate
-                    'as_key_value' => true,
-                ],
-                'attributes' => [
-                    'id' => 'field_boosts',
-                    'required' => false,
-                    'rows' => 12,
-                    'placeholder' => <<<'STRING'
-                            dcterms_creator_ss = 100
-                            dcterms_creator_txt = 50
-                            dcterms_subject_ss = 10
-                            dcterms_subject_txt = 5
-                            dcterms_description_txt = 0.01
-                            bibo_content_txt = 0.001
-                            STRING,
-                ],
-            ])
-            ->add([
-                'name' => 'minimum_match',
-                'type' => Element\Text::class,
-                'options' => [
-                    'label' => 'Minimum match (or/and) (Solr only)', // @translate
-                    'info' => 'Integer "1" means "OR", "100%" means "AND". Complex expressions are possible, like "3<80%". If empty, the solrconfig.xml config is used.', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'index_minimum_match',
-                    'required' => false,
-                    'placeholder' => '3<80%',
-                ],
-            ])
-            ->add([
-                'name' => 'tie_breaker',
-                'type' => CommonElement\OptionalNumber::class,
-                'options' => [
-                    'label' => 'Tie breaker (Solr only)', // @translate
-                    'info' => 'Increase score according to the number of matched fields. If empty, the solrconfig.xml config is used.', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'index_tie_breaker',
-                    'required' => false,
-                    'placeholder' => '0.15',
-                    'min' => '0.0',
-                    'max' => '1.0',
-                    'step' => '0.01',
                 ],
             ])
         ;
@@ -1507,7 +1462,16 @@ class SearchConfigConfigureForm extends Form
         ;
 
         $this
-            ->addFormFieldset()
+            ->addFormFieldset();
+
+        // Modules can append their own top-level fieldsets, displayed as tabs,
+        // in particular the engine specific settings (e.g. SearchSolr): the
+        // reserved fieldset name "engine" is read for the query relevance
+        // (field boosts, minimum match, tie breaker).
+        $event = new Event('form.add_elements', $this);
+        $this->getEventManager()->triggerEvent($event);
+
+        $this
             ->prepareInputFilters();
     }
 

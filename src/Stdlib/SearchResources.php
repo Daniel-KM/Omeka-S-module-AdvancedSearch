@@ -613,6 +613,15 @@ class SearchResources
         // The query is cleaned first to simplify checks.
         $query = $this->cleanQuery($query);
 
+        // The improved form uses a multiple select for the media types, so the
+        // argument is an array, that the core cannot handle: it expects a
+        // single string and throws a type error on it. The argument keeps its
+        // name, singular like in core, and is managed here during the query.
+        if (isset($query['media_type']) && is_array($query['media_type'])) {
+            $override['media_type'] = $query['media_type'];
+            unset($query['media_type']);
+        }
+
         if (isset($query['owner_id'])) {
             $override['owner_id'] = $query['owner_id'];
             unset($query['owner_id']);
@@ -670,6 +679,11 @@ class SearchResources
         }
         if (isset($override['property'])) {
             $query['property'] = $override['property'];
+        }
+        // The media types are restored before the filters of the module, that
+        // run later on the same event: they read the argument themselves.
+        if (isset($override['media_type'])) {
+            $query['media_type'] = $override['media_type'];
         }
 
         return $query;
@@ -3751,9 +3765,13 @@ class SearchResources
         $hasThumbnails = isset($query['has_thumbnails']) && (string) $query['has_thumbnails'] !== ''
             ? (bool) $query['has_thumbnails']
             : null;
-        $mediaTypes = isset($query['media_types'])
-            ? array_filter(array_map('trim', is_array($query['media_types']) ? $query['media_types'] : [$query['media_types']]))
-            : null;
+        // The key "media_type" is the argument of the core, that supports a
+        // single string; the module supports a list too, here and in the key
+        // "media_types", kept for compatibility.
+        $mediaTypesQuery = $query['media_type'] ?? $query['media_types'] ?? null;
+        $mediaTypes = $mediaTypesQuery === null
+            ? null
+            : array_filter(array_map('trim', is_array($mediaTypesQuery) ? $mediaTypesQuery : [$mediaTypesQuery]));
 
         if ($hasOriginal === null && $hasThumbnails === null && !$mediaTypes) {
             return $this;
@@ -3847,13 +3865,18 @@ class SearchResources
      */
     protected function searchByMediaType(QueryBuilder $qb, array $query): self
     {
-        if (!isset($query['media_types'])) {
+        $mediaTypesQuery = $query['media_types'] ?? null;
+        // The core manages a single string, so only a list is managed here.
+        if ($mediaTypesQuery === null && isset($query['media_type']) && is_array($query['media_type'])) {
+            $mediaTypesQuery = $query['media_type'];
+        }
+        if ($mediaTypesQuery === null) {
             return $this;
         }
 
-        $values = is_array($query['media_types'])
-            ? $query['media_types']
-            : [$query['media_types']];
+        $values = is_array($mediaTypesQuery)
+            ? $mediaTypesQuery
+            : [$mediaTypesQuery];
         $values = array_filter(array_map('trim', $values));
         if (empty($values)) {
             return $this;

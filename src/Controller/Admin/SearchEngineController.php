@@ -38,6 +38,7 @@ use Common\Stdlib\PsrMessage;
 use Doctrine\ORM\EntityManager;
 use Laminas\Mvc\Controller\AbstractActionController;
 use Laminas\View\Model\JsonModel;
+use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
 use Laminas\View\Model\ViewModel;
 use Omeka\Form\ConfirmForm;
 
@@ -365,15 +366,121 @@ class SearchEngineController extends AbstractActionController
         $response = $this->api()->read('search_engines', $this->params('id'));
         $searchEngine = $response->getContent();
 
-        // TODO Add a warning about the related configs, that will be deleted.
-
         $view = new ViewModel([
             'resourceLabel' => 'search engine',
             'resource' => $searchEngine,
+            'partialPath' => 'common/delete-confirm-search-engine',
+            'dependencies' => $this->searchEngineDependencies($searchEngine),
         ]);
         return $view
             ->setTerminal(true)
             ->setTemplate('common/delete-confirm-details');
+    }
+
+    /**
+     * Remove deleted search configs from the settings that point to them.
+     *
+     * The cascade of the database removes the configs, but not the settings
+     * that store their ids, so a site would keep a page that does not exist.
+     */
+    protected function removeSearchConfigsFromSettings(array $searchConfigIds): void
+    {
+        $singleKeys = [
+            'advancedsearch_main_config',
+            'advancedsearch_api_config',
+            'advancedsearch_items_config',
+            'advancedsearch_media_config',
+            'advancedsearch_item_sets_config',
+            'advancedsearch_items_browse_config',
+            'advancedsearch_item_sets_browse_config',
+        ];
+
+        $searchConfigIds = array_map('intval', $searchConfigIds);
+        $cleanedSites = [];
+
+        /** @var \Omeka\Settings\Settings $settings */
+        $settings = $this->settings();
+        foreach ($singleKeys as $key) {
+            if (in_array((int) $settings->get($key), $searchConfigIds, true)) {
+                $settings->set($key, null);
+            }
+        }
+
+        /** @var \Omeka\Settings\SiteSettings $siteSettings */
+        $siteSettings = $this->siteSettings();
+        foreach ($this->api()->search('sites')->getContent() as $site) {
+            $siteId = $site->id();
+            $cleaned = false;
+
+            foreach ($singleKeys as $key) {
+                if (in_array((int) $siteSettings->get($key, null, $siteId), $searchConfigIds, true)) {
+                    $siteSettings->set($key, null, $siteId);
+                    $cleaned = true;
+                }
+            }
+
+            $availables = $siteSettings->get('advancedsearch_configs', [], $siteId);
+            if (is_array($availables)) {
+                $kept = array_values(array_diff(array_map('intval', $availables), $searchConfigIds));
+                if (count($kept) !== count($availables)) {
+                    $siteSettings->set('advancedsearch_configs', $kept, $siteId);
+                    $cleaned = true;
+                }
+            }
+
+            if ($cleaned) {
+                $cleanedSites[] = $site->slug();
+            }
+        }
+
+        if ($cleanedSites) {
+            $this->messenger()->addWarning(new PsrMessage(
+                'The deleted search pages were removed from the settings of these sites: {site_slugs}. Check the pages that used them.', // @translate
+                ['site_slugs' => implode(', ', $cleanedSites)]
+            ));
+        }
+    }
+
+    /**
+     * List what a foreign key deletes with a search engine.
+     *
+     * The search configs, the suggesters and the solr maps are removed by a
+     * cascade of the database, so they are listed before the confirmation.
+     *
+     * @return array Names by type of resource.
+     */
+    protected function searchEngineDependencies(SearchEngineRepresentation $searchEngine): array
+    {
+        $engineId = $searchEngine->id();
+
+        $result = [
+            'search_configs' => [],
+            'search_suggesters' => [],
+            'solr_maps' => 0,
+        ];
+
+        foreach ($this->api()->search('search_configs')->getContent() as $searchConfig) {
+            $configEngine = $searchConfig->searchEngine();
+            if ($configEngine && $configEngine->id() === $engineId) {
+                $result['search_configs'][] = sprintf('%s (/%s)', $searchConfig->name(), $searchConfig->slug());
+            }
+        }
+
+        foreach ($this->api()->search('search_suggesters')->getContent() as $suggester) {
+            $suggesterEngine = $suggester->searchEngine();
+            if ($suggesterEngine && $suggesterEngine->id() === $engineId) {
+                $result['search_suggesters'][] = $suggester->name();
+            }
+        }
+
+        // The maps belong to the module SearchSolr, that may be absent.
+        try {
+            $result['solr_maps'] = count($this->api()->search('solr_maps', ['engine_id' => $engineId], ['returnScalar' => 'id'])->getContent());
+        } catch (\Throwable $e) {
+            $result['solr_maps'] = 0;
+        }
+
+        return $result;
     }
 
     public function deleteAction()
@@ -384,11 +491,26 @@ class SearchEngineController extends AbstractActionController
             $searchEngineId = $this->params('id');
             $searchEngineName = $this->api()->read('search_engines', $searchEngineId)->getContent()->name();
             if ($form->isValid()) {
+                // The configs are deleted by a cascade of the database, so
+                // collect their ids before, to clean the settings that point
+                // to them.
+                $searchConfigIds = [];
+                foreach ($this->api()->search('search_configs')->getContent() as $searchConfig) {
+                    $configEngine = $searchConfig->searchEngine();
+                    if ($configEngine && $configEngine->id() === (int) $searchEngineId) {
+                        $searchConfigIds[] = $searchConfig->id();
+                    }
+                }
+
                 $this->api()->delete('search_engines', $searchEngineId);
                 $this->messenger()->addSuccess(new PsrMessage(
                     'Search index "{name}" successfully deleted', // @translate
                     ['name' => $searchEngineName]
                 ));
+
+                if ($searchConfigIds) {
+                    $this->removeSearchConfigsFromSettings($searchConfigIds);
+                }
             } else {
                 $this->messenger()->addError(new PsrMessage(
                     'Search index "{name}" could not be deleted', // @translate

@@ -1,0 +1,51 @@
+<?php
+/**
+ * List what is deleted with a search engine.
+ *
+ * The search configs, the suggesters and the solr maps are removed by a cascade
+ * of the database, without any event nor log, so they are listed before the
+ * confirmation.
+ *
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ * @var array $dependencies Names by type of resource.
+ */
+
+$translate = $this->plugin('translate');
+$escape = $this->plugin('escapeHtml');
+
+$searchConfigs = $dependencies['search_configs'] ?? [];
+$suggesters = $dependencies['search_suggesters'] ?? [];
+$totalMaps = (int) ($dependencies['solr_maps'] ?? 0);
+
+if (!$searchConfigs && !$suggesters && !$totalMaps):
+    return;
+endif;
+?>
+
+<div class="delete-confirm-dependencies">
+    <p class="error"><?= $escape($translate('These resources are deleted with the search engine and cannot be recovered:')) ?></p>
+
+    <?php if ($searchConfigs): ?>
+    <p><strong><?= $escape(sprintf($translate('Search pages (%d)'), count($searchConfigs))) ?></strong></p>
+    <ul>
+        <?php foreach ($searchConfigs as $name): ?>
+        <li><?= $escape($name) ?></li>
+        <?php endforeach; ?>
+    </ul>
+    <?php endif; ?>
+
+    <?php if ($suggesters): ?>
+    <p><strong><?= $escape(sprintf($translate('Suggesters (%d)'), count($suggesters))) ?></strong></p>
+    <ul>
+        <?php foreach ($suggesters as $name): ?>
+        <li><?= $escape($name) ?></li>
+        <?php endforeach; ?>
+    </ul>
+    <?php endif; ?>
+
+    <?php if ($totalMaps): ?>
+    <p><strong><?= $escape(sprintf($translate('Indexes of the Solr core: %d'), $totalMaps)) ?></strong></p>
+    <?php endif; ?>
+
+    <p><?= $escape($translate('The settings of the sites that use these pages are cleaned too.')) ?></p>
+</div>

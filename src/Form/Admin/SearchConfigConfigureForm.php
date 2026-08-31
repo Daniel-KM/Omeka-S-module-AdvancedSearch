@@ -398,6 +398,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
         /** @var \AdvancedSearch\Form\Admin\SearchConfigFilterFieldset $filterFieldset */
         $filterFieldset = $this->formElementManager->get(SearchConfigFilterFieldset::class, [
             'search_config' => $searchConfig,
+            'translator' => $this->translator,
         ]);
 
         $this
@@ -1090,6 +1091,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
         /** @var \AdvancedSearch\Form\Admin\SearchConfigFacetFieldset $facetFieldset */
         $facetFieldset = $this->formElementManager->get(SearchConfigFacetFieldset::class, [
             'search_config' => $searchConfig,
+            'translator' => $this->translator,
         ]);
 
         $this

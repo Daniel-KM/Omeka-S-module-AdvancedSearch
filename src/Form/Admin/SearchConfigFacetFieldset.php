@@ -27,6 +27,9 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
 
     public function init(): void
     {
+        /** @var \Laminas\I18n\Translator\TranslatorInterface $translator */
+        $translator = $this->getOption('translator');
+        $tr = fn (string $string): string => $translator ? $translator->translate($string) : $string;
         // These fields may be overridden by the available fields.
         $availableFacetFields = $this->getAvailableFacetFields();
 
@@ -100,11 +103,16 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
             ])
             ->add([
                 'name' => 'value_labels',
-                'type' => OmekaElement\ArrayTextarea::class,
+                'type' => CommonElement\ArrayTextarea::class,
                 'options' => [
                     'label' => 'Value labels', // @translate
                     'info' => 'One pair per line: indexed_value = displayed_label. Replaces the raw value in facet items, "see more" buttons and active facets. Mainly useful for boolean fields (e.g. 1 = Only with image / 0 = Without image) and small enumerations. Overrides the table source above for the listed codes.', // @translate
                     'as_key_value' => true,
+                    'pairs_editor' => [
+                        'key_label' => $tr('Value'), // @translate
+                        'value_label' => $tr('Label'), // @translate
+                        'sortable' => false,
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'form_facet_value_labels',
@@ -356,11 +364,16 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
             ])
             ->add([
                 'name' => 'scale_breakpoints',
-                'type' => OmekaElement\ArrayTextarea::class,
+                'type' => CommonElement\ArrayTextarea::class,
                 'options' => [
                     'label' => 'Scale breakpoints', // @translate
                     'info' => 'One pair per line: value = position. Position is a percentage between 0 and 100.', // @translate
                     'as_key_value' => true,
+                    'pairs_editor' => [
+                        'key_label' => $tr('Value'), // @translate
+                        'value_label' => $tr('Position (%)'), // @translate
+                        'value_type' => 'number',
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'form_facet_scale_breakpoints',
@@ -405,6 +418,11 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                         Note: "min", "max", "step" should be set in "Html attributes".
                         HTML, // @translate
                     'ini_typed_mode' => true,
+                    'pairs_editor' => [
+                        'key_label' => $tr('Option'), // @translate
+                        'value_label' => $tr('Value'), // @translate
+                        'sortable' => false,
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'form_facet_options',
@@ -419,6 +437,11 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                     'label' => 'Html attributes', // @translate
                     'info' => 'Attributes to add to the input field, for example `class = "my-specific-class"`, or `min = 1454` for RangeDouble/SelectRange, or max, step, placeholder, data, etc.', // @translate
                     'ini_typed_mode' => true,
+                    'pairs_editor' => [
+                        'key_label' => $tr('Attribute'), // @translate
+                        'value_label' => $tr('Value'), // @translate
+                        'sortable' => false,
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'form_facet_attributes',

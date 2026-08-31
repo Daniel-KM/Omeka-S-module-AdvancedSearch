@@ -943,6 +943,12 @@ class SearchConfigController extends AbstractActionController
                 unset($filter['type']);
             }
 
+            // The manual list of values has its own field.
+            if (!empty($filter['options']['value_options']) && empty($filter['values'])) {
+                $filter['values'] = $this->normalizeManualValues($filter['options']['value_options']);
+                unset($filter['options']['value_options']);
+            }
+
             // The settings of the groups the type does not use are removed.
             $filter = $this->cleanSettingsByType($filter, $type, [
                 [SearchConfigFilterFieldset::TYPES_LIST, SearchConfigFilterFieldset::SETTINGS_LIST],
@@ -1244,6 +1250,24 @@ class SearchConfigController extends AbstractActionController
      * @param array $groups List of [types, settings]: the settings are kept
      * only when the type is one of the types.
      */
+    /**
+     * Normalize the legacy manual list of values into an array "value => label".
+     *
+     * The legacy option "value_options" was a list of values, without label:
+     * only the values were used, whatever the keys.
+     */
+    protected function normalizeManualValues($values): array
+    {
+        $result = [];
+        foreach ((array) $values as $value) {
+            $value = is_scalar($value) ? trim((string) $value) : '';
+            if ($value !== '') {
+                $result[$value] = '';
+            }
+        }
+        return $result;
+    }
+
     protected function cleanSettingsByType(array $settings, string $type, array $groups): array
     {
         foreach ($groups as [$types, $keys]) {

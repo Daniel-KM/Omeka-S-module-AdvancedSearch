@@ -1285,6 +1285,20 @@ class MainSearchForm extends Form
             return [];
         }
 
+        // The manual list of values, with optional labels.
+        $values = $filter['values'] ?? null;
+        if (is_array($values) && $values) {
+            $result = [];
+            foreach ($values as $value => $label) {
+                $value = (string) $value;
+                if ($value === '') {
+                    continue;
+                }
+                $result[$value] = is_string($label) && $label !== '' ? $label : $value;
+            }
+            return $result;
+        }
+        // Legacy manual list, without labels.
         $valueOptions = $filter['options']['value_options'] ?? null;
         if (is_array($valueOptions)) {
             // Avoid issue with duplicates.

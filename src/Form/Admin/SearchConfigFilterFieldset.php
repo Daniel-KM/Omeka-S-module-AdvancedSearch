@@ -2,6 +2,7 @@
 
 namespace AdvancedSearch\Form\Admin;
 
+use AdvancedSearch\Stdlib\SearchResources;
 use Common\Form\Element as CommonElement;
 use Laminas\Form\Element;
 use Laminas\Form\Fieldset;
@@ -21,13 +22,20 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
     /**
      * The settings by group, cleaned when the type does not use them.
      */
-    const SETTINGS_LIST = ['value_labels_table', 'value_labels', 'language_site', 'languages', 'order', 'limit'];
+    const SETTINGS_LIST = ['values', 'value_labels_table', 'value_labels', 'language_site', 'languages', 'order', 'limit'];
     const SETTINGS_RANGE = ['field_end'];
     const SETTINGS_SLIDER = ['scale_mode', 'scale_breakpoints', 'scale_show_ticks'];
     const SETTINGS_ADVANCED = ['default_number', 'max_number', 'field_elements', 'field_joiner', 'field_joiner_not', 'field_operator', 'field_operators', 'field_value_autosuggest', 'fields'];
 
     public function init(): void
     {
+        /** @var \Laminas\I18n\Translator\TranslatorInterface $translator */
+        $translator = $this->getOption('translator');
+        $operators = SearchResources::FIELD_QUERY['labels'];
+        if ($translator) {
+            $operators = array_map([$translator, 'translate'], $operators);
+        }
+        $tr = fn (string $string): string => $translator ? $translator->translate($string) : $string;
         // These fields may be overridden by the available fields.
         $availableFields = $this->getAvailableFields();
 
@@ -105,6 +113,26 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
             ])
             ->add([
+                'name' => 'values',
+                'type' => CommonElement\ArrayTextarea::class,
+                'options' => [
+                    'label' => 'Manual list of values', // @translate
+                    'info' => 'Leave empty to list the values of the index. Format is "value = label"; the label is optional.', // @translate
+                    'as_key_value' => true,
+                    'key_value_separator' => '=',
+                    'pairs_editor' => [
+                        'key_label' => $tr('Value'), // @translate
+                        'value_label' => $tr('Label'), // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_values',
+                    'data-filter-types' => implode(' ', self::TYPES_LIST),
+                    'rows' => 6,
+                    'placeholder' => 'yes = Yes',
+                ],
+            ])
+            ->add([
                 'name' => 'value_labels_table',
                 'type' => Element\Text::class,
                 'options' => [
@@ -120,11 +148,16 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
             ])
             ->add([
                 'name' => 'value_labels',
-                'type' => OmekaElement\ArrayTextarea::class,
+                'type' => CommonElement\ArrayTextarea::class,
                 'options' => [
                     'label' => 'Value labels', // @translate
                     'info' => 'One pair per line: indexed_value = displayed_label. Replaces the raw value in select/radio/checkbox options and in active filter chips. Mainly useful for boolean fields (e.g. 1 = Only with image / 0 = Without image) and small enumerations. Overrides the table source above for the listed codes.', // @translate
                     'as_key_value' => true,
+                    'pairs_editor' => [
+                        'key_label' => $tr('Value'), // @translate
+                        'value_label' => $tr('Label'), // @translate
+                        'sortable' => false,
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'form_filter_value_labels',
@@ -216,6 +249,12 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                         'value' => null,
                         'label' => null,
                     ],
+                    'pairs_editor' => [
+                        'key_source' => '#form_filter_field',
+                        'key_skip' => ['advanced'],
+                        'key_label' => $tr('Field'), // @translate
+                        'value_label' => $tr('Label'), // @translate
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'form_filter_fields',
@@ -285,12 +324,17 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
             ])
             ->add([
                 'name' => 'field_operators',
-                'type' => OmekaElement\ArrayTextarea::class,
+                'type' => CommonElement\ArrayTextarea::class,
                 'options' => [
                     'label' => 'Available operators', // @translate
                     'info' => 'By default, all the operators of the standard advanced search form. Negative operators are removed when the joiner "not" is used.', // @translate
                     'as_key_value' => true,
                     'key_value_separator' => '=',
+                    'pairs_editor' => [
+                        'keys' => $operators,
+                        'key_label' => $tr('Operator'), // @translate
+                        'value_label' => $tr('Label'), // @translate
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'form_filter_field_operators',
@@ -403,11 +447,16 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
             ])
             ->add([
                 'name' => 'scale_breakpoints',
-                'type' => OmekaElement\ArrayTextarea::class,
+                'type' => CommonElement\ArrayTextarea::class,
                 'options' => [
                     'label' => 'Scale breakpoints', // @translate
                     'info' => 'One pair per line: value = position. Position is a percentage between 0 and 100.', // @translate
                     'as_key_value' => true,
+                    'pairs_editor' => [
+                        'key_label' => $tr('Value'), // @translate
+                        'value_label' => $tr('Position (%)'), // @translate
+                        'value_type' => 'number',
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'form_filter_scale_breakpoints',
@@ -451,6 +500,11 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                         Note: "min", "max", "step" should be set in "Html attributes".
                         HTML, // @translate
                     'ini_typed_mode' => true,
+                    'pairs_editor' => [
+                        'key_label' => $tr('Option'), // @translate
+                        'value_label' => $tr('Value'), // @translate
+                        'sortable' => false,
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'form_filters_options',
@@ -465,6 +519,11 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                     'label' => 'Html attributes', // @translate
                     'info' => 'Attributes to add to the input field, for example `class = "my-specific-class"`, or `min = 1454` for Number/Range/RangeDouble, or max, step, placeholder, data, etc.', // @translate
                     'ini_typed_mode' => true,
+                    'pairs_editor' => [
+                        'key_label' => $tr('Attribute'), // @translate
+                        'value_label' => $tr('Value'), // @translate
+                        'sortable' => false,
+                    ],
                 ],
                 'attributes' => [
                     'id' => 'form_filters_attributes',

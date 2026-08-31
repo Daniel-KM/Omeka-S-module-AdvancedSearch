@@ -1072,7 +1072,7 @@ class SearchResources
 
         // Quick clean for most of the cases.
         // TODO Check if the quick clean is enough.
-        // "0" is a valid value.
+        // "0" is a valid value, and the same for 0 and false.
         $arrayFilterRecursiveEmpty = null;
         $arrayFilterRecursiveEmpty = function (array &$array) use (&$arrayFilterRecursiveEmpty): array {
             foreach ($array as $key => $value) {

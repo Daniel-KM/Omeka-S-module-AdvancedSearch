@@ -77,7 +77,7 @@ $(document).ready(function() {
             // Data Type Geometry.
             'geo[mode]',
             // Numeric Data Types
-             'numeric-toggle-time-checkbox',
+            'numeric-toggle-time-checkbox',
             'year',
             'month',
             'day',

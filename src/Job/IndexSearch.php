@@ -139,6 +139,18 @@ class IndexSearch extends AbstractJob
         $referenceIdProcessor->setReferenceId('search/index/job_' . $this->job->getId());
         $this->logger->addProcessor($referenceIdProcessor);
 
+        // The job indexes the resources the owner of the job can view, so an
+        // owner without the right to view the private ones would build an
+        // index amputed of them, without any error.
+        $acl = $services->get('Omeka\Acl');
+        if (!$acl->userIsAllowed(\Omeka\Entity\Resource::class, 'view-all')) {
+            $message = 'The owner of the job cannot view all resources, so the index would be partial. Run the indexation as a global admin.'; // @translate
+            $this->logger->err($message);
+            // Fail the job: a partial index is worse than no indexation, since
+            // nothing would tell that resources are missing.
+            throw new \Omeka\Job\Exception\RuntimeException($message);
+        }
+
         $searchEngineIds = $this->getArg('search_engine_ids');
 
         $this->resourceIds = $this->getArg('resource_ids', []) ?: [];

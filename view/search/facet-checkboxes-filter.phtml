@@ -11,6 +11,7 @@ $plugins = $this->getHelperPluginManager();
 $escape = $plugins->get('escapeHtml');
 $translate = $plugins->get('translate');
 $escapeAttr = $plugins->get('escapeHtmlAttr');
+$formatNumber = $plugins->get('formatNumber');
 
 $isFacetModeDirect = in_array($options['mode'] ?? null, ['link', 'js']);
 $displayCount = !empty($options['display_count']);
@@ -27,7 +28,7 @@ $inputLabel = sprintf($translate('Filter values of %s'), $facetLabel); // @trans
         $escapedValue = $escapeAttr($facetValue['value']);
         $escapedId = $name . '[]' . $escapedValue;
         $label = $displayCount
-            ? sprintf('<span>%s <span class="count">(%s)</span></span>', $escape($facetValue['label']), number_format($facetValue['count']))
+            ? sprintf('<span>%s <span class="count">(%s)</span></span>', $escape($facetValue['label']), $formatNumber($facetValue['count']))
             : $escape($facetValue['label']);
         $treeVal = $isTree ? $tree[$facetValue['value']] ?? null : null;
         $treeValAttrs = $treeVal ? sprintf(' data-value="%s" data-parent="%s" data-level="%s"', $treeVal['id'], $treeVal['parent'], $treeVal['level']) : '';

@@ -18,6 +18,7 @@
 
 $plugins = $this->getHelperPluginManager();
 $translate = $plugins->get('translate');
+$formatNumber = $plugins->get('formatNumber');
 
 // Check if Mapping module is active and map display is enabled.
 $mapDisplayEnabled = (bool) $searchConfig->subSetting('results', 'map_display');
@@ -75,7 +76,7 @@ $hasRefineActive = trim((string) $query->getQueryRefine()) !== '';
 <?php if (isset($displayParts['total_results'])): ?>
 <div class="search-results-count-total">
     <?php $totalResults = $response->getTotalResults(); ?>
-    <?= sprintf($totalResults <= 1 ? $translate('%s resource') : $translate('%s resources'), number_format($totalResults)) ?>
+    <?= sprintf($totalResults <= 1 ? $translate('%s resource') : $translate('%s resources'), $formatNumber($totalResults)) ?>
 </div>
 <?php endif; ?>
 

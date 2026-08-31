@@ -10,6 +10,7 @@
 $plugins = $this->getHelperPluginManager();
 $escape = $plugins->get('escapeHtml');
 $escapeAttr = $plugins->get('escapeHtmlAttr');
+$formatNumber = $plugins->get('formatNumber');
 
 $displayCount = !empty($options['display_count']);
 
@@ -26,7 +27,7 @@ $isTree = is_array($tree);
             <span>
                 <?= $escape($facetValue['label']) ?>
                 <?php if ($displayCount): ?>
-                <span class="count">(<?= number_format($facetValue['count']) ?>)</span>
+                <span class="count">(<?= $formatNumber($facetValue['count']) ?>)</span>
                 <?php endif; ?>
             </span>
         </a>

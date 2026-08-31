@@ -11,6 +11,7 @@ $plugins = $this->getHelperPluginManager();
 $escape = $plugins->get('escapeHtml');
 $translate = $plugins->get('translate');
 $escapeAttr = $plugins->get('escapeHtmlAttr');
+$formatNumber = $plugins->get('formatNumber');
 
 $isFacetModeDirect = in_array($options['mode'] ?? null, ['link', 'js']);
 $displayCount = !empty($options['display_count']);
@@ -26,7 +27,7 @@ $labelTo = sprintf($translate('%s: to'), $facetLabel); // @translate
         <option value=""></option>
         <?php foreach ($facetValues as $facetValue): ?>
         <option value="<?= $escapeAttr($facetValue['value']) ?>"<?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($facetValue['url_from']) . '"' : '' ?><?= $facetValue['is_from'] ? ' selected="selected"' : '' ?>>
-            <?= $displayCount ? sprintf('%1$s (<span class="count">%2$s</span>)', $escape($facetValue['value']), number_format($facetValue['count'])) : $escape($facetValue['value']) ?>
+            <?= $displayCount ? sprintf('%1$s (<span class="count">%2$s</span>)', $escape($facetValue['value']), $formatNumber($facetValue['count'])) : $escape($facetValue['value']) ?>
         </option>
         <?php endforeach; ?>
     </select>
@@ -35,7 +36,7 @@ $labelTo = sprintf($translate('%s: to'), $facetLabel); // @translate
         <option value=""></option>
         <?php foreach ($facetValues as $facetValue): ?>
         <option value="<?= $escapeAttr($facetValue['value']) ?>"<?= $isFacetModeDirect ? ' data-url="' . $escapeAttr($facetValue['url_to']) . '"' : '' ?><?= $facetValue['is_to'] ? ' selected="selected"' : '' ?>>
-            <?= $displayCount ? sprintf('%1$s (<span class="count">%2$s</span>)', $escape($facetValue['value']), number_format($facetValue['count'])) : $escape($facetValue['value']) ?>
+            <?= $displayCount ? sprintf('%1$s (<span class="count">%2$s</span>)', $escape($facetValue['value']), $formatNumber($facetValue['count'])) : $escape($facetValue['value']) ?>
         </option>
         <?php endforeach; ?>
     </select>

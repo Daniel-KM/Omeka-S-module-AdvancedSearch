@@ -1336,9 +1336,16 @@ class SearchConfigController extends AbstractActionController
             'facet' => 'facets',
         ];
         foreach ($collections as $mainName => $name) {
-            foreach ($params[$mainName][$name] ?? [] as $key => $data) {
-                unset($data['minus'], $data['plus'], $data['up'], $data['down']);
-                $params[$mainName][$name][$key] = $data;
+            $list = $params[$mainName][$name] ?? [];
+            // The list may be an unparsed textarea (raw post).
+            if (!is_array($list)) {
+                continue;
+            }
+            foreach ($list as $key => $data) {
+                if (is_array($data)) {
+                    unset($data['minus'], $data['plus'], $data['up'], $data['down']);
+                    $params[$mainName][$name][$key] = $data;
+                }
             }
         }
 

@@ -25,7 +25,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
     /**
      * The settings by group, cleaned when the type does not use them.
      */
-    const SETTINGS_LIST = ['language_site', 'languages', 'order', 'limit', 'state', 'paginate', 'more', 'per_page'];
+    const SETTINGS_LIST = ['language_site', 'languages', 'order', 'limit', 'state', 'paginate', 'more', 'per_page', 'join'];
     const SETTINGS_VALUES = ['value_labels_table', 'value_labels', 'display_count'];
     const SETTINGS_LINK = ['as_link'];
     const SETTINGS_SLIDER = ['field_end', 'scale_mode', 'scale_breakpoints', 'scale_show_ticks'];
@@ -184,6 +184,27 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                     'data-advanced-section' => $tr('Values'), // @translate
                     'data-filter-types' => implode(' ', self::TYPES_LIST),
                     'placeholder' => 'fra|way|apy|',
+                ],
+            ])
+            ->add([
+                'name' => 'join',
+                'type' => CommonElement\OptionalSelect::class,
+                'options' => [
+                    'label' => 'Join the selected values with', // @translate
+                    'info' => 'With "or", a resource matching any of the selected values is kept, so selecting a second value widens the results. With "and", a resource must match all of them, so each new value narrows the results.', // @translate
+                    'value_options' => [
+                        'or' => 'Or (default)', // @translate
+                        'and' => 'And', // @translate
+                    ],
+                    'empty_option' => '',
+                ],
+                'attributes' => [
+                    'id' => 'facet_join',
+                    'data-filter-types' => implode(' ', self::TYPES_LIST),
+                    'data-common' => '1',
+                    'multiple' => false,
+                    'class' => 'chosen-select',
+                    'data-placeholder' => 'Select joiner…', // @translate
                 ],
             ])
             ->add([

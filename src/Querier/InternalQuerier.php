@@ -901,8 +901,24 @@ class InternalQuerier extends AbstractQuerier
         $this->filterQueryAny($this->query->getFilters(), false, true);
         $this->filterQueryRanges($this->query->getFiltersRange());
         $this->filterQueryAny($this->query->getFiltersQuery());
+        // The counts of the facets are computed on the query without the
+        // active facets, so a value displays how many results it would add.
+        // But a facet joined with "and" narrows the results, so it stays in the
+        // base query: else the counts would promise results that the "and"
+        // cannot return.
+        $activeFacets = $this->query->getActiveFacets();
+        $facetsConfig = $this->query->getFacets();
+        $activeFacetsAnd = [];
+        $activeFacetsOr = [];
+        foreach ($activeFacets as $facetName => $facetValues) {
+            $facetData = $facetsConfig[$facetName] ?? [];
+            ($facetData['join'] ?? $facetData['options']['join'] ?? 'or') === 'and'
+                ? $activeFacetsAnd[$facetName] = $facetValues
+                : $activeFacetsOr[$facetName] = $facetValues;
+        }
+        $this->filterQueryAny($activeFacetsAnd, true, true);
         $this->argsWithoutActiveFacets = $this->args;
-        $this->filterQueryAny($this->query->getActiveFacets(), true, true);
+        $this->filterQueryAny($activeFacetsOr, true, true);
         $this->filterQueryRefine($this->query->getQueryRefine());
     }
 
@@ -1127,23 +1143,39 @@ class InternalQuerier extends AbstractQuerier
                         }
                     } else {
                         $fieldQueryArgs = $this->query->getFieldQueryArgs($fieldName);
+                        // With the joiner "and", a resource must match all the
+                        // selected values, so each value is a filter of its
+                        // own: a single filter with multiple values is an "in
+                        // list", so an "or".
+                        $isAnd = ($fieldData['join'] ?? $fieldData['options']['join'] ?? 'or') === 'and';
+                        $flatValues = $flatArray($values);
                         if ($fieldQueryArgs) {
-                            $this->args['filter'][] = [
+                            $baseFilter = [
                                 'join' => $fieldQueryArgs['join'] ?? 'and',
                                 'field' => $field,
                                 'except' => $fieldQueryArgs['except'] ?? null,
                                 'type' => $fieldQueryArgs['type'] ?? 'eq',
-                                'val' => $flatArray($values),
+                                'val' => $flatValues,
                                 'lang' => $fieldQueryArgs['lang'] ?? null,
                                 'datatype' => $fieldQueryArgs['datatype'] ?? null,
                             ];
                         } else {
-                            $this->args['filter'][] = [
+                            $baseFilter = [
                                 'join' => 'and',
                                 'field' => $field,
                                 'type' => 'eq',
-                                'val' => $flatArray($values),
+                                'val' => $flatValues,
                             ];
+                        }
+                        if ($isAnd && count($flatValues) > 1) {
+                            foreach ($flatValues as $flatValue) {
+                                $this->args['filter'][] = array_replace($baseFilter, [
+                                    'join' => 'and',
+                                    'val' => $flatValue,
+                                ]);
+                            }
+                        } else {
+                            $this->args['filter'][] = $baseFilter;
                         }
                     }
                 }

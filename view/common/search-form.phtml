@@ -1,0 +1,54 @@
+<?php
+/**
+ * Override of the standard search form of Omeka, rendered by the layout of the
+ * themes.
+ *
+ * When the site is set to replace it, the form of the main search page is
+ * displayed instead, with its filters and its autosuggestion. Else the standard
+ * form is rendered, exactly like the core one.
+ *
+ * The helper "searchingForm" is not used here: it falls back to this partial,
+ * so it would loop.
+ *
+ * @see \AdvancedSearch\View\Helper\SearchingForm
+ *
+ * @var \Laminas\View\Renderer\PhpRenderer $this
+ */
+
+$plugins = $this->getHelperPluginManager();
+$translate = $plugins->get('translate');
+$escape = $plugins->get('escapeHtml');
+$siteSetting = $plugins->get('siteSetting');
+
+if ($siteSetting('advancedsearch_main_config_replace_quick')) {
+    /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
+    $searchConfig = $plugins->has('getSearchConfig') ? $this->getSearchConfig() : null;
+    if ($searchConfig) {
+        // The simple variant keeps the main field, the hidden elements and the
+        // button: it replaces a quick search, not the advanced search form,
+        // whose filters remain available on the search page itself.
+        echo $searchConfig->renderForm([
+            'template' => 'search/search-form-simple',
+            'variant' => 'simple',
+        ]);
+        return;
+    }
+}
+
+$searchType = $siteSetting('search_type', 'sitewide');
+switch ($searchType) {
+    case 'cross-site':
+        $searchAction = $this->url('site/cross-site-search', ['action' => 'results'], true);
+        break;
+    case 'sitewide':
+    default:
+        $searchAction = $this->url('site/resource', ['controller' => 'index', 'action' => 'search'], true);
+}
+$searchValue = $escape($this->params()->fromQuery('fulltext_search', ''));
+?>
+
+<form action="<?= $escape($searchAction) ?>" id="search-form" aria-label="<?= $translate('Search') ?>" role="search">
+    <input type="text" id="fulltext-search" name="fulltext_search" value="<?= $searchValue ?>"
+        aria-label="<?= $translate('Query') ?>" aria-labelledby="search-form fulltext-search">
+    <button id="search-submit" type="submit" aria-label="<?= $translate('Submit') ?>" title="<?= $translate('Submit') ?>"><span class="o-icon-search" aria-hidden="true"></span></button>
+</form>

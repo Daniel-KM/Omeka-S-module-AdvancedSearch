@@ -452,6 +452,7 @@ return [
             'advancedsearch_filter_joiner_not' => true,
             'advancedsearch_fulltextsearch_alto' => false,
             'advancedsearch_main_config' => 1,
+            'advancedsearch_main_config_replace_quick' => false,
             'advancedsearch_api_config' => '',
             // Hidden value.
             'advancedsearch_all_configs' => [1 => 'find'],
@@ -488,6 +489,7 @@ return [
             'advancedsearch_filter_joiner_not' => true,
             'advancedsearch_configs' => [1],
             'advancedsearch_main_config' => 1,
+            'advancedsearch_main_config_replace_quick' => false,
             'advancedsearch_hidden_query_filters_per_config' => [],
             'advancedsearch_items_config' => 1,
             'advancedsearch_items_template_form' => null,

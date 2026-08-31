@@ -84,6 +84,18 @@ class SiteSettingsFieldset extends Fieldset
                     'id' => 'advancedsearch_main_config',
                 ],
             ])
+            ->add([
+                'name' => 'advancedsearch_main_config_replace_quick',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'element_group' => 'advanced_search',
+                    'label' => 'Replace the search form of the theme by this search page', // @translate
+                    'info' => 'The theme displays the standard search form of Omeka, that searches the full text. When replaced, the form of the search page is displayed instead, with its filters and its autosuggestion. A theme that renders its own form is not impacted.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearch_main_config_replace_quick',
+                ],
+            ])
 
             ->add([
                 'name' => 'advancedsearch_hidden_query_filters_per_config',

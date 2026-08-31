@@ -72,6 +72,18 @@ class SettingsFieldset extends Fieldset
                 ],
             ])
             ->add([
+                'name' => 'advancedsearch_main_config_replace_quick',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'element_group' => 'advanced_search',
+                    'label' => 'Replace the quick search of the admin side bar by this search page', // @translate
+                    'info' => 'By default, the search page is added below the quick search of Omeka, so the side bar has two search fields. When replaced, only the search page remains.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearch_main_config_replace_quick',
+                ],
+            ])
+            ->add([
                 'name' => 'advancedsearch_api_config',
                 'type' => CommonElement\OptionalSelect::class,
                 'options' => [

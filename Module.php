@@ -2055,6 +2055,12 @@ class Module extends AbstractModule
             $searchUrl = $basePath('admin/' . $searchConfig->slug());
             $script = sprintf('var searchUrl = %s;', json_encode($searchUrl, 320));
 
+            // The search page may replace the quick search of Omeka instead of
+            // being added below it, so the side bar has a single search field.
+            if ($plugins->get('setting')('advancedsearch_main_config_replace_quick')) {
+                $script .= "\nvar searchReplaceQuick = true;";
+            }
+
             $autoSuggestUrl = $searchConfig->subSetting('q', 'suggest_url');
             if (!$autoSuggestUrl) {
                 $suggester = $searchConfig->subSetting('q', 'suggester');

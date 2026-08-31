@@ -9,6 +9,10 @@
         vertical-align: top;
         margin: 0 0 24px;
     }
+    /* Remove margin when advanced search form replaces the quick search. */
+    #search > #search-form-quick {
+        margin-bottom: 0;
+    }
     #search-form-quick input[type=text] {
         width: calc(100% - 36px);
         float: left;

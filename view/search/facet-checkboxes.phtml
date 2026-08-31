@@ -22,7 +22,7 @@ $isTree = is_array($tree);
         $escapedValue = $escapeAttr($facetValue['value']);
         $escapedId = $name . '[]' . $escapedValue;
         $label = $displayCount
-            ? sprintf('<span>%s <span class="count">(%d)</span></span>', $escape($facetValue['label']),  $facetValue['count'])
+            ? sprintf('<span>%s <span class="count">(%s)</span></span>', $escape($facetValue['label']), number_format($facetValue['count']))
             : $escape($facetValue['label']);
         $treeVal = $isTree ? $tree[$facetValue['value']] ?? null : null;
         $treeValAttrs = $treeVal ? sprintf(' data-value="%s" data-parent="%s" data-level="%s"', $treeVal['id'], $treeVal['parent'], $treeVal['level']) : '';

@@ -1407,12 +1407,24 @@ $(document).ready(function() {
     // one on a page, e.g. a duplicated sticky header search). Each controller
     // is stored on its fieldset so delegated handlers can reach the right
     // instance.
-    $('.search-filters-advanced').each(function() {
-        var $fieldset = $(this);
-        var controller = Search.createFiltersAdvanced($fieldset);
-        $fieldset.data('filtersAdvanced', controller);
-        controller.init();
-    });
+    Search.initFiltersAdvanced = function(context) {
+        var $context = context ? $(context) : $(document);
+        $context.find('.search-filters-advanced')
+            .addBack('.search-filters-advanced')
+            .each(function() {
+                var $fieldset = $(this);
+                // The fieldset may have been initialized in a previous call.
+                if ($fieldset.data('filtersAdvanced')) {
+                    return;
+                }
+                var controller = Search.createFiltersAdvanced($fieldset);
+                $fieldset.data('filtersAdvanced', controller);
+                controller.init();
+            });
+        return Search;
+    };
+
+    Search.initFiltersAdvanced(document);
 
     var getFiltersAdvanced = function(ev) {
         return $(ev.target).closest('.search-filters-advanced').data('filtersAdvanced');
@@ -1763,8 +1775,19 @@ $(document).ready(function() {
     /**
      * Init chosen select.
      */
+    Search.initChosen = function(context) {
+        if (!$.fn.chosen) {
+            return Search;
+        }
+        var $context = context ? $(context) : $(document);
+        $context.find('select.chosen-select')
+            .addBack('select.chosen-select')
+            .chosen(Search.chosenOptions);
+        return Search;
+    };
+
     if (hasChosenSelect) {
-        $('select.chosen-select').chosen(Search.chosenOptions);
+        Search.initChosen(document);
     }
 
     /**

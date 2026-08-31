@@ -68,6 +68,26 @@
         };
     }
 
+    /**
+     * Init the form loaded in the dialog.
+     *
+     * The form is inserted after the load of the page, so it is not handled by
+     * the init of search.js, that runs on the ready event: the selects would
+     * stay standard ones and the buttons to add or remove a filter would do
+     * nothing, since they need the controller stored on the fieldset.
+     */
+    function initForm(dialog) {
+        if (typeof Search === 'undefined') {
+            return;
+        }
+        if (Search.initChosen) {
+            Search.initChosen(dialog);
+        }
+        if (Search.initFiltersAdvanced) {
+            Search.initFiltersAdvanced(dialog);
+        }
+    }
+
     function openDialog(html, heading) {
         CommonDialog.dialogGeneric({
             heading: heading,
@@ -85,6 +105,8 @@
 
         var restore = suspendDuplicatedIds(dialog);
         dialog.addEventListener('close', restore, {once: true});
+
+        initForm(dialog);
 
         var field = dialog.querySelector('input[type="text"], input[type="search"]');
         if (field) {

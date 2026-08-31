@@ -27,7 +27,7 @@ class FormMultiText extends FormText
         $name = $element->getName();
         if ($name === null || $name === '') {
             throw new Exception\DomainException(sprintf(
-                '%s requires that the element has an assigned name; none discovered', // @ŧranslate
+                '%s requires that the element has an assigned name; none discovered', // @translate
                 __METHOD__
             ));
         }

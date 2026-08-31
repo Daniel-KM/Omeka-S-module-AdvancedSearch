@@ -143,6 +143,102 @@
         }
     };
 
+    // Set the value of a select of a fieldset and refresh chosen.
+    const setSelectValue = function (fieldset, name, value) {
+        const select = fieldset.querySelector('select[name$="[' + name + ']"]');
+        if (!select) return;
+        select.value = value;
+        select.dispatchEvent(new Event('change', {bubbles: true}));
+        if (window.jQuery) window.jQuery(select).trigger('chosen:updated');
+    };
+
+    // Append an item to the collection and fill it with a suggestion.
+    const addSuggestedItem = function (collection, suggestion) {
+        const plus = collection.querySelector('.config-fieldset-plus');
+        if (!plus) return;
+        const before = collection.querySelectorAll('fieldset.form-fieldset-element[name]').length;
+        plus.click();
+        // The clone is appended to the collection itself, then moved into the
+        // list by the observer: search it in the whole collection.
+        const fieldsets = collection.querySelectorAll('fieldset.form-fieldset-element[name]');
+        if (fieldsets.length !== before + 1) return;
+        const fieldset = fieldsets[fieldsets.length - 1];
+        setSelectValue(fieldset, 'field', suggestion.field);
+        setSelectValue(fieldset, 'type', suggestion.type);
+        const label = fieldset.querySelector('input[name$="[label]"]');
+        if (label && suggestion.label) {
+            label.value = suggestion.label;
+            label.dispatchEvent(new Event('input', {bubbles: true}));
+        }
+    };
+
+    // The label of a type in the select of the template of the collection.
+    const typeLabel = function (collection, type) {
+        const span = collection.querySelector(':scope > span[data-template]');
+        if (span) {
+            const holder = document.createElement('div');
+            holder.innerHTML = span.getAttribute('data-template').split('__index__').join('0');
+            const option = holder.querySelector('select[name$="[type]"] option[value="' + type + '"]');
+            if (option) return option.textContent.trim();
+        }
+        return type;
+    };
+
+    const initSuggest = function (collection, side) {
+        if (['form_filters', 'facet_facets'].indexOf(collection.id) === -1) return;
+        const match = window.location.pathname.match(/(.*\/config\/\d+)\/edit/);
+        if (!match) return;
+        const url = match[1] + '/suggest';
+        const kind = collection.id === 'facet_facets' ? 'facets' : 'filters';
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'button collection-suggest';
+        button.textContent = t('suggest', 'Suggestions');
+        side.appendChild(button);
+        button.addEventListener('click', function () {
+            button.disabled = true;
+            fetch(url, {headers: {Accept: 'application/json'}})
+                .then(function (response) { return response.json(); })
+                .then(function (json) {
+                    button.disabled = false;
+                    const all = (json.data && json.data[kind]) || [];
+                    // Skip the fields already in the list.
+                    const used = {};
+                    collection.querySelectorAll('select[name$="[field]"]').forEach(function (select) {
+                        used[select.value] = true;
+                    });
+                    const suggestions = all.filter(function (suggestion) { return !used[suggestion.field]; });
+                    if (!suggestions.length || !window.CommonDialog) {
+                        if (window.CommonDialog) CommonDialog.alert(t('noSuggestion', 'No suggestion: the used properties are already configured.'));
+                        return;
+                    }
+                    const body = '<ul class="collection-suggestions">' + suggestions.map(function (suggestion, index) {
+                        return '<li><label>'
+                            + '<input type="checkbox" value="' + index + '"/> '
+                            + '<strong>' + escapeHtml(suggestion.field) + '</strong>'
+                            + ' — ' + escapeHtml(typeLabel(collection, suggestion.type))
+                            + '<br/><span class="collection-suggestion-reason">' + escapeHtml(suggestion.reason) + '</span>'
+                            + '</label></li>';
+                    }).join('') + '</ul>';
+                    const promise = CommonDialog.dialogGeneric({
+                        heading: t('suggestions', 'Suggestions'),
+                        body: body,
+                        textOk: t('addSelected', 'Add the checked ones'),
+                    });
+                    // The dialog is detached on close, but its nodes remain
+                    // readable, so the checked boxes are read after.
+                    const dialog = document.querySelector('dialog.dialog-generic');
+                    promise.then(function (accepted) {
+                        if (!accepted || !dialog) return;
+                        dialog.querySelectorAll('input[type=checkbox]:checked').forEach(function (checkbox) {
+                            addSuggestedItem(collection, suggestions[checkbox.value]);
+                        });
+                    });
+                })
+                .catch(function () { button.disabled = false; });
+        });
+    };
+
     const initCollection = function (collection) {
         if (collection.dataset.collectionReady) return;
         collection.dataset.collectionReady = '1';
@@ -202,6 +298,11 @@
         attachPlus();
         window.setTimeout(attachPlus, 0);
         if (window.jQuery) window.jQuery(attachPlus);
+
+        // A button under the list opens a dialog of suggestions of filters
+        // or facets, derived from the data and the resource templates. The
+        // user picks the ones to add: nothing is imposed.
+        initSuggest(collection, side);
 
         const items = function () {
             return Array.from(main.querySelectorAll(':scope > fieldset'));

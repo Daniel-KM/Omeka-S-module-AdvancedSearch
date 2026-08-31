@@ -101,9 +101,9 @@ class UserBarDelegator extends UserBar
         $params = $view->params()->fromRoute();
         $controller = $params['__CONTROLLER__'] ?? $params['controller'] ?? null;
         $controllers = [
-            'AdvancedSearch\Controller\SearchController' => 'advanced-search', // @ŧranslate
+            'AdvancedSearch\Controller\SearchController' => 'advanced-search', // @translate
             // Deprecated.
-            'AdvancedSearch\Controller\IndexController' => 'advanced-search', // @ŧranslate
+            'AdvancedSearch\Controller\IndexController' => 'advanced-search', // @translate
         ];
 
         if (!isset($controllers[$controller])) {

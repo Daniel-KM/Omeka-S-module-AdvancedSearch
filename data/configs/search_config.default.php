@@ -348,7 +348,7 @@ return [
                 'item_set_id' => [
                     'field' => 'item_set_id',
                     // A end user doesn't know "item set", but "collection".
-                    'label' => $translate('Collection'), // @ŧranslate
+                    'label' => $translate('Collection'), // @translate
                     'type' => 'Select',
                     'limit' => 100,
                     'options' => [

@@ -209,7 +209,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 'type' => Element\Text::class,
                 'options' => [
                     'label' => 'Default query', // @translate
-                    'info' => 'The format of the query depends on the search form and the search engine.', // @translated
+                    'info' => 'The format of the query depends on the search form and the search engine.', // @translate
                 ],
                 'attributes' => [
                     'id' => 'default_query',
@@ -220,7 +220,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 'type' => Element\Text::class,
                 'options' => [
                     'label' => 'Complementary default query', // @translate
-                    'info' => 'Mainly used to specify a default sort when request is empty, but other args are possible (default pagination, selected facets…).', // @translated
+                    'info' => 'Mainly used to specify a default sort when request is empty, but other args are possible (default pagination, selected facets…).', // @translate
                 ],
                 'attributes' => [
                     'id' => 'default_query_post',
@@ -231,7 +231,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 'type' => CommonElement\UrlQuery::class,
                 'options' => [
                     'label' => 'Hidden query filter to limit results', // @translate
-                    'info' => 'These args are appended to all queries. The format of the query depends on the search form and the search engine.', // @translated
+                    'info' => 'These args are appended to all queries. The format of the query depends on the search form and the search engine.', // @translate
                 ],
                 'attributes' => [
                     'id' => 'hidden_query_filters',
@@ -252,7 +252,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 'type' => Element\Text::class,
                 'options' => [
                     'label' => 'Query default field', // @translate
-                    'info' => 'Optional. Specifies a default search field in case it is not made explicit in the query.', // @translated
+                    'info' => 'Optional. Specifies a default search field in case it is not made explicit in the query.', // @translate
                 ],
                 'attributes' => [
                     'id' => 'query_default_field',
@@ -503,7 +503,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 'name' => 'filters',
                 'type' => Element\Collection::class,
                 'options' => [
-                    'label' => 'Filters', // @ŧranslate
+                    'label' => 'Filters', // @translate
                     'info' => 'The filters are the fields of the search form, used before submitting the search.', // @translate
                     'count' => 0,
                     'allow_add' => true,
@@ -517,7 +517,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                     'id' => 'form_filters',
                     'required' => false,
                     'class' => 'form-fieldset-collection',
-                    'data-label-index' => $this->translator->translate('Filter {index}'), // @ŧranslate
+                    'data-label-index' => $this->translator->translate('Filter {index}'), // @translate
                     'data-label-new' => $this->translator->translate('New filter'), // @translate
                 ],
             ])
@@ -1357,7 +1357,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 'name' => 'facets',
                 'type' => Element\Collection::class,
                 'options' => [
-                    'label' => 'Facets', // @ŧranslate
+                    'label' => 'Facets', // @translate
                     'info' => 'The facets are displayed in the page of results, after the search, in order to refine them.', // @translate
                     'count' => 0,
                     'allow_add' => true,
@@ -1371,7 +1371,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                     'id' => 'facet_facets',
                     'required' => false,
                     'class' => 'form-fieldset-collection',
-                    'data-label-index' => $this->translator->translate('Facet {index}'), // @ŧranslate
+                    'data-label-index' => $this->translator->translate('Facet {index}'), // @translate
                     'data-label-new' => $this->translator->translate('New facet'), // @translate
                 ],
             ])

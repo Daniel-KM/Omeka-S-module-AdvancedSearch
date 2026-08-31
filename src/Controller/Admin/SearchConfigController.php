@@ -41,6 +41,7 @@ use Common\Stdlib\PsrMessage;
 use Doctrine\ORM\EntityManager;
 use Laminas\Form\FormElementManager;
 use Laminas\Mvc\Controller\AbstractActionController;
+use Laminas\View\Model\JsonModel;
 use Laminas\View\Model\ViewModel;
 use Omeka\Form\ConfirmForm;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -278,6 +279,198 @@ class SearchConfigController extends AbstractActionController
             }
         }
         return $this->redirect()->toRoute('admin/search-manager');
+    }
+
+    /**
+     * Suggest filters and facets from the data and the resource templates.
+     *
+     * The suggestions are heuristics on the values: a property repeated on
+     * many resources with a medium number of distinct values makes a good
+     * facet; a property with mostly four-digits values is a date range, etc.
+     * The user picks the ones to add: nothing is imposed.
+     */
+    public function suggestAction()
+    {
+        $id = $this->params('id');
+
+        /** @var \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig */
+        $searchConfig = $this->api()->read('search_configs', ['id' => $id])->getContent();
+
+        $stats = $this->statsPerProperty();
+        $templateData = $this->statsPerTemplateProperty();
+
+        // The fields already configured are not suggested again.
+        $usedFilterFields = array_column($searchConfig->subSetting('form', 'filters', []), 'field', 'field');
+        $usedFacetFields = array_column($searchConfig->subSetting('facet', 'facets', []), 'field', 'field');
+
+        // For a non-internal engine (Solr), the suggestions are mapped from
+        // the property terms to the fields of the engine via their source.
+        $engine = $searchConfig->searchEngine();
+        $engineAdapter = $engine ? $engine->engineAdapter() : null;
+        $fieldsBysource = [];
+        $isInternal = true;
+        if ($engineAdapter && !$engineAdapter instanceof \AdvancedSearch\EngineAdapter\Internal) {
+            $isInternal = false;
+            foreach ($engineAdapter->getAvailableFields() as $availableField) {
+                if (!empty($availableField['from'])) {
+                    $fieldsBysource[$availableField['from']][] = $availableField['name'];
+                }
+            }
+        }
+
+        $translate = $this->plugin('translate');
+        $filters = [];
+        $facets = [];
+        foreach ($stats as $term => $stat) {
+            $repetition = $stat['distinct_values'] ? $stat['total_values'] / $stat['distinct_values'] : 0;
+            $isDate = $stat['total_values'] && ($stat['total_dateish'] / $stat['total_values']) >= 0.8;
+            $isLinked = $stat['total_values'] && (($stat['total_linked'] + $stat['total_uri']) / $stat['total_values']) >= 0.8;
+            $label = $templateData[$term]['alternate_label'] ?? '';
+
+            $suggestion = null;
+            if ($isDate && $stat['distinct_values'] >= 5) {
+                $suggestion = [
+                    'type' => 'RangeDouble',
+                    'reason' => (string) new PsrMessage($translate('Date or year on {total} resources'), // @translate
+                        ['total' => $stat['total_resources']]),
+                ];
+            } elseif ($stat['distinct_values'] >= 2 && $stat['distinct_values'] <= 400 && $repetition >= 2) {
+                $suggestion = [
+                    'type' => 'Checkbox',
+                    'reason' => (string) new PsrMessage($translate('{distinct} distinct values on {total} resources{linked}'), // @translate
+                        [
+                            'distinct' => $stat['distinct_values'],
+                            'total' => $stat['total_resources'],
+                            'linked' => $isLinked ? ' (' . $translate('linked resources or uris') . ')' : '',
+                        ]),
+                ];
+            }
+            if (!$suggestion) {
+                continue;
+            }
+
+            // Map the term to the fields of the engine when needed.
+            $fieldFacet = $term;
+            $fieldFilter = $term;
+            if (!$isInternal) {
+                $sourceFields = $fieldsBysource[$term] ?? [];
+                if (!$sourceFields) {
+                    continue;
+                }
+                $fieldFacet = $this->pickEngineField($sourceFields, $suggestion['type'] === 'RangeDouble' ? ['_is', '_i'] : ['_ss', '_s']);
+                $fieldFilter = $this->pickEngineField($sourceFields, $suggestion['type'] === 'RangeDouble' ? ['_is', '_i'] : ['_ss', '_s', '_txt']);
+            }
+
+            if (!isset($usedFacetFields[$fieldFacet]) && count($facets) < 15) {
+                $facets[] = [
+                    'field' => $fieldFacet,
+                    'label' => $label,
+                    'type' => $suggestion['type'],
+                    'reason' => $suggestion['reason'],
+                ];
+            }
+            // As filters, the medium lists are selects; the long ones are
+            // covered by the advanced filter.
+            $filterType = $suggestion['type'] === 'RangeDouble'
+                ? 'RangeDouble'
+                : ($stat['distinct_values'] <= 50 ? 'Select' : null);
+            if ($filterType && !isset($usedFilterFields[$fieldFilter]) && count($filters) < 15) {
+                $filters[] = [
+                    'field' => $fieldFilter,
+                    'label' => $label,
+                    'type' => $filterType,
+                    'reason' => $suggestion['reason'],
+                ];
+            }
+        }
+
+        return new JsonModel([
+            'status' => 'success',
+            'data' => [
+                'filters' => $filters,
+                'facets' => $facets,
+            ],
+        ]);
+    }
+
+    /**
+     * Statistics of the values by property, ordered by used resources.
+     *
+     * @return array Data by property term: total_values, total_resources,
+     * distinct_values, total_linked, total_uri, total_dateish.
+     */
+    protected function statsPerProperty(): array
+    {
+        $connection = $this->entityManager->getConnection();
+        $totalResources = (int) $connection->fetchOne('SELECT COUNT(*) FROM `resource`');
+        $minResources = max(5, (int) ($totalResources / 100));
+        $rows = $connection->fetchAllAssociative(
+            'SELECT
+                `v`.`property_id`,
+                COUNT(*) AS total_values,
+                COUNT(DISTINCT `v`.`resource_id`) AS total_resources,
+                COUNT(DISTINCT COALESCE(`v`.`value`, `v`.`uri`, `v`.`value_resource_id`)) AS distinct_values,
+                SUM(`v`.`value_resource_id` IS NOT NULL) AS total_linked,
+                SUM(`v`.`uri` IS NOT NULL AND `v`.`uri` != "") AS total_uri,
+                SUM(`v`.`value` REGEXP "^-?[0-9]{3,4}([^0-9].*)?$") AS total_dateish
+            FROM `value` `v`
+            GROUP BY `v`.`property_id`
+            HAVING total_resources >= :min_resources
+            ORDER BY total_resources DESC
+            LIMIT 100',
+            ['min_resources' => $minResources]
+        );
+        $easyMeta = $this->easyMeta();
+        $stats = [];
+        foreach ($rows as $row) {
+            $term = $easyMeta->propertyTerm((int) $row['property_id']);
+            if ($term) {
+                $stats[$term] = array_map('intval', array_slice($row, 1));
+            }
+        }
+        return $stats;
+    }
+
+    /**
+     * The alternate labels of the properties in the most used template.
+     *
+     * @return array Data by property term: alternate_label.
+     */
+    protected function statsPerTemplateProperty(): array
+    {
+        $connection = $this->entityManager->getConnection();
+        $rows = $connection->fetchAllAssociative(
+            'SELECT `rtp`.`property_id`, `rtp`.`alternate_label`, COUNT(`r`.`id`) AS total
+            FROM `resource_template_property` `rtp`
+            INNER JOIN `resource` `r` ON `r`.`resource_template_id` = `rtp`.`resource_template_id`
+            WHERE `rtp`.`alternate_label` IS NOT NULL AND `rtp`.`alternate_label` != ""
+            GROUP BY `rtp`.`property_id`, `rtp`.`alternate_label`
+            ORDER BY total DESC'
+        );
+        $easyMeta = $this->easyMeta();
+        $result = [];
+        foreach ($rows as $row) {
+            $term = $easyMeta->propertyTerm((int) $row['property_id']);
+            if ($term && !isset($result[$term])) {
+                $result[$term] = ['alternate_label' => $row['alternate_label']];
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Pick the field of the engine matching the preferred suffixes.
+     */
+    protected function pickEngineField(array $fields, array $suffixes): string
+    {
+        foreach ($suffixes as $suffix) {
+            foreach ($fields as $field) {
+                if (str_ends_with($field, $suffix)) {
+                    return $field;
+                }
+            }
+        }
+        return reset($fields);
     }
 
     /**

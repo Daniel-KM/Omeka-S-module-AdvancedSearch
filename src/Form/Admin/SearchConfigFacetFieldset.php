@@ -197,7 +197,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                         'total desc' => 'Total', // @translate
                         'total asc' => 'Total ascendant', // @translate
                         'total_alpha desc' => 'Total then alphabetic for hidden values', // @translate
-                        'values asc' => 'Values (listed below)', // @translate
+                        'values asc' => 'Values (set in the options)', // @translate
                         'values desc' => 'Values descendant', // @translate
                     ],
                     'empty_option' => '',
@@ -215,7 +215,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 'name' => 'limit',
                 'type' => Element\Number::class,
                 'options' => [
-                    'label' => 'Maximum number of facets', // @translate
+                    'label' => 'Maximum number of values', // @translate
                 ],
                 'attributes' => [
                     'id' => 'facet_limit',
@@ -352,12 +352,12 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
             ->addOptionsElement(
                 $tr,
                 'form_facet_options',
-                $tr('List of specific options, in ini format, for example `thesaurus = 151`, `languages = "fra|way|apa|"`, `data_types[] = "valuesuggest:idref:person"`, `main_types = "resource"`, `values[] = "Alpha"`, `first_digits = false`. The dedicated fields above take precedence over the keys set here.') // @translate
+                $tr('List of rarely used options, as key-values pairs. Omeka and Laminas options are accepted. A key set here takes precedence over the dedicated fields above.') // @translate
             )
             ->addAttributesElement(
                 $tr,
                 'form_facet_attributes',
-                $tr('Rarely used attributes to add to the input field, for example `class = "my-specific-class"`, or placeholder, data, etc.') // @translate
+                $tr('Specific attributes to add to the input field, for example `class = "my-specific-class"`, or placeholder, data, etc.') // @translate
             )
 
             // Action buttons.

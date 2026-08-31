@@ -724,3 +724,29 @@
         min-width: 0;
     }
 }
+
+/* Suggestions of filters and facets. */
+.collection-side .collection-suggest {
+    margin-top: 6px;
+    width: 100%;
+}
+.collection-suggestions {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 60vh;
+    overflow-y: auto;
+    text-align: left;
+}
+.collection-suggestions li {
+    padding: 6px 0;
+    border-bottom: 1px solid #e7e7e7;
+}
+.collection-suggestions li:last-child {
+    border-bottom: 0;
+}
+.collection-suggestion-reason {
+    color: #676767;
+    font-size: 0.875em;
+    margin-inline-start: 22px;
+}

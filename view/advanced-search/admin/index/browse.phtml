@@ -276,9 +276,6 @@ $engineDetails = $this->trigger('view.browse.engine_details', ['searchEngines' =
                 <tr>
                     <td>
                         <span><?= $searchConfig->name() ?></span>
-                        <?php foreach ($defaults as $role): ?>
-                        <span class="search-config-default" title="<?= $escapeAttr($translate('Default search page for this scope')) ?>"><?= $escape(sprintf($translate('default: %s'), $translate($role))) ?></span>
-                        <?php endforeach; ?>
                         <ul class="actions">
                             <?php if ($openUrl): ?>
                             <li>
@@ -316,7 +313,12 @@ $engineDetails = $this->trigger('view.browse.engine_details', ['searchEngines' =
                     </td>
                     <td><?= $escape($searchConfig->searchEngine()->name()) ?></td>
                     <td><?= $searchConfig->slug() ?></td>
-                    <td><?= $sites ? $escape(implode(', ', $sites)) : '<span class="warning-notice">' . $escape($translate('none')) . '</span>' ?></td>
+                    <td>
+                        <?= $sites ? $escape(implode(', ', $sites)) : '<span class="warning-notice">' . $escape($translate('none')) . '</span>' ?>
+                        <?php foreach ($defaults as $role): ?>
+                        <span class="search-config-default" title="<?= $escapeAttr($translate('Default search page for this scope')) ?>"><?= $escape(sprintf($translate('default: %s'), $translate($role))) ?></span>
+                        <?php endforeach; ?>
+                    </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>

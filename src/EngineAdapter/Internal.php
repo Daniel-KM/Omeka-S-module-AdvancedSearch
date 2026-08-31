@@ -183,7 +183,7 @@ class Internal extends AbstractEngineAdapter
         $availableFields = $this->getAvailableFieldsForSelect();
 
         $directionLabels = [
-            'asc' => $this->translator->translate('ascendant'), // @ŧranslate
+            'asc' => $this->translator->translate('ascendant'), // @translate
             'desc' => $this->translator->translate('descendant'), // @translate
         ];
 

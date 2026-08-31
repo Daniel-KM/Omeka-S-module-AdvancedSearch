@@ -32,7 +32,7 @@ class FormRangeDouble extends FormInput
         $name = $element->getName();
         if ($name === null || $name === '') {
             throw new Exception\DomainException(sprintf(
-                'Method %s requires that the element has an assigned name; none discovered', // @ŧranslate
+                'Method %s requires that the element has an assigned name; none discovered', // @translate
                 __METHOD__
             ));
         }

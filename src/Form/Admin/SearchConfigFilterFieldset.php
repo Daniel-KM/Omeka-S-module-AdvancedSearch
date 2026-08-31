@@ -256,7 +256,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                     'info' => 'The type of input displayed in the search form. Each type has its own settings below; the preview shows what the visitor will see. The values of a list come from the index, or from the manual list of values in the advanced settings.', // @translate
                     /** @see \AdvancedSearch\Form\MainSearchForm::init() */
                     'value_options' => $this->inputTypeOptions([
-                        'text' => 'Text (default)', // @ŧranslate
+                        'text' => 'Text (default)', // @translate
                         'Advanced' => 'Advanced filter', // @translate
                         'Checkbox' => 'Checkbox', // @translate
                         'HasValue' => 'Checkbox: has a value / has no value', // @translate
@@ -484,10 +484,10 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 'name' => 'language_site',
                 'type' => CommonElement\OptionalRadio::class,
                 'options' => [
-                    'label' => 'Limit languages of filters (internal querier)', // @ŧranslate
+                    'label' => 'Limit languages of filters (internal querier)', // @translate
                     'value_options' => [
                         '' => 'No limit', // @translate
-                        'site' => 'Limit filters to site language or empty language', // @ŧranslate
+                        'site' => 'Limit filters to site language or empty language', // @translate
                         'site_setting' => 'Use site setting "Filter values based on site locale"', // @translate
                     ],
                 ],
@@ -522,13 +522,13 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 'options' => [
                     'label' => 'Order', // @translate
                     'value_options' => [
-                        'alphabetic asc' => 'Alphabetic (default)', // @ŧranslate
-                        'alphabetic desc' => 'Alphabetic descendant', // @ŧranslate
-                        'total desc' => 'Total', // @ŧranslate
-                        'total asc' => 'Total ascendant', // @ŧranslate
-                        'total_alpha desc' => 'Total then alphabetic for hidden values', // @ŧranslate
-                        'values asc' => 'Values (listed below)', // @ŧranslate
-                        'values desc' => 'Values descendant', // @ŧranslate
+                        'alphabetic asc' => 'Alphabetic (default)', // @translate
+                        'alphabetic desc' => 'Alphabetic descendant', // @translate
+                        'total desc' => 'Total', // @translate
+                        'total asc' => 'Total ascendant', // @translate
+                        'total_alpha desc' => 'Total then alphabetic for hidden values', // @translate
+                        'values asc' => 'Values (listed below)', // @translate
+                        'values desc' => 'Values descendant', // @translate
                     ],
                     'empty_option' => '',
                 ],
@@ -545,7 +545,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 'name' => 'limit',
                 'type' => Element\Number::class,
                 'options' => [
-                    'label' => 'Maximum number of filters', // @translate
+                    'label' => 'Maximum number of values', // @translate
                 ],
                 'attributes' => [
                     'id' => 'form_filter_limit',
@@ -576,12 +576,12 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
             ->addOptionsElement(
                 $tr,
                 'form_filter_options',
-                $tr('List of rarely used options, in ini format, for example `empty_option = ""` or `select = true` for the access filter. Omeka and Laminas options are accepted. A key set here takes precedence over the dedicated fields above.') // @translate
+                $tr('List of rarely used options, as key-value pairs, for example `empty_option = ""` or `select = true` for the access filter. Omeka and Laminas options are accepted. A key set here takes precedence over the dedicated fields above.') // @translate
             )
             ->addAttributesElement(
                 $tr,
                 'form_filter_attributes',
-                $tr('Specific attributes to add to the input field, for example `class = "my-specific-class"`, or placeholder, data, etc. A key set here takes precedence over the dedicated fields above.') // @translate
+                $tr('Specific attributes to add to the input field, for example `class = "my-specific-class"`, or placeholder, data, etc.') // @translate
             )
         ;
     }

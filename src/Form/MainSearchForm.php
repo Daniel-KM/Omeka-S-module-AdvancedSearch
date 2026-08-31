@@ -444,8 +444,8 @@ class MainSearchForm extends Form
                     // The empty label allows to have a fieldset wrapping radio.
                     ->setLabel(' ')
                     ->setValueOptions([
-                        'all' => 'Full text', // @ŧranslate
-                        'record' => 'Record only', // @ŧranslate
+                        'all' => 'Full text', // @translate
+                        'record' => 'Record only', // @translate
                     ])
                     ->setAttribute('id', 'rft')
                     ->setValue('all')
@@ -457,8 +457,8 @@ class MainSearchForm extends Form
                     // The empty label allows to have a fieldset wrapping radio.
                     ->setLabel(' ')
                     ->setValueOptions([
-                        'record' => 'Record only', // @ŧranslate
-                        'all' => 'Full text', // @ŧranslate
+                        'record' => 'Record only', // @translate
+                        'all' => 'Full text', // @translate
                     ])
                     ->setAttribute('id', 'rft')
                     ->setValue('record')

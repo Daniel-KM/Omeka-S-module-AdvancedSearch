@@ -691,7 +691,6 @@ class SearchConfigController extends AbstractActionController
         $allDefaults = [];
         $allAvailables = [];
         $defaultForAllSitesAdded = in_array('all', $searchConfigSiteDefaults);
-        $defaultForAllSitesRemoved = in_array('none', $searchConfigSiteDefaults);
         $availabilityForAllSitesEnabled = in_array('enable', $searchConfigSiteAvailabilities);
         $availabilityForAllSitesDisabled = in_array('disable', $searchConfigSiteAvailabilities);
 
@@ -704,7 +703,10 @@ class SearchConfigController extends AbstractActionController
                 || in_array($siteId, $searchConfigSiteDefaults);
             if ($setDefaultForSite) {
                 $siteSettings->set('advancedsearch_main_config', $searchConfigId, $siteId);
-            } elseif ($defaultForAllSitesRemoved || $prevDefaultForSite === $searchConfigId) {
+            } elseif ($prevDefaultForSite === $searchConfigId) {
+                // An empty selection means "no site": the config is simply no
+                // more the default one, and the default of the other sites,
+                // that may be another config, is not touched.
                 $siteSettings->set('advancedsearch_main_config', null, $siteId);
             }
             if ($siteSettings->get('advancedsearch_main_config', null, $siteId) === $searchConfigId) {
@@ -763,12 +765,6 @@ class SearchConfigController extends AbstractActionController
     {
         $filterTypes = $this->getFormFilterTypes();
 
-        // Legacy: the settings of the advanced filter were a separate section.
-        if (!empty($settings['form']['advanced']) && isset($settings['form']['filters']['advanced'])) {
-            $settings['form']['filters']['advanced'] += $settings['form']['advanced'];
-        }
-        unset($settings['form']['advanced']);
-
         foreach ($settings['form']['filters'] ?? [] as $key => $fieldset) {
             // The name of filters are used as key and should be unique.
             $settings['form']['filters'][$key]['name'] = $key;
@@ -792,21 +788,22 @@ class SearchConfigController extends AbstractActionController
             // The variants of the select are a type with two options in the
             // form: multiple choices and layout of the values.
             $type = $fieldset['type'] ?? '';
-            if (in_array($type, SearchConfigFilterFieldset::TYPES_SELECT, true)) {
-                $settings['form']['filters'][$key]['type'] = 'Select';
-                $settings['form']['filters'][$key]['multiple'] = strpos($type, 'Multi') === 0;
-                $settings['form']['filters'][$key]['value_layout'] = substr($type, -4) === 'Flat' ? 'flat' : (substr($type, -5) === 'Group' ? 'group' : '');
+            if ($type === 'Select') {
+                $settings['form']['filters'][$key]['multiple'] = !empty($fieldset['options']['multiple']);
+                $settings['form']['filters'][$key]['value_layout'] = $fieldset['options']['value_layout'] ?? '';
+                unset(
+                    $settings['form']['filters'][$key]['options']['multiple'],
+                    $settings['form']['filters'][$key]['options']['value_layout']
+                );
             }
-            // The elements of a row of the advanced filter are a multi
-            // checkbox in the form and booleans in the settings.
+            // The settings of the advanced filter are options of the filter.
             if (($fieldset['type'] ?? '') === 'Advanced') {
-                $elements = [];
-                foreach (['field_joiner' => 'joiner', 'field_joiner_not' => 'joiner_not', 'field_operator' => 'operator', 'field_value_autosuggest' => 'autosuggest'] as $k => $v) {
-                    if (!empty($fieldset[$k])) {
-                        $elements[] = $v;
+                foreach (['default_number', 'max_number', 'field_elements', 'field_operators', 'fields'] as $k) {
+                    if (isset($fieldset['options'][$k])) {
+                        $settings['form']['filters'][$key][$k] = $fieldset['options'][$k];
                     }
+                    unset($settings['form']['filters'][$key]['options'][$k]);
                 }
-                $settings['form']['filters'][$key]['field_elements'] = $elements;
             }
             // Set specific types options.
             $type = $settings['form']['filters'][$key]['type'] ?? '';
@@ -817,14 +814,6 @@ class SearchConfigController extends AbstractActionController
             }
         }
         $settings['form']['filters'] = array_values($settings['form']['filters'] ?? []);
-
-        // The sort selector is stored with the name and the label, edited as
-        // pairs "name => label".
-        $sortList = [];
-        foreach ($settings['results']['sort_list'] ?? [] as $name => $sort) {
-            $sortList[$name] = is_array($sort) ? (string) ($sort['label'] ?? '') : (string) $sort;
-        }
-        $settings['results']['sort_list'] = $sortList;
 
         // The properties to display may be a simple list (no labels) or a
         // map "term => label" for the form.
@@ -871,21 +860,9 @@ class SearchConfigController extends AbstractActionController
         ];
         $settings['facet']['mode'] = in_array($settings['facet']['mode'] ?? null, ['button', 'link', 'js']) ? $settings['facet']['mode'] : 'button';
         foreach ($settings['facet']['facets'] ?? [] as $key => $facet) {
-            // The bounds are fields of the form; the key in the attributes
-            // takes precedence over the field.
-            foreach (['min', 'max', 'step'] as $k) {
-                if (isset($facet['attributes'][$k])) {
-                    $facet[$k] = $facet['attributes'][$k];
-                    unset($facet['attributes'][$k]);
-                }
-            }
             // The checkbox "first digits" is checked by default.
-            $facet['first_digits'] = ($facet['first_digits'] ?? $facet['integer'] ?? true) === true
-                || in_array($facet['first_digits'] ?? $facet['integer'] ?? null, [1, '1', 'true'], true);
-            unset($facet['integer']);
-            // Remove the mode of each facet to simplify config: it is stored
-            // in each facet to simplify theming, but it is a global option.
-            unset($facet['mode']);
+            $facet['first_digits'] = ($facet['first_digits'] ?? true) === true
+                || in_array($facet['first_digits'] ?? null, [1, '1', 'true'], true);
             // Simplify some values too (integer and boolean).
             if (isset($facet['display_count'])) {
                 $facet['display_count'] = (bool) $facet['display_count'];
@@ -923,8 +900,21 @@ class SearchConfigController extends AbstractActionController
     {
         unset($params['csrf']);
 
-        // The properties to display are stored as a simple list when no
-        // custom label is set.
+        $params = $this->normalizePropertiesToSave($params);
+        $params = $this->removeUselessFields($params);
+        $params = $this->normalizeRequestToSave($params);
+        $params['form']['filters'] = $this->normalizeFiltersToSave($params['form']['filters'] ?? []);
+        $params['results']['sort_list'] = $this->normalizeSortListToSave($params['results']['sort_list'] ?? []);
+        $params['facet'] = $this->normalizeFacetsToSave($params['facet'] ?? []);
+        return $params;
+    }
+
+    /**
+     * The properties to display are stored as a simple list when no custom
+     * label is set.
+     */
+    protected function normalizePropertiesToSave(array $params): array
+    {
         foreach (['properties', 'properties_grid'] as $key) {
             $properties = $params['results'][$key] ?? [];
             if (is_array($properties)) {
@@ -934,30 +924,40 @@ class SearchConfigController extends AbstractActionController
                     : array_keys($properties);
             }
         }
+        return $params;
+    }
 
-        $params = $this->removeUselessFields($params);
-
+    /**
+     * Clean the default queries and normalize the hidden query filters.
+     */
+    protected function normalizeRequestToSave(array $params): array
+    {
         if (isset($params['search']['default_query'])) {
             $params['search']['default_query'] = trim($params['search']['default_query'] ?? '', "? \t\n\r\0\x0B");
         }
-
         if (isset($params['search']['default_query_post'])) {
             $params['search']['default_query_post'] = trim($params['search']['default_query_post'] ?? '', "? \t\n\r\0\x0B");
         }
-
-        // Normalize hidden query filters from the legacy URL format (e.g.
+        // Normalize hidden query filters from the url format (e.g.
         // property[N][property|type|text]) to the flat format consumable by
         // InternalQuerier::filterQueryAny(). Stored once at save-time so the
         // runtime path stays simple.
         if (!empty($params['request']['hidden_query_filters']) && is_array($params['request']['hidden_query_filters'])) {
             $params['request']['hidden_query_filters'] = SearchResources::normalizeHiddenQueryFilters($params['request']['hidden_query_filters']);
         }
+        return $params;
+    }
 
+    /**
+     * Normalize the posted filters, keyed by their name.
+     */
+    protected function normalizeFiltersToSave(array $postedFilters): array
+    {
         // Set name as key and move all specific types to options. The name is
         // optional: it is derived from the field below when empty.
-        $filters = [];
+        $keyed = [];
         $j = 0;
-        foreach ($params['form']['filters'] ?? [] as $filter) {
+        foreach ($postedFilters as $filter) {
             $name = trim($filter['name'] ?? '');
             unset($filter['name']);
             // The record or full text filter has no field in the select.
@@ -967,295 +967,315 @@ class SearchConfigController extends AbstractActionController
             if (empty($filter['field']) && !$name) {
                 continue;
             }
-            $type = $filter['type'] ?? '';
-            if ($type === 'Specific') {
+            if (($filter['type'] ?? '') === 'Specific') {
                 $filter['type'] = $filter['options']['type'] ?? '';
                 unset($filter['options']['type']);
             }
             // A numeric key is replaced by the field below.
-            $filters[$name !== '' ? $name : $j++] = $filter;
+            $keyed[$name !== '' ? $name : $j++] = $filter;
         }
-        $params['form']['filters'] = $filters;
 
-        // Normalize filters.
         $filterTypes = $this->getFormFilterTypes();
-
         $filters = [];
         $i = 0;
-        foreach ($params['form']['filters'] ?? [] as $name => $filter) {
-            if (empty($filter['field'])) {
+        foreach ($keyed as $name => $filter) {
+            $normalized = $this->normalizeFilterToSave($filter, $filterTypes);
+            if ($normalized === null) {
                 continue;
             }
-
-            $field = $filter['field'];
-
-            // The type is a key of the list of types, else a specific one.
-            $type = $filter['type'] ?? '';
-            $type = isset($filterTypes[$type]) ? $type : ucfirst($type);
-
-            // Key is always "rft" for the record or full text filter.
-            if ($type === 'Rft') {
-                $name = 'rft';
-                $filter = [
-                    'field' => 'rft',
-                    'label' => $filter['label'] ?? '',
-                    'type' => 'Rft',
-                ] + $filter;
-            }
-
-            // Key is always "advanced" for advanced filters, so no duplicate.
-            // Its settings are stored with the filter.
-            if ($type === 'Advanced') {
-                $name = 'advanced';
-                $filter = [
-                    'field' => 'advanced',
-                    'label' => $filter['label'] ?? '',
-                    'type' => 'Advanced',
-                ] + $filter;
-                $filter['default_number'] = isset($filter['default_number']) ? (int) $filter['default_number'] : 1;
-                $filter['max_number'] = isset($filter['max_number']) ? (int) $filter['max_number'] : 10;
-                $elements = isset($filter['field_elements']) ? (array) $filter['field_elements'] : [];
-                unset($filter['field_elements']);
-                $filter['field_joiner'] = in_array('joiner', $elements);
-                $filter['field_joiner_not'] = in_array('joiner_not', $elements);
-                $filter['field_operator'] = in_array('operator', $elements);
-                $filter['field_operators'] = isset($filter['field_operators']) ? (array) $filter['field_operators'] : [];
-                $filter['field_value_autosuggest'] = in_array('autosuggest', $elements);
-                // Move the fields as last key for end user.
-                $advancedFields = $filter['fields'] ?? [];
-                unset($filter['fields']);
-                $filter['fields'] = $advancedFields;
-            } elseif ($type === '') {
-                unset($filter['type']);
-            }
-
-            // The manual list of values has its own field.
-            if (!empty($filter['options']['value_options']) && empty($filter['values'])) {
-                $filter['values'] = $this->normalizeManualValues($filter['options']['value_options']);
-                unset($filter['options']['value_options']);
-            }
-
-            // The settings of the groups the type does not use are removed.
-            $filter = $this->cleanSettingsByType($filter, $type, [
-                [SearchConfigFilterFieldset::TYPES_LIST, SearchConfigFilterFieldset::SETTINGS_LIST],
-                [SearchConfigFilterFieldset::TYPES_RANGE, SearchConfigFilterFieldset::SETTINGS_RANGE],
-                [SearchConfigFilterFieldset::TYPES_SLIDER, SearchConfigFilterFieldset::SETTINGS_SLIDER],
-                [['Advanced'], SearchConfigFilterFieldset::SETTINGS_ADVANCED],
-                [['text'], SearchConfigFilterFieldset::SETTINGS_TEXT],
-                [['Hidden'], SearchConfigFilterFieldset::SETTINGS_HIDDEN],
-                [['Rft'], SearchConfigFilterFieldset::SETTINGS_RFT],
-                [['Checkbox', 'HasValue'], array_unique(array_merge(SearchConfigFilterFieldset::SETTINGS_CHECKBOX, SearchConfigFilterFieldset::SETTINGS_HAS_VALUE))],
-                [['Thesaurus'], SearchConfigFilterFieldset::SETTINGS_THESAURUS],
-                [['Number', 'Range', 'RangeDouble'], SearchConfigFilterFieldset::SETTINGS_NUMBER],
-            ]);
-            if ($type === 'HasValue') {
-                unset($filter['unchecked_value']);
-            } elseif ($type === 'Checkbox') {
-                unset($filter['query_type'], $filter['value_label']);
-            }
-
-            // The promoted fields are stored as options or attributes of the
-            // filter; a key set in the textarea takes precedence.
-            foreach (SearchConfigFilterFieldset::PROMOTED_OPTIONS as $k) {
-                $v = $filter[$k] ?? null;
-                unset($filter[$k]);
-                if ($k === 'first_digits') {
-                    // Enabled by default: store only when disabled.
-                    if (in_array($type, ['Number', 'Range', 'RangeDouble'], true)
-                        && !$v
-                        && !isset($filter['options'][$k])
-                    ) {
-                        $filter['options'][$k] = false;
-                    }
-                    continue;
-                }
-                if ($k === 'autosuggest' || $k === 'thesaurus') {
-                    $v = $v ? ($k === 'autosuggest' ? true : (int) $v) : null;
-                }
-                if ($v !== null && $v !== '' && !isset($filter['options'][$k])) {
-                    $filter['options'][$k] = $v;
-                }
-            }
-            foreach (SearchConfigFilterFieldset::PROMOTED_ATTRIBUTES as $k) {
-                $v = $filter[$k] ?? null;
-                unset($filter[$k]);
-                if ($v !== null && $v !== '' && !isset($filter['attributes'][$k])) {
-                    $filter['attributes'][$k] = $v;
-                }
-            }
-
-            // The default display of a filter is the advanced search only.
-            if (($filter['display_in'] ?? '') === 'advanced' || $type === 'Advanced') {
-                unset($filter['display_in']);
-            }
-
-            // The type Select is recomposed with its two options.
-            if ($type === 'Select') {
-                $layout = $filter['value_layout'] ?? '';
-                $filter['type'] = (empty($filter['multiple']) ? '' : 'Multi')
-                    . 'Select'
-                    . ($layout === 'flat' ? 'Flat' : ($layout === 'group' ? 'Group' : ''));
-            }
-            unset($filter['multiple'], $filter['value_layout']);
-
-            foreach ($filter as $k => $v) {
-                if ($v === null || $v === '' || $v === []) {
-                    unset($filter[$k]);
-                }
-            }
-
-            $name = is_numeric($name) ? $field : $name;
-            // Name is no more forcet to lower case, only slugified.
-            $name = $this->slugify($name);
+            [$fixedName, $filter] = $normalized;
+            $name = $fixedName ?? (is_numeric($name) ? $filter['field'] : $name);
+            // Name is no more forced to lower case, only slugified.
+            $name = $this->slugify((string) $name);
             if (!in_array($name, ['advanced', 'rft']) && isset($filters[$name])) {
                 $name .= '_' . ++$i;
             }
-
             $filters[$name] = $filter;
         }
+        return $filters;
+    }
 
-        $params['form']['filters'] = $filters;
-        // The settings of the advanced filter are stored with it now.
-        unset($params['form']['advanced']);
+    /**
+     * Normalize one filter: type, promoted options and attributes, cleanup.
+     *
+     * @return array|null [forced name or null, filter], or null to skip.
+     */
+    protected function normalizeFilterToSave(array $filter, array $filterTypes): ?array
+    {
+        if (empty($filter['field'])) {
+            return null;
+        }
 
-        // The sort selector is a list of pairs "name => label" in the form,
-        // stored with the name and the label.
-        $sortList = [];
-        foreach ($params['results']['sort_list'] ?? [] as $name => $sort) {
-            if (is_array($sort)) {
-                // Legacy fieldsets of the collection.
-                if (!empty($sort['name'])) {
-                    $sortList[$sort['name']] = $sort;
+        // The type is a key of the list of types, else a specific one.
+        $type = $filter['type'] ?? '';
+        $type = isset($filterTypes[$type]) ? $type : ucfirst($type);
+        $fixedName = null;
+
+        // Key is always "rft" for the record or full text filter.
+        if ($type === 'Rft') {
+            $fixedName = 'rft';
+            $filter = [
+                'field' => 'rft',
+                'label' => $filter['label'] ?? '',
+                'type' => 'Rft',
+            ] + $filter;
+        }
+
+        // Key is always "advanced" for advanced filters, so no duplicate.
+        // Its settings are options, like the ones of the other types.
+        if ($type === 'Advanced') {
+            $fixedName = 'advanced';
+            $options = [
+                'default_number' => isset($filter['default_number']) ? (int) $filter['default_number'] : 1,
+                'max_number' => isset($filter['max_number']) ? (int) $filter['max_number'] : 10,
+                'field_elements' => array_values((array) ($filter['field_elements'] ?? [])),
+                'field_operators' => isset($filter['field_operators']) ? (array) $filter['field_operators'] : [],
+                'fields' => isset($filter['fields']) ? (array) $filter['fields'] : [],
+            ];
+            unset($filter['default_number'], $filter['max_number'], $filter['field_elements'], $filter['field_operators'], $filter['fields']);
+            $filter = [
+                'field' => 'advanced',
+                'label' => $filter['label'] ?? '',
+                'type' => 'Advanced',
+            ] + $filter;
+            $filter['options'] = array_filter($options, fn ($v) => $v !== [] && $v !== '') + ($filter['options'] ?? []);
+        } elseif ($type === '') {
+            unset($filter['type']);
+        }
+
+        // The settings of the groups the type does not use are removed.
+        $filter = $this->cleanSettingsByType($filter, $type, [
+            [SearchConfigFilterFieldset::TYPES_LIST, SearchConfigFilterFieldset::SETTINGS_LIST],
+            [SearchConfigFilterFieldset::TYPES_RANGE, SearchConfigFilterFieldset::SETTINGS_RANGE],
+            [SearchConfigFilterFieldset::TYPES_SLIDER, SearchConfigFilterFieldset::SETTINGS_SLIDER],
+            [['Advanced'], SearchConfigFilterFieldset::SETTINGS_ADVANCED],
+            [['text'], SearchConfigFilterFieldset::SETTINGS_TEXT],
+            [['Hidden'], SearchConfigFilterFieldset::SETTINGS_HIDDEN],
+            [['Rft'], SearchConfigFilterFieldset::SETTINGS_RFT],
+            [['Checkbox', 'HasValue'], array_unique(array_merge(SearchConfigFilterFieldset::SETTINGS_CHECKBOX, SearchConfigFilterFieldset::SETTINGS_HAS_VALUE))],
+            [['Thesaurus'], SearchConfigFilterFieldset::SETTINGS_THESAURUS],
+            [['Number', 'Range', 'RangeDouble'], SearchConfigFilterFieldset::SETTINGS_NUMBER],
+        ]);
+        if ($type === 'HasValue') {
+            unset($filter['unchecked_value']);
+        } elseif ($type === 'Checkbox') {
+            unset($filter['query_type'], $filter['value_label']);
+        }
+
+        $filter = $this->storePromotedFilterSettings($filter, $type);
+
+        // The default display of a filter is the advanced search only.
+        if (($filter['display_in'] ?? '') === 'advanced' || $type === 'Advanced') {
+            unset($filter['display_in']);
+        }
+
+        // The select stores its two options with the other ones.
+        if ($type === 'Select') {
+            if (!empty($filter['multiple'])) {
+                $filter['options']['multiple'] = true;
+            }
+            $layout = $filter['value_layout'] ?? '';
+            if (in_array($layout, ['flat', 'group'], true)) {
+                $filter['options']['value_layout'] = $layout;
+            }
+        }
+        unset($filter['multiple'], $filter['value_layout']);
+
+        foreach ($filter as $k => $v) {
+            if ($v === null || $v === '' || $v === []) {
+                unset($filter[$k]);
+            }
+        }
+
+        return [$fixedName, $filter];
+    }
+
+    /**
+     * The promoted fields are stored as options or attributes of the filter;
+     * a key set in the textarea takes precedence.
+     */
+    protected function storePromotedFilterSettings(array $filter, string $type): array
+    {
+        foreach (SearchConfigFilterFieldset::PROMOTED_OPTIONS as $k) {
+            $v = $filter[$k] ?? null;
+            unset($filter[$k]);
+            if ($k === 'first_digits') {
+                // Enabled by default: store only when disabled.
+                if (in_array($type, ['Number', 'Range', 'RangeDouble'], true)
+                    && !$v
+                    && !isset($filter['options'][$k])
+                ) {
+                    $filter['options'][$k] = false;
                 }
                 continue;
             }
-            $name = trim((string) $name);
-            if ($name !== '') {
-                $sortList[$name] = ['name' => $name, 'label' => trim((string) $sort)];
+            if ($k === 'autosuggest' || $k === 'thesaurus') {
+                $v = $v ? ($k === 'autosuggest' ? true : (int) $v) : null;
+            }
+            if ($v !== null && $v !== '' && !isset($filter['options'][$k])) {
+                $filter['options'][$k] = $v;
             }
         }
-        $params['results']['sort_list'] = $sortList;
+        foreach (SearchConfigFilterFieldset::PROMOTED_ATTRIBUTES as $k) {
+            $v = $filter[$k] ?? null;
+            unset($filter[$k]);
+            if ($v !== null && $v !== '' && !isset($filter['attributes'][$k])) {
+                $filter['attributes'][$k] = $v;
+            }
+        }
+        return $filter;
+    }
 
+    /**
+     * The sort selector is stored flat, like in the form ("name => label").
+     */
+    protected function normalizeSortListToSave($sorts): array
+    {
+        if (is_string($sorts)) {
+            // The textarea may be unparsed.
+            $sortsArray = [];
+            foreach (array_filter(array_map('trim', explode("\n", $sorts))) as $line) {
+                $pos = mb_strpos($line, '=');
+                $sortsArray[trim($pos === false ? $line : mb_substr($line, 0, $pos))] = $pos === false ? '' : trim(mb_substr($line, $pos + 1));
+            }
+            $sorts = $sortsArray;
+        }
+        $sortList = [];
+        foreach ($sorts as $name => $sort) {
+            $name = trim((string) $name);
+            if ($name !== '') {
+                $sortList[$name] = trim((string) $sort);
+            }
+        }
+        return $sortList;
+    }
+
+    /**
+     * Normalize the posted facets, keyed by their field.
+     */
+    protected function normalizeFacetsToSave(array $facetParams): array
+    {
         // Three possible modes: button, link, checkbox js as link.
-        $facetMode = in_array($params['facet']['mode'] ?? null, ['button', 'link', 'js']) ? $params['facet']['mode'] : 'button';
+        $facetParams['mode'] = in_array($facetParams['mode'] ?? null, ['button', 'link', 'js']) ? $facetParams['mode'] : 'button';
         $warnLanguage = false;
         $facets = [];
         $i = 0;
-        foreach ($params['facet']['facets'] ?? [] as $name => $facet) {
+        foreach ($facetParams['facets'] ?? [] as $facet) {
             if (empty($facet['field'])) {
-                unset($params['facet']['facets'][$name]);
                 continue;
             }
-            $field = $facet['field'];
             // Check the name: it should be the field name, except in case of a
             // duplicate, normally never in real use cases.
             // Use field as name: the standard form does not allow to set a
             // specific name, unlike filters.
             // TODO Manage use of duplicated facets with a name suffixed with an index.
-            // Name is no more forcet to lower case, only slugified.
-            $name = $this->slugify($field);
+            $name = $this->slugify($facet['field']);
             if (isset($facets[$name])) {
                 $name .= '_' . ++$i;
             }
-            // There can be only one mode for all facets, so add the mode to
-            // each facet to simplify theme.
-            $facet['mode'] = $facetMode;
-            // Move specific settings to the root of the array. Keys with
-            // dedicated form fields must not be overridden by stale entries
-            // coming from the "options" IniTextarea.
-            $reservedKeys = [
-                'boolean_filter',
-                'field_end',
-                'paginate',
-                'language_site',
-                'languages',
-                'thesaurus',
-                'min',
-                'max',
-                'step',
-                'first_digits',
-                'scale_mode',
-                'scale_breakpoints',
-                'scale_show_ticks',
-                'value_labels',
-                'value_labels_table',
-            ];
-            foreach ($facet['options'] as $k => $v) {
-                if (in_array($k, $reservedKeys, true) && array_key_exists($k, $facet)) {
-                    continue;
-                }
-                $facet[$k] = $v;
-            }
-            unset($facet['options']);
-            // The settings of the groups the type does not use are removed.
-            $facet = $this->cleanSettingsByType($facet, $facet['type'] ?? 'Checkbox', [
-                [SearchConfigFacetFieldset::TYPES_LIST, SearchConfigFacetFieldset::SETTINGS_LIST],
-                [SearchConfigFacetFieldset::TYPES_VALUES, SearchConfigFacetFieldset::SETTINGS_VALUES],
-                [SearchConfigFacetFieldset::TYPES_LINK, SearchConfigFacetFieldset::SETTINGS_LINK],
-                [SearchConfigFacetFieldset::TYPES_SLIDER, SearchConfigFacetFieldset::SETTINGS_SLIDER],
-                [SearchConfigFacetFieldset::TYPES_BOUNDS, SearchConfigFacetFieldset::SETTINGS_BOUNDS],
-                [['Thesaurus'], SearchConfigFacetFieldset::SETTINGS_THESAURUS],
-            ]);
-            // The option "first digits" is enabled by default: store only
-            // when disabled.
-            if (array_key_exists('first_digits', $facet)) {
-                if ($facet['first_digits'] && $facet['first_digits'] !== '0') {
-                    unset($facet['first_digits']);
-                } else {
-                    $facet['first_digits'] = false;
-                }
-            }
-            if (isset($facet['thesaurus'])) {
-                $facet['thesaurus'] = (int) $facet['thesaurus'] ?: null;
-            }
-            // Simplify some values (empty string, integer and boolean).
-            foreach (['display_count', 'paginate', 'as_link'] as $k) {
-                if (isset($facet[$k])) {
-                    $facet[$k] = (bool) $facet[$k];
-                }
-            }
-            foreach (['limit', 'more', 'per_page', 'min', 'max'] as $k) {
-                if (isset($facet[$k])) {
-                    if ($facet[$k] === '') {
-                        unset($facet[$k]);
-                    } else {
-                        $facet[$k] = (int) $facet[$k];
-                    }
-                }
-            }
-            foreach ($facet as $k => $v) {
-                if ($v === null || $v === '' || $v === []) {
-                    unset($facet[$k]);
-                }
-            }
-            // Add a warning for languages of facets because it may be a hard to
-            // understand issue.
-            if (!empty($facet['languages'])) {
-                if (is_string($facet['languages'])) {
-                    $facet['languages'] = explode('|', $facet['languages']);
-                }
-                $facet['languages'] = array_values(array_unique(array_map('trim', $facet['languages'])));
-                if (!empty($facet['languages']) && !in_array('', $facet['languages'])) {
-                    $warnLanguage = true;
-                }
-            }
-            foreach ($facet as $k => $v) {
-                if ($v === null || $v === '' || $v === []) {
-                    unset($facet[$k]);
-                }
-            }
-            // TODO Explode array options ("|" and "," are supported) early or keep user input?
-            $facets[$name] = $facet;
+            $facets[$name] = $this->normalizeFacetToSave($facet, $warnLanguage);
         }
-        $params['facet']['facets'] = $facets;
+        $facetParams['facets'] = $facets;
 
         if ($warnLanguage) {
             $this->messenger()->addWarning(
                 'Note that you didn’t set an empty language for some facets, so all values without language will be skipped in the facet.' // @translate
             );
         }
+        return $facetParams;
+    }
 
-        return $params;
+    /**
+     * Normalize one facet: free options to the root, cleanup by type.
+     */
+    protected function normalizeFacetToSave(array $facet, bool &$warnLanguage): array
+    {
+        // Move specific settings to the root of the array. Keys with
+        // dedicated form fields must not be overridden by stale entries
+        // coming from the "options" IniTextarea.
+        $reservedKeys = [
+            'boolean_filter',
+            'field_end',
+            'paginate',
+            'language_site',
+            'languages',
+            'thesaurus',
+            'min',
+            'max',
+            'step',
+            'first_digits',
+            'scale_mode',
+            'scale_breakpoints',
+            'scale_show_ticks',
+            'value_labels',
+            'value_labels_table',
+        ];
+        foreach ($facet['options'] ?? [] as $k => $v) {
+            if (in_array($k, $reservedKeys, true) && array_key_exists($k, $facet)) {
+                continue;
+            }
+            $facet[$k] = $v;
+        }
+        unset($facet['options']);
+
+        // The settings of the groups the type does not use are removed.
+        $facet = $this->cleanSettingsByType($facet, $facet['type'] ?? 'Checkbox', [
+            [SearchConfigFacetFieldset::TYPES_LIST, SearchConfigFacetFieldset::SETTINGS_LIST],
+            [SearchConfigFacetFieldset::TYPES_VALUES, SearchConfigFacetFieldset::SETTINGS_VALUES],
+            [SearchConfigFacetFieldset::TYPES_LINK, SearchConfigFacetFieldset::SETTINGS_LINK],
+            [SearchConfigFacetFieldset::TYPES_SLIDER, SearchConfigFacetFieldset::SETTINGS_SLIDER],
+            [SearchConfigFacetFieldset::TYPES_BOUNDS, SearchConfigFacetFieldset::SETTINGS_BOUNDS],
+            [['Thesaurus'], SearchConfigFacetFieldset::SETTINGS_THESAURUS],
+        ]);
+
+        // The option "first digits" is enabled by default: store only when
+        // disabled.
+        if (array_key_exists('first_digits', $facet)) {
+            if ($facet['first_digits'] && $facet['first_digits'] !== '0') {
+                unset($facet['first_digits']);
+            } else {
+                $facet['first_digits'] = false;
+            }
+        }
+        if (isset($facet['thesaurus'])) {
+            $facet['thesaurus'] = (int) $facet['thesaurus'] ?: null;
+        }
+
+        // Simplify some values (empty string, integer and boolean).
+        foreach (['display_count', 'paginate', 'as_link'] as $k) {
+            if (isset($facet[$k])) {
+                $facet[$k] = (bool) $facet[$k];
+            }
+        }
+        foreach (['limit', 'more', 'per_page', 'min', 'max'] as $k) {
+            if (isset($facet[$k])) {
+                if ($facet[$k] === '') {
+                    unset($facet[$k]);
+                } else {
+                    $facet[$k] = (int) $facet[$k];
+                }
+            }
+        }
+
+        // Add a warning for languages of facets because it may be a hard to
+        // understand issue.
+        if (!empty($facet['languages'])) {
+            if (is_string($facet['languages'])) {
+                $facet['languages'] = explode('|', $facet['languages']);
+            }
+            $facet['languages'] = array_values(array_unique(array_map('trim', $facet['languages'])));
+            if (!empty($facet['languages']) && !in_array('', $facet['languages'])) {
+                $warnLanguage = true;
+            }
+        }
+
+        foreach ($facet as $k => $v) {
+            if ($v === null || $v === '' || $v === []) {
+                unset($facet[$k]);
+            }
+        }
+        // TODO Explode array options ("|" and "," are supported) early or keep user input?
+        return $facet;
     }
 
     /**
@@ -1282,9 +1302,9 @@ class SearchConfigController extends AbstractActionController
             return;
         }
 
-        // Manage the exception for "advanced".
+        // Manage the exceptions: "advanced" and "rft" are not indexes.
         $advanced = $fields['advanced'] ?? null;
-        unset($fields['advanced']);
+        unset($fields['advanced'], $fields['rft']);
 
         if (count($fields)) {
             // Don't use the key, but the key field in each value, because the key
@@ -1428,23 +1448,6 @@ class SearchConfigController extends AbstractActionController
      * @param array $groups List of [types, settings]: the settings are kept
      * only when the type is one of the types.
      */
-    /**
-     * Normalize the legacy manual list of values into an array "value => label".
-     *
-     * The legacy option "value_options" was a list of values, without label:
-     * only the values were used, whatever the keys.
-     */
-    protected function normalizeManualValues($values): array
-    {
-        $result = [];
-        foreach ((array) $values as $value) {
-            $value = is_scalar($value) ? trim((string) $value) : '';
-            if ($value !== '') {
-                $result[$value] = '';
-            }
-        }
-        return $result;
-    }
 
     protected function cleanSettingsByType(array $settings, string $type, array $groups): array
     {

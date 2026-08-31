@@ -305,18 +305,6 @@ class MainSearchForm extends Form
                     $values = $this->listValues($filter);
                     $element = $this->searchMultiCheckbox($filter, $values);
                     break;
-                case 'Multiselect':
-                    $values = $this->listValues($filter);
-                    $element = $this->searchMultiSelect($filter, $values);
-                    break;
-                case 'Multiselectflat':
-                    $values = $this->listValues($filter);
-                    $element = $this->searchMultiSelectFlat($filter, $values);
-                    break;
-                case 'Multiselectgroup':
-                    $values = $this->listValues($filter);
-                    $element = $this->searchMultiSelectGroup($filter, $values);
-                    break;
                 case 'Multitext':
                     $values = $this->listValues($filter);
                     $element = $this->searchMultiSelectFlat($filter, $values);
@@ -341,16 +329,20 @@ class MainSearchForm extends Form
                     $element = $this->searchRangeDouble($filter, $values);
                     break;
                 case 'Select':
+                    // The select carries its options: multiple choices and
+                    // layout of the values (flat or grouped).
                     $values = $this->listValues($filter);
-                    $element = $this->searchSelect($filter, $values);
-                    break;
-                case 'Selectflat':
-                    $values = $this->listValues($filter);
-                    $element = $this->searchSelectFlat($filter, $values);
-                    break;
-                case 'Selectgroup':
-                    $values = $this->listValues($filter);
-                    $element = $this->searchSelectGroup($filter, $values);
+                    $multiple = !empty($filter['options']['multiple']);
+                    $layout = $filter['options']['value_layout'] ?? '';
+                    if ($multiple) {
+                        $element = $layout === 'flat'
+                            ? $this->searchMultiSelectFlat($filter, $values)
+                            : ($layout === 'group' ? $this->searchMultiSelectGroup($filter, $values) : $this->searchMultiSelect($filter, $values));
+                    } else {
+                        $element = $layout === 'flat'
+                            ? $this->searchSelectFlat($filter, $values)
+                            : ($layout === 'group' ? $this->searchSelectGroup($filter, $values) : $this->searchSelect($filter, $values));
+                    }
                     break;
                 case 'Text':
                     $element = $this->searchText($filter);
@@ -610,12 +602,8 @@ class MainSearchForm extends Form
             return null;
         }
 
-        $queryType = $filter['options']['query_type']
-            ?? $filter['query_type']
-            ?? 'ex';
-        $checkedValue = $filter['options']['checked_value']
-            ?? $filter['checked_value']
-            ?? '1';
+        $queryType = $filter['options']['query_type'] ?? 'ex';
+        $checkedValue = $filter['options']['checked_value'] ?? '1';
 
         $fieldset = new \Laminas\Form\Fieldset('filter');
         $sub = new \Laminas\Form\Fieldset($key);

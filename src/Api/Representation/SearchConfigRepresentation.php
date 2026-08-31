@@ -206,7 +206,19 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
     public function subSetting(string $mainName, string $name, $default = null)
     {
         [$mainName, $name] = $this->settingCheckName($mainName, $name);
-        return $this->resource->getSettings()[$mainName][$name] ?? $default;
+        $result = $this->resource->getSettings()[$mainName][$name] ?? $default;
+        // The mode is a global option of the facets, added to each facet to
+        // simplify theming.
+        if ($mainName === 'facet' && $name === 'facets' && is_array($result)) {
+            $mode = $this->resource->getSettings()['facet']['mode'] ?? 'button';
+            foreach ($result as &$facet) {
+                if (is_array($facet)) {
+                    $facet['mode'] ??= $mode;
+                }
+            }
+            unset($facet);
+        }
+        return $result;
     }
 
     /**
@@ -224,9 +236,20 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
                 break;
             }
         }
-        // Legacy section, merged under the filter keys.
-        $legacy = $settings['form']['advanced'] ?? [];
-        return $advanced ? $advanced + $legacy : $legacy;
+        if (!$advanced) {
+            return [];
+        }
+        // The settings are stored in the options of the filter; the booleans
+        // by element of a row are derived for the readers.
+        $advanced += $advanced['options'] ?? [];
+        unset($advanced['options']);
+        $elements = $advanced['field_elements'] ?? [];
+        $advanced['field_elements'] = $elements;
+        $advanced['field_joiner'] = in_array('joiner', $elements);
+        $advanced['field_joiner_not'] = in_array('joiner_not', $elements);
+        $advanced['field_operator'] = in_array('operator', $elements);
+        $advanced['field_value_autosuggest'] = in_array('autosuggest', $elements);
+        return $advanced;
     }
 
     public function subSubSetting(string $mainName, string $name, string $subName, $default = null)

@@ -291,18 +291,18 @@ $engineDetails = $this->trigger('view.browse.engine_details', ['searchEngines' =
                             </li>
                             <?php endif; ?>
                             <li>
-                                <?= $searchConfig->link('', 'edit', [
-                                    'class' => 'o-icon-edit',
-                                    'aria-label' => $translate('Edit'),
-                                    'title' => $translate('Edit'),
-                                ]) ?>
-                            </li>
-                            <li>
                                 <?= $searchConfig->link('', 'copy', [
                                     'class' => 'o-icon- far fa-copy copy-search-config',
                                     'aria-label' => $translate('Copy'),
                                     'title' => $translate('Copy'),
                                     'data-confirm-message' => $translate('Are you sure you want to copy this search page?'),
+                                ]) ?>
+                            </li>
+                            <li>
+                                <?= $searchConfig->link('', 'edit', [
+                                    'class' => 'o-icon-edit',
+                                    'aria-label' => $translate('Edit'),
+                                    'title' => $translate('Edit'),
                                 ]) ?>
                             </li>
                             <li>
@@ -434,11 +434,13 @@ if ($recommendSync && class_exists(\SearchSolr\Module::class, false)):
         <p>
             <a href="#"
                 class="button sidebar-content"
+                data-sidebar-selector="#recommend-sync-sidebar"
                 data-sidebar-content-url="<?= $escape($syncUrl) ?>"><?= $escape($translate('Align the maps…')) ?></a>
         </p>
         <p>
             <a href="#"
                 class="button sidebar-content"
+                data-sidebar-selector="#recommend-sync-sidebar"
                 data-sidebar-content-url="<?= $escape($reindexUrl) ?>"><?= $escape($translate('Reindex…')) ?></a>
         </p>
     </div>

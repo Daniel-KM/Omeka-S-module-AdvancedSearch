@@ -11,6 +11,7 @@ use Laminas\InputFilter\InputFilterProviderInterface;
 class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderInterface
 {
     use TraitInputTypeOptions;
+    use TraitSharedFieldsetElements;
 
     /**
      * The types of facet by group of settings, used by the form and to clean
@@ -108,46 +109,12 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                     'min' => '0',
                 ],
             ])
-            ->add([
-                'name' => 'value_labels_table',
-                'type' => Element\Text::class,
-                'options' => [
-                    'label' => 'Value labels: table source', // @translate
-                    'info' => 'Optional slug or id of a table (module Table) used as the base code / label mapping. Inline "Value labels" below override the table entries when both are defined.', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'form_facet_value_labels_table',
-                    'data-advanced-section' => $tr('Values'), // @translate
-                    'data-filter-types' => implode(' ', self::TYPES_VALUES),
-                    'required' => false,
-                    'placeholder' => 'my-table-slug',
-                ],
-            ])
-            ->add([
-                'name' => 'value_labels',
-                'type' => CommonElement\ArrayTextarea::class,
-                'options' => [
-                    'label' => 'Value labels', // @translate
-                    'info' => 'One pair per line: indexed_value = displayed_label. Replaces the raw value in facet items, "see more" buttons and active facets. Mainly useful for boolean fields (e.g. 1 = Only with image / 0 = Without image) and small enumerations. Overrides the table source above for the listed codes.', // @translate
-                    'as_key_value' => true,
-                    'pairs_editor' => [
-                        'key_label' => $tr('Value'), // @translate
-                        'value_label' => $tr('Label'), // @translate
-                        'sortable' => false,
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'form_facet_value_labels',
-                    'data-advanced-section' => $tr('Values'), // @translate
-                    'data-filter-types' => implode(' ', self::TYPES_VALUES),
-                    'required' => false,
-                    'rows' => 3,
-                    'placeholder' => <<<'TXT'
-                        1 = Only with image
-                        0 = Without image
-                        TXT,
-                ],
-            ])
+            ->addValueLabelsElements(
+                $tr,
+                'form_facet_',
+                implode(' ', self::TYPES_VALUES),
+                $tr('One pair per line: indexed_value = displayed_label. Replaces the raw value in facet items, "see more" buttons and active facets. Mainly useful for boolean fields (e.g. 1 = Only with image / 0 = Without image) and small enumerations. Overrides the table source above for the listed codes.') // @translate
+            )
             ->add([
                 'name' => 'type',
                 'type' => Element\Select::class,
@@ -377,176 +344,21 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
             // the default and ignores breakpoints. Mode "piecewise" requires at
             // least two breakpoints with values and positions strictly
             // increasing from 0 to 100.
-            ->add([
-                'name' => 'min',
-                'type' => CommonElement\OptionalNumber::class,
-                'options' => [
-                    'label' => 'Minimum', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'facet_min',
-                    'data-filter-types' => 'RangeDouble SelectRange',
-                    'data-advanced-section' => $tr('Slider'), // @translate
-                    'data-inline' => 'bounds',
-                    'required' => false,
-                    'step' => 'any',
-                ],
-            ])
-            ->add([
-                'name' => 'max',
-                'type' => CommonElement\OptionalNumber::class,
-                'options' => [
-                    'label' => 'Maximum', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'facet_max',
-                    'data-filter-types' => 'RangeDouble SelectRange',
-                    'data-advanced-section' => $tr('Slider'), // @translate
-                    'data-inline' => 'bounds',
-                    'required' => false,
-                    'step' => 'any',
-                ],
-            ])
-            ->add([
-                'name' => 'step',
-                'type' => CommonElement\OptionalNumber::class,
-                'options' => [
-                    'label' => 'Step', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'facet_step',
-                    'data-filter-types' => 'RangeDouble SelectRange',
-                    'data-advanced-section' => $tr('Slider'), // @translate
-                    'data-inline' => 'bounds',
-                    'required' => false,
-                    'step' => 'any',
-                    'min' => '0',
-                ],
-            ])
-            ->add([
-                'name' => 'first_digits',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'label' => 'Extract the first digits of the values (year of a date)', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'facet_first_digits',
-                    'data-filter-types' => 'RangeDouble SelectRange',
-                    'data-advanced-section' => $tr('Slider'), // @translate
-                    'required' => false,
-                    'value' => '1',
-                ],
-            ])
-            ->add([
-                'name' => 'scale_mode',
-                'type' => CommonElement\OptionalRadio::class,
-                'options' => [
-                    'label' => 'Slider scale (RangeDouble)', // @translate
-                    'value_options' => [
-                        'linear' => 'Linear', // @translate
-                        'log' => 'Logarithmic', // @translate
-                        'piecewise' => 'Piecewise (with breakpoints)', // @translate
-                        'auto' => 'Auto (quartiles from data)', // @translate
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'form_facet_scale_mode',
-                    'data-advanced-section' => $tr('Slider'), // @translate
-                    'data-filter-types' => implode(' ', self::TYPES_SLIDER),
-                    'value' => 'linear',
-                ],
-            ])
-            ->add([
-                'name' => 'scale_breakpoints',
-                'type' => CommonElement\ArrayTextarea::class,
-                'options' => [
-                    'label' => 'Scale breakpoints', // @translate
-                    'info' => 'One pair per line: value = position. Position is a percentage between 0 and 100.', // @translate
-                    'as_key_value' => true,
-                    'pairs_editor' => [
-                        'key_label' => $tr('Value'), // @translate
-                        'value_label' => $tr('Position (%)'), // @translate
-                        'value_type' => 'number',
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'form_facet_scale_breakpoints',
-                    'data-advanced-section' => $tr('Slider'), // @translate
-                    'data-filter-types' => implode(' ', self::TYPES_SLIDER),
-                    'required' => false,
-                    'rows' => 5,
-                    'placeholder' => <<<TXT
-                        min = 0
-                        1 = 20
-                        1789 = 50
-                        max = 100
-                        TXT,
-                ],
-            ])
-            ->add([
-                'name' => 'scale_show_ticks',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'label' => 'Display ticks at breakpoints', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'form_facet_scale_show_ticks',
-                    'data-advanced-section' => $tr('Slider'), // @translate
-                    'data-filter-types' => implode(' ', self::TYPES_SLIDER),
-                ],
-            ])
+            ->addBoundsElements($tr, 'form_facet_', 'RangeDouble SelectRange')
+            ->addScaleElements($tr, 'form_facet_', implode(' ', self::TYPES_SLIDER))
 
             // Common fields continued (same order as filters).
 
-            ->add([
-                'type' => CommonElement\IniTextarea::class,
-                'name' => 'options',
-                'options' => [
-                    'label' => 'Options', // @translate
-                    'info' => <<<'HTML'
-                        List of specific options, in ini format, for example:
-                        `thesaurus = 151`,
-                        `languages = "fra|way|apa|"`,
-                        `data_types[] = "valuesuggest:idref:person"`,
-                        `main_types = "resource"`,
-                        `values[] = "Alpha"`,
-                        `first_digits = false`.
-                        Note: "min", "max", "step" should be set in "Html attributes".
-                        HTML, // @translate
-                    'ini_typed_mode' => true,
-                    'pairs_editor' => [
-                        'key_label' => $tr('Option'), // @translate
-                        'value_label' => $tr('Value'), // @translate
-                        'sortable' => false,
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'form_facet_options',
-                    'data-advanced-section' => $tr('Advanced'), // @translate
-                    'required' => false,
-                    'placeholder' => '',
-                ],
-            ])
-            ->add([
-                'type' => CommonElement\ArrayTextarea::class,
-                'name' => 'attributes',
-                'options' => [
-                    'label' => 'Html attributes', // @translate
-                    'info' => 'Rarely used attributes to add to the input field, for example `class = "my-specific-class"`, or placeholder, data, etc. A key set here takes precedence over the dedicated fields above.', // @translate
-                    'as_key_value' => true,
-                    'key_value_separator' => '=',
-                    'pairs_editor' => [
-                        'key_label' => $tr('Attribute'), // @translate
-                        'value_label' => $tr('Value'), // @translate
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'form_facet_attributes',
-                    'data-advanced-section' => $tr('Advanced'), // @translate
-                    'required' => false,
-                    'placeholder' => '',
-                ],
-            ])
+            ->addOptionsElement(
+                $tr,
+                'form_facet_options',
+                $tr('List of specific options, in ini format, for example `thesaurus = 151`, `languages = "fra|way|apa|"`, `data_types[] = "valuesuggest:idref:person"`, `main_types = "resource"`, `values[] = "Alpha"`, `first_digits = false`. The dedicated fields above take precedence over the keys set here.') // @translate
+            )
+            ->addAttributesElement(
+                $tr,
+                'form_facet_attributes',
+                $tr('Rarely used attributes to add to the input field, for example `class = "my-specific-class"`, or placeholder, data, etc.') // @translate
+            )
 
             // Action buttons.
         ;

@@ -333,7 +333,9 @@ return [
         ],
 
         // All filters except "advanced" are managed the same via querier:
-        // a form is a query configurator.
+        // a form is a query configurator. Each filter may set "display_in"
+        // ("advanced" by default, "simple" or "both") and stores its specific
+        // settings in "options" and its html attributes in "attributes".
         'form' => [
             'button_submit' => true,
             'label_submit' => $translate('Search'),
@@ -341,46 +343,37 @@ return [
             'label_reset' => $translate('Reset'),
             'attribute_form' => false,
 
-            'rft' => null,
-
             'filters' => [
                 // Ordered list of specific filters.
                 'item_set_id' => [
                     'field' => 'item_set_id',
                     // A end user doesn't know "item set", but "collection".
                     'label' => $translate('Collection'), // @ŧranslate
-                    'type' => 'MultiSelect',
-                    'language_site' => '',
-                    'languages' => [],
-                    'order' => 'default',
+                    'type' => 'Select',
                     'limit' => 100,
+                    'options' => [
+                        'multiple' => true,
+                    ],
                 ],
                 'resource_class_id' => [
                     'field' => 'resource_class_id',
                     'label' => $translate('Class'),
-                    'type' => 'MultiSelectFlat',
-                    'language_site' => '',
-                    'languages' => [],
-                    'order' => 'default',
+                    'type' => 'Select',
                     'limit' => 100,
+                    'options' => [
+                        'multiple' => true,
+                        'value_layout' => 'flat',
+                    ],
                 ],
                 'resource_template_id' => [
                     'field' => 'resource_template_id',
                     'label' => $translate('Template'),
                     'type' => 'Radio',
-                    'language_site' => '',
-                    'languages' => [],
-                    'order' => 'default',
                     'limit' => 100,
                 ],
                 'title' => [
                     'field' => 'title',
                     'label' => $translate('Title'),
-                    'type' => null,
-                    'language_site' => '',
-                    'languages' => [],
-                    'order' => 'default',
-                    'limit' => 100,
                     'options' => [
                         'autosuggest' => true,
                     ],
@@ -389,19 +382,11 @@ return [
                     'field' => 'author',
                     'label' => $translate('Author'),
                     'type' => 'Select',
-                    'language_site' => '',
-                    'languages' => [],
-                    'order' => 'default',
                     'limit' => 100,
                 ],
                 'dcterms_subject' => [
                     'field' => 'dcterms:subject',
                     'label' => $translate('Subject'),
-                    'type' => null,
-                    'language_site' => '',
-                    'languages' => [],
-                    'order' => 'default',
-                    'limit' => 100,
                     'options' => [
                         'autosuggest' => true,
                     ],
@@ -410,10 +395,6 @@ return [
                     'field' => 'date',
                     'label' => $translate('Date range'),
                     'type' => 'RangeDouble',
-                    'language_site' => '',
-                    'languages' => [],
-                    'order' => 'default',
-                    'limit' => 100,
                     'options' => [
                         'first_digits' => true,
                     ],
@@ -422,121 +403,85 @@ return [
                         'max' => 2025,
                     ],
                 ],
+                // The advanced filter is a filter like the others: its
+                // settings are stored in its options.
                 'advanced' => [
                     'field' => 'advanced',
                     'label' => $translate('Filters'),
                     'type' => 'Advanced',
-                    'language_site' => '',
-                    'languages' => [],
-                    'order' => 'default',
-                    'limit' => 100,
+                    'options' => [
+                        'default_number' => 1,
+                        'max_number' => 10,
+                        'field_elements' => [
+                            'joiner',
+                            'joiner_not',
+                            'operator',
+                        ],
+                        'field_operators' => [
+                            'in' => $translate('contains'), // @translate
+                            'eq' => $translate('is exactly'), // @translate
+                            'sw' => $translate('starts with'), // @translate
+                            'ew' => $translate('ends with'), // @translate
+                            'ex' => $translate('has any value'), // @translate
+                            'res' => $translate('is resource with ID'), // @translate
+                        ],
+                        'fields' => [
+                            'title' => [
+                                'value' => 'title',
+                                'label' => $translate('Title'),
+                            ],
+                            'author' => [
+                                'value' => 'author',
+                                'label' => $translate('Author'),
+                            ],
+                            'dcterms:creator' => [
+                                'value' => 'dcterms:creator',
+                                'label' => $translate('Creator'),
+                            ],
+                            'dcterms:subject' => [
+                                'value' => 'dcterms:subject',
+                                'label' => $translate('Subject'),
+                            ],
+                            'date' => [
+                                'value' => 'date',
+                                'label' => $translate('Date'),
+                            ],
+                            'description' => [
+                                'value' => 'description',
+                                'label' => $translate('Description'),
+                            ],
+                            'resource_class_id' => [
+                                'value' => 'resource_class_id',
+                                'label' => $translate('Class'),
+                            ],
+                        ],
+                    ],
                 ],
                 // Other available filters.
                 /*
+                // The record or full text button next to the main field.
+                'rft' => [
+                    'field' => 'rft',
+                    'type' => 'Rft',
+                    'options' => [
+                        'rft' => 'fulltext_checkbox',
+                    ],
+                ],
                 'dcterms_created' => [
                     'field' => 'dcterms:created',
                     'label' => $translate('Number'),
                     'type' => 'Number',
-                    'language_site' => '',
-                    'languages' => [],
-                    'order' => 'default',
-                    'limit' => 100,
                 ],
                 'dcterms_audience' => [
                     'field' => 'dcterms:audience',
-                    'label' = >$translate('Audience'),
+                    'label' => $translate('Audience'),
                     'type' => 'Checkbox',
-                    'language_site' => '',
-                    'languages' => [],
-                    'order' => 'default',
-                    'limit' => 100,
                     'options' => [
                         'unchecked_value' => 'no',
                         'checked_value' => 'yes',
                     ],
                 ],
-                // Not managed currently.
-                /*
-                'date_range' => [
-                    'field' => 'date_range',
-                    'label' => $translate('Date range'),
-                    'type' => 'DateRangeStartEnd',
-                    'language_site' => '',
-                    'languages' => [],
-                    'order' => 'default',
-                    'limit' => 100,
-                    'options' => [
-                        'from' => 'dcterms:created',
-                        'to' => 'dcterms:issued',
-                    ],
-                ],
-                'dcterms_spatial' => [
-                    'field' => 'dcterms:spatial',
-                    'label' => $translate('Place'),
-                    'type' => 'Spatial',
-                    'language_site' => '',
-                    'languages' => [],
-                    'order' => 'default',
-                    'limit' => 100,
-                ],
-                'dcterms_spatial_2' => [
-                    'field' => 'dcterms:spatial',
-                    'label' => $translate('Place'),
-                    'type' => 'SpatialBox',
-                    'language_site' => '',
-                    'languages' => [],
-                    'order' => 'default',
-                    'limit' => 100,
-                ],
                 */
-            ],
-
-            // The specific settings for filter Advanced are separated to avoid
-            // a complex form.
-            'advanced' => [
-                'default_number' => 1,
-                'max_number' => 10,
-                'field_joiner' => true,
-                'field_joiner_not' => true,
-                'field_operator' => true,
-                'field_operators' => [
-                    'in' => $translate('contains'), // @translate
-                    'eq' => $translate('is exactly'), // @translate
-                    'sw' => $translate('starts with'), // @translate
-                    'ew' => $translate('ends with'), // @translate
-                    'ex' => $translate('has any value'), // @translate
-                    'res' => $translate('is resource with ID'), // @translate
-                ],
-                'fields' => [
-                    'title' => [
-                        'value' => 'title',
-                        'label' => $translate('Title'),
-                    ],
-                    'author' => [
-                        'value' => 'author',
-                        'label' => $translate('Author'),
-                    ],
-                    'dcterms:creator' => [
-                        'value' => 'dcterms:creator',
-                        'label' => $translate('Creator'),
-                    ],
-                    'dcterms:subject' => [
-                        'value' => 'dcterms:subject',
-                        'label' => $translate('Subject'),
-                    ],
-                    'date' => [
-                        'value' => 'date',
-                        'label' => $translate('Date'),
-                    ],
-                    'description' => [
-                        'value' => 'description',
-                        'label' => $translate('Description'),
-                    ],
-                    'resource_class_id' => [
-                        'value' => 'resource_class_id',
-                        'label' => $translate('Class'),
-                    ],
-                ],
             ],
         ],
 
@@ -545,7 +490,6 @@ return [
             'label_results' => $translate('Search results'), // @translate
             'label_no_results' => $translate('No results'), // @translate
             'by_resource_type' => false,
-            'template' => null,
             'breadcrumbs' => false,
             'search_filters' => 'header',
             'active_facets' => 'none',
@@ -560,11 +504,8 @@ return [
             'thumbnail_mode' => 'default',
             'thumbnail_type' => 'medium',
             'allow_html' => false,
-            'facets' => 'before',
             'pagination_per_page' => 0,
             'per_page_list' => [
-                // For translation only.
-                10 => $translate('Results by %d'), // @translate
                 10 => $translate('Results by 10'), // @translate
                 // This is the default for Omeka.
                 25 => $translate('Results by 25'), // @translate
@@ -572,37 +513,26 @@ return [
                 100 => $translate('Results by 100'), // @translate
             ],
             'label_sort' => $translate('Sort'),
+            // The sort selector is a flat list "name => label".
             'sort_list' => [
-                'relevance desc' => [
-                    'name' => 'relevance desc',
-                    'label' => $translate('Relevance'), // @translate
-                ],
-                'relevance asc' => [
-                    'name' => 'relevance asc',
-                    'label' => $translate('Relevance (inversed)'), // @translate
-                ],
-                'dcterms:title asc' => [
-                    'name' => 'dcterms:title asc',
-                    'label' => $translate('Title'), // @translate
-                ],
-                'dcterms:title desc' => [
-                    'name' => 'dcterms:title desc',
-                    'label' => $translate('Title (from z to a)'), // @translate
-                ],
-                'dcterms:date asc' => [
-                    'name' => 'dcterms:date asc',
-                    'label' => $translate('Date'), // @translate
-                ],
-                'dcterms:date desc' => [
-                    'name' => 'dcterms:date desc',
-                    'label' => $translate('Date (most recent first)'), // @translate
-                ],
+                'relevance desc' => $translate('Relevance'), // @translate
+                'relevance asc' => $translate('Relevance (inversed)'), // @translate
+                'dcterms:title asc' => $translate('Title'), // @translate
+                'dcterms:title desc' => $translate('Title (from z to a)'), // @translate
+                'dcterms:date asc' => $translate('Date'), // @translate
+                'dcterms:date desc' => $translate('Date (most recent first)'), // @translate
             ],
+            // The properties displayed for each result ("term => label",
+            // with the pseudo-properties "header" and "body"), and the
+            // optional distinct list for the grid mode.
+            // 'properties' => [],
+            // 'properties_grid' => [],
         ],
 
         'facet' => [
-            'label' => 'Facets',
+            'label' => $translate('Facets'),
             'label_no_facets' => $translate('No facets'),
+            'position' => 'before',
             'mode' => 'button',
             'list' => 'available',
             'display_active' => true,
@@ -613,103 +543,70 @@ return [
             'label_reset' => $translate('Reset facets'),
             'display_refine' => true,
             'label_refine' => $translate('Refine search'),
-            // The mode is the always the same, but passed with each facet for simplicity.
+            // The mode is global: it is added to each facet at reading.
             'facets' => [
                 'item_set_id' => [
                     'field' => 'item_set_id',
-                    'language_site' => '',
-                    'languages' => [],
-                    'order' => 'default',
-                    'limit' => 100,
                     'label' => $translate('Collection'),
                     'type' => 'Checkbox',
+                    'order' => 'default',
+                    'limit' => 100,
                     'state' => 'static',
                     'more' => 10,
-                    'display_count' => false,
-                    'mode' => 'button',
                 ],
                 'resource_class_id' => [
                     'field' => 'resource_class_id',
-                    'language_site' => '',
-                    'languages' => [],
-                    'order' => 'default',
-                    'limit' => 100,
                     'label' => $translate('Class'),
                     'type' => 'Checkbox',
+                    'order' => 'default',
+                    'limit' => 100,
                     'state' => 'static',
                     'more' => 10,
-                    'display_count' => false,
-                    'mode' => 'button',
                 ],
                 'date' => [
                     'field' => 'date',
-                    'language_site' => '',
-                    'languages' => [],
-                    'order' => 'default',
-                    'limit' => 100,
                     'label' => $translate('Date'),
                     'type' => 'RangeDouble',
                     'state' => 'static',
-                    'options' => [
-                        'first_digits' => true,
-                    ],
-                    'attributes' => [
-                        'min' => 1454,
-                        'max' => 2025,
-                    ],
-                    'mode' => 'button',
+                    'first_digits' => true,
+                    'min' => 1454,
+                    'max' => 2025,
                 ],
                 'dcterms:subject' => [
                     'field' => 'dcterms:subject',
-                    'language_site' => '',
-                    'languages' => [],
-                    'order' => 'default',
-                    'limit' => 100,
                     'label' => $translate('Subject'),
                     'type' => 'Checkbox',
+                    'order' => 'default',
+                    'limit' => 100,
                     'state' => 'static',
                     'more' => 10,
-                    'display_count' => false,
-                    'mode' => 'button',
                 ],
                 'dcterms:type' => [
                     'field' => 'dcterms:type',
-                    'language_site' => '',
-                    'languages' => [],
-                    'order' => 'default',
-                    'limit' => 100,
                     'label' => $translate('Type'),
                     'type' => 'Checkbox',
+                    'order' => 'default',
+                    'limit' => 100,
                     'state' => 'static',
                     'more' => 10,
-                    'display_count' => false,
-                    'mode' => 'button',
                 ],
                 'author' => [
                     'field' => 'author',
-                    'language_site' => '',
-                    'languages' => [],
-                    'order' => 'default',
-                    'limit' => 100,
                     'label' => $translate('Author'),
                     'type' => 'Checkbox',
                     'order' => 'default',
+                    'limit' => 100,
+                    'state' => 'static',
                     'more' => 10,
-                    'display_count' => false,
-                    'mode' => 'button',
                 ],
                 'dcterms:language' => [
                     'field' => 'dcterms:language',
-                    'language_site' => '',
-                    'languages' => [],
-                    'order' => 'default',
-                    'limit' => 100,
                     'label' => $translate('Language'),
                     'type' => 'Checkbox',
+                    'order' => 'default',
+                    'limit' => 100,
                     'state' => 'static',
                     'more' => 10,
-                    'display_count' => false,
-                    'mode' => 'button',
                 ],
             ],
         ],

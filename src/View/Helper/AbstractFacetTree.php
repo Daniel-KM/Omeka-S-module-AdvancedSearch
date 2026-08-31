@@ -281,7 +281,7 @@ class AbstractFacetTree extends AbstractFacet
     protected function thesaurusQuick(string $facetField, array $options): ?array
     {
         // Normally thesaurus id is not in a sub-array.
-        $thesaurusId = (int) ($options['thesaurus'] ?? $options['options']['thesaurus'] ?? 0);
+        $thesaurusId = (int) ($options['thesaurus'] ?? 0);
         if (!$thesaurusId) {
             $this->logger->__invoke()->err(
                 'For facet "{field}", the thesaurus is not defined. Set it as option thesaurus = id.', // @translate

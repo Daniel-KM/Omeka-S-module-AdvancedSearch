@@ -71,7 +71,7 @@ class SearchSortSelector extends AbstractHelper
         $plugins = $this->getView()->getHelperPluginManager();
         $translate = $plugins->get('translate');
         foreach ($valueOptions as $name => &$sortOption) {
-            $sortOption = $sortOption['label'] ? $translate($sortOption['label']) : $name;
+            $sortOption = (string) $sortOption === '' ? $name : $translate($sortOption);
         }
         unset($sortOption);
         $valueOptions = array_map($translate, $valueOptions);
@@ -96,7 +96,7 @@ class SearchSortSelector extends AbstractHelper
             $valueOptionsWithUrl[$name] = [
                 'value' => $name,
                 // The label is automatically translated by Laminas.
-                'label' => $sortOption['label'] ?: $name,
+                'label' => (string) $sortOption === '' ? $name : $sortOption,
                 'attributes' => [
                     'data-url' => $url,
                 ],

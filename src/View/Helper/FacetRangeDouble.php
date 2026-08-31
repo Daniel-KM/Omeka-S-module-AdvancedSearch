@@ -7,8 +7,6 @@ class FacetRangeDouble extends AbstractFacet
     protected $partial = 'search/facet-range-double';
 
     /**
-     * @param $options "min", "max", "step" are read from "attributes" and appended to options for the template.
-     *
      * {@inheritDoc}
      * @see \AdvancedSearch\View\Helper\AbstractFacet::prepareFacetData()
      */
@@ -16,18 +14,15 @@ class FacetRangeDouble extends AbstractFacet
     {
         $isFacetModeDirect = in_array($options['mode'] ?? null, ['link', 'js']);
 
-        // Get the min/max/step from attributes (like filters) or from facet values.
+        // Get the min/max/step from the settings or from the facet values.
         // Like any facets: they can be filtered or they can be all.
-        $attributes = $options['attributes'] ?? [];
+        $options['min'] = ($options['min'] ?? '') === '' ? null : (string) $options['min'];
+        $options['max'] = ($options['max'] ?? '') === '' ? null : (string) $options['max'];
+        $options['step'] = empty($options['step'] ?? null) ? null : (string) $options['step'];
 
-        $options['min'] = ($attributes['min'] ?? $options['min'] ?? '') === '' ? null : (string) ($attributes['min'] ?? $options['min']);
-        $options['max'] = ($attributes['max'] ?? $options['max'] ?? '') === '' ? null : (string) ($attributes['max'] ?? $options['max']);
-        $options['step'] = empty($attributes['step'] ?? $options['step'] ?? null) ? null : (string) ($attributes['step'] ?? $options['step']);
-
-        // Option "first_digits" (or legacy "integer") extracts year from dates.
-        // Enabled by default for RangeDouble facets.
-        $formatInteger = ($options['first_digits'] ?? $options['integer'] ?? true) === true
-            || in_array($options['first_digits'] ?? $options['integer'] ?? null, [1, '1', 'true'], true);
+        // Option "first_digits" extracts the year from dates. Enabled by
+        // default for RangeDouble facets.
+        $formatInteger = !isset($options['first_digits']) || !in_array($options['first_digits'], [false, 0, '0', 'false'], true);
 
         if ($formatInteger) {
             $options['min'] = isset($options['min']) ? (int) $options['min'] : null;

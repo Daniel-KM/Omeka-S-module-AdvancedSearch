@@ -89,7 +89,7 @@ $quickUrl = $url('admin/search-manager/engine', ['action' => 'add-quick']);
 <?php if ($backends): ?>
 <dialog id="quick-engine-dialog">
     <h3><?= $escape($translate('Create a search engine')) ?></h3>
-    <p class="explanation"><?= $escape($translate('An engine is a real backend: the sql database or a Solr core without engine.')) ?></p>
+    <p class="explanation"><?= $escape($translate('An engine requires a backend, as the sql database or a Solr core.')) ?></p>
     <div class="field">
         <label for="quick-engine-backend"><?= $escape($translate('Backend')) ?></label>
         <select id="quick-engine-backend">

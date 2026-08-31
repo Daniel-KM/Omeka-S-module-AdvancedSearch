@@ -12,15 +12,13 @@ use Omeka\Form\Element as OmekaElement;
 class SearchConfigFilterFieldset extends Fieldset implements InputFilterProviderInterface
 {
     use TraitInputTypeOptions;
+    use TraitSharedFieldsetElements;
 
     /**
      * The types of filter by group of settings, used by the form and to clean
      * the settings on save.
      */
     const TYPES_LIST = ['Select', 'Radio', 'Checkbox', 'MultiCheckbox', 'Tree', 'Thesaurus'];
-    // The stored variants of the type Select, recomposed on save from the
-    // options "multiple" and "value_layout".
-    const TYPES_SELECT = ['Select', 'SelectFlat', 'SelectGroup', 'MultiSelect', 'MultiSelectFlat', 'MultiSelectGroup'];
     const TYPES_RANGE = ['Range', 'RangeDouble'];
     const TYPES_SLIDER = ['RangeDouble'];
 
@@ -44,7 +42,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
     const PROMOTED_ATTRIBUTES = ['min', 'max', 'step'];
     const SETTINGS_RANGE = ['field_end'];
     const SETTINGS_SLIDER = ['scale_mode', 'scale_breakpoints', 'scale_show_ticks'];
-    const SETTINGS_ADVANCED = ['default_number', 'max_number', 'field_elements', 'field_joiner', 'field_joiner_not', 'field_operator', 'field_operators', 'field_value_autosuggest', 'fields'];
+    const SETTINGS_ADVANCED = ['default_number', 'max_number', 'field_elements', 'field_operators', 'fields'];
 
     public function init(): void
     {
@@ -222,66 +220,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                     'required' => false,
                 ],
             ])
-            ->add([
-                'name' => 'min',
-                'type' => CommonElement\OptionalNumber::class,
-                'options' => [
-                    'label' => 'Minimum', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'form_filter_min',
-                    'data-filter-types' => 'Number Range RangeDouble',
-                    'data-advanced-section' => $tr('Slider'), // @translate
-                    'data-inline' => 'bounds',
-                    'required' => false,
-                    'step' => 'any',
-                ],
-            ])
-            ->add([
-                'name' => 'max',
-                'type' => CommonElement\OptionalNumber::class,
-                'options' => [
-                    'label' => 'Maximum', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'form_filter_max',
-                    'data-filter-types' => 'Number Range RangeDouble',
-                    'data-advanced-section' => $tr('Slider'), // @translate
-                    'data-inline' => 'bounds',
-                    'required' => false,
-                    'step' => 'any',
-                ],
-            ])
-            ->add([
-                'name' => 'step',
-                'type' => CommonElement\OptionalNumber::class,
-                'options' => [
-                    'label' => 'Step', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'form_filter_step',
-                    'data-filter-types' => 'Number Range RangeDouble',
-                    'data-advanced-section' => $tr('Slider'), // @translate
-                    'data-inline' => 'bounds',
-                    'required' => false,
-                    'step' => 'any',
-                    'min' => '0',
-                ],
-            ])
-            ->add([
-                'name' => 'first_digits',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'label' => 'Extract the first digits of the values (year of a date)', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'form_filter_first_digits',
-                    'data-filter-types' => 'Number Range RangeDouble',
-                    'data-advanced-section' => $tr('Slider'), // @translate
-                    'required' => false,
-                    'value' => '1',
-                ],
-            ])
+            ->addBoundsElements($tr, 'form_filter_', 'Number Range RangeDouble')
             ->add([
                 'name' => 'values',
                 'type' => CommonElement\ArrayTextarea::class,
@@ -303,46 +242,12 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                     'placeholder' => 'yes = Yes',
                 ],
             ])
-            ->add([
-                'name' => 'value_labels_table',
-                'type' => Element\Text::class,
-                'options' => [
-                    'label' => 'Value labels: table source', // @translate
-                    'info' => 'Optional slug or id of a table (module Table) used as the base code / label mapping. Inline "Value labels" below override the table entries when both are defined.', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'form_filter_value_labels_table',
-                    'data-advanced-section' => $tr('Values'), // @translate
-                    'data-filter-types' => implode(' ', self::TYPES_LIST),
-                    'required' => false,
-                    'placeholder' => 'my-table-slug',
-                ],
-            ])
-            ->add([
-                'name' => 'value_labels',
-                'type' => CommonElement\ArrayTextarea::class,
-                'options' => [
-                    'label' => 'Value labels', // @translate
-                    'info' => 'One pair per line: indexed_value = displayed_label. Replaces the raw value in select/radio/checkbox options and in active filter chips. Mainly useful for boolean fields (e.g. 1 = Only with image / 0 = Without image) and small enumerations. Overrides the table source above for the listed codes.', // @translate
-                    'as_key_value' => true,
-                    'pairs_editor' => [
-                        'key_label' => $tr('Value'), // @translate
-                        'value_label' => $tr('Label'), // @translate
-                        'sortable' => false,
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'form_filter_value_labels',
-                    'data-advanced-section' => $tr('Values'), // @translate
-                    'data-filter-types' => implode(' ', self::TYPES_LIST),
-                    'required' => false,
-                    'rows' => 3,
-                    'placeholder' => <<<'TXT'
-                        1 = Only with image
-                        0 = Without image
-                        TXT,
-                ],
-            ])
+            ->addValueLabelsElements(
+                $tr,
+                'form_filter_',
+                implode(' ', self::TYPES_LIST),
+                $tr('One pair per line: indexed_value = displayed_label. Replaces the raw value in select/radio/checkbox options and in active filter chips. Mainly useful for boolean fields (e.g. 1 = Only with image / 0 = Without image) and small enumerations. Overrides the table source above for the listed codes.') // @translate
+            )
             ->add([
                 'name' => 'type',
                 'type' => Element\Select::class,
@@ -651,68 +556,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
             ])
 
-            // Slider scale (Range and RangeDouble only). Mode "linear" is the
-            // default and ignores breakpoints. Mode "piecewise" requires at
-            // least two breakpoints with values and positions strictly
-            // increasing from 0 to 100.
-            ->add([
-                'name' => 'scale_mode',
-                'type' => CommonElement\OptionalRadio::class,
-                'options' => [
-                    'label' => 'Slider scale (RangeDouble only)', // @translate
-                    'value_options' => [
-                        'linear' => 'Linear', // @translate
-                        'log' => 'Logarithmic', // @translate
-                        'piecewise' => 'Piecewise (with breakpoints)', // @translate
-                        'auto' => 'Auto (quartiles from data)', // @translate
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'form_filter_scale_mode',
-                    'data-advanced-section' => $tr('Slider'), // @translate
-                    'data-filter-types' => implode(' ', self::TYPES_SLIDER),
-                    'value' => 'linear',
-                ],
-            ])
-            ->add([
-                'name' => 'scale_breakpoints',
-                'type' => CommonElement\ArrayTextarea::class,
-                'options' => [
-                    'label' => 'Scale breakpoints', // @translate
-                    'info' => 'One pair per line: value = position. Position is a percentage between 0 and 100.', // @translate
-                    'as_key_value' => true,
-                    'pairs_editor' => [
-                        'key_label' => $tr('Value'), // @translate
-                        'value_label' => $tr('Position (%)'), // @translate
-                        'value_type' => 'number',
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'form_filter_scale_breakpoints',
-                    'data-advanced-section' => $tr('Slider'), // @translate
-                    'data-filter-types' => implode(' ', self::TYPES_SLIDER),
-                    'required' => false,
-                    'rows' => 5,
-                    'placeholder' => <<<TXT
-                        min = 0
-                        1 = 20
-                        1789 = 50
-                        max = 100
-                        TXT,
-                ],
-            ])
-            ->add([
-                'name' => 'scale_show_ticks',
-                'type' => Element\Checkbox::class,
-                'options' => [
-                    'label' => 'Display ticks at breakpoints', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'form_filter_scale_show_ticks',
-                    'data-advanced-section' => $tr('Slider'), // @translate
-                    'data-filter-types' => implode(' ', self::TYPES_SLIDER),
-                ],
-            ])
+            ->addScaleElements($tr, 'form_filter_', implode(' ', self::TYPES_SLIDER))
 
             ->add([
                 'name' => 'name',
@@ -729,48 +573,16 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                     'data-filter-types-not' => 'Advanced Rft',
                 ],
             ])
-            ->add([
-                'type' => CommonElement\IniTextarea::class,
-                'name' => 'options',
-                'options' => [
-                    'label' => 'Options', // @translate
-                    'info' => <<<'TXT'
-                        List of rarely used options, in ini format, for example `empty_option = ""` or `select = true` for the access filter. Omeka and Laminas options are accepted. A key set here takes precedence over the dedicated fields above.
-                        TXT, // @translate
-                    'ini_typed_mode' => true,
-                    'pairs_editor' => [
-                        'key_label' => $tr('Option'), // @translate
-                        'value_label' => $tr('Value'), // @translate
-                        'sortable' => false,
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'form_filters_options',
-                    'data-advanced-section' => $tr('Advanced'), // @translate
-                    'required' => false,
-                    'placeholder' => '',
-                ],
-            ])
-            ->add([
-                'type' => CommonElement\ArrayTextarea::class,
-                'name' => 'attributes',
-                'options' => [
-                    'label' => 'Html attributes', // @translate
-                    'info' => 'Specific attributes to add to the input field, for example `class = "my-specific-class"`, or placeholder, data, etc. A key set here takes precedence over the dedicated fields above.', // @translate
-                    'as_key_value' => true,
-                    'key_value_separator' => '=',
-                    'pairs_editor' => [
-                        'key_label' => $tr('Attribute'), // @translate
-                        'value_label' => $tr('Value'), // @translate
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'form_filters_attributes',
-                    'data-advanced-section' => $tr('Advanced'), // @translate
-                    'required' => false,
-                    'placeholder' => '',
-                ],
-            ])
+            ->addOptionsElement(
+                $tr,
+                'form_filter_options',
+                $tr('List of rarely used options, in ini format, for example `empty_option = ""` or `select = true` for the access filter. Omeka and Laminas options are accepted. A key set here takes precedence over the dedicated fields above.') // @translate
+            )
+            ->addAttributesElement(
+                $tr,
+                'form_filter_attributes',
+                $tr('Specific attributes to add to the input field, for example `class = "my-specific-class"`, or placeholder, data, etc. A key set here takes precedence over the dedicated fields above.') // @translate
+            )
         ;
     }
 

@@ -32,7 +32,6 @@ class SearchConfigSitesFieldset extends Fieldset implements InputFilterProviderI
                     'label' => 'Default search page for sites', // @translate
                     'empty_option' => '',
                     'prepend_value_options' => [
-                        'none' => '[No site]', // @translate
                         'all' => '[All sites]', // @translate
                     ],
                 ],

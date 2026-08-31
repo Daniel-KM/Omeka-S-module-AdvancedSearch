@@ -112,7 +112,6 @@ class SearchConfigForm extends Form
                     'label' => 'Default search page for admin and sites', // @translate
                     'empty_option' => '',
                     'prepend_value_options' => [
-                        'none' => '[No site]', // @translate
                         'all' => '[All sites]', // @translate
                         'admin' => 'Admin', // @translate
                     ],

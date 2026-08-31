@@ -746,6 +746,10 @@ class InternalQuerier extends AbstractQuerier
             }
             $this->args['sort_by'] = $sortField;
             $this->args['sort_order'] = $sortOrder === 'desc' ? 'desc' : 'asc';
+        } else {
+            // Without an explicit sort, the most recent resources come first.
+            $this->args['sort_by'] = 'id';
+            $this->args['sort_order'] = 'desc';
         }
 
         // Limit is per page and offset is page x limit.

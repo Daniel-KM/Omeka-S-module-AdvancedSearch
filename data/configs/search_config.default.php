@@ -515,6 +515,8 @@ return [
             'label_sort' => $translate('Sort'),
             // The sort selector is a flat list "name => label".
             'sort_list' => [
+                'id desc' => $translate('Most recent'), // @translate
+                'id asc' => $translate('Oldest'), // @translate
                 'relevance desc' => $translate('Relevance'), // @translate
                 'relevance asc' => $translate('Relevance (inversed)'), // @translate
                 'dcterms:title asc' => $translate('Title'), // @translate

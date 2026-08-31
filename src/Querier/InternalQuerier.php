@@ -492,9 +492,17 @@ class InternalQuerier extends AbstractQuerier
             && isset($fieldQueryArgs[$fieldQueryArgs['type']])
             && in_array($fieldQueryArgs[$fieldQueryArgs['type']], SearchResources::FIELD_QUERY['main_type']['resource']);
 
+        // The alias "v" cannot be reused in the "where" clause: it is a select
+        // alias, unknown to the database there, so the full expression is kept
+        // apart. It remains used in "group by" and "order by", where dql
+        // accepts only a result variable.
+        $valueExpression = $isResourceQuery
+            ? 'valueResource.title'
+            : "COALESCE(value.value, valueResource.title, value.uri, '')";
+
         if ($isResourceQuery) {
             $qb
-                ->select('valueResource.title AS v')
+                ->select($valueExpression . ' AS v')
                 ->from(\Omeka\Entity\Value::class, 'value')
                 // Join on Resource instead of Item so suggestions get titles of
                 // value resources. Join checks visibility automatically too.
@@ -507,13 +515,13 @@ class InternalQuerier extends AbstractQuerier
             $qb
                 // Always return a string, not null. Doctrine rejects empty
                 // string with double quote.
-                ->select("COALESCE(value.value, valueResource.title, value.uri, '') AS v")
+                ->select($valueExpression . ' AS v')
                 ->from(\Omeka\Entity\Value::class, 'value')
                 // Join on Resource; see note above.
                 ->innerJoin(\Omeka\Entity\Resource::class, 'resource', Join::WITH, $expr->eq('value.resource', 'resource'))
                 // The values should be distinct for each type.
                 ->leftJoin(\Omeka\Entity\Resource::class, 'valueResource', Join::WITH, $expr->eq('value.valueResource', 'valueResource'))
-                ->where("COALESCE(value.value, valueResource.title, value.uri, '') != ''");
+                ->where($valueExpression . " != ''");
         }
 
         // Restrict the suggestion scope to the resource types declared by the
@@ -587,12 +595,15 @@ class InternalQuerier extends AbstractQuerier
         $qb
             ->andWhere($expr->in('value.property', ':properties'))
             ->setParameter('properties', array_values($propertyIds), \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
-            ->groupBy('v')
+            // "distinct" is used instead of a "group by" on the alias: dql
+            // accepts only a result variable there, and such an alias is not
+            // supported in "group by" by all databases.
+            ->distinct()
             ->orderBy('v', 'asc');
 
         if ($prefix !== null && $prefix !== '') {
             $qb
-                ->andWhere($expr->like('v', ':prefix'))
+                ->andWhere($expr->like($valueExpression, ':prefix'))
                 ->setParameter('prefix', $prefix . '%');
         }
         if ($limit > 0) {

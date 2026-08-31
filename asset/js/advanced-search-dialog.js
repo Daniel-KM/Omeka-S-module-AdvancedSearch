@@ -106,6 +106,10 @@
             return;
         }
 
+        // The dialog wraps a form: it is wider, so a row of filters fits on a
+        // single line.
+        dialog.classList.add('dialog-form', 'dialog-search-form');
+
         var restore = suspendDuplicatedIds(dialog);
         dialog.addEventListener('close', restore, {once: true});
 

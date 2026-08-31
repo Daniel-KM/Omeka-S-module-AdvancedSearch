@@ -9,9 +9,42 @@
         vertical-align: top;
         margin: 0 0 24px;
     }
-    /* Remove margin when advanced search form replaces the quick search. */
+    /* Fixes to override default quick search form. */
     #search > #search-form-quick {
         margin-bottom: 0;
+    }
+    #search > #search-form-quick input[type=text] {
+        width: calc(100% - 36px);
+    }
+    #search > #search-form-quick.has-advanced input[type=text] {
+        width: calc(100% - 72px);
+    }
+    #search-form-quick #search-advanced {
+        width: 36px;
+        height: 36px;
+        float: left;
+        margin: 0;
+        padding: 0;
+        text-indent: -9999px;
+        background-color: #222933;
+        color: #bdcde3;
+        border: 0;
+        border-right: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 0;
+        box-shadow: none;
+        position: relative;
+    }
+    #search-form-quick #search-advanced::after {
+        content: "\f0b0";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        text-indent: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 36px;
+        line-height: 36px;
+        text-align: center;
     }
     #search-form-quick input[type=text] {
         width: calc(100% - 36px);
@@ -41,6 +74,29 @@
         width: 36px;
         line-height: 36px;
         text-align: center;
+    }
+
+    .form-search .field .inputs > label,
+    .form-search .field .inputs > label > input[type=radio],
+    .form-search .field .inputs > label > input[type=checkbox] {
+        width: auto;
+    }
+
+    .form-search .search-filters-advanced .filter {
+        min-width: 0;
+    }
+
+    .form-search .search-filters-advanced {
+        /* Fix for the inputs of a field with indentation and right size. */
+        --search-filter-inputs-padding: 0;
+        --search-filter-button-size: max(24px, 36px);
+        background-color: rgba(0, 0, 0, .04);
+        padding: 6px;
+        margin: 0 0 6px;
+    }
+    .form-search .search-filters-advanced > legend {
+        padding-top: 0;
+        padding-bottom: 0;
     }
 
     /* Autocomplete: see common-autocomplete.css (module Common). */

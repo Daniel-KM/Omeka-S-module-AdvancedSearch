@@ -2103,6 +2103,33 @@ class Module extends AbstractModule
             // being added below it, so the side bar has a single search field.
             if ($plugins->get('setting')('advancedsearch_main_config_replace_quick')) {
                 $script .= "\nvar searchReplaceQuick = true;";
+
+                // A link to the advanced search is added next to the submit,
+                // like the button of the core for its own advanced options.
+                // Without a form adapter, the search page has no form, so
+                // there is nothing to open.
+                $advancedLink = $plugins->get('setting')('advancedsearch_main_config_advanced_link', 'dialog');
+                if ($advancedLink && $searchConfig->formAdapter()) {
+                    $script .= sprintf("\nvar searchAdvancedLink = %s;", json_encode($advancedLink, 320));
+                    $script .= sprintf("\nvar searchAdvancedUrl = %s;", json_encode($searchUrl, 320));
+                    if ($advancedLink === 'dialog') {
+                        $script .= sprintf("\nvar searchAdvancedFormUrl = %s;", json_encode($searchUrl . '/form', 320));
+                        // The form is loaded in the dialog after the page, so
+                        // its own assets are added here: the partial headers of
+                        // the form adapter are not rendered by the terminal
+                        // action that returns it.
+                        $plugins->get('headLink')
+                            ->prependStylesheet($assetUrl('vendor/chosen-js/chosen.css', 'Omeka'))
+                            ->appendStylesheet($assetUrl('css/common-dialog-admin.css', 'Common'))
+                            ->appendStylesheet($assetUrl('css/search.css', 'AdvancedSearch'));
+                        $plugins->get('headScript')
+                            ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.min.js', 'Omeka'), 'text/javascript', ['defer' => 'defer'])
+                            ->appendFile($assetUrl('vendor/jquery-autocomplete/jquery.autocomplete.min.js', 'Common'), 'text/javascript', ['defer' => 'defer'])
+                            ->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer'])
+                            ->appendFile($assetUrl('js/common-dialog.js', 'Common'), 'text/javascript', ['defer' => 'defer'])
+                            ->appendFile($assetUrl('js/advanced-search-dialog.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
+                    }
+                }
             }
 
             $autoSuggestUrl = $searchConfig->subSetting('q', 'suggest_url');

@@ -19,7 +19,7 @@ trait TraitCommonSettings
                 'name' => 'advancedsearch_search_fields',
                 'type' => CommonElement\OptionalMultiCheckbox::class,
                 'options' => [
-                    'element_group' => 'search',
+                    'element_group' => 'search_general',
                     'label' => 'Fields for standard advanced search form', // @translate
                     'info' => 'The check box marked with a "*" are improvements of the standard search fields. They should be replaced by equivalent arguments of the module Advanced Search to avoid side effects.', // @translate
                     'value_options' => $this->listSearchFields,
@@ -33,7 +33,7 @@ trait TraitCommonSettings
                 'name' => 'advancedsearch_filter_types',
                 'type' => CommonElement\OptionalMultiCheckbox::class,
                 'options' => [
-                    'element_group' => 'search',
+                    'element_group' => 'search_general',
                     'label' => $this instanceof SiteSettingsFieldset
                         ? 'Query types for filters of this site' // @translate
                         : 'Query types for filters of the admin board', // @translate
@@ -51,7 +51,7 @@ trait TraitCommonSettings
                 'name' => 'advancedsearch_filter_joiner_not',
                 'type' => \Laminas\Form\Element\Checkbox::class,
                 'options' => [
-                    'element_group' => 'search',
+                    'element_group' => 'search_general',
                     'label' => 'Add joiner "not" to filters and simplify query types', // @translate
                     'info' => 'When enabled, negative query types (does not contain, is not…) are removed and replaced by the "not" joiner.', // @translate
                 ],
@@ -63,7 +63,7 @@ trait TraitCommonSettings
                 'name' => 'advancedsearch_filter_value_autosuggest_whitelist',
                 'type' => CommonElement\OptionalPropertySelect::class,
                 'options' => [
-                    'element_group' => 'search',
+                    'element_group' => 'search_general',
                     'label' => 'Properties with autocompletion on filter values (whitelist)', // @translate
                     'info' => 'Autocompletion requires module Reference.', // @translate
                     'term_as_value' => true,
@@ -82,7 +82,7 @@ trait TraitCommonSettings
                 'name' => 'advancedsearch_filter_value_autosuggest_blacklist',
                 'type' => CommonElement\OptionalPropertySelect::class,
                 'options' => [
-                    'element_group' => 'search',
+                    'element_group' => 'search_general',
                     'label' => 'Properties without autocompletion on filter values (blacklist)', // @translate
                     'term_as_value' => true,
                 ],

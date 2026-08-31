@@ -48,8 +48,14 @@ class SearchQuickReplacement extends AbstractHelper
             'variant' => 'simple',
         ]);
 
+        // Without a form, there is nothing to display, neither the quick search
+        // nor a link to filters that do not exist.
+        if (!$html) {
+            return '';
+        }
+
         $advancedLink = $plugins->get('siteSetting')('advancedsearch_main_config_advanced_link', 'dialog');
-        if (!$advancedLink) {
+        if (!$advancedLink || !$searchConfig->formAdapter()) {
             return $html;
         }
 

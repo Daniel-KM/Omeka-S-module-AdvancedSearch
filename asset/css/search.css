@@ -46,86 +46,127 @@
         height: 36px;
     }
 
+    /* Inline radios and checkboxes. */
+    .form-search .field .inputs > label {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 0.35em;
+        margin-right: 1em;
+    }
+    .form-search .field .inputs > label:last-child {
+        margin-right: 0;
+    }
+    .form-search .field .inputs > label > input[type=radio],
+    .form-search .field .inputs > label > input[type=checkbox] {
+        flex: 0 0 auto;
+        margin: 0;
+    }
+
+    /* A text input fills the width of its column. */
+    .form-search .field .inputs > input[type=text],
+    .form-search .field .inputs > input[type=search] {
+        width: 100%;
+    }
+
     /* Search form filters */
 
+    /* The advanced filters follow the grid of the default theme. */
     .search-filters-advanced {
-        display: flex;
-        flex-direction: column;
-        margin-bottom: 6px;
+        --search-filter-label-width: 30%;
+        --search-filter-inputs-padding: 30px;
+        --search-filter-gap: 6px;
+        --search-filter-button-size: max(24px, 45px);
+        position: relative;
+        margin: 30px 0;
     }
-    .search-filters-advanced > .search-filter-action {
-        display: inline-block;
-        align-self: flex-end;
-        order: 2;
-        width: fit-content;
-        margin: 6px 6px 0 0;
+    .search-filters-advanced > legend {
+        float: left;
+        width: var(--search-filter-label-width);
+        padding: 7.5px 45px 7.5px 0;
+        /* A legend is bold and bigger by default: it is a label of a field
+           like the other ones. */
+        font-size: inherit;
+        font-weight: inherit;
     }
-    .search-filters-advanced > .search-filter-action::before {
-        content: "+";
-        font-size: larger;
-        font-size: bolder;
+    .search-filters-advanced > legend[hidden] {
+        display: none;
     }
     .search-filters-advanced .filter {
         display: flex;
-        justify-content: space-between;
-        margin-bottom: 0;
-        /*
-        margin-left: 30%;
-        padding-bottom: 6px;
-        padding-left: 1.69492%;
-        */
-        padding: 6px;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--search-filter-gap);
+        margin-left: var(--search-filter-label-width);
+        margin-bottom: var(--search-filter-gap);
+        padding-left: var(--search-filter-inputs-padding);
+        width: calc(100% - var(--search-filter-label-width));
     }
     .search-filters-advanced .filter[hidden] {
         display: none;
     }
-    .search-filters-advanced .filter:first-of-type {
-        padding-top: 0.4em;
-    }
     .search-filters-advanced:not(.has-joiner-not) .filter:first-of-type select[name$="[join]"] {
         display: none;
     }
-    .search-filters-advanced .filter select,
-    .search-filters-advanced .filter input {
-        margin-top: 0;
-        margin-right: 6px;
-        margin-left: 6px;
+    .search-filters-advanced .filter > select {
+        flex: 0 0 auto;
+        width: auto;
+    }
+    /* The text input takes all the remaining width. */
+    .search-filters-advanced .filter > input[type=text] {
+        flex: 1 1 12em;
+        width: 100%;
         min-width: 0;
     }
-    .search-filters-advanced .filter select:nth-of-type(1) {
-        min-width: 3.5em;
-        margin-left: 0;
-    }
-    .search-filters-advanced .filter select:nth-of-type(2) {
-        min-width: 8em;
-    }
-    .search-filters-advanced .filter select:nth-of-type(3) {
-        min-width: 8em;
-    }
-    .search-filters-advanced .filter input {
-        width: calc( 100% - 200px );
-        margin-right: 0;
-    }
-    /* Buttons remove/add a filter. */
     .search-filters-advanced .filter .field {
-        background-color: inherit;
-        padding: 0;
-        margin: 0 0 0 6px;
-        width: auto;
+        display: contents;
     }
     .search-filters-advanced .filter .field .field-meta {
         display: none;
     }
-    .search-filters-advanced .filter > input[type=text] {
-        margin-right: 6px;
+    .search-filters-advanced .filter .field .inputs {
+        flex: 0 0 auto;
+        width: auto;
+        padding: 0;
     }
-    .search-filters-advanced .filter .field .inputs button {
-        margin: 0;
+    /* The buttons are square, as high as the input next to them. */
+    .search-filters-advanced .search-filter-action {
+        flex: 0 0 auto;
+        width: var(--search-filter-button-size);
+        height: var(--search-filter-button-size);
+        aspect-ratio: 1;
+        min-width: 24px;
+        min-height: 24px;
+        padding: 0;
+        line-height: 1;
+        text-align: center;
     }
-    .search-filters-advanced .filter .field .inputs button::before {
-        content: "−";
-        font-size: larger;
-        font-size: bolder;
+    .search-filters-advanced > .search-filter-plus {
+        position: absolute;
+        top: 0;
+        right: calc(100% - var(--search-filter-label-width));
+    }
+    .search-filters-advanced .search-filter-plus::before {
+        content: "+";
+    }
+    .search-filters-advanced .search-filter-minus::before {
+        content: "\2212";
+    }
+
+    @media screen and (max-width: 799px) {
+        .search-filters-advanced {
+            --search-filter-label-width: 100%;
+            --search-filter-inputs-padding: 0;
+        }
+        .search-filters-advanced > legend {
+            float: none;
+            padding-right: calc(var(--search-filter-button-size) + var(--search-filter-gap));
+        }
+        .search-filters-advanced .filter {
+            margin-left: 0;
+        }
+        .search-filters-advanced > .search-filter-plus {
+            right: 0;
+        }
     }
 
     /* Search results */
@@ -695,6 +736,14 @@
         justify-content: space-between;
         flex-wrap: wrap;
         gap: 1em;
+    }
+    .range-double .range-numeric {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 0.4em;
+    }
+    .range-double .range-numeric > input[type=number] {
+        width: auto;
     }
     .range-double .range-numerics-button {
         gap: 0.4em;

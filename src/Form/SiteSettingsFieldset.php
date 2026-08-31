@@ -46,7 +46,7 @@ class SiteSettingsFieldset extends Fieldset
     protected $label = 'Advanced Search (module)'; // @translate
 
     protected $elementGroups = [
-        'search' => 'Search', // @translate
+        'search_general' => 'Search', // @translate
         'advanced_search' => 'Advanced Search (module)', // @translate
     ];
 
@@ -98,7 +98,7 @@ class SiteSettingsFieldset extends Fieldset
             ])
             ->add([
                 'name' => 'advancedsearch_main_config_advanced_link',
-                'type' => Element\Radio::class,
+                'type' => CommonElement\OptionalRadio::class,
                 'options' => [
                     'element_group' => 'advanced_search',
                     'label' => 'Link to the advanced search below the search form', // @translate

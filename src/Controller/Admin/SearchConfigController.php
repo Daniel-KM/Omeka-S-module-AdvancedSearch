@@ -92,11 +92,6 @@ class SearchConfigController extends AbstractActionController
             $formData['manage_config_availability'] ?: [],
             $formData['manage_config_default'] ?: []
         );
-        if (!in_array($formData['manage_config_availability'], ['disable', 'enable'])
-            && in_array($formData['manage_config_default'], ['', 'let'])
-        ) {
-            $this->messenger()->addWarning('You can enable this page in your site settings or in admin settings.'); // @translate
-        }
 
         $this->recommendSolrSyncMaps($searchConfig);
 
@@ -159,6 +154,12 @@ class SearchConfigController extends AbstractActionController
         ];
 
         $form->setData($data);
+
+        if ($form->has('sites') && $form->get('sites')->has('manage_config_usage')) {
+            $form->get('sites')->get('manage_config_usage')
+                ->setOption('text', $this->searchConfigUsagesHtml($searchConfig));
+        }
+
         $view->setVariable('form', $form);
 
         if (!$this->getRequest()->isPost()) {
@@ -997,6 +998,115 @@ class SearchConfigController extends AbstractActionController
     }
 
     /**
+     * List the roles of a search config in the main settings and in each site.
+     *
+     * The settings are the single source: the tab "sites" of the search config
+     * is only another point of view on them, so the roles that cannot be set
+     * from this tab are displayed as a read-only summary.
+     *
+     * @return array Roles by site id, with the key "admin" for the main
+     * settings. Each role is a label.
+     */
+    protected function searchConfigUsages(SearchConfigRepresentation $searchConfig): array
+    {
+        $searchConfigId = $searchConfig->id();
+
+        // The settings that store a single search config id, with their label.
+        $singleSettings = [
+            'advancedsearch_main_config' => 'Main search page', // @translate
+            'advancedsearch_items_config' => 'Search page for items', // @translate
+            'advancedsearch_media_config' => 'Search page for media', // @translate
+            'advancedsearch_item_sets_config' => 'Search page for item sets', // @translate
+            'advancedsearch_items_browse_config' => 'Redirect of the browse page of items', // @translate
+            'advancedsearch_item_sets_browse_config' => 'Redirect of the browse page of item sets', // @translate
+            'advancedsearch_api_config' => 'Search page for the api', // @translate
+        ];
+
+        $result = [];
+
+        $settings = $this->settings();
+        foreach ($singleSettings as $name => $label) {
+            if ((int) $settings->get($name) === $searchConfigId) {
+                $result['admin'][] = $label;
+            }
+        }
+
+        $siteSettings = $this->siteSettings();
+        foreach ($this->api()->search('sites')->getContent() as $site) {
+            $siteId = $site->id();
+            foreach ($singleSettings as $name => $label) {
+                if ((int) $siteSettings->get($name, null, $siteId) === $searchConfigId) {
+                    $result[$siteId][] = $label;
+                }
+            }
+            if (in_array($searchConfigId, $siteSettings->get('advancedsearch_configs', [], $siteId))) {
+                $result[$siteId][] = 'Available'; // @translate
+            }
+            $redirects = $siteSettings->get('advancedsearch_item_sets_redirects', [], $siteId);
+            if (is_array($redirects) && in_array($searchConfig->slug(), $redirects, true)) {
+                $result[$siteId][] = 'Redirect of some item sets'; // @translate
+            }
+            $hidden = $siteSettings->get('advancedsearch_hidden_query_filters_per_config', [], $siteId);
+            if (is_array($hidden) && !empty($hidden[$searchConfigId])) {
+                $result[$siteId][] = 'Hidden query filters'; // @translate
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Render the roles of a search config as a read-only list.
+     *
+     * The list is grouped by role and not by site: a search page has usually
+     * the same role on all the sites where it is used, so it is shorter.
+     */
+    protected function searchConfigUsagesHtml(SearchConfigRepresentation $searchConfig): string
+    {
+        $usages = $this->searchConfigUsages($searchConfig);
+        $plugins = $this->viewHelpers();
+        $escape = $plugins->get('escapeHtml');
+        $translate = $plugins->get('translate');
+
+        if (!$usages) {
+            return '<p>' . $escape($translate('This search page is not used yet.')) . '</p>'; // @translate
+        }
+
+        /** @var \Omeka\Api\Representation\SiteRepresentation[] $sites */
+        $sites = [];
+        foreach ($this->api()->search('sites')->getContent() as $site) {
+            $sites[$site->id()] = $site;
+        }
+
+        // Pivot the roles by site into the sites by role, keeping the order.
+        $byRole = [];
+        foreach ($usages as $siteId => $roles) {
+            foreach ($roles as $role) {
+                $byRole[$role][] = $siteId;
+            }
+        }
+
+        $html = '<ul class="search-config-usages">';
+        foreach ($byRole as $role => $siteIds) {
+            $labels = [];
+            foreach ($siteIds as $siteId) {
+                if ($siteId === 'admin') {
+                    $labels[] = $escape($translate('Admin board')); // @translate
+                } elseif (isset($sites[$siteId])) {
+                    $labels[] = sprintf(
+                        '<a href="%s">%s</a>',
+                        $escape($sites[$siteId]->adminUrl('settings')),
+                        $escape($sites[$siteId]->title())
+                    );
+                }
+            }
+            $html .= sprintf('<li><strong>%s</strong>: %s</li>', $escape($translate($role)), implode(', ', $labels));
+        }
+
+        return $html . '</ul>';
+    }
+
+    /**
      * Set the search config for admin and sites.
      */
     protected function manageSearchConfigSettings(
@@ -1072,13 +1182,22 @@ class SearchConfigController extends AbstractActionController
             }
         }
 
+        // An unused search page is not an error, but it is rarely wanted, so a
+        // single warning replaces the two messages about the missing sites.
+        if (!$allDefaults && !$allAvailables) {
+            $this->messenger()->addWarning(new PsrMessage(
+                'This search page is available on no site: select the sites in the tab "Sites" of the page, or set it in the settings of each site.' // @translate
+            ));
+            return;
+        }
+
         if ($allDefaults) {
             $this->messenger()->addSuccess(new PsrMessage(
                 'This search config is the default one in sites: {site_slugs}.', // @translate
                 ['site_slugs' => implode(', ', $allDefaults)]
             ));
         } else {
-            $this->messenger()->addSuccess(new PsrMessage(
+            $this->messenger()->addWarning(new PsrMessage(
                 'This search config is not used as default in any site.' // @translate
             ));
         }
@@ -1089,7 +1208,7 @@ class SearchConfigController extends AbstractActionController
                 ['site_slugs' => implode(', ', $allAvailables)]
             ));
         } else {
-            $this->messenger()->addSuccess(new PsrMessage(
+            $this->messenger()->addWarning(new PsrMessage(
                 'This search config is not available in any site.' // @translate
             ));
         }

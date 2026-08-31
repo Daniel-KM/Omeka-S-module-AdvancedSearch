@@ -573,6 +573,50 @@ class Module extends AbstractModule
             'form.add_input_filters',
             [$this, 'handleSiteSettingsInputFilter']
         );
+
+        // Listeners to close the rest api to non-admin users.
+
+        // The search config and the related resources are needed by the public
+        // front-end, so they are readable via the internal api. But they are
+        // administrative resources: their settings describe the internal index,
+        // the aliases and the hidden filters, so they are not published via the
+        // rest api, that is available to anonymous visitors by default.
+        foreach ([
+            \AdvancedSearch\Api\Adapter\SearchConfigAdapter::class,
+            \AdvancedSearch\Api\Adapter\SearchEngineAdapter::class,
+            \AdvancedSearch\Api\Adapter\SearchSuggesterAdapter::class,
+        ] as $adapter) {
+            foreach (['api.search.pre', 'api.read.pre'] as $event) {
+                $sharedEventManager->attach($adapter, $event, [$this, 'denyRestApiToNonAdmin']);
+            }
+        }
+    }
+
+    /**
+     * Forbid the rest api to non-admin users, but keep the internal api.
+     *
+     * The check is done on the adapter and not on the controller or the route,
+     * because only the adapter throws the exception inside the api action, so
+     * the error is rendered as a json 403 and not as a html 500.
+     */
+    public function denyRestApiToNonAdmin(Event $event): void
+    {
+        $services = $this->getServiceLocator();
+        if (!$services->get('Omeka\Status')->isApiRequest()) {
+            return;
+        }
+
+        $user = $services->get('Omeka\AuthenticationService')->getIdentity();
+        if ($user && $services->get('Omeka\Acl')->isAdminRole($user->getRole())) {
+            return;
+        }
+
+        throw new \Omeka\Api\Exception\PermissionDeniedException(
+            (string) new PsrMessage(
+                'The resource "{resource}" is not available through the rest api.', // @translate
+                ['resource' => $event->getTarget()->getResourceName()]
+            )
+        );
     }
 
     protected function addAclRules(): void

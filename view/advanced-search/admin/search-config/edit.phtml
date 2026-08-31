@@ -13,6 +13,7 @@ $this->headLink()
     ->appendStylesheet($assetUrl('css/advanced-search-manager.css', 'AdvancedSearch'));
 $this->headScript()
     ->appendFile($assetUrl('js/advanced-search-manager.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer'])
+    ->appendFile($assetUrl('js/advanced-search-input-preview.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer'])
     ->appendFile($assetUrl('js/advanced-search-collection.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
 
 $this->htmlElement('body')->appendAttribute('class', 'search-admin search-config resource edit');
@@ -35,6 +36,38 @@ $this->headScript()->appendScript(sprintf(
         'drag' => $translate('Drag to reorder'),
         'general' => $translate('General'),
         'list' => $translate('List'),
+    ], JSON_UNESCAPED_UNICODE)
+));
+$this->headScript()->appendScript(sprintf(
+    'window.AdvancedSearch.preview = %s;',
+    json_encode([
+        'preview' => $translate('Preview'),
+        'label' => $translate('Label'),
+        'value1' => $translate('First value'),
+        'value2' => $translate('Second value'),
+        'value3' => $translate('Third value'),
+        'choose' => $translate('Choose…'),
+        'group' => $translate('Group'),
+        'anyField' => $translate('Any field'),
+        'title' => $translate('Title'),
+        'subject' => $translate('Subject'),
+        'opContains' => $translate('contains'),
+        'opIs' => $translate('is exactly'),
+        'queryText' => $translate('Text to search'),
+        'and' => $translate('and'),
+        'or' => $translate('or'),
+        'hidden' => $translate('Hidden field: nothing is displayed, the value is sent with the query.'),
+        'multiText' => $translate('first value, second value'),
+        'specific' => $translate('Specific type set in the options: no preview.'),
+        'accessFree' => $translate('Free'),
+        'accessReserved' => $translate('Reserved'),
+        'accessForbidden' => $translate('Forbidden'),
+        'filterValues' => $translate('Filter the values…'),
+        'from' => $translate('From'),
+        'to' => $translate('To'),
+        'not' => $translate('not'),
+        'typed' => $translate('Val'),
+        'seeMore' => $translate('See more'),
     ], JSON_UNESCAPED_UNICODE)
 ));
 

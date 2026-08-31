@@ -11,11 +11,16 @@ use Omeka\Form\Element as OmekaElement;
 
 class SearchConfigFilterFieldset extends Fieldset implements InputFilterProviderInterface
 {
+    use TraitInputTypeOptions;
+
     /**
      * The types of filter by group of settings, used by the form and to clean
      * the settings on save.
      */
-    const TYPES_LIST = ['Select', 'SelectFlat', 'SelectGroup', 'MultiSelect', 'MultiSelectFlat', 'MultiSelectGroup', 'Radio', 'Checkbox', 'MultiCheckbox', 'Tree', 'Thesaurus'];
+    const TYPES_LIST = ['Select', 'Radio', 'Checkbox', 'MultiCheckbox', 'Tree', 'Thesaurus'];
+    // The stored variants of the type Select, recomposed on save from the
+    // options "multiple" and "value_layout".
+    const TYPES_SELECT = ['Select', 'SelectFlat', 'SelectGroup', 'MultiSelect', 'MultiSelectFlat', 'MultiSelectGroup'];
     const TYPES_RANGE = ['Range', 'RangeDouble'];
     const TYPES_SLIDER = ['RangeDouble'];
 
@@ -23,6 +28,19 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
      * The settings by group, cleaned when the type does not use them.
      */
     const SETTINGS_LIST = ['values', 'value_labels_table', 'value_labels', 'language_site', 'languages', 'order', 'limit'];
+    const SETTINGS_TEXT = ['autosuggest'];
+    const SETTINGS_HIDDEN = ['value'];
+    const SETTINGS_CHECKBOX = ['checked_value', 'unchecked_value'];
+    const SETTINGS_HAS_VALUE = ['checked_value', 'query_type', 'value_label'];
+    const SETTINGS_THESAURUS = ['thesaurus'];
+    const SETTINGS_NUMBER = ['min', 'max', 'step', 'first_digits'];
+
+    /**
+     * The promoted fields, stored as options or attributes of the filter. A
+     * key set directly in the textarea takes precedence over the field.
+     */
+    const PROMOTED_OPTIONS = ['autosuggest', 'checked_value', 'unchecked_value', 'query_type', 'value_label', 'thesaurus', 'first_digits'];
+    const PROMOTED_ATTRIBUTES = ['min', 'max', 'step'];
     const SETTINGS_RANGE = ['field_end'];
     const SETTINGS_SLIDER = ['scale_mode', 'scale_breakpoints', 'scale_show_ticks'];
     const SETTINGS_ADVANCED = ['default_number', 'max_number', 'field_elements', 'field_joiner', 'field_joiner_not', 'field_operator', 'field_operators', 'field_value_autosuggest', 'fields'];
@@ -46,20 +64,6 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
             ->setAttribute('class', 'form-fieldset-element form-search-config-filter')
             ->setName('filter')
 
-            ->add([
-                'name' => 'name',
-                'type' => Element\Text::class,
-                'options' => [
-                    'label' => 'Name (alphanumeric)', // @translate
-                    'info' => 'The technical key of the filter, used in the url of the query. Leave empty to derive it from the field; set it to distinguish two filters on the same field, or for a short url.', // @translate
-                ],
-                'attributes' => [
-                    'id' => 'form_filter_name',
-                    'required' => false,
-                    'pattern' => '[a-zA-Z0-9_:\-]+',
-                    'data-filter-types-not' => 'Advanced',
-                ],
-            ])
             ->add([
                 'name' => 'field',
                 'type' => Element\Select::class,
@@ -113,6 +117,171 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
             ])
             ->add([
+                'name' => 'value',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Value sent with the query', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_value',
+                    'data-filter-types' => 'Hidden',
+                    'data-advanced-section' => $tr('Values'), // @translate
+                    'required' => false,
+                ],
+            ])
+            ->add([
+                'name' => 'thesaurus',
+                'type' => CommonElement\OptionalNumber::class,
+                'options' => [
+                    'label' => 'Id of the thesaurus', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_thesaurus',
+                    'data-filter-types' => 'Thesaurus',
+                    'data-advanced-section' => $tr('Values'), // @translate
+                    'required' => false,
+                    'min' => '0',
+                ],
+            ])
+            ->add([
+                'name' => 'autosuggest',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Autocompletion of the values', // @translate
+                    'info' => 'Requires module Reference (database values) or SearchSolr (indexed values).', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_autosuggest',
+                    'data-filter-types' => 'text',
+                    'data-advanced-section' => $tr('Values'), // @translate
+                    'required' => false,
+                ],
+            ])
+            ->add([
+                'name' => 'checked_value',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Value sent when checked', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_checked_value',
+                    'data-filter-types' => 'Checkbox HasValue',
+                    'data-advanced-section' => $tr('Values'), // @translate
+                    'required' => false,
+                    'placeholder' => '1',
+                ],
+            ])
+            ->add([
+                'name' => 'unchecked_value',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Value sent when unchecked', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_unchecked_value',
+                    'data-filter-types' => 'Checkbox',
+                    'data-advanced-section' => $tr('Values'), // @translate
+                    'required' => false,
+                ],
+            ])
+            ->add([
+                'name' => 'query_type',
+                'type' => CommonElement\OptionalSelect::class,
+                'options' => [
+                    'label' => 'Query type', // @translate
+                    'value_options' => [
+                        'ex' => 'Has any value (default)', // @translate
+                        'nex' => 'Has no value', // @translate
+                        'eq' => 'Is exactly the value', // @translate
+                        'in' => 'Contains the value', // @translate
+                        'res' => 'Is the resource with the value as id', // @translate
+                        'sw' => 'Starts with the value', // @translate
+                        'ew' => 'Ends with the value', // @translate
+                    ],
+                    'empty_option' => '',
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_query_type',
+                    'data-filter-types' => 'HasValue',
+                    'data-advanced-section' => $tr('Values'), // @translate
+                    'required' => false,
+                ],
+            ])
+            ->add([
+                'name' => 'value_label',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Label of the checkbox', // @translate
+                    'info' => 'Displayed next to the checkbox; the label of the filter is used when empty.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_value_label',
+                    'data-filter-types' => 'HasValue',
+                    'data-advanced-section' => $tr('Values'), // @translate
+                    'required' => false,
+                ],
+            ])
+            ->add([
+                'name' => 'min',
+                'type' => CommonElement\OptionalNumber::class,
+                'options' => [
+                    'label' => 'Minimum', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_min',
+                    'data-filter-types' => 'Number Range RangeDouble',
+                    'data-advanced-section' => $tr('Slider'), // @translate
+                    'data-inline' => 'bounds',
+                    'required' => false,
+                    'step' => 'any',
+                ],
+            ])
+            ->add([
+                'name' => 'max',
+                'type' => CommonElement\OptionalNumber::class,
+                'options' => [
+                    'label' => 'Maximum', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_max',
+                    'data-filter-types' => 'Number Range RangeDouble',
+                    'data-advanced-section' => $tr('Slider'), // @translate
+                    'data-inline' => 'bounds',
+                    'required' => false,
+                    'step' => 'any',
+                ],
+            ])
+            ->add([
+                'name' => 'step',
+                'type' => CommonElement\OptionalNumber::class,
+                'options' => [
+                    'label' => 'Step', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_step',
+                    'data-filter-types' => 'Number Range RangeDouble',
+                    'data-advanced-section' => $tr('Slider'), // @translate
+                    'data-inline' => 'bounds',
+                    'required' => false,
+                    'step' => 'any',
+                    'min' => '0',
+                ],
+            ])
+            ->add([
+                'name' => 'first_digits',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Extract the first digits of the values (year of a date)', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_first_digits',
+                    'data-filter-types' => 'Number Range RangeDouble',
+                    'data-advanced-section' => $tr('Slider'), // @translate
+                    'required' => false,
+                    'value' => '1',
+                ],
+            ])
+            ->add([
                 'name' => 'values',
                 'type' => CommonElement\ArrayTextarea::class,
                 'options' => [
@@ -127,6 +296,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filter_values',
+                    'data-advanced-section' => $tr('Values'), // @translate
                     'data-filter-types' => implode(' ', self::TYPES_LIST),
                     'rows' => 6,
                     'placeholder' => 'yes = Yes',
@@ -141,6 +311,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filter_value_labels_table',
+                    'data-advanced-section' => $tr('Values'), // @translate
                     'data-filter-types' => implode(' ', self::TYPES_LIST),
                     'required' => false,
                     'placeholder' => 'my-table-slug',
@@ -161,6 +332,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filter_value_labels',
+                    'data-advanced-section' => $tr('Values'), // @translate
                     'data-filter-types' => implode(' ', self::TYPES_LIST),
                     'required' => false,
                     'rows' => 3,
@@ -175,25 +347,9 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 'type' => Element\Select::class,
                 'options' => [
                     'label' => 'Input type', // @translate
-                    'info' => 'The type of filter that will be displayed in the search form.', // @translate
-                    // TODO Convert documentation into help. See application/view/common/form-row.phtml
-                    'documentation' => nl2br(<<<'MARKDOWN'
-                        #"></a><div class="field-description no-link">
-                        - The types are html input types: Text (default), Advanced (list of advanced filters), Checkbox, Hidden, Number, Radio, Range, RangeDouble, Select, SelectFlat, SelectGroup, MultiCheckbox, MultiSelect, MultiSelectFlat, MultiSelectGroup, MultiText, and, for modules, Access, Thesaurus, and Tree (item sets tree).
-                        - Text: the default html input field may be improved with an autosuggester. Enable it with option "autosuggest" and value "true". An external url can be set via attribute "'data-autosuggest-url'."
-                        - Checkbox: the keys "unchecked_value" and "checked_value" allow to define a specific value to be returned.
-                        - Hidden: the value can be passed with key "value". If the value is not a scalar, it is serialized as json.
-                        - Number: the keys "min", "max" and "step" can be set as attributes, else they will be extracted from data. Of course, data should be numbers.
-                        - Range and RangeDouble allows to display a slider with one or two values. Min and max are extracted from data if not set as attributes.
-                        - For Number, Range and RangeDouble, the option "first_digits" is enabled by default to extract the year from dates. Set "first_digits = false" to disable it. It is recommended to use an index with the year to avoid strange results when casting and sorting non-normalized data.
-                        - MultiSelectFlat and SelectFlat may be used to be sure that values are flatten.
-                        - MultiSelectGroup and SelectGroup may be used for some specific fields that group options by default (resource classes, resource templates), in which case the options labels are removed.
-                        - Tree can be used for item sets when module ItemSetsTree is enabled and data indexed recursively.
-                        - For the types MultiCheckbox, Radio, Select, and derivatives, the values can be passed with the option "value_options", else the ones of the field will be used.
-                        </div><a href="#
-                        MARKDOWN), // @translate
+                    'info' => 'The type of input displayed in the search form. Each type has its own settings below; the preview shows what the visitor will see. The values of a list come from the index, or from the manual list of values in the advanced settings.', // @translate
                     /** @see \AdvancedSearch\Form\MainSearchForm::init() */
-                    'value_options' => [
+                    'value_options' => $this->inputTypeOptions([
                         'text' => 'Text (default)', // @ŧranslate
                         'Advanced' => 'Advanced filter', // @translate
                         'Checkbox' => 'Checkbox', // @translate
@@ -208,11 +364,6 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                         'RangeDouble' => 'Slider for a range of values', // @translate
                         // A space is added to avoid an issue with translation.
                         'Select' => 'Select ', // @translate
-                        'SelectFlat' => 'Select (flat)', // @translate
-                        'SelectGroup' => 'Select (group)', // @translate
-                        'MultiSelect' => 'Select (multiple choices)', // @translate
-                        'MultiSelectFlat' => 'Select (multiple choices, flat)', // @translate'
-                        'MultiSelectGroup' => 'Select (multiple choices, group)', // @translate'
                         'MultiText' => 'Text (multiple, with a separator)', // @translate
                         'Specific' => 'Specific (set as option)', // @translate
                         'modules' => [
@@ -223,7 +374,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                                 'Thesaurus' => 'Thesaurus', // @translate
                             ],
                         ],
-                    ],
+                    ]),
                     'empty_option' => '',
                 ],
                 'attributes' => [
@@ -237,6 +388,39 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
             ])
             // Settings of the advanced filter (type Advanced), stored with the
             // filter itself.
+            ->add([
+                'name' => 'multiple',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Multiple choices', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_multiple',
+                    'data-filter-types' => 'Select',
+                    'data-common' => '1',
+                    'required' => false,
+                ],
+            ])
+            ->add([
+                'name' => 'value_layout',
+                'type' => CommonElement\OptionalRadio::class,
+                'options' => [
+                    'label' => 'Layout of the values', // @translate
+                    'info' => 'Some fields group their values (classes and templates by vocabulary, hierarchical lists).', // @translate
+                    'value_options' => [
+                        '' => 'According to the field (default)', // @translate
+                        'flat' => 'Flat list', // @translate
+                        'group' => 'Grouped list', // @translate
+                    ],
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_value_layout',
+                    'data-advanced-section' => $tr('Values'), // @translate
+                    'data-filter-types' => 'Select',
+                    'required' => false,
+                    'value' => '',
+                ],
+            ])
             ->add([
                 'name' => 'fields',
                 'type' => CommonElement\DataTextarea::class,
@@ -338,6 +522,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filter_field_operators',
+                    'data-advanced-section' => $tr('Values'), // @translate
                     'data-filter-types' => 'Advanced',
                     'rows' => 12,
                     // This placeholder does not contain all query types.
@@ -362,6 +547,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filter_language_site',
+                    'data-advanced-section' => $tr('Values'), // @translate
                     'data-filter-types' => implode(' ', self::TYPES_LIST),
                     'required' => false,
                     'value' => '',
@@ -379,6 +565,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filter_languages',
+                    'data-advanced-section' => $tr('Values'), // @translate
                     'data-filter-types' => implode(' ', self::TYPES_LIST),
                     'placeholder' => 'fra|way|apy|',
                 ],
@@ -441,6 +628,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filter_scale_mode',
+                    'data-advanced-section' => $tr('Slider'), // @translate
                     'data-filter-types' => implode(' ', self::TYPES_SLIDER),
                     'value' => 'linear',
                 ],
@@ -460,6 +648,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filter_scale_breakpoints',
+                    'data-advanced-section' => $tr('Slider'), // @translate
                     'data-filter-types' => implode(' ', self::TYPES_SLIDER),
                     'required' => false,
                     'rows' => 5,
@@ -479,25 +668,37 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filter_scale_show_ticks',
+                    'data-advanced-section' => $tr('Slider'), // @translate
                     'data-filter-types' => implode(' ', self::TYPES_SLIDER),
                 ],
             ])
 
+            ->add([
+                'name' => 'name',
+                'type' => Element\Text::class,
+                'options' => [
+                    'label' => 'Name (alphanumeric)', // @translate
+                    'info' => 'The technical key of the filter, used in the url of the query. Leave empty to derive it from the field; set it to distinguish two filters on the same field, or for a short url.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'form_filter_name',
+                    'data-advanced-section' => $tr('Technical'), // @translate
+                    'required' => false,
+                    'pattern' => '[a-zA-Z0-9_:\-]+',
+                    'data-filter-types-not' => 'Advanced',
+                ],
+            ])
             ->add([
                 'type' => CommonElement\IniTextarea::class,
                 'name' => 'options',
                 'options' => [
                     'label' => 'Options', // @translate
                     'info' => <<<'HTML'
-                        List of specific options, in ini format, for example:
-                        `empty_option = ""`,
-                        `checked_value = "yes"`,
-                        `value_label = "Has an image"`,
-                        `autosuggest = true`,
-                        `value_options.first = "First"`,
-                        `first_digits = false`.
-                        Omeka and Laminas options are accepted.
-                        Note: "min", "max", "step" should be set in "Html attributes".
+                        List of rarely used options, in ini format, for
+                        example `empty_option = ""` or `select = true` for the
+                        access filter. Omeka and Laminas options are accepted.
+                        A key set here takes precedence over the dedicated
+                        fields above.
                         HTML, // @translate
                     'ini_typed_mode' => true,
                     'pairs_editor' => [
@@ -508,6 +709,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filters_options',
+                    'data-advanced-section' => $tr('Technical'), // @translate
                     'required' => false,
                     'placeholder' => '',
                 ],
@@ -517,7 +719,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 'name' => 'attributes',
                 'options' => [
                     'label' => 'Html attributes', // @translate
-                    'info' => 'Attributes to add to the input field, for example `class = "my-specific-class"`, or `min = 1454` for Number/Range/RangeDouble, or max, step, placeholder, data, etc.', // @translate
+                    'info' => 'Rarely used attributes to add to the input field, for example `class = "my-specific-class"`, or placeholder, data, etc. A key set here takes precedence over the dedicated fields above.', // @translate
                     'ini_typed_mode' => true,
                     'pairs_editor' => [
                         'key_label' => $tr('Attribute'), // @translate
@@ -527,6 +729,7 @@ class SearchConfigFilterFieldset extends Fieldset implements InputFilterProvider
                 ],
                 'attributes' => [
                     'id' => 'form_filters_attributes',
+                    'data-advanced-section' => $tr('Technical'), // @translate
                     'required' => false,
                     'placeholder' => '',
                 ],

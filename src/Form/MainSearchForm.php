@@ -1188,6 +1188,10 @@ class MainSearchForm extends Form
         ]);
         unset($valueOptions['protected']);
 
+        // With only three levels, a radio is more direct than a select; the
+        // option "select" allows to keep a select.
+        $asSelect = !empty($filter['options']['select']);
+        unset($filter['options']['select']);
         $fieldset = new Fieldset('access');
         $fieldset
             ->setAttributes([
@@ -1195,9 +1199,9 @@ class MainSearchForm extends Form
             ])
             ->add([
                 'name' => 'id',
-                'type' => $filter['type'] === 'Radio'
-                    ? CommonElement\OptionalRadio::class
-                    : CommonElement\OptionalSelect::class,
+                'type' => $asSelect
+                    ? CommonElement\OptionalSelect::class
+                    : CommonElement\OptionalRadio::class,
                 'options' => [
                     'label' => $filter['label'],
                     'value_options' => $valueOptions,
@@ -1206,7 +1210,7 @@ class MainSearchForm extends Form
                 'attributes' => [
                     'id' => 'search-access',
                     // 'multiple' => false,
-                    'class' => $filter['type'] === 'Radio' ? '' : 'chosen-select',
+                    'class' => $asSelect ? 'chosen-select' : '',
                     'data-placeholder' => $filter['attributes']['data-placeholder'] ?? 'Select access…', // @translate
                 ] + $filter['attributes'],
             ])

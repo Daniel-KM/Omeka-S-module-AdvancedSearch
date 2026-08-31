@@ -118,6 +118,16 @@
             const visible = Array.from(group.children).some(function (f) { return f.style.display !== 'none'; });
             group.style.display = visible ? '' : 'none';
         });
+        // A section heading is hidden when all its fields are.
+        fieldset.querySelectorAll('.collection-advanced-section').forEach(function (heading) {
+            let visible = false;
+            let node = heading.nextElementSibling;
+            while (node && !node.classList.contains('collection-advanced-section')) {
+                if (node.style.display !== 'none') { visible = true; break; }
+                node = node.nextElementSibling;
+            }
+            heading.style.display = visible ? '' : 'none';
+        });
         // The label falls back to the label of the field: show it as a
         // placeholder.
         const fieldControl = fieldset.querySelector('select[name$="[field]"]');
@@ -125,6 +135,11 @@
         if (fieldControl && labelControl) {
             const opt = fieldControl.selectedOptions[0];
             labelControl.placeholder = opt && opt.value !== '' ? opt.textContent.trim() : '';
+        }
+        // The preview of the type of input.
+        if (window.AdvancedSearchInputPreview) {
+            const collection = fieldset.closest('.form-fieldset-collection');
+            window.AdvancedSearchInputPreview.render(fieldset, collection && collection.id === 'facet_facets' ? 'facet' : 'filter');
         }
     };
 
@@ -274,7 +289,28 @@
             const summaryEl = document.createElement('summary');
             summaryEl.textContent = t('advanced', 'Advanced settings');
             details.appendChild(summaryEl);
-            advanced.forEach(function (field) { details.appendChild(field); });
+            // The fields are grouped by section, titled, in the order of the
+            // first field of each section.
+            const sectionOf = function (field) {
+                const control = field.querySelector('[data-advanced-section]');
+                return control ? control.dataset.advancedSection : '';
+            };
+            const done = [];
+            advanced.forEach(function (field) {
+                const section = sectionOf(field);
+                if (section && done.indexOf(section) === -1) {
+                    done.push(section);
+                    const heading = document.createElement('div');
+                    heading.className = 'collection-advanced-section';
+                    heading.textContent = section;
+                    details.appendChild(heading);
+                    advanced.forEach(function (other) {
+                        if (sectionOf(other) === section) details.appendChild(other);
+                    });
+                } else if (!section) {
+                    details.appendChild(field);
+                }
+            });
             fieldset.appendChild(details);
         };
 

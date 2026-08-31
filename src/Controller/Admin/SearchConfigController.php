@@ -772,6 +772,31 @@ class SearchConfigController extends AbstractActionController
         foreach ($settings['form']['filters'] ?? [] as $key => $fieldset) {
             // The name of filters are used as key and should be unique.
             $settings['form']['filters'][$key]['name'] = $key;
+            // The promoted options and attributes are fields of the form;
+            // the key in the textarea takes precedence over the field.
+            foreach (SearchConfigFilterFieldset::PROMOTED_OPTIONS as $k) {
+                if (isset($fieldset['options'][$k])) {
+                    $settings['form']['filters'][$key][$k] = $fieldset['options'][$k];
+                    unset($settings['form']['filters'][$key]['options'][$k]);
+                }
+            }
+            foreach (SearchConfigFilterFieldset::PROMOTED_ATTRIBUTES as $k) {
+                if (isset($fieldset['attributes'][$k])) {
+                    $settings['form']['filters'][$key][$k] = $fieldset['attributes'][$k];
+                    unset($settings['form']['filters'][$key]['attributes'][$k]);
+                }
+            }
+            // The checkbox "first digits" is checked by default.
+            $settings['form']['filters'][$key]['first_digits'] = ($settings['form']['filters'][$key]['first_digits'] ?? true) === true
+                || in_array($settings['form']['filters'][$key]['first_digits'], [1, '1', 'true'], true);
+            // The variants of the select are a type with two options in the
+            // form: multiple choices and layout of the values.
+            $type = $fieldset['type'] ?? '';
+            if (in_array($type, SearchConfigFilterFieldset::TYPES_SELECT, true)) {
+                $settings['form']['filters'][$key]['type'] = 'Select';
+                $settings['form']['filters'][$key]['multiple'] = strpos($type, 'Multi') === 0;
+                $settings['form']['filters'][$key]['value_layout'] = substr($type, -4) === 'Flat' ? 'flat' : (substr($type, -5) === 'Group' ? 'group' : '');
+            }
             // The elements of a row of the advanced filter are a multi
             // checkbox in the form and booleans in the settings.
             if (($fieldset['type'] ?? '') === 'Advanced') {
@@ -784,7 +809,7 @@ class SearchConfigController extends AbstractActionController
                 $settings['form']['filters'][$key]['field_elements'] = $elements;
             }
             // Set specific types options.
-            $type = $fieldset['type'] ?? '';
+            $type = $settings['form']['filters'][$key]['type'] ?? '';
             if ($type && !isset($filterTypes[$type])) {
                 $settings['form']['filters'][$key]['type'] = 'Specific';
                 $settings['form']['filters'][$key]['options'] = ['type' => $type]
@@ -807,6 +832,12 @@ class SearchConfigController extends AbstractActionController
             'more',
             'per_page',
             'display_count',
+            'as_link',
+            'thesaurus',
+            'min',
+            'max',
+            'step',
+            'first_digits',
             'options',
             'attributes',
             // Slider scale settings: dedicated form fields, must not be moved
@@ -823,6 +854,18 @@ class SearchConfigController extends AbstractActionController
         ];
         $settings['facet']['mode'] = in_array($settings['facet']['mode'] ?? null, ['button', 'link', 'js']) ? $settings['facet']['mode'] : 'button';
         foreach ($settings['facet']['facets'] ?? [] as $key => $facet) {
+            // The bounds are fields of the form; the key in the attributes
+            // takes precedence over the field.
+            foreach (['min', 'max', 'step'] as $k) {
+                if (isset($facet['attributes'][$k])) {
+                    $facet[$k] = $facet['attributes'][$k];
+                    unset($facet['attributes'][$k]);
+                }
+            }
+            // The checkbox "first digits" is checked by default.
+            $facet['first_digits'] = ($facet['first_digits'] ?? $facet['integer'] ?? true) === true
+                || in_array($facet['first_digits'] ?? $facet['integer'] ?? null, [1, '1', 'true'], true);
+            unset($facet['integer']);
             // Remove the mode of each facet to simplify config: it is stored
             // in each facet to simplify theming, but it is a global option.
             unset($facet['mode']);
@@ -955,7 +998,56 @@ class SearchConfigController extends AbstractActionController
                 [SearchConfigFilterFieldset::TYPES_RANGE, SearchConfigFilterFieldset::SETTINGS_RANGE],
                 [SearchConfigFilterFieldset::TYPES_SLIDER, SearchConfigFilterFieldset::SETTINGS_SLIDER],
                 [['Advanced'], SearchConfigFilterFieldset::SETTINGS_ADVANCED],
+                [['text'], SearchConfigFilterFieldset::SETTINGS_TEXT],
+                [['Hidden'], SearchConfigFilterFieldset::SETTINGS_HIDDEN],
+                [['Checkbox', 'HasValue'], array_unique(array_merge(SearchConfigFilterFieldset::SETTINGS_CHECKBOX, SearchConfigFilterFieldset::SETTINGS_HAS_VALUE))],
+                [['Thesaurus'], SearchConfigFilterFieldset::SETTINGS_THESAURUS],
+                [['Number', 'Range', 'RangeDouble'], SearchConfigFilterFieldset::SETTINGS_NUMBER],
             ]);
+            if ($type === 'HasValue') {
+                unset($filter['unchecked_value']);
+            } elseif ($type === 'Checkbox') {
+                unset($filter['query_type'], $filter['value_label']);
+            }
+
+            // The promoted fields are stored as options or attributes of the
+            // filter; a key set in the textarea takes precedence.
+            foreach (SearchConfigFilterFieldset::PROMOTED_OPTIONS as $k) {
+                $v = $filter[$k] ?? null;
+                unset($filter[$k]);
+                if ($k === 'first_digits') {
+                    // Enabled by default: store only when disabled.
+                    if (in_array($type, ['Number', 'Range', 'RangeDouble'], true)
+                        && !$v
+                        && !isset($filter['options'][$k])
+                    ) {
+                        $filter['options'][$k] = false;
+                    }
+                    continue;
+                }
+                if ($k === 'autosuggest' || $k === 'thesaurus') {
+                    $v = $v ? ($k === 'autosuggest' ? true : (int) $v) : null;
+                }
+                if ($v !== null && $v !== '' && !isset($filter['options'][$k])) {
+                    $filter['options'][$k] = $v;
+                }
+            }
+            foreach (SearchConfigFilterFieldset::PROMOTED_ATTRIBUTES as $k) {
+                $v = $filter[$k] ?? null;
+                unset($filter[$k]);
+                if ($v !== null && $v !== '' && !isset($filter['attributes'][$k])) {
+                    $filter['attributes'][$k] = $v;
+                }
+            }
+
+            // The type Select is recomposed with its two options.
+            if ($type === 'Select') {
+                $layout = $filter['value_layout'] ?? '';
+                $filter['type'] = (empty($filter['multiple']) ? '' : 'Multi')
+                    . 'Select'
+                    . ($layout === 'flat' ? 'Flat' : ($layout === 'group' ? 'Group' : ''));
+            }
+            unset($filter['multiple'], $filter['value_layout']);
 
             foreach ($filter as $k => $v) {
                 if ($v === null || $v === '' || $v === []) {
@@ -1018,6 +1110,11 @@ class SearchConfigController extends AbstractActionController
                 'paginate',
                 'language_site',
                 'languages',
+                'thesaurus',
+                'min',
+                'max',
+                'step',
+                'first_digits',
                 'scale_mode',
                 'scale_breakpoints',
                 'scale_show_ticks',
@@ -1035,10 +1132,25 @@ class SearchConfigController extends AbstractActionController
             $facet = $this->cleanSettingsByType($facet, $facet['type'] ?? 'Checkbox', [
                 [SearchConfigFacetFieldset::TYPES_LIST, SearchConfigFacetFieldset::SETTINGS_LIST],
                 [SearchConfigFacetFieldset::TYPES_VALUES, SearchConfigFacetFieldset::SETTINGS_VALUES],
+                [SearchConfigFacetFieldset::TYPES_LINK, SearchConfigFacetFieldset::SETTINGS_LINK],
                 [SearchConfigFacetFieldset::TYPES_SLIDER, SearchConfigFacetFieldset::SETTINGS_SLIDER],
+                [SearchConfigFacetFieldset::TYPES_BOUNDS, SearchConfigFacetFieldset::SETTINGS_BOUNDS],
+                [['Thesaurus'], SearchConfigFacetFieldset::SETTINGS_THESAURUS],
             ]);
+            // The option "first digits" is enabled by default: store only
+            // when disabled.
+            if (array_key_exists('first_digits', $facet)) {
+                if ($facet['first_digits'] && $facet['first_digits'] !== '0') {
+                    unset($facet['first_digits']);
+                } else {
+                    $facet['first_digits'] = false;
+                }
+            }
+            if (isset($facet['thesaurus'])) {
+                $facet['thesaurus'] = (int) $facet['thesaurus'] ?: null;
+            }
             // Simplify some values (empty string, integer and boolean).
-            foreach (['display_count', 'paginate'] as $k) {
+            foreach (['display_count', 'paginate', 'as_link'] as $k) {
                 if (isset($facet[$k])) {
                     $facet[$k] = (bool) $facet[$k];
                 }

@@ -29,6 +29,7 @@ class SearchConfigSitesFieldset extends Fieldset implements InputFilterProviderI
             'manage_config_default' => ['required' => false],
             'manage_config_availability' => ['required' => false],
             'manage_config_default_admin' => ['required' => false],
+            'manage_config_default_api' => ['required' => false],
         ];
     }
 
@@ -85,6 +86,17 @@ class SearchConfigSitesFieldset extends Fieldset implements InputFilterProviderI
                 ],
                 'attributes' => [
                     'id' => 'manage_config_default_admin',
+                ],
+            ])
+            ->add([
+                'name' => 'manage_config_default_api',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'label' => 'Default search page for the api', // @translate
+                    'info' => 'The api uses the index of the engine of this page, so this option has an effect only when the engine is an external index, like Solr. With the internal engine, the api keeps querying the database.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'manage_config_default_api',
                 ],
             ])
             // The text is filled by the controller, that knows the config.

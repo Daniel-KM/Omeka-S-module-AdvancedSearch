@@ -73,13 +73,27 @@ class IndexController extends AbstractActionController
             'advancedsearch_items_config' => 'items', // @translate
             'advancedsearch_media_config' => 'media', // @translate
             'advancedsearch_item_sets_config' => 'item sets', // @translate
+            'advancedsearch_api_config' => 'api', // @translate
         ];
         $result = [];
         foreach ($keys as $key => $role) {
             $configId = (int) $settings->get($key);
-            if ($configId) {
-                $result[$configId][] = $role;
+            if (!$configId) {
+                continue;
             }
+            // The api uses the external index only, so tell what it really
+            // does: the setting alone does not say it.
+            if ($key === 'advancedsearch_api_config') {
+                try {
+                    $searchConfig = $this->api()->read('search_configs', ['id' => $configId])->getContent();
+                    $role = $searchConfig->hasExternalIndex()
+                        ? 'api (index)' // @translate
+                        : 'api (database)'; // @translate
+                } catch (\Omeka\Api\Exception\NotFoundException $e) {
+                    // Keep the generic role.
+                }
+            }
+            $result[$configId][] = $role;
         }
         return $result;
     }

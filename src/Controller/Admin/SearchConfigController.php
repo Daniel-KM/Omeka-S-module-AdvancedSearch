@@ -147,10 +147,12 @@ class SearchConfigController extends AbstractActionController
         ];
         $defaults = $this->sitesWithSearchConfigAsDefault($searchConfig);
         $adminDefault = in_array('admin', $defaults, true);
+        $apiDefault = in_array('api', $defaults, true);
         $data['sites'] = [
-            'manage_config_default' => array_values(array_diff($defaults, ['admin'])),
+            'manage_config_default' => array_values(array_diff($defaults, ['admin', 'api'])),
             'manage_config_availability' => $this->sitesWithSearchConfigAsAvailable($searchConfig),
             'manage_config_default_admin' => $adminDefault ? '1' : '0',
+            'manage_config_default_api' => $apiDefault ? '1' : '0',
         ];
 
         $form->setData($data);
@@ -221,6 +223,9 @@ class SearchConfigController extends AbstractActionController
         $defaults = $sitesPart['manage_config_default'] ?? [];
         if (!empty($sitesPart['manage_config_default_admin'])) {
             $defaults[] = 'admin';
+        }
+        if (!empty($sitesPart['manage_config_default_api'])) {
+            $defaults[] = 'api';
         }
         $this->manageSearchConfigSettings(
             $searchConfig,
@@ -959,10 +964,14 @@ class SearchConfigController extends AbstractActionController
         $result = [];
         $searchConfigId = $searchConfig->id();
 
-        // Check admin.
+        // Check admin and api, that are global and not per site.
         $adminSearchId = (int) $this->settings()->get('advancedsearch_main_config');
         if ($adminSearchId && $adminSearchId === $searchConfigId) {
             $result[] = 'admin';
+        }
+        $apiSearchId = (int) $this->settings()->get('advancedsearch_api_config');
+        if ($apiSearchId && $apiSearchId === $searchConfigId) {
+            $result[] = 'api';
         }
 
         // Check all sites.
@@ -1026,9 +1035,14 @@ class SearchConfigController extends AbstractActionController
 
         $settings = $this->settings();
         foreach ($singleSettings as $name => $label) {
-            if ((int) $settings->get($name) === $searchConfigId) {
-                $result['admin'][] = $label;
+            if ((int) $settings->get($name) !== $searchConfigId) {
+                continue;
             }
+            // Tell what the api really does with this page.
+            if ($name === 'advancedsearch_api_config' && !$searchConfig->hasExternalIndex()) {
+                $label = 'Search page for the api (not used: the engine is not an external index)'; // @translate
+            }
+            $result['admin'][] = $label;
         }
 
         $siteSettings = $this->siteSettings();
@@ -1069,7 +1083,9 @@ class SearchConfigController extends AbstractActionController
         $translate = $plugins->get('translate');
 
         if (!$usages) {
-            return '<p>' . $escape($translate('This search page is not used yet.')) . '</p>'; // @translate
+            return '<p>'
+            . $escape($translate('This search page is not used yet.')) // @translate
+            . '</p>';
         }
 
         /** @var \Omeka\Api\Representation\SiteRepresentation[] $sites */
@@ -1131,6 +1147,24 @@ class SearchConfigController extends AbstractActionController
             } else {
                 $settings->set('advancedsearch_main_config', null);
                 $message = 'The page has been unset in admin board.'; // @translate
+            }
+            $this->messenger()->addSuccess($message);
+        }
+
+        $current = in_array('api', $searchConfigSiteDefaultsCurrent);
+        $new = in_array('api', $searchConfigSiteDefaults);
+        if ($current !== $new) {
+            if ($new) {
+                $settings->set('advancedsearch_api_config', $searchConfigId);
+                $message = 'The page has been set by default for the api.'; // @translate
+                if (!$searchConfig->hasExternalIndex()) {
+                    $this->messenger()->addWarning(new PsrMessage(
+                        'The engine of this page is not an external index, so the api keeps querying the database: the option has an effect only with an engine like Solr.' // @translate
+                    ));
+                }
+            } else {
+                $settings->set('advancedsearch_api_config', null);
+                $message = 'The page has been unset for the api.'; // @translate
             }
             $this->messenger()->addSuccess($message);
         }

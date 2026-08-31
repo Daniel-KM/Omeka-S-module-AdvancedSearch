@@ -131,6 +131,23 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
             : null;
     }
 
+    /**
+     * Check if the search engine is an external index, like Solr.
+     *
+     * Only an external index is used by the api and by the modules that
+     * bypass the database, so this is what makes the difference, and not the
+     * engine itself.
+     *
+     * @see \AdvancedSearch\Service\ControllerPlugin\ApiSearchFactory
+     */
+    public function hasExternalIndex(): bool
+    {
+        $engineAdapter = $this->engineAdapter();
+        return $engineAdapter
+            && !$engineAdapter instanceof \AdvancedSearch\EngineAdapter\Internal
+            && !$engineAdapter instanceof \AdvancedSearch\EngineAdapter\Noop;
+    }
+
     public function engineAdapter(): ?\AdvancedSearch\EngineAdapter\EngineAdapterInterface
     {
         $searchEngine = $this->searchEngine();

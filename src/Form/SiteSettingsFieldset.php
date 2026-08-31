@@ -17,6 +17,17 @@ class SiteSettingsFieldset extends Fieldset
     protected $searchConfigs = [];
 
     /**
+     * @var array
+     */
+    protected $itemSets = [];
+
+    public function setItemSets(array $itemSets): self
+    {
+        $this->itemSets = $itemSets;
+        return $this;
+    }
+
+    /**
      * Warning: there is a core fieldset "Search" (before Omeka v4).
      *
      * @var string
@@ -71,6 +82,7 @@ class SiteSettingsFieldset extends Fieldset
                     'label' => 'Hidden query filters per search page', // @translate
                     'info' => 'One filter per line, formatted as "search_config_slug = query_args" (e.g. "recherche = item_set_id[]=151"). Filters are merged with the search config "Hidden query filter" only on this site, so other sites sharing the same search page are unaffected.', // @translate
                     'as_key_value' => true,
+                    'default_view' => 'querier',
                 ],
                 'attributes' => [
                     'id' => 'advancedsearch_hidden_query_filters_per_config',
@@ -82,76 +94,33 @@ class SiteSettingsFieldset extends Fieldset
                 ],
             ])
 
-            // TODO Move these options to redirect item set to search page or a search page setting?
             ->add([
-                'name' => 'advancedsearch_item_sets_redirect_browse',
-                'type' => CommonElement\OptionalItemSetSelect::class,
+                'name' => 'advancedsearch_item_sets_redirects',
+                'type' => CommonElement\ArrayTextarea::class,
                 'options' => [
                     'element_group' => 'advanced_search',
-                    'label' => 'Item sets to redirect to item/browse', // @translate
-                    'empty_option' => '',
-                    'disable_inarray_validator' => true,
-                    'prepend_value_options' => [
-                        'all' => 'All item sets', // @translate
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'advancedsearch_item_sets_redirect_browse',
-                    'multiple' => true,
-                    'class' => 'chosen-select',
-                    'data-placeholder' => 'Select item sets…', // @translate
-                ],
-            ])
-            ->add([
-                'name' => 'advancedsearch_item_sets_redirect_search',
-                'type' => CommonElement\OptionalItemSetSelect::class,
-                'options' => [
-                    'element_group' => 'advanced_search',
-                    'label' => 'Item sets to redirect to search', // @translate
-                    'empty_option' => '',
-                    'disable_inarray_validator' => true,
-                    'prepend_value_options' => [
-                        'all' => 'All item sets', // @translate
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'advancedsearch_item_sets_redirect_search',
-                    'multiple' => true,
-                    'class' => 'chosen-select',
-                    'data-placeholder' => 'Select item sets…', // @translate
-                ],
-            ])
-            ->add([
-                'name' => 'advancedsearch_item_sets_redirect_search_first',
-                'type' => CommonElement\OptionalItemSetSelect::class,
-                'options' => [
-                    'element_group' => 'advanced_search',
-                    'label' => 'Item sets to redirect to search (display record only on first page, old default Omeka)', // @translate
-                    'empty_option' => '',
-                    'disable_inarray_validator' => true,
-                    'prepend_value_options' => [
-                        'all' => 'All item sets', // @translate
-                    ],
-                ],
-                'attributes' => [
-                    'id' => 'advancedsearch_item_sets_redirect_search_first',
-                    'multiple' => true,
-                    'class' => 'chosen-select',
-                    'data-placeholder' => 'Select item sets…', // @translate
-                ],
-            ])
-            ->add([
-                'name' => 'advancedsearch_item_sets_redirect_page_url',
-                'type' => OmekaElement\ArrayTextarea::class,
-                'options' => [
-                    'element_group' => 'advanced_search',
-                    'label' => 'Item sets to redirect to a page or a url', // @translate
-                    'info' => 'Set the item set id, then the sign "=", then a page slug or a url, relative or absolute.', // @translate
+                    'label' => 'Redirection of the page of an item set', // @translate
+                    'info' => 'One row by item set, and the row "default" for all the other ones. The redirection is "browse" (standard Omeka page), "search" (search page of the site), "first" (search page, but the item set is displayed on the first page only), or the slug of a site page or a url, relative or absolute.', // @translate
                     'as_key_value' => true,
+                    'pairs_editor' => [
+                        'key_label' => 'Item set', // @translate
+                        'value_label' => 'Redirection', // @translate
+                        // The picker displays "label (key)", so the item sets
+                        // are listed by title, and the redirection is set by
+                        // the user, since it is not a default value.
+                        'keys' => ['default' => 'All other item sets'] + $this->itemSets, // @translate
+                        'key_fill' => false,
+                        'key_select' => true,
+                    ],
                 ],
                 'attributes' => [
-                    'id' => 'advancedsearch_item_sets_redirect_page_url',
-                    'placeholder' => '151 = events', // @translate
+                    'id' => 'advancedsearch_item_sets_redirects',
+                    'placeholder' => <<<'TEXT'
+                        default = browse
+                        151 = search
+                        152 = events
+                        TEXT, // @translate
+                    'rows' => 5,
                 ],
             ])
 

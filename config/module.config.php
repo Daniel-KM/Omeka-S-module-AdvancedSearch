@@ -492,10 +492,6 @@ return [
             'advancedsearch_item_sets_config' => 1,
             'advancedsearch_item_sets_template_form' => null,
             'advancedsearch_item_sets_scope' => 0,
-            'advancedsearch_item_sets_redirect_browse' => ['all'],
-            'advancedsearch_item_sets_redirect_search' => [],
-            'advancedsearch_item_sets_redirect_search_first' => [],
-            'advancedsearch_item_sets_redirect_page_url' => [],
             'advancedsearch_item_sets_browse_config' => 0,
             'advancedsearch_item_sets_browse_page' => '',
             'advancedsearch_items_browse_config' => 0,
@@ -515,10 +511,8 @@ return [
             ],
             // Hidden options.
             // This option is a merge of the previous ones for simplicity.
-            'advancedsearch_item_sets_redirects' => [],
+            'advancedsearch_item_sets_redirects' => ['default' => 'browse'],
             // The old options are not removed for now for compatibility with old themes (search, links).
-            'advancedsearch_redirect_itemsets' => [],
-            'advancedsearch_redirect_itemset' => 'browse',
         ],
         'block_settings' => [
             'searchingForm' => [

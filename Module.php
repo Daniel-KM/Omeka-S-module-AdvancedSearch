@@ -906,47 +906,33 @@ class Module extends AbstractModule
 
     protected function finalizeSiteSettings(): void
     {
-        // Prepare a single setting with all values to simplify next checks.
-        // Most of the time, the array contains only the default value and
-        // sometime a few item sets.
+        // The redirections are stored as a single map "item set id => mode",
+        // so an item set cannot be set to two modes at the same time, unlike
+        // the four lists used until version 3.4.64.
 
         $services = $this->getServiceLocator();
         $siteSettings = $services->get('Omeka\Settings\Site');
 
-        // Don't set default early.
-        $redirectBrowse = $siteSettings->get('advancedsearch_item_sets_redirect_browse') ?: [];
-        $redirectSearch = $siteSettings->get('advancedsearch_item_sets_redirect_search') ?: [];
-        $redirectSearchFirst = $siteSettings->get('advancedsearch_item_sets_redirect_search_first') ?: [];
-        $redirectPageUrl = $siteSettings->get('advancedsearch_item_sets_redirect_page_url') ?: [];
-        $redirectBrowse = array_fill_keys($redirectBrowse, 'browse');
-        $redirectSearch = array_fill_keys($redirectSearch, 'search');
-        $redirectSearchFirst = array_fill_keys($redirectSearchFirst, 'first');
-        // Keep redirect page urls as it: this is already an array with data.
-
-        // Don't use "else" in order to manage bad config. Default is browse.
-        $merged = ['default' => 'browse'];
-        if (isset($redirectSearchFirst['all'])) {
-            $merged = ['default' => 'first'];
-            unset($redirectSearchFirst['all']);
-        }
-        if (isset($redirectSearch['all'])) {
-            $merged = ['default' => 'search'];
-            unset($redirectSearch['all']);
-        }
-        if (isset($redirectBrowse['all'])) {
-            $merged = ['default' => 'browse'];
-            unset($redirectBrowse['all']);
+        $redirects = $siteSettings->get('advancedsearch_item_sets_redirects') ?: [];
+        if (!is_array($redirects)) {
+            $redirects = [];
         }
 
-        $merged += $redirectBrowse
-            + $redirectSearch
-            + $redirectSearchFirst
-            + $redirectPageUrl;
+        // Keep only real item set ids and the key "default", and a mode that
+        // is a keyword or the slug or the url of a page.
+        $result = [];
+        foreach ($redirects as $key => $mode) {
+            $mode = trim((string) $mode);
+            $key = trim((string) $key);
+            if ($mode === '' || ($key !== 'default' && !(int) $key)) {
+                continue;
+            }
+            $result[$key === 'default' ? 'default' : (int) $key] = $mode;
+        }
 
-        $siteSettings->set('advancedsearch_item_sets_redirects', $merged);
-        // Kept for compatibility with old themes.
-        $siteSettings->set('advancedsearch_redirect_itemsets', $merged);
-        $siteSettings->set('advancedsearch_redirect_itemset', $merged['default']);
+        $result = ['default' => $result['default'] ?? 'browse'] + $result;
+
+        $siteSettings->set('advancedsearch_item_sets_redirects', $result);
     }
 
     /**
@@ -2146,14 +2132,7 @@ class Module extends AbstractModule
         $siteId = $site->getId();
         $siteSettings->set('advancedsearch_main_config', $searchConfig->id(), $siteId);
         $siteSettings->set('advancedsearch_configs', [$searchConfig->id()], $siteId);
-        $siteSettings->set('advancedsearch_item_sets_redirect_browse', ['all'], $siteId);
-        $siteSettings->set('advancedsearch_item_sets_redirect_search', [], $siteId);
-        $siteSettings->set('advancedsearch_item_sets_redirect_search_first', [], $siteId);
-        $siteSettings->set('advancedsearch_item_sets_redirect_page_url', [], $siteId);
         $siteSettings->set('advancedsearch_item_sets_redirects', ['default' => 'browse'], $siteId);
-        // Compatibility for old themes.
-        $siteSettings->set('advancedsearch_redirect_itemsets', ['default' => 'browse'], $siteId);
-        $siteSettings->set('advancedsearch_redirect_itemset', 'browse', $siteId);
     }
 
     public function refreshSearchConfigsList(Event $event): void

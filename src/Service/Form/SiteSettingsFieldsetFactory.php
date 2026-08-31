@@ -24,10 +24,24 @@ class SiteSettingsFieldsetFactory implements FactoryInterface
             $listSearchFields[$key] = $searchField['label'] ?? $key;
         }
 
+        // The item sets of the site, to fill the picker of the redirections.
+        $itemSets = [];
+        try {
+            $site = $services->get('ControllerPluginManager')->get('currentSite')();
+            foreach ($site->siteItemSets() as $siteItemSet) {
+                $itemSet = $siteItemSet->itemSet();
+                // The picker of the editor of pairs appends the id itself.
+                $itemSets[$itemSet->id()] = (string) $itemSet->displayTitle();
+            }
+        } catch (\Throwable $e) {
+            // No current site, for example during an upgrade.
+        }
+
         $fieldset = new SiteSettingsFieldset(null, $options ?? []);
         return $fieldset
             ->setSearchConfigs($valueOptions)
             ->setListSearchFields($listSearchFields)
+            ->setItemSets($itemSets)
         ;
     }
 }

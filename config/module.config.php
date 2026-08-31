@@ -2,44 +2,36 @@
 
 namespace AdvancedSearch;
 
-// The constant is not available during upgrade.
-/** @see \AdvancedSearch\Stdlib\SearchResources::FIELD_QUERY['labels'] */
-$allFilterTypes = [
-    'eq', 'neq', 'in', 'nin',
-    'sw', 'nsw', 'ew', 'new',
-    'near', 'nnear', 'ma', 'nma',
-    'lt', 'lte', 'gte', 'gt',
-    '<', '≤', '≥', '>',
-    'yreq', 'nyreq', 'yrgte', 'yrlte', 'yrgt', 'yrlt',
-    'res', 'nres', 'resq', 'nresq',
-    'lex', 'nlex', 'lres', 'nlres', 'lkq', 'nlkq',
-    'ex', 'nex', 'exs', 'nexs', 'exm', 'nexm',
-    'dtp', 'ndtp', 'tp', 'ntp',
-    'tpl', 'ntpl', 'tpr', 'ntpr', 'tpu', 'ntpu',
-    'dup', 'ndup', 'dupt', 'ndupt', 'dupl', 'ndupl',
-    'duptl', 'nduptl',
-    'dupv', 'ndupv', 'dupvt', 'ndupvt', 'dupvl', 'ndupvl',
-    'dupvtl', 'ndupvtl',
-    'dupr', 'ndupr', 'duprt', 'nduprt', 'duprl', 'nduprl',
-    'duprtl', 'nduprtl',
-    'dupu', 'ndupu', 'duput', 'nduput', 'dupul', 'ndupul',
-    'duputl', 'nduputl',
+/**
+ * The constant is not available during upgrade.
+ *
+ * @see \AdvancedSearch\Stdlib\SearchResources::FIELD_QUERY['labels']
+ * @see \AdvancedSearch\Stdlib\SearchResources::filterTypesDisplayed()
+ */
+$displayedFilterTypes = [
+    'eq', 'in',
+    'sw', 'ew',
+    'near', 'ma',
+    'lt', 'lte', 'gte', 'gt', '<', '≤', '≥', '>',
+    'yreq', 'yrgte', 'yrlte', 'yrgt', 'yrlt',
+    'res', 'resq', 'lex', 'lres', 'lkq',
+    'ex', 'exs', 'exm',
+    'dtp', 'tp', 'tpl', 'tpr', 'tpu',
+    'dup', 'dupv', 'dupr', 'dupu',
+    't', 'l', 'tl',
 ];
 
-/** @see \AdvancedSearch\Stdlib\SearchResources::FIELD_QUERY['default'] */
 /**
- * The types displayed by default in the sites, that is a simple list for the
- * visitors: the technical ones (data type, count of values, resource by id)
- * remain available, but they are enabled by the admin of the site.
+ * The types displayed by default in the sites, simpler than admin side.
  *
- * The main settings, used in the admin board, keep all the types.
+ * @see \AdvancedSearch\Stdlib\SearchResources::FIELD_QUERY['default']
  */
 $defaultFilterTypes = [
-    'eq', 'neq', 'in', 'nin',
-    'sw', 'nsw', 'ew', 'new',
+    'eq', 'in',
+    'sw', 'ew',
     'lt', 'lte', 'gte', 'gt',
-    'yreq', 'nyreq', 'yrgte', 'yrlte',
-    'ex', 'nex',
+    'yreq', 'yrgte', 'yrlte',
+    'ex',
 ];
 
 $defaultAutosuggestBlacklist = [
@@ -447,7 +439,7 @@ return [
                 'common/advanced-search/data-type-geography',
                 'common/numeric-data-types-advanced-search',
             ],
-            'advancedsearch_filter_types' => \AdvancedSearch\Stdlib\SearchResources::filterTypesDisplayed(),
+            'advancedsearch_filter_types' => $displayedFilterTypes,
             'advancedsearch_filter_value_autosuggest_whitelist' => ['all'],
             'advancedsearch_filter_value_autosuggest_blacklist' => $defaultAutosuggestBlacklist,
             'advancedsearch_filter_joiner_not' => true,
@@ -485,7 +477,7 @@ return [
                 'common/advanced-search/data-type-geography',
                 'common/numeric-data-types-advanced-search',
             ],
-            'advancedsearch_filter_types' => \AdvancedSearch\Stdlib\SearchResources::collapseFilterTypes($defaultFilterTypes),
+            'advancedsearch_filter_types' => $defaultFilterTypes,
             'advancedsearch_filter_value_autosuggest_whitelist' => ['all'],
             'advancedsearch_filter_value_autosuggest_blacklist' => $defaultAutosuggestBlacklist,
             'advancedsearch_filter_joiner_not' => true,

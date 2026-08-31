@@ -3728,3 +3728,676 @@ if (version_compare($oldVersion, '3.4.63', '<')) {
         ));
     }
 }
+
+if (version_compare($oldVersion, '3.4.64', '<')) {
+    // The format of the search config settings changed: when the module
+    // SearchSolr is installed, its directory must contain version 3.5.70 or
+    // above, so it can be upgraded to read the new format right after this
+    // upgrade.
+    $searchSolrVersion = $connection->fetchOne("SELECT `version` FROM `module` WHERE `id` = 'SearchSolr'");
+    if ($searchSolrVersion) {
+        if (!$this->isModuleVersionAtLeast('SearchSolr', '3.5.70')) {
+            $message = new PsrMessage(
+                'The module SearchSolr is installed: update its directory to version {version} or above before upgrading the module AdvancedSearch, then upgrade it.', // @translate
+                ['version' => '3.5.70']
+            );
+            $messenger->addError($message);
+            throw new \Omeka\Module\Exception\ModuleCannotInstallException((string) $message->setTranslator($translator));
+        }
+        $messenger->addWarning(new PsrMessage(
+            'The module SearchSolr must be upgraded immediately after this upgrade.' // @translate
+        ));
+    }
+
+
+    // The engine specific settings of a search page (field boosts, minimum
+    // match, tie breaker) move from the section "index" to the reserved section
+    // "engine", filled by the module of the engine (e.g. SearchSolr).
+    $configs = $connection->fetchAllAssociative(
+        'SELECT `id`, `settings` FROM `search_config` ORDER BY `id` ASC'
+    );
+    foreach ($configs as $configRow) {
+        $configSettings = json_decode((string) $configRow['settings'], true) ?: [];
+        $hasChange = false;
+        foreach (['field_boosts', 'minimum_match', 'tie_breaker'] as $key) {
+            if (array_key_exists($key, $configSettings['index'] ?? [])) {
+                $value = $configSettings['index'][$key];
+                unset($configSettings['index'][$key]);
+                if ($value !== '' && $value !== null && $value !== []
+                    && ($configSettings['engine'][$key] ?? '') === ''
+                ) {
+                    $configSettings['engine'][$key] = $value;
+                }
+                $hasChange = true;
+            }
+        }
+        if ($hasChange) {
+            $connection->executeStatement(
+                'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?;',
+                [json_encode($configSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), (int) $configRow['id']]
+            );
+        }
+    }
+
+    // The settings of the advanced filter (number of filters, joiners,
+    // operators, fields…) are stored with the filter of type "Advanced"
+    // instead of a separate section "form.advanced".
+    $configs = $connection->fetchAllAssociative(
+        'SELECT `id`, `settings` FROM `search_config` ORDER BY `id` ASC'
+    );
+    foreach ($configs as $configRow) {
+        $configSettings = json_decode((string) $configRow['settings'], true) ?: [];
+        if (!array_key_exists('advanced', $configSettings['form'] ?? [])) {
+            continue;
+        }
+        $advanced = $configSettings['form']['advanced'] ?: [];
+        unset($configSettings['form']['advanced']);
+        $filters = $configSettings['form']['filters'] ?? [];
+        foreach ($filters as $key => $filter) {
+            if ($key === 'advanced' || ($filter['type'] ?? '') === 'Advanced' || ($filter['field'] ?? '') === 'advanced') {
+                $filters[$key] = $filter + $advanced;
+                // Move the fields as last key for end user.
+                $fields = $filters[$key]['fields'] ?? [];
+                unset($filters[$key]['fields']);
+                $filters[$key]['fields'] = $fields;
+                break;
+            }
+        }
+        $configSettings['form']['filters'] = $filters;
+        $connection->executeStatement(
+            'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?;',
+            [json_encode($configSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), (int) $configRow['id']]
+        );
+    }
+
+    // The manual list of values of a filter is a dedicated setting "values"
+    // ("value" => "label"), no more the option "value_options".
+    $configs = $connection->fetchAllAssociative(
+        'SELECT `id`, `settings` FROM `search_config` ORDER BY `id` ASC'
+    );
+    foreach ($configs as $configRow) {
+        $configSettings = json_decode((string) $configRow['settings'], true) ?: [];
+        $hasChange = false;
+        foreach ($configSettings['form']['filters'] ?? [] as $key => $filter) {
+            if (empty($filter['options']['value_options']) || !empty($filter['values'])) {
+                continue;
+            }
+            // The legacy list has no label: only the values were used.
+            $values = [];
+            foreach ((array) $filter['options']['value_options'] as $v) {
+                $v = is_scalar($v) ? trim((string) $v) : '';
+                if ($v !== '') {
+                    $values[$v] = '';
+                }
+            }
+            unset($filter['options']['value_options']);
+            if (empty($filter['options'])) {
+                unset($filter['options']);
+            }
+            $filter['values'] = $values;
+            $configSettings['form']['filters'][$key] = $filter;
+            $hasChange = true;
+        }
+        if ($hasChange) {
+            $connection->executeStatement(
+                'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?;',
+                [json_encode($configSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), (int) $configRow['id']]
+            );
+        }
+    }
+
+    // The facet types "Link", "TreeLink" and "ThesaurusLink" are the types
+    // "Checkbox", "Tree" and "Thesaurus" with the option "as_link".
+    $configs = $connection->fetchAllAssociative(
+        'SELECT `id`, `settings` FROM `search_config` ORDER BY `id` ASC'
+    );
+    $linkTypes = ['Link' => 'Checkbox', 'TreeLink' => 'Tree', 'ThesaurusLink' => 'Thesaurus'];
+    foreach ($configs as $configRow) {
+        $configSettings = json_decode((string) $configRow['settings'], true) ?: [];
+        $hasChange = false;
+        foreach ($configSettings['facet']['facets'] ?? [] as $key => $facet) {
+            $type = $facet['type'] ?? '';
+            if (!isset($linkTypes[$type])) {
+                continue;
+            }
+            $facet['type'] = $linkTypes[$type];
+            $facet['as_link'] = true;
+            $configSettings['facet']['facets'][$key] = $facet;
+            $hasChange = true;
+        }
+        if ($hasChange) {
+            $connection->executeStatement(
+                'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?;',
+                [json_encode($configSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), (int) $configRow['id']]
+            );
+        }
+    }
+
+    // The position of the block of facets is a setting of the facets
+    // ("facet.position"), no more of the results ("results.facets").
+    $configs = $connection->fetchAllAssociative(
+        'SELECT `id`, `settings` FROM `search_config` ORDER BY `id` ASC'
+    );
+    foreach ($configs as $configRow) {
+        $configSettings = json_decode((string) $configRow['settings'], true) ?: [];
+        if (!isset($configSettings['results']['facets'])) {
+            continue;
+        }
+        $configSettings['facet']['position'] ??= $configSettings['results']['facets'];
+        unset($configSettings['results']['facets']);
+        $connection->executeStatement(
+            'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?;',
+            [json_encode($configSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), (int) $configRow['id']]
+        );
+    }
+
+    // The quick filter is a standard filter displayed in the simple search,
+    // no more a specialized setting of the form.
+    $configs = $connection->fetchAllAssociative(
+        'SELECT `id`, `settings` FROM `search_config` ORDER BY `id` ASC'
+    );
+    foreach ($configs as $configRow) {
+        $configSettings = json_decode((string) $configRow['settings'], true) ?: [];
+        $quickField = $configSettings['form']['quick_filter'] ?? '';
+        $hasChange = array_intersect_key($configSettings['form'] ?? [], array_flip(['quick_filter', 'quick_filter_label', 'quick_filter_values', 'quick_filter_advanced']));
+        if (!$hasChange) {
+            continue;
+        }
+        if ($quickField) {
+            $values = [];
+            foreach ($configSettings['form']['quick_filter_values'] ?? [] as $k => $v) {
+                $values[(string) $k] = (string) $v;
+            }
+            $filter = [
+                'field' => $quickField,
+                'label' => (string) ($configSettings['form']['quick_filter_label'] ?? ''),
+                'type' => 'Select',
+                'display_in' => empty($configSettings['form']['quick_filter_advanced']) ? 'simple' : 'both',
+            ];
+            if ($values) {
+                $filter['values'] = $values;
+            }
+            $name = $quickField;
+            if (isset($configSettings['form']['filters'][$name])) {
+                $name .= '_quick';
+            }
+            $configSettings['form']['filters'][$name] = $filter;
+        }
+        unset(
+            $configSettings['form']['quick_filter'],
+            $configSettings['form']['quick_filter_label'],
+            $configSettings['form']['quick_filter_values'],
+            $configSettings['form']['quick_filter_advanced']
+        );
+        $connection->executeStatement(
+            'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?;',
+            [json_encode($configSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), (int) $configRow['id']]
+        );
+    }
+
+    // The record or full text button is a standard filter of type "Rft", no
+    // more a specialized setting of the form.
+    $configs = $connection->fetchAllAssociative(
+        'SELECT `id`, `settings` FROM `search_config` ORDER BY `id` ASC'
+    );
+    foreach ($configs as $configRow) {
+        $configSettings = json_decode((string) $configRow['settings'], true) ?: [];
+        if (!array_key_exists('rft', $configSettings['form'] ?? [])) {
+            continue;
+        }
+        $rft = $configSettings['form']['rft'];
+        unset($configSettings['form']['rft']);
+        if ($rft) {
+            $configSettings['form']['filters']['rft'] = [
+                'field' => 'rft',
+                'type' => 'Rft',
+                'rft' => $rft,
+            ];
+        }
+        $connection->executeStatement(
+            'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?;',
+            [json_encode($configSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), (int) $configRow['id']]
+        );
+    }
+
+    // The sort selector is stored flat: "name => label".
+    $configs = $connection->fetchAllAssociative(
+        'SELECT `id`, `settings` FROM `search_config` ORDER BY `id` ASC'
+    );
+    foreach ($configs as $configRow) {
+        $configSettings = json_decode((string) $configRow['settings'], true) ?: [];
+        $sortList = $configSettings['results']['sort_list'] ?? [];
+        if (!$sortList || !is_array(reset($sortList))) {
+            continue;
+        }
+        $configSettings['results']['sort_list'] = array_map(fn ($sort) => is_array($sort) ? (string) ($sort['label'] ?? '') : (string) $sort, $sortList);
+        $connection->executeStatement(
+            'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?;',
+            [json_encode($configSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), (int) $configRow['id']]
+        );
+    }
+
+    // The settings of the advanced filter are options of the filter, with a
+    // list of elements of a row instead of a boolean by element.
+    $configs = $connection->fetchAllAssociative(
+        'SELECT `id`, `settings` FROM `search_config` ORDER BY `id` ASC'
+    );
+    foreach ($configs as $configRow) {
+        $configSettings = json_decode((string) $configRow['settings'], true) ?: [];
+        $filter = $configSettings['form']['filters']['advanced'] ?? null;
+        if (!$filter || isset($filter['options']['field_elements'])) {
+            continue;
+        }
+        $elements = array_keys(array_filter([
+            'joiner' => !empty($filter['field_joiner']),
+            'joiner_not' => !empty($filter['field_joiner_not']),
+            'operator' => !empty($filter['field_operator']),
+            'autosuggest' => !empty($filter['field_value_autosuggest']),
+        ]));
+        $options = array_filter([
+            'default_number' => isset($filter['default_number']) ? (int) $filter['default_number'] : 1,
+            'max_number' => isset($filter['max_number']) ? (int) $filter['max_number'] : 10,
+            'field_elements' => $elements,
+            'field_operators' => $filter['field_operators'] ?? [],
+            'fields' => $filter['fields'] ?? [],
+        ], fn ($v) => $v !== [] && $v !== '');
+        unset(
+            $filter['default_number'], $filter['max_number'],
+            $filter['field_joiner'], $filter['field_joiner_not'],
+            $filter['field_operator'], $filter['field_value_autosuggest'],
+            $filter['field_operators'], $filter['fields']
+        );
+        $filter['options'] = $options + ($filter['options'] ?? []);
+        $configSettings['form']['filters']['advanced'] = $filter;
+        $connection->executeStatement(
+            'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?;',
+            [json_encode($configSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), (int) $configRow['id']]
+        );
+    }
+
+    // The select filter stores its type as "Select" and its variants as
+    // options ("multiple" and "value_layout").
+    $configs = $connection->fetchAllAssociative(
+        'SELECT `id`, `settings` FROM `search_config` ORDER BY `id` ASC'
+    );
+    $selectTypes = [
+        'SelectFlat' => [false, 'flat'],
+        'SelectGroup' => [false, 'group'],
+        'MultiSelect' => [true, ''],
+        'MultiSelectFlat' => [true, 'flat'],
+        'MultiSelectGroup' => [true, 'group'],
+    ];
+    foreach ($configs as $configRow) {
+        $configSettings = json_decode((string) $configRow['settings'], true) ?: [];
+        $hasChange = false;
+        foreach ($configSettings['form']['filters'] ?? [] as $key => $filter) {
+            $type = $filter['type'] ?? '';
+            if (!isset($selectTypes[$type])) {
+                continue;
+            }
+            [$multiple, $layout] = $selectTypes[$type];
+            $filter['type'] = 'Select';
+            if ($multiple) {
+                $filter['options']['multiple'] = true;
+            }
+            if ($layout) {
+                $filter['options']['value_layout'] = $layout;
+            }
+            $configSettings['form']['filters'][$key] = $filter;
+            $hasChange = true;
+        }
+        if ($hasChange) {
+            $connection->executeStatement(
+                'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?;',
+                [json_encode($configSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), (int) $configRow['id']]
+            );
+        }
+    }
+
+    // The mode is stored once, no more copied in each facet.
+    $configs = $connection->fetchAllAssociative(
+        'SELECT `id`, `settings` FROM `search_config` ORDER BY `id` ASC'
+    );
+    foreach ($configs as $configRow) {
+        $configSettings = json_decode((string) $configRow['settings'], true) ?: [];
+        $hasChange = false;
+        foreach ($configSettings['facet']['facets'] ?? [] as $key => $facet) {
+            if (isset($facet['mode'])) {
+                unset($configSettings['facet']['facets'][$key]['mode']);
+                $hasChange = true;
+            }
+        }
+        if ($hasChange) {
+            $connection->executeStatement(
+                'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?;',
+                [json_encode($configSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), (int) $configRow['id']]
+            );
+        }
+    }
+
+    // Complete the conversion of the facets: the legacy option "integer"
+    // becomes "first_digits", the bounds move from the html attributes to the
+    // root, and the keys duplicated in the free options are removed.
+    $configs = $connection->fetchAllAssociative(
+        'SELECT `id`, `settings` FROM `search_config` ORDER BY `id` ASC'
+    );
+    $facetRootKeys = ['boolean_filter', 'field_end', 'paginate', 'language_site', 'languages', 'thesaurus', 'min', 'max', 'step', 'first_digits', 'scale_mode', 'scale_breakpoints', 'scale_show_ticks', 'value_labels', 'value_labels_table', 'field', 'label', 'type', 'order', 'limit', 'state', 'more', 'per_page', 'display_count', 'as_link', 'mode'];
+    foreach ($configs as $configRow) {
+        $configSettings = json_decode((string) $configRow['settings'], true) ?: [];
+        $hasChange = false;
+        foreach ($configSettings['facet']['facets'] ?? [] as $key => $facet) {
+            $original = $facet;
+            if (array_key_exists('integer', $facet)) {
+                $facet['first_digits'] ??= $facet['integer'];
+                unset($facet['integer']);
+            }
+            foreach (['min', 'max', 'step'] as $k) {
+                if (isset($facet['attributes'][$k])) {
+                    $facet[$k] ??= $facet['attributes'][$k];
+                    unset($facet['attributes'][$k]);
+                }
+            }
+            if (empty($facet['attributes'])) {
+                unset($facet['attributes']);
+            }
+            foreach ($facetRootKeys as $k) {
+                if (isset($facet['options'][$k]) && array_key_exists($k, $facet)) {
+                    unset($facet['options'][$k]);
+                }
+            }
+            if (empty($facet['options'])) {
+                unset($facet['options']);
+            }
+            if ($facet !== $original) {
+                $configSettings['facet']['facets'][$key] = $facet;
+                $hasChange = true;
+            }
+        }
+        if ($hasChange) {
+            $connection->executeStatement(
+                'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?;',
+                [json_encode($configSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), (int) $configRow['id']]
+            );
+        }
+    }
+    // Check the themes that override the templates whose data contract
+    // changed with the new format of the search config settings.
+    $themeChecks = [];
+
+    // The position of the facets is read from "facet.position" instead of
+    // "results.facets" in search.phtml. A theme reading the old key without
+    // the new one displays the facets at the default position only.
+    foreach (glob(OMEKA_PATH . '/themes/*/view/search/search.phtml') as $file) {
+        $content = (string) file_get_contents($file);
+        $readsOldKey = strpos($content, "'results', 'facets'") !== false
+            || strpos($content, '"results", "facets"') !== false
+            || strpos($content, "['facets']") !== false;
+        $readsNewKey = strpos($content, "'facet', 'position'") !== false
+            || strpos($content, '"facet", "position"') !== false;
+        if ($readsOldKey && !$readsNewKey) {
+            $themeChecks['search.phtml (facet position)'][] = mb_substr($file, mb_strlen(OMEKA_PATH) + 1);
+        }
+    }
+
+    // The properties of the results support a map with labels and the pseudo
+    // properties "header" and "body" in results.phtml. A theme rendering the
+    // setting without them skips these new options.
+    foreach (glob(OMEKA_PATH . '/themes/*/view/search/results.phtml') as $file) {
+        $content = (string) file_get_contents($file);
+        $readsProperties = strpos($content, "'results', 'properties'") !== false
+            || strpos($content, '"results", "properties"') !== false;
+        $handlesPseudo = strpos($content, "'header'") !== false
+            || strpos($content, '"header"') !== false;
+        if ($readsProperties && !$handlesPseudo) {
+            $themeChecks['results.phtml (properties header/body)'][] = mb_substr($file, mb_strlen(OMEKA_PATH) + 1);
+        }
+    }
+
+    // The settings of the record or full text search moved from "form.rft" to
+    // the options of the filter "rft".
+    $manageModuleAndResources = $this->getManageModuleAndResources();
+    $result = $skipThemeResults($manageModuleAndResources->checkStringsInFiles(
+        ["'form', 'rft'", '"form", "rft"'],
+        'themes/*/view/search/*'
+    ));
+    if ($result) {
+        $themeChecks['rft (settings moved to filter options)'] = array_values(array_unique($result));
+    }
+
+    foreach ($themeChecks as $check => $files) {
+        $themeChecks[$check] = $skipThemeResults($files);
+    }
+    $themeChecks = array_filter($themeChecks);
+    if ($themeChecks) {
+        $messenger->addWarning(new PsrMessage(
+            'The format of the search config settings was simplified (position of the facets, properties of the results, record or full text filter). Check and update the listed theme templates: {json}', // @translate
+            ['json' => json_encode($themeChecks, 448)]
+        ));
+    }
+
+    // The four lists of item sets to redirect are merged into the single map
+    // "advancedsearch_item_sets_redirects", that is already the only one read.
+    // An item set could be set in two lists, and the merge silently kept the
+    // mode "browse", so the applied redirection was not the expected one.
+    $siteIds = $api->search('sites', [], ['returnScalar' => 'id'])->getContent();
+    $conflictsBySite = [];
+    foreach ($siteIds as $siteId) {
+        $siteId = (int) $siteId;
+        $getList = function (string $name) use ($siteSettings, $siteId): array {
+            $value = $siteSettings->get($name, [], $siteId);
+            return is_array($value) ? $value : [];
+        };
+
+        $browse = array_fill_keys($getList('advancedsearch_item_sets_redirect_browse'), 'browse');
+        $search = array_fill_keys($getList('advancedsearch_item_sets_redirect_search'), 'search');
+        $first = array_fill_keys($getList('advancedsearch_item_sets_redirect_search_first'), 'first');
+        $pageUrl = $getList('advancedsearch_item_sets_redirect_page_url');
+
+        // Keep the previous precedence, so the stored redirections don't change.
+        $default = 'browse';
+        foreach (['first' => $first, 'search' => $search, 'browse' => $browse] as $mode => $list) {
+            if (isset($list['all'])) {
+                $default = $mode;
+            }
+        }
+        unset($browse['all'], $search['all'], $first['all']);
+
+        // An item set set in two lists keeps the mode of the first list.
+        $conflicts = array_keys(array_intersect_key($browse, $search)
+            + array_intersect_key($browse, $first)
+            + array_intersect_key($search, $first));
+        if ($conflicts) {
+            $conflictsBySite[$siteId] = $conflicts;
+        }
+
+        $merged = ['default' => $default] + $browse + $search + $first + $pageUrl;
+
+        $siteSettings->set('advancedsearch_item_sets_redirects', $merged, $siteId);
+
+        $siteSettings->delete('advancedsearch_item_sets_redirect_browse', $siteId);
+        $siteSettings->delete('advancedsearch_item_sets_redirect_search', $siteId);
+        $siteSettings->delete('advancedsearch_item_sets_redirect_search_first', $siteId);
+        $siteSettings->delete('advancedsearch_item_sets_redirect_page_url', $siteId);
+        // The two aliases kept for old themes are removed too.
+        $siteSettings->delete('advancedsearch_redirect_itemsets', $siteId);
+        $siteSettings->delete('advancedsearch_redirect_itemset', $siteId);
+    }
+
+    $messenger->addSuccess(new PsrMessage(
+        'The four lists of redirection of the item sets are merged into the single setting "Redirection of the page of an item set" for {count} sites.', // @translate
+        ['count' => count($siteIds)]
+    ));
+
+    if ($conflictsBySite) {
+        $messenger->addWarning(new PsrMessage(
+            'Some item sets were set in more than one list of redirection: the first mode was kept, as before, but it may not be the expected one. Check the setting for these sites and item sets: {json}', // @translate
+            ['json' => json_encode($conflictsBySite, 448)]
+        ));
+    }
+
+    // The two aliases are removed, so warn the themes that still read them.
+    $themesWithAlias = [];
+    foreach (glob(OMEKA_PATH . '/themes/*/view', GLOB_ONLYDIR) ?: [] as $themeView) {
+        $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($themeView));
+        foreach ($iterator as $file) {
+            if ($file->isFile()
+                && $file->getExtension() === 'phtml'
+                && strpos((string) file_get_contents($file->getPathname()), 'advancedsearch_redirect_itemset') !== false
+            ) {
+                $themesWithAlias[] = mb_substr($file->getPathname(), mb_strlen(OMEKA_PATH) + 1);
+            }
+        }
+    }
+    if ($themesWithAlias) {
+        $messenger->addWarning(new PsrMessage(
+            'The site settings "advancedsearch_redirect_itemset" and "advancedsearch_redirect_itemsets" are removed: use "advancedsearch_item_sets_redirects". Update the listed theme templates: {json}', // @translate
+            ['json' => json_encode($themesWithAlias, 448)]
+        ));
+    }
+
+    // The 84 query types for the filters are reduced to the 39 displayed ones:
+    // the negative types are derived from their positive one and the
+    // duplicates are families and variants.
+    // The autoloader of the module is not available during the upgrade.
+    require_once dirname(__DIR__, 2) . '/src/Stdlib/SearchResources.php';
+    $reduce = fn ($types) => is_array($types)
+        ? \AdvancedSearch\Stdlib\SearchResources::collapseFilterTypes($types)
+        : [];
+
+    $settings->set('advancedsearch_filter_types', $reduce($settings->get('advancedsearch_filter_types')));
+
+    foreach ($api->search('sites', [], ['returnScalar' => 'id'])->getContent() as $siteId) {
+        $siteId = (int) $siteId;
+        $siteSettings->set(
+            'advancedsearch_filter_types',
+            $reduce($siteSettings->get('advancedsearch_filter_types', [], $siteId)),
+            $siteId
+        );
+    }
+
+    $messenger->addSuccess(new PsrMessage(
+        'The query types for the filters are simplified: 39 types are displayed in the settings instead of 84, since the negative ones are derived and the duplicates are families and variants.' // @translate
+    ));
+
+    // The default sort is now the most recent resources first. The sort list of
+    // a search config is updated only when it was never customized, that is
+    // when it contains exactly the keys of a previous default, in the same
+    // order: any other list is a choice of the user and is kept as is.
+    // The sort "relevance asc" is rarely available, so it is not taken in
+    // account in the comparison, on both sides.
+    $previousDefaultSorts = [
+        'relevance desc',
+        'dcterms:title asc',
+        'dcterms:title desc',
+        'dcterms:date asc',
+        'dcterms:date desc',
+    ];
+
+    $newSorts = [
+        'id desc' => 'Most recent', // @translate
+        'id asc' => 'Oldest', // @translate
+    ];
+
+    $updated = [];
+    $skipped = [];
+    $searchConfigs = $connection->fetchAllKeyValue(
+        'SELECT `id`, `settings` FROM `search_config`'
+    );
+    foreach ($searchConfigs as $searchConfigId => $searchConfigSettings) {
+        $searchConfigSettings = json_decode((string) $searchConfigSettings, true) ?: [];
+        $sortList = $searchConfigSettings['results']['sort_list'] ?? [];
+        if (!is_array($sortList) || !count($sortList)) {
+            continue;
+        }
+        $name = $connection->fetchOne(
+            'SELECT `name` FROM `search_config` WHERE `id` = :id',
+            ['id' => $searchConfigId]
+        );
+        $sortKeys = array_values(array_diff(array_keys($sortList), ['relevance asc']));
+        if ($sortKeys !== $previousDefaultSorts) {
+            $skipped[] = $name;
+            continue;
+        }
+        $searchConfigSettings['results']['sort_list'] = $newSorts + $sortList;
+        $connection->executeStatement(
+            'UPDATE `search_config` SET `settings` = :settings WHERE `id` = :id',
+            [
+                'settings' => json_encode($searchConfigSettings, 320),
+                'id' => $searchConfigId,
+            ]
+        );
+        $updated[] = $name;
+    }
+
+    if ($updated) {
+        $messenger->addSuccess(new PsrMessage(
+            'The sorts "Most recent" and "Oldest" were prepended to the search pages that kept the default sort list, so the results are now displayed from the most recent one: {names}.', // @translate
+            ['names' => implode(', ', $updated)]
+        ));
+    }
+    if ($skipped) {
+        $messenger->addWarning(new PsrMessage(
+            'The default sort is now the most recent resources first. The sort list of these search pages was customized, so it was not modified: {names}. The sorts "id desc" and "id asc" can be added manually.', // @translate
+            ['names' => implode(', ', $skipped)]
+        ));
+    }
+
+    $messenger->addSuccess(new PsrMessage(
+        'A new option allows to replace the quick search of the theme and of the admin board by the form of the main search page, with a link to the advanced search, in a dialog or to the search page. See the main settings and the site settings.' // @translate
+    ));
+
+    $messenger->addWarning(new PsrMessage(
+        'The joiner "not" of the advanced filters now implies the joiner "and"/"or": the select was not displayed at all when only "not" was checked, so the option had no effect. Check the search pages that use it.' // @translate
+    ));
+
+    // Some old configs kept sub-arrays in the settings of the filters, for
+    // example the html attributes of the sub-elements of the filter "advanced",
+    // that are no more managed. They are lists of strings since a long time, so
+    // remove the remaining values that are arrays, else the config of the
+    // search page cannot be displayed.
+    $configs = $connection->fetchAllAssociative(
+        'SELECT `id`, `settings` FROM `search_config` ORDER BY `id` ASC'
+    );
+    $cleaned = [];
+    foreach ($configs as $configRow) {
+        $configSettings = json_decode((string) $configRow['settings'], true) ?: [];
+        $hasChange = false;
+        foreach ($configSettings['form']['filters'] ?? [] as $key => $filter) {
+            if (!is_array($filter)) {
+                continue;
+            }
+            foreach (['attributes', 'values', 'field_operators'] as $name) {
+                if (empty($filter[$name]) || !is_array($filter[$name])) {
+                    continue;
+                }
+                $list = array_filter($filter[$name], 'is_scalar');
+                if ($list === $filter[$name]) {
+                    continue;
+                }
+                if ($list) {
+                    $configSettings['form']['filters'][$key][$name] = $list;
+                } else {
+                    unset($configSettings['form']['filters'][$key][$name]);
+                }
+                $hasChange = true;
+            }
+        }
+        if ($hasChange) {
+            $connection->executeStatement(
+                'UPDATE `search_config` SET `settings` = :settings WHERE `id` = :id',
+                [
+                    'settings' => json_encode($configSettings, 320),
+                    'id' => (int) $configRow['id'],
+                ]
+            );
+            $cleaned[] = (int) $configRow['id'];
+        }
+    }
+
+    if ($cleaned) {
+        $messenger->addWarning(new PsrMessage(
+            'Some obsolete settings of the filters were removed in {count} search pages, in particular the html attributes of the sub-elements of the filter "advanced". Check them.', // @translate
+            ['count' => count($cleaned)]
+        ));
+    }
+}

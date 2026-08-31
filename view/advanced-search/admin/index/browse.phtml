@@ -34,6 +34,8 @@
  * @var \AdvancedSearch\Api\Representation\SearchSuggesterRepresentation[] $suggesters
  * @var array $runningJobs
  * @var array $searchConfigDefaults Config id => admin default roles.
+ * @var array $searchConfigSiteDefaults Config id => slugs of the sites using it
+ * by default.
  * @var array $searchConfigSites Config id => site slugs exposing it.
  */
 
@@ -258,6 +260,10 @@ $engineDetails = $this->trigger('view.browse.engine_details', ['searchEngines' =
                     $configId = $searchConfig->id();
                     $defaults = $searchConfigDefaults[$configId] ?? [];
                     $sites = $searchConfigSites[$configId] ?? [];
+                    $siteDefaults = $searchConfigSiteDefaults[$configId] ?? [];
+                    // A site may use a page by default without listing it as
+                    // available, so display it anyway: this is a real use.
+                    $sites = array_values(array_unique(array_merge($sites, $siteDefaults)));
                     // Open the search page in a new tab: the admin page if the
                     // config is enabled there (its route exists), else the
                     // front-end page of the first site exposing it.
@@ -314,7 +320,20 @@ $engineDetails = $this->trigger('view.browse.engine_details', ['searchEngines' =
                     <td><?= $escape($searchConfig->searchEngine()->name()) ?></td>
                     <td><?= $searchConfig->slug() ?></td>
                     <td>
-                        <?= $sites ? $escape(implode(', ', $sites)) : '<span class="warning-notice">' . $escape($translate('none')) . '</span>' ?>
+                        <?php
+                        if ($sites) {
+                            $siteLabels = [];
+                            foreach ($sites as $siteSlug) {
+                                $siteLabels[] = $escape($siteSlug)
+                                    . (in_array($siteSlug, $siteDefaults)
+                                        ? '<span class="search-config-default" title="' . $escapeAttr($translate('Default search page of this site')) . '">' . $escape($translate('default')) . '</span>'
+                                        : '');
+                            }
+                            echo implode(', ', $siteLabels);
+                        } else {
+                            echo '<span class="warning-notice">' . $escape($translate('none')) . '</span>';
+                        }
+                        ?>
                         <?php foreach ($defaults as $role): ?>
                         <span class="search-config-default" title="<?= $escapeAttr($translate('Default search page for this scope')) ?>"><?= $escape(sprintf($translate('default: %s'), $translate($role))) ?></span>
                         <?php endforeach; ?>

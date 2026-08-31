@@ -57,6 +57,7 @@ class IndexController extends AbstractActionController
             // page is actually used.
             'searchConfigDefaults' => $this->listSearchConfigDefaults(),
             'searchConfigSites' => $this->listSearchConfigSites(),
+            'searchConfigSiteDefaults' => $this->listSearchConfigSiteDefaults(),
         ]);
     }
 
@@ -114,6 +115,29 @@ class IndexController extends AbstractActionController
             $configIds = $siteSettings->get('advancedsearch_configs', []) ?: [];
             foreach ($configIds as $configId) {
                 $result[(int) $configId][] = $slug;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Map each config id to the slugs of the sites using it by default.
+     *
+     * A site may expose many search pages, but only one is its default one.
+     *
+     * @return array [config_id => ['site-slug', …]]
+     */
+    protected function listSearchConfigSiteDefaults(): array
+    {
+        $services = $this->getEvent()->getApplication()->getServiceManager();
+        $siteSettings = $services->get('Omeka\Settings\Site');
+        $sites = $this->api()->search('sites', [], ['returnScalar' => 'slug'])->getContent();
+        $result = [];
+        foreach ($sites as $siteId => $slug) {
+            $siteSettings->setTargetId($siteId);
+            $configId = (int) $siteSettings->get('advancedsearch_main_config');
+            if ($configId) {
+                $result[$configId][] = $slug;
             }
         }
         return $result;

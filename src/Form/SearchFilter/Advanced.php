@@ -61,8 +61,10 @@ class Advanced extends Fieldset
                 'class' => 'filter',
             ]);
 
-        $joiner = (bool) $this->getOption('field_joiner');
         $joinerNot = (bool) $this->getOption('field_joiner_not');
+        // The joiner "not" is a third option of the joiner, so it implies it:
+        // else the option would have no effect at all.
+        $joiner = $joinerNot || (bool) $this->getOption('field_joiner');
         if ($joiner) {
             $valueOptions = [
                 'and' => 'and', // @translate

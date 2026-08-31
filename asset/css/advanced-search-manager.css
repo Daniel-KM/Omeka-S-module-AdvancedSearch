@@ -131,6 +131,29 @@
         margin: 0.5em 0 0;
         width: 100%;
     }
+    .search-admin .collection-side > .collection-preview-all {
+        flex: none;
+        margin: 0.5em 0 0;
+        width: 100%;
+    }
+    /* The global preview uses the dialog of Common. */
+    .dialog-common .input-type-preview-all {
+        width: 560px;
+        max-width: 80vw;
+        text-align: left;
+    }
+    .input-type-preview-all .input-type-preview-item {
+        margin-bottom: 1.25em;
+    }
+    .input-type-preview-all .preview-label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 0.4em;
+    }
+    .dialog-common .input-type-preview-all input,
+    .dialog-common .input-type-preview-all select {
+        width: auto;
+    }
     .search-admin .collection-empty {
         margin: 0.5em 0;
         color: #676767;
@@ -250,8 +273,10 @@
         color: #676767;
         font-size: 0.85em;
     }
-    .search-admin .collection-item-type {
-        flex-basis: 100%;
+    /* The type of an item is its icon. */
+    .search-admin .collection-item-type.input-type::before {
+        margin-right: 0;
+        width: 1.2em;
     }
     /* Fields laid out side by side. */
     .search-admin .collection-inline {

@@ -193,19 +193,10 @@
     /**
      * Render the preview of an item (filter or facet) of the config.
      */
-    const render = function (fieldset, kind) {
+    // The mock of an item of the config: {type, label, html} or null.
+    const buildMock = function (fieldset, kind) {
         const typeControl = fieldset.querySelector('[name$="[type]"]');
-        if (!typeControl) return;
-        const typeField = typeControl.closest('.field');
-        if (!typeField) return;
-        let box = typeField.nextElementSibling;
-        if (!box || !box.classList.contains('input-type-preview')) {
-            box = document.createElement('div');
-            box.className = 'input-type-preview';
-            box.innerHTML = '<span class="input-type-preview-title">' + escapeHtml(t('preview', 'Preview')) + '</span><div class="input-type-preview-body" inert></div>';
-            typeField.parentNode.insertBefore(box, typeField.nextSibling);
-        }
-        const body = box.querySelector('.input-type-preview-body');
+        if (!typeControl) return null;
         const type = typeControl.value || '';
         const mocks = kind === 'facet' ? facets : filters;
         const mock = mocks[type];
@@ -234,16 +225,36 @@
             filterAutosuggest: elements.indexOf('autosuggest') !== -1,
             checked: false,
         };
-        if (!mock) {
-            box.hidden = true;
-            return;
-        }
-        box.hidden = false;
+        if (!mock) return null;
         // A simple filter carries its label itself.
         const withTitle = kind === 'facet' || ['Checkbox', 'HasValue', 'text', ''].indexOf(type) === -1;
-        body.innerHTML = (withTitle ? '<span class="preview-label">' + escapeHtml(options.label) + '</span>' : '') + mock(options);
+        return {
+            type: type,
+            label: options.label,
+            html: (withTitle ? '<span class="preview-label">' + escapeHtml(options.label) + '</span>' : '') + mock(options),
+        };
+    };
+
+    const render = function (fieldset, kind) {
+        const typeControl = fieldset.querySelector('[name$="[type]"]');
+        if (!typeControl) return;
+        const typeField = typeControl.closest('.field');
+        if (!typeField) return;
+        let box = typeField.nextElementSibling;
+        if (!box || !box.classList.contains('input-type-preview')) {
+            box = document.createElement('div');
+            box.className = 'input-type-preview';
+            box.innerHTML = '<span class="input-type-preview-title">' + escapeHtml(t('preview', 'Preview')) + '</span><div class="input-type-preview-body" inert></div>';
+            typeField.parentNode.insertBefore(box, typeField.nextSibling);
+        }
+        const built = buildMock(fieldset, kind);
+        box.hidden = !built;
+        if (built) {
+            box.querySelector('.input-type-preview-body').innerHTML = built.html;
+        }
 
         // The icon of the selected type in the chosen container.
+        const type = typeControl.value || '';
         const chosen = typeControl.nextElementSibling;
         if (chosen && chosen.classList.contains('chosen-container')) {
             const single = chosen.querySelector('.chosen-single > span');
@@ -251,6 +262,22 @@
                 single.className = type ? 'input-type input-type-' + type.toLowerCase() : '';
             }
         }
+    };
+
+    // A modal preview of the whole form or facets, built from the mocks of
+    // every item of the collection, in their order, in the dialog of Common.
+    const showAll = function (collection, kind, title) {
+        if (!window.CommonDialog) return;
+        const parts = Array.from(collection.querySelectorAll('.collection-main > fieldset, :scope > fieldset'))
+            .map(function (fieldset) { return buildMock(fieldset, kind); })
+            .filter(Boolean)
+            .map(function (built) { return '<div class="input-type-preview-item">' + built.html + '</div>'; });
+        window.CommonDialog.dialogGeneric({
+            heading: title,
+            body: '<div class="input-type-preview-all input-type-preview-body" inert>' + parts.join('') + '</div>',
+            textOk: null,
+            textCancel: null,
+        });
     };
 
     // The preview depends on the label and on some options too.
@@ -266,5 +293,7 @@
 
     window.AdvancedSearchInputPreview = {
         render: render,
+        buildMock: buildMock,
+        showAll: showAll,
     };
 })();

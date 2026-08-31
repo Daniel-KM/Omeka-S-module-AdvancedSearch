@@ -547,7 +547,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 'type' => Element\Collection::class,
                 'options' => [
                     'label' => 'Filters', // @ŧranslate
-                    'info' => 'The filters are the fields of the search form, used before the search, in this order. Select a filter in the list to edit it: the field to search, its label, the type of input, and the specific options.', // @translate
+                    'info' => 'The filters are the fields of the search form, used before submitting the search.', // @translate
                     'count' => 0,
                     'allow_add' => true,
                     'allow_remove' => true,
@@ -1048,7 +1048,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 'name' => 'sort_list',
                 'options' => [
                     'label' => 'Sort', // @translate
-                    'info' => 'The sort options offered in the results, in this order. Select one in the list to edit its field and label.', // @translate
+                    'info' => 'The sort options offered in the results.', // @translate
                     'count' => 0,
                     'allow_add' => true,
                     'allow_remove' => true,
@@ -1305,7 +1305,7 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 'type' => Element\Collection::class,
                 'options' => [
                     'label' => 'Facets', // @ŧranslate
-                    'info' => 'The facets are displayed in the page of results, after the search, to refine it, in this order. Select a facet in the list to edit it: the indexed field, its label, the type of display, and the specific options.', // @translate
+                    'info' => 'The facets are displayed in the page of results, after the search, in order to refine them.', // @translate
                     'count' => 0,
                     'allow_add' => true,
                     'allow_remove' => true,

@@ -195,8 +195,28 @@
                 plus.dataset.collectionId = collection.id;
                 plus.classList.add('collection-add');
                 plus.setAttribute('title', t('add', 'Add'));
-                side.appendChild(plus);
+                // The "+" stays above the preview button.
+                side.insertBefore(plus, side.querySelector('.collection-preview-all'));
             }
+            // A global preview of the form or the facets, from the mocks.
+            const kinds = {form_filters: 'filter', facet_facets: 'facet'};
+            if (kinds[collection.id] && window.AdvancedSearchInputPreview
+                && !side.querySelector('.collection-preview-all')
+            ) {
+                const previewButton = document.createElement('button');
+                previewButton.type = 'button';
+                previewButton.className = 'button collection-preview-all';
+                previewButton.textContent = collection.id === 'facet_facets'
+                    ? t('previewFacets', 'Preview the facets')
+                    : t('previewForm', 'Preview the form');
+                previewButton.addEventListener('click', function () {
+                    window.AdvancedSearchInputPreview.showAll(collection, kinds[collection.id], previewButton.textContent);
+                });
+                side.appendChild(previewButton);
+            }
+            // The preview button stays last, under the "+".
+            const preview = side.querySelector('.collection-preview-all');
+            if (preview && preview !== side.lastElementChild) side.appendChild(preview);
         };
         attachPlus();
         window.setTimeout(attachPlus, 0);
@@ -209,11 +229,13 @@
         const summary = function (fieldset) {
             const label = fieldText(fieldset, 'label');
             const field = fieldText(fieldset, 'field') || fieldText(fieldset, 'name');
-            const type = fieldText(fieldset, 'type');
+            const typeControl = fieldset.querySelector('select[name$="[type]"]');
+            const type = typeControl ? typeControl.value : '';
+            const typeLabel = fieldText(fieldset, 'type');
             const parts = [];
+            if (type) parts.push('<span class="collection-item-type input-type input-type-' + escapeHtml(type.toLowerCase()) + '" title="' + escapeHtml(typeLabel) + '" aria-label="' + escapeHtml(typeLabel) + '"></span>');
             if (label) parts.push('<span class="collection-item-label">' + escapeHtml(label) + '</span>');
             if (field && field !== label) parts.push('<span class="collection-item-field">' + escapeHtml(field) + '</span>');
-            if (type) parts.push('<span class="collection-item-type">' + escapeHtml(type) + '</span>');
             return parts.length
                 ? parts.join(' ')
                 : '<span class="collection-item-new">' + escapeHtml(collection.dataset.labelNew || t('newItem', 'New item')) + '</span>';

@@ -71,10 +71,12 @@ if (PHP_VERSION_ID < 80100) {
     $hasError = true;
 }
 
-// The module Thesaurus, when present, should be up to date, else the maps and
-// the queries on thesaurus fields may not work.
-if ($services->get('Omeka\ModuleManager')->getModule('Thesaurus')
-    && !$this->checkModuleActiveVersion('Thesaurus', '3.4.26')
+// The module Thesaurus, when installed, should be up to date, else the maps and
+// the queries on thesaurus fields may not work. The check applies whether it is
+// enabled or not, since its data remain, but not to a module only present on
+// the disk, and the version is compared without requiring an active module.
+if ($this->isModuleInstalled('Thesaurus')
+    && !$this->isModuleVersionAtLeast('Thesaurus', '3.4.26')
 ) {
     $message = new \Omeka\Stdlib\Message(
         $translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate

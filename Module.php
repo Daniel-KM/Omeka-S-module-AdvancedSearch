@@ -131,9 +131,47 @@ class Module extends AbstractModule
             );
         }
 
+        // The module Thesaurus, when installed, should be up to date, else the
+        // maps and the queries on thesaurus fields may not work. The check
+        // applies whether it is enabled or not, since its data remain, but not
+        // to a module only present on the disk.
+        if ($this->isModuleInstalled('Thesaurus')
+            && !$this->isModuleVersionAtLeast('Thesaurus', '3.4.26')
+        ) {
+            $errors[] = (string) new \Omeka\Stdlib\Message(
+                $translator->translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
+                'Thesaurus', '3.4.26'
+            );
+        }
+
         if ($errors) {
             throw new \Omeka\Module\Exception\ModuleCannotInstallException(implode("\n", $errors));
         }
+    }
+
+    /**
+     * Check if a module is installed, active or not.
+     *
+     * The module manager returns a module for any directory it finds, so the
+     * sole presence of a module says nothing: an archive that was unzipped and
+     * never installed, or a module with a broken ini, is returned like an
+     * installed one. Only the state tells that the module was really installed,
+     * so that its tables, its settings and its data are there, whether it is
+     * currently enabled or not.
+     *
+     * @todo Remove this method once Common 3.4.91, that provides it, is required.
+     */
+    protected function isModuleInstalled(string $module): bool
+    {
+        /** @var \Omeka\Module\Manager $moduleManager */
+        $moduleManager = $this->getServiceLocator()->get('Omeka\ModuleManager');
+        $module = $moduleManager->getModule($module);
+        return $module
+            && in_array($module->getState(), [
+                \Omeka\Module\Manager::STATE_ACTIVE,
+                \Omeka\Module\Manager::STATE_NOT_ACTIVE,
+                \Omeka\Module\Manager::STATE_NEEDS_UPGRADE,
+            ], true);
     }
 
     protected function postInstall(): void

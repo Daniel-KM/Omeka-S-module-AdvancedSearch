@@ -356,14 +356,19 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                 ->get('q')
                 ->add([
                     'name' => 'default_search_partial_word',
-                    'type' => Element\Checkbox::class,
+                    'type' => CommonElement\OptionalRadio::class,
                     'options' => [
                         'label' => 'Partial word search for main field (instead of standard full text search)', // @translate
-                        'info' => 'Currently, this mode does not allow to exclude properties for the main search field.', // @translate
+                        'info' => 'The search on the beginning of the words uses the full text index, so it is a lot quicker than searching anywhere in the values. Currently, these modes do not allow to exclude properties for the main search field.', // @translate
+                        'value_options' => [
+                            '' => 'No: search the exact words', // @translate
+                            'start' => 'Yes: search the beginning of the words', // @translate
+                            'anywhere' => 'Yes: search anywhere in the values (slow on big bases)', // @translate
+                        ],
                     ],
                     'attributes' => [
                         'id' => 'q_default_search_partial_word',
-                    'data-advanced-section' => $this->translator->translate('Query processing'), // @translate
+                        'data-advanced-section' => $this->translator->translate('Query processing'), // @translate
                     ],
                 ])
             ;

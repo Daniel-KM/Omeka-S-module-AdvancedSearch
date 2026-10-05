@@ -142,7 +142,7 @@ trait TraitFormAdapterClassic
             ->setAliases($formSettings['aliases'] ?? [])
             ->setFieldsQueryArgs($formSettings['fields_query_args'] ?? [])
             ->setOption('remove_diacritics', !empty($formSettings['remove_diacritics']))
-            ->setOption('default_search_partial_word', !empty($formSettings['default_search_partial_word']));
+            ->setOption('default_search_partial_word', (string) ($formSettings['default_search_partial_word'] ?? ''));
 
         // TODO Manage the "browse_attached_items" / "site_attachments_only".
 
@@ -625,7 +625,7 @@ trait TraitFormAdapterClassic
         $searchFormSettings['fields_query_args'] = $this->searchConfig->subSetting('index', 'query_args', []);
 
         $searchFormSettings['remove_diacritics'] = (bool) $this->searchConfig->subSetting('q', 'remove_diacritics', false);
-        $searchFormSettings['default_search_partial_word'] = (bool) $this->searchConfig->subSetting('q', 'default_search_partial_word', false);
+        $searchFormSettings['default_search_partial_word'] = (string) $this->searchConfig->subSetting('q', 'default_search_partial_word', '');
 
         // TODO Add a max per_page.
         $searchConfigSettings['results']['pagination_per_page'] = !empty($searchConfigSettings['results']['pagination_per_page'])

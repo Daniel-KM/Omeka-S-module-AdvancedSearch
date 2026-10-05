@@ -617,7 +617,7 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
             ->setAliases($aliases)
             ->setFieldsQueryArgs($fieldQueryArgs)
             ->setOption('remove_diacritics', (bool) $this->subSetting('q', 'remove_diacritics', false))
-            ->setOption('default_search_partial_word', (bool) $this->subSetting('q', 'default_search_partial_word', false));
+            ->setOption('default_search_partial_word', (string) $this->subSetting('q', 'default_search_partial_word', ''));
 
         $fields = [];
         if ($field) {

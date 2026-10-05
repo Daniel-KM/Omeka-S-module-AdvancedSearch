@@ -715,7 +715,8 @@ class SearchResources
             ->searchDateTime($qb, $query)
             // Override property with many features, replaced by filter.
             ->buildPropertyQuery($qb, $query)
-            ->buildFilterQuery($qb, $query);
+            ->buildFilterQuery($qb, $query)
+            ->searchFullTextStart($qb, $query);
         if ($this->adapter instanceof ItemAdapter) {
             $this
                 // Override for without item set id (with value "0").
@@ -1864,6 +1865,81 @@ class SearchResources
                     ->andWhere($expr->orX(...$or));
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Search the resources with a word starting with the query.
+     *
+     * The full text search of Omeka searches the exact words, so a search for a
+     * partial word uses a sql "like" with a leading wildcard, that no index can
+     * serve: on a big base, it is the slowest part of a search. The boolean
+     * mode of mysql searches the beginning of the words with the index of the
+     * table of the full text, so it is hundreds of times quicker, but it cannot
+     * find a word by its end or its middle.
+     *
+     * All the words are required, like the "like" does with the full query.
+     */
+    public function searchFullTextStart(QueryBuilder $qb, array $query): self
+    {
+        if (empty($query['fulltext_search_start'])
+            || !$this->adapter
+            || !($this->adapter instanceof \Omeka\Api\Adapter\FulltextSearchableInterface)
+        ) {
+            return $this;
+        }
+
+        // The words shorter than the minimal length of a word indexed by mysql
+        // (four characters by default) are skipped by the index, so they are
+        // searched as they are: the boolean mode returns no result for them.
+        $words = preg_split('~\s+~', trim((string) $query['fulltext_search_start']), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $words = array_filter($words, fn ($word): bool => $word !== '*');
+        if (!$words) {
+            return $this;
+        }
+        // Each word is required and searched as the beginning of a word. The
+        // special characters of the boolean mode are removed, so a query cannot
+        // change the logic of the search.
+        $against = implode(' ', array_map(
+            fn ($word): string => '+' . str_replace(['+', '-', '<', '>', '(', ')', '~', '*', '"', '@'], '', $word) . '*',
+            $words
+        ));
+
+        $expr = $qb->expr();
+        $alias = 'omeka_advancedsearch_fulltext';
+
+        $qb
+            ->innerJoin(
+                \Omeka\Entity\FulltextSearch::class,
+                $alias,
+                \Doctrine\ORM\Query\Expr\Join::WITH,
+                $expr->andX(
+                    $expr->eq("$alias.id", 'omeka_root.id'),
+                    $expr->eq("$alias.resource", $this->adapter->createNamedParameter($qb, $this->adapter->getResourceName()))
+                )
+            )
+            ->andWhere($expr->gt(
+                "MATCH($alias.title, $alias.text) AGAINST (" . $this->adapter->createNamedParameter($qb, $against) . ' BOOLEAN)',
+                0
+            ));
+
+        // Set the visibility constraints, like the full text search of Omeka.
+        /** @see \Omeka\Module::searchFullText() */
+        $services = $this->adapter->getServiceLocator();
+        $acl = $services->get('Omeka\Acl');
+        if ($acl->userIsAllowed(\Omeka\Entity\Resource::class, 'view-all')) {
+            return $this;
+        }
+        $constraints = $expr->eq("$alias.isPublic", true);
+        $identity = $services->get('Omeka\AuthenticationService')->getIdentity();
+        if ($identity) {
+            $constraints = $expr->orX(
+                $constraints,
+                $expr->eq("$alias.owner", $identity->getId())
+            );
+        }
+        $qb->andWhere($constraints);
 
         return $this;
     }

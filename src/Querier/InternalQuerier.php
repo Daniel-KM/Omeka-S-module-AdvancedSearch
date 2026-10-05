@@ -817,13 +817,21 @@ class InternalQuerier extends AbstractQuerier
             $q = trim($q, '" ');
         }
 
-        if ($isWrappedWithQuote || $this->query->getOption('default_search_partial_word', false)) {
+        $partialWord = $this->partialWordMode();
+        if ($isWrappedWithQuote || $partialWord === 'anywhere') {
             $this->args['filter'][] = [
                 'join' => 'and',
                 'field' => '',
                 'type' => 'in',
                 'val' => $q,
             ];
+            return;
+        }
+
+        // The search on the beginning of the words uses the index of the full
+        // text, unlike the search anywhere in the values.
+        if ($partialWord === 'start' && $q !== '*') {
+            $this->args['fulltext_search_start'] = $q;
             return;
         }
 
@@ -876,7 +884,8 @@ class InternalQuerier extends AbstractQuerier
             $q = trim($q, '" ');
         }
 
-        if ($isWrappedWithQuote || $this->query->getOption('default_search_partial_word', false)) {
+        $partialWord = $this->partialWordMode();
+        if ($isWrappedWithQuote || $partialWord === 'anywhere') {
             $this->args['filter'][] = [
                 'join' => 'and',
                 'field' => '',
@@ -1851,6 +1860,21 @@ class InternalQuerier extends AbstractQuerier
         }
 
         $this->response->setFacetCounts(array_map('array_values', $facetCountsByField));
+    }
+
+    /**
+     * Get the mode of the search on a partial word: "", "start" or "anywhere".
+     *
+     * The option was a checkbox, so a true value is the search anywhere in the
+     * values, that was the only mode.
+     */
+    protected function partialWordMode(): string
+    {
+        $mode = $this->query->getOption('default_search_partial_word', '');
+        if ($mode === true || $mode === 1 || $mode === '1') {
+            return 'anywhere';
+        }
+        return in_array($mode, ['start', 'anywhere'], true) ? $mode : '';
     }
 
     /**

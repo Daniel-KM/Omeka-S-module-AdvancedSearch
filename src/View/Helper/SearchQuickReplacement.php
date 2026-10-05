@@ -67,7 +67,7 @@ class SearchQuickReplacement extends AbstractHelper
         // The attribute data-search-form-url turns it into a dialog.
         return $html . sprintf(
             '<a href="%s" class="advanced-search-link" data-quick-replacement="1"%s data-dialog-heading="%s">%s</a>',
-            $escape($searchConfig->siteUrl()),
+            $escape((string) $searchConfig->siteUrl()),
             $advancedLink === 'dialog'
                 ? sprintf(' data-search-form-url="%s"', $escape($searchConfig->formUrl()))
                 : '',

@@ -84,14 +84,13 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
      */
     public function adminSearchUrl($canonical = false, array $query = []): string
     {
-        $url = $this->getViewHelper('Url');
         $options = [
             'force_canonical' => $canonical,
         ];
         if ($query) {
             $options['query'] = $query;
         }
-        return $url('search-admin-page-' . $this->slug(), [], $options);
+        return (string) $this->routeUrl('search-admin-page-' . $this->slug(), [], $options);
     }
 
     public function siteUrl($siteSlug = null, $canonical = false, array $query = [])
@@ -109,8 +108,30 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
         if ($query) {
             $options['query'] = $query;
         }
+        return $this->routeUrl('search-page-' . $this->slug(), $params, $options);
+    }
+
+    /**
+     * Get the url of a route of the search page, or null when it has none.
+     *
+     * A search page is available in admin, in sites, or in both, so the route
+     * of the other context does not exist. Furthermore, a page may be used in a
+     * context where it is not available, for example when it is set as the main
+     * search page of the admin and rendered in the layout of a site: the theme
+     * should not break the whole page for that.
+     */
+    protected function routeUrl(string $route, array $params = [], array $options = []): ?string
+    {
         $url = $this->getViewHelper('Url');
-        return $url('search-page-' . $this->slug(), $params, $options);
+        try {
+            return $url($route, $params, $options);
+        } catch (\Laminas\Router\Exception\RuntimeException $e) {
+            $this->getServiceLocator()->get('Omeka\Logger')->warn(
+                'The search page "{search_slug}" has no route "{route}": it is not available in this context.', // @translate
+                ['search_slug' => $this->slug(), 'route' => $route]
+            );
+            return null;
+        }
     }
 
     /**
@@ -120,16 +141,15 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
      */
     public function formUrl($siteSlug = null): string
     {
-        $url = $this->getViewHelper('Url');
         $status = $this->getServiceLocator()->get('Omeka\Status');
         if ($status->isAdminRequest()) {
-            return $url('search-admin-page-' . $this->slug() . '/form', [], []);
+            return (string) $this->routeUrl('search-admin-page-' . $this->slug() . '/form');
         }
         if (!$siteSlug) {
             $siteSlug = $this->getServiceLocator()->get('Application')
                 ->getMvcEvent()->getRouteMatch()->getParam('site-slug');
         }
-        return $url('search-page-' . $this->slug() . '/form', ['site-slug' => $siteSlug], []);
+        return (string) $this->routeUrl('search-page-' . $this->slug() . '/form', ['site-slug' => $siteSlug]);
     }
 
     public function name(): string

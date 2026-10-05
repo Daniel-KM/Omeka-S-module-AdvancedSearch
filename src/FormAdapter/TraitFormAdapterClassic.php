@@ -106,7 +106,12 @@ trait TraitFormAdapterClassic
             $formActionUrl = $isAdmin
                 ? $this->searchConfig->adminSearchUrl()
                 : $this->searchConfig->siteUrl();
-            $form->setAttribute('action', $formActionUrl);
+            // The search page may have no route in this context, for example an
+            // admin page rendered in the layout of a site: keep the form usable
+            // and submit it to the current page.
+            if ($formActionUrl) {
+                $form->setAttribute('action', $formActionUrl);
+            }
         }
 
         if (!empty($options['request'])) {

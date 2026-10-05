@@ -8,12 +8,41 @@
  * - the main field ("q"),
  * - the hidden elements,
  * - the button submit.
+ *
+ * The markup is the same than the core partial common/search-form, with the
+ * same ids and classes, so the css of the themes applies without any change.
+ * @see \Omeka\View\Helper\...  view/common/search-form.phtml
  */
+
+$escapeAttr = $this->plugin('escapeHtmlAttr');
+$translate = $this->plugin('translate');
 
 $params = $this->params()->fromQuery() ?: [];
 $form
     ->setData($params)
     ->prepare();
+
+$elementQ = $form->has('q') ? $form->get('q') : null;
+if (!$elementQ) {
+    echo $this->form($form);
+    return;
+}
+
+$elementQ
+    ->setAttribute('id', 'fulltext-search')
+    ->setAttribute('aria-label', $translate('Query'));
+
+$submit = $form->has('submit') ? $form->get('submit') : null;
 ?>
 
-<?= $this->form($form) ?>
+<form action="<?= $escapeAttr($form->getAttribute('action')) ?>" id="search-form" class="<?= $escapeAttr($form->getAttribute('class')) ?>" method="GET" aria-label="<?= $escapeAttr($translate('Search')) ?>" role="search">
+    <?= $this->formElement($elementQ) ?>
+    <?php foreach ($form->getElements() as $element): ?>
+        <?php if ($element->getAttribute('type') === 'hidden'): ?>
+    <?= $this->formElement($element) ?>
+        <?php endif; ?>
+    <?php endforeach; ?>
+    <?php if ($submit): ?>
+    <button id="search-submit" type="submit" class="search-submit button" aria-label="<?= $escapeAttr($translate('Submit')) ?>" title="<?= $escapeAttr($translate('Submit')) ?>"><span class="o-icon-search" aria-hidden="true"></span></button>
+    <?php endif; ?>
+</form>

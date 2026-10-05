@@ -55,7 +55,15 @@ class GetSearchConfig extends AbstractHelper
                     $defaultSiteId = $plugins->get('defaultSite')('id');
                     $searchConfigIdOrSlug = $siteSetting($configKey, null, $defaultSiteId);
                 }
+            } elseif ($plugins->get('status')->isAdminRequest()) {
+                // A page available only in admin can be set for the admin side
+                // bar, so it is never used by a site, that has no route for it.
+                $searchConfigIdOrSlug = $setting('advancedsearch_admin_config')
+                    ?: $setting('advancedsearch_main_config');
             } else {
+                // The context is unknown, for example an error page of a site,
+                // where no site route is matched: use the default page, that is
+                // available in the sites.
                 $searchConfigIdOrSlug = $setting('advancedsearch_main_config');
             }
             if (!$searchConfigIdOrSlug) {

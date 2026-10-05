@@ -445,6 +445,7 @@ return [
             'advancedsearch_filter_joiner_not' => true,
             'advancedsearch_fulltextsearch_alto' => false,
             'advancedsearch_main_config' => 1,
+            'advancedsearch_admin_config' => null,
             'advancedsearch_main_config_replace_quick' => false,
             'advancedsearch_main_config_advanced_link' => 'dialog',
             'advancedsearch_api_config' => '',

@@ -63,12 +63,27 @@ class SettingsFieldset extends Fieldset
                 'type' => CommonElement\OptionalSelect::class,
                 'options' => [
                     'element_group' => 'advanced_search',
-                    'label' => 'Default search page in admin side bar', // @translate
+                    'label' => 'Default search page', // @translate
+                    'info' => 'The default search page of a site is set in the site settings; this one is used when a site has none, so it should be a page available in the sites.', // @translate
                     'value_options' => $this->searchConfigs,
-                    'empty_option' => 'Select the search engine for the admin side bar…', // @translate
+                    'empty_option' => 'Select the default search page…', // @translate
                 ],
                 'attributes' => [
                     'id' => 'advancedsearch_main_config',
+                ],
+            ])
+            ->add([
+                'name' => 'advancedsearch_admin_config',
+                'type' => CommonElement\OptionalSelect::class,
+                'options' => [
+                    'element_group' => 'advanced_search',
+                    'label' => 'Default search page in admin side bar', // @translate
+                    'info' => 'A page available only in admin can be used here: unlike the default search page above, this one is never rendered by a site.', // @translate
+                    'value_options' => $this->searchConfigs,
+                    'empty_option' => 'Use the default search page…', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearch_admin_config',
                 ],
             ])
             ->add([

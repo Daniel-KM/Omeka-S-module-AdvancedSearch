@@ -2072,7 +2072,10 @@ class Module extends AbstractModule
                 $searchConfig = $view->siteSetting('advancedsearch_main_config');
             }
         } elseif ($status->isAdminRequest()) {
-            $searchConfig = $view->setting('advancedsearch_main_config');
+            // A page available only in admin can be set for the side bar, so it
+            // is never rendered by a site, that has no route for it.
+            $searchConfig = $view->setting('advancedsearch_admin_config')
+                ?: $view->setting('advancedsearch_main_config');
         } else {
             return;
         }

@@ -557,9 +557,18 @@ class IndexSearch extends AbstractJob
         );
 
         // After a full reindex, let the indexer finalize any pending migration
-        // (e.g. drop a renamed field once every document carries the new one).
-        // The default implementation does nothing.
-        if ($clearFullIndex) {
+        // (e.g. drop a renamed field once every document carries the new one)
+        // or purge the documents that were not reindexed. A reindex is full
+        // when it is not limited to some resources. The default implementation
+        // does nothing.
+        $isFullReindex = $clearFullIndex
+            || (!$this->resourceIds
+                && !$this->resourceTypes
+                && !$this->startResourceId
+                && !$this->resourcesLimit
+                && !$this->resourcesOffset
+            );
+        if ($isFullReindex) {
             try {
                 $indexer->onFullReindexed();
             } catch (\Throwable $e) {

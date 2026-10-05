@@ -86,9 +86,11 @@ interface IndexerInterface extends LoggerAwareInterface
     /**
      * Hook called once by the indexing job after a full reindex completed.
      *
-     * Lets an indexer finalize a pending migration of its engine, for instance
-     * dropping a renamed field once every document carries the new one. The
-     * default implementation does nothing.
+     * A reindex is full when it is not limited to some resources, even if the
+     * index was not cleared before. Lets an indexer finalize a pending
+     * migration of its engine, for instance dropping a renamed field once every
+     * document carries the new one, or purge the documents that were not
+     * reindexed. The default implementation does nothing.
      */
     public function onFullReindexed(): self;
 }

@@ -343,18 +343,47 @@ class RangeDouble extends Element implements InputProviderInterface
                 if ($domainMin === null) {
                     continue;
                 }
-                $pairs[] = [(float) $domainMin, $p];
+                $pairs[] = [(float) $domainMin, (float) $p];
             } elseif ($v === 'max') {
                 if ($domainMax === null) {
                     continue;
                 }
-                $pairs[] = [(float) $domainMax, $p];
+                $pairs[] = [(float) $domainMax, (float) $p];
             } else {
-                $pairs[] = [(float) $v, $p];
+                // A fixed breakpoint outside the current bounds is skipped: the
+                // bounds depend on the results, so a breakpoint set for the
+                // whole base may be out of them. Kept, it would break the order
+                // of the positions and the cursor would jump from a bound to
+                // the breakpoint.
+                $value = (float) $v;
+                if (($domainMin !== null && $value <= $domainMin)
+                    || ($domainMax !== null && $value >= $domainMax)
+                ) {
+                    continue;
+                }
+                $pairs[] = [$value, (float) $p];
             }
         }
         usort($pairs, fn ($a, $b) => $a[0] <=> $b[0]);
-        return $pairs;
+
+        // The positions must increase with the values, else the scale is not
+        // monotonic and the cursor jumps backward: skip the breakpoints that
+        // break the order, for example two of them at the same position.
+        $result = [];
+        $previousValue = null;
+        $previousPosition = null;
+        foreach ($pairs as $pair) {
+            if ($previousValue !== null
+                && ($pair[0] <= $previousValue || $pair[1] <= $previousPosition)
+            ) {
+                continue;
+            }
+            $result[] = $pair;
+            $previousValue = $pair[0];
+            $previousPosition = $pair[1];
+        }
+
+        return $result;
     }
 
     public function setScaleShowTicks(bool $showTicks): self

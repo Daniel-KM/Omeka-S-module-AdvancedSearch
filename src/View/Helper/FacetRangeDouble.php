@@ -127,12 +127,40 @@ class FacetRangeDouble extends AbstractFacet
                     }
                     $pairs[] = [$domainMax, $pos];
                 } elseif (is_numeric($rawValue)) {
-                    $pairs[] = [(float) $rawValue, $pos];
+                    // A fixed breakpoint outside the current bounds is skipped:
+                    // the bounds depend on the results, so a breakpoint set for
+                    // the whole base may be out of them. Kept, it would break
+                    // the order of the positions and the cursor would jump from
+                    // a bound to the breakpoint.
+                    $rawValue = (float) $rawValue;
+                    if (($domainMin !== null && $rawValue <= $domainMin)
+                        || ($domainMax !== null && $rawValue >= $domainMax)
+                    ) {
+                        continue;
+                    }
+                    $pairs[] = [$rawValue, $pos];
                 }
             }
             usort($pairs, fn ($a, $b) => $a[0] <=> $b[0]);
-            $options['scale_breakpoints'] = $pairs;
-            if (count($pairs) < 2) {
+
+            // The values and the positions must increase together, else the
+            // scale is not monotonic and the cursor jumps backward.
+            $breakpoints = [];
+            $previousValue = null;
+            $previousPosition = null;
+            foreach ($pairs as $pair) {
+                if ($previousValue !== null
+                    && ($pair[0] <= $previousValue || $pair[1] <= $previousPosition)
+                ) {
+                    continue;
+                }
+                $breakpoints[] = $pair;
+                $previousValue = $pair[0];
+                $previousPosition = $pair[1];
+            }
+
+            $options['scale_breakpoints'] = $breakpoints;
+            if (count($breakpoints) < 2) {
                 $options['scale_mode'] = 'linear';
                 $options['scale_breakpoints'] = [];
             }

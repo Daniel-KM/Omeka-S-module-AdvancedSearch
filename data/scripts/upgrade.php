@@ -4401,3 +4401,84 @@ if (version_compare($oldVersion, '3.4.64', '<')) {
         ));
     }
 }
+
+if (version_compare($oldVersion, '3.4.65', '<')) {
+    $messenger->addWarning(new PsrMessage(
+        'The facets of the internal engine no more count the values selected in the facet itself, like the Solr engine, so the other values of a facet stay available once a value is selected. Set the joiner "and" on a facet to keep the previous behaviour. Check the search pages.' // @translate
+    ));
+
+    // The option for the search on a partial word is no more a checkbox: the
+    // search on the beginning of the words was added, that uses the index of
+    // the full text, unlike the search anywhere in the values.
+    $configs = $connection->fetchAllAssociative(
+        'SELECT `id`, `settings` FROM `search_config` ORDER BY `id` ASC'
+    );
+    $partialWords = [];
+    foreach ($configs as $configRow) {
+        $configSettings = json_decode((string) $configRow['settings'], true) ?: [];
+        $partialWord = $configSettings['q']['default_search_partial_word'] ?? null;
+        if ($partialWord === null || is_string($partialWord)) {
+            continue;
+        }
+        // The only previous mode was the search anywhere in the values.
+        $configSettings['q']['default_search_partial_word'] = $partialWord ? 'anywhere' : '';
+        $connection->executeStatement(
+            'UPDATE `search_config` SET `settings` = :settings WHERE `id` = :id',
+            [
+                'settings' => json_encode($configSettings, 320),
+                'id' => (int) $configRow['id'],
+            ]
+        );
+        if ($partialWord) {
+            $partialWords[] = (int) $configRow['id'];
+        }
+    }
+
+    if ($partialWords) {
+        $messenger->addWarning(new PsrMessage(
+            'The search on a partial word can now be done on the beginning of the words, that uses the index of the full text and is hundreds of times quicker than the search anywhere in the values, kept in {count} search pages. Check them.', // @translate
+            ['count' => count($partialWords)]
+        ));
+    }
+}
+
+if (version_compare($oldVersion, '3.4.65', '<')) {
+    // The default search page of the admin side bar is a specific setting now:
+    // the main one is used by the sites that have no setting, so it must be a
+    // page available in the sites. A page available only in admin was rendered
+    // by the theme of a site when no site route was matched, for example on an
+    // error page, and the missing route broke the whole page.
+    $mainConfig = $settings->get('advancedsearch_main_config');
+    if ($mainConfig) {
+        $settings->set('advancedsearch_admin_config', $mainConfig);
+
+        // The main setting is used when no site route is matched, but the page
+        // may be rendered by the theme of a site, so it must be a page
+        // available in a site: else it takes the one of the main site.
+        $siteIds = $connection->fetchFirstColumn('SELECT `id` FROM `site` ORDER BY `id` ASC');
+        $inSite = false;
+        foreach ($siteIds as $siteId) {
+            $siteSettings->setTargetId((int) $siteId);
+            $availables = $siteSettings->get('advancedsearch_configs', []) ?: [];
+            $availables = array_map('intval', is_array($availables) ? $availables : [$availables]);
+            if (in_array((int) $mainConfig, $availables, true)) {
+                $inSite = true;
+                break;
+            }
+        }
+
+        if (!$inSite) {
+            $mainSiteId = (int) $settings->get('default_site');
+            $replacement = null;
+            if ($mainSiteId) {
+                $siteSettings->setTargetId($mainSiteId);
+                $replacement = (int) $siteSettings->get('advancedsearch_main_config') ?: null;
+            }
+            $settings->set('advancedsearch_main_config', $replacement);
+            $messenger->addWarning(new PsrMessage(
+                'The default search page was available only in admin, so it was moved to the new setting for the admin side bar and replaced by the one of the main site ({config}): a page that no site can display broke the sites when the theme rendered its form. Check the main settings.', // @translate
+                ['config' => $replacement ?: '-']
+            ));
+        }
+    }
+}

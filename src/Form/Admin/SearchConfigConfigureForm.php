@@ -1057,6 +1057,11 @@ class SearchConfigConfigureForm extends Form implements EventManagerAwareInterfa
                     'pairs_editor' => [
                         'key_label' => $this->translator->translate('Number'), // @translate
                         'value_label' => $this->translator->translate('Label'), // @translate
+                        // The number of results by page is a number.
+                        'key_element' => [
+                            'type' => CommonElement\OptionalNumber::class,
+                            'attributes' => ['min' => 1, 'step' => 1],
+                        ],
                     ],
                 ],
                 'attributes' => [

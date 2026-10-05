@@ -2075,6 +2075,18 @@ class Module extends AbstractModule
                 ->appendFile($assetUrl('js/advanced-search-form.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
         }
 
+        // Most themes render their own link to the advanced search of the core
+        // next to the quick search form. When the module appends its own link,
+        // the script moves the one of the theme to the search page and removes
+        // the one of the module, so no theme has to be updated.
+        if ($status->isSiteRequest()
+            && $plugins->get('siteSetting')('advancedsearch_main_config_replace_quick')
+            && $plugins->get('siteSetting')('advancedsearch_main_config_advanced_link', 'dialog')
+        ) {
+            $plugins->get('headScript')
+                ->appendFile($plugins->get('assetUrl')('js/search-quick-replacement.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
+        }
+
         // The quick search may be replaced by the main search form, with a
         // link opening the full form in a dialog, loaded on demand.
         if ($status->isSiteRequest()

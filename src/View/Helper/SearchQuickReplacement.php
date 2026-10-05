@@ -66,7 +66,7 @@ class SearchQuickReplacement extends AbstractHelper
         // or when the dialog cannot be loaded, the filters remain reachable.
         // The attribute data-search-form-url turns it into a dialog.
         return $html . sprintf(
-            '<a href="%s" class="advanced-search-link"%s data-dialog-heading="%s">%s</a>',
+            '<a href="%s" class="advanced-search-link" data-quick-replacement="1"%s data-dialog-heading="%s">%s</a>',
             $escape($searchConfig->siteUrl()),
             $advancedLink === 'dialog'
                 ? sprintf(' data-search-form-url="%s"', $escape($searchConfig->formUrl()))

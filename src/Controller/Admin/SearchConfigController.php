@@ -970,7 +970,8 @@ class SearchConfigController extends AbstractActionController
         $searchConfigId = $searchConfig->id();
 
         // Check admin and api, that are global and not per site.
-        $adminSearchId = (int) $this->settings()->get('advancedsearch_main_config');
+        $adminSearchId = (int) ($this->settings()->get('advancedsearch_admin_config')
+            ?: $this->settings()->get('advancedsearch_main_config'));
         if ($adminSearchId && $adminSearchId === $searchConfigId) {
             $result[] = 'admin';
         }
@@ -1147,10 +1148,10 @@ class SearchConfigController extends AbstractActionController
         $new = in_array('admin', $searchConfigSiteDefaults);
         if ($current !== $new) {
             if ($new) {
-                $settings->set('advancedsearch_main_config', $searchConfigId);
+                $settings->set('advancedsearch_admin_config', $searchConfigId);
                 $message = 'The page has been set by default in admin board.'; // @translate
             } else {
-                $settings->set('advancedsearch_main_config', null);
+                $settings->set('advancedsearch_admin_config', null);
                 $message = 'The page has been unset in admin board.'; // @translate
             }
             $this->messenger()->addSuccess($message);
@@ -1223,10 +1224,16 @@ class SearchConfigController extends AbstractActionController
 
         // An unused search page is not an error, but it is rarely wanted, so a
         // single warning replaces the two messages about the missing sites.
+        // A page used in admin or for the api does not need a site, so the
+        // warning would be useless for it.
         if (!$allDefaults && !$allAvailables) {
-            $this->messenger()->addWarning(new PsrMessage(
-                'This search page is available on no site: select the sites in the tab "Sites" of the page, or set it in the settings of each site.' // @translate
-            ));
+            if (!in_array('admin', $searchConfigSiteDefaults)
+                && !in_array('api', $searchConfigSiteDefaults)
+            ) {
+                $this->messenger()->addWarning(new PsrMessage(
+                    'This search page is available on no site: select the sites in the tab "Sites" of the page, or set it in the settings of each site.' // @translate
+                ));
+            }
             return;
         }
 

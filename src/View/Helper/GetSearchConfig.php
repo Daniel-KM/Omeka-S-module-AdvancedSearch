@@ -17,7 +17,18 @@ class GetSearchConfig extends AbstractHelper
         // Most of the time, only the current main search config is stored.
         static $searchConfigs = [];
 
-        $cacheKey = $searchConfigIdOrSlug . '/' . $resourceName;
+        // The context is part of the key: the same call gives another config in
+        // admin, in a site, and in another context, for example during the
+        // routing of a module (ark, identifier, etc.), where the site is not
+        // known yet.
+        $view = $this->getView();
+        $plugins = $view->getHelperPluginManager();
+        $status = $plugins->get('status');
+        $context = $status->isAdminRequest()
+            ? 'admin'
+            : ($status->isSiteRequest() ? 'site' : 'other');
+
+        $cacheKey = $context . '/' . $searchConfigIdOrSlug . '/' . $resourceName;
 
         if (array_key_exists($cacheKey, $searchConfigs)) {
             return $searchConfigs[$cacheKey];
@@ -27,9 +38,7 @@ class GetSearchConfig extends AbstractHelper
         // The try/catch avoids issue when the helper is called before the site
         // setting target is set.
 
-        $view = $this->getView();
-        $plugins = $view->getHelperPluginManager();
-        $isSiteRequest = $plugins->get('status')->isSiteRequest();
+        $isSiteRequest = $status->isSiteRequest();
         $setting = $plugins->get('setting');
         $siteSetting = $plugins->get('siteSetting');
 
@@ -55,14 +64,16 @@ class GetSearchConfig extends AbstractHelper
                     $defaultSiteId = $plugins->get('defaultSite')('id');
                     $searchConfigIdOrSlug = $siteSetting($configKey, null, $defaultSiteId);
                 }
-            } elseif ($plugins->get('status')->isAdminRequest()) {
+            } elseif ($status->isAdminRequest()) {
                 // A page available only in admin can be set for the admin side
                 // bar, so it is never used by a site, that has no route for it.
                 $searchConfigIdOrSlug = $setting('advancedsearch_admin_config')
                     ?: $setting('advancedsearch_main_config');
             } else {
-                // The context is unknown, for example an error page of a site,
-                // where no site route is matched: use the default page, that is
+                // The context is unknown: no site route is matched, but the
+                // page may be rendered by the theme of a site, for example on
+                // the route of a module (ark, identifier, etc.) or on an error
+                // page. So the global setting is used and it must be a page
                 // available in the sites.
                 $searchConfigIdOrSlug = $setting('advancedsearch_main_config');
             }
@@ -70,7 +81,7 @@ class GetSearchConfig extends AbstractHelper
                 $searchConfigs[$cacheKey] = null;
                 return null;
             }
-            $cacheKey = $searchConfigIdOrSlug . '/' . $resourceName;
+            $cacheKey = $context . '/' . $searchConfigIdOrSlug . '/' . $resourceName;
         }
 
         // Don't set it early because the cache key may have changed.

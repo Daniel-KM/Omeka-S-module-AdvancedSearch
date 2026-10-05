@@ -41,6 +41,13 @@ class InternalQuerier extends AbstractQuerier
      */
     protected $argsWithoutActiveFacets;
 
+    /**
+     * Active facets joined with "or", by facet name.
+     *
+     * @var array
+     */
+    protected $activeFacetsOr = [];
+
     public function query(): Response
     {
         /** @var \Omeka\Api\Manager $api */
@@ -933,6 +940,7 @@ class InternalQuerier extends AbstractQuerier
         }
         $this->filterQueryAny($activeFacetsAnd, true, true);
         $this->argsWithoutActiveFacets = $this->args;
+        $this->activeFacetsOr = $activeFacetsOr;
         $this->filterQueryAny($activeFacetsOr, true, true);
         $this->filterQueryRefine($this->query->getQueryRefine());
     }
@@ -1776,38 +1784,29 @@ class InternalQuerier extends AbstractQuerier
             $totalRess = $this->response->getTotalResults();
             // Like Solr, get only available useful values or all existing values.
             /** @see https://solr.apache.org/guide/solr/latest/query-guide/faceting.html */
-            if ($isAllFacets) {
-                // Do the query one time for all facets, for each resource type.
-                // It is not possible when there are facets for item set or site
-                // because they are removed from the query.
-                // FIXME Where the item sets and facets are removed from the query?
-                // TODO Check if item sets and sites are still an exception for references.
-                /** @see \Reference\Mvc\Controller\Plugin\References::searchQuery() */
-                $referenceQuery = $this->argsWithoutActiveFacets;
-            } elseif (!$totalRess) {
+            if (!$isAllFacets && !$totalRess) {
                 return;
-            } else {
-                // For performance, use the full list of resource ids when possible,
-                // instead of the original query, that implies to run query twice.
-                // This is no more possible, because the full list of ids is no
-                // more filled early.
-                $referenceQuery = $this->args;
             }
 
             $referenceOptions['resource_name'] = $mainResourceType;
-            $values = $references
-                ->setMetadata($referenceMetadata)
-                ->setQuery($referenceQuery)
-                ->setOptions($referenceOptions)
-                ->list();
-            // When first_digits is enabled, Reference already returns aggregated
-            // year values at the SQL level, so no PHP aggregation is needed.
-            foreach (array_keys($referenceMetadata) as $facetName) {
-                foreach ($values[$facetName]['o:references'] ?? [] as $value => $count) {
-                    $facetCountsByField[$facetName][$value] = [
-                        'value' => $value,
-                        'count' => $count,
-                    ];
+            // The facets are grouped by the query used to count their values,
+            // so the search is done one time for all the facets that share it.
+            foreach ($this->facetGroups($referenceMetadata, $isAllFacets) as $group) {
+                $values = $references
+                    ->setMetadata($group['metadata'])
+                    ->setQuery($group['query'])
+                    ->setOptions($referenceOptions)
+                    ->list();
+                // When first_digits is enabled, Reference already returns
+                // aggregated year values at the SQL level, so no PHP
+                // aggregation is needed.
+                foreach (array_keys($group['metadata']) as $facetName) {
+                    foreach ($values[$facetName]['o:references'] ?? [] as $value => $count) {
+                        $facetCountsByField[$facetName][$value] = [
+                            'value' => $value,
+                            'count' => $count,
+                        ];
+                    }
                 }
             }
             $this->response->setFacetCounts(array_map('array_values', $facetCountsByField));
@@ -1820,39 +1819,84 @@ class InternalQuerier extends AbstractQuerier
         // The query already contains the arg "resource_type".
         foreach ($this->byResourceType ? $this->resourceTypes : ['resources'] as $resourceType) {
             $totalRess = $this->response->getTotalResults();
-            if ($isAllFacets) {
-                $referenceQuery = $this->argsWithoutActiveFacets;
-            } elseif (!$totalRess) {
+            if (!$isAllFacets && !$totalRess) {
                 continue;
-            } else {
-                $referenceQuery = $this->args;
             }
 
             $referenceOptions['resource_name'] = $resourceType;
-            $values = $references
-                ->setMetadata($referenceMetadata)
-                ->setQuery($referenceQuery)
-                ->setOptions($referenceOptions)
-                ->list();
-            // When first_digits is enabled, Reference already returns aggregated
-            // year values at the SQL level. Here we merge counts across resource
-            // types when querying multiple types separately.
-            foreach (array_keys($referenceMetadata) as $facetName) {
-                foreach ($values[$facetName]['o:references'] ?? [] as $value => $count) {
-                    if (empty($facetCountsByField[$facetName][$value])) {
-                        $facetCountsByField[$facetName][$value] = [
-                            'value' => $value,
-                            'count' => $count,
-                        ];
-                    } else {
-                        // Merge counts from multiple resource types.
-                        $facetCountsByField[$facetName][$value]['count'] += $count;
+            foreach ($this->facetGroups($referenceMetadata, $isAllFacets) as $group) {
+                $values = $references
+                    ->setMetadata($group['metadata'])
+                    ->setQuery($group['query'])
+                    ->setOptions($referenceOptions)
+                    ->list();
+                // When first_digits is enabled, Reference already returns
+                // aggregated year values at the SQL level. Here we merge counts
+                // across resource types when querying multiple types
+                // separately.
+                foreach (array_keys($group['metadata']) as $facetName) {
+                    foreach ($values[$facetName]['o:references'] ?? [] as $value => $count) {
+                        if (empty($facetCountsByField[$facetName][$value])) {
+                            $facetCountsByField[$facetName][$value] = [
+                                'value' => $value,
+                                'count' => $count,
+                            ];
+                        } else {
+                            // Merge counts from multiple resource types.
+                            $facetCountsByField[$facetName][$value]['count'] += $count;
+                        }
                     }
                 }
             }
         }
 
         $this->response->setFacetCounts(array_map('array_values', $facetCountsByField));
+    }
+
+    /**
+     * Group the facets by the query used to count their values.
+     *
+     * A facet joined with "or" excludes its own active values from its counts,
+     * so its other values stay available, like Solr does with the tagged
+     * filters. A facet joined with "and" narrows the results, so its values are
+     * kept: else a value would promise results that the "and" cannot return.
+     *
+     * The facets without active values share the same query, so the search is
+     * done one time for all of them, instead of one time by facet.
+     */
+    protected function facetGroups(array $referenceMetadata, bool $isAllFacets): array
+    {
+        if ($isAllFacets) {
+            return [[
+                'query' => $this->argsWithoutActiveFacets,
+                'metadata' => $referenceMetadata,
+            ]];
+        }
+        $groups = [];
+        foreach ($referenceMetadata as $facetName => $field) {
+            $key = isset($this->activeFacetsOr[$facetName]) ? $facetName : '';
+            $groups[$key]['query'] ??= $this->facetArgs($facetName);
+            $groups[$key]['metadata'][$facetName] = $field;
+        }
+        return $groups;
+    }
+
+    /**
+     * Get the query used to count the values of a facet.
+     */
+    protected function facetArgs(string $facetName): array
+    {
+        if (!isset($this->activeFacetsOr[$facetName])) {
+            return $this->args;
+        }
+        $otherFacets = $this->activeFacetsOr;
+        unset($otherFacets[$facetName]);
+        $args = $this->args;
+        $this->args = $this->argsWithoutActiveFacets;
+        $this->filterQueryAny($otherFacets, true, true);
+        $facetArgs = $this->args;
+        $this->args = $args;
+        return $facetArgs;
     }
 
     /**

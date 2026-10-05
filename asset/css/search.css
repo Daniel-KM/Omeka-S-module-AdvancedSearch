@@ -38,8 +38,15 @@
     .form-search label.search-submit {
         display: none;
     }
+    /* The buttons are aligned to the right without float: a float makes the
+       next block (the results) wrap beside the button, like a column. */
+    .form-search .search-form-buttons {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
     .form-search button.search-submit {
-        float: right;
+        float: none;
     }
     .form-search .chosen-container-single .chosen-single,
     .form-search .chosen-container-multi .chosen-choices {

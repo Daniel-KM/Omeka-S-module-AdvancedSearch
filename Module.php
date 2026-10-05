@@ -2048,8 +2048,10 @@ class Module extends AbstractModule
         }
 
         if ($status->isSiteRequest()) {
-            $params = $view->params()->fromRoute();
-            if ($params['controller'] === \AdvancedSearch\Controller\SearchController::class) {
+            // The route params are null on an error page, for example when the
+            // site is not available.
+            $params = $view->params()->fromRoute() ?: [];
+            if (($params['controller'] ?? null) === \AdvancedSearch\Controller\SearchController::class) {
                 $searchConfig = @$params['id'];
             } else {
                 $searchConfig = $view->siteSetting('advancedsearch_main_config');

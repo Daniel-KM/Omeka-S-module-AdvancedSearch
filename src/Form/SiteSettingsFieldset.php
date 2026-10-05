@@ -151,7 +151,22 @@ class SiteSettingsFieldset extends Fieldset
                         // the user, since it is not a default value.
                         'keys' => ['default' => 'All other item sets'] + $this->itemSets, // @translate
                         'key_fill' => false,
-                        'key_select' => true,
+                        // The item sets are selected with the element of
+                        // Omeka, that groups them by owner and is searchable.
+                        'key_element' => [
+                            'type' => OmekaElement\ItemSetSelect::class,
+                            'options' => [
+                                'prepend_value_options' => [
+                                    'default' => 'All other item sets', // @translate
+                                ],
+                            ],
+                            'attributes' => ['class' => 'chosen-select'],
+                        ],
+                        // The redirection is a keyword or a page or a url, so
+                        // the choices are radios and the last one reveals a
+                        // field with the pages of the site as suggestions.
+                        'value_type' => 'itemSetRedirect',
+                        'value_options' => ['pages' => $this->sitePages],
                     ],
                 ],
                 'attributes' => [

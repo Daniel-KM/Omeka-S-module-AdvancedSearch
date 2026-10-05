@@ -1,4 +1,7 @@
-/* Collapsible groups of the grouped checkboxes of the settings pages. */
+/*
+ * Collapsible groups of the grouped checkboxes of the settings pages.
+ * Some rules are set to bypass default omeka ones.
+ */
 
 .grouped-checkboxes-group {
     clear: both;
@@ -45,4 +48,49 @@
 
 .grouped-checkboxes-content {
     padding: 0.3em 0 0 1em;
+}
+
+.item-sets-redirect {
+    display: flex;
+    align-items: center;
+    gap: 0.35em;
+    flex-wrap: wrap;
+    min-width: 0;
+    flex: 0 1 auto;
+}
+.item-sets-redirect-choices {
+    display: flex;
+    align-items: center;
+    gap: 0.1em 0.6em;
+    flex-wrap: wrap;
+}
+.inputs .common-pairs-cell-value.item-sets-redirect label {
+    margin: 0;
+    padding: 0;
+}
+
+.common-pairs .item-sets-redirect-choice,
+.common-pairs .item-sets-redirect-choice input[type=radio] {
+    width: auto !important;
+    flex: 0 0 auto;
+}
+.item-sets-redirect-choice {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25em;
+    margin: 0;
+    white-space: nowrap;
+    font-size: 0.9em;
+    width: auto;
+    flex: 0 0 auto;
+}
+.item-sets-redirect-choice input[type=radio] {
+    margin: 0;
+    width: auto;
+    flex: 0 0 auto;
+}
+.item-sets-redirect-target {
+    flex: 1 1 8em;
+    min-width: 6em;
+    margin: 0;
 }

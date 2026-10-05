@@ -2040,10 +2040,25 @@ class Module extends AbstractModule
                     && in_array($params['action'] ?? null, ['edit', 'settings'], true));
             if ($isSettings) {
                 $assetUrl = $plugins->get('assetUrl');
+                $translate = $plugins->get('translate');
                 $plugins->get('headLink')
                     ->appendStylesheet($assetUrl('css/advanced-search-settings.css', 'AdvancedSearch'));
                 $plugins->get('headScript')
                     ->appendFile($assetUrl('js/advanced-search-settings.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
+                // Widget of the editor of pairs for the redirections of the
+                // item sets: it is registered in the editor of module Common,
+                // so it is loaded after it.
+                $plugins->get('headScript')
+                    ->appendScript(sprintf('window.AdvancedSearchItemSetsRedirects = %s;', json_encode([
+                        'labels' => [
+                            'browse' => $translate('Browse'), // @translate
+                            'search' => $translate('Search'), // @translate
+                            'first' => $translate('First page'), // @translate
+                            'custom' => $translate('Page or url'), // @translate
+                            'pageOrUrl' => $translate('Slug of a page or url'), // @translate
+                        ],
+                    ], 320)))
+                    ->appendFile($assetUrl('js/item-sets-redirects.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);
             }
         }
 

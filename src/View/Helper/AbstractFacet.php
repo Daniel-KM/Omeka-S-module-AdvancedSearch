@@ -88,6 +88,41 @@ class AbstractFacet extends AbstractHelper
     {
         static $facetsData = [];
 
+        $this->init();
+
+        // For active facets, there is no facet field.
+        if ($facetField === null) {
+            /** @see \AdvancedSearch\View\Helper\FacetActives::prepareActiveFacetData() */
+            $facetsData[$facetField] = $this->prepareActiveFacetData($facetValues, $options);
+        } elseif (!isset($facetsData[$facetField])) {
+            $facetsData[$facetField] = $this->prepareFacetData($facetField, $facetValues, $options);
+        }
+
+        if ($asData) {
+            return $facetsData[$facetField];
+        }
+
+        return $this->partialHelper->__invoke($this->partial, $facetField === null
+            ? ['activeFacets' => $facetsData[$facetField], 'options' => $options]
+            : $facetsData[$facetField]);
+    }
+
+    /**
+     * Get the label of a value of a field, for example the title of an item set
+     * from its id, like in the facets.
+     *
+     * @param string|int|float|null $value
+     */
+    public function valueLabel(string $field, $value): ?string
+    {
+        if (!$this->api) {
+            $this->init();
+        }
+        return $this->facetValueLabel($field, $value);
+    }
+
+    protected function init(): void
+    {
         $view = $this->getView();
         $plugins = $view->getHelperPluginManager();
         $this->api = $plugins->get('api');
@@ -125,22 +160,6 @@ class AbstractFacet extends AbstractHelper
         }
 
         unset($this->queryBase['page']);
-
-        // For active facets, there is no facet field.
-        if ($facetField === null) {
-            /** @see \AdvancedSearch\View\Helper\FacetActives::prepareActiveFacetData() */
-            $facetsData[$facetField] = $this->prepareActiveFacetData($facetValues, $options);
-        } elseif (!isset($facetsData[$facetField])) {
-            $facetsData[$facetField] = $this->prepareFacetData($facetField, $facetValues, $options);
-        }
-
-        if ($asData) {
-            return $facetsData[$facetField];
-        }
-
-        return $this->partialHelper->__invoke($this->partial, $facetField === null
-            ? ['activeFacets' => $facetsData[$facetField], 'options' => $options]
-            : $facetsData[$facetField]);
     }
 
     /**
@@ -294,6 +313,15 @@ class AbstractFacet extends AbstractHelper
             return null;
         }
 
+        // The values of an integer index may be integers.
+        $value = (string) $value;
+
+        // An index of linked resources stores their ids, displayed with their
+        // titles like the field "id".
+        if (is_numeric($value) && preg_match('~_link_(?:is?|ss?)$~', $facetField)) {
+            $facetField = 'id';
+        }
+
         switch ($facetField) {
             case 'access':
             case 'resource_type':
@@ -309,15 +337,11 @@ class AbstractFacet extends AbstractHelper
                     : $public;
 
             case 'id':
-                $data = ['id' => $value];
-                // The site id is required in public.
-                if ($this->siteId) {
-                    $data['site_id'] = $this->siteId;
-                }
-                /** @var \Omeka\Api\Representation\ItemSetRepresentation $resource */
+                // Resources cannot be searched, only read, so the site is not
+                // checked; the visibility is managed by the api.
+                $resource = null;
                 try {
-                    // Resources cannot be searched, only read.
-                    $resource = $this->api->read('resources', $data)->getContent();
+                    $resource = $this->api->read('resources', ['id' => $value])->getContent();
                 } catch (\Throwable $e) {
                 }
                 return $resource

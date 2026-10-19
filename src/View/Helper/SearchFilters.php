@@ -817,10 +817,18 @@ class SearchFilters extends AbstractHelper
             } else {
                 $vals = $this->checkAndFlatArray($val);
                 // Manage special display: uri, linked resource, data type…
+                // Only the labels of the values of this filter are used.
                 if (in_array($queryType, ['eq', 'neq'], true)) {
-                    $vals = array_replace(array_combine($vals, $vals), $linkUris);
+                    $vals = array_combine($vals, $vals);
+                    $vals = array_replace($vals, array_intersect_key($linkUris, $vals));
+                    // An id of resource, like an item set, is displayed with
+                    // its title.
+                    if ($this->isResourceIdField($queryFields)) {
+                        $vals = array_replace($vals, array_intersect_key($linkIds, $vals));
+                    }
                 } elseif (in_array($queryType, ['res', 'nres'], true)) {
-                    $vals = array_replace(array_combine($vals, $vals), $linkIds);
+                    $vals = array_combine($vals, $vals);
+                    $vals = array_replace($vals, array_intersect_key($linkIds, $vals));
                 } elseif (in_array($queryType, ['dt', 'ndt', 'dtp', 'ndtp'])) {
                     // If this is a data type query, convert the value to the
                     // data type's label.
@@ -868,6 +876,25 @@ class SearchFilters extends AbstractHelper
         }
 
         return $filters;
+    }
+
+    /**
+     * Check if a filter field stores ids of resources, like item sets.
+     *
+     * The owner or the site are not resources, so their ids are not checked.
+     *
+     * @param string|array|null $fields
+     */
+    protected function isResourceIdField($fields): bool
+    {
+        foreach (is_array($fields) ? $fields : [$fields] as $field) {
+            if (is_string($field)
+                && preg_match('~^(?:item_set|item|media|resource)(?:_id)?(?:_is?|_ss?)?$|_link_is?$~', $field)
+            ) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

@@ -312,11 +312,13 @@ class SearchingFilters extends AbstractHelper
                                 $filters[$filterLabel][$this->urlQuery($key)] = sprintf($translate('until %s'), $valueTo); // @translate
                             }
                         }
-                        // Else manage raw label/value.
+                        // Else manage label/value, with the label of the value
+                        // like in the facets (title of an item set, etc.).
                         else {
                             $filterLabel = $fieldLabels[$key];
+                            $facetHelper = $plugins->get('facetLinks');
                             foreach (array_filter(array_map('trim', array_map('strval', $this->checkAndFlatArray($value))), 'strlen') as $subKey => $subValue) {
-                                $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $subValue;
+                                $filters[$filterLabel][$this->urlQuery($key, $subKey)] = $facetHelper->valueLabel($key, $subValue) ?? $subValue;
                             }
                         }
                     }

@@ -52,6 +52,11 @@ class IndexSuggestions extends AbstractJob
      */
     protected $modeIndex;
 
+    /**
+     * @var bool|null
+     */
+    protected $hasRegexpReplace;
+
     public function perform(): void
     {
         $services = $this->getServiceLocator();
@@ -372,27 +377,13 @@ class IndexSuggestions extends AbstractJob
         if ($this->modeIndex === 'start' || $this->modeIndex === 'start_full' || !$this->modeIndex) {
             for ($numberWords = 3; $numberWords >= 1; $numberWords--) {
                 // Don't "insert ignore and distinct", increment on duplicate.
-                // Use REGEXP_REPLACE to trim non-letter/non-number characters from start and end.
-                // Keep "/" for paths. Unicode classes: \pL = letters, \pN = numbers.
+                $text = $this->trimNonWordCharacters(
+                    "TRIM(SUBSTRING_INDEX(CONCAT(TRIM(REPLACE(REPLACE(`value`.`value`, '\\n', ' '), '\\r', ' ')), ' '), ' ', $numberWords))"
+                );
                 $sql = <<<SQL
                     INSERT INTO `_suggestions_temp` (`text`, `site_id`, `$column`)
                     SELECT
-                        SUBSTRING(
-                            REGEXP_REPLACE(
-                                REGEXP_REPLACE(
-                                    TRIM(
-                                        SUBSTRING_INDEX(
-                                            CONCAT(TRIM(REPLACE(REPLACE(`value`.`value`, "\n", ' '), "\r", ' ')), ' '),
-                                            ' ',
-                                            $numberWords
-                                        )
-                                    ),
-                                    '^[^\\\\pL\\\\pN/]+', ''
-                                ),
-                                '[^\\\\pL\\\\pN/]+$', ''
-                            ),
-                            1, 190
-                        ),
+                        SUBSTRING($text, 1, 190),
                         $siteValue,
                         1
                     FROM `value`
@@ -410,16 +401,13 @@ class IndexSuggestions extends AbstractJob
 
         // For full mode: also add complete trimmed values.
         if ($this->modeIndex === 'full' || $this->modeIndex === 'start_full' || $this->modeIndex === 'contain_full') {
+            $text = $this->trimNonWordCharacters(
+                "TRIM(SUBSTRING(REPLACE(REPLACE(`value`.`value`, '\\n', ' '), '\\r', ' '), 1, 190))"
+            );
             $sql = <<<SQL
                 INSERT INTO `_suggestions_temp` (`text`, `site_id`, `$column`)
                 SELECT
-                    REGEXP_REPLACE(
-                        REGEXP_REPLACE(
-                            TRIM(SUBSTRING(REPLACE(REPLACE(`value`.`value`, "\n", ' '), "\r", ' '), 1, 190)),
-                            '^[^\\\\pL\\\\pN/]+', ''
-                        ),
-                        '[^\\\\pL\\\\pN/]+$', ''
-                    ),
+                    $text,
                     $siteValue,
                     1
                 FROM `value`
@@ -433,6 +421,48 @@ class IndexSuggestions extends AbstractJob
                 SQL;
             $this->connection->executeStatement($sql, $bind, $types);
         }
+    }
+
+    /**
+     * Get the sql expression that trims the non-word characters of a text.
+     *
+     * The characters that are neither letters nor numbers are removed from
+     * the start and the end, except "/" for paths. The function REGEXP_REPLACE
+     * is missing before MySQL 8.0, so the common punctuation is trimmed one by
+     * one instead, twice to manage the combinations like "word).".
+     */
+    protected function trimNonWordCharacters(string $expression): string
+    {
+        if ($this->hasRegexpReplace()) {
+            return "REGEXP_REPLACE(REGEXP_REPLACE($expression, '^[^\\\\pL\\\\pN/]+', ''), '[^\\\\pL\\\\pN/]+$', '')";
+        }
+        $characters = ['.', ',', ';', ':', '!', '?', '"', "'", '(', ')', '[', ']', '{', '}', '«', '»', '“', '”', '‘', '’', '-', '–', '—', '…', '*', '_', '#', '+', '=', '<', '>', '|', '\\', '~', '`', '^', '%', '&', '@', '$', '§', '°'];
+        for ($i = 0; $i < 2; $i++) {
+            foreach ($characters as $character) {
+                $expression = 'TRIM(BOTH ' . $this->connection->quote($character) . " FROM $expression)";
+            }
+            $expression = "TRIM($expression)";
+        }
+        return $expression;
+    }
+
+    /**
+     * Check if the database supports the function REGEXP_REPLACE.
+     */
+    protected function hasRegexpReplace(): bool
+    {
+        if ($this->hasRegexpReplace === null) {
+            try {
+                $this->connection->executeQuery("SELECT REGEXP_REPLACE('a', 'a', '')")->fetchOne();
+                $this->hasRegexpReplace = true;
+            } catch (\Throwable $e) {
+                $this->hasRegexpReplace = false;
+                $this->logger->warn(
+                    'The database does not support the function REGEXP_REPLACE (mysql 8.0 or mariadb 10.0.5 is required): the suggestions are trimmed of the common punctuation only.' // @translate
+                );
+            }
+        }
+        return $this->hasRegexpReplace;
     }
 
     /**

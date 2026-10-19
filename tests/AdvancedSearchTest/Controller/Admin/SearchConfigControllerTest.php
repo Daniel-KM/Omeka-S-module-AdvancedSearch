@@ -47,7 +47,7 @@ class SearchConfigControllerTest extends \AdvancedSearchTest\Controller\SearchCo
 
     public function testConfigurePostAction(): void
     {
-        $url = '/admin/search-manager/config/' . $this->searchConfig->id() . '/configure';
+        $url = '/admin/search-manager/config/' . $this->searchConfig->id() . '/edit';
         $this->dispatchPost(
             $url,
             [],

@@ -846,4 +846,113 @@ class IndexSuggestionsTest extends AbstractHttpControllerTestCase
 
         $this->assertEquals(1, $count, 'Should have only one suggestion after case normalization');
     }
+
+    /**
+     * Test accented variants of a text are merged without a duplicate key.
+     *
+     * The collation of the table merges "Élysée" and "Elysee", so a grouping
+     * that separates them failed on a duplicate key.
+     */
+    public function testAccentedVariantsMerged(): void
+    {
+        $variants = ['Élysée Palace', 'Élysée Palace', 'Elysee Palace'];
+        foreach ($variants as $variant) {
+            $response = $this->api()->create('items', [
+                'o:is_public' => true,
+                'dcterms:title' => [
+                    [
+                        'type' => 'literal',
+                        'property_id' => $this->getPropertyId('dcterms:title'),
+                        '@value' => $variant,
+                    ],
+                ],
+            ]);
+            $this->items[] = $response->getContent();
+        }
+
+        $this->runIndexation();
+
+        $sql = <<<SQL
+            SELECT ss.`text` FROM `search_suggestion` ss
+            WHERE ss.`suggester_id` = ?
+              AND ss.`text` = 'elysee palace'
+            SQL;
+        $texts = $this->connection->executeQuery($sql, [$this->suggester->id()])->fetchFirstColumn();
+
+        $this->assertCount(1, $texts, 'Accented variants should be merged in one suggestion');
+        $this->assertEquals('Élysée Palace', $texts[0], 'Majority variant "Élysée Palace" should be kept');
+    }
+
+    /**
+     * Test the upgrade aligns the table of a previous schema, even twice.
+     *
+     * The previous upgrade used "IF EXISTS", that MySQL does not support, so
+     * the old columns and indexes may remain.
+     */
+    public function testUpgradeAlignsPreviousSuggestionTable(): void
+    {
+        $connection = $this->connection;
+        $connection->executeStatement('DELETE FROM `search_suggestion` WHERE `suggester_id` = ' . (int) $this->suggester->id());
+
+        // The previous schema had a simple index on the suggester, used by the
+        // foreign key, so the unique index can be removed.
+        $connection->executeStatement('ALTER TABLE `search_suggestion` ADD INDEX `IDX_536C3D170913F08` (`suggester_id`)');
+        $indexes = $connection->fetchFirstColumn('SELECT DISTINCT `INDEX_NAME` FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = "search_suggestion" AND `NON_UNIQUE` = 0 AND `INDEX_NAME` <> "PRIMARY"');
+        foreach ($indexes as $index) {
+            $connection->executeStatement("ALTER TABLE `search_suggestion` DROP INDEX `$index`");
+        }
+        $connection->executeStatement('ALTER TABLE `search_suggestion` ADD `total_all` INT NOT NULL, ADD `total_public` INT NOT NULL, ADD INDEX `search_text_idx` (`text`, `suggester_id`)');
+        foreach (['Paris', 'paris', 'Rome'] as $text) {
+            $connection->executeStatement(
+                'INSERT INTO `search_suggestion` (`suggester_id`, `text`, `total_all`, `total_public`) VALUES (?, ?, 1, 1)',
+                [$this->suggester->id(), $text]
+            );
+        }
+
+        // The upgrade relaunches the indexing of the suggesters in background:
+        // the dispatches are only recorded, else a background job would use
+        // the main database.
+        $services = $this->getApplication()->getServiceManager();
+        $dispatcher = $services->get('Omeka\Job\Dispatcher');
+        $recorder = new class extends \Omeka\Job\Dispatcher {
+            public $dispatched = [];
+
+            public function __construct()
+            {
+            }
+
+            public function dispatch($class, $args = null, ?\Omeka\Job\DispatchStrategy\StrategyInterface $strategy = null)
+            {
+                $this->dispatched[] = [$class, $args];
+                return null;
+            }
+        };
+        $services->setAllowOverride(true);
+        $services->setService('Omeka\Job\Dispatcher', $recorder);
+        try {
+            // The upgrade is replayed.
+            $module = new \AdvancedSearch\Module();
+            $module->upgrade('3.4.65', '3.4.66', $services);
+            $module->upgrade('3.4.65', '3.4.66', $services);
+        } finally {
+            $services->setService('Omeka\Job\Dispatcher', $dispatcher);
+            $services->setAllowOverride(false);
+        }
+        $this->assertContains(
+            [\AdvancedSearch\Job\IndexSuggestions::class, ['search_suggester_id' => $this->suggester->id(), 'force' => true]],
+            $recorder->dispatched,
+            'The suggester without site rows should be reindexed'
+        );
+
+        $columns = $connection->fetchFirstColumn('SELECT `COLUMN_NAME` FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = "search_suggestion"');
+        $this->assertNotContains('total_all', $columns);
+        $this->assertNotContains('total_public', $columns);
+
+        $uniqueColumns = $connection->fetchFirstColumn('SELECT `COLUMN_NAME` FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = "search_suggestion" AND `NON_UNIQUE` = 0 AND `INDEX_NAME` <> "PRIMARY" ORDER BY `SEQ_IN_INDEX`');
+        $this->assertSame(['suggester_id', 'text'], $uniqueColumns, 'The unique index should be created');
+
+        // The indexing works on the aligned table.
+        $this->runIndexation();
+        $this->assertGreaterThan(0, (int) $connection->fetchOne('SELECT COUNT(*) FROM `search_suggestion` WHERE `suggester_id` = ?', [$this->suggester->id()]));
+    }
 }

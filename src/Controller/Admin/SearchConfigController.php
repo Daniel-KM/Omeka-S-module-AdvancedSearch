@@ -1724,8 +1724,9 @@ class SearchConfigController extends AbstractActionController
         }
         unset($facet['options']);
 
-        // The settings of the groups the type does not use are removed.
-        $facet = $this->cleanSettingsByType($facet, $facet['type'] ?? 'Checkbox', [
+        // The settings of the groups the type does not use are removed. An
+        // unset type is the default one (fix #32).
+        $facet = $this->cleanSettingsByType($facet, ($facet['type'] ?? '') ?: 'Checkbox', [
             [SearchConfigFacetFieldset::TYPES_LIST, SearchConfigFacetFieldset::SETTINGS_LIST],
             [SearchConfigFacetFieldset::TYPES_VALUES, SearchConfigFacetFieldset::SETTINGS_VALUES],
             [SearchConfigFacetFieldset::TYPES_COUNT, SearchConfigFacetFieldset::SETTINGS_COUNT],

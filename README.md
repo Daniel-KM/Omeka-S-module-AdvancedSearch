@@ -380,8 +380,12 @@ integer = true
 
 The section is a unique name.
 
-Keys are: `field`, `label`, `type`, `order`, `limit`, `state`, `more`, `languages`, `data_types`,
+Keys are: `field`, `label`, `type`, `intro`, `order`, `limit`, `state`, `more`, `languages`, `data_types`,
 `main_types`, `values`, `display_count`, and specific options, like `thesaurus`.
+
+The key `intro` is a short text displayed above the values of the facet, for
+example to explain how to use it. It is translated and escaped, so html is not
+allowed.
 
 Multi-valued keys can be set as ini (key ending with [] or .xxx) or as a string
 with multiple values separated with a "|".
@@ -477,7 +481,7 @@ the core.
 The resource page block layout `Resource navigation` adds a `< prev / next >`
 navigation on an item show page, within the context of the last browse of the
 user: search results, item set, user selection, or an arbitrary series of items
-(a `Browse preview` block on a site page).
+(a [Browse preview] block on a site page).
 
 Four navigation contexts are supported, enabled via the site setting
 `Block Resource navigation: active contexts`:
@@ -768,10 +772,8 @@ improvements were done for the digital library [Musee de Bretagne].
 [Omeka S]: https://omeka.org/s
 [Solr]: https://solr.apache.org/
 [Search Solr]: https://gitlab.com/Daniel-KM/Omeka-S-module-SearchSolr
-[SearchSolr]: https://gitlab.com/Daniel-KM/Omeka-S-module-SearchSolr
 [Soundex]: https://en.wikipedia.org/wiki/Soundex
 [installing a module]: https://omeka.org/s/docs/user-manual/modules/#installing-modules
-[this patch]: https://github.com/omeka/omeka-s/pull/1519/files
 [Common]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common
 [Reference]: https://gitlab.com/Daniel-KM/Omeka-S-module-Reference
 [Advanced Search Plus]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearchPlus
@@ -780,7 +782,7 @@ improvements were done for the digital library [Musee de Bretagne].
 [Browse preview]: https://omeka.org/s/docs/user-manual/sites/site_pages/#browse-preview
 [Bulk Import]: https://gitlab.com/Daniel-KM/Omeka-S-module-BulkImport
 [CSV Import]: https://github.com/omeka-s-modules/CSVImport
-[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch/issues
+[module issues]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch/-/work_items
 [CeCILL v2.1]: https://www.cecill.info/licences/Licence_CeCILL_V2.1-en.html
 [GNU/GPL]: https://www.gnu.org/licenses/gpl-3.0.html
 [FSF]: https://www.fsf.org
@@ -788,7 +790,7 @@ improvements were done for the digital library [Musee de Bretagne].
 [Search]: https://gitlab.com/Daniel-KM/Omeka-S-module-Search
 [BibLibre]: https://github.com/biblibre
 [GitLab]: https://gitlab.com/Daniel-KM
-[digital library of PSL]: https://bibnum.explore.univ-psl.fr
+[digital library of PSL]: https://bibnum.explore.psl.eu
 [Campus Condorcet]: https://bibnum.campus-condorcet.fr
 [Corpus du Louvre]: https://corpus.louvre.fr
 [Musee de Bretagne]: https://www.collections.musee-bretagne.fr

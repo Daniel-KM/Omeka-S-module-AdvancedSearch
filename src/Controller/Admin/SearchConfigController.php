@@ -1728,6 +1728,7 @@ class SearchConfigController extends AbstractActionController
         $facet = $this->cleanSettingsByType($facet, $facet['type'] ?? 'Checkbox', [
             [SearchConfigFacetFieldset::TYPES_LIST, SearchConfigFacetFieldset::SETTINGS_LIST],
             [SearchConfigFacetFieldset::TYPES_VALUES, SearchConfigFacetFieldset::SETTINGS_VALUES],
+            [SearchConfigFacetFieldset::TYPES_COUNT, SearchConfigFacetFieldset::SETTINGS_COUNT],
             [SearchConfigFacetFieldset::TYPES_LINK, SearchConfigFacetFieldset::SETTINGS_LINK],
             [SearchConfigFacetFieldset::TYPES_SLIDER, SearchConfigFacetFieldset::SETTINGS_SLIDER],
             [SearchConfigFacetFieldset::TYPES_BOUNDS, SearchConfigFacetFieldset::SETTINGS_BOUNDS],

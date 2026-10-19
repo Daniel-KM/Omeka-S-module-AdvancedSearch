@@ -19,6 +19,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
      */
     const TYPES_LIST = ['Checkbox', 'CheckboxFilter', 'Select', 'Tree', 'Thesaurus'];
     const TYPES_VALUES = ['Checkbox', 'CheckboxFilter', 'Select', 'Tree', 'Thesaurus', 'HasValue'];
+    const TYPES_COUNT = ['Checkbox', 'CheckboxFilter', 'Select', 'SelectRange', 'Tree', 'Thesaurus', 'HasValue'];
     const TYPES_LINK = ['Checkbox', 'Tree', 'Thesaurus'];
     const TYPES_SLIDER = ['RangeDouble'];
 
@@ -26,7 +27,8 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
      * The settings by group, cleaned when the type does not use them.
      */
     const SETTINGS_LIST = ['language_site', 'languages', 'order', 'limit', 'state', 'paginate', 'more', 'per_page', 'join'];
-    const SETTINGS_VALUES = ['value_labels_table', 'value_labels', 'display_count'];
+    const SETTINGS_VALUES = ['value_labels_table', 'value_labels'];
+    const SETTINGS_COUNT = ['display_count'];
     const SETTINGS_LINK = ['as_link'];
     const SETTINGS_SLIDER = ['field_end', 'scale_mode', 'scale_breakpoints', 'scale_show_ticks'];
     const SETTINGS_BOUNDS = ['min', 'max', 'step', 'first_digits'];
@@ -336,7 +338,7 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 'attributes' => [
                     'id' => 'facet_display_count',
                     'data-advanced-section' => $tr('Display'), // @translate
-                    'data-filter-types' => implode(' ', self::TYPES_VALUES),
+                    'data-filter-types' => implode(' ', self::TYPES_COUNT),
                     'required' => false,
                 ],
             ])

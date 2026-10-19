@@ -1556,7 +1556,7 @@ class Module extends AbstractModule
         $auth = $services->get('Omeka\AuthenticationService');
         $user = $auth->hasIdentity() ? $auth->getIdentity() : null;
         $acl = $services->get('Omeka\Acl');
-        $canViewAll = $user && class_exists(\Selection\Entity\Selection::class)
+        $canViewAll = $user && class_exists(\Selection\Entity\Selection::class, false)
             && $acl->userIsAllowed(\Selection\Entity\Selection::class, 'view-all');
         if (!$canViewAll) {
             $isOwner = $user

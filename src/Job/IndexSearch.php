@@ -808,7 +808,7 @@ class IndexSearch extends AbstractJob
                     // Dispatch via class name string to
                     // avoid coupling with SearchSolr.
                     $class = 'SearchSolr\Job\CreateSolrSuggesters';
-                    if (class_exists($class)) {
+                    if (class_exists('SearchSolr\Module', false)) {
                         $dispatcher->dispatch(
                             $class,
                             ['search_suggester_id' => $suggester->id()]

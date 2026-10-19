@@ -542,7 +542,7 @@ class InternalQuerier extends AbstractQuerier
                 'media' => \Omeka\Entity\Media::class,
                 'value_annotations' => \Omeka\Entity\ValueAnnotation::class,
             ];
-            if (class_exists(\Annotate\Entity\Annotation::class)) {
+            if (class_exists(\Annotate\Entity\Annotation::class, false)) {
                 $resourceMap['annotations'] = \Annotate\Entity\Annotation::class;
             }
             if (class_exists('DigitalObject\Module', false)) {

@@ -391,12 +391,18 @@ return [
         ],
     ],
     'js_translate_strings' => [
+        'Advanced search', // @translate
         'Automatic mapping of empty values', // @translate
         'Available', // @translate
+        'Collapse all', // @translate
         'Enabled', // @translate
+        'Expand all', // @translate
         'Find', // @translate
         'Find resources…', // @translate
         'Processing…', // @translate
+        'Search', // @translate
+        'See less', // @translate
+        'See more', // @translate
         'Try to map automatically the metadata and the properties that are not mapped yet with the fields of the index', // @translate
         '[Edit below]', // @translate
     ],

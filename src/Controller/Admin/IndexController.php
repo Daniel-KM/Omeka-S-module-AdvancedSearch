@@ -175,7 +175,7 @@ class IndexController extends AbstractActionController
             \AdvancedSearch\Job\IndexSuggestions::class,
         ];
         $solrClass = 'SearchSolr\Job\CreateSolrSuggesters';
-        if (class_exists($solrClass)) {
+        if (class_exists('SearchSolr\Module', false)) {
             $jobClasses[] = $solrClass;
         }
 

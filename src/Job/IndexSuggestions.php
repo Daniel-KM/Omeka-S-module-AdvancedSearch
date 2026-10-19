@@ -226,19 +226,28 @@ class IndexSuggestions extends AbstractJob
 
         // 1. Index global (site_id = 0): all resources (public + private).
         if ($indexAdmin) {
-            $this->logger->info('Suggester #{id}: indexing global (all resources)...', ['id' => $suggesterId]);
+            $this->logger->info(
+                'Suggester #{id}: indexing global (all resources)...', // @translate
+                ['id' => $suggesterId]
+            );
             $this->indexSuggestions($sqlResourceTypes, $sqlFields, null, $bind, $types);
         }
 
         // 2. Index per site: both total (all) and total_public (public only).
         if ($siteIds) {
-            $this->logger->info('Suggester #{id}: indexing {count} sites...', ['id' => $suggesterId, 'count' => count($siteIds)]);
+            $this->logger->info(
+                'Suggester #{id}: indexing {count} sites...', // @translate
+                ['id' => $suggesterId, 'count' => count($siteIds)]
+            );
             foreach ($siteIds as $siteId) {
                 if ($this->shouldStop()) {
-                    $this->logger->warn('Job stopped by user.');
+                    $this->logger->warn('Job stopped by user.'); // @translate
                     return $this;
                 }
-                $this->logger->info('Suggester #{id}: indexing site #{site_id}...', ['id' => $suggesterId, 'site_id' => $siteId]);
+                $this->logger->info(
+                    'Suggester #{id}: indexing site #{site_id}...', // @translate
+                    ['id' => $suggesterId, 'site_id' => $siteId]
+                );
                 $this->indexSuggestions($sqlResourceTypes, $sqlFields, (int) $siteId, $bind, $types);
             }
         }
@@ -269,7 +278,10 @@ class IndexSuggestions extends AbstractJob
                     $patternEnd = '[[:space:]](' . $stopwordsAlternation . ')$';
                     $this->connection->executeStatement($sql, ['stopwords_pattern' => $patternEnd]);
                 }
-                $this->logger->info('Suggester #{id}: removed suggestions with stopwords ({mode}).', ['id' => $suggesterId, 'mode' => $stopwordsMode]);
+                $this->logger->info(
+                    'Suggester #{id}: removed suggestions with stopwords ({mode}).', // @translate
+                    ['id' => $suggesterId, 'mode' => $stopwordsMode]
+                );
             }
         }
 
@@ -513,6 +525,9 @@ class IndexSuggestions extends AbstractJob
         $this->connection->executeStatement('DROP TABLE `_suggestions_temp`');
         $this->connection->executeStatement('ALTER TABLE `_suggestions_merged` RENAME TO `_suggestions_temp`');
 
-        $this->logger->info('Suggester #{id}: normalized case (kept majority version).', ['id' => $suggesterId]);
+        $this->logger->info(
+            'Suggester #{id}: normalized case (kept majority version).', // @translate
+            ['id' => $suggesterId]
+        );
     }
 }

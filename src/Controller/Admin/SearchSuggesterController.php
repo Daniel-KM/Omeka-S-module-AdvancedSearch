@@ -119,7 +119,7 @@ class SearchSuggesterController extends AbstractActionController
 
         $listJobStatusesByIds = $this->listJobStatusesByIds(IndexSuggestions::class, true);
         // Include Solr suggester jobs if the class exists.
-        if (class_exists('SearchSolr\Job\CreateSolrSuggesters', true)) {
+        if (class_exists('SearchSolr\Module', false)) {
             $listJobStatusesByIds += $this->listJobStatusesByIds(\SearchSolr\Job\CreateSolrSuggesters::class, true);
         }
 

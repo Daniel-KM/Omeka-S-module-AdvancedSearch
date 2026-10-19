@@ -191,10 +191,11 @@ class SearchSuggesterRepresentation extends AbstractEntityRepresentation
                 "Query error: {message}\nQuery:{query}", // @translate
                 ['message' => $e->getMessage(), 'query' => $query->jsonSerialize()]
             );
+            // The details are logged only, not returned to the visitor.
             $this->logger()->err($message->getMessage(), $message->getContext());
             $translator = $services->get('MvcTranslator');
             return (new Response)
-                ->setMessage($message->setTranslator($translator));
+                ->setMessage($translator->translate('An error occurred.')); // @translate
         }
     }
 }

@@ -689,9 +689,10 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
                 "Query error: {message}\nQuery:{query}", // @translate
                 ['message' => $e->getMessage(), 'query' => $query->jsonSerialize()]
             );
+            // The details are logged only, not returned to the visitor.
             $this->logger()->err($message->getMessage(), $message->getContext());
             return $response
-                ->setMessage($message);
+                ->setMessage($this->getServiceLocator()->get('MvcTranslator')->translate('An error occurred.')); // @translate
         }
     }
 }

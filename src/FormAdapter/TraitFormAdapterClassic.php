@@ -810,10 +810,12 @@ trait TraitFormAdapterClassic
                 "Query error: {message}\nQuery: {json_query}", // @translate
                 ['message' => $e->getMessage(), 'json_query' => json_encode($query->jsonSerialize(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)]
             );
+            // The details are logged only: the visitor gets a generic message,
+            // without the error of the engine and the full query.
             $logger->err($message->getMessage(), $message->getContext());
             return $response
                 ->setIsSuccess(false)
-                ->setMessage($message->setTranslator($translator));
+                ->setMessage($translator->translate('An error occurred.')); // @translate
         }
 
         // Order facet according to settings of the search page.

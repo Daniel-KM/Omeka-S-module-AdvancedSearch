@@ -146,12 +146,6 @@ class IndexSuggestions extends AbstractJob
 
         $suggesterId = $suggester->id();
 
-        // Delete existing suggestions for this suggester.
-        $sql = 'DELETE FROM `search_suggestion` WHERE `suggester_id` = :suggester_id';
-        $this->connection->executeStatement($sql, ['suggester_id' => $suggesterId]);
-
-        $this->logger->info('Suggester #{id}: old suggestions deleted.', ['id' => $suggesterId]);
-
         // Get configuration.
         $resourceTypes = $suggester->searchEngine()->setting('resource_types', []);
         $mapResourcesToClasses = [
@@ -280,7 +274,29 @@ class IndexSuggestions extends AbstractJob
         // - Sum all totals together
         $this->normalizeSuggestionCase($suggesterId);
 
-        // Transfer from temporary table to final tables.
+        // The old suggestions are replaced only once the new ones are ready, in
+        // a transaction, so a failed indexing keeps them.
+        $this->connection->beginTransaction();
+        try {
+            $sql = 'DELETE FROM `search_suggestion` WHERE `suggester_id` = :suggester_id';
+            $this->connection->executeStatement($sql, ['suggester_id' => $suggesterId]);
+            $this->transferSuggestions($bind, $types);
+            $this->connection->commit();
+        } catch (\Throwable $e) {
+            $this->connection->rollBack();
+            throw $e;
+        }
+
+        $this->connection->executeStatement('DROP TABLE IF EXISTS `_suggestions_temp`');
+
+        return $this;
+    }
+
+    /**
+     * Transfer the suggestions from the temporary table to the final tables.
+     */
+    protected function transferSuggestions(array $bind, array $types): void
+    {
         $sql = <<<SQL
             INSERT INTO `search_suggestion` (`suggester_id`, `text`)
             SELECT DISTINCT :suggester_id, `text`
@@ -300,11 +316,6 @@ class IndexSuggestions extends AbstractJob
             ON DUPLICATE KEY UPDATE `total` = VALUES(`total`), `total_public` = VALUES(`total_public`);
             SQL;
         $this->connection->executeStatement($sql, $bind, $types);
-
-        // Cleanup.
-        $this->connection->executeStatement('DROP TABLE IF EXISTS `_suggestions_temp`');
-
-        return $this;
     }
 
     /**
@@ -451,25 +462,20 @@ class IndexSuggestions extends AbstractJob
             $this->connection->executeStatement($sql);
         }
 
-        // For each case-insensitive group, find the variant with highest total
-        // and insert it with summed totals.
-        // The subquery finds the "best" text (highest total) for each group.
+        // The rows are inserted by decreasing total, so the first variant of a
+        // group is the most frequent one and the next ones only add their
+        // totals. The group is the unique key of the merged table, with the
+        // collation of the final table: a grouping by LOWER() would separate
+        // variants that this collation merges (accents, trailing spaces), and
+        // the insert would fail on a duplicate key.
         $sql = <<<'SQL'
             INSERT INTO `_suggestions_merged` (`text`, `site_id`, `total`, `total_public`)
-            SELECT
-                -- Pick text variant with highest total in this group
-                (
-                    SELECT t2.`text`
-                    FROM `_suggestions_temp` t2
-                    WHERE LOWER(t2.`text`) = LOWER(t.`text`) AND t2.`site_id` = t.`site_id`
-                    ORDER BY t2.`total` DESC, t2.`text`
-                    LIMIT 1
-                ) AS best_text,
-                t.`site_id`,
-                SUM(t.`total`) AS total,
-                SUM(t.`total_public`) AS total_public
+            SELECT t.`text`, t.`site_id`, t.`total`, t.`total_public`
             FROM `_suggestions_temp` t
-            GROUP BY LOWER(t.`text`), t.`site_id`
+            ORDER BY t.`total` DESC, t.`text`
+            ON DUPLICATE KEY UPDATE
+                `total` = `_suggestions_merged`.`total` + VALUES(`total`),
+                `total_public` = `_suggestions_merged`.`total_public` + VALUES(`total_public`)
             SQL;
         $this->connection->executeStatement($sql);
 

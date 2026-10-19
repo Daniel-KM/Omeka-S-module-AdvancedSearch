@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-21 00:00+0000\n"
+"POT-Creation-Date: 2026-10-19 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -75,28 +75,28 @@ msgstr ""
 msgid "Date (most recent first)"
 msgstr ""
 
-#: data/configs/search_config.default.php:535 data/scripts/upgrade.php:1276
+#: data/configs/search_config.default.php:535 data/scripts/upgrade.php:1261
 #: view/advanced-search/admin/search-config/edit.phtml:91
 #: view/advanced-search/admin/search-config/edit.phtml:112
 #: view/search/search.phtml:207 view/search/search.phtml:287
 msgid "Facets"
 msgstr ""
 
-#: data/configs/search_config.default.php:536 data/scripts/upgrade.php:1277
+#: data/configs/search_config.default.php:536 data/scripts/upgrade.php:1262
 msgid "No facets"
 msgstr ""
 
-#: data/configs/search_config.default.php:541 data/scripts/upgrade.php:1281
+#: data/configs/search_config.default.php:541 data/scripts/upgrade.php:1266
 #: view/search/facet-actives.phtml:29
 msgid "Active facets"
 msgstr ""
 
-#: data/configs/search_config.default.php:543 data/scripts/upgrade.php:1283
+#: data/configs/search_config.default.php:543 data/scripts/upgrade.php:1268
 #: view/advanced-search/admin/search-config/edit.phtml:89
 msgid "Apply facets"
 msgstr ""
 
-#: data/configs/search_config.default.php:545 data/scripts/upgrade.php:1285
+#: data/configs/search_config.default.php:545 data/scripts/upgrade.php:1270
 #: view/advanced-search/admin/search-config/edit.phtml:90
 msgid "Reset facets"
 msgstr ""
@@ -106,13 +106,12 @@ msgstr ""
 msgid "Refine search"
 msgstr ""
 
-#: data/scripts/upgrade.php:56 data/scripts/upgrade.php:82 Module.php:129
-#: Module.php:142
+#: data/scripts/upgrade.php:56 Module.php:129
 #, php-format
 msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr ""
 
-#: data/scripts/upgrade.php:60 data/scripts/upgrade.php:90
+#: data/scripts/upgrade.php:60 data/scripts/upgrade.php:75
 msgid "Missing requirement. Unable to upgrade."
 msgstr ""
 
@@ -121,25 +120,33 @@ msgstr ""
 msgid "The module %1$s requires PHP %2$s or later."
 msgstr ""
 
-#: data/scripts/upgrade.php:1703 Module.php:2328
+#: data/scripts/upgrade.php:1688 Module.php:2318
 msgid "Main index"
 msgstr ""
 
-#: data/scripts/upgrade.php:2011 src/View/Helper/SearchFilters.php:535
+#: data/scripts/upgrade.php:1996 src/View/Helper/SearchFilters.php:535
 #: view/advanced-search/admin/search-config/edit.phtml:95
 msgid "Full text"
 msgstr ""
 
-#: Module.php:2056
+#: Module.php:2043
 msgid "First page"
 msgstr ""
 
-#: Module.php:2057
+#: Module.php:2044
 msgid "Page or url"
 msgstr ""
 
-#: Module.php:2058
+#: Module.php:2045
 msgid "Slug of a page or url"
+msgstr ""
+
+#: src/Api/Representation/SearchConfigRepresentation.php:695
+#: src/Api/Representation/SearchSuggesterRepresentation.php:198
+#: src/Controller/SearchController.php:197
+#: src/Controller/SearchController.php:330
+#: src/FormAdapter/TraitFormAdapterClassic.php:818
+msgid "An error occurred."
 msgstr ""
 
 #: src/Api/Representation/SearchEngineRepresentation.php:160
@@ -164,11 +171,11 @@ msgstr ""
 msgid "%s (copy)"
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1092
+#: src/Controller/Admin/SearchConfigController.php:1093
 msgid "This search page is not used yet."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1115
+#: src/Controller/Admin/SearchConfigController.php:1116
 msgid "Admin board"
 msgstr ""
 
@@ -190,11 +197,6 @@ msgstr ""
 
 #: src/Controller/SearchController.php:167
 msgid "No query."
-msgstr ""
-
-#: src/Controller/SearchController.php:197
-#: src/Controller/SearchController.php:330
-msgid "An error occurred."
 msgstr ""
 
 #: src/Controller/SearchController.php:269
@@ -806,7 +808,7 @@ msgid "Val"
 msgstr ""
 
 #: view/advanced-search/admin/search-config/edit.phtml:84
-#: view/search/facets-list.phtml:141
+#: view/search/facets-list.phtml:144
 msgid "See more"
 msgstr ""
 
@@ -1523,15 +1525,15 @@ msgstr ""
 msgid "Select below…"
 msgstr ""
 
-#: view/search/facets-list.phtml:141
+#: view/search/facets-list.phtml:144
 msgid "See less"
 msgstr ""
 
-#: view/search/facets-list.phtml:141 view/search/facets-list.phtml:146
+#: view/search/facets-list.phtml:144 view/search/facets-list.phtml:149
 msgid "Previous page"
 msgstr ""
 
-#: view/search/facets-list.phtml:141 view/search/facets-list.phtml:146
+#: view/search/facets-list.phtml:144 view/search/facets-list.phtml:149
 msgid "Next page"
 msgstr ""
 
@@ -1590,63 +1592,63 @@ msgstr ""
 msgid "The query returned no results"
 msgstr ""
 
-#: data/scripts/upgrade.php:272
+#: data/scripts/upgrade.php:257
 msgid "The module {module} should be updated to version {version}."
 msgstr ""
 
-#: data/scripts/upgrade.php:279
+#: data/scripts/upgrade.php:264
 msgid ""
 "It is now possible to aggregate properties with the internal (sql) adapter. "
 "See config of the internal search engine."
 msgstr ""
 
-#: data/scripts/upgrade.php:284
+#: data/scripts/upgrade.php:269
 msgid "It is now possible to add a pagination per-page to the search page."
 msgstr ""
 
-#: data/scripts/upgrade.php:289
+#: data/scripts/upgrade.php:274
 msgid "It is now possible to use \"not\" in advanced filters."
 msgstr ""
 
-#: data/scripts/upgrade.php:294
+#: data/scripts/upgrade.php:279
 msgid ""
 "It is now possible to display the used search filters in the results header."
 msgstr ""
 
-#: data/scripts/upgrade.php:299
+#: data/scripts/upgrade.php:284
 msgid ""
 "Some field types have been renamed for filters in the form. To use the core "
 "input elements, the type should be \"Omeka\" (or prepend \"Omeka/\" if "
 "needed). See the default config page."
 msgstr ""
 
-#: data/scripts/upgrade.php:306
+#: data/scripts/upgrade.php:291
 msgid ""
 "It is now possible to query ressources with linked ressources in the "
 "standard advanced form."
 msgstr ""
 
-#: data/scripts/upgrade.php:313
+#: data/scripts/upgrade.php:298
 msgid ""
 "A new option was added to display the resources mixed (by default) or item "
 "sets and items separately (old behavior)."
 msgstr ""
 
-#: data/scripts/upgrade.php:317
+#: data/scripts/upgrade.php:302
 msgid "The template for the sort selector has been updated."
 msgstr ""
 
-#: data/scripts/upgrade.php:321
+#: data/scripts/upgrade.php:306
 msgid "A helper for the pagination per page has been added."
 msgstr ""
 
-#: data/scripts/upgrade.php:328
+#: data/scripts/upgrade.php:313
 msgid ""
 "It’s now possible to search resources by multiples properties, and resources "
 "without class, template, item set, site or owner."
 msgstr ""
 
-#: data/scripts/upgrade.php:335
+#: data/scripts/upgrade.php:320
 msgid ""
 "It’s now possible to use facet range with a double select (from/to). With "
 "internal sql engine, order is alphabetic only for now: it works for strings "
@@ -1655,360 +1657,360 @@ msgid ""
 "to be updated."
 msgstr ""
 
-#: data/scripts/upgrade.php:339
+#: data/scripts/upgrade.php:324
 msgid ""
 "The property query types lower/greater have been updated to use alphabetic "
 "order, no more date-time only. For integer and date-time, use numeric data "
 "types."
 msgstr ""
 
-#: data/scripts/upgrade.php:343
+#: data/scripts/upgrade.php:328
 msgid ""
 "Update your theme to support new features for facets (active facets, button "
 "apply facets with id=\"apply-facets\", list of facet values)."
 msgstr ""
 
-#: data/scripts/upgrade.php:360
+#: data/scripts/upgrade.php:345
 msgid ""
 "It’s now possible to search values similar other ones (via {link}"
 "Soundex{link_end}, designed for British English phonetic)."
 msgstr ""
 
-#: data/scripts/upgrade.php:369
+#: data/scripts/upgrade.php:354
 msgid "Some new options were added to manage facets."
 msgstr ""
 
-#: data/scripts/upgrade.php:401 data/scripts/upgrade.php:2211
+#: data/scripts/upgrade.php:386 data/scripts/upgrade.php:2196
 msgid ""
 "It is recommended to upgrade the module \"Reference\" to improve performance."
 msgstr ""
 
-#: data/scripts/upgrade.php:452
+#: data/scripts/upgrade.php:437
 msgid ""
 "A new settings allows to skip indexing after a batch process because an "
 "issue can occurs in some cases."
 msgstr ""
 
-#: data/scripts/upgrade.php:465
+#: data/scripts/upgrade.php:450
 msgid ""
 "The performance was improved in many places, in particular for large "
 "databases."
 msgstr ""
 
-#: data/scripts/upgrade.php:470
+#: data/scripts/upgrade.php:455
 msgid ""
 "It is now possible to order results by a list of ids with argument "
 "\"sort_by=ids\"."
 msgstr ""
 
-#: data/scripts/upgrade.php:477
+#: data/scripts/upgrade.php:462
 msgid ""
 "It is now possible to do a standard search with a sub-query, for example to "
 "get all items with creators born in 1789."
 msgstr ""
 
-#: data/scripts/upgrade.php:494
+#: data/scripts/upgrade.php:479
 msgid ""
 "When full text is managed in alto files, it is now possible to search full "
 "text or record only."
 msgstr ""
 
-#: data/scripts/upgrade.php:501
+#: data/scripts/upgrade.php:486
 msgid ""
 "It is now possible to search resources with duplicated values to help "
 "curation."
 msgstr ""
 
-#: data/scripts/upgrade.php:506
+#: data/scripts/upgrade.php:491
 msgid ""
 "The speed of the derivative forms were improved and can be called directly "
 "from the search config with option \"variant\". Upgrade your theme if it was "
 "customized."
 msgstr ""
 
-#: data/scripts/upgrade.php:543
+#: data/scripts/upgrade.php:528
 msgid ""
 "View helpers \"FacetActive\", \"FacetCheckbox\" and \"FacetLink\" and "
 "associate theme files were removed in favor of plural view helpers. Check "
 "your theme if you customized it. Matching files: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:594
+#: data/scripts/upgrade.php:579
 msgid ""
 "The variables \"$heading\", \"$html\" and \"$cssClass\" were removed from "
 "block Searching Form. Remove them in the following files before upgrade and "
 "automatic conversion: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:701
+#: data/scripts/upgrade.php:686
 msgid ""
 "The settings \"heading\" and \"html\" were removed from block Searching "
 "Form. New blocks \"Heading\" or \"Html\" were prepended to all blocks that "
 "had a filled heading or html. You may check pages for styles: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:711
+#: data/scripts/upgrade.php:696
 msgid ""
 "The setting \"template\" was moved to the new block layout settings "
 "available since Omeka S v4.1. You may check pages for styles: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:718
+#: data/scripts/upgrade.php:703
 msgid ""
 "The template files for the block Searching Form should be moved from \"view/"
 "common/block-layout\" to \"view/common/block-template\" in your themes. You "
 "may check your themes for pages: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:726 data/scripts/upgrade.php:1186
+#: data/scripts/upgrade.php:711 data/scripts/upgrade.php:1171
 msgid ""
 "New options were added in search config: the choice of the theme template "
 "(search/search) and an option to display the breadcrumbs."
 msgstr ""
 
-#: data/scripts/upgrade.php:761
+#: data/scripts/upgrade.php:746
 msgid ""
 "The option to redirect item set to search was improved to manage all pages."
 msgstr ""
 
-#: data/scripts/upgrade.php:820 data/scripts/upgrade.php:1236
+#: data/scripts/upgrade.php:805 data/scripts/upgrade.php:1221
 msgid ""
 "The template for facets was simplified. See view/search/facets-list.phtml. "
 "Matching templates: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:891 data/scripts/upgrade.php:923
+#: data/scripts/upgrade.php:876 data/scripts/upgrade.php:908
 msgid ""
 "Command \"{name}\" #{index}/{total} for {key}: file #{count}/{count_total} "
 "{file} partially updated."
 msgstr ""
 
-#: data/scripts/upgrade.php:901
+#: data/scripts/upgrade.php:886
 msgid ""
 "The option \"facet_filters\" was removed. Update the theme to use facets "
 "instead. Matching templates: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:909
+#: data/scripts/upgrade.php:894
 msgid ""
 "The view helper \"facetLabel()\" was removed. Update the theme and get the "
 "label directly from the each facet config: replace `$facetLabel($name)` by "
 "`$facetOptions['label'] ?: $name)`. Matching templates: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:936
+#: data/scripts/upgrade.php:921
 msgid ""
 "The view helper `searchForm()` was removed. You should replace it with "
 "`$searchConfig->renderForm([])`. Matching templates: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:944
+#: data/scripts/upgrade.php:929
 msgid ""
 "The template \"search/facets\" was renamed \"search/facets-list\". Update it "
 "in your theme. Matching templates: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:964
+#: data/scripts/upgrade.php:949
 msgid ""
 "The template \"search/resource-list\" was renamed \"search/results\". Update "
 "your theme. Matching templates: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:985
+#: data/scripts/upgrade.php:970
 msgid ""
 "The templates \"search/results-header\" and \"search/results-footer\" were "
 "replaced by \"search/results-header-footer\". Remove them in your theme. "
 "Matching templates: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:993
+#: data/scripts/upgrade.php:978
 msgid ""
 "The key \"per_pages\" was renamed \"per_page\". Update your theme. Matching "
 "templates: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:1034
+#: data/scripts/upgrade.php:1019
 msgid ""
 "Command \"{name}\" #{index}/{total} for {key}: file #{count}/{count_total} "
 "{file} failed to be renamed {file_new}."
 msgstr ""
 
-#: data/scripts/upgrade.php:1041
+#: data/scripts/upgrade.php:1026
 msgid ""
 "Command \"{name}\" #{index}/{total} for {key}: file #{count}/{count_total} "
 "{file} successfully renamed {file_new}."
 msgstr ""
 
-#: data/scripts/upgrade.php:1061
+#: data/scripts/upgrade.php:1046
 msgid ""
 "Command \"{name}\" #{index}/{total} for {key}: file #{count}/{count_total}  "
 "{file} unwriteable."
 msgstr ""
 
-#: data/scripts/upgrade.php:1068
+#: data/scripts/upgrade.php:1053
 msgid ""
 "Command \"{name}\" #{index}/{total} for {key}: file #{count}/{count_total}  "
 "{file} updated."
 msgstr ""
 
-#: data/scripts/upgrade.php:1076
+#: data/scripts/upgrade.php:1061
 msgid ""
 "Command \"{name}\" #{index}/{total} for {key}: file #{count}/{count_total} "
 "{file} unreadable."
 msgstr ""
 
-#: data/scripts/upgrade.php:1089
+#: data/scripts/upgrade.php:1074
 msgid ""
 "The module may break the theme to manage new features, in particular for "
 "facets."
 msgstr ""
 
-#: data/scripts/upgrade.php:1116
+#: data/scripts/upgrade.php:1101
 msgid ""
 "The view helper `searchingForm()` is deprecated. Replace it with "
 "`$searchConfig->renderForm([])`. Matching templates: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:1127
+#: data/scripts/upgrade.php:1112
 msgid ""
 "The title of the result part is no more appended in template \"search/"
 "resource-list\" or \"search/results\", but in main search template. Update "
 "your theme. Matching templates: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:1191
+#: data/scripts/upgrade.php:1176
 msgid "New options were added to define the thumbnail."
 msgstr ""
 
-#: data/scripts/upgrade.php:1196
+#: data/scripts/upgrade.php:1181
 msgid "It is now possible to sort by relevance with the internal querier."
 msgstr ""
 
-#: data/scripts/upgrade.php:1201
+#: data/scripts/upgrade.php:1186
 msgid ""
 "The default template for the list of results was updated to use css flex. "
 "Check your theme."
 msgstr ""
 
-#: data/scripts/upgrade.php:1207 data/scripts/upgrade.php:1214
+#: data/scripts/upgrade.php:1192 data/scripts/upgrade.php:1199
 msgid "The key \"{key}\" can be removed from the file config/local.config.php."
 msgstr ""
 
-#: data/scripts/upgrade.php:1225
+#: data/scripts/upgrade.php:1210
 msgid ""
 "The html/css class names were simplified in the search page, in particular "
 "for facets. You should check your theme if you customized it."
 msgstr ""
 
-#: data/scripts/upgrade.php:1347
+#: data/scripts/upgrade.php:1332
 msgid ""
 "It is now possible to have a specific config for each facet (index, type, "
 "size, display, etc.)."
 msgstr ""
 
-#: data/scripts/upgrade.php:1362
+#: data/scripts/upgrade.php:1347
 msgid ""
 "The option to display available or all facets was inverted and the same for "
 "the internal engine."
 msgstr ""
 
-#: data/scripts/upgrade.php:1377
+#: data/scripts/upgrade.php:1362
 msgid ""
 "The search config setting \"search\" was renamed \"request\". Check your "
 "theme. Matching templates: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:1385
+#: data/scripts/upgrade.php:1370
 msgid ""
 "The search config setting \"autosuggest\" was renamed \"q\" and sub-settings "
 "too. Check your theme. Matching templates: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:1393
+#: data/scripts/upgrade.php:1378
 msgid ""
 "The search config setting \"pagination/per_page\" was renamed \"display/"
 "per_page_list\". Check your theme. Matching templates: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:1401
+#: data/scripts/upgrade.php:1386
 msgid ""
 "The search config setting \"sort/fields\" was renamed \"display/sort_list\" "
 "and label \"sort/label\" was renamed \"display/label_sort\". Check your "
 "theme. Matching templates: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:1409
+#: data/scripts/upgrade.php:1394
 msgid ""
 "The variable \"$resourceName\" was renamed \"$resourceType\". Check your "
 "theme. Matching templates: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:1417
+#: data/scripts/upgrade.php:1402
 msgid ""
 "The template for sort-selector was simplified. See view/search/sort-"
 "selector.phtml. Check your theme. Matching templates: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:1425
+#: data/scripts/upgrade.php:1410
 msgid ""
 "The use of the view helper searchingFilters() is deprecated. Use "
 "$searchConfig->renderSearchFilters() instead. Check your theme. Matching "
 "templates: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:1588
+#: data/scripts/upgrade.php:1573
 msgid ""
 "The search type \"{type}\" is no more managed and should be migrated "
 "manually in search config #{search_config_id}."
 msgstr ""
 
-#: data/scripts/upgrade.php:1713
+#: data/scripts/upgrade.php:1698
 msgid "The form simple filters is now simpler to manage."
 msgstr ""
 
-#: data/scripts/upgrade.php:1718
+#: data/scripts/upgrade.php:1703
 msgid ""
 "Each simple filter can have a specific input type instead of a html input "
 "text. When a specific type is set, it is automatically filled with values "
 "from the field."
 msgstr ""
 
-#: data/scripts/upgrade.php:1723
+#: data/scripts/upgrade.php:1708
 msgid ""
 "Filters are now standard Omeka or Laminas html elements, so any options and "
 "attributes can be passed from the config."
 msgstr ""
 
-#: data/scripts/upgrade.php:1728
+#: data/scripts/upgrade.php:1713
 msgid ""
 "The advanced filters was restructured and new options were added to manage "
 "most common needs."
 msgstr ""
 
-#: data/scripts/upgrade.php:1733
+#: data/scripts/upgrade.php:1718
 msgid ""
 "The autosuggester is now auto-submitting the selected suggestion. An option "
 "was added to keep old behavior (fill the input and stay on form)."
 msgstr ""
 
-#: data/scripts/upgrade.php:1738
+#: data/scripts/upgrade.php:1723
 msgid ""
 "The autosuggester can be enabled for any filter in advanced search form."
 msgstr ""
 
-#: data/scripts/upgrade.php:1743
+#: data/scripts/upgrade.php:1728
 msgid ""
 "It is now possible to display all resources (item sets, items, etc.) "
 "together in results or to separate them, like in previous versions."
 msgstr ""
 
-#: data/scripts/upgrade.php:1748
+#: data/scripts/upgrade.php:1733
 msgid ""
 "A new element was added to the standard advanced search for a thumbnail "
 "attached to a resource."
 msgstr ""
 
-#: data/scripts/upgrade.php:1753
+#: data/scripts/upgrade.php:1738
 msgid ""
 "A new element was added to the standard advanced search to filter "
 "properties. It allows to avoid to override the default element to search "
@@ -2016,165 +2018,159 @@ msgid ""
 "them."
 msgstr ""
 
-#: data/scripts/upgrade.php:1758
+#: data/scripts/upgrade.php:1743
 msgid ""
 "You should check all your search engines: form, filters, results, sort, "
 "facets. It may be simpler to remove all your specific search files and to "
 "update only the css."
 msgstr ""
 
-#: data/scripts/upgrade.php:1818
+#: data/scripts/upgrade.php:1803
 msgid ""
 "It is now possible to configure a search engine to index only public "
 "resources."
 msgstr ""
 
-#: data/scripts/upgrade.php:1853
+#: data/scripts/upgrade.php:1838
 msgid ""
 "It is now possible to configure the redirect to search for each item set "
 "separately in site settings."
 msgstr ""
 
-#: data/scripts/upgrade.php:1858
+#: data/scripts/upgrade.php:1843
 msgid ""
 "Any item set can be redirected to the search page or any site page or url."
 msgstr ""
 
-#: data/scripts/upgrade.php:1872
+#: data/scripts/upgrade.php:1857
 msgid ""
 "The form element \"reset\" was renamed \"form-reset\" to avoid issues with "
 "javascript. You should fix your theme first: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:1911
+#: data/scripts/upgrade.php:1896
 msgid ""
 "Some search page configs were enabled for site \"{site_slug}\", because the "
 "navigation uses them."
 msgstr ""
 
-#: data/scripts/upgrade.php:1928
+#: data/scripts/upgrade.php:1913
 msgid ""
 "The search config setting \"display\" was renamed \"results\". Check your "
 "theme. Matching templates: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:1963
+#: data/scripts/upgrade.php:1948
 msgid ""
 "New site settings and main settings were added to manage standard search "
 "form or improved search elements."
 msgstr ""
 
-#: data/scripts/upgrade.php:2023
+#: data/scripts/upgrade.php:2008
 msgid ""
 "The option \"Record or Full text\" is now configurable with alias "
 "\"full_text\" to define properties with full text."
 msgstr ""
 
-#: data/scripts/upgrade.php:2043 Module.php:185
+#: data/scripts/upgrade.php:2028 Module.php:172
 msgid ""
 "The module Reference is required to use the facets with the default internal "
 "adapter, but not for the Solr adapter."
 msgstr ""
 
-#: data/scripts/upgrade.php:2046 Module.php:188 Module.php:203
+#: data/scripts/upgrade.php:2031 Module.php:175 Module.php:190
 msgid "The module {module} should be upgraded to version {version} or later."
 msgstr ""
 
-#: data/scripts/upgrade.php:2070
+#: data/scripts/upgrade.php:2055
 msgid ""
 "It is now possible to limit filters and facets to the language of the site."
 msgstr ""
 
-#: data/scripts/upgrade.php:2086
+#: data/scripts/upgrade.php:2071
 msgid ""
 "Json-ld data are appended to results when enabled. You may need to add "
 "triggers if the theme is customized."
 msgstr ""
 
-#: data/scripts/upgrade.php:2139
+#: data/scripts/upgrade.php:2124
 msgid ""
 "A new order for facets was added: order by total descendant, then "
 "alphabetically for hidden values."
 msgstr ""
 
-#: data/scripts/upgrade.php:2168
+#: data/scripts/upgrade.php:2153
 msgid ""
 "A resource page block has been added, in particular to search inside an item "
 "set."
 msgstr ""
 
-#: data/scripts/upgrade.php:2172
+#: data/scripts/upgrade.php:2157
 msgid ""
 "The css of the sidebar for facets and the css for structure of a thesaurus "
 "or a a hierarchy of item sets were simplified. You may check the search page."
 msgstr ""
 
-#: data/scripts/upgrade.php:2179
+#: data/scripts/upgrade.php:2164
 msgid ""
 "It is now possible to redirect the page to browse item sets to a search page."
 msgstr ""
 
-#: data/scripts/upgrade.php:2186
+#: data/scripts/upgrade.php:2171
 msgid ""
 "The class `search-results-list` was renamed `search-result-list` in view "
 "template `search/results`. Check it if the theme is customized."
 msgstr ""
 
-#: data/scripts/upgrade.php:2191
+#: data/scripts/upgrade.php:2176
 msgid ""
 "It is now possible to add boost multiplier for specific index (Solr only)."
 msgstr ""
 
-#: data/scripts/upgrade.php:2198
+#: data/scripts/upgrade.php:2183
 msgid ""
 "New options were added: quick filter on advanced form, specific properties "
 "in results, and auto-scroll to results."
 msgstr ""
 
-#: data/scripts/upgrade.php:2244
+#: data/scripts/upgrade.php:2229
 msgid ""
 "The facet option \"integer\" was renamed \"first_digits\" for consistency "
 "with filters. It is now enabled by default for RangeDouble and SelectRange "
 "facets to extract years from dates."
 msgstr ""
 
-#: data/scripts/upgrade.php:2291
+#: data/scripts/upgrade.php:2276
 msgid ""
 "The facet options \"min\", \"max\", and \"step\" were moved to "
 "\"attributes\" for consistency with filters. They are now HTML input "
 "attributes like for filters."
 msgstr ""
 
-#: data/scripts/upgrade.php:2354
-msgid ""
-"The suggester indexation was optimized for per-site search. Please reindex "
-"your suggesters to enable site-specific suggestions."
-msgstr ""
-
-#: data/scripts/upgrade.php:3105
+#: data/scripts/upgrade.php:3124
 msgid "{count} stored queries have been normalized to standard Omeka format."
 msgstr ""
 
-#: data/scripts/upgrade.php:3143
+#: data/scripts/upgrade.php:3162
 msgid ""
 "The deprecated search field \"properties-improved\" has been removed and "
 "replaced by \"properties\" and \"filters\" in admin, or \"filters\" only in "
 "sites."
 msgstr ""
 
-#: data/scripts/upgrade.php:3148
+#: data/scripts/upgrade.php:3167
 msgid ""
 "The rss/atom feed feature for search pages has been moved to the module "
 "{link}Feed{link_end}. Install it to keep feed urls on search pages."
 msgstr ""
 
-#: data/scripts/upgrade.php:3163
+#: data/scripts/upgrade.php:3182
 msgid ""
 "Automatic daily reindexation is now disabled by default. Enable it in the "
 "main settings if needed."
 msgstr ""
 
-#: data/scripts/upgrade.php:3202
+#: data/scripts/upgrade.php:3221
 msgid ""
 "New options are available for standard and module search filters: "
 "configurable query types, joiner \"not\" (simplifies negative operators), "
@@ -2182,51 +2178,51 @@ msgid ""
 "SearchSolr). Check main settings and site settings."
 msgstr ""
 
-#: data/scripts/upgrade.php:3363
+#: data/scripts/upgrade.php:3382
 msgid ""
 "Fixed {count} entries with double-encoded query strings introduced by the "
 "previous upgrade."
 msgstr ""
 
-#: data/scripts/upgrade.php:3406
+#: data/scripts/upgrade.php:3425
 msgid ""
 "A new resource page block \"Resource navigation\" allows to display a "
 "previous/next navigation on the item page within the first results of the "
 "last search, item set or user selection."
 msgstr ""
 
-#: data/scripts/upgrade.php:3445
+#: data/scripts/upgrade.php:3464
 msgid ""
 "A new option \"Query filters display\" is available in search page settings "
 "for results, that can be read only or with links (previous default)."
 msgstr ""
 
-#: data/scripts/upgrade.php:3476
+#: data/scripts/upgrade.php:3495
 msgid ""
 "New options were added to display or hide the field label in active filters "
 "and active facets."
 msgstr ""
 
-#: data/scripts/upgrade.php:3548
+#: data/scripts/upgrade.php:3567
 msgid ""
 "Migrated hidden query filters to the flat format: {configs} search config(s) "
 "and {sites} site setting(s) updated. The legacy URL form (property[N]"
 "[property|type|text]) was silently ignored by AdvancedSearch."
 msgstr ""
 
-#: data/scripts/upgrade.php:3595
+#: data/scripts/upgrade.php:3614
 msgid ""
 "A new option allows to enable the pagination for facets. You may need to "
 "check your facets if you use a custom theme."
 msgstr ""
 
-#: data/scripts/upgrade.php:3680
+#: data/scripts/upgrade.php:3699
 msgid ""
 "Search config availability was repaired for sites referencing search pages "
 "absent from \"Available search pages\": {sites}."
 msgstr ""
 
-#: data/scripts/upgrade.php:3726
+#: data/scripts/upgrade.php:3745
 msgid ""
 "The form adapter \"api\" was removed: api queries are now handled natively "
 "by every engine. The search configs using it were switched to the standard "
@@ -2234,38 +2230,38 @@ msgid ""
 "settings is unchanged."
 msgstr ""
 
-#: data/scripts/upgrade.php:3741
+#: data/scripts/upgrade.php:3760
 msgid ""
 "The module SearchSolr is installed: update its directory to version "
 "{version} or above before upgrading the module AdvancedSearch, then upgrade "
 "it."
 msgstr ""
 
-#: data/scripts/upgrade.php:3748
+#: data/scripts/upgrade.php:3767
 msgid "The module SearchSolr must be upgraded immediately after this upgrade."
 msgstr ""
 
-#: data/scripts/upgrade.php:4173
+#: data/scripts/upgrade.php:4192
 msgid ""
 "The format of the search config settings was simplified (position of the "
 "facets, properties of the results, record or full text filter). Check and "
 "update the listed theme templates: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:4227
+#: data/scripts/upgrade.php:4246
 msgid ""
 "The four lists of redirection of the item sets are merged into the single "
 "setting \"Redirection of the page of an item set\" for {count} sites."
 msgstr ""
 
-#: data/scripts/upgrade.php:4233
+#: data/scripts/upgrade.php:4252
 msgid ""
 "Some item sets were set in more than one list of redirection: the first mode "
 "was kept, as before, but it may not be the expected one. Check the setting "
 "for these sites and item sets: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:4253
+#: data/scripts/upgrade.php:4272
 msgid ""
 "The site settings \"advancedsearch_redirect_itemset\" and "
 "\"advancedsearch_redirect_itemsets\" are removed: use "
@@ -2273,28 +2269,28 @@ msgid ""
 "{json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:4279
+#: data/scripts/upgrade.php:4298
 msgid ""
 "The query types for the filters are simplified: 39 types are displayed in "
 "the settings instead of 84, since the negative ones are derived and the "
 "duplicates are families and variants."
 msgstr ""
 
-#: data/scripts/upgrade.php:4334
+#: data/scripts/upgrade.php:4353
 msgid ""
 "The sorts \"Most recent\" and \"Oldest\" were prepended to the search pages "
 "that kept the default sort list, so the results are now displayed from the "
 "most recent one: {names}."
 msgstr ""
 
-#: data/scripts/upgrade.php:4340
+#: data/scripts/upgrade.php:4359
 msgid ""
 "The default sort is now the most recent resources first. The sort list of "
 "these search pages was customized, so it was not modified: {names}. The "
 "sorts \"id desc\" and \"id asc\" can be added manually."
 msgstr ""
 
-#: data/scripts/upgrade.php:4346
+#: data/scripts/upgrade.php:4365
 msgid ""
 "A new option allows to replace the quick search of the theme and of the "
 "admin board by the form of the main search page, with a link to the advanced "
@@ -2302,21 +2298,21 @@ msgid ""
 "site settings."
 msgstr ""
 
-#: data/scripts/upgrade.php:4350
+#: data/scripts/upgrade.php:4369
 msgid ""
 "The joiner \"not\" of the advanced filters now implies the joiner \"and\"/"
 "\"or\": the select was not displayed at all when only \"not\" was checked, "
 "so the option had no effect. Check the search pages that use it."
 msgstr ""
 
-#: data/scripts/upgrade.php:4399
+#: data/scripts/upgrade.php:4418
 msgid ""
 "Some obsolete settings of the filters were removed in {count} search pages, "
 "in particular the html attributes of the sub-elements of the filter "
 "\"advanced\". Check them."
 msgstr ""
 
-#: data/scripts/upgrade.php:4407
+#: data/scripts/upgrade.php:4426
 msgid ""
 "The facets of the internal engine no more count the values selected in the "
 "facet itself, like the Solr engine, so the other values of a facet stay "
@@ -2324,162 +2320,690 @@ msgid ""
 "keep the previous behaviour. Check the search pages."
 msgstr ""
 
-#: data/scripts/upgrade.php:4439
+#: data/scripts/upgrade.php:4458
 msgid ""
 "The search on a partial word can now be done on the beginning of the words, "
 "that uses the index of the full text and is hundreds of times quicker than "
 "the search anywhere in the values, kept in {count} search pages. Check them."
 msgstr ""
 
-#: config/module.config.php:165
-msgid "Advanced Search: Browse preview with resource navigation"
-msgstr ""
-
-#: config/module.config.php:394
-msgid "Automatic mapping of empty values"
-msgstr ""
-
-#: config/module.config.php:395
-#: src/Controller/Admin/SearchConfigController.php:1062
-msgid "Available"
-msgstr ""
-
-#: config/module.config.php:396
-msgid "Enabled"
-msgstr ""
-
-#: config/module.config.php:397
-msgid "Find"
-msgstr ""
-
-#: config/module.config.php:398
-msgid "Find resources…"
-msgstr ""
-
-#: config/module.config.php:399
-msgid "Processing…"
-msgstr ""
-
-#: config/module.config.php:400
+#: data/scripts/upgrade.php:4498
 msgid ""
-"Try to map automatically the metadata and the properties that are not mapped "
-"yet with the fields of the index"
+"The default search page was available only in admin, so it was moved to the "
+"new setting for the admin side bar and replaced by the one of the main site "
+"({config}): a page that no site can display broke the sites when the theme "
+"rendered its form. Check the main settings."
 msgstr ""
 
-#: config/module.config.php:563
-msgid "Classes *"
+#: data/scripts/upgrade.php:4556
+msgid ""
+"The suggestions of the sites were missing since the upgrade to version "
+"3.4.57, so the suggesters #{ids} are being reindexed in background."
 msgstr ""
 
-#: config/module.config.php:574
-msgid "Templates *"
+#: data/scripts/upgrade.php:4561
+msgid ""
+"The suggestions of the sites are missing since the upgrade to version "
+"3.4.57: reindex the suggesters #{ids} once the module is active."
 msgstr ""
 
-#: config/module.config.php:581
-msgid "Templates (specific option \"restricted\")"
+#: Module.php:195
+msgid "The module {module} can be reenabled."
 msgstr ""
 
-#: config/module.config.php:593
-msgid "Item sets *"
+#: Module.php:612
+msgid "The resource \"{resource}\" is not available through the rest api."
 msgstr ""
 
-#: config/module.config.php:599
-msgid "default_site"
+#: Module.php:1710
+msgid "Unable to launch indexing metadata: {message}"
 msgstr ""
 
-#: config/module.config.php:605
-msgid "Site *"
+#: Module.php:1714
+msgid "Unable to launch indexing metadata: see log."
 msgstr ""
 
-#: config/module.config.php:612
-msgid "Has media (select)"
+#: Module.php:1883
+msgid ""
+"Unable to delete the search index for resource #{resource_id} in search "
+"engine \"{name}\": {message}"
 msgstr ""
 
-#: config/module.config.php:619
-msgid "Has media (radio)"
+#: Module.php:1888
+msgid ""
+"Unable to delete the search index for the deleted resource #{resource_id} in "
+"search engine \"{name}\": see log."
 msgstr ""
 
-#: config/module.config.php:629
-msgid "Media type (single)"
+#: Module.php:1989
+msgid "AdvancedSearch cron: unable to launch reindexation: {message}"
 msgstr ""
 
-#: config/module.config.php:634
-msgid "Media types *"
+#: Module.php:2332
+msgid ""
+"The {link_url}internal suggester{link_end} (sql) will be available after "
+"indexation."
 msgstr ""
 
-#: config/module.config.php:650
-msgid "Owner *"
+#: Module.php:2370
+msgid ""
+"The default search config can be {link_1}edited{link_end} and defined in the "
+"{link_3}main settings{link_end} for admin search and in each site settings "
+"for public search."
 msgstr ""
 
-#: config/module.config.php:657
-msgid "Visibility (select)"
+#: Module.php:2417
+msgid ""
+"The internal search engine \"{name}\" (sql) can be edited in the {link_url}"
+"search manager{link_end}."
 msgstr ""
 
-#: config/module.config.php:663
-msgid "Visibility (radio)"
+#: view/common/advanced-search/has-thumbnails.phtml:13
+msgid "Presence of thumbnails"
 msgstr ""
 
-#: config/module.config.php:667
-msgid "Id"
+#: view/common/advanced-search/has-thumbnails.phtml:17
+msgid "Has no thumbnails"
 msgstr ""
 
-#: config/module.config.php:673
-msgid "Date time"
+#: view/common/advanced-search/has-thumbnails.phtml:19
+#: view/common/advanced-search/has-media-radio.phtml:24
+#: view/common/advanced-search/has-asset.phtml:19
+#: view/common/advanced-search/has-original.phtml:19
+#: view/common/advanced-search/visibility-radio.phtml:24
+msgid "Any"
 msgstr ""
 
-#: config/module.config.php:678
+#: view/common/advanced-search/has-asset.phtml:13
+msgid "Use an asset as thumbnail"
+msgstr ""
+
+#: view/common/advanced-search/has-asset.phtml:16
+msgid "Has asset"
+msgstr ""
+
+#: view/common/advanced-search/has-asset.phtml:17
+msgid "Has no asset"
+msgstr ""
+
+#: view/common/advanced-search/has-original.phtml:13
+msgid "Presence of original file"
+msgstr ""
+
 #: view/common/advanced-search/has-original.phtml:16
+#: config/module.config.php:685
 msgid "Has original file"
 msgstr ""
 
-#: config/module.config.php:693
-msgid "Has a specific asset"
+#: view/common/advanced-search/has-original.phtml:17
+msgid "Has no original file"
 msgstr ""
 
-#: config/module.config.php:700
-#: src/Form/Admin/SearchConfigFilterFieldset.php:279
-msgid "Access"
+#: view/common/advanced-search/media-types.phtml:19
+#: view/common/advanced-search/media-type-improved.phtml:19
+msgid "Search by media type"
 msgstr ""
 
-#: config/module.config.php:709
-msgid "Extended date time format"
+#: view/common/advanced-search/media-types.phtml:28
+#: view/common/advanced-search/media-type-improved.phtml:28
+msgid "Select media types…"
 msgstr ""
 
-#: config/module.config.php:716
-msgid "Geography"
+#: view/common/advanced-search/filters.phtml:72
+#: view/common/advanced-search/properties-improved.phtml:37
+msgid "literal"
 msgstr ""
 
-#: config/module.config.php:722
-msgid "Is dynamic item set"
+#: view/common/advanced-search/filters.phtml:73
+#: view/common/advanced-search/properties-improved.phtml:38
+msgid "resource"
 msgstr ""
 
-#: config/module.config.php:732
-msgid "Numeric"
+#: view/common/advanced-search/filters.phtml:80
+#: view/common/advanced-search/properties-improved.phtml:45
+msgid "Select main data type…"
 msgstr ""
 
-#: config/module.config.php:739
-msgid "OAI-PMH harvests"
+#: view/common/advanced-search/filters.phtml:183
+msgid "[any metadata]"
 msgstr ""
 
-#: config/module.config.php:748
-msgid "Selections"
+#: view/common/advanced-search/media-item-sets.phtml:27
+msgid "Select item sets…"
 msgstr ""
 
-#: config/module.config.php:757
-msgid "🖒"
+#: view/common/advanced-search/properties-improved.phtml:126
+msgid "[any property]"
 msgstr ""
 
-#: config/module.config.php:767
-msgid "Reindex search engines"
+#: src/EngineAdapter/Internal.php:20
+msgid "Internal [sql]"
+msgstr ""
+
+#: src/EngineAdapter/Internal.php:140
+#: src/Form/Admin/SearchConfigConfigureForm.php:124
+msgid "Aliases and aggregated fields"
+msgstr ""
+
+#: src/EngineAdapter/Internal.php:232
+msgid "Resource id"
+msgstr ""
+
+#: src/EngineAdapter/Noop.php:10
+msgid "No operation (noop)"
+msgstr ""
+
+#: src/FormAdapter/FallbackFormAdapter.php:7
+msgid "Fallback"
+msgstr ""
+
+#: src/FormAdapter/AbstractFormAdapter.php:64
+msgid "[Undefined]"
+msgstr ""
+
+#: src/FormAdapter/AbstractFormAdapter.php:133
+msgid "Not implemented in this form adapter."
+msgstr ""
+
+#: src/FormAdapter/TraitFormAdapterClassic.php:548
+msgid "The search config {search_config} has no form adapter."
+msgstr ""
+
+#: src/FormAdapter/TraitFormAdapterClassic.php:561
+msgid ""
+"The search config {search_config} has a unavailable form adapter "
+"{form_adapter}."
+msgstr ""
+
+#: src/FormAdapter/TraitFormAdapterClassic.php:810
+msgid ""
+"Query error: {message}\n"
+"Query: {json_query}"
+msgstr ""
+
+#: src/Mvc/Controller/Plugin/ApiSearch.php:480
+msgid ""
+"The \"{field}\" field is not available for returnScalar in resource type "
+"\"{type}\"."
+msgstr ""
+
+#: src/View/Helper/FieldSelect.php:32
+msgid "Select metadata…"
+msgstr ""
+
+#: src/View/Helper/UserBarDelegator.php:104
+#: src/View/Helper/UserBarDelegator.php:106
+msgid "advanced-search"
+msgstr ""
+
+#: src/View/Helper/SearchingFilters.php:62
+msgid ""
+"The use of the view helper searchingFilters() is deprecated. Use "
+"$searchConfig->renderSearchFilters() instead."
+msgstr ""
+
+#: src/View/Helper/AbstractFacet.php:233
+msgid ""
+"[AdvancedSearch] {count} facet values for field \"{field}\" were skipped "
+"because they have no label or are not in the current site (sample: {sample})."
+msgstr ""
+
+#: src/View/Helper/AbstractFacetTree.php:287
+msgid ""
+"For facet \"{field}\", the thesaurus is not defined. Set it as option "
+"thesaurus = id."
+msgstr ""
+
+#: src/View/Helper/SearchingUrl.php:36
+msgid "Search engine #{search_config} does not exist."
+msgstr ""
+
+#: src/View/Helper/SearchingUrl.php:41
+msgid "Search engine {name} (#{search_config}) is not available."
+msgstr ""
+
+#: src/View/Helper/SearchPaginationPerPageSelector.php:42
+#, php-format
+msgid "Results by %d"
+msgstr ""
+
+#: src/Job/IndexSuggestions.php:82
+msgid ""
+"Suggester #{search_suggester_id} (\"{name}\"): Only search engine with the "
+"internal adapter (sql) can be indexed."
+msgstr ""
+
+#: src/Job/IndexSuggestions.php:102
+msgid ""
+"Suggester #{search_suggester_id} (\"{name}\"): there is no resource type to "
+"index."
+msgstr ""
+
+#: src/Job/IndexSuggestions.php:114
+msgid ""
+"Suggester #{search_suggester_id} (\"{name}\"): There are already {total} "
+"other jobs \"Index Suggestion\" and the current one is not forced."
+msgstr ""
+
+#: src/Job/IndexSuggestions.php:124
+msgid ""
+"There are already {total} other jobs \"Index Suggestions\". Slowdowns may "
+"occur."
+msgstr ""
+
+#: src/Job/IndexSuggestions.php:133
+msgid ""
+"Suggester #{search_suggester_id} (\"{name}\"): start of indexing (mode: "
+"{mode})."
+msgstr ""
+
+#: src/Job/IndexSuggestions.php:143
+msgid ""
+"Suggester #{search_suggester_id} (\"{name}\"): end of indexing. {total} "
+"suggestions indexed. Execution time: {duration} seconds."
+msgstr ""
+
+#: src/Job/IndexSuggestions.php:230
+msgid "Suggester #{id}: indexing global (all resources)..."
+msgstr ""
+
+#: src/Job/IndexSuggestions.php:239
+msgid "Suggester #{id}: indexing {count} sites..."
+msgstr ""
+
+#: src/Job/IndexSuggestions.php:244
+msgid "Job stopped by user."
+msgstr ""
+
+#: src/Job/IndexSuggestions.php:248
+msgid "Suggester #{id}: indexing site #{site_id}..."
+msgstr ""
+
+#: src/Job/IndexSuggestions.php:282
+msgid "Suggester #{id}: removed suggestions with stopwords ({mode})."
+msgstr ""
+
+#: src/Job/IndexSuggestions.php:473
+msgid ""
+"The database does not support the function REGEXP_REPLACE (mysql 8.0 or "
+"mariadb 10.0.5 is required): the suggestions are trimmed of the common "
+"punctuation only."
+msgstr ""
+
+#: src/Job/IndexSuggestions.php:529
+msgid "Suggester #{id}: normalized case (kept majority version)."
+msgstr ""
+
+#: src/Job/IndexSearch.php:147
+msgid ""
+"The owner of the job cannot view all resources, so the index would be "
+"partial. Run the indexation as a global admin."
+msgstr ""
+
+#: src/Job/IndexSearch.php:171
+msgid "No search engine is defined to be indexed."
+msgstr ""
+
+#: src/Job/IndexSearch.php:194
+msgid "No search engine is defined to index the specified resource types."
+msgstr ""
+
+#: src/Job/IndexSearch.php:205
+msgid ""
+"Search index #{search_engine_id} (\"{name}\"): the list of resource ids "
+"contains invalid ids."
+msgstr ""
+
+#: src/Job/IndexSearch.php:218
+msgid ""
+"Search index #{search_engine_id} (\"{name}\"): There are already {total} "
+"other jobs \"Index Search\" (#{list}) and the current one is not forced."
+msgstr ""
+
+#: src/Job/IndexSearch.php:229
+msgid ""
+"There are already {total} other jobs \"Index Search\". Slowdowns may occur "
+"on the site."
+msgstr ""
+
+#: src/Job/IndexSearch.php:239
+msgid "Reindexing starts at resource #{resource_id}."
+msgstr ""
+
+#: src/Job/IndexSearch.php:253
+msgid "Process done with the main entity manager"
+msgstr ""
+
+#: src/Job/IndexSearch.php:258
+msgid "Process done with a new entity manager"
+msgstr ""
+
+#: src/Job/IndexSearch.php:310
+msgid ""
+"End of indexing. Execution time: {duration} seconds. Max memory: {memory}. "
+"Failed indexed resources should be checked manually."
+msgstr ""
+
+#: src/Job/IndexSearch.php:334
+msgid ""
+"Search index #{search_engine_id} (\"{name}\"): there is no resource type to "
+"index or the indexation is not needed."
+msgstr ""
+
+#: src/Job/IndexSearch.php:351
+msgid ""
+"Search index #{search_engine_id} (\"{name}\"): Only {visibility} resources "
+"will be indexed."
+msgstr ""
+
+#: src/Job/IndexSearch.php:359
+msgid "Search index #{search_engine_id} (\"{name}\"): start of indexing"
+msgstr ""
+
+#: src/Job/IndexSearch.php:366
+msgid ""
+"All indexes of the shared core are cleared, included the ones managed "
+"externally."
+msgstr ""
+
+#: src/Job/IndexSearch.php:371
+msgid "Search index is fully cleared."
+msgstr ""
+
+#: src/Job/IndexSearch.php:444
+msgid "Error loading batch #{number} of {resource_type}: {message}. Skipping."
+msgstr ""
+
+#: src/Job/IndexSearch.php:457
+msgid ""
+"Batch #{number} of {resource_type}: {count} resources skipped (private, "
+"deleted, or filtered by module)."
+msgstr ""
+
+#: src/Job/IndexSearch.php:482
+msgid "Indexing of {resource_type} #{resource_id} failed: {message}"
+msgstr ""
+
+#: src/Job/IndexSearch.php:486
+msgid "message"
+msgstr ""
+
+#: src/Job/IndexSearch.php:531
+msgid "Final commit failed for {resource_type}: {message}"
+msgstr ""
+
+#: src/Job/IndexSearch.php:541 src/Job/IndexSearch.php:593
+msgid "{resource_type}: {count} indexed"
+msgstr ""
+
+#: src/Job/IndexSearch.php:549
+msgid ""
+"Search index #{search_engine_id} (\"{name}\"): end of indexing. {results}. "
+"Execution time: {duration} seconds. Failed indexed resources should be "
+"checked manually."
+msgstr ""
+
+#: src/Job/IndexSearch.php:576
+msgid "Post-reindex finalization failed: {message}"
+msgstr ""
+
+#: src/Job/IndexSearch.php:603
+msgid "Last indexed resource: {resource_type} #{resource_id}."
+msgstr ""
+
+#: src/Job/IndexSearch.php:612
+msgid ""
+"Search index #{search_engine_id} (\"{name}\"): the indexing was stopped. "
+"{results}. Execution time: {duration} seconds."
+msgstr ""
+
+#: src/Job/IndexSearch.php:748
+msgid ""
+"Indexing {resource_type}: {indexed}/{total} ({percent}%). Memory: {memory} "
+"MB."
+msgstr ""
+
+#: src/Job/IndexSearch.php:792
+msgid "Dispatched reindex of internal suggester \"{name}\"."
+msgstr ""
+
+#: src/Job/IndexSearch.php:803
+msgid "Skipped suggester \"{name}\": build on commit is disabled."
+msgstr ""
+
+#: src/Job/IndexSearch.php:817
+msgid "Dispatched reindex of Solr suggester \"{name}\"."
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:46 src/Form/SiteSettingsFieldset.php:50
+#: src/Form/SettingsFieldset.php:27
+#: src/Site/ResourcePageBlockLayout/SearchingForm.php:13
+msgid "Advanced Search (module)"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:66
+msgid "Available search pages"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:79 src/Form/SiteSettingsFieldset.php:193
+#: src/Form/SiteSettingsFieldset.php:230 src/Form/SettingsFieldset.php:66
+msgid "Default search page"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:81
+msgid "Select the default search engine for the site…"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:92
+msgid "Replace the search form of the theme by this search page"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:93
+msgid ""
+"The theme displays the standard search form of Omeka, that searches the full "
+"text. When replaced, the form of the search page is displayed instead, with "
+"its filters and its autosuggestion. A theme that renders its own form is not "
+"impacted."
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:104 src/Form/SettingsFieldset.php:106
+msgid "Link to the advanced search below the search form"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:105 src/Form/SettingsFieldset.php:107
+msgid ""
+"The dialog loads the form only at the first click, so it does not slow down "
+"the pages. A theme that displays its own panel in the header can keep \"no\" "
+"and fetch the url of the form itself."
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:107 src/Form/SettingsFieldset.php:109
+msgid "Yes, in a dialog"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:108 src/Form/SettingsFieldset.php:110
+msgid "Yes, to the search page"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:123
+msgid "Hidden query filters per search page"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:124
+msgid ""
+"One filter per line, formatted as \"search_config_slug = query_args\" (e.g. "
+"\"recherche = item_set_id[]=151\"). Filters are merged with the search "
+"config \"Hidden query filter\" only on this site, so other sites sharing the "
+"same search page are unaffected."
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:143
+msgid "Redirection of the page of an item set"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:144
+msgid ""
+"One row by item set, and the row \"default\" for all the other ones. The "
+"redirection is \"browse\" (standard Omeka page), \"search\" (search page of "
+"the site), \"first\" (search page, but the item set is displayed on the "
+"first page only), or the slug of a site page or a url, relative or absolute."
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:148
+msgid "Redirection"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:152 src/Form/SiteSettingsFieldset.php:160
+msgid "All other item sets"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:174
+msgid ""
+"default = browse\n"
+"151 = search\n"
+"152 = events"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:189
+msgid "Redirect page \"browse item sets\""
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:190
+msgid ""
+"The page that lists the item sets may be replaced by a search page or by any "
+"page of the site. Use the setting below for an external url."
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:192 src/Form/SiteSettingsFieldset.php:229
+msgid "No redirect"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:198 src/Form/SiteSettingsFieldset.php:199
+msgid "Pages of the site"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:214
+msgid "Redirect page \"browse item sets\" to an external url"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:215
+msgid "An absolute url, that takes precedence on the setting above."
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:227
+msgid "Redirect page \"browse items\""
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:250
+msgid "Block Search (item): Config"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:252
+msgid "Select the search engine for items…"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:263
+msgid "Block Search (item): Form template"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:276
+msgid "Block Search (media): Config"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:278
+msgid "Select the search engine for medias…"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:289
+msgid "Block Search (media): Form template"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:303
+msgid "Block Search (item set): Config"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:305
+msgid "Select the search engine for item sets…"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:316
+msgid "Block Search (item set): Form template"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:328
+msgid "Block Search (item set): Scope of the search"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:330
+msgid "Search in current item set"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:331
+msgid "Search in all resources"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:344
+msgid "Block Resource navigation: active contexts"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:348
+msgid "User selection"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:349
+msgid "Series in page blocks"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:350
+msgid "Featured (browse preview page block)"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:362
+msgid "Block Resource navigation: max results"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:376
+msgid "Block Resource navigation: parts to display"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:378
+msgid "Type label (Search, Item set, Selection…)"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:379
+msgid "Context name (item set title, selection title, query)"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:380
+msgid "Position (n / total)"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:393
+msgid "Block Resource navigation: fall back to an item set on direct access"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:394
+msgid ""
+"When no browse context exists (no URL param, no session), show a navigation "
+"within an item set of the item. \"First\" picks the first item set; a "
+"property sorts the item sets by that property value and picks the first with "
+"a non-empty value."
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:395
+msgid "Disabled"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:397
+msgid "First item set"
+msgstr ""
+
+#: src/Form/SiteSettingsFieldset.php:404
+msgid "Select a fallback…"
 msgstr ""
 
 #: src/Form/SettingsFieldset.php:23
 msgid "Advanced Search (admin board)"
-msgstr ""
-
-#: src/Form/SettingsFieldset.php:27 src/Form/SiteSettingsFieldset.php:46
-#: src/Form/SiteSettingsFieldset.php:50
-#: src/Site/ResourcePageBlockLayout/SearchingForm.php:13
-msgid "Advanced Search (module)"
 msgstr ""
 
 #: src/Form/SettingsFieldset.php:43
@@ -2496,54 +3020,51 @@ msgid ""
 "property."
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:66
-msgid "Default search page in admin side bar"
+#: src/Form/SettingsFieldset.php:67
+msgid ""
+"The default search page of a site is set in the site settings; this one is "
+"used when a site has none, so it should be a page available in the sites."
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:68
-msgid "Select the search engine for the admin side bar…"
-msgstr ""
-
-#: src/Form/SettingsFieldset.php:79
-msgid "Replace the quick search of the admin side bar by this search page"
+#: src/Form/SettingsFieldset.php:69
+msgid "Select the default search page…"
 msgstr ""
 
 #: src/Form/SettingsFieldset.php:80
+msgid "Default search page in admin side bar"
+msgstr ""
+
+#: src/Form/SettingsFieldset.php:81
+msgid ""
+"A page available only in admin can be used here: unlike the default search "
+"page above, this one is never rendered by a site."
+msgstr ""
+
+#: src/Form/SettingsFieldset.php:83
+msgid "Use the default search page…"
+msgstr ""
+
+#: src/Form/SettingsFieldset.php:94
+msgid "Replace the quick search of the admin side bar by this search page"
+msgstr ""
+
+#: src/Form/SettingsFieldset.php:95
 msgid ""
 "By default, the search page is added below the quick search of Omeka, so the "
 "side bar has two search fields. When replaced, only the search page remains."
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:91 src/Form/SiteSettingsFieldset.php:104
-msgid "Link to the advanced search below the search form"
-msgstr ""
-
-#: src/Form/SettingsFieldset.php:92 src/Form/SiteSettingsFieldset.php:105
-msgid ""
-"The dialog loads the form only at the first click, so it does not slow down "
-"the pages. A theme that displays its own panel in the header can keep \"no\" "
-"and fetch the url of the form itself."
-msgstr ""
-
-#: src/Form/SettingsFieldset.php:94 src/Form/SiteSettingsFieldset.php:107
-msgid "Yes, in a dialog"
-msgstr ""
-
-#: src/Form/SettingsFieldset.php:95 src/Form/SiteSettingsFieldset.php:108
-msgid "Yes, to the search page"
-msgstr ""
-
-#: src/Form/SettingsFieldset.php:109
+#: src/Form/SettingsFieldset.php:124
 msgid "Quick api search via external search engine"
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:110
+#: src/Form/SettingsFieldset.php:125
 msgid ""
 "The method apiSearch() allows to do a quick search in some cases. It "
 "requires a mapping done with the Omeka api and the selected index."
 msgstr ""
 
-#: src/Form/SettingsFieldset.php:112
+#: src/Form/SettingsFieldset.php:127
 msgid "Select the config for quick api search…"
 msgstr ""
 
@@ -2556,7 +3077,7 @@ msgid "Remove this filter"
 msgstr ""
 
 #: src/Form/SearchFilter/Advanced.php:213
-#: src/Controller/Admin/SearchConfigController.php:1850
+#: src/Controller/Admin/SearchConfigController.php:1859
 msgid ""
 "The indexes of the advanced filters are not present in the search engine."
 msgstr ""
@@ -2570,31 +3091,554 @@ msgstr ""
 msgid "Fields"
 msgstr ""
 
-#: src/Form/View/Helper/FormMultiText.php:22
-#: src/Form/View/Helper/FormRangeDouble.php:27
-#, php-format
-msgid "Method %1$s requires that the element is of type %2$s"
+#: src/Form/Admin/SearchConfigImportForm.php:18
+msgid "Config file (yaml or json)"
 msgstr ""
 
-#: src/Form/View/Helper/FormMultiText.php:30
-#, php-format
-msgid "%s requires that the element has an assigned name; none discovered"
+#: src/Form/Admin/SearchConfigImportForm.php:29
+msgid "Or paste the config (yaml or json)"
 msgstr ""
 
-#: src/Form/View/Helper/FormRangeDouble.php:35
-#, php-format
+#: src/Form/Admin/TraitSharedFieldsetElements.php:27
+msgid "Value labels: table source"
+msgstr ""
+
+#: src/Form/Admin/TraitSharedFieldsetElements.php:28
 msgid ""
-"Method %s requires that the element has an assigned name; none discovered"
+"Optional slug or id of a table (module Table) used as the base code / label "
+"mapping. Inline \"Value labels\" below override the table entries when both "
+"are defined."
 msgstr ""
 
-#: src/Form/View/Helper/FormRangeDouble.php:43
-#, php-format
-msgid "Method %s requires that the value be an associative array"
+#: src/Form/Admin/TraitSharedFieldsetElements.php:42
+msgid "Value labels"
 msgstr ""
 
-#: src/Form/Admin/SearchConfigConfigureForm.php:124
-#: src/EngineAdapter/Internal.php:140
-msgid "Aliases and aggregated fields"
+#: src/Form/Admin/TraitSharedFieldsetElements.php:76
+msgid "Minimum"
+msgstr ""
+
+#: src/Form/Admin/TraitSharedFieldsetElements.php:81
+#: src/Form/Admin/TraitSharedFieldsetElements.php:96
+#: src/Form/Admin/TraitSharedFieldsetElements.php:111
+#: src/Form/Admin/TraitSharedFieldsetElements.php:127
+#: src/Form/Admin/TraitSharedFieldsetElements.php:159
+#: src/Form/Admin/TraitSharedFieldsetElements.php:179
+#: src/Form/Admin/TraitSharedFieldsetElements.php:199
+msgid "Slider"
+msgstr ""
+
+#: src/Form/Admin/TraitSharedFieldsetElements.php:91
+msgid "Maximum"
+msgstr ""
+
+#: src/Form/Admin/TraitSharedFieldsetElements.php:106
+msgid "Step"
+msgstr ""
+
+#: src/Form/Admin/TraitSharedFieldsetElements.php:122
+msgid "Extract the first digits of the values (year of a date)"
+msgstr ""
+
+#: src/Form/Admin/TraitSharedFieldsetElements.php:149
+msgid "Slider scale (RangeDouble)"
+msgstr ""
+
+#: src/Form/Admin/TraitSharedFieldsetElements.php:151
+msgid "Linear"
+msgstr ""
+
+#: src/Form/Admin/TraitSharedFieldsetElements.php:152
+msgid "Logarithmic"
+msgstr ""
+
+#: src/Form/Admin/TraitSharedFieldsetElements.php:153
+msgid "Piecewise (with breakpoints)"
+msgstr ""
+
+#: src/Form/Admin/TraitSharedFieldsetElements.php:154
+msgid "Auto (quartiles from data)"
+msgstr ""
+
+#: src/Form/Admin/TraitSharedFieldsetElements.php:168
+msgid "Scale breakpoints"
+msgstr ""
+
+#: src/Form/Admin/TraitSharedFieldsetElements.php:169
+msgid ""
+"One pair per line: value = position. Position is a percentage between 0 and "
+"100."
+msgstr ""
+
+#: src/Form/Admin/TraitSharedFieldsetElements.php:173
+msgid "Position (%)"
+msgstr ""
+
+#: src/Form/Admin/TraitSharedFieldsetElements.php:195
+msgid "Display ticks at breakpoints"
+msgstr ""
+
+#: src/Form/Admin/TraitSharedFieldsetElements.php:245
+#: src/Form/Admin/SearchConfigConfigureForm.php:403
+msgid "Html attributes"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigForm.php:86
+#: src/Form/Admin/SearchConfigSettingsFieldset.php:63
+#: src/Form/Admin/SearchSuggesterForm.php:49
+msgid "Select a search engine below…"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigForm.php:98
+#: src/Form/Admin/SearchConfigSettingsFieldset.php:74
+msgid "Form"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigForm.php:100
+#: src/Form/Admin/SearchConfigSettingsFieldset.php:76
+msgid "Select a form below…"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigForm.php:112
+msgid "Default search page for admin and sites"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigForm.php:130
+#: src/Form/Admin/SearchConfigSitesFieldset.php:62
+msgid "Availability on sites"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigForm.php:136
+#: src/Form/Admin/SearchConfigSitesFieldset.php:65
+msgid "Make available in all sites"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigSettingsFieldset.php:50
+msgid ""
+"The slug to the search form. The site slug will be automatically prepended."
+msgstr ""
+
+#: src/Form/Admin/SearchConfigSitesFieldset.php:45
+msgid "Default search page for sites"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigSitesFieldset.php:85
+msgid "Default search page for admin board"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigSitesFieldset.php:95
+msgid "Default search page for the api"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigSitesFieldset.php:96
+msgid ""
+"The api uses the index of the engine of this page, so this option has an "
+"effect only when the engine is an external index, like Solr. With the "
+"internal engine, the api keeps querying the database."
+msgstr ""
+
+#: src/Form/Admin/SearchConfigSitesFieldset.php:107
+msgid "Current use of this search page"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:57
+#: src/Form/Admin/SearchConfigFilterFieldset.php:70
+#: src/Form/Admin/SearchConfigFilterFieldset.php:385
+msgid "Field"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:58
+#: src/Form/Admin/SearchConfigFilterFieldset.php:71
+msgid ""
+"The field is an index available in the search engine. The internal search "
+"engine supports property terms and aggregated fields (date, author, etc)."
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:67
+#: src/Form/Admin/SearchConfigFilterFieldset.php:83
+msgid "Set field or index…"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:74
+#: src/Form/Admin/SearchConfigFilterFieldset.php:90
+msgid "Field (interval end)"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:75
+msgid ""
+"For RangeDouble facets on uncertain dates: when set, \"Field\" is used as "
+"the interval start and this field as the interval end. Search matches "
+"resources whose [start, end] overlaps the queried [from, to]."
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:85
+#: src/Form/Admin/SearchConfigFilterFieldset.php:101
+msgid "Set interval end field…"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:104
+msgid "Introduction"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:105
+msgid "Short text displayed above the values of the facet."
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:118
+#: src/Form/Admin/SearchConfigFilterFieldset.php:135
+msgid "Id of the thesaurus"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:132
+msgid ""
+"One pair per line: indexed_value = displayed_label. Replaces the raw value "
+"in facet items, \"see more\" buttons and active facets. Mainly useful for "
+"boolean fields (e.g. 1 = Only with image / 0 = Without image) and small "
+"enumerations. Overrides the table source above for the listed codes."
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:138
+#: src/Form/Admin/SearchConfigFilterFieldset.php:255
+msgid "Input type"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:139
+msgid ""
+"The type of facet displayed in the page of results. Each type has its own "
+"settings below; the preview shows what the visitor will see."
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:142
+msgid "Checkbox (default)"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:143
+msgid "Checkbox with filter input"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:144
+msgid "Boolean (has a value / has no value)"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:145
+#: src/Form/Admin/SearchConfigFilterFieldset.php:270
+msgid "Slider for a range of values"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:147
+#: src/Form/Admin/SearchConfigFilterFieldset.php:272
+msgid "Select "
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:148
+msgid "Select range"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:153
+#: src/Form/Admin/SearchConfigFilterFieldset.php:281
+msgid "Thesaurus"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:165
+msgid "Set facet type…"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:173
+msgid "Limit languages of facets (internal querier)"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:175
+#: src/Form/Admin/SearchConfigFilterFieldset.php:489
+msgid "No limit"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:176
+msgid "Limit facets to site language or empty language"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:177
+#: src/Form/Admin/SearchConfigFilterFieldset.php:491
+msgid "Use site setting \"Filter values based on site locale\""
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:192
+msgid "Limit facets to specific languages (internal querier)"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:193
+#: src/Form/Admin/SearchConfigFilterFieldset.php:507
+msgid ""
+"Use \"|\" to separate multiple languages. Use a trailing \"|\" for values "
+"without language. When fields with languages (like subjects) and fields "
+"without language (like date) are facets, the empty language must be set to "
+"get results."
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:209
+msgid "Join the selected values with"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:210
+msgid ""
+"With \"or\", a resource matching any of the selected values is kept, so "
+"selecting a second value widens the results. With \"and\", a resource must "
+"match all of them, so each new value narrows the results."
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:212
+msgid "Or (default)"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:213
+msgid "And"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:223
+msgid "Select joiner…"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:230
+#: src/Form/Admin/SearchConfigFilterFieldset.php:523
+msgid "Order"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:232
+#: src/Form/Admin/SearchConfigFilterFieldset.php:525
+msgid "Alphabetic (default)"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:233
+#: src/Form/Admin/SearchConfigFilterFieldset.php:526
+msgid "Alphabetic descendant"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:234
+#: src/Form/Admin/SearchConfigFilterFieldset.php:527
+msgid "Total"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:235
+#: src/Form/Admin/SearchConfigFilterFieldset.php:528
+msgid "Total ascendant"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:236
+#: src/Form/Admin/SearchConfigFilterFieldset.php:529
+msgid "Total then alphabetic for hidden values"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:237
+msgid "Values (set in the options)"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:238
+#: src/Form/Admin/SearchConfigFilterFieldset.php:531
+msgid "Values descendant"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:248
+#: src/Form/Admin/SearchConfigFilterFieldset.php:541
+msgid "Select order…"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:255
+#: src/Form/Admin/SearchConfigFilterFieldset.php:548
+msgid "Maximum number of values"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:272
+msgid "Display of facets"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:274
+msgid "Static"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:275
+msgid "Expanded"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:276
+msgid "Collapsed"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:277
+msgid "Collapsed unless a facet is set"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:292
+msgid "Enable pagination"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:293
+msgid ""
+"Paginate the facet values with a per page navigation, instead of a \"see "
+"more\" button. Uses \"per page\" as the page size and ignores \"display on "
+"load\"."
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:305
+msgid "Values displayed on load"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:320
+msgid "Values per page (with pagination)"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:336
+msgid "Display the values as links"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:337
+msgid ""
+"The values are simple links instead of checkboxes: the facet applies on "
+"click, without button."
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:350
+msgid "Display count"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:364
+msgid "Boolean buckets (fields ending with \"_b\")"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:365
+msgid ""
+"Filter Solr facet buckets for boolean fields. Default shows all returned "
+"buckets (typically Yes and No)."
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:367
+msgid "Show all buckets"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:368
+msgid "Show only \"Yes\" bucket"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:369
+msgid "Show only \"No\" bucket"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:392
+msgid ""
+"List of rarely used options, as key-values pairs. Omeka and Laminas options "
+"are accepted. A key set here takes precedence over the dedicated fields "
+"above."
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFacetFieldset.php:397
+#: src/Form/Admin/SearchConfigFilterFieldset.php:584
+msgid ""
+"Specific attributes to add to the input field, for example `class = \"my-"
+"specific-class\"`, or placeholder, data, etc."
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:68
+msgid "The search engine cannot be changed after creation."
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:82
+msgid "Suggester settings"
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:120
+msgid "Sites to index"
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:141
+msgid "Mode to index values"
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:143
+msgid "First words of values"
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:144
+msgid "All words"
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:145
+msgid "Full value"
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:146
+msgid "First words of values and full value"
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:147
+msgid "All words and full value"
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:160
+msgid "Mode to search suggestions"
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:162
+msgid "Start of a word"
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:163
+msgid "In word"
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:176
+msgid "Max number of results"
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:189
+msgid "Max number of characters of a result"
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:203
+msgid "Limit query to specific fields"
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:204
+msgid ""
+"With the internal search engine, it is not recommended to use full text "
+"content."
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:212
+#: src/Form/Admin/SearchSuggesterForm.php:228
+msgid "Select fields…"
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:219
+msgid "Exclude fields"
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:220
+msgid ""
+"Allow to skip the full text content, that may be useless for suggestions."
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:235
+msgid "Stopwords"
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:236
+msgid ""
+"Suggestions starting or ending with these words will be excluded. One word "
+"per line."
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:254
+msgid "Stopwords position"
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:256
+msgid "Start and end (recommended)"
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:257
+msgid "Start only"
+msgstr ""
+
+#: src/Form/Admin/SearchSuggesterForm.php:258
+msgid "End only"
 msgstr ""
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:125
@@ -2738,11 +3782,6 @@ msgstr ""
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:384
 msgid "List of specific Omeka and Laminas options."
-msgstr ""
-
-#: src/Form/Admin/SearchConfigConfigureForm.php:403
-#: src/Form/Admin/TraitSharedFieldsetElements.php:245
-msgid "Html attributes"
 msgstr ""
 
 #: src/Form/Admin/SearchConfigConfigureForm.php:404
@@ -3197,300 +4236,6 @@ msgstr ""
 msgid "A numeric breakpoint cannot share position 100 with \"max\"."
 msgstr ""
 
-#: src/Form/Admin/SearchConfigImportForm.php:18
-msgid "Config file (yaml or json)"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigImportForm.php:29
-msgid "Or paste the config (yaml or json)"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:55
-#: src/Form/Admin/SearchConfigFilterFieldset.php:70
-#: src/Form/Admin/SearchConfigFilterFieldset.php:385
-msgid "Field"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:56
-#: src/Form/Admin/SearchConfigFilterFieldset.php:71
-msgid ""
-"The field is an index available in the search engine. The internal search "
-"engine supports property terms and aggregated fields (date, author, etc)."
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:65
-#: src/Form/Admin/SearchConfigFilterFieldset.php:83
-msgid "Set field or index…"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:72
-#: src/Form/Admin/SearchConfigFilterFieldset.php:90
-msgid "Field (interval end)"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:73
-msgid ""
-"For RangeDouble facets on uncertain dates: when set, \"Field\" is used as "
-"the interval start and this field as the interval end. Search matches "
-"resources whose [start, end] overlaps the queried [from, to]."
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:83
-#: src/Form/Admin/SearchConfigFilterFieldset.php:101
-msgid "Set interval end field…"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:102
-#: src/Form/Admin/SearchConfigFilterFieldset.php:135
-msgid "Id of the thesaurus"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:116
-msgid ""
-"One pair per line: indexed_value = displayed_label. Replaces the raw value "
-"in facet items, \"see more\" buttons and active facets. Mainly useful for "
-"boolean fields (e.g. 1 = Only with image / 0 = Without image) and small "
-"enumerations. Overrides the table source above for the listed codes."
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:122
-#: src/Form/Admin/SearchConfigFilterFieldset.php:255
-msgid "Input type"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:123
-msgid ""
-"The type of facet displayed in the page of results. Each type has its own "
-"settings below; the preview shows what the visitor will see."
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:126
-msgid "Checkbox (default)"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:127
-msgid "Checkbox with filter input"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:128
-msgid "Boolean (has a value / has no value)"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:129
-#: src/Form/Admin/SearchConfigFilterFieldset.php:270
-msgid "Slider for a range of values"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:131
-#: src/Form/Admin/SearchConfigFilterFieldset.php:272
-msgid "Select "
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:132
-msgid "Select range"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:137
-#: src/Form/Admin/SearchConfigFilterFieldset.php:281
-msgid "Thesaurus"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:149
-msgid "Set facet type…"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:157
-msgid "Limit languages of facets (internal querier)"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:159
-#: src/Form/Admin/SearchConfigFilterFieldset.php:489
-msgid "No limit"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:160
-msgid "Limit facets to site language or empty language"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:161
-#: src/Form/Admin/SearchConfigFilterFieldset.php:491
-msgid "Use site setting \"Filter values based on site locale\""
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:176
-msgid "Limit facets to specific languages (internal querier)"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:177
-#: src/Form/Admin/SearchConfigFilterFieldset.php:507
-msgid ""
-"Use \"|\" to separate multiple languages. Use a trailing \"|\" for values "
-"without language. When fields with languages (like subjects) and fields "
-"without language (like date) are facets, the empty language must be set to "
-"get results."
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:193
-msgid "Join the selected values with"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:194
-msgid ""
-"With \"or\", a resource matching any of the selected values is kept, so "
-"selecting a second value widens the results. With \"and\", a resource must "
-"match all of them, so each new value narrows the results."
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:196
-msgid "Or (default)"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:197
-msgid "And"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:207
-msgid "Select joiner…"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:214
-#: src/Form/Admin/SearchConfigFilterFieldset.php:523
-msgid "Order"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:216
-#: src/Form/Admin/SearchConfigFilterFieldset.php:525
-msgid "Alphabetic (default)"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:217
-#: src/Form/Admin/SearchConfigFilterFieldset.php:526
-msgid "Alphabetic descendant"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:218
-#: src/Form/Admin/SearchConfigFilterFieldset.php:527
-msgid "Total"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:219
-#: src/Form/Admin/SearchConfigFilterFieldset.php:528
-msgid "Total ascendant"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:220
-#: src/Form/Admin/SearchConfigFilterFieldset.php:529
-msgid "Total then alphabetic for hidden values"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:221
-msgid "Values (set in the options)"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:222
-#: src/Form/Admin/SearchConfigFilterFieldset.php:531
-msgid "Values descendant"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:232
-#: src/Form/Admin/SearchConfigFilterFieldset.php:541
-msgid "Select order…"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:239
-#: src/Form/Admin/SearchConfigFilterFieldset.php:548
-msgid "Maximum number of values"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:256
-msgid "Display of facets"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:258
-msgid "Static"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:259
-msgid "Expanded"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:260
-msgid "Collapsed"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:261
-msgid "Collapsed unless a facet is set"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:276
-msgid "Enable pagination"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:277
-msgid ""
-"Paginate the facet values with a per page navigation, instead of a \"see "
-"more\" button. Uses \"per page\" as the page size and ignores \"display on "
-"load\"."
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:289
-msgid "Values displayed on load"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:304
-msgid "Values per page (with pagination)"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:320
-msgid "Display the values as links"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:321
-msgid ""
-"The values are simple links instead of checkboxes: the facet applies on "
-"click, without button."
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:334
-msgid "Display count"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:348
-msgid "Boolean buckets (fields ending with \"_b\")"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:349
-msgid ""
-"Filter Solr facet buckets for boolean fields. Default shows all returned "
-"buckets (typically Yes and No)."
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:351
-msgid "Show all buckets"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:352
-msgid "Show only \"Yes\" bucket"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:353
-msgid "Show only \"No\" bucket"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:376
-msgid ""
-"List of rarely used options, as key-values pairs. Omeka and Laminas options "
-"are accepted. A key set here takes precedence over the dedicated fields "
-"above."
-msgstr ""
-
-#: src/Form/Admin/SearchConfigFacetFieldset.php:381
-#: src/Form/Admin/SearchConfigFilterFieldset.php:584
-msgid ""
-"Specific attributes to add to the input field, for example `class = \"my-"
-"specific-class\"`, or placeholder, data, etc."
-msgstr ""
-
 #: src/Form/Admin/SearchEngineConfigureForm.php:62
 msgid "Resources searchable"
 msgstr ""
@@ -3519,248 +4264,6 @@ msgstr ""
 
 #: src/Form/Admin/SearchEngineConfigureForm.php:139
 msgid "Concepts"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigForm.php:86
-#: src/Form/Admin/SearchSuggesterForm.php:49
-#: src/Form/Admin/SearchConfigSettingsFieldset.php:63
-msgid "Select a search engine below…"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigForm.php:98
-#: src/Form/Admin/SearchConfigSettingsFieldset.php:74
-msgid "Form"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigForm.php:100
-#: src/Form/Admin/SearchConfigSettingsFieldset.php:76
-msgid "Select a form below…"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigForm.php:112
-msgid "Default search page for admin and sites"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigForm.php:130
-#: src/Form/Admin/SearchConfigSitesFieldset.php:62
-msgid "Availability on sites"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigForm.php:136
-#: src/Form/Admin/SearchConfigSitesFieldset.php:65
-msgid "Make available in all sites"
-msgstr ""
-
-#: src/Form/Admin/SearchEngineForm.php:60
-msgid "Select an engine adapter below…"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigSitesFieldset.php:45
-msgid "Default search page for sites"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigSitesFieldset.php:85
-msgid "Default search page for admin board"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigSitesFieldset.php:95
-msgid "Default search page for the api"
-msgstr ""
-
-#: src/Form/Admin/SearchConfigSitesFieldset.php:96
-msgid ""
-"The api uses the index of the engine of this page, so this option has an "
-"effect only when the engine is an external index, like Solr. With the "
-"internal engine, the api keeps querying the database."
-msgstr ""
-
-#: src/Form/Admin/SearchConfigSitesFieldset.php:107
-msgid "Current use of this search page"
-msgstr ""
-
-#: src/Form/Admin/TraitSharedFieldsetElements.php:27
-msgid "Value labels: table source"
-msgstr ""
-
-#: src/Form/Admin/TraitSharedFieldsetElements.php:28
-msgid ""
-"Optional slug or id of a table (module Table) used as the base code / label "
-"mapping. Inline \"Value labels\" below override the table entries when both "
-"are defined."
-msgstr ""
-
-#: src/Form/Admin/TraitSharedFieldsetElements.php:42
-msgid "Value labels"
-msgstr ""
-
-#: src/Form/Admin/TraitSharedFieldsetElements.php:76
-msgid "Minimum"
-msgstr ""
-
-#: src/Form/Admin/TraitSharedFieldsetElements.php:81
-#: src/Form/Admin/TraitSharedFieldsetElements.php:96
-#: src/Form/Admin/TraitSharedFieldsetElements.php:111
-#: src/Form/Admin/TraitSharedFieldsetElements.php:127
-#: src/Form/Admin/TraitSharedFieldsetElements.php:159
-#: src/Form/Admin/TraitSharedFieldsetElements.php:179
-#: src/Form/Admin/TraitSharedFieldsetElements.php:199
-msgid "Slider"
-msgstr ""
-
-#: src/Form/Admin/TraitSharedFieldsetElements.php:91
-msgid "Maximum"
-msgstr ""
-
-#: src/Form/Admin/TraitSharedFieldsetElements.php:106
-msgid "Step"
-msgstr ""
-
-#: src/Form/Admin/TraitSharedFieldsetElements.php:122
-msgid "Extract the first digits of the values (year of a date)"
-msgstr ""
-
-#: src/Form/Admin/TraitSharedFieldsetElements.php:149
-msgid "Slider scale (RangeDouble)"
-msgstr ""
-
-#: src/Form/Admin/TraitSharedFieldsetElements.php:151
-msgid "Linear"
-msgstr ""
-
-#: src/Form/Admin/TraitSharedFieldsetElements.php:152
-msgid "Logarithmic"
-msgstr ""
-
-#: src/Form/Admin/TraitSharedFieldsetElements.php:153
-msgid "Piecewise (with breakpoints)"
-msgstr ""
-
-#: src/Form/Admin/TraitSharedFieldsetElements.php:154
-msgid "Auto (quartiles from data)"
-msgstr ""
-
-#: src/Form/Admin/TraitSharedFieldsetElements.php:168
-msgid "Scale breakpoints"
-msgstr ""
-
-#: src/Form/Admin/TraitSharedFieldsetElements.php:169
-msgid ""
-"One pair per line: value = position. Position is a percentage between 0 and "
-"100."
-msgstr ""
-
-#: src/Form/Admin/TraitSharedFieldsetElements.php:173
-msgid "Position (%)"
-msgstr ""
-
-#: src/Form/Admin/TraitSharedFieldsetElements.php:195
-msgid "Display ticks at breakpoints"
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:68
-msgid "The search engine cannot be changed after creation."
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:82
-msgid "Suggester settings"
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:120
-msgid "Sites to index"
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:141
-msgid "Mode to index values"
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:143
-msgid "First words of values"
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:144
-msgid "All words"
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:145
-msgid "Full value"
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:146
-msgid "First words of values and full value"
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:147
-msgid "All words and full value"
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:160
-msgid "Mode to search suggestions"
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:162
-msgid "Start of a word"
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:163
-msgid "In word"
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:176
-msgid "Max number of results"
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:189
-msgid "Max number of characters of a result"
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:203
-msgid "Limit query to specific fields"
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:204
-msgid ""
-"With the internal search engine, it is not recommended to use full text "
-"content."
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:212
-#: src/Form/Admin/SearchSuggesterForm.php:228
-msgid "Select fields…"
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:219
-msgid "Exclude fields"
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:220
-msgid ""
-"Allow to skip the full text content, that may be useless for suggestions."
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:235
-msgid "Stopwords"
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:236
-msgid ""
-"Suggestions starting or ending with these words will be excluded. One word "
-"per line."
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:254
-msgid "Stopwords position"
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:256
-msgid "Start and end (recommended)"
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:257
-msgid "Start only"
-msgstr ""
-
-#: src/Form/Admin/SearchSuggesterForm.php:258
-msgid "End only"
 msgstr ""
 
 #: src/Form/Admin/SearchConfigFilterFieldset.php:73
@@ -3903,6 +4406,11 @@ msgstr ""
 
 #: src/Form/Admin/SearchConfigFilterFieldset.php:275
 msgid "Specific (set as option)"
+msgstr ""
+
+#: src/Form/Admin/SearchConfigFilterFieldset.php:279
+#: config/module.config.php:707
+msgid "Access"
 msgstr ""
 
 #: src/Form/Admin/SearchConfigFilterFieldset.php:293
@@ -4056,67 +4564,30 @@ msgid ""
 "above."
 msgstr ""
 
-#: src/Form/Admin/SearchConfigSettingsFieldset.php:50
+#: src/Form/Admin/SearchEngineForm.php:60
+msgid "Select an engine adapter below…"
+msgstr ""
+
+#: src/Form/View/Helper/FormRangeDouble.php:27
+#: src/Form/View/Helper/FormMultiText.php:22
+#, php-format
+msgid "Method %1$s requires that the element is of type %2$s"
+msgstr ""
+
+#: src/Form/View/Helper/FormRangeDouble.php:35
+#, php-format
 msgid ""
-"The slug to the search form. The site slug will be automatically prepended."
+"Method %s requires that the element has an assigned name; none discovered"
 msgstr ""
 
-#: src/Form/SearchingFormFieldset.php:23
-msgid "Search config page"
+#: src/Form/View/Helper/FormRangeDouble.php:43
+#, php-format
+msgid "Method %s requires that the value be an associative array"
 msgstr ""
 
-#: src/Form/SearchingFormFieldset.php:25
-msgid "Search config of the site"
-msgstr ""
-
-#: src/Form/SearchingFormFieldset.php:33
-msgid "Select a search engine…"
-msgstr ""
-
-#: src/Form/SearchingFormFieldset.php:40
-msgid "Display results"
-msgstr ""
-
-#: src/Form/SearchingFormFieldset.php:41
-msgid "If not set, display only the search form."
-msgstr ""
-
-#: src/Form/SearchingFormFieldset.php:52
-msgid "List of property terms to display below each result, one by line."
-msgstr ""
-
-#: src/Form/SearchingFormFieldset.php:68
-msgid "Auto-scroll to block"
-msgstr ""
-
-#: src/Form/SearchingFormFieldset.php:69
-msgid ""
-"When enabled, the page will scroll to this block after form submission. "
-"Useful when the block is not at the top of the page."
-msgstr ""
-
-#: src/Form/SearchingFormFieldset.php:80
-msgid ""
-"Display resources using this search query. Important: use the format of the "
-"query of the engine (standard api request or solr)."
-msgstr ""
-
-#: src/Form/SearchingFormFieldset.php:90
-msgid "Hidden filter query"
-msgstr ""
-
-#: src/Form/SearchingFormFieldset.php:91
-msgid ""
-"Limit the search to a specific subset of the resources. This query is merged "
-"with the default block query and with the user one."
-msgstr ""
-
-#: src/Form/SearchingFormFieldset.php:101
-msgid "Link to display"
-msgstr ""
-
-#: src/Form/SearchingFormFieldset.php:102
-msgid "Formatted as \"/url/full/path Label of the link\"."
+#: src/Form/View/Helper/FormMultiText.php:30
+#, php-format
+msgid "%s requires that the element has an assigned name; none discovered"
 msgstr ""
 
 #: src/Form/TraitCommonSettings.php:23
@@ -4192,206 +4663,62 @@ msgstr ""
 msgid "Duplicates: variants"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:66
-msgid "Available search pages"
+#: src/Form/SearchingFormFieldset.php:23
+msgid "Search config page"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:79 src/Form/SiteSettingsFieldset.php:193
-#: src/Form/SiteSettingsFieldset.php:230
-msgid "Default search page"
+#: src/Form/SearchingFormFieldset.php:25
+msgid "Search config of the site"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:81
-msgid "Select the default search engine for the site…"
+#: src/Form/SearchingFormFieldset.php:33
+msgid "Select a search engine…"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:92
-msgid "Replace the search form of the theme by this search page"
+#: src/Form/SearchingFormFieldset.php:40
+msgid "Display results"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:93
+#: src/Form/SearchingFormFieldset.php:41
+msgid "If not set, display only the search form."
+msgstr ""
+
+#: src/Form/SearchingFormFieldset.php:52
+msgid "List of property terms to display below each result, one by line."
+msgstr ""
+
+#: src/Form/SearchingFormFieldset.php:68
+msgid "Auto-scroll to block"
+msgstr ""
+
+#: src/Form/SearchingFormFieldset.php:69
 msgid ""
-"The theme displays the standard search form of Omeka, that searches the full "
-"text. When replaced, the form of the search page is displayed instead, with "
-"its filters and its autosuggestion. A theme that renders its own form is not "
-"impacted."
+"When enabled, the page will scroll to this block after form submission. "
+"Useful when the block is not at the top of the page."
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:123
-msgid "Hidden query filters per search page"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:124
+#: src/Form/SearchingFormFieldset.php:80
 msgid ""
-"One filter per line, formatted as \"search_config_slug = query_args\" (e.g. "
-"\"recherche = item_set_id[]=151\"). Filters are merged with the search "
-"config \"Hidden query filter\" only on this site, so other sites sharing the "
-"same search page are unaffected."
+"Display resources using this search query. Important: use the format of the "
+"query of the engine (standard api request or solr)."
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:143
-msgid "Redirection of the page of an item set"
+#: src/Form/SearchingFormFieldset.php:90
+msgid "Hidden filter query"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:144
+#: src/Form/SearchingFormFieldset.php:91
 msgid ""
-"One row by item set, and the row \"default\" for all the other ones. The "
-"redirection is \"browse\" (standard Omeka page), \"search\" (search page of "
-"the site), \"first\" (search page, but the item set is displayed on the "
-"first page only), or the slug of a site page or a url, relative or absolute."
+"Limit the search to a specific subset of the resources. This query is merged "
+"with the default block query and with the user one."
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:148
-msgid "Redirection"
+#: src/Form/SearchingFormFieldset.php:101
+msgid "Link to display"
 msgstr ""
 
-#: src/Form/SiteSettingsFieldset.php:152 src/Form/SiteSettingsFieldset.php:160
-msgid "All other item sets"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:174
-msgid ""
-"default = browse\n"
-"151 = search\n"
-"152 = events"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:189
-msgid "Redirect page \"browse item sets\""
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:190
-msgid ""
-"The page that lists the item sets may be replaced by a search page or by any "
-"page of the site. Use the setting below for an external url."
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:192 src/Form/SiteSettingsFieldset.php:229
-msgid "No redirect"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:198 src/Form/SiteSettingsFieldset.php:199
-msgid "Pages of the site"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:214
-msgid "Redirect page \"browse item sets\" to an external url"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:215
-msgid "An absolute url, that takes precedence on the setting above."
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:227
-msgid "Redirect page \"browse items\""
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:250
-msgid "Block Search (item): Config"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:252
-msgid "Select the search engine for items…"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:263
-msgid "Block Search (item): Form template"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:276
-msgid "Block Search (media): Config"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:278
-msgid "Select the search engine for medias…"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:289
-msgid "Block Search (media): Form template"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:303
-msgid "Block Search (item set): Config"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:305
-msgid "Select the search engine for item sets…"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:316
-msgid "Block Search (item set): Form template"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:328
-msgid "Block Search (item set): Scope of the search"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:330
-msgid "Search in current item set"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:331
-msgid "Search in all resources"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:344
-msgid "Block Resource navigation: active contexts"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:348
-msgid "User selection"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:349
-msgid "Series in page blocks"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:350
-msgid "Featured (browse preview page block)"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:362
-msgid "Block Resource navigation: max results"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:376
-msgid "Block Resource navigation: parts to display"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:378
-msgid "Type label (Search, Item set, Selection…)"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:379
-msgid "Context name (item set title, selection title, query)"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:380
-msgid "Position (n / total)"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:393
-msgid "Block Resource navigation: fall back to an item set on direct access"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:394
-msgid ""
-"When no browse context exists (no URL param, no session), show a navigation "
-"within an item set of the item. \"First\" picks the first item set; a "
-"property sorts the item sets by that property value and picks the first with "
-"a non-empty value."
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:395
-msgid "Disabled"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:397
-msgid "First item set"
-msgstr ""
-
-#: src/Form/SiteSettingsFieldset.php:404
-msgid "Select a fallback…"
+#: src/Form/SearchingFormFieldset.php:102
+msgid "Formatted as \"/url/full/path Label of the link\"."
 msgstr ""
 
 #: src/Form/MainSearchForm.php:757
@@ -4414,38 +4741,182 @@ msgstr ""
 msgid "Is private"
 msgstr ""
 
-#: src/Site/BlockLayout/SearchingForm.php:23
-msgid "Search form (module Advanced Search)"
-msgstr ""
-
-#: src/Site/BlockLayout/SearchingForm.php:102
+#: src/Api/Adapter/SearchEngineAdapter.php:118
 msgid ""
-"No search config \"{value}\" specified for this block or not available for "
-"site {site_slug}."
+"An internal search engine already exists: an engine is a real backend and "
+"there is only one sql database."
 msgstr ""
 
-#: src/Site/BlockLayout/SearchingForm.php:111
-msgid "The search config \"{search_slug}\" has no form associated."
-msgstr ""
-
-#: src/Site/ResourcePageBlockLayout/ResourceNav.php:23
-msgid "Resource navigation"
-msgstr ""
-
-#: src/Site/Navigation/Link/SearchingPage.php:54
-msgid "Invalid navigation: browse link missing search page id"
-msgstr ""
-
-#: src/Controller/SearchController.php:63
+#: src/Api/Adapter/SearchConfigAdapter.php:125
 msgid ""
-"The search engine {search_slug} is not available in site {site_slug}. Check "
-"site settings or search config."
+"A query for search config uses the argument path, that was replaced by "
+"\"slug\". You should update your query. An exception will be thrown in a "
+"future version."
 msgstr ""
 
-#: src/Controller/SearchController.php:68
+#: src/Api/Adapter/SearchConfigAdapter.php:176
+msgid "The slug \"{search_slug}\" is already taken."
+msgstr ""
+
+#: src/Api/Representation/SearchSuggesterRepresentation.php:191
+#: src/Api/Representation/SearchConfigRepresentation.php:689
 msgid ""
-"The search engine {search_slug} is not available for admin. Check main "
-"settings or search config."
+"Query error: {message}\n"
+"Query:{query}"
+msgstr ""
+
+#: src/Api/Representation/SearchConfigRepresentation.php:130
+msgid ""
+"The search page \"{search_slug}\" has no route \"{route}\": it is not "
+"available in this context."
+msgstr ""
+
+#: src/Api/Representation/SearchConfigRepresentation.php:326
+#: src/Api/Representation/SearchConfigRepresentation.php:335
+#: src/Api/Representation/SearchConfigRepresentation.php:351
+#: src/Api/Representation/SearchConfigRepresentation.php:360
+#: src/Api/Representation/SearchConfigRepresentation.php:374
+msgid ""
+"The search config setting \"{old}\" was renamed \"{new}\". You should update "
+"your theme."
+msgstr ""
+
+#: src/Api/Representation/SearchConfigRepresentation.php:579
+msgid "The search page \"{search_page}\" has no suggester."
+msgstr ""
+
+#: src/Api/Representation/SearchConfigRepresentation.php:592
+msgid "The search page \"{search_page}\" has no more suggester."
+msgstr ""
+
+#: src/Api/Representation/SearchConfigRepresentation.php:609
+msgid "The search page \"{search_page}\" has no search engine."
+msgstr ""
+
+#: src/Controller/Admin/SearchSuggesterController.php:44
+msgid "Search suggester \"{name}\" created."
+msgstr ""
+
+#: src/Controller/Admin/SearchSuggesterController.php:61
+msgid "The search adapter for engine \"{name}\" is not available."
+msgstr ""
+
+#: src/Controller/Admin/SearchSuggesterController.php:96
+msgid "Suggester \"{name}\" successfully configured."
+msgstr ""
+
+#: src/Controller/Admin/SearchSuggesterController.php:101
+msgid "Don’t forget to run the indexation of the suggester."
+msgstr ""
+
+#: src/Controller/Admin/SearchSuggesterController.php:157
+msgid ""
+"Indexing suggestions of suggester \"{name}\" started in job {link_job}"
+"#{job_id}{link_end} ({link_log}logs{link_end})."
+msgstr ""
+
+#: src/Controller/Admin/SearchSuggesterController.php:208
+msgid "Search suggester \"{name}\" successfully deleted"
+msgstr ""
+
+#: src/Controller/Admin/SearchSuggesterController.php:213
+msgid "Search suggester \"{name}\" could not be deleted"
+msgstr ""
+
+#: src/Controller/Admin/SearchSuggesterController.php:238
+#: src/Controller/Admin/SearchSuggesterController.php:249
+msgid "The name should be unique."
+msgstr ""
+
+#: src/Controller/Admin/SearchSuggesterController.php:264
+#: src/Controller/Admin/SearchEngineController.php:75
+#: src/Controller/Admin/SearchEngineController.php:235
+#: src/Controller/Admin/SearchConfigController.php:734
+msgid "There was an error during validation"
+msgstr ""
+
+#: src/Controller/Admin/IndexController.php:73
+msgid "admin"
+msgstr ""
+
+#: src/Controller/Admin/IndexController.php:74
+msgid "items"
+msgstr ""
+
+#: src/Controller/Admin/IndexController.php:76
+msgid "item sets"
+msgstr ""
+
+#: src/Controller/Admin/IndexController.php:77
+msgid "api"
+msgstr ""
+
+#: src/Controller/Admin/IndexController.php:91
+msgid "api (index)"
+msgstr ""
+
+#: src/Controller/Admin/IndexController.php:92
+msgid "api (database)"
+msgstr ""
+
+#: src/Controller/Admin/SearchEngineController.php:81
+msgid "Search index \"{name}\" created."
+msgstr ""
+
+#: src/Controller/Admin/SearchEngineController.php:98
+msgid "An internal search engine already exists."
+msgstr ""
+
+#: src/Controller/Admin/SearchEngineController.php:103
+msgid "Internal"
+msgstr ""
+
+#: src/Controller/Admin/SearchEngineController.php:110
+msgid "Search index \"{name}\" created. You can now add a search page."
+msgstr ""
+
+#: src/Controller/Admin/SearchEngineController.php:189
+msgid "The search engine #{search_engine_id} does not exist."
+msgstr ""
+
+#: src/Controller/Admin/SearchEngineController.php:197
+msgid "The engine adapter \"{name}\" is not available."
+msgstr ""
+
+#: src/Controller/Admin/SearchEngineController.php:217
+msgid "Engine adapter settings"
+msgstr ""
+
+#: src/Controller/Admin/SearchEngineController.php:251
+msgid "Search index \"{name}\" successfully configured."
+msgstr ""
+
+#: src/Controller/Admin/SearchEngineController.php:256
+msgid "Don’t forget to run the indexation of the search engine."
+msgstr ""
+
+#: src/Controller/Admin/SearchEngineController.php:321
+msgid "The search engine \"{name}\" has nothing to index."
+msgstr ""
+
+#: src/Controller/Admin/SearchEngineController.php:347
+msgid ""
+"Indexing of \"{name}\" started in job {link_job}#{job_id}{link_end} "
+"({link_log}logs{link_end})."
+msgstr ""
+
+#: src/Controller/Admin/SearchEngineController.php:438
+msgid ""
+"The deleted search pages were removed from the settings of these sites: "
+"{site_slugs}. Check the pages that used them."
+msgstr ""
+
+#: src/Controller/Admin/SearchEngineController.php:507
+msgid "Search index \"{name}\" successfully deleted"
+msgstr ""
+
+#: src/Controller/Admin/SearchEngineController.php:516
+msgid "Search index \"{name}\" could not be deleted"
 msgstr ""
 
 #: src/Controller/Admin/SearchConfigController.php:87
@@ -4513,13 +4984,6 @@ msgstr ""
 msgid "The slug should be relative to the root of the site, like \"search\"."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:734
-#: src/Controller/Admin/SearchEngineController.php:75
-#: src/Controller/Admin/SearchEngineController.php:235
-#: src/Controller/Admin/SearchSuggesterController.php:264
-msgid "There was an error during validation"
-msgstr ""
-
 #: src/Controller/Admin/SearchConfigController.php:880
 msgid ""
 "The search engine type changed. Field names use different conventions per "
@@ -4550,366 +5014,152 @@ msgid ""
 "select a suggester of the new engine."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1030
+#: src/Controller/Admin/SearchConfigController.php:1031
 msgid "Main search page"
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1031
+#: src/Controller/Admin/SearchConfigController.php:1032
 msgid "Search page for items"
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1032
+#: src/Controller/Admin/SearchConfigController.php:1033
 msgid "Search page for media"
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1033
+#: src/Controller/Admin/SearchConfigController.php:1034
 msgid "Search page for item sets"
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1034
+#: src/Controller/Admin/SearchConfigController.php:1035
 msgid "Redirect of the browse page of items"
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1035
+#: src/Controller/Admin/SearchConfigController.php:1036
 msgid "Redirect of the browse page of item sets"
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1036
+#: src/Controller/Admin/SearchConfigController.php:1037
 msgid "Search page for the api"
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1048
+#: src/Controller/Admin/SearchConfigController.php:1049
 msgid "Search page for the api (not used: the engine is not an external index)"
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1066
+#: src/Controller/Admin/SearchConfigController.php:1063
+#: config/module.config.php:396
+msgid "Available"
+msgstr ""
+
+#: src/Controller/Admin/SearchConfigController.php:1067
 msgid "Redirect of some item sets"
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1070
+#: src/Controller/Admin/SearchConfigController.php:1071
 msgid "Hidden query filters"
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1151
+#: src/Controller/Admin/SearchConfigController.php:1152
 msgid "The page has been set by default in admin board."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1154
+#: src/Controller/Admin/SearchConfigController.php:1155
 msgid "The page has been unset in admin board."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1164
+#: src/Controller/Admin/SearchConfigController.php:1165
 msgid "The page has been set by default for the api."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1167
+#: src/Controller/Admin/SearchConfigController.php:1168
 msgid ""
 "The engine of this page is not an external index, so the api keeps querying "
 "the database: the option has an effect only with an engine like Solr."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1172
+#: src/Controller/Admin/SearchConfigController.php:1173
 msgid "The page has been unset for the api."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1228
+#: src/Controller/Admin/SearchConfigController.php:1234
 msgid ""
 "This search page is available on no site: select the sites in the tab "
 "\"Sites\" of the page, or set it in the settings of each site."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1235
+#: src/Controller/Admin/SearchConfigController.php:1242
 msgid "This search config is the default one in sites: {site_slugs}."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1240
+#: src/Controller/Admin/SearchConfigController.php:1247
 msgid "This search config is not used as default in any site."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1246
+#: src/Controller/Admin/SearchConfigController.php:1253
 msgid "This search config is available in sites: {site_slugs}."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1251
+#: src/Controller/Admin/SearchConfigController.php:1258
 msgid "This search config is not available in any site."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1681
+#: src/Controller/Admin/SearchConfigController.php:1688
 msgid ""
 "Note that you didn’t set an empty language for some facets, so all values "
 "without language will be skipped in the facet."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1820
+#: src/Controller/Admin/SearchConfigController.php:1829
 msgid "The indexes of the filters are not present in the search engine."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1825
+#: src/Controller/Admin/SearchConfigController.php:1834
 msgid ""
 "Some indexes of the filters are not present in the search engine: {list}"
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1841
+#: src/Controller/Admin/SearchConfigController.php:1850
 msgid "The list of fields of the advanced filters is not configured."
 msgstr ""
 
-#: src/Controller/Admin/SearchConfigController.php:1855
+#: src/Controller/Admin/SearchConfigController.php:1864
 msgid ""
 "Some indexes of the advanced filters are not present in the search engine: "
 "{list}"
 msgstr ""
 
-#: src/Controller/Admin/SearchEngineController.php:81
-msgid "Search index \"{name}\" created."
-msgstr ""
-
-#: src/Controller/Admin/SearchEngineController.php:98
-msgid "An internal search engine already exists."
-msgstr ""
-
-#: src/Controller/Admin/SearchEngineController.php:103
-msgid "Internal"
-msgstr ""
-
-#: src/Controller/Admin/SearchEngineController.php:110
-msgid "Search index \"{name}\" created. You can now add a search page."
-msgstr ""
-
-#: src/Controller/Admin/SearchEngineController.php:189
-msgid "The search engine #{search_engine_id} does not exist."
-msgstr ""
-
-#: src/Controller/Admin/SearchEngineController.php:197
-msgid "The engine adapter \"{name}\" is not available."
-msgstr ""
-
-#: src/Controller/Admin/SearchEngineController.php:217
-msgid "Engine adapter settings"
-msgstr ""
-
-#: src/Controller/Admin/SearchEngineController.php:251
-msgid "Search index \"{name}\" successfully configured."
-msgstr ""
-
-#: src/Controller/Admin/SearchEngineController.php:256
-msgid "Don’t forget to run the indexation of the search engine."
-msgstr ""
-
-#: src/Controller/Admin/SearchEngineController.php:321
-msgid "The search engine \"{name}\" has nothing to index."
-msgstr ""
-
-#: src/Controller/Admin/SearchEngineController.php:347
+#: src/Controller/SearchController.php:63
 msgid ""
-"Indexing of \"{name}\" started in job {link_job}#{job_id}{link_end} "
-"({link_log}logs{link_end})."
+"The search engine {search_slug} is not available in site {site_slug}. Check "
+"site settings or search config."
 msgstr ""
 
-#: src/Controller/Admin/SearchEngineController.php:438
+#: src/Controller/SearchController.php:68
 msgid ""
-"The deleted search pages were removed from the settings of these sites: "
-"{site_slugs}. Check the pages that used them."
+"The search engine {search_slug} is not available for admin. Check main "
+"settings or search config."
 msgstr ""
 
-#: src/Controller/Admin/SearchEngineController.php:507
-msgid "Search index \"{name}\" successfully deleted"
+#: src/Site/Navigation/Link/SearchingPage.php:54
+msgid "Invalid navigation: browse link missing search page id"
 msgstr ""
 
-#: src/Controller/Admin/SearchEngineController.php:516
-msgid "Search index \"{name}\" could not be deleted"
+#: src/Site/ResourcePageBlockLayout/ResourceNav.php:23
+msgid "Resource navigation"
 msgstr ""
 
-#: src/Controller/Admin/IndexController.php:73
-msgid "admin"
+#: src/Site/BlockLayout/SearchingForm.php:23
+msgid "Search form (module Advanced Search)"
 msgstr ""
 
-#: src/Controller/Admin/IndexController.php:74
-msgid "items"
-msgstr ""
-
-#: src/Controller/Admin/IndexController.php:76
-msgid "item sets"
-msgstr ""
-
-#: src/Controller/Admin/IndexController.php:77
-msgid "api"
-msgstr ""
-
-#: src/Controller/Admin/IndexController.php:91
-msgid "api (index)"
-msgstr ""
-
-#: src/Controller/Admin/IndexController.php:92
-msgid "api (database)"
-msgstr ""
-
-#: src/Controller/Admin/SearchSuggesterController.php:44
-msgid "Search suggester \"{name}\" created."
-msgstr ""
-
-#: src/Controller/Admin/SearchSuggesterController.php:61
-msgid "The search adapter for engine \"{name}\" is not available."
-msgstr ""
-
-#: src/Controller/Admin/SearchSuggesterController.php:96
-msgid "Suggester \"{name}\" successfully configured."
-msgstr ""
-
-#: src/Controller/Admin/SearchSuggesterController.php:101
-msgid "Don’t forget to run the indexation of the suggester."
-msgstr ""
-
-#: src/Controller/Admin/SearchSuggesterController.php:157
+#: src/Site/BlockLayout/SearchingForm.php:102
 msgid ""
-"Indexing suggestions of suggester \"{name}\" started in job {link_job}"
-"#{job_id}{link_end} ({link_log}logs{link_end})."
+"No search config \"{value}\" specified for this block or not available for "
+"site {site_slug}."
 msgstr ""
 
-#: src/Controller/Admin/SearchSuggesterController.php:208
-msgid "Search suggester \"{name}\" successfully deleted"
-msgstr ""
-
-#: src/Controller/Admin/SearchSuggesterController.php:213
-msgid "Search suggester \"{name}\" could not be deleted"
-msgstr ""
-
-#: src/Controller/Admin/SearchSuggesterController.php:238
-#: src/Controller/Admin/SearchSuggesterController.php:249
-msgid "The name should be unique."
-msgstr ""
-
-#: src/Querier/InternalQuerier.php:76 src/Querier/InternalQuerier.php:176
-msgid "An issue occurred."
-msgstr ""
-
-#: src/Querier/InternalQuerier.php:192
-msgid "An issue occurred for the suggester."
-msgstr ""
-
-#: src/Querier/InternalQuerier.php:260 src/Querier/InternalQuerier.php:436
-msgid "An internal issue in database occurred."
-msgstr ""
-
-#: src/Querier/InternalQuerier.php:428
-msgid "This mode is currently not supported with the internal search engine."
-msgstr ""
-
-#: src/Querier/InternalQuerier.php:440
-msgid "An internal issue occurred."
-msgstr ""
-
-#: src/Querier/InternalQuerier.php:732
-msgid ""
-"The query \"{query}\" uses {count} properties or filters, that is more than "
-"the {total} supported currently. The query should be simplified."
-msgstr ""
-
-#: src/Querier/InternalQuerier.php:737
-msgid ""
-"A user tried a query with {count} arguments. The config or theme should be "
-"checked to forbid them earlier. Query: {query}"
-msgstr ""
-
-#: src/Querier/InternalQuerier.php:1716
-msgid "The field for the facet \"{name}\" is not set."
-msgstr ""
-
-#: src/View/Helper/SearchPaginationPerPageSelector.php:42
-#, php-format
-msgid "Results by %d"
-msgstr ""
-
-#: src/View/Helper/SearchingFilters.php:62
-msgid ""
-"The use of the view helper searchingFilters() is deprecated. Use "
-"$searchConfig->renderSearchFilters() instead."
-msgstr ""
-
-#: src/View/Helper/AbstractFacet.php:214
-msgid ""
-"[AdvancedSearch] {count} facet values for field \"{field}\" were skipped "
-"because they have no label or are not in the current site (sample: {sample})."
-msgstr ""
-
-#: src/View/Helper/AbstractFacetTree.php:287
-msgid ""
-"For facet \"{field}\", the thesaurus is not defined. Set it as option "
-"thesaurus = id."
-msgstr ""
-
-#: src/View/Helper/SearchingUrl.php:36
-msgid "Search engine #{search_config} does not exist."
-msgstr ""
-
-#: src/View/Helper/SearchingUrl.php:41
-msgid "Search engine {name} (#{search_config}) is not available."
-msgstr ""
-
-#: src/View/Helper/UserBarDelegator.php:104
-#: src/View/Helper/UserBarDelegator.php:106
-msgid "advanced-search"
-msgstr ""
-
-#: src/View/Helper/FieldSelect.php:32
-msgid "Select metadata…"
-msgstr ""
-
-#: src/EngineAdapter/Noop.php:10
-msgid "No operation (noop)"
-msgstr ""
-
-#: src/EngineAdapter/Internal.php:20
-msgid "Internal [sql]"
-msgstr ""
-
-#: src/EngineAdapter/Internal.php:232
-msgid "Resource id"
-msgstr ""
-
-#: src/Api/Representation/SearchSuggesterRepresentation.php:191
-#: src/Api/Representation/SearchConfigRepresentation.php:669
-msgid ""
-"Query error: {message}\n"
-"Query:{query}"
-msgstr ""
-
-#: src/Api/Representation/SearchConfigRepresentation.php:306
-#: src/Api/Representation/SearchConfigRepresentation.php:315
-#: src/Api/Representation/SearchConfigRepresentation.php:331
-#: src/Api/Representation/SearchConfigRepresentation.php:340
-#: src/Api/Representation/SearchConfigRepresentation.php:354
-msgid ""
-"The search config setting \"{old}\" was renamed \"{new}\". You should update "
-"your theme."
-msgstr ""
-
-#: src/Api/Representation/SearchConfigRepresentation.php:559
-msgid "The search page \"{search_page}\" has no suggester."
-msgstr ""
-
-#: src/Api/Representation/SearchConfigRepresentation.php:572
-msgid "The search page \"{search_page}\" has no more suggester."
-msgstr ""
-
-#: src/Api/Representation/SearchConfigRepresentation.php:589
-msgid "The search page \"{search_page}\" has no search engine."
-msgstr ""
-
-#: src/Api/Adapter/SearchEngineAdapter.php:118
-msgid ""
-"An internal search engine already exists: an engine is a real backend and "
-"there is only one sql database."
-msgstr ""
-
-#: src/Api/Adapter/SearchConfigAdapter.php:125
-msgid ""
-"A query for search config uses the argument path, that was replaced by "
-"\"slug\". You should update your query. An exception will be thrown in a "
-"future version."
-msgstr ""
-
-#: src/Api/Adapter/SearchConfigAdapter.php:176
-msgid "The slug \"{search_slug}\" is already taken."
+#: src/Site/BlockLayout/SearchingForm.php:111
+msgid "The search config \"{search_slug}\" has no form associated."
 msgstr ""
 
 #: src/Stdlib/SearchResources.php:63
@@ -4952,337 +5202,164 @@ msgstr ""
 msgid "with type and language"
 msgstr ""
 
-#: src/Mvc/Controller/Plugin/ApiSearch.php:480
+#: src/Querier/InternalQuerier.php:76 src/Querier/InternalQuerier.php:176
+msgid "An issue occurred."
+msgstr ""
+
+#: src/Querier/InternalQuerier.php:192
+msgid "An issue occurred for the suggester."
+msgstr ""
+
+#: src/Querier/InternalQuerier.php:260 src/Querier/InternalQuerier.php:436
+msgid "An internal issue in database occurred."
+msgstr ""
+
+#: src/Querier/InternalQuerier.php:428
+msgid "This mode is currently not supported with the internal search engine."
+msgstr ""
+
+#: src/Querier/InternalQuerier.php:440
+msgid "An internal issue occurred."
+msgstr ""
+
+#: src/Querier/InternalQuerier.php:733
 msgid ""
-"The \"{field}\" field is not available for returnScalar in resource type "
-"\"{type}\"."
+"The query \"{query}\" uses {count} properties or filters, that is more than "
+"the {total} supported currently. The query should be simplified."
 msgstr ""
 
-#: src/Job/IndexSearch.php:147
+#: src/Querier/InternalQuerier.php:738
 msgid ""
-"The owner of the job cannot view all resources, so the index would be "
-"partial. Run the indexation as a global admin."
+"A user tried a query with {count} arguments. The config or theme should be "
+"checked to forbid them earlier. Query: {query}"
 msgstr ""
 
-#: src/Job/IndexSearch.php:171
-msgid "No search engine is defined to be indexed."
+#: src/Querier/InternalQuerier.php:1717
+msgid "The field for the facet \"{name}\" is not set."
 msgstr ""
 
-#: src/Job/IndexSearch.php:194
-msgid "No search engine is defined to index the specified resource types."
+#: config/module.config.php:165
+msgid "Advanced Search: Browse preview with resource navigation"
 msgstr ""
 
-#: src/Job/IndexSearch.php:205
+#: config/module.config.php:395
+msgid "Automatic mapping of empty values"
+msgstr ""
+
+#: config/module.config.php:398
+msgid "Enabled"
+msgstr ""
+
+#: config/module.config.php:400
+msgid "Find"
+msgstr ""
+
+#: config/module.config.php:401
+msgid "Find resources…"
+msgstr ""
+
+#: config/module.config.php:402
+msgid "Processing…"
+msgstr ""
+
+#: config/module.config.php:406
 msgid ""
-"Search index #{search_engine_id} (\"{name}\"): the list of resource ids "
-"contains invalid ids."
+"Try to map automatically the metadata and the properties that are not mapped "
+"yet with the fields of the index"
 msgstr ""
 
-#: src/Job/IndexSearch.php:218
-msgid ""
-"Search index #{search_engine_id} (\"{name}\"): There are already {total} "
-"other jobs \"Index Search\" (#{list}) and the current one is not forced."
+#: config/module.config.php:570
+msgid "Classes *"
 msgstr ""
 
-#: src/Job/IndexSearch.php:229
-msgid ""
-"There are already {total} other jobs \"Index Search\". Slowdowns may occur "
-"on the site."
+#: config/module.config.php:581
+msgid "Templates *"
 msgstr ""
 
-#: src/Job/IndexSearch.php:239
-msgid "Reindexing starts at resource #{resource_id}."
+#: config/module.config.php:588
+msgid "Templates (specific option \"restricted\")"
 msgstr ""
 
-#: src/Job/IndexSearch.php:253
-msgid "Process done with the main entity manager"
+#: config/module.config.php:600
+msgid "Item sets *"
 msgstr ""
 
-#: src/Job/IndexSearch.php:258
-msgid "Process done with a new entity manager"
+#: config/module.config.php:606
+msgid "default_site"
 msgstr ""
 
-#: src/Job/IndexSearch.php:310
-msgid ""
-"End of indexing. Execution time: {duration} seconds. Max memory: {memory}. "
-"Failed indexed resources should be checked manually."
+#: config/module.config.php:612
+msgid "Site *"
 msgstr ""
 
-#: src/Job/IndexSearch.php:334
-msgid ""
-"Search index #{search_engine_id} (\"{name}\"): there is no resource type to "
-"index or the indexation is not needed."
+#: config/module.config.php:619
+msgid "Has media (select)"
 msgstr ""
 
-#: src/Job/IndexSearch.php:351
-msgid ""
-"Search index #{search_engine_id} (\"{name}\"): Only {visibility} resources "
-"will be indexed."
+#: config/module.config.php:626
+msgid "Has media (radio)"
 msgstr ""
 
-#: src/Job/IndexSearch.php:359
-msgid "Search index #{search_engine_id} (\"{name}\"): start of indexing"
+#: config/module.config.php:636
+msgid "Media type (single)"
 msgstr ""
 
-#: src/Job/IndexSearch.php:366
-msgid ""
-"All indexes of the shared core are cleared, included the ones managed "
-"externally."
+#: config/module.config.php:641
+msgid "Media types *"
 msgstr ""
 
-#: src/Job/IndexSearch.php:371
-msgid "Search index is fully cleared."
+#: config/module.config.php:657
+msgid "Owner *"
 msgstr ""
 
-#: src/Job/IndexSearch.php:444
-msgid "Error loading batch #{number} of {resource_type}: {message}. Skipping."
+#: config/module.config.php:664
+msgid "Visibility (select)"
 msgstr ""
 
-#: src/Job/IndexSearch.php:457
-msgid ""
-"Batch #{number} of {resource_type}: {count} resources skipped (private, "
-"deleted, or filtered by module)."
+#: config/module.config.php:670
+msgid "Visibility (radio)"
 msgstr ""
 
-#: src/Job/IndexSearch.php:482
-msgid "Indexing of {resource_type} #{resource_id} failed: {message}"
+#: config/module.config.php:674
+msgid "Id"
 msgstr ""
 
-#: src/Job/IndexSearch.php:486
-msgid "message"
+#: config/module.config.php:680
+msgid "Date time"
 msgstr ""
 
-#: src/Job/IndexSearch.php:531
-msgid "Final commit failed for {resource_type}: {message}"
+#: config/module.config.php:700
+msgid "Has a specific asset"
 msgstr ""
 
-#: src/Job/IndexSearch.php:541 src/Job/IndexSearch.php:584
-msgid "{resource_type}: {count} indexed"
+#: config/module.config.php:716
+msgid "Extended date time format"
 msgstr ""
 
-#: src/Job/IndexSearch.php:549
-msgid ""
-"Search index #{search_engine_id} (\"{name}\"): end of indexing. {results}. "
-"Execution time: {duration} seconds. Failed indexed resources should be "
-"checked manually."
+#: config/module.config.php:723
+msgid "Geography"
 msgstr ""
 
-#: src/Job/IndexSearch.php:567
-msgid "Post-reindex finalization failed: {message}"
+#: config/module.config.php:729
+msgid "Is dynamic item set"
 msgstr ""
 
-#: src/Job/IndexSearch.php:594
-msgid "Last indexed resource: {resource_type} #{resource_id}."
+#: config/module.config.php:739
+msgid "Numeric"
 msgstr ""
 
-#: src/Job/IndexSearch.php:603
-msgid ""
-"Search index #{search_engine_id} (\"{name}\"): the indexing was stopped. "
-"{results}. Execution time: {duration} seconds."
+#: config/module.config.php:746
+msgid "OAI-PMH harvests"
 msgstr ""
 
-#: src/Job/IndexSearch.php:739
-msgid ""
-"Indexing {resource_type}: {indexed}/{total} ({percent}%). Memory: {memory} "
-"MB."
+#: config/module.config.php:755
+msgid "Selections"
 msgstr ""
 
-#: src/Job/IndexSearch.php:783
-msgid "Dispatched reindex of internal suggester \"{name}\"."
+#: config/module.config.php:764
+msgid "🖒"
 msgstr ""
 
-#: src/Job/IndexSearch.php:794
-msgid "Skipped suggester \"{name}\": build on commit is disabled."
-msgstr ""
-
-#: src/Job/IndexSearch.php:808
-msgid "Dispatched reindex of Solr suggester \"{name}\"."
-msgstr ""
-
-#: src/Job/IndexSuggestions.php:77
-msgid ""
-"Suggester #{search_suggester_id} (\"{name}\"): Only search engine with the "
-"internal adapter (sql) can be indexed."
-msgstr ""
-
-#: src/Job/IndexSuggestions.php:97
-msgid ""
-"Suggester #{search_suggester_id} (\"{name}\"): there is no resource type to "
-"index."
-msgstr ""
-
-#: src/Job/IndexSuggestions.php:109
-msgid ""
-"Suggester #{search_suggester_id} (\"{name}\"): There are already {total} "
-"other jobs \"Index Suggestion\" and the current one is not forced."
-msgstr ""
-
-#: src/Job/IndexSuggestions.php:119
-msgid ""
-"There are already {total} other jobs \"Index Suggestions\". Slowdowns may "
-"occur."
-msgstr ""
-
-#: src/Job/IndexSuggestions.php:128
-msgid ""
-"Suggester #{search_suggester_id} (\"{name}\"): start of indexing (mode: "
-"{mode})."
-msgstr ""
-
-#: src/Job/IndexSuggestions.php:138
-msgid ""
-"Suggester #{search_suggester_id} (\"{name}\"): end of indexing. {total} "
-"suggestions indexed. Execution time: {duration} seconds."
-msgstr ""
-
-#: src/FormAdapter/AbstractFormAdapter.php:64
-msgid "[Undefined]"
-msgstr ""
-
-#: src/FormAdapter/AbstractFormAdapter.php:133
-msgid "Not implemented in this form adapter."
-msgstr ""
-
-#: src/FormAdapter/TraitFormAdapterClassic.php:543
-msgid "The search config {search_config} has no form adapter."
-msgstr ""
-
-#: src/FormAdapter/TraitFormAdapterClassic.php:556
-msgid ""
-"The search config {search_config} has a unavailable form adapter "
-"{form_adapter}."
-msgstr ""
-
-#: src/FormAdapter/TraitFormAdapterClassic.php:805
-msgid ""
-"Query error: {message}\n"
-"Query: {json_query}"
-msgstr ""
-
-#: src/FormAdapter/FallbackFormAdapter.php:7
-msgid "Fallback"
-msgstr ""
-
-#: view/common/advanced-search/has-media-radio.phtml:24
-#: view/common/advanced-search/has-asset.phtml:19
-#: view/common/advanced-search/has-thumbnails.phtml:19
-#: view/common/advanced-search/has-original.phtml:19
-#: view/common/advanced-search/visibility-radio.phtml:24
-msgid "Any"
-msgstr ""
-
-#: view/common/advanced-search/has-asset.phtml:13
-msgid "Use an asset as thumbnail"
-msgstr ""
-
-#: view/common/advanced-search/has-asset.phtml:16
-msgid "Has asset"
-msgstr ""
-
-#: view/common/advanced-search/has-asset.phtml:17
-msgid "Has no asset"
-msgstr ""
-
-#: view/common/advanced-search/has-thumbnails.phtml:13
-msgid "Presence of thumbnails"
-msgstr ""
-
-#: view/common/advanced-search/has-thumbnails.phtml:17
-msgid "Has no thumbnails"
-msgstr ""
-
-#: view/common/advanced-search/has-original.phtml:13
-msgid "Presence of original file"
-msgstr ""
-
-#: view/common/advanced-search/has-original.phtml:17
-msgid "Has no original file"
-msgstr ""
-
-#: view/common/advanced-search/media-types.phtml:19
-#: view/common/advanced-search/media-type-improved.phtml:19
-msgid "Search by media type"
-msgstr ""
-
-#: view/common/advanced-search/media-types.phtml:28
-#: view/common/advanced-search/media-type-improved.phtml:28
-msgid "Select media types…"
-msgstr ""
-
-#: view/common/advanced-search/filters.phtml:72
-#: view/common/advanced-search/properties-improved.phtml:37
-msgid "literal"
-msgstr ""
-
-#: view/common/advanced-search/filters.phtml:73
-#: view/common/advanced-search/properties-improved.phtml:38
-msgid "resource"
-msgstr ""
-
-#: view/common/advanced-search/filters.phtml:80
-#: view/common/advanced-search/properties-improved.phtml:45
-msgid "Select main data type…"
-msgstr ""
-
-#: view/common/advanced-search/filters.phtml:183
-msgid "[any metadata]"
-msgstr ""
-
-#: view/common/advanced-search/properties-improved.phtml:126
-msgid "[any property]"
-msgstr ""
-
-#: view/common/advanced-search/media-item-sets.phtml:27
-msgid "Select item sets…"
-msgstr ""
-
-#: Module.php:208
-msgid "The module {module} can be reenabled."
-msgstr ""
-
-#: Module.php:625
-msgid "The resource \"{resource}\" is not available through the rest api."
-msgstr ""
-
-#: Module.php:1723
-msgid "Unable to launch indexing metadata: {message}"
-msgstr ""
-
-#: Module.php:1727
-msgid "Unable to launch indexing metadata: see log."
-msgstr ""
-
-#: Module.php:1896
-msgid ""
-"Unable to delete the search index for resource #{resource_id} in search "
-"engine \"{name}\": {message}"
-msgstr ""
-
-#: Module.php:1901
-msgid ""
-"Unable to delete the search index for the deleted resource #{resource_id} in "
-"search engine \"{name}\": see log."
-msgstr ""
-
-#: Module.php:2002
-msgid "AdvancedSearch cron: unable to launch reindexation: {message}"
-msgstr ""
-
-#: Module.php:2342
-msgid ""
-"The {link_url}internal suggester{link_end} (sql) will be available after "
-"indexation."
-msgstr ""
-
-#: Module.php:2380
-msgid ""
-"The default search config can be {link_1}edited{link_end}, {link_2}"
-"configured{link_end} and defined in the {link_3}main settings{link_end} for "
-"admin search and in each site settings for public search."
-msgstr ""
-
-#: Module.php:2428
-msgid ""
-"The internal search engine \"{name}\" (sql) can be edited in the {link_url}"
-"search manager{link_end}."
+#: config/module.config.php:774
+msgid "Reindex search engines"
 msgstr ""

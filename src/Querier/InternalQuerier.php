@@ -548,7 +548,8 @@ class InternalQuerier extends AbstractQuerier
             if (class_exists('DigitalObject\Module', false)) {
                 $resourceMap['digital_objects'] = \DigitalObject\Entity\DigitalObject::class;
             }
-            if (class_exists('Thesaurus\Module', false)) {
+            // The concepts are items before Thesaurus 3.4.26.
+            if (class_exists(\Thesaurus\Entity\Concept::class, false)) {
                 $resourceMap['concepts'] = \Thesaurus\Entity\Concept::class;
             }
             $resourceClasses = array_values(array_intersect_key($resourceMap, array_flip($this->resourceTypes)));

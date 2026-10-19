@@ -131,19 +131,6 @@ class Module extends AbstractModule
             );
         }
 
-        // The module Thesaurus, when installed, should be up to date, else the
-        // maps and the queries on thesaurus fields may not work. The check
-        // applies whether it is enabled or not, since its data remain, but not
-        // to a module only present on the disk.
-        if ($this->isModuleInstalled('Thesaurus')
-            && !$this->isModuleVersionAtLeast('Thesaurus', '3.4.26')
-        ) {
-            $errors[] = (string) new \Omeka\Stdlib\Message(
-                $translator->translate('The module %1$s should be upgraded to version %2$s or later.'), // @translate
-                'Thesaurus', '3.4.26'
-            );
-        }
-
         if ($errors) {
             throw new \Omeka\Module\Exception\ModuleCannotInstallException(implode("\n", $errors));
         }

@@ -2278,6 +2278,57 @@ if (version_compare($oldVersion, '3.4.56', '<')) {
     $messenger->addSuccess($message);
 }
 
+// The table of the suggestions is aligned with checks of the schema, not with
+// "IF EXISTS", that MySQL does not support. The duplicates must be removed
+// before the unique index, else it cannot be created.
+$alignSuggestionTable = function () use ($connection): void {
+    $columns = $connection->fetchFirstColumn(
+        'SELECT `COLUMN_NAME` FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = "search_suggestion"'
+    );
+    $indexes = [];
+    foreach ($connection->fetchAllAssociative(
+        'SELECT `INDEX_NAME`, `NON_UNIQUE`, `COLUMN_NAME` FROM `information_schema`.`STATISTICS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = "search_suggestion" ORDER BY `INDEX_NAME`, `SEQ_IN_INDEX`'
+    ) as $row) {
+        $indexes[$row['INDEX_NAME']]['unique'] = !$row['NON_UNIQUE'];
+        $indexes[$row['INDEX_NAME']]['columns'][] = $row['COLUMN_NAME'];
+    }
+
+    if (isset($indexes['search_text_idx'])) {
+        $connection->executeStatement('ALTER TABLE `search_suggestion` DROP INDEX `search_text_idx`');
+    }
+    foreach (['total_all', 'total_public'] as $column) {
+        if (in_array($column, $columns, true)) {
+            $connection->executeStatement("ALTER TABLE `search_suggestion` DROP COLUMN `$column`");
+        }
+    }
+
+    foreach ($indexes as $index) {
+        if ($index['unique'] && $index['columns'] === ['suggester_id', 'text']) {
+            return;
+        }
+    }
+    // The duplicates are found by a grouping on a provisional index: without
+    // it, a self-join on the text compares all the rows of a suggester two by
+    // two and takes hours on a big base, and MySQL 5.6 fails on the internal
+    // temporary table of the grouping ("Duplicate entry for key group_key").
+    // The ids are stored in a temporary table, since MySQL cannot delete from a
+    // table read in the same query. They are distinct, because a row may match
+    // several groups when the grouping separates texts that the comparison
+    // considers equal.
+    if (!isset($indexes['tmp_suggester_text'])) {
+        $connection->executeStatement('ALTER TABLE `search_suggestion` ADD INDEX `tmp_suggester_text` (`suggester_id`, `text`)');
+    }
+    $connection->executeStatement('DROP TEMPORARY TABLE IF EXISTS `_suggestion_duplicate`');
+    $connection->executeStatement('CREATE TEMPORARY TABLE `_suggestion_duplicate` (`id` INT NOT NULL, PRIMARY KEY (`id`))');
+    $connection->executeStatement(
+        'INSERT INTO `_suggestion_duplicate` (`id`) SELECT DISTINCT `s`.`id` FROM `search_suggestion` `s` JOIN (SELECT `suggester_id`, `text`, MIN(`id`) AS `min_id` FROM `search_suggestion` GROUP BY `suggester_id`, `text` HAVING COUNT(*) > 1) `d` ON `d`.`suggester_id` = `s`.`suggester_id` AND `d`.`text` = `s`.`text` AND `s`.`id` > `d`.`min_id`'
+    );
+    $connection->executeStatement('DELETE `s` FROM `search_suggestion` `s` JOIN `_suggestion_duplicate` `d` ON `d`.`id` = `s`.`id`');
+    $connection->executeStatement('DROP TEMPORARY TABLE `_suggestion_duplicate`');
+    $connection->executeStatement('ALTER TABLE `search_suggestion` ADD UNIQUE INDEX `suggester_text_idx` (`suggester_id`, `text`)');
+    $connection->executeStatement('ALTER TABLE `search_suggestion` DROP INDEX `tmp_suggester_text`');
+};
+
 if (version_compare($oldVersion, '3.4.57', '<')) {
     // Optimize suggester: per-site indexing with separate counts for admin/public.
     // Create new table search_suggestion_site for per-site suggestion counts.
@@ -2321,24 +2372,7 @@ if (version_compare($oldVersion, '3.4.57', '<')) {
     }
 
     // Remove old columns and update index.
-    $sqls = <<<'SQL'
-        ALTER TABLE `search_suggestion` DROP INDEX IF EXISTS `search_text_idx`;
-        ALTER TABLE `search_suggestion` DROP COLUMN IF EXISTS `total_all`;
-        ALTER TABLE `search_suggestion` DROP COLUMN IF EXISTS `total_public`;
-        ALTER TABLE `search_suggestion` ADD UNIQUE INDEX IF NOT EXISTS `suggester_text_idx` (`suggester_id`, `text`);
-        SQL;
-    foreach (array_filter(explode(";\n", $sqls)) as $sql) {
-        try {
-            $connection->executeStatement($sql);
-        } catch (\Throwable $e) {
-            // Column may not exist or already removed.
-        }
-    }
-
-    $message = new PsrMessage(
-        'The suggester indexation was optimized for per-site search. Please reindex your suggesters to enable site-specific suggestions.' // @translate
-    );
-    $messenger->addWarning($message);
+    $alignSuggestionTable();
 }
 
 if (version_compare($oldVersion, '3.4.58', '<')) {
@@ -4465,5 +4499,67 @@ if (version_compare($oldVersion, '3.4.65', '<')) {
                 ['config' => $replacement ?: '-']
             ));
         }
+    }
+}
+
+if (version_compare($oldVersion, '3.4.66', '<')) {
+    // The upgrade to 3.4.57 failed silently on MySQL, that does not support
+    // "IF EXISTS" in "ALTER TABLE", so the old columns without default value
+    // made any indexing of the suggestions fail.
+    $alignSuggestionTable();
+
+    // The upgrade to 3.4.57 migrated only the global suggestions (site_id = 0),
+    // but a site reads its own rows, so the suggesters indexed for the sites
+    // without any site row are reindexed.
+    $sql = <<<'SQL'
+        SELECT `search_suggester`.`id`, `search_suggester`.`settings`
+        FROM `search_suggester`
+        JOIN `search_engine` ON `search_engine`.`id` = `search_suggester`.`engine_id`
+        WHERE `search_engine`.`adapter` = 'internal'
+            AND NOT EXISTS (
+                SELECT 1
+                FROM `search_suggestion` s
+                JOIN `search_suggestion_site` ss ON ss.`suggestion_id` = s.`id`
+                WHERE s.`suggester_id` = `search_suggester`.`id`
+                    AND ss.`site_id` <> 0
+            )
+        SQL;
+    $siteIds = array_map('intval', $connection->fetchFirstColumn('SELECT `id` FROM `site`'));
+    // The autoloader of the module is not available during the upgrade, but
+    // the dispatcher checks the job class.
+    require_once dirname(__DIR__, 2) . '/src/Job/IndexSuggestions.php';
+    $reindexed = [];
+    foreach ($connection->fetchAllKeyValue($sql) as $suggesterId => $suggesterSettings) {
+        $suggesterSettings = json_decode((string) $suggesterSettings, true) ?: [];
+        $sites = ($suggesterSettings['sites'] ?? null) ?: ['admin', 'all'];
+        $sites = is_array($sites) ? $sites : [$sites];
+        if (!in_array('all', $sites) && !array_intersect(array_map('intval', $sites), $siteIds)) {
+            continue;
+        }
+        $reindexed[] = (int) $suggesterId;
+    }
+
+    // The job runs in another process, that loads the module only when its
+    // version is the current one, so the version is stored before: this block
+    // is the last one of the upgrade. An inactive module is not loaded at all.
+    $isActive = (bool) $connection->fetchOne('SELECT `is_active` FROM `module` WHERE `id` = ?', ['AdvancedSearch']);
+    if ($reindexed && $isActive) {
+        $connection->executeStatement('UPDATE `module` SET `version` = ? WHERE `id` = ?', [$newVersion, 'AdvancedSearch']);
+        $jobDispatcher = $services->get('Omeka\Job\Dispatcher');
+        foreach ($reindexed as $suggesterId) {
+            $jobDispatcher->dispatch(\AdvancedSearch\Job\IndexSuggestions::class, [
+                'search_suggester_id' => $suggesterId,
+                'force' => true,
+            ]);
+        }
+        $messenger->addWarning(new PsrMessage(
+            'The suggestions of the sites were missing since the upgrade to version 3.4.57, so the suggesters #{ids} are being reindexed in background.', // @translate
+            ['ids' => implode(', #', $reindexed)]
+        ));
+    } elseif ($reindexed) {
+        $messenger->addWarning(new PsrMessage(
+            'The suggestions of the sites are missing since the upgrade to version 3.4.57: reindex the suggesters #{ids} once the module is active.', // @translate
+            ['ids' => implode(', #', $reindexed)]
+        ));
     }
 }

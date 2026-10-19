@@ -42,7 +42,7 @@ class IndexSearch extends AbstractJob
      *
      * A lower batch size does not mean lower memory usage. It may depends on
      * resources and number of linked resources.
-     * @see https://gitlab.com/Daniel-KM/Omeka-S-module-SearchSolr/-/issues/13
+     * @see https://gitlab.com/Daniel-KM/Omeka-S-module-SearchSolr/-/work_items/13
      *
      * @var int
      */

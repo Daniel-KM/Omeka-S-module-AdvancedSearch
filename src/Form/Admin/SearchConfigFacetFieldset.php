@@ -98,6 +98,20 @@ class SearchConfigFacetFieldset extends Fieldset implements InputFilterProviderI
                 ],
             ])
             ->add([
+                'name' => 'intro',
+                'type' => Element\Textarea::class,
+                'options' => [
+                    'label' => 'Introduction', // @translate
+                    'info' => 'Short text displayed above the values of the facet.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'form_facet_intro',
+                    'data-common' => '1',
+                    'required' => false,
+                    'rows' => 2,
+                ],
+            ])
+            ->add([
                 'name' => 'thesaurus',
                 'type' => CommonElement\OptionalNumber::class,
                 'options' => [

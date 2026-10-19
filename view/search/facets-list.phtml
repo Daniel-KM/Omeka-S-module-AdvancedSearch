@@ -135,6 +135,9 @@ if (!empty($itemSet)) {
                 <h4><?= $escape($facetLabel) ?></h4>
                 <?php endif; ?>
                 <div id="<?= $facetElementsId ?>" class="facet-elements<?= $hasState ? ' collapsible' : '' ?>"<?= $hasState && !$stateExpand ? ' hidden="hidden"' : '' ?>>
+                    <?php if (!empty($facetParams['intro'])): ?>
+                    <p class="facet-intro"><?= $escape($translate($facetParams['intro'])) ?></p>
+                    <?php endif; ?>
                     <?= $facetElements($name, $facetValues, $facetParams) ?>
                     <?php if (empty($facetParams['paginate']) && ($facetParams['more'] ?? '') !== '' && in_array($facetParams['type'] ?? '', ['', 'Checkbox', 'CheckboxFilter', 'Link', 'Tree', 'TreeLink', 'Thesaurus', 'ThesaurusLink']) && count($facetValues) > (int) $facetParams['more']): ?>
                     <div class="facet-see-more">

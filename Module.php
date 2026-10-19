@@ -2367,12 +2367,11 @@ class Module extends AbstractModule
                 [$searchConfigConfig['o:slug']]
             );
             $message = new PsrMessage(
-                'The default search config can be {link_1}edited{link_end}, {link_2}configured{link_end} and defined in the {link_3}main settings{link_end} for admin search and in each site settings for public search.', // @translate
+                'The default search config can be {link_1}edited{link_end} and defined in the {link_3}main settings{link_end} for admin search and in each site settings for public search.', // @translate
                 [
                     // Don't use the module routes: they are not available during install.
                     'link_end' => '</a>',
                     'link_1' => sprintf('<a href="%s">', htmlspecialchars($urlHelper('admin') . '/search-manager/config/' . $searchConfigId . '/edit')),
-                    'link_2' => sprintf('<a href="%s">', htmlspecialchars($urlHelper('admin') . '/search-manager/config/' . $searchConfigId . '/configure')),
                     'link_3' => sprintf('<a href="%s">', htmlspecialchars($urlHelper('admin') . '/setting#advancedsearch_main_config')),
                 ]
             );

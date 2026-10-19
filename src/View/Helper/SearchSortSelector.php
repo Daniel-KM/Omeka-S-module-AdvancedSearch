@@ -55,9 +55,10 @@ class SearchSortSelector extends AbstractHelper
             ? $this->asUrl($query, $valueOptions)
             : $this->asForm($query, $valueOptions);
 
-        $label = $params['label'] ?? null;
+        // An empty label is no label: the helper formLabel() rejects it.
+        $label = trim((string) ($params['label'] ?? ''));
         $select
-            ->setLabel($label);
+            ->setLabel($label === '' ? null : $label);
 
         return $view->partial($params['template'] ?: $this->partial, [
             'query' => $query,

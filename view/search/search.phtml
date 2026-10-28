@@ -86,6 +86,11 @@ $this->headLink()
     ->prependStylesheet($assetUrl('vendor/chosen-js/chosen.css', 'Omeka'))
     ->appendStylesheet($assetUrl('css/common-autocomplete.css', 'Common'))
     ->appendStylesheet($assetUrl('css/search.css', 'AdvancedSearch'));
+// The filters are aligned on the grid of the fields, with the labels on the
+// left, in the admin board and in the default theme.
+if ($isAdmin || $site->theme() === 'default') {
+    $this->headLink()->appendStylesheet($assetUrl('css/search-grid.css', 'AdvancedSearch'));
+}
 $this->headScript()
     ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.js', 'Omeka'), 'text/javascript', ['defer' => 'defer'])
     ->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);

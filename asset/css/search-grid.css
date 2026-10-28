@@ -1,0 +1,28 @@
+/* Align the advanced filters of the search form on the grid of the fields, with
+   the labels on the left of the inputs, like in the default theme and in the
+   admin board. A theme with another grid can load this stylesheet and set the
+   variables to its own sizes. On small screens, the labels are above the inputs,
+   so the default layout of search.css is kept. */
+@media screen and (min-width: 800px) {
+    .search-filters-advanced {
+        --search-filter-label-width: 30%;
+        --search-filter-inputs-padding: 30px;
+        display: block;
+        position: relative;
+    }
+    .search-filters-advanced > legend {
+        float: left;
+        width: var(--search-filter-label-width);
+        padding: 7.5px 45px 7.5px 0;
+    }
+    .search-filters-advanced .filter {
+        margin-left: var(--search-filter-label-width);
+        padding-left: var(--search-filter-inputs-padding);
+        width: calc(100% - var(--search-filter-label-width));
+    }
+    .search-filters-advanced > .search-filter-plus {
+        position: absolute;
+        top: 0;
+        right: calc(100% - var(--search-filter-label-width));
+    }
+}

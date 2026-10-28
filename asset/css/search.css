@@ -77,19 +77,19 @@
 
     /* Search form filters */
 
-    /* The advanced filters follow the grid of the default theme. */
+    /* The advanced filters use the whole width and the button to add a filter is
+       below them, so they fit any theme. A theme with the labels on the left of
+       the inputs, like the default theme, can align them on its grid with the
+       stylesheet search-grid.css. */
     .search-filters-advanced {
-        --search-filter-label-width: 30%;
-        --search-filter-inputs-padding: 30px;
         --search-filter-gap: 6px;
         --search-filter-button-size: max(24px, 45px);
-        position: relative;
+        display: flex;
+        flex-direction: column;
         margin: 30px 0;
     }
     .search-filters-advanced > legend {
-        float: left;
-        width: var(--search-filter-label-width);
-        padding: 7.5px 45px 7.5px 0;
+        padding: 7.5px 0;
         /* A legend is bold and bigger by default: it is a label of a field
            like the other ones. */
         font-size: inherit;
@@ -103,10 +103,7 @@
         flex-wrap: wrap;
         align-items: center;
         gap: var(--search-filter-gap);
-        margin-left: var(--search-filter-label-width);
         margin-bottom: var(--search-filter-gap);
-        padding-left: var(--search-filter-inputs-padding);
-        width: calc(100% - var(--search-filter-label-width));
     }
     .search-filters-advanced .filter[hidden] {
         display: none;
@@ -148,32 +145,14 @@
         text-align: center;
     }
     .search-filters-advanced > .search-filter-plus {
-        position: absolute;
-        top: 0;
-        right: calc(100% - var(--search-filter-label-width));
+        order: 1;
+        align-self: flex-start;
     }
     .search-filters-advanced .search-filter-plus::before {
         content: "+";
     }
     .search-filters-advanced .search-filter-minus::before {
         content: "\2212";
-    }
-
-    @media screen and (max-width: 799px) {
-        .search-filters-advanced {
-            --search-filter-label-width: 100%;
-            --search-filter-inputs-padding: 0;
-        }
-        .search-filters-advanced > legend {
-            float: none;
-            padding-right: calc(var(--search-filter-button-size) + var(--search-filter-gap));
-        }
-        .search-filters-advanced .filter {
-            margin-left: 0;
-        }
-        .search-filters-advanced > .search-filter-plus {
-            right: 0;
-        }
     }
 
     /* Search results */

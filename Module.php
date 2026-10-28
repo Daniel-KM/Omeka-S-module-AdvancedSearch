@@ -2150,6 +2150,15 @@ class Module extends AbstractModule
                             ->prependStylesheet($assetUrl('vendor/chosen-js/chosen.css', 'Omeka'))
                             ->appendStylesheet($assetUrl('css/common-dialog-admin.css', 'Common'))
                             ->appendStylesheet($assetUrl('css/search.css', 'AdvancedSearch'));
+                        // The filters are aligned on the grid of the fields,
+                        // with the labels on the left, in the admin board and
+                        // in the default theme.
+                        if ($plugins->get('status')->isAdminRequest()
+                            || $plugins->get('currentSite')()?->theme() === 'default'
+                        ) {
+                            $plugins->get('headLink')
+                                ->appendStylesheet($assetUrl('css/search-grid.css', 'AdvancedSearch'));
+                        }
                         $plugins->get('headScript')
                             ->appendFile($assetUrl('vendor/chosen-js/chosen.jquery.js', 'Omeka'), 'text/javascript', ['defer' => 'defer'])
                             ->appendFile($assetUrl('vendor/jquery-autocomplete/jquery.autocomplete.min.js', 'Common'), 'text/javascript', ['defer' => 'defer'])

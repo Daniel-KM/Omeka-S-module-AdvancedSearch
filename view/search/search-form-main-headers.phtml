@@ -36,5 +36,12 @@ if (!$status->isAdminRequest()) {
 $headLink
     ->appendStylesheet($assetUrl('css/common-autocomplete.css', 'Common'))
     ->appendStylesheet($assetUrl('css/search.css', 'AdvancedSearch'));
+
+// The filters are aligned on the grid of the fields, with the labels on the
+// left, in the admin board and in the default theme.
+if ($status->isAdminRequest() || $plugins->get('currentSite')()?->theme() === 'default') {
+    $headLink->appendStylesheet($assetUrl('css/search-grid.css', 'AdvancedSearch'));
+}
+
 $headScript
     ->appendFile($assetUrl('js/search.js', 'AdvancedSearch'), 'text/javascript', ['defer' => 'defer']);

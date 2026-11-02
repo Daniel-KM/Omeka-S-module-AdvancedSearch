@@ -319,8 +319,7 @@
     .search-results .resource-list.grid .resource-heading {
         justify-content: center;
     }
-    /* .resource-metadata is kept for now, but deprecated and replaced by resource-body. */
-    .search-results .resource-list.grid .resource-metadata,
+    /* Old .resource-metadata was replaced by .resource-body. */
     .search-results .resource-list.grid .resource-body {
         display: none;
     }

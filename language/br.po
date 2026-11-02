@@ -2782,7 +2782,7 @@ msgstr "Diuzit an hollad traezoù…"
 
 #: view/common/advanced-search/properties-improved.phtml:126
 msgid "[any property]"
-msgstr "[forzh peseurt perc'henniezh]"
+msgstr "[forzh peseurt perzh]"
 
 #: src/EngineAdapter/Internal.php:20
 msgid "Internal [sql]"
@@ -5214,7 +5214,7 @@ msgstr "Ma n'eo ket bet lakaet, diskouez ar furmskrid klask hepken."
 #: src/Form/SearchingFormFieldset.php:52
 msgid "List of property terms to display below each result, one by line."
 msgstr ""
-"Roll termenoù ar perc'henniezh da ziskouez dindan pep disoc'h, unan dre "
+"Roll termenoù ar perzh da ziskouez dindan pep disoc'h, unan dre "
 "linenn."
 
 #: src/Form/SearchingFormFieldset.php:68
@@ -5578,7 +5578,7 @@ msgstr ""
 
 #: src/Controller/Admin/SearchConfigController.php:884
 msgid "Fields renamed to their property term: {list}."
-msgstr "Anvioù an tachennoù adanvet diouzh o dermen perc'henniezh : {list}."
+msgstr "Anvioù an tachennoù adanvet diouzh o dermen perzh : {list}."
 
 #: src/Controller/Admin/SearchConfigController.php:890
 msgid ""
@@ -5802,10 +5802,7 @@ msgstr "n'eo ket liammet gant ar vammenn gant an ID"
 #, fuzzy
 #| msgid "Full value"
 msgid "values"
-msgstr ""
-"Ur bug kent en deus lamet moarvat talvoudoù ar perzhioù moned. Ur labour a-"
-"dreñv zo bet lañset evit o adsevel diwar an endeksoù ({link}job #{job_id}"
-"{link_end}, {link_log}logs{link_end})."
+msgstr "talvoudoù"
 
 #: src/Stdlib/SearchResources.php:938
 #, fuzzy

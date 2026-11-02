@@ -50,7 +50,7 @@ class SearchingPage implements LinkInterface
 
     public function isValid(array $data, ErrorStore $errorStore)
     {
-        if (!isset($data['advancedsearch_config_id'])) {
+        if (!$this->searchConfigId($data)) {
             $errorStore->addError('o:navigation', 'Invalid navigation: browse link missing search page id'); // @translate
             return false;
         }
@@ -66,7 +66,7 @@ class SearchingPage implements LinkInterface
     {
         $api = $site->getServiceLocator()->get('Omeka\ApiManager');
         try {
-            $searchConfig = $api->read('search_configs', ['id' => $data['advancedsearch_config_id']])->getContent();
+            $searchConfig = $api->read('search_configs', ['id' => $this->searchConfigId($data)])->getContent();
         } catch (\Omeka\Api\Exception\NotFoundException $e) {
             return [
                 'type' => 'uri',
@@ -85,10 +85,18 @@ class SearchingPage implements LinkInterface
     public function toJstree(array $data, SiteRepresentation $site)
     {
         $label = $data['label'] ?? $site->title();
-        $searchConfigId = $data['advancedsearch_config_id'] ?? null;
+        $searchConfigId = $this->searchConfigId($data) ?: null;
         return [
             'label' => $label,
             'advancedsearch_config_id' => $searchConfigId,
         ];
+    }
+
+    /**
+     * Get the search config id, managing the key of old versions.
+     */
+    protected function searchConfigId(array $data): int
+    {
+        return (int) ($data['advancedsearch_config_id'] ?? $data['search_page_id'] ?? 0);
     }
 }

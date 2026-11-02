@@ -425,7 +425,14 @@ class Module extends AbstractModule
             -100
         );
 
-        // Medias. There is no api.create.post for medias.
+        // Medias. A media created with its item has no event, but a media
+        // created alone (api, import) has one.
+        $sharedEventManager->attach(
+            \Omeka\Api\Adapter\MediaAdapter::class,
+            'api.create.post',
+            [$this, 'updateSearchEngineMedia'],
+            -100
+        );
         $sharedEventManager->attach(
             \Omeka\Api\Adapter\MediaAdapter::class,
             'api.update.post',

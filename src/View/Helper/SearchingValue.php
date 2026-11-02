@@ -139,6 +139,7 @@ class SearchingValue extends AbstractHelper
                     ]]
                 );
             }
+            $searchUrl = strtr($searchUrl, ['%5B' => '[', '%5D' => ']']);
         }
 
         if ($asUrl) {

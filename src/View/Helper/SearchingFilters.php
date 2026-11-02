@@ -401,7 +401,7 @@ class SearchingFilters extends AbstractHelper
             unset($newQuery[$key][$subKey]);
         }
         return $newQuery
-            ? $this->baseUrl . '?' . http_build_query($newQuery, '', '&', PHP_QUERY_RFC3986)
+            ? $this->baseUrl . '?' . strtr(http_build_query($newQuery, '', '&', PHP_QUERY_RFC3986), ['%5B' => '[', '%5D' => ']'])
             : $this->baseUrl;
     }
 
@@ -423,7 +423,7 @@ class SearchingFilters extends AbstractHelper
             unset($newQuery[$key]['id'][$subKey]);
         }
         return $newQuery
-            ? $this->baseUrl . '?' . http_build_query($newQuery, '', '&', PHP_QUERY_RFC3986)
+            ? $this->baseUrl . '?' . strtr(http_build_query($newQuery, '', '&', PHP_QUERY_RFC3986), ['%5B' => '[', '%5D' => ']'])
             : $this->baseUrl;
     }
 }

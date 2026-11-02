@@ -79,7 +79,7 @@ class SearchPaginationPerPageSelector extends AbstractHelper
         $optionsWithUrl = [];
         foreach ($options as $perPage => $label) {
             $perPage = (int) $perPage;
-            $url = $currentUrl . '?' . http_build_query(['page' => 1, 'per_page' => $perPage] + $currentQuery, '', '&', PHP_QUERY_RFC3986);
+            $url = $currentUrl . '?' . strtr(http_build_query(['page' => 1, 'per_page' => $perPage] + $currentQuery, '', '&', PHP_QUERY_RFC3986), ['%5B' => '[', '%5D' => ']']);
             $optionsWithUrl[$perPage] = [
                 'value' => $perPage,
                 // The label is automatically translated by Laminas.

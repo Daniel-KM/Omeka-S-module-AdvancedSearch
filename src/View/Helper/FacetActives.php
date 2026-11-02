@@ -34,7 +34,7 @@ class FacetActives extends AbstractFacet
                 'count' => null,
                 'label' => $refineValue,
                 'active' => true,
-                'url' => $this->urlHelper->__invoke($this->route, $this->params, ['query' => $refineQuery]),
+                'url' => $this->facetUrl($refineQuery),
                 'fieldLabel' => $refineLabel,
             ]]] + $activeFacets;
         }
@@ -87,7 +87,7 @@ class FacetActives extends AbstractFacet
                 $query['facet'][$facetName] = $newValues;
 
                 // Set url in all cases, even when not used (not direct mode).
-                $url = $this->urlHelper->__invoke($this->route, $this->params, ['query' => $query]);
+                $url = $this->facetUrl($query);
 
                 $facetValue = [
                     'value' => $facetValue,

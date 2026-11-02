@@ -185,7 +185,7 @@ class FacetRangeDouble extends AbstractFacet
             $queryBaseRange = $this->queryBase;
             unset($queryBaseRange['facet'][$facetField]['from']);
             unset($queryBaseRange['facet'][$facetField]['to']);
-            $urlBase = $this->urlHelper->__invoke($this->route, $this->params, ['query' => $queryBaseRange]);
+            $urlBase = $this->facetUrl($queryBaseRange);
             $urlFrom = $urlBase;
             $urlTo = $urlBase;
         }

@@ -124,7 +124,8 @@ class SearchConfigRepresentation extends AbstractEntityRepresentation
     {
         $url = $this->getViewHelper('Url');
         try {
-            return $url($route, $params, $options);
+            // Keep brackets of query keys readable, like a submitted form.
+            return strtr($url($route, $params, $options), ['%5B' => '[', '%5D' => ']']);
         } catch (\Laminas\Router\Exception\RuntimeException $e) {
             $this->getServiceLocator()->get('Omeka\Logger')->warn(
                 'The search page "{search_slug}" has no route "{route}": it is not available in this context.', // @translate

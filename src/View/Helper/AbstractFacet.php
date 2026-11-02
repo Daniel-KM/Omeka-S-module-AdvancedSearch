@@ -276,10 +276,18 @@ class AbstractFacet extends AbstractHelper
         }
 
         $url = $isFacetModeDirect
-            ? $this->urlHelper->__invoke($this->route, $this->params, ['query' => $query])
+            ? $this->facetUrl($query)
             : '';
 
         return [$active, $url];
+    }
+
+    /**
+     * Get the url of the current route with the query, brackets unencoded.
+     */
+    protected function facetUrl(array $query): string
+    {
+        return strtr($this->urlHelper->__invoke($this->route, $this->params, ['query' => $query]), ['%5B' => '[', '%5D' => ']']);
     }
 
     /**

@@ -93,7 +93,7 @@ class SearchSortSelector extends AbstractHelper
         $currentSort = $query->getSort();
         $valueOptionsWithUrl = [];
         foreach ($valueOptions as $name => $sortOption) {
-            $url = $currentUrl . '?' . http_build_query(['page' => 1, 'sort' => $name] + $currentQuery, '', '&', PHP_QUERY_RFC3986);
+            $url = $currentUrl . '?' . strtr(http_build_query(['page' => 1, 'sort' => $name] + $currentQuery, '', '&', PHP_QUERY_RFC3986), ['%5B' => '[', '%5D' => ']']);
             $valueOptionsWithUrl[$name] = [
                 'value' => $name,
                 // The label is automatically translated by Laminas.

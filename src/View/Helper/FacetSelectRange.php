@@ -105,16 +105,16 @@ class FacetSelectRange extends AbstractFacet
                         // Prepare reset query.
                         $queryFromOrTo = $query;
                         unset($queryFromOrTo['facet'][$facetField][$fromOrTo]);
-                        $urls['url'] = $this->urlHelper->__invoke($this->route, $this->params, ['query' => $queryFromOrTo]);
+                        $urls['url'] = $this->facetUrl($queryFromOrTo);
                         $urls[$fromOrTo] = $urls['url'];
                         // Prepare other query.
                         $queryToOrFrom = $query;
                         $toOrFrom = $fromOrTo === 'from' ? 'to' : 'from';
                         $queryToOrFrom['facet'][$facetField][$toOrFrom] = $facetValueValue;
-                        $urls[$toOrFrom] = $this->urlHelper->__invoke($this->route, $this->params, ['query' => $queryToOrFrom]);
+                        $urls[$toOrFrom] = $this->facetUrl($queryToOrFrom);
                     } else {
                         $query['facet'][$facetField]['__from_or_to__'] = $facetValueValue;
-                        $urls['url'] = $this->urlHelper->__invoke($this->route, $this->params, ['query' => $query]);
+                        $urls['url'] = $this->facetUrl($query);
                         $urls['from'] = strtr($urls['url'], ['__from_or_to__' => 'from']);
                         $urls['to'] = strtr($urls['url'], ['__from_or_to__' => 'to']);
                     }

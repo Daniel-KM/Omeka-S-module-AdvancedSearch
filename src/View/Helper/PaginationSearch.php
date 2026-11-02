@@ -20,7 +20,7 @@ class PaginationSearch extends Pagination
         $view = $this->getView();
         $itemSet = $view->vars()->offsetGet('itemSet');
         if (!$itemSet) {
-            return parent::getUrl($page);
+            return strtr(parent::getUrl($page), ['%5B' => '[', '%5D' => ']']);
         }
 
         $query = $view->params()->fromQuery();
@@ -47,7 +47,7 @@ class PaginationSearch extends Pagination
             $options['fragment'] = $this->fragment;
         }
 
-        return $view->url('site/item-set', ['item-set-id' => $itemSet->id()], $options, true);
+        return strtr($view->url('site/item-set', ['item-set-id' => $itemSet->id()], $options, true), ['%5B' => '[', '%5D' => ']']);
     }
 
     /**
@@ -61,7 +61,7 @@ class PaginationSearch extends Pagination
         $view = $this->getView();
         $itemSet = $view->vars()->offsetGet('itemSet');
         if (!$itemSet) {
-            return parent::getPagelessUrl();
+            return strtr(parent::getPagelessUrl(), ['%5B' => '[', '%5D' => ']']);
         }
 
         $query = $view->params()->fromQuery();
@@ -78,6 +78,6 @@ class PaginationSearch extends Pagination
             $options['fragment'] = $this->fragment;
         }
 
-        return $view->url('site/item-set', ['item-set-id' => $itemSet->id()], $options, true);
+        return strtr($view->url('site/item-set', ['item-set-id' => $itemSet->id()], $options, true), ['%5B' => '[', '%5D' => ']']);
     }
 }

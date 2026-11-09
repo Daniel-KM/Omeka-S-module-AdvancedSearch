@@ -541,8 +541,7 @@ class MainSearchForm extends Form
         ];
 
         if (!empty($filter['field_value_autosuggest']) && $this->searchConfig) {
-            $attributes['data-autosuggest-url'] = $this->basePath
-                . ($this->site ? '/s/' . $this->site->slug() : '/admin')
+            $attributes['data-autosuggest-url'] = ($this->site ? rtrim($this->site->siteUrl(), '/') : $this->basePath . '/admin')
                 . '/' . $this->searchConfig->slug()
                 . '/suggest?mode=values';
         }
@@ -772,9 +771,7 @@ class MainSearchForm extends Form
         if (!$autoSuggestUrl) {
             $suggester = $filter['suggester'] ?? null;
             if ($suggester) {
-                // TODO Use url helper?
-                $autoSuggestUrl = $this->basePath
-                . ($this->site ? '/s/' . $this->site->slug() : '/admin')
+                $autoSuggestUrl = ($this->site ? rtrim($this->site->siteUrl(), '/') : $this->basePath . '/admin')
                 . '/' . ($this->searchConfig ? $this->searchConfig->slug() : 'search')
                 . '/suggest';
             }
@@ -1155,9 +1152,7 @@ class MainSearchForm extends Form
     {
         $filter['attributes']['class'] = isset($filter['attributes']['class']) ? $filter['attributes']['class'] . ' autosuggest' : 'autosuggest';
         $filter['attributes']['autocomplete'] = 'off';
-        // TODO Use url helper?
-        $filter['attributes']['data-autosuggest-url'] ??= $this->basePath
-            . ($this->site ? '/s/' . $this->site->slug() : '/admin')
+        $filter['attributes']['data-autosuggest-url'] ??= ($this->site ? rtrim($this->site->siteUrl(), '/') : $this->basePath . '/admin')
             . '/' . ($this->searchConfig ? $this->searchConfig->slug() : 'search')
             . '/suggest?field=' . rawurlencode($filter['field']);
         $filter['attributes']['data-autosuggest-fill-input'] ??= '1';

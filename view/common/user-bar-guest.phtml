@@ -42,7 +42,7 @@ $this->headLink()
         </span>
         <?php
         $logoutQuery = $this->params()->fromQuery() ?: [];
-        $url = $hasGuest ? $basePath() . '/s/' . $site->slug() . '/guest/logout' . ($logoutQuery ? '?' . http_build_query($logoutQuery) : '') : $urlHelper('logout');
+        $url = $hasGuest ? $this->url('site/guest/guest', ['site-slug' => $site->slug(), 'action' => 'logout']) . ($logoutQuery ? '?' . http_build_query($logoutQuery) : '') : $urlHelper('logout');
         echo $hyperlink($translate('Logout', null, $userLocale), $url, ['class' => 'logout']);
         ?>
     </div>
@@ -51,7 +51,7 @@ $this->headLink()
         <?php
         $loginQuery = $this->params()->fromQuery() ?: [];
         $url = $hasGuest
-            ? $basePath() . '/s/' . $site->slug() . '/guest/login' . ($loginQuery ? '?' . http_build_query($loginQuery) : '')
+            ? $this->url('site/guest/anonymous', ['site-slug' => $site->slug(), 'action' => 'login']) . ($loginQuery ? '?' . http_build_query($loginQuery) : '')
             : $urlHelper('login');
         echo $hyperlink($translate('Log in'), $url, ['class' => 'login']);
         ?>

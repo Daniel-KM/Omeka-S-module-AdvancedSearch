@@ -118,12 +118,12 @@ $hasRefineActive = trim((string) $query->getQueryRefine()) !== '';
 <?php $isGrid = in_array($gridListMode, ['grid', 'auto']); ?>
 <?php $isMap = $gridListMode === 'map'; ?>
 <div class="search-results-display" role="group" aria-label="<?= $this->escapeHtmlAttr($translate('Display mode')) ?>">
-    <a class="search-view-type search-view-type-list<?= $isList ? ' active' : '' ?>" href="#" role="button" aria-pressed="<?= $isList ? 'true' : 'false' ?>"><?= $translate('list') ?></a>
+    <button type="button" class="search-view-type search-view-type-list<?= $isList ? ' active' : '' ?>" aria-pressed="<?= $isList ? 'true' : 'false' ?>"><?= $translate('list') ?></button>
     <span aria-hidden="true">|</span>
-    <a class="search-view-type search-view-type-grid<?= $isGrid ? ' active' : '' ?>" href="#" role="button" aria-pressed="<?= $isGrid ? 'true' : 'false' ?>"><?= $translate('grid') ?></a>
+    <button type="button" class="search-view-type search-view-type-grid<?= $isGrid ? ' active' : '' ?>" aria-pressed="<?= $isGrid ? 'true' : 'false' ?>"><?= $translate('grid') ?></button>
     <?php if ($showMapView): ?>
     <span aria-hidden="true">|</span>
-    <a class="search-view-type search-view-type-map<?= $isMap ? ' active' : '' ?>" href="#" role="button" aria-pressed="<?= $isMap ? 'true' : 'false' ?>"><?= $translate('map') ?></a>
+    <button type="button" class="search-view-type search-view-type-map<?= $isMap ? ' active' : '' ?>" aria-pressed="<?= $isMap ? 'true' : 'false' ?>"><?= $translate('map') ?></button>
     <?php endif; ?>
 </div>
 <?php endif; ?>

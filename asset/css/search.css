@@ -232,6 +232,16 @@
         content: none;
     }
 
+    /* The view types are buttons displayed as links. */
+    button.search-view-type {
+        padding: 0;
+        border: 0;
+        background: none;
+        color: inherit;
+        font: inherit;
+        text-decoration: underline;
+        cursor: pointer;
+    }
     .search-view-type.active {
         font-weight: bold;
     }

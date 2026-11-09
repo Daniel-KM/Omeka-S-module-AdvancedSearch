@@ -306,8 +306,7 @@ class MainSearchForm extends Form
                     $element = $this->searchMultiCheckbox($filter, $values);
                     break;
                 case 'Multitext':
-                    $values = $this->listValues($filter);
-                    $element = $this->searchMultiSelectFlat($filter, $values);
+                    $element = $this->searchMultiText($filter);
                     break;
                 case 'Number':
                     $values = $this->listValuesAttributesMinMax($filter);

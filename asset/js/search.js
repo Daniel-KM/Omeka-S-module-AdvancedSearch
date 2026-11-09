@@ -189,6 +189,17 @@ var Search = (function() {
      *
      * @see https://github.com/devbridge/jQuery-Autocomplete
      */
+    /**
+     * Inside a modal dialog, the suggestions are appended to it, else they are
+     * displayed below the dialog, in the top layer.
+     */
+    self.autosuggestContainer = function(element) {
+        const dialog = element.closest('dialog');
+        return dialog.length
+            ? { appendTo: dialog, forceFixPosition: true }
+            : {};
+    };
+
     self.autosuggestOptions = function(element) {
         let serviceUrl = element.data('autosuggest-url');
         if (!serviceUrl || !serviceUrl.length) {
@@ -225,6 +236,7 @@ var Search = (function() {
         let paramName = element.data('autosuggest-param-name');
         paramName = paramName && paramName.length ? paramName : 'q';
         return {
+            ...self.autosuggestContainer(element),
             serviceUrl: serviceUrl,
             dataType: 'json',
             paramName: paramName,
@@ -1467,6 +1479,7 @@ $(document).ready(function() {
             if (!field) return;
 
             input.autocomplete({
+                ...Search.autosuggestContainer(input),
                 serviceUrl: advFilterAutosuggestUrl
                     + '&field=' + encodeURIComponent(field),
                 dataType: 'json',

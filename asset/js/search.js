@@ -243,6 +243,10 @@ var Search = (function() {
             triggerSelectOnValidInput: false,
             transformResult: transformResult,
             onSearchError: function(query, jqXHR, textStatus, errorThrown) {
+                // A previous request is aborted when the user types again.
+                if (textStatus === 'abort') {
+                    return;
+                }
                 if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
                     console.error(jqXHR.responseJSON.message);
                 } else if (errorThrown.length) {

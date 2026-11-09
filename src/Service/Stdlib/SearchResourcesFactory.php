@@ -23,12 +23,15 @@ class SearchResourcesFactory implements FactoryInterface
             'aliases' => [],
             'query_args' => [],
             'form_filters_fields' => [],
+            'form_filters_types' => [],
         ];
         if ($searchConfig) {
             $searchIndex = $searchConfig->setting('index', []) + $searchIndex;
             // With form filters, the filter name and the field are not the same.
             // The filter name is not really used for now.
-            $searchIndex['form_filters_fields'] = array_column($searchConfig->subSetting('form', 'filters', []), 'label', 'field');
+            $formFilters = $searchConfig->subSetting('form', 'filters', []) ?: [];
+            $searchIndex['form_filters_fields'] = array_column($formFilters, 'label', 'field');
+            $searchIndex['form_filters_types'] = \AdvancedSearch\Stdlib\SearchResources::formFiltersQueryTypes($formFilters);
         }
 
         return new SearchResources(

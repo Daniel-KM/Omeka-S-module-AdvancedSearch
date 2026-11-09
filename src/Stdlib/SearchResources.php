@@ -538,6 +538,7 @@ class SearchResources
         'aliases' => [],
         'query_args' => [],
         'form_filters_fields' => [],
+        'form_filters_types' => [],
     ];
 
     public function __construct(
@@ -1643,6 +1644,30 @@ class SearchResources
     }
 
     /**
+     * Get the query type of the form filters that are not exact, by field.
+     *
+     * A filter "Text" searches the value as a part ("in"), unlike "TextExact"
+     * and "MultiText". The option "query_type" of a filter overrides it.
+     */
+    public static function formFiltersQueryTypes(array $filters): array
+    {
+        $types = [];
+        foreach ($filters as $filter) {
+            $field = $filter['field'] ?? null;
+            if (!is_string($field) || $field === '') {
+                continue;
+            }
+            $queryType = $filter['options']['query_type'] ?? null;
+            if (is_string($queryType) && isset(self::FIELD_QUERY['reciprocal'][$queryType])) {
+                $types[$field] = $queryType;
+            } elseif (strtolower(basename(strtr((string) ($filter['type'] ?? ''), '\\', '/'))) === 'text') {
+                $types[$field] = 'in';
+            }
+        }
+        return $types;
+    }
+
+    /**
      * Expand form fields according to the config.
      *
      * This method is used early by the form adapter.
@@ -1660,10 +1685,8 @@ class SearchResources
             return $expandedQueries[$sum];
         }
 
-        // TODO Use an option to specify the default type (eq or in) to have the same than field query args.
-        // For now, use "in" in main search form filters and "eq" in standard
-        // advanced form (see TraitFormAdapterClassic).
-
+        // The advanced filters search "in" by default, like the form fields
+        // of type "Text". The other form fields search the exact value.
         $typeDefault = 'in';
 
         foreach ($query['filter'] ?? [] as $key => $filter) {
@@ -1694,6 +1717,7 @@ class SearchResources
         }
 
         $typeDefault = 'eq';
+        $formFiltersTypes = $this->searchIndex['form_filters_types'] ?? [];
 
         // The label is used for the search filters.
 
@@ -1703,7 +1727,7 @@ class SearchResources
                     'join' => $this->searchIndex['query_args'][$field]['join'] ?? 'and',
                     'field' => $this->searchIndex['aliases'][$field]['fields'] ?? $field,
                     'except' => $this->searchIndex['query_args'][$field]['except'] ?? null,
-                    'type' => $this->searchIndex['query_args'][$field]['type'] ?? $typeDefault,
+                    'type' => $this->searchIndex['query_args'][$field]['type'] ?? $formFiltersTypes[$field] ?? $typeDefault,
                     'val' => $value,
                     'lang' => $this->searchIndex['query_args'][$field]['lang'] ?? null,
                     'datatype' => $this->searchIndex['query_args'][$field]['datatype'] ?? null,
@@ -1723,7 +1747,7 @@ class SearchResources
                 $filter = [
                     'join' => 'and',
                     'field' => $term,
-                    'type' => $typeDefault,
+                    'type' => $formFiltersTypes[$field] ?? $typeDefault,
                     'val' => $value,
                     'label' => $this->searchIndex['form_filters_fields'][$field]
                         ?? $this->searchIndex['aliases'][$field]['label']

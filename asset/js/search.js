@@ -1373,11 +1373,11 @@ $(document).ready(function() {
     /**
      * Fix when the simple and the advanced form are the same form.
      */
-    $('.advanced-search-form-toggle a').on('click', function(e) {
+    $('.advanced-search-form-toggle a, .advanced-search-form-toggle button').on('click', function(e) {
         e.preventDefault();
         $('.advanced-search-form, .advanced-search-form-toggle').toggleClass('open');
         const isOpen = $('.advanced-search-form').hasClass('open');
-        const toggleLink = $('.advanced-search-form-toggle a');
+        const toggleLink = $('.advanced-search-form-toggle a, .advanced-search-form-toggle button');
         if (isOpen) {
             toggleLink.text($('.advanced-search-form-toggle').data('msgOpen'));
         } else {
@@ -1762,7 +1762,7 @@ $(document).ready(function() {
      * @todo Use focus on load, but don't open autosuggestion on focus.
      */
     if (Search.isAdvancedSearchQuery()) {
-        $('.advanced-search-form-toggle a').click();
+        $('.advanced-search-form-toggle a, .advanced-search-form-toggle button').click();
     }
 
     /**

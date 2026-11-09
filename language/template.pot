@@ -3,13 +3,12 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#: view/search/results.phtml:110
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-19 00:00+0000\n"
+"POT-Creation-Date: 2026-11-09 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,13 +27,13 @@ msgstr ""
 msgid "Filters"
 msgstr ""
 
-#: data/configs/search_config.default.php:490 view/search/search.phtml:176
-#: view/search/search.phtml:192 view/search/search.phtml:212
+#: data/configs/search_config.default.php:490 view/search/search.phtml:181
+#: view/search/search.phtml:197 view/search/search.phtml:217
 msgid "Search results"
 msgstr ""
 
-#: data/configs/search_config.default.php:491 view/search/search.phtml:177
-#: view/search/search.phtml:193
+#: data/configs/search_config.default.php:491 view/search/search.phtml:182
+#: view/search/search.phtml:198
 msgid "No results"
 msgstr ""
 
@@ -78,7 +77,7 @@ msgstr ""
 #: data/configs/search_config.default.php:535 data/scripts/upgrade.php:1261
 #: view/advanced-search/admin/search-config/edit.phtml:91
 #: view/advanced-search/admin/search-config/edit.phtml:112
-#: view/search/search.phtml:207 view/search/search.phtml:287
+#: view/search/search.phtml:212 view/search/search.phtml:292
 msgid "Facets"
 msgstr ""
 
@@ -106,7 +105,7 @@ msgstr ""
 msgid "Refine search"
 msgstr ""
 
-#: data/scripts/upgrade.php:56 Module.php:129
+#: data/scripts/upgrade.php:56 Module.php:131
 #, php-format
 msgid "The module %1$s should be upgraded to version %2$s or later."
 msgstr ""
@@ -115,37 +114,37 @@ msgstr ""
 msgid "Missing requirement. Unable to upgrade."
 msgstr ""
 
-#: data/scripts/upgrade.php:67 Module.php:122
+#: data/scripts/upgrade.php:67 Module.php:124
 #, php-format
 msgid "The module %1$s requires PHP %2$s or later."
 msgstr ""
 
-#: data/scripts/upgrade.php:1688 Module.php:2318
+#: data/scripts/upgrade.php:1688 Module.php:2336
 msgid "Main index"
 msgstr ""
 
-#: data/scripts/upgrade.php:1996 src/View/Helper/SearchFilters.php:535
+#: data/scripts/upgrade.php:1993 src/View/Helper/SearchFilters.php:535
 #: view/advanced-search/admin/search-config/edit.phtml:95
 msgid "Full text"
 msgstr ""
 
-#: Module.php:2043
+#: Module.php:2052
 msgid "First page"
 msgstr ""
 
-#: Module.php:2044
+#: Module.php:2053
 msgid "Page or url"
 msgstr ""
 
-#: Module.php:2045
+#: Module.php:2054
 msgid "Slug of a page or url"
 msgstr ""
 
-#: src/Api/Representation/SearchConfigRepresentation.php:695
+#: src/Api/Representation/SearchConfigRepresentation.php:696
 #: src/Api/Representation/SearchSuggesterRepresentation.php:198
 #: src/Controller/SearchController.php:197
 #: src/Controller/SearchController.php:330
-#: src/FormAdapter/TraitFormAdapterClassic.php:818
+#: src/FormAdapter/TraitFormAdapterClassic.php:822
 msgid "An error occurred."
 msgstr ""
 
@@ -310,7 +309,7 @@ msgstr ""
 msgid "New facet"
 msgstr ""
 
-#: src/Form/MainSearchForm.php:528
+#: src/Form/MainSearchForm.php:527
 msgid "Add a filter"
 msgstr ""
 
@@ -332,7 +331,7 @@ msgid "[none]"
 msgstr ""
 
 #: src/View/Helper/SearchFilters.php:234 src/View/Helper/SearchFilters.php:425
-#: src/View/Helper/SearchFilters.php:809
+#: src/View/Helper/SearchFilters.php:819
 msgid "EXCEPT"
 msgstr ""
 
@@ -410,7 +409,7 @@ msgstr ""
 msgid "Record only"
 msgstr ""
 
-#: src/View/Helper/SearchFilters.php:796
+#: src/View/Helper/SearchFilters.php:806
 msgid "[Any field]"
 msgstr ""
 
@@ -1537,29 +1536,29 @@ msgstr ""
 msgid "Next page"
 msgstr ""
 
-#: view/search/results-header-footer.phtml:79
+#: view/search/results-header-footer.phtml:78
 #, php-format
 msgid "%s resource"
 msgstr ""
 
-#: view/search/results-header-footer.phtml:79
+#: view/search/results-header-footer.phtml:78
 #, php-format
 msgid "%s resources"
 msgstr ""
 
-#: view/search/results-header-footer.phtml:121
+#: view/search/results-header-footer.phtml:120
 msgid "Display mode"
 msgstr ""
 
-#: view/search/results-header-footer.phtml:122
+#: view/search/results-header-footer.phtml:121
 msgid "list"
 msgstr ""
 
-#: view/search/results-header-footer.phtml:124
+#: view/search/results-header-footer.phtml:123
 msgid "grid"
 msgstr ""
 
-#: view/search/results-header-footer.phtml:127
+#: view/search/results-header-footer.phtml:126
 msgid "map"
 msgstr ""
 
@@ -1567,28 +1566,28 @@ msgstr ""
 msgid "No media"
 msgstr ""
 
-#: view/search/search.phtml:129
+#: view/search/search.phtml:134
 msgid "Breadcrumbs"
 msgstr ""
 
-#: view/search/search.phtml:135
+#: view/search/search.phtml:140
 msgid "Collections"
 msgstr ""
 
-#: view/search/search.phtml:226
+#: view/search/search.phtml:231
 #, php-format
 msgid "%1$s %2$s"
 msgstr ""
 
-#: view/search/search.phtml:261
+#: view/search/search.phtml:266
 msgid "Fill a query and get results."
 msgstr ""
 
-#: view/search/search.phtml:263
+#: view/search/search.phtml:268
 msgid "This item set has no items."
 msgstr ""
 
-#: view/search/search.phtml:270
+#: view/search/search.phtml:275
 msgid "The query returned no results"
 msgstr ""
 
@@ -1680,7 +1679,7 @@ msgstr ""
 msgid "Some new options were added to manage facets."
 msgstr ""
 
-#: data/scripts/upgrade.php:386 data/scripts/upgrade.php:2196
+#: data/scripts/upgrade.php:386 data/scripts/upgrade.php:2193
 msgid ""
 "It is recommended to upgrade the module \"Reference\" to improve performance."
 msgstr ""
@@ -2066,111 +2065,111 @@ msgid ""
 "form or improved search elements."
 msgstr ""
 
-#: data/scripts/upgrade.php:2008
+#: data/scripts/upgrade.php:2005
 msgid ""
 "The option \"Record or Full text\" is now configurable with alias "
 "\"full_text\" to define properties with full text."
 msgstr ""
 
-#: data/scripts/upgrade.php:2028 Module.php:172
+#: data/scripts/upgrade.php:2025 Module.php:174
 msgid ""
 "The module Reference is required to use the facets with the default internal "
 "adapter, but not for the Solr adapter."
 msgstr ""
 
-#: data/scripts/upgrade.php:2031 Module.php:175 Module.php:190
+#: data/scripts/upgrade.php:2028 Module.php:177 Module.php:192
 msgid "The module {module} should be upgraded to version {version} or later."
 msgstr ""
 
-#: data/scripts/upgrade.php:2055
+#: data/scripts/upgrade.php:2052
 msgid ""
 "It is now possible to limit filters and facets to the language of the site."
 msgstr ""
 
-#: data/scripts/upgrade.php:2071
+#: data/scripts/upgrade.php:2068
 msgid ""
 "Json-ld data are appended to results when enabled. You may need to add "
 "triggers if the theme is customized."
 msgstr ""
 
-#: data/scripts/upgrade.php:2124
+#: data/scripts/upgrade.php:2121
 msgid ""
 "A new order for facets was added: order by total descendant, then "
 "alphabetically for hidden values."
 msgstr ""
 
-#: data/scripts/upgrade.php:2153
+#: data/scripts/upgrade.php:2150
 msgid ""
 "A resource page block has been added, in particular to search inside an item "
 "set."
 msgstr ""
 
-#: data/scripts/upgrade.php:2157
+#: data/scripts/upgrade.php:2154
 msgid ""
 "The css of the sidebar for facets and the css for structure of a thesaurus "
 "or a a hierarchy of item sets were simplified. You may check the search page."
 msgstr ""
 
-#: data/scripts/upgrade.php:2164
+#: data/scripts/upgrade.php:2161
 msgid ""
 "It is now possible to redirect the page to browse item sets to a search page."
 msgstr ""
 
-#: data/scripts/upgrade.php:2171
+#: data/scripts/upgrade.php:2168
 msgid ""
 "The class `search-results-list` was renamed `search-result-list` in view "
 "template `search/results`. Check it if the theme is customized."
 msgstr ""
 
-#: data/scripts/upgrade.php:2176
+#: data/scripts/upgrade.php:2173
 msgid ""
 "It is now possible to add boost multiplier for specific index (Solr only)."
 msgstr ""
 
-#: data/scripts/upgrade.php:2183
+#: data/scripts/upgrade.php:2180
 msgid ""
 "New options were added: quick filter on advanced form, specific properties "
 "in results, and auto-scroll to results."
 msgstr ""
 
-#: data/scripts/upgrade.php:2229
+#: data/scripts/upgrade.php:2226
 msgid ""
 "The facet option \"integer\" was renamed \"first_digits\" for consistency "
 "with filters. It is now enabled by default for RangeDouble and SelectRange "
 "facets to extract years from dates."
 msgstr ""
 
-#: data/scripts/upgrade.php:2276
+#: data/scripts/upgrade.php:2273
 msgid ""
 "The facet options \"min\", \"max\", and \"step\" were moved to "
 "\"attributes\" for consistency with filters. They are now HTML input "
 "attributes like for filters."
 msgstr ""
 
-#: data/scripts/upgrade.php:3124
+#: data/scripts/upgrade.php:3118
 msgid "{count} stored queries have been normalized to standard Omeka format."
 msgstr ""
 
-#: data/scripts/upgrade.php:3162
+#: data/scripts/upgrade.php:3156
 msgid ""
 "The deprecated search field \"properties-improved\" has been removed and "
 "replaced by \"properties\" and \"filters\" in admin, or \"filters\" only in "
 "sites."
 msgstr ""
 
-#: data/scripts/upgrade.php:3167
+#: data/scripts/upgrade.php:3161
 msgid ""
 "The rss/atom feed feature for search pages has been moved to the module "
 "{link}Feed{link_end}. Install it to keep feed urls on search pages."
 msgstr ""
 
-#: data/scripts/upgrade.php:3182
+#: data/scripts/upgrade.php:3176
 msgid ""
 "Automatic daily reindexation is now disabled by default. Enable it in the "
 "main settings if needed."
 msgstr ""
 
-#: data/scripts/upgrade.php:3221
+#: data/scripts/upgrade.php:3215
 msgid ""
 "New options are available for standard and module search filters: "
 "configurable query types, joiner \"not\" (simplifies negative operators), "
@@ -2178,51 +2177,51 @@ msgid ""
 "SearchSolr). Check main settings and site settings."
 msgstr ""
 
-#: data/scripts/upgrade.php:3382
+#: data/scripts/upgrade.php:3376
 msgid ""
 "Fixed {count} entries with double-encoded query strings introduced by the "
 "previous upgrade."
 msgstr ""
 
-#: data/scripts/upgrade.php:3425
+#: data/scripts/upgrade.php:3419
 msgid ""
 "A new resource page block \"Resource navigation\" allows to display a "
 "previous/next navigation on the item page within the first results of the "
 "last search, item set or user selection."
 msgstr ""
 
-#: data/scripts/upgrade.php:3464
+#: data/scripts/upgrade.php:3458
 msgid ""
 "A new option \"Query filters display\" is available in search page settings "
 "for results, that can be read only or with links (previous default)."
 msgstr ""
 
-#: data/scripts/upgrade.php:3495
+#: data/scripts/upgrade.php:3489
 msgid ""
 "New options were added to display or hide the field label in active filters "
 "and active facets."
 msgstr ""
 
-#: data/scripts/upgrade.php:3567
+#: data/scripts/upgrade.php:3561
 msgid ""
 "Migrated hidden query filters to the flat format: {configs} search config(s) "
 "and {sites} site setting(s) updated. The legacy URL form (property[N]"
 "[property|type|text]) was silently ignored by AdvancedSearch."
 msgstr ""
 
-#: data/scripts/upgrade.php:3614
+#: data/scripts/upgrade.php:3608
 msgid ""
 "A new option allows to enable the pagination for facets. You may need to "
 "check your facets if you use a custom theme."
 msgstr ""
 
-#: data/scripts/upgrade.php:3699
+#: data/scripts/upgrade.php:3693
 msgid ""
 "Search config availability was repaired for sites referencing search pages "
 "absent from \"Available search pages\": {sites}."
 msgstr ""
 
-#: data/scripts/upgrade.php:3745
+#: data/scripts/upgrade.php:3739
 msgid ""
 "The form adapter \"api\" was removed: api queries are now handled natively "
 "by every engine. The search configs using it were switched to the standard "
@@ -2230,38 +2229,38 @@ msgid ""
 "settings is unchanged."
 msgstr ""
 
-#: data/scripts/upgrade.php:3760
+#: data/scripts/upgrade.php:3754
 msgid ""
 "The module SearchSolr is installed: update its directory to version "
 "{version} or above before upgrading the module AdvancedSearch, then upgrade "
 "it."
 msgstr ""
 
-#: data/scripts/upgrade.php:3767
+#: data/scripts/upgrade.php:3761
 msgid "The module SearchSolr must be upgraded immediately after this upgrade."
 msgstr ""
 
-#: data/scripts/upgrade.php:4192
+#: data/scripts/upgrade.php:4186
 msgid ""
 "The format of the search config settings was simplified (position of the "
 "facets, properties of the results, record or full text filter). Check and "
 "update the listed theme templates: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:4246
+#: data/scripts/upgrade.php:4240
 msgid ""
 "The four lists of redirection of the item sets are merged into the single "
 "setting \"Redirection of the page of an item set\" for {count} sites."
 msgstr ""
 
-#: data/scripts/upgrade.php:4252
+#: data/scripts/upgrade.php:4246
 msgid ""
 "Some item sets were set in more than one list of redirection: the first mode "
 "was kept, as before, but it may not be the expected one. Check the setting "
 "for these sites and item sets: {json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:4272
+#: data/scripts/upgrade.php:4266
 msgid ""
 "The site settings \"advancedsearch_redirect_itemset\" and "
 "\"advancedsearch_redirect_itemsets\" are removed: use "
@@ -2269,28 +2268,28 @@ msgid ""
 "{json}"
 msgstr ""
 
-#: data/scripts/upgrade.php:4298
+#: data/scripts/upgrade.php:4292
 msgid ""
 "The query types for the filters are simplified: 39 types are displayed in "
 "the settings instead of 84, since the negative ones are derived and the "
 "duplicates are families and variants."
 msgstr ""
 
-#: data/scripts/upgrade.php:4353
+#: data/scripts/upgrade.php:4347
 msgid ""
 "The sorts \"Most recent\" and \"Oldest\" were prepended to the search pages "
 "that kept the default sort list, so the results are now displayed from the "
 "most recent one: {names}."
 msgstr ""
 
-#: data/scripts/upgrade.php:4359
+#: data/scripts/upgrade.php:4353
 msgid ""
 "The default sort is now the most recent resources first. The sort list of "
 "these search pages was customized, so it was not modified: {names}. The "
 "sorts \"id desc\" and \"id asc\" can be added manually."
 msgstr ""
 
-#: data/scripts/upgrade.php:4365
+#: data/scripts/upgrade.php:4359
 msgid ""
 "A new option allows to replace the quick search of the theme and of the "
 "admin board by the form of the main search page, with a link to the advanced "
@@ -2298,21 +2297,21 @@ msgid ""
 "site settings."
 msgstr ""
 
-#: data/scripts/upgrade.php:4369
+#: data/scripts/upgrade.php:4363
 msgid ""
 "The joiner \"not\" of the advanced filters now implies the joiner \"and\"/"
 "\"or\": the select was not displayed at all when only \"not\" was checked, "
 "so the option had no effect. Check the search pages that use it."
 msgstr ""
 
-#: data/scripts/upgrade.php:4418
+#: data/scripts/upgrade.php:4412
 msgid ""
 "Some obsolete settings of the filters were removed in {count} search pages, "
 "in particular the html attributes of the sub-elements of the filter "
 "\"advanced\". Check them."
 msgstr ""
 
-#: data/scripts/upgrade.php:4426
+#: data/scripts/upgrade.php:4420
 msgid ""
 "The facets of the internal engine no more count the values selected in the "
 "facet itself, like the Solr engine, so the other values of a facet stay "
@@ -2320,14 +2319,14 @@ msgid ""
 "keep the previous behaviour. Check the search pages."
 msgstr ""
 
-#: data/scripts/upgrade.php:4458
+#: data/scripts/upgrade.php:4452
 msgid ""
 "The search on a partial word can now be done on the beginning of the words, "
 "that uses the index of the full text and is hundreds of times quicker than "
 "the search anywhere in the values, kept in {count} search pages. Check them."
 msgstr ""
 
-#: data/scripts/upgrade.php:4498
+#: data/scripts/upgrade.php:4492
 msgid ""
 "The default search page was available only in admin, so it was moved to the "
 "new setting for the admin side bar and replaced by the one of the main site "
@@ -2335,64 +2334,91 @@ msgid ""
 "rendered its form. Check the main settings."
 msgstr ""
 
-#: data/scripts/upgrade.php:4556
+#: data/scripts/upgrade.php:4566
+msgid ""
+"The form of the search configs #{ids} was restored after a previous upgrade. "
+"Check the filters."
+msgstr ""
+
+#: data/scripts/upgrade.php:4573
+msgid ""
+"The optional module {link}Job Queue{link_end} can be installed to avoid "
+"running the same background jobs several times in parallel and to limit the "
+"number of heavy jobs running at the same time."
+msgstr ""
+
+#: data/scripts/upgrade.php:4610
+msgid ""
+"With Solr, the multiple values of a simple arg of the url (site, item set, "
+"class, template, owner) are now joined with \"or\", like in the api, and no "
+"more with \"and\". Check the links to the search pages in: {list}."
+msgstr ""
+
+#: data/scripts/upgrade.php:4629
+msgid ""
+"The input type \"Text (multiple, with a separator)\" is now a text input and "
+"no more a select of the values. Set the type \"Select\" if needed in the "
+"search configs: {list}."
+msgstr ""
+
+#: data/scripts/upgrade.php:4693
 msgid ""
 "The suggestions of the sites were missing since the upgrade to version "
 "3.4.57, so the suggesters #{ids} are being reindexed in background."
 msgstr ""
 
-#: data/scripts/upgrade.php:4561
+#: data/scripts/upgrade.php:4698
 msgid ""
 "The suggestions of the sites are missing since the upgrade to version "
 "3.4.57: reindex the suggesters #{ids} once the module is active."
 msgstr ""
 
-#: Module.php:195
+#: Module.php:197
 msgid "The module {module} can be reenabled."
 msgstr ""
 
-#: Module.php:612
+#: Module.php:621
 msgid "The resource \"{resource}\" is not available through the rest api."
 msgstr ""
 
-#: Module.php:1710
+#: Module.php:1719
 msgid "Unable to launch indexing metadata: {message}"
 msgstr ""
 
-#: Module.php:1714
+#: Module.php:1723
 msgid "Unable to launch indexing metadata: see log."
 msgstr ""
 
-#: Module.php:1883
+#: Module.php:1892
 msgid ""
 "Unable to delete the search index for resource #{resource_id} in search "
 "engine \"{name}\": {message}"
 msgstr ""
 
-#: Module.php:1888
+#: Module.php:1897
 msgid ""
 "Unable to delete the search index for the deleted resource #{resource_id} in "
 "search engine \"{name}\": see log."
 msgstr ""
 
-#: Module.php:1989
+#: Module.php:1998
 msgid "AdvancedSearch cron: unable to launch reindexation: {message}"
 msgstr ""
 
-#: Module.php:2332
+#: Module.php:2350
 msgid ""
 "The {link_url}internal suggester{link_end} (sql) will be available after "
 "indexation."
 msgstr ""
 
-#: Module.php:2370
+#: Module.php:2388
 msgid ""
 "The default search config can be {link_1}edited{link_end} and defined in the "
 "{link_3}main settings{link_end} for admin search and in each site settings "
 "for public search."
 msgstr ""
 
-#: Module.php:2417
+#: Module.php:2435
 msgid ""
 "The internal search engine \"{name}\" (sql) can be edited in the {link_url}"
 "search manager{link_end}."
@@ -2505,17 +2531,17 @@ msgstr ""
 msgid "Not implemented in this form adapter."
 msgstr ""
 
-#: src/FormAdapter/TraitFormAdapterClassic.php:548
+#: src/FormAdapter/TraitFormAdapterClassic.php:552
 msgid "The search config {search_config} has no form adapter."
 msgstr ""
 
-#: src/FormAdapter/TraitFormAdapterClassic.php:561
+#: src/FormAdapter/TraitFormAdapterClassic.php:565
 msgid ""
 "The search config {search_config} has a unavailable form adapter "
 "{form_adapter}."
 msgstr ""
 
-#: src/FormAdapter/TraitFormAdapterClassic.php:810
+#: src/FormAdapter/TraitFormAdapterClassic.php:814
 msgid ""
 "Query error: {message}\n"
 "Query: {json_query}"
@@ -2767,11 +2793,7 @@ msgstr ""
 msgid "Dispatched reindex of internal suggester \"{name}\"."
 msgstr ""
 
-#: src/Job/IndexSearch.php:803
-msgid "Skipped suggester \"{name}\": build on commit is disabled."
-msgstr ""
-
-#: src/Job/IndexSearch.php:817
+#: src/Job/IndexSearch.php:814
 msgid "Dispatched reindex of Solr suggester \"{name}\"."
 msgstr ""
 
@@ -4721,23 +4743,23 @@ msgstr ""
 msgid "Formatted as \"/url/full/path Label of the link\"."
 msgstr ""
 
-#: src/Form/MainSearchForm.php:757
+#: src/Form/MainSearchForm.php:756
 msgid "YYYY"
 msgstr ""
 
-#: src/Form/MainSearchForm.php:883 src/Form/MainSearchForm.php:1098
+#: src/Form/MainSearchForm.php:882 src/Form/MainSearchForm.php:1097
 msgid "Select collections…"
 msgstr ""
 
-#: src/Form/MainSearchForm.php:981
+#: src/Form/MainSearchForm.php:980
 msgid "Select owners…"
 msgstr ""
 
-#: src/Form/MainSearchForm.php:1144
+#: src/Form/MainSearchForm.php:1143
 msgid "Select access…"
 msgstr ""
 
-#: src/Form/MainSearchForm.php:1267
+#: src/Form/MainSearchForm.php:1266
 msgid "Is private"
 msgstr ""
 
@@ -4759,37 +4781,37 @@ msgid "The slug \"{search_slug}\" is already taken."
 msgstr ""
 
 #: src/Api/Representation/SearchSuggesterRepresentation.php:191
-#: src/Api/Representation/SearchConfigRepresentation.php:689
+#: src/Api/Representation/SearchConfigRepresentation.php:690
 msgid ""
 "Query error: {message}\n"
 "Query:{query}"
 msgstr ""
 
-#: src/Api/Representation/SearchConfigRepresentation.php:130
+#: src/Api/Representation/SearchConfigRepresentation.php:131
 msgid ""
 "The search page \"{search_slug}\" has no route \"{route}\": it is not "
 "available in this context."
 msgstr ""
 
-#: src/Api/Representation/SearchConfigRepresentation.php:326
-#: src/Api/Representation/SearchConfigRepresentation.php:335
-#: src/Api/Representation/SearchConfigRepresentation.php:351
-#: src/Api/Representation/SearchConfigRepresentation.php:360
-#: src/Api/Representation/SearchConfigRepresentation.php:374
+#: src/Api/Representation/SearchConfigRepresentation.php:327
+#: src/Api/Representation/SearchConfigRepresentation.php:336
+#: src/Api/Representation/SearchConfigRepresentation.php:352
+#: src/Api/Representation/SearchConfigRepresentation.php:361
+#: src/Api/Representation/SearchConfigRepresentation.php:375
 msgid ""
 "The search config setting \"{old}\" was renamed \"{new}\". You should update "
 "your theme."
 msgstr ""
 
-#: src/Api/Representation/SearchConfigRepresentation.php:579
+#: src/Api/Representation/SearchConfigRepresentation.php:580
 msgid "The search page \"{search_page}\" has no suggester."
 msgstr ""
 
-#: src/Api/Representation/SearchConfigRepresentation.php:592
+#: src/Api/Representation/SearchConfigRepresentation.php:593
 msgid "The search page \"{search_page}\" has no more suggester."
 msgstr ""
 
-#: src/Api/Representation/SearchConfigRepresentation.php:609
+#: src/Api/Representation/SearchConfigRepresentation.php:610
 msgid "The search page \"{search_page}\" has no search engine."
 msgstr ""
 
@@ -5174,31 +5196,31 @@ msgstr ""
 msgid "is not linked with resource with ID"
 msgstr ""
 
-#: src/Stdlib/SearchResources.php:937
+#: src/Stdlib/SearchResources.php:938
 msgid "values"
 msgstr ""
 
-#: src/Stdlib/SearchResources.php:938
+#: src/Stdlib/SearchResources.php:939
 msgid "simple values"
 msgstr ""
 
-#: src/Stdlib/SearchResources.php:939
+#: src/Stdlib/SearchResources.php:940
 msgid "linked resources"
 msgstr ""
 
-#: src/Stdlib/SearchResources.php:940
+#: src/Stdlib/SearchResources.php:941
 msgid "uris"
 msgstr ""
 
-#: src/Stdlib/SearchResources.php:943
+#: src/Stdlib/SearchResources.php:944
 msgid "with type"
 msgstr ""
 
-#: src/Stdlib/SearchResources.php:944
+#: src/Stdlib/SearchResources.php:945
 msgid "with language"
 msgstr ""
 
-#: src/Stdlib/SearchResources.php:945
+#: src/Stdlib/SearchResources.php:946
 msgid "with type and language"
 msgstr ""
 

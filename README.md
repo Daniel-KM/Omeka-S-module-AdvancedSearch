@@ -136,13 +136,17 @@ ties and classes in the
 advanced search form, with chosen-select.
 
 **IMPORTANT**: the improvements done on query argument "property" were moved to
-"filter" and were removed. So use the key "filter" instead of "property" for future compatibility.
+"filter" and were removed. So use the key "filter" instead of "property" for
+future compatibility.
 
 
 Installation
 ------------
 
 This module is dependant of module [Common], that should be installed first.
+
+With big bases or on shared hosts, it is recommended to install the optional
+module [Job Queue] to avoid to overload the server when indexing data.
 
 * From the zip
 
@@ -161,8 +165,7 @@ composer install --no-dev
 
 See general end user documentation for [installing a module].
 
-
-- For test
+* For test
 
 The module includes a comprehensive test suite with unit and functional tests.
 Run them from the root of Omeka:
@@ -338,6 +341,13 @@ options, separated with a `=`.
 For advanced filters, similar to the Omeka ones, use "advanced" as field name
 and type.
 
+A filter "Text" on a property searches the resources whose value contains the
+text ("in"), like the advanced filters by default. The filters "TextExact" and
+"MultiText" and the lists of values search the exact value ("eq"). The option
+"query_type" of a filter sets another query type, for example "eq" or "sw"
+(starts with). With the internal engine, a search of a part of the value cannot
+use an index, so it may be slower on a very large database.
+
 #### Index
 
 The index can be aggregated, for example to search "Person" will search in
@@ -426,6 +436,13 @@ Only the key "field" is required.
   or "closed".
 - "options" are useful for some types (see above).
 - "attributes" are appended as html attributes to fields.
+
+The option "Values displayed in each facet" of the search config applies to
+all facets. By default, a facet lists only the values available with the facets
+selected in the other facets. With "All values", the values are counted without
+any selected facet, ranges included, so the list does not change when a value
+is selected. With the internal engine, this option may be slow when there are
+facets and filters for item sets or sites.
 
 
 Internal engine (mysql)
@@ -764,7 +781,7 @@ were initially used by the [digital library of PSL], a French university. Next
 improvements were done for various projects. The auto-completion was built for
 the future digital library of [Campus Condorcet]. The aggregated fields feature
 was built for the digital library [Corpus du Louvre]. Many performance
-improvements were done for the digital library [Musee de Bretagne].
+improvements were done for the digital libraries [Musee de Bretagne] and [Numistral].
 
 
 [Advanced Search]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearch
@@ -775,6 +792,7 @@ improvements were done for the digital library [Musee de Bretagne].
 [Soundex]: https://en.wikipedia.org/wiki/Soundex
 [installing a module]: https://omeka.org/s/docs/user-manual/modules/#installing-modules
 [Common]: https://gitlab.com/Daniel-KM/Omeka-S-module-Common
+[Job Queue]: https://gitlab.com/Daniel-KM/Omeka-S-module-JobQueue
 [Reference]: https://gitlab.com/Daniel-KM/Omeka-S-module-Reference
 [Advanced Search Plus]: https://gitlab.com/Daniel-KM/Omeka-S-module-AdvancedSearchPlus
 [Psl Search Form]: https://gitlab.com/Daniel-KM/Omeka-S-module-PslSearchForm
@@ -794,4 +812,5 @@ improvements were done for the digital library [Musee de Bretagne].
 [Campus Condorcet]: https://bibnum.campus-condorcet.fr
 [Corpus du Louvre]: https://corpus.louvre.fr
 [Musee de Bretagne]: https://www.collections.musee-bretagne.fr
+[Numistral]: https://omeka.numistral.fr
 [Daniel-KM]: https://gitlab.com/Daniel-KM "Daniel Berthereau"

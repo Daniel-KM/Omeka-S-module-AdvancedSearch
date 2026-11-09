@@ -1961,9 +1961,6 @@ if (version_compare($oldVersion, '3.4.37', '<')) {
             $searchConfigSettings = ['results' => $searchConfigSettings['display'] ?? []] + $searchConfigSettings;
             unset($searchConfigSettings['display']);
         }
-        if (!isset($searchConfigSettings['form']['default'])) {
-            $searchConfigSettings = ['form' => ['default' => ['name' => 'default'] + ($searchConfigSettings['form'] ?? [])]] + $searchConfigSettings;
-        }
         $sql = 'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?;';
         $connection->executeStatement($sql, [json_encode($searchConfigSettings, 320), $id]);
     }
@@ -2387,29 +2384,26 @@ if (version_compare($oldVersion, '3.4.58', '<')) {
     $connection->executeStatement($sql);
 
     // Fix: auto-populate form.filters from index.aliases for configs that were
-    // upgraded from before 3.4.31 without explicit filters. Note: the 3.4.37
-    // upgrade nests form parameters under form.default for future form
-    // variants. The 3.4.58 fix below ignored that move and rebuilt form.filters
-    // from index.aliases on configs that actually had filters under
-    // form.default.filters, desynchronizing the popup. Honor
-    // form.default.filters as a fallback before reconstructing.
+    // upgraded from before 3.4.31 without explicit filters. The settings nested
+    // under form.default by the previous upgrades to 3.4.37 are moved back to
+    // form first, so the filters and the advanced filter are kept and converted
+    // by the next steps.
     $sql = 'SELECT `id`, `settings` FROM `search_config`';
     $searchConfigs = $connection->executeQuery($sql)->fetchAllKeyValue();
     foreach ($searchConfigs as $id => $searchConfigJson) {
         $searchConfigSettings = json_decode($searchConfigJson, true) ?: [];
-        $filters = $searchConfigSettings['form']['filters']
-            ?? $searchConfigSettings['form']['default']['filters']
-            ?? [];
         $changed = false;
-        // If only form.default.filters exists, mirror it on form.filters so
-        // MainSearchForm::init() can read it.
-        if (empty($searchConfigSettings['form']['filters'])
-            && !empty($searchConfigSettings['form']['default']['filters'])
-        ) {
-            $searchConfigSettings['form']['filters'] = $searchConfigSettings['form']['default']['filters'];
+        if (is_array($searchConfigSettings['form']['default'] ?? null)) {
+            $default = $searchConfigSettings['form']['default'];
+            unset($default['name'], $searchConfigSettings['form']['default']);
+            if (empty($searchConfigSettings['form']['filters'])) {
+                unset($searchConfigSettings['form']['filters']);
+            }
+            $searchConfigSettings['form'] = $default + $searchConfigSettings['form'];
             $changed = true;
         }
-        // Only rebuild from aliases when truly empty in both locations.
+        $filters = $searchConfigSettings['form']['filters'] ?? [];
+        // Only rebuild from aliases when there is no filter at all.
         if (empty($filters) && !empty($searchConfigSettings['index']['aliases'])) {
             foreach ($searchConfigSettings['index']['aliases'] as $aliasName => $alias) {
                 $name = mb_strtolower(strtr($aliasName, ['-' => '_', ':' => '_']));
@@ -4502,6 +4496,149 @@ if (version_compare($oldVersion, '3.4.65', '<')) {
     }
 }
 
+if (version_compare($oldVersion, '3.4.68', '<')) {
+    // The previous upgrades left the form settings under form.default and
+    // replaced the filters by the aliases, so the advanced filter was lost.
+    // Furthermore, the submit button became optional without any upgrade, so
+    // the configs saved before have no button.
+    $repaired = [];
+    $configs = $connection->fetchAllAssociative(
+        'SELECT `id`, `settings` FROM `search_config` ORDER BY `id` ASC'
+    );
+    foreach ($configs as $configRow) {
+        $configSettings = json_decode((string) $configRow['settings'], true) ?: [];
+        if (!is_array($configSettings['form'] ?? null)) {
+            continue;
+        }
+        $hasChange = false;
+        $default = $configSettings['form']['default'] ?? null;
+        if (is_array($default)) {
+            $advanced = $default['advanced'] ?? [];
+            $filters = [];
+            foreach ($default['filters'] ?? [] as $key => $filter) {
+                if ($key === 'advanced' || ($filter['type'] ?? '') === 'Advanced') {
+                    $key = 'advanced';
+                    $elements = array_keys(array_filter([
+                        'joiner' => !empty($advanced['field_joiner']),
+                        'joiner_not' => !empty($advanced['field_joiner_not']),
+                        'operator' => !empty($advanced['field_operator']),
+                        'autosuggest' => !empty($advanced['field_value_autosuggest']),
+                    ]));
+                    $filter['options'] = array_filter([
+                        'default_number' => isset($advanced['default_number']) ? (int) $advanced['default_number'] : 1,
+                        'max_number' => isset($advanced['max_number']) ? (int) $advanced['max_number'] : 10,
+                        'field_elements' => $elements,
+                        'field_operators' => $advanced['field_operators'] ?? [],
+                        'fields' => $advanced['fields'] ?? [],
+                    ], fn ($v) => $v !== [] && $v !== '') + ($filter['options'] ?? []);
+                }
+                $filters[$key] = $filter;
+            }
+            // The filters rebuilt from the aliases have no type.
+            foreach ($configSettings['form']['filters'] ?? [] as $key => $filter) {
+                $isRebuilt = $filters
+                    && empty($filter['type'])
+                    && isset($configSettings['index']['aliases'][$filter['field'] ?? '']);
+                if (!isset($filters[$key]) && !$isRebuilt) {
+                    $filters[$key] = $filter;
+                }
+            }
+            unset($default['name'], $default['filters'], $default['advanced']);
+            unset($configSettings['form']['default'], $configSettings['form']['filters']);
+            $configSettings['form'] = $default + $configSettings['form'] + ['filters' => $filters];
+            $repaired[] = (int) $configRow['id'];
+            $hasChange = true;
+        }
+        if (!array_key_exists('button_submit', $configSettings['form'])) {
+            $configSettings['form']['button_submit'] = true;
+            $configSettings['form']['label_submit'] ??= $translate('Search');
+            $hasChange = true;
+        }
+        if ($hasChange) {
+            $connection->executeStatement(
+                'UPDATE `search_config` SET `settings` = ? WHERE `id` = ?;',
+                [json_encode($configSettings, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), (int) $configRow['id']]
+            );
+        }
+    }
+    if ($repaired) {
+        $messenger->addWarning(new PsrMessage(
+            'The form of the search configs #{ids} was restored after a previous upgrade. Check the filters.', // @translate
+            ['ids' => implode(', #', $repaired)]
+        ));
+    }
+
+    if (!$this->isModuleActive('JobQueue')) {
+        $message = new PsrMessage(
+            'The optional module {link}Job Queue{link_end} can be installed to avoid running the same background jobs several times in parallel and to limit the number of heavy jobs running at the same time.', // @translate
+            ['link' => '<a href="https://gitlab.com/Daniel-KM/Omeka-S-module-JobQueue" target="_blank" rel="noopener">', 'link_end' => '</a>']
+        );
+        $message->setEscapeHtml(false);
+        $messenger->addNotice($message);
+    }
+
+    // The simple args of the url (site, item set, class…) are now separate
+    // conditions, like in the api: with Solr, the values of a multi-valued arg
+    // are joined with "or" and no more with "and". Warn about the stored links
+    // to a search page with such an arg.
+    $slugs = $connection->fetchFirstColumn('SELECT `c`.`slug` FROM `search_config` `c` JOIN `search_engine` `e` ON `e`.`id` = `c`.`engine_id` WHERE `e`.`adapter` = "solarium"');
+    $queries = [
+        'block' => 'SELECT `b`.`id`, CONCAT(`s`.`slug`, "/", `p`.`slug`), `b`.`data` FROM `site_page_block` `b` JOIN `site_page` `p` ON `p`.`id` = `b`.`page_id` JOIN `site` `s` ON `s`.`id` = `p`.`site_id`',
+        'navigation' => 'SELECT `id`, `slug`, `navigation` FROM `site`',
+        'menu' => 'SELECT `site_id`, `id`, `value` FROM `site_setting` WHERE `id` LIKE "menu\_menu:%"',
+    ];
+    $regex = $slugs
+        ? '~/(?:' . implode('|', array_map(fn ($slug) => preg_quote($slug, '~'), $slugs)) . ')\?([^"\s<>]+)~'
+        : null;
+    $found = [];
+    foreach ($regex ? $queries : [] as $type => $sql) {
+        foreach ($connection->fetchAllNumeric($sql) as [$id, $label, $value]) {
+            preg_match_all($regex, html_entity_decode(stripslashes((string) $value)), $matches);
+            foreach ($matches[1] as $queryString) {
+                parse_str($queryString, $args);
+                foreach ($args as $name => $arg) {
+                    if (is_array($arg) && count($arg) > 1 && preg_match('~^(?:site|item_set|resource_class|resource_template|owner)_id~', (string) $name)) {
+                        $found[] = "$type #$id ($label)";
+                        continue 3;
+                    }
+                }
+            }
+        }
+    }
+    if ($found) {
+        $message = new PsrMessage(
+            'With Solr, the multiple values of a simple arg of the url (site, item set, class, template, owner) are now joined with "or", like in the api, and no more with "and". Check the links to the search pages in: {list}.', // @translate
+            ['list' => implode(', ', array_slice(array_unique($found), 0, 50))]
+        );
+        $messenger->addWarning($message);
+        $logger->warn($message->getMessage(), $message->getContext());
+    }
+
+    // The input type "MultiText" was displayed as a select of the values.
+    $found = [];
+    foreach ($connection->fetchAllKeyValue('SELECT `id`, `settings` FROM `search_config`') as $id => $configSettings) {
+        $configSettings = json_decode((string) $configSettings, true) ?: [];
+        foreach ($configSettings['form']['filters'] ?? [] as $filter) {
+            if (strtolower(basename(strtr((string) ($filter['type'] ?? ''), '\\', '/'))) === 'multitext') {
+                $found[] = '#' . $id . ' (' . ($filter['field'] ?? '') . ')';
+            }
+        }
+    }
+    if ($found) {
+        $message = new PsrMessage(
+            'The input type "Text (multiple, with a separator)" is now a text input and no more a select of the values. Set the type "Select" if needed in the search configs: {list}.', // @translate
+            ['list' => implode(', ', $found)]
+        );
+        $messenger->addWarning($message);
+        $logger->warn($message->getMessage(), $message->getContext());
+    }
+}
+
+// This block of the version 3.4.66 is the last one, after the newer versions:
+// it stores the new version of the module before dispatching the reindexing of
+// the suggesters, because the job runs in another process that loads the module
+// only when its version is the current one. So the job must start when all the
+// other upgrades, in particular the restored search configs, are done.
 if (version_compare($oldVersion, '3.4.66', '<')) {
     // The upgrade to 3.4.57 failed silently on MySQL, that does not support
     // "IF EXISTS" in "ALTER TABLE", so the old columns without default value

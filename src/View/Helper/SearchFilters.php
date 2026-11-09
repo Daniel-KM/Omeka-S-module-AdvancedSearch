@@ -720,6 +720,16 @@ class SearchFilters extends AbstractHelper
         $searchFormAdvanced = $this->searchConfig ? $this->searchConfig->advancedFilterSettings() : [];
         $searchFormAdvancedLabels = array_column($searchFormAdvanced['fields'] ?? [], 'label', 'value');
         $fieldFiltersLabels = array_replace($fieldLabels, array_filter($searchFormAdvancedLabels));
+        // A filter may use the source of an indexed field (a property term from
+        // a link), so use the label set in the form for that field too.
+        foreach ($availableFields as $name => $field) {
+            if (!empty($field['from'])
+                && !empty($searchFormAdvancedLabels[$name])
+                && !isset($fieldFiltersLabels[$field['from']])
+            ) {
+                $fieldFiltersLabels[$field['from']] = $searchFormAdvancedLabels[$name];
+            }
+        }
 
         // Map of indexed value => admin-defined display label, per field. Used
         // to replace raw values (e.g. "1") with readable text (e.g. "Only with

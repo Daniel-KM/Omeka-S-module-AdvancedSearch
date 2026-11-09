@@ -778,4 +778,16 @@ return [
             'default_frequency' => 'daily',
         ],
     ],
+    // Rules of the background jobs for the module Job Queue, used only when it
+    // is installed: merge the jobs dispatched again before they start and limit
+    // the number of heavy jobs running at the same time.
+    'jobqueue' => [
+        'jobs' => [
+            'AdvancedSearch\Job\IndexSearch' => [
+                'group' => 'index',
+                'group_all' => 'default',
+                'merge' => ['resource_ids'],
+            ],
+        ],
+    ],
 ];

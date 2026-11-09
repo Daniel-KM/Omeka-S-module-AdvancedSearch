@@ -793,16 +793,13 @@ class IndexSearch extends AbstractJob
                         ['name' => $suggester->name()]
                     );
                 } else {
-                    // Solr suggesters: skip if build on
-                    // commit is disabled.
-                    $skip = $suggester->setting(
-                        'solr_skip_build_on_commit', false
-                    );
-                    if ($skip) {
-                        $this->logger->info(
-                            'Skipped suggester "{name}": build on commit is disabled.', // @translate
-                            ['name' => $suggester->name()]
-                        );
+                    // Solr rebuilds the suggester itself on commit when set,
+                    // else the scheduled task of the module rebuilds it, so it
+                    // is rebuilt here only after a full reindexation. The old
+                    // inverted option is used before SearchSolr 3.5.76.
+                    $buildOnCommit = $suggester->setting('solr_build_on_commit')
+                        ?? !$suggester->setting('solr_skip_build_on_commit', true);
+                    if ($buildOnCommit || $this->resourceIds) {
                         continue;
                     }
                     // Dispatch via class name string to

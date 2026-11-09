@@ -14,46 +14,44 @@
     /* Override theme .value { flex-wrap: wrap } to keep
        multi-element rows on one line. Property-queries,
        item-sets and datetime need nowrap. */
-    #advanced-search #property-queries .value,
-    #advanced-search #item-sets .value,
-    #advanced-search #datetime-queries .value {
-        flex-wrap: nowrap;
-    }
+    #advanced-search {
+        & #property-queries .value,
+        & #item-sets .value,
+        & #datetime-queries .value {
+            flex-wrap: nowrap;
+        }
 
-    /* Omeka 4.2 sets the flex layout on .inputs, but not Omeka 4.1, where the
-       fields of the module would not be justified. */
-    #advanced-search .inputs,
-    #advanced-search .inputs .value {
-        display: flex;
-        flex-wrap: wrap;
-    }
-
-    /* A row fills the column of the inputs: it is a flex item, so it does not
-       grow by itself and the fields stopped before the right edge. */
-    #advanced-search .inputs > .value {
-        flex: 1 1 auto;
-        min-width: 0;
-    }
-
-    /* The fields added by the module fill the column too: a lone input takes
-       the full width, and the fields of a row share it. */
-    #advanced-search .inputs > input[type=text],
-    #advanced-search .inputs > input[type=number] {
-        width: 100%;
-    }
-    #advanced-search #sort_field .inputs,
-    #advanced-search .inputs > .field-geo {
-        display: flex;
-        gap: .25rem;
-    }
-    #advanced-search .inputs > .field-geo {
-        flex: 1 1 auto;
-        min-width: 0;
-    }
-    #advanced-search #sort_field .inputs > select,
-    #advanced-search .inputs [name^="geo["] {
-        flex: 1 1 auto;
-        min-width: 0;
+        /* Omeka 4.2 sets the flex layout on .inputs, but not Omeka 4.1, where the
+           fields of the module would not be justified. */
+        & .inputs {
+            &,
+            & .value {
+                display: flex;
+                flex-wrap: wrap;
+            }
+            & > .value {
+                flex: 1 1 auto;
+                min-width: 0;
+            }
+            & > input[type=text],
+            & > input[type=number] {
+                width: 100%;
+            }
+        }
+        & #sort_field .inputs,
+        & .inputs > .field-geo {
+            display: flex;
+            gap: .25rem;
+        }
+        & .inputs > .field-geo {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+        & #sort_field .inputs > select,
+        & .inputs [name^="geo["] {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
     }
 
     /* The close of a choice is a button since 4.2. */
@@ -66,126 +64,134 @@
     }
 
     /* The radios and the checkboxes are inline by default. */
-    #advanced-search .inputs label {
-        width: auto;
-    }
+    #advanced-search {
+        & .inputs label {
+            width: auto;
+        }
 
-    #advanced-search .chosen-container-multi .chosen-choices {
-        min-height: 36px;
-        padding: 0 5px;
-    }
-    #advanced-search .chosen-container-multi .chosen-choices .search-field input[type=text] {
-        height: 34px;
-        min-height: 0;
-        margin: 0;
-        padding: 0;
-    }
-    #advanced-search .chosen-container-single .chosen-single {
-        height: 36px;
-        line-height: 34px;
-    }
+        & .chosen-container-multi {
+            & .chosen-choices {
+                min-height: 36px;
+                padding: 0 5px;
+                & .search-field input[type=text] {
+                    height: 34px;
+                    min-height: 0;
+                    margin: 0;
+                    padding: 0;
+                }
+            }
+        }
+        & .chosen-container-single .chosen-single {
+            height: 36px;
+            line-height: 34px;
+        }
+        /* Make chosen behave like native selects in flex. */
+        & .chosen-container {
+            display: block;
+            min-width: 0;
+        }
 
-    /* Make chosen behave like native selects in flex:
-       block display + shrinkable. */
-    #advanced-search .chosen-container {
-        display: block;
-        min-width: 0;
-    }
+        /* === Filter-queries specific === */
 
-    /* === Filter-queries specific === */
+        & #filter-queries .inputs > .value {
+            flex-wrap: wrap;
+        }
+        & .inputs > .value .value-fields {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: .25rem;
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+        & #filter-queries {
+            & .chosen-container,
+            & .query-text {
+                flex: 1 1 0;
+            }
+            & .query-type {
+                width: auto;
+                flex: 0 0 auto;
+            }
+            & .joiner {
+                width: auto;
+                flex: 0 0 auto;
+                min-width: 4em;
+            }
 
-    /* Filter .value needs wrap so sub-query goes below. */
-    #advanced-search #filter-queries .inputs > .value {
-        flex-wrap: wrap;
-    }
+            /* Hide disabled/empty filter elements. */
+            & .query-text:disabled,
+            & .chosen-disabled,
+            &.multi-value:not(.has-joiner-not) .value:first-child .joiner,
+            &.multi-value:not(.has-joiner-not) .value:first-child .chosen-container:first-of-type {
+                display: none;
+            }
+            /* Show first joiner when "not" joiner is enabled. */
+            &.multi-value.has-joiner-not .value:first-child .joiner {
+                display: initial;
+            }
 
-    /* Filter .value-fields: inner flex row. */
-    #advanced-search .inputs > .value .value-fields {
-        display: flex;
-        flex-wrap: nowrap;
-        align-items: center;
-        gap: .25rem;
-        flex: 1 1 auto;
-        min-width: 0;
-    }
+            & .chosen-container-multi .chosen-choices .search-choice {
+                max-width: 24em;
+            }
+        }
+        & .chosen-choices li.search-choice span {
+            padding: 4px;
+        }
 
-    /* In filters, chosen and text input grow to fill space
-       while joiner and query-type keep natural width. */
-    #advanced-search #filter-queries .chosen-container,
-    #advanced-search #filter-queries .query-text {
-        flex: 1 1 0;
-    }
-    #advanced-search #filter-queries .query-type {
-        width: auto;
-        flex: 0 0 auto;
-    }
-    #advanced-search #filter-queries .joiner {
-        width: auto;
-        flex: 0 0 auto;
-        min-width: 4em;
-    }
+        & #filter-queries {
+            & .query-form-element {
+                display: none;
+            }
+            & .query-text.hide {
+                display: none;
+            }
+        }
 
-    /* Hide disabled/empty filter elements. */
-    #advanced-search #filter-queries .query-text:disabled,
-    #advanced-search #filter-queries .chosen-disabled,
-    #advanced-search #filter-queries.multi-value:not(.has-joiner-not) .value:first-child .joiner,
-    #advanced-search #filter-queries.multi-value:not(.has-joiner-not) .value:first-child .chosen-container:first-of-type {
-       display: none;
-    }
-    /* Show first joiner when "not" joiner is enabled. */
-    #advanced-search #filter-queries.multi-value.has-joiner-not .value:first-child .joiner {
-        display: initial;
-    }
+        /* Sub-query wraps to next line in the parent .value. */
+        & .inputs {
+            & > .value {
+                & .sub-query {
+                    width: 100%;
+                }
+                & .sub-query .query-display {
+                    min-height: 35px;
+                }
+                & .sub-query .query-form-element {
+                    flex: 1;
+                    margin-top: 0.25rem;
+                    margin-bottom: 0.5rem;
+                }
+            }
+        }
 
-    #advanced-search #filter-queries .chosen-container-multi .chosen-choices .search-choice {
-        max-width: 24em;
-    }
-    #advanced-search .chosen-choices li.search-choice span {
-        padding: 4px;
-    }
+        /* === Item-sets === */
+        & #item-sets {
+            & .value {
+                gap: .25rem;
+            }
+            /* "Dans/Pas dans" fixed width for column alignment. */
+            & .item-set-select-type + .chosen-container {
+                flex: 0 0 7em;
+                width: 7em !important;
+            }
+        }
 
-    #advanced-search #filter-queries .query-form-element {
-        display: none;
-    }
-    #advanced-search #filter-queries .query-text.hide {
-        display: none;
-    }
-
-    /* Sub-query wraps to next line in the parent .value. */
-    #advanced-search .inputs > .value .sub-query {
-        width: 100%;
-    }
-    #advanced-search .inputs > .value .sub-query .query-display {
-        min-height: 35px;
-    }
-    #advanced-search .inputs > .value .sub-query .query-form-element {
-        flex: 1;
-        margin-top: 0.25rem;
-        margin-bottom: 0.5rem;
-    }
-
-    /* === Item-sets === */
-    #advanced-search #item-sets .value {
-        gap: .25rem;
-    }
-    /* "Dans/Pas dans" fixed width for column alignment. */
-    #advanced-search #item-sets .item-set-select-type + .chosen-container {
-        flex: 0 0 7em;
-        width: 7em !important;
-    }
-
-    /* === Datetime: native selects, no chosen === */
-    #advanced-search #datetime-queries .value {
-        gap: .25rem;
-        align-items: center;
-    }
-    #advanced-search #datetime-queries .value select {
-        width: auto;
-        flex: 0 0 auto;
-    }
-    #advanced-search #datetime-queries .value .query-text {
-        width: auto;
-        flex: 1 1 auto;
-        min-width: 12em;
+        /* === Datetime: native selects, no chosen === */
+        & #datetime-queries {
+            & .value {
+                gap: .25rem;
+                align-items: center;
+                & select {
+                    width: auto;
+                    flex: 0 0 auto;
+                }
+                & .query-text {
+                    width: auto;
+                    flex: 1 1 auto;
+                    min-width: 12em;
+                }
+            }
+        }
     }
 }

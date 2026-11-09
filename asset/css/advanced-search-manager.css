@@ -3,18 +3,22 @@
         font-weight: 400;
     }
 
-    .search-admin .subhead::before {
-        content:"";
-    }
+    .search-admin {
+        & .subhead::before {
+            content:"";
+        }
 
-    .search-admin .actions .disabled {
-        color: currentColor;
-        cursor: not-allowed;
-        opacity: 0.5;
-        text-decoration: none;
-    }
-    .search-admin .actions span::before {
-        text-align: right;
+        & .actions {
+            & .disabled {
+                color: currentColor;
+                cursor: not-allowed;
+                opacity: 0.5;
+                text-decoration: none;
+            }
+            & span::before {
+                text-align: right;
+            }
+        }
     }
     .search-admin .actions span,
     .actions span::before {
@@ -25,40 +29,48 @@
         border: 0;
         box-shadow: none;
     }
-    .search-admin .actions .system-state-icon.fa-spin {
-        margin-left: 8px;
-    }
+    .search-admin {
+        & .actions .system-state-icon.fa-spin {
+            margin-left: 8px;
+        }
 
-    .search-admin .tablesaw-cell-content {
-        flex-wrap: wrap;
-    }
-    .search-admin td .actions + .actions {
-        flex-basis: 100%;
-        justify-content: flex-end;
-    }
-    .search-admin td .engine-status,
-    .search-admin td .warning-notice {
-        flex-basis: 100%;
-    }
-    .search-admin .actions a.fa-spin,
-    .search-admin .actions a.fa-spin::before {
-        text-align: center;
-    }
+        & .tablesaw-cell-content {
+            flex-wrap: wrap;
+        }
+        & td {
+            & .actions + .actions {
+                flex-basis: 100%;
+                justify-content: flex-end;
+            }
+            & .engine-status,
+            & .warning-notice {
+                flex-basis: 100%;
+            }
+        }
+        & .actions a.fa-spin,
+        & .actions a.fa-spin::before {
+            text-align: center;
+        }
 
-    .search-admin td .warning-notice {
-        background-color: #fff6e6;
-        color: orange;
-        font-family: inherit;
-        font-weight: normal;
-    }
+        & td .warning-notice {
+            background-color: #fff6e6;
+            color: orange;
+            font-family: inherit;
+            font-weight: normal;
+        }
 
-    .search-admin #sidebar-confirm .inputs label {
-        margin-bottom: 0;
-        padding-bottom: 0;
-        font-weight: normal;
-    }
-    .search-admin #sidebar-confirm .inputs label::after {
-        content: initial;
+        & #sidebar-confirm {
+            & .inputs {
+                & label {
+                    margin-bottom: 0;
+                    padding-bottom: 0;
+                    font-weight: normal;
+                }
+                & label::after {
+                    content: initial;
+                }
+            }
+        }
     }
 
     .ui-sortable {
@@ -73,15 +85,15 @@
         cursor: grab;
         display: flex;
         align-items: center;
-    }
-    .ui-sortable-handle::before {
-        display: inline-block;
-        font-family: 'Font Awesome 5 Free';
-        content: "\f0b2";
-        width: 1.5em;
-    }
-    .ui-sortable-handle > span {
-        flex-grow: 1;
+        &::before {
+            display: inline-block;
+            font-family: 'Font Awesome 5 Free';
+            content: "\f0b2";
+            width: 1.5em;
+        }
+        & > span {
+            flex-grow: 1;
+        }
     }
     .ui-dialog .ui-dialog-titlebar-close {
         min-height: inherit;
@@ -96,63 +108,65 @@
 }
 
 @media all {
-    .search-admin .collection-subnav {
-        margin-bottom: 1em;
-    }
-    /* The sub tabs have no href: keep the pointer. */
-    .search-admin .collection-subnav a {
-        cursor: pointer;
-    }
-    .search-admin .collection-wrapper {
-        display: flex;
-        align-items: flex-start;
-        gap: 1.5em;
-    }
-    .search-admin .collection-side {
-        flex: 0 0 30%;
-        max-width: 360px;
-        position: sticky;
-        top: 1em;
-        display: flex;
-        flex-direction: column;
-        max-height: calc(100vh - 6em);
-    }
-    .search-admin .collection-main {
-        flex: 1;
-        min-width: 0;
-    }
-    .search-admin .collection-list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        min-height: 0;
-        overflow-y: auto;
-    }
-    /* The "+" button under the list. */
-    .search-admin .collection-side > .collection-add {
-        display: block;
-        flex: none;
-        margin: 0.5em 0 0;
-        width: 100%;
-    }
-    /* The badge of the default search page in the list of the pages. */
-    .search-admin .search-config-default {
-        display: inline-block;
-        margin-left: 0.5em;
-        padding: 0.05em 0.6em;
-        background: #efefef;
-        border: 1px solid #dfdfdf;
-        border-radius: 1em;
-        font-size: 0.8em;
-        color: #4d4d4d;
-        vertical-align: middle;
-    }
-    /* The long radios are displayed one by line. */
-    .search-admin .field:has(#facet_mode) .inputs > label {
-        display: block;
-        margin: 0;
-        padding: 0.25em 0;
-        line-height: 1.5;
+    .search-admin {
+        & .collection-subnav {
+            margin-bottom: 1em;
+            /* The sub tabs have no href: keep the pointer. */
+            & a {
+                cursor: pointer;
+            }
+        }
+        & .collection-wrapper {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5em;
+        }
+        & .collection-side {
+            flex: 0 0 30%;
+            max-width: 360px;
+            position: sticky;
+            top: 1em;
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100vh - 6em);
+        }
+        & .collection-main {
+            flex: 1;
+            min-width: 0;
+        }
+        & .collection-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            min-height: 0;
+            overflow-y: auto;
+        }
+        /* The "+" button under the list. */
+        & .collection-side > .collection-add {
+            display: block;
+            flex: none;
+            margin: 0.5em 0 0;
+            width: 100%;
+        }
+        /* The badge of the default search page in the list of the pages. */
+        & .search-config-default {
+            display: inline-block;
+            margin-left: 0.5em;
+            padding: 0.05em 0.6em;
+            background: #efefef;
+            border: 1px solid #dfdfdf;
+            border-radius: 1em;
+            font-size: 0.8em;
+            color: #4d4d4d;
+            vertical-align: middle;
+        }
+        /* The long radios are displayed one by line. */
+        & .field:has(#facet_mode) .inputs > label {
+            display: block;
+            margin: 0;
+            padding: 0.25em 0;
+            line-height: 1.5;
+        }
     }
     /* The preview of the page of results. */
     #page-actions .collection-preview-results {
@@ -167,9 +181,9 @@
         background: #f7f7f7;
         border: 1px solid #dfdfdf;
         border-radius: 3px;
-    }
-    .preview-search-full .input-type-preview-item {
-        margin-bottom: 0.75em;
+        & .input-type-preview-item {
+            margin-bottom: 0.75em;
+        }
     }
     .preview-breadcrumbs {
         color: #676767;
@@ -200,10 +214,10 @@
         border-top: 1px solid #dfdfdf;
         border-bottom: 1px solid #dfdfdf;
         margin-bottom: 0.75em;
-    }
-    .preview-results-bar select {
-        min-width: 0 !important;
-        width: auto !important;
+        & select {
+            min-width: 0 !important;
+            width: auto !important;
+        }
     }
     .preview-grid-list {
         letter-spacing: 0.25em;
@@ -213,9 +227,9 @@
         display: flex;
         gap: 1.25em;
         align-items: flex-start;
-    }
-    .preview-results-layout.preview-facets-after {
-        flex-direction: row-reverse;
+        &.preview-facets-after {
+            flex-direction: row-reverse;
+        }
     }
     .preview-facets {
         flex: 0 0 30%;
@@ -223,9 +237,9 @@
         background: #f7f7f7;
         border: 1px solid #dfdfdf;
         border-radius: 3px;
-    }
-    .preview-facets .input-type-preview-item {
-        margin-bottom: 0.75em;
+        & .input-type-preview-item {
+            margin-bottom: 0.75em;
+        }
     }
     .preview-facets-label {
         font-weight: bold;
@@ -238,9 +252,9 @@
         display: flex;
         gap: 0.5em;
         margin: 0.25em 0 0.75em;
-    }
-    .preview-facets-buttons .preview-button {
-        padding: 0.2em 0.8em;
+        & .preview-button {
+            padding: 0.2em 0.8em;
+        }
     }
     .preview-results-list {
         flex: 1;
@@ -256,20 +270,20 @@
         display: flex;
         flex-wrap: wrap;
         gap: 0.75em;
-    }
-    .preview-results-grid .preview-result {
-        flex: 1 1 30%;
-        min-width: 8em;
-        flex-direction: column;
-        margin-bottom: 0;
-        padding: 0.5em;
-        border: 1px solid #dfdfdf;
-        border-radius: 3px;
-        background: #fff;
-    }
-    .preview-results-grid .preview-thumb {
-        width: 100%;
-        height: 64px;
+        & .preview-result {
+            flex: 1 1 30%;
+            min-width: 8em;
+            flex-direction: column;
+            margin-bottom: 0;
+            padding: 0.5em;
+            border: 1px solid #dfdfdf;
+            border-radius: 3px;
+            background: #fff;
+        }
+        & .preview-thumb {
+            width: 100%;
+            height: 64px;
+        }
     }
     .preview-thumb {
         flex: none;
@@ -278,15 +292,15 @@
         background: #dfdfdf;
         border-radius: 3px;
         position: relative;
-    }
-    .preview-thumb::before {
-        content: "🖼";
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0.5;
+        &::before {
+            content: "🖼";
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.5;
+        }
     }
     .preview-result-title {
         font-weight: bold;
@@ -296,20 +310,22 @@
         margin: 0.25em 0 0;
         color: #4d4d4d;
     }
-    .preview-result dl {
-        margin: 0.25em 0 0;
-    }
-    .preview-result dl > div {
-        display: flex;
-        gap: 0.5em;
-    }
-    .preview-result dt {
-        font-weight: bold;
-        min-width: 6em;
-    }
-    .preview-result dd {
-        margin: 0;
-        color: #4d4d4d;
+    .preview-result {
+        & dl {
+            margin: 0.25em 0 0;
+            & > div {
+                display: flex;
+                gap: 0.5em;
+            }
+        }
+        & dt {
+            font-weight: bold;
+            min-width: 6em;
+        }
+        & dd {
+            margin: 0;
+            color: #4d4d4d;
+        }
     }
     /* The global preview uses the dialog of Common. */
     .dialog-common .input-type-preview-all {
@@ -317,202 +333,212 @@
         max-width: 80vw;
         text-align: left;
     }
-    .input-type-preview-all .input-type-preview-item {
-        margin-bottom: 1.25em;
-    }
-    .input-type-preview-all .preview-label {
-        display: block;
-        font-weight: bold;
-        margin-bottom: 0.4em;
+    .input-type-preview-all {
+        & .input-type-preview-item {
+            margin-bottom: 1.25em;
+        }
+        & .preview-label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.4em;
+        }
     }
     .dialog-common .input-type-preview-all input,
     .dialog-common .input-type-preview-all select {
         width: auto;
     }
-    .search-admin .collection-empty {
-        margin: 0.5em 0;
-        color: #676767;
-    }
-    /* Only the selected item is displayed; the others stay in the form. */
-    .search-admin .collection-main > fieldset {
-        display: none;
-        margin-top: 0;
-    }
-    .search-admin .collection-main > fieldset.collection-item-active {
-        display: block;
-    }
-    /* The list identifies the item: its numbered legend is useless. */
-    .search-admin .collection-main > fieldset > legend {
-        display: none;
-    }
-    .search-admin .collection-list > li {
-        display: flex;
-        align-items: center;
-        gap: 0.4em;
-        position: relative;
-        padding: 0.3em 2em 0.3em 0;
-        margin-bottom: 0.5em;
-        border: 1px solid #dfdfdf;
-        border-radius: 2px;
-        background-color: #fff;
-        cursor: pointer;
-    }
-    .search-admin .collection-list > li:last-child {
-        margin-bottom: 0;
-    }
-    .search-admin .collection-list > li:hover {
-        background-color: rgba(0, 0, 0, 0.03);
-    }
-    .search-admin .collection-list > li.active {
-        background-color: rgba(0, 0, 0, 0.06);
-        font-weight: bold;
-    }
-    /* The handle: same design as the values of the resource form. */
-    .search-admin .collection-item-handle {
-        align-self: stretch;
-        width: 12px;
-        margin: -0.3em 0;
-        background-color: #f0f0f0;
-        border-right: 1px solid #dfdfdf;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: move;
-    }
-    .search-admin .collection-item-handle::before {
-        font-size: 10px;
-        line-height: 1;
-    }
-    /* Accessible move buttons, stacked next to the handle. */
-    .search-admin .collection-item-moves {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-    .search-admin .collection-item-moves button,
-    .search-admin .collection-item-remove {
-        background: none;
-        border: none;
-        box-shadow: none;
-        padding: 0;
-        margin: 0;
-        min-height: 0;
-        width: 24px;
-        height: 24px;
-        line-height: 24px;
-        color: #676767;
-        font-size: 1.15em;
-        cursor: pointer;
-    }
-    .search-admin .collection-item-moves button:hover,
-    .search-admin .collection-item-moves button:focus-visible {
-        color: #000;
-        background-color: rgba(0, 0, 0, 0.08);
-        border-radius: 3px;
-    }
-    .search-admin .collection-item-remove:hover,
-    .search-admin .collection-item-remove:focus-visible {
-        color: #e11717;
-        background-color: rgba(169, 25, 25, 0.08);
-        border-radius: 3px;
-    }
-    .search-admin .collection-item-moves button:disabled,
-    .search-admin .collection-item-moves button:disabled:hover {
-        color: #676767;
-        opacity: 0.25;
-        background: none;
-        cursor: default;
-    }
-    .search-admin .collection-item-remove {
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 2em;
-        height: 2em;
-        line-height: 2em;
-        text-align: center;
-        color: #a91919;
-        font-size: 0.85em;
-    }
-    .search-admin .collection-item-summary {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.25em 0.6em;
-        min-width: 0;
-        flex: 1;
-    }
-    .search-admin .collection-item-field,
-    .search-admin .collection-item-type,
-    .search-admin .collection-item-new {
-        font-weight: normal;
-        color: #676767;
-        font-size: 0.85em;
-    }
-    /* The type of an item is its icon. */
-    .search-admin .collection-item-type.input-type::before {
-        margin-right: 0;
-        width: 1.2em;
-    }
-    /* Fields laid out side by side. */
-    .search-admin .collection-inline {
-        display: flex;
-        gap: 1em;
-    }
-    .search-admin .collection-inline > .field {
-        flex: 1;
-        min-width: 0;
-    }
-    .search-admin .collection-inline > .field > .field-meta {
-        width: auto;
-        flex: none;
-        margin-right: 1em;
-    }
-    .search-admin .collection-inline > .field > .field-meta label {
-        max-width: none;
-        white-space: nowrap;
-    }
-    .search-admin .collection-inline > .field > .inputs {
-        width: auto;
-        flex: 1;
-    }
-    .search-admin .collection-inline input[type="number"] {
-        width: 6em;
-    }
-    /* One element by line. */
-    .search-admin .field:has([name$="[field_elements][]"]) .inputs > label {
-        display: block;
-        margin: 0;
-        padding: 0.25em 0;
-        line-height: 1.5;
-    }
-    /* The advanced fields of an item are folded. */
-    .search-admin .collection-advanced {
-        margin: 0.5em 0 1em;
-    }
-    .search-admin .collection-advanced-section {
-        margin: 1em 0 0.25em;
-        padding-bottom: 0.25em;
-        border-bottom: 1px solid #dfdfdf;
-        font-weight: bold;
-        font-size: 0.95em;
-        color: #4d4d4d;
-    }
-    .search-admin .collection-advanced > summary {
-        display: list-item;
-        cursor: pointer;
-        font-weight: bold;
-        margin-bottom: 0.5em;
+    .search-admin {
+        & .collection-empty {
+            margin: 0.5em 0;
+            color: #676767;
+        }
+        /* Only the selected item is displayed; the others stay in the form. */
+        & .collection-main {
+            & > fieldset {
+                display: none;
+                margin-top: 0;
+                &.collection-item-active {
+                    display: block;
+                }
+                /* The list identifies the item: its numbered legend is useless. */
+                & > legend {
+                    display: none;
+                }
+            }
+        }
+        & .collection-list {
+            & > li {
+                display: flex;
+                align-items: center;
+                gap: 0.4em;
+                position: relative;
+                padding: 0.3em 2em 0.3em 0;
+                margin-bottom: 0.5em;
+                border: 1px solid #dfdfdf;
+                border-radius: 2px;
+                background-color: #fff;
+                cursor: pointer;
+                &:last-child {
+                    margin-bottom: 0;
+                }
+                &:hover {
+                    background-color: rgba(0, 0, 0, 0.03);
+                }
+                &.active {
+                    background-color: rgba(0, 0, 0, 0.06);
+                    font-weight: bold;
+                }
+            }
+        }
+        /* The handle: same design as the values of the resource form. */
+        & .collection-item-handle {
+            align-self: stretch;
+            width: 12px;
+            margin: -0.3em 0;
+            background-color: #f0f0f0;
+            border-right: 1px solid #dfdfdf;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: move;
+            &::before {
+                font-size: 10px;
+                line-height: 1;
+            }
+        }
+        /* Accessible move buttons, stacked next to the handle. */
+        & .collection-item-moves {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        & .collection-item-moves button,
+        & .collection-item-remove {
+            background: none;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            margin: 0;
+            min-height: 0;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            color: #676767;
+            font-size: 1.15em;
+            cursor: pointer;
+        }
+        & .collection-item-moves button:hover,
+        & .collection-item-moves button:focus-visible {
+            color: #000;
+            background-color: rgba(0, 0, 0, 0.08);
+            border-radius: 3px;
+        }
+        & .collection-item-remove:hover,
+        & .collection-item-remove:focus-visible {
+            color: #e11717;
+            background-color: rgba(169, 25, 25, 0.08);
+            border-radius: 3px;
+        }
+        & .collection-item-moves button:disabled,
+        & .collection-item-moves button:disabled:hover {
+            color: #676767;
+            opacity: 0.25;
+            background: none;
+            cursor: default;
+        }
+        & .collection-item-remove {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 2em;
+            height: 2em;
+            line-height: 2em;
+            text-align: center;
+            color: #a91919;
+            font-size: 0.85em;
+        }
+        & .collection-item-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25em 0.6em;
+            min-width: 0;
+            flex: 1;
+        }
+        & .collection-item-field,
+        & .collection-item-type,
+        & .collection-item-new {
+            font-weight: normal;
+            color: #676767;
+            font-size: 0.85em;
+        }
+        /* The type of an item is its icon. */
+        & .collection-item-type.input-type::before {
+            margin-right: 0;
+            width: 1.2em;
+        }
+        /* Fields laid out side by side. */
+        & .collection-inline {
+            display: flex;
+            gap: 1em;
+            & > .field {
+                flex: 1;
+                min-width: 0;
+                & > .field-meta {
+                    width: auto;
+                    flex: none;
+                    margin-right: 1em;
+                }
+                & > .field-meta label {
+                    max-width: none;
+                    white-space: nowrap;
+                }
+                & > .inputs {
+                    width: auto;
+                    flex: 1;
+                }
+            }
+            & input[type="number"] {
+                width: 6em;
+            }
+        }
+        /* One element by line. */
+        & .field:has([name$="[field_elements][]"]) .inputs > label {
+            display: block;
+            margin: 0;
+            padding: 0.25em 0;
+            line-height: 1.5;
+        }
+        /* The advanced fields of an item are folded. */
+        & .collection-advanced {
+            margin: 0.5em 0 1em;
+        }
+        & .collection-advanced-section {
+            margin: 1em 0 0.25em;
+            padding-bottom: 0.25em;
+            border-bottom: 1px solid #dfdfdf;
+            font-weight: bold;
+            font-size: 0.95em;
+            color: #4d4d4d;
+        }
+        & .collection-advanced > summary {
+            display: list-item;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 0.5em;
+        }
     }
 }
 @media only screen and (max-width: 39.9375em) {
-    .search-admin .collection-wrapper {
-        display: block;
-    }
-    .search-admin .collection-side {
-        position: static;
-        max-width: none;
-        max-height: none;
-        margin-bottom: 1em;
+    .search-admin {
+        & .collection-wrapper {
+            display: block;
+        }
+        & .collection-side {
+            position: static;
+            max-width: none;
+            max-height: none;
+            margin-bottom: 1em;
+        }
     }
 }
 
@@ -554,174 +580,176 @@
     .input-type-checkboxfilter::before { content: "\f002"; }
     .input-type-selectrange::before { content: "\f548"; }
 
-    .search-admin .input-type-preview {
-        display: flex;
-        margin: 0 0 0.5em;
-        padding: 0.5em 0;
-        border-bottom: 1px solid #dfdfdf;
-    }
-    .search-admin .input-type-preview-title {
-        width: 30%;
-        flex: none;
-        padding-right: 12px;
-        font-size: 0.85em;
-        color: #676767;
-    }
-    .search-admin .input-type-preview-body {
-        flex: 1;
-        min-width: 0;
-        padding: 0.75em 1em;
-        background: #fff;
-        border: 1px dashed #c9c9c9;
-        border-radius: 3px;
-        pointer-events: none;
-        user-select: none;
-        font-size: 0.9em;
-    }
-    .search-admin .input-type-preview-body .preview-label {
-        display: block;
-        font-weight: bold;
-        margin-bottom: 0.4em;
-    }
-    .search-admin .input-type-preview-body input[type="text"],
-    .search-admin .input-type-preview-body input[type="number"],
-    .search-admin .input-type-preview-body select {
-        width: auto;
-        min-width: 10em;
-        max-width: 100%;
-        margin: 0 0.25em 0.25em 0;
-        display: inline-block;
-    }
-    .search-admin .input-type-preview-body select[multiple] {
-        height: auto;
-    }
-    .search-admin .input-type-preview-body .preview-list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-    }
-    .search-admin .input-type-preview-body .preview-list li {
-        margin: 0 0 0.2em;
-    }
-    .search-admin .input-type-preview-body .preview-list label {
-        display: inline;
-        font-weight: normal;
-    }
-    .search-admin .input-type-preview-body .preview-tree ul {
-        list-style: none;
-        margin: 0.2em 0 0 1.5em;
-        padding: 0;
-    }
-    .search-admin .input-type-preview-body .count {
-        color: #676767;
-    }
-    .search-admin .input-type-preview-body .preview-links a {
-        text-decoration: underline;
-    }
-    .search-admin .input-type-preview-body .preview-note {
-        margin: 0;
-        color: #676767;
-        font-style: italic;
-    }
-    .search-admin .input-type-preview-body .preview-inline {
-        display: flex;
-        gap: 0.5em;
-        flex-wrap: wrap;
-    }
-    .search-admin .input-type-preview-body .preview-advanced-row {
-        display: flex;
-        gap: 0.25em;
-        flex-wrap: wrap;
-        margin-bottom: 0.25em;
-    }
-    .search-admin .input-type-preview-body .preview-advanced-row select,
-    .search-admin .input-type-preview-body .preview-advanced-row input {
-        min-width: 0;
-        margin: 0;
-        flex: 1 1 6em;
-    }
-    .search-admin .input-type-preview-body .preview-advanced-row input {
-        flex: 2 1 8em;
-    }
-    .search-admin .input-type-preview-body .preview-button {
-        min-height: 0;
-        padding: 0.1em 0.6em;
-        margin: 0;
-    }
-    .search-admin .input-type-preview-body .preview-slider {
-        padding: 0.5em 0.25em 0;
-    }
-    .search-admin .input-type-preview-body .preview-slider-track {
-        display: block;
-        position: relative;
-        height: 6px;
-        margin: 0.5em 0.5em 1em;
-        background: #dfdfdf;
-        border-radius: 3px;
-    }
-    .search-admin .input-type-preview-body .preview-slider-fill {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        background: #676767;
-        border-radius: 3px;
-    }
-    .search-admin .input-type-preview-body .preview-slider-tick {
-        position: absolute;
-        top: -3px;
-        width: 2px;
-        height: 12px;
-        margin-left: -1px;
-        background: #b5b5b5;
-    }
-    .search-admin .input-type-preview-body .preview-see-more {
-        display: inline-block;
-        margin-top: 0.25em;
-        text-decoration: underline;
-        font-size: 0.9em;
-    }
-    .search-admin .input-type-preview-body .preview-pagination {
-        display: inline-block;
-        margin-top: 0.25em;
-    }
-    .search-admin .input-type-preview-body .preview-pagination .current {
-        font-weight: bold;
-    }
-    .search-admin .input-type-preview-body .preview-pagination a {
-        margin: 0 0.15em;
-        text-decoration: underline;
-    }
-    .search-admin .input-type-preview-body .preview-autosuggest {
-        position: relative;
-        display: inline-block;
-    }
-    .search-admin .input-type-preview-body .preview-autosuggest-list {
-        display: block;
-        border: 1px solid #dfdfdf;
-        border-top: none;
-        background: #fff;
-        font-size: 0.9em;
-    }
-    .search-admin .input-type-preview-body .preview-autosuggest-list span {
-        display: block;
-        padding: 0.1em 0.5em;
-    }
-    .search-admin .input-type-preview-body .preview-autosuggest-list span:first-child {
-        background: #f0f0f0;
-    }
-    .search-admin .input-type-preview-body .preview-slider-thumb {
-        position: absolute;
-        top: -5px;
-        width: 16px;
-        height: 16px;
-        margin-left: -8px;
-        background: #fff;
-        border: 2px solid #676767;
-        border-radius: 50%;
-    }
-    .search-admin .input-type-preview-body .preview-slider-values input {
-        width: 5em;
-        min-width: 0;
+    .search-admin {
+        & .input-type-preview {
+            display: flex;
+            margin: 0 0 0.5em;
+            padding: 0.5em 0;
+            border-bottom: 1px solid #dfdfdf;
+        }
+        & .input-type-preview-title {
+            width: 30%;
+            flex: none;
+            padding-right: 12px;
+            font-size: 0.85em;
+            color: #676767;
+        }
+        & .input-type-preview-body {
+            flex: 1;
+            min-width: 0;
+            padding: 0.75em 1em;
+            background: #fff;
+            border: 1px dashed #c9c9c9;
+            border-radius: 3px;
+            pointer-events: none;
+            user-select: none;
+            font-size: 0.9em;
+            & .preview-label {
+                display: block;
+                font-weight: bold;
+                margin-bottom: 0.4em;
+            }
+            & input[type="text"],
+            & input[type="number"],
+            & select {
+                width: auto;
+                min-width: 10em;
+                max-width: 100%;
+                margin: 0 0.25em 0.25em 0;
+                display: inline-block;
+            }
+            & select[multiple] {
+                height: auto;
+            }
+            & .preview-list {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                & li {
+                    margin: 0 0 0.2em;
+                }
+                & label {
+                    display: inline;
+                    font-weight: normal;
+                }
+            }
+            & .preview-tree ul {
+                list-style: none;
+                margin: 0.2em 0 0 1.5em;
+                padding: 0;
+            }
+            & .count {
+                color: #676767;
+            }
+            & .preview-links a {
+                text-decoration: underline;
+            }
+            & .preview-note {
+                margin: 0;
+                color: #676767;
+                font-style: italic;
+            }
+            & .preview-inline {
+                display: flex;
+                gap: 0.5em;
+                flex-wrap: wrap;
+            }
+            & .preview-advanced-row {
+                display: flex;
+                gap: 0.25em;
+                flex-wrap: wrap;
+                margin-bottom: 0.25em;
+                & select,
+                & input {
+                    min-width: 0;
+                    margin: 0;
+                    flex: 1 1 6em;
+                }
+                & input {
+                    flex: 2 1 8em;
+                }
+            }
+            & .preview-button {
+                min-height: 0;
+                padding: 0.1em 0.6em;
+                margin: 0;
+            }
+            & .preview-slider {
+                padding: 0.5em 0.25em 0;
+            }
+            & .preview-slider-track {
+                display: block;
+                position: relative;
+                height: 6px;
+                margin: 0.5em 0.5em 1em;
+                background: #dfdfdf;
+                border-radius: 3px;
+            }
+            & .preview-slider-fill {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                background: #676767;
+                border-radius: 3px;
+            }
+            & .preview-slider-tick {
+                position: absolute;
+                top: -3px;
+                width: 2px;
+                height: 12px;
+                margin-left: -1px;
+                background: #b5b5b5;
+            }
+            & .preview-see-more {
+                display: inline-block;
+                margin-top: 0.25em;
+                text-decoration: underline;
+                font-size: 0.9em;
+            }
+            & .preview-pagination {
+                display: inline-block;
+                margin-top: 0.25em;
+                & .current {
+                    font-weight: bold;
+                }
+                & a {
+                    margin: 0 0.15em;
+                    text-decoration: underline;
+                }
+            }
+            & .preview-autosuggest {
+                position: relative;
+                display: inline-block;
+            }
+            & .preview-autosuggest-list {
+                display: block;
+                border: 1px solid #dfdfdf;
+                border-top: none;
+                background: #fff;
+                font-size: 0.9em;
+                & span {
+                    display: block;
+                    padding: 0.1em 0.5em;
+                }
+                & span:first-child {
+                    background: #f0f0f0;
+                }
+            }
+            & .preview-slider-thumb {
+                position: absolute;
+                top: -5px;
+                width: 16px;
+                height: 16px;
+                margin-left: -8px;
+                background: #fff;
+                border: 2px solid #676767;
+                border-radius: 50%;
+            }
+            & .preview-slider-values input {
+                width: 5em;
+                min-width: 0;
+            }
+        }
     }
 }
 
@@ -737,13 +765,13 @@
     max-height: 60vh;
     overflow-y: auto;
     text-align: left;
-}
-.collection-suggestions li {
-    padding: 6px 0;
-    border-bottom: 1px solid #e7e7e7;
-}
-.collection-suggestions li:last-child {
-    border-bottom: 0;
+    & li {
+        padding: 6px 0;
+        border-bottom: 1px solid #e7e7e7;
+        &:last-child {
+            border-bottom: 0;
+        }
+    }
 }
 .collection-suggestion-reason {
     color: #676767;

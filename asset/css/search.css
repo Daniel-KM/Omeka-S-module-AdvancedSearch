@@ -16,143 +16,142 @@
     /* Search form */
     .form-search {
         margin-bottom: 24px;
-    }
-    .form-search fieldset {
-        border: 0;
-        margin: 0 0 36px;
-        padding: 0;
-    }
-    .form-search fieldset > fieldset{
-        margin: 0;
-    }
-    .form-search input[type="search"] {
-        appearance: none;
-        border-radius: 0;
-        height: 36px;
-        border: 1px solid rgba(0,0,0,.15);
-        padding: 6px;
-        width: 100%;
-        min-height: 36px;
-        margin: 0;
-    }
-    .form-search label.search-submit {
-        display: none;
-    }
-    /* The buttons are aligned to the right without float: a float makes the
-       next block (the results) wrap beside the button, like a column. */
-    .form-search .search-form-buttons {
-        display: flex;
-        gap: 10px;
-        justify-content: flex-end;
-    }
-    .form-search button.search-submit {
-        float: none;
-    }
-    .form-search .chosen-container-single .chosen-single,
-    .form-search .chosen-container-multi .chosen-choices {
-        height: 36px;
-    }
+        & fieldset {
+            border: 0;
+            margin: 0 0 36px;
+            padding: 0;
+            & > fieldset {
+                margin: 0;
+            }
+        }
+        & input[type="search"] {
+            appearance: none;
+            border-radius: 0;
+            height: 36px;
+            border: 1px solid rgba(0,0,0,.15);
+            padding: 6px;
+            width: 100%;
+            min-height: 36px;
+            margin: 0;
+        }
+        & label.search-submit {
+            display: none;
+        }
+        & .search-form-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        & button.search-submit {
+            float: none;
+        }
+        & .chosen-container-single .chosen-single,
+        & .chosen-container-multi .chosen-choices {
+            height: 36px;
+        }
 
-    /* Inline radios and checkboxes. */
-    .form-search .field .inputs > label {
-        display: inline-flex;
-        align-items: baseline;
-        gap: 0.35em;
-        margin-right: 1em;
-    }
-    .form-search .field .inputs > label:last-child {
-        margin-right: 0;
-    }
-    .form-search .field .inputs > label > input[type=radio],
-    .form-search .field .inputs > label > input[type=checkbox] {
-        flex: 0 0 auto;
-        margin: 0;
-    }
+        /* Inline radios and checkboxes. */
+        & .field {
+            & .inputs {
+                & > label {
+                    display: inline-flex;
+                    align-items: baseline;
+                    gap: 0.35em;
+                    margin-right: 1em;
+                }
+                & > label:last-child {
+                    margin-right: 0;
+                }
+                & > label > input[type=radio],
+                & > label > input[type=checkbox] {
+                    flex: 0 0 auto;
+                    margin: 0;
+                }
 
-    /* A text input fills the width of its column. */
-    .form-search .field .inputs > input[type=text],
-    .form-search .field .inputs > input[type=search] {
-        width: 100%;
+                /* A text input fills the width of its column. */
+                & > input[type=text],
+                & > input[type=search] {
+                    width: 100%;
+                }
+            }
+        }
     }
 
     /* Search form filters */
 
-    /* The advanced filters use the whole width and the button to add a filter is
-       below them, so they fit any theme. A theme with the labels on the left of
-       the inputs, like the default theme, can align them on its grid with the
-       stylesheet search-grid.css. */
+    /* A theme with the labels on the left of the inputs, like the default theme,
+       can align them on grid with the stylesheet search-grid.css. */
     .search-filters-advanced {
         --search-filter-gap: 6px;
         --search-filter-button-size: max(24px, 45px);
         display: flex;
         flex-direction: column;
         margin: 30px 0;
-    }
-    .search-filters-advanced > legend {
-        padding: 7.5px 0;
-        /* A legend is bold and bigger by default: it is a label of a field
-           like the other ones. */
-        font-size: inherit;
-        font-weight: inherit;
-    }
-    .search-filters-advanced > legend[hidden] {
-        display: none;
-    }
-    .search-filters-advanced .filter {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: var(--search-filter-gap);
-        margin-bottom: var(--search-filter-gap);
-    }
-    .search-filters-advanced .filter[hidden] {
-        display: none;
-    }
-    .search-filters-advanced:not(.has-joiner-not) .filter:first-of-type select[name$="[join]"] {
-        display: none;
-    }
-    .search-filters-advanced .filter > select {
-        flex: 0 0 auto;
-        width: auto;
-    }
-    /* The text input takes all the remaining width. */
-    .search-filters-advanced .filter > input[type=text] {
-        flex: 1 1 12em;
-        width: 100%;
-        min-width: 0;
-    }
-    .search-filters-advanced .filter .field {
-        display: contents;
-    }
-    .search-filters-advanced .filter .field .field-meta {
-        display: none;
-    }
-    .search-filters-advanced .filter .field .inputs {
-        flex: 0 0 auto;
-        width: auto;
-        padding: 0;
-    }
-    /* The buttons are square, as high as the input next to them. */
-    .search-filters-advanced .search-filter-action {
-        flex: 0 0 auto;
-        width: var(--search-filter-button-size);
-        height: var(--search-filter-button-size);
-        aspect-ratio: 1;
-        min-width: 24px;
-        min-height: 24px;
-        padding: 0;
-        line-height: 1;
-        text-align: center;
-    }
-    .search-filters-advanced > .search-filter-plus {
-        order: 1;
-        align-self: flex-start;
-    }
-    .search-filters-advanced .search-filter-plus::before {
-        content: "+";
-    }
-    .search-filters-advanced .search-filter-minus::before {
-        content: "\2212";
+        & > legend {
+            padding: 7.5px 0;
+            font-size: inherit;
+            font-weight: inherit;
+            &[hidden] {
+                display: none;
+            }
+        }
+        & .filter {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: var(--search-filter-gap);
+            margin-bottom: var(--search-filter-gap);
+            &[hidden] {
+                display: none;
+            }
+        }
+        &:not(.has-joiner-not) .filter:first-of-type select[name$="[join]"] {
+            display: none;
+        }
+        & .filter {
+            & > select {
+                flex: 0 0 auto;
+                width: auto;
+            }
+            /* The text input takes all the remaining width. */
+            & > input[type=text] {
+                flex: 1 1 12em;
+                width: 100%;
+                min-width: 0;
+            }
+            & .field {
+                display: contents;
+                & .field-meta {
+                    display: none;
+                }
+                & .inputs {
+                    flex: 0 0 auto;
+                    width: auto;
+                    padding: 0;
+                }
+            }
+        }
+        & .search-filter-action {
+            flex: 0 0 auto;
+            width: var(--search-filter-button-size);
+            height: var(--search-filter-button-size);
+            aspect-ratio: 1;
+            min-width: 24px;
+            min-height: 24px;
+            padding: 0;
+            line-height: 1;
+            text-align: center;
+        }
+        & > .search-filter-plus {
+            order: 1;
+            align-self: flex-start;
+        }
+        & .search-filter-plus::before {
+            content: "+";
+        }
+        & .search-filter-minus::before {
+            content: "\2212";
+        }
     }
 
     /* Search results */
@@ -207,33 +206,36 @@
     .search-sort label {
         white-space: nowrap;
     }
-    /* Pagination arrows and page indicator stay aligned. */
     .search-results-count {
         flex-wrap: nowrap;
         white-space: nowrap;
-    }
-    .search-results-count .pagination,
-    .search-results-count nav.pagination {
-        display: inline-flex;
-        align-items: center;
-        flex-wrap: nowrap;
-        gap: 4px;
-    }
-
-    .search-results .search-filters {
-        width: 100%;
-        flex: 0 0 100%;
-        padding-left: 0;
-    }
-    .search-results .search-filters .filter a {
-        color: inherit;
-    }
-    .search-results .search-filters .filter a::after {
-        content: none;
+        & .pagination,
+        & nav.pagination {
+            display: inline-flex;
+            align-items: center;
+            flex-wrap: nowrap;
+            gap: 4px;
+        }
     }
 
-    /* The view types are buttons displayed as links. */
-    button.search-view-type {
+    .search-results {
+        & .search-filters {
+            width: 100%;
+            flex: 0 0 100%;
+            padding-left: 0;
+            & .filter {
+                & a {
+                    color: inherit;
+                }
+                & a::after {
+                    content: none;
+                }
+            }
+        }
+    }
+
+    /* Zero specificity, so a theme can style the buttons. */
+    :where(button.search-view-type) {
         padding: 0;
         border: 0;
         background: none;
@@ -255,83 +257,87 @@
     .search-results-count.no-total-results .row-count {
         display: none;
     }
-    .search-results .resource-list .resource-heading {
-        font-weight: bold;
-    }
-    /* Search results (list) */
-    .search-results .resource-list.list {
-        flex-direction: column;
-    }
-    .search-results .resource-list.list .resource {
-        display: flex;
-        flex-flow: row wrap;
-        align-items: flex-start;
-        padding: 6px 0 5px;
-    }
-    .search-results .resource-list.list .resource-thumbnail {
-        margin-left: auto;
-    }
-    .search-results .resource-list.list .resource-thumbnail .resource-link img {
-        max-width: 60px;
-        max-height: 60px;
-        width: auto;
-        height: auto;
-        margin: 0 0 0 auto;
-        padding: 0;
-    }
-    .search-results .resource-list.list .resource-heading {
-        flex-basis: calc(100% - 66px);
-    }
-    .search-results .resource-list.list .resource-metadata,
-    .search-results .resource-list.list .resource-body {
-        flex-basis: 100%;
-    }
-    .search-results .resource-list.grid .only-list,
-    .search-results .resource-list.list .only-grid,
-    .search-results .resource-list .hidden-both {
-        display: none;
-    }
+    .search-results {
+        & .resource-list {
+            & .resource-heading {
+                font-weight: bold;
+            }
+            /* Search results (list) */
+            &.list {
+                flex-direction: column;
+            }
+            &.list .resource {
+                display: flex;
+                flex-flow: row wrap;
+                align-items: flex-start;
+                padding: 6px 0 5px;
+            }
+            &.list .resource-thumbnail {
+                margin-left: auto;
+            }
+            &.list .resource-thumbnail .resource-link img {
+                max-width: 60px;
+                max-height: 60px;
+                width: auto;
+                height: auto;
+                margin: 0 0 0 auto;
+                padding: 0;
+            }
+            &.list .resource-heading {
+                flex-basis: calc(100% - 66px);
+            }
+            &.list .resource-metadata,
+            &.list .resource-body {
+                flex-basis: 100%;
+            }
+            &.grid .only-list,
+            &.list .only-grid,
+            & .hidden-both {
+                display: none;
+            }
 
-    /* Search results (grid) */
-    .search-results .resource-list.grid {
-        display: flex;
-        flex-wrap: wrap;
-        flex-direction: row;
-        justify-content: start;
-        align-items: stretch;
-        align-content: start;
-        gap: 18px 18px;
-        padding: initial;
-        margin: initial;
-    }
-    .search-results .resource-list.grid .resource {
-        display: flex;
-        flex-flow: column wrap;
-        flex: 1 1 200px;
-        row-gap: 6px;
-        align-items: flex-start;
-        width: 0;
-        margin: 0;
-        padding: 0 0 12px;
-    }
-    .search-results .resource-list.grid .resource-thumbnail {
-        display: flex;
-        justify-content: center;
-    }
-    .search-results .resource-list.grid .resource-thumbnail img {
-        max-width: 200px;
-        max-height: 200px;
-        width: auto;
-        height: auto;
-        margin: 0;
-        padding: 0;
-    }
-    .search-results .resource-list.grid .resource-heading {
-        justify-content: center;
-    }
-    /* Old .resource-metadata was replaced by .resource-body. */
-    .search-results .resource-list.grid .resource-body {
-        display: none;
+            /* Search results (grid) */
+            &.grid {
+                display: flex;
+                flex-wrap: wrap;
+                flex-direction: row;
+                justify-content: start;
+                align-items: stretch;
+                align-content: start;
+                gap: 18px 18px;
+                padding: initial;
+                margin: initial;
+            }
+            &.grid .resource {
+                display: flex;
+                flex-flow: column wrap;
+                flex: 1 1 200px;
+                row-gap: 6px;
+                align-items: flex-start;
+                width: 0;
+                margin: 0;
+                padding: 0 0 12px;
+            }
+            &.grid .resource-thumbnail {
+                display: flex;
+                justify-content: center;
+            }
+            &.grid .resource-thumbnail img {
+                max-width: 200px;
+                max-height: 200px;
+                width: auto;
+                height: auto;
+                margin: 0;
+                padding: 0;
+            }
+            &.grid .resource-heading {
+                justify-content: center;
+            }
+            /* Old .resource-metadata was replaced by .resource-body. */
+            &.grid .resource-body {
+                display: none;
+            }
+        }
     }
 
     /* Active facets */
@@ -343,25 +349,25 @@
         list-style: none;
         margin: 0 0 6px;
         padding-left: 0;
-    }
-    .facets-active .facet-active {
-        display: inline-block;
-        font-size: 13.08px;
-        margin: 0 6px 6px 0;
-        padding: 0;
-        vertical-align: top;
-        background-color: #f0f0f0;
-        border-radius: 3px;
-    }
-    .facets-active .facet-active .facet-active-label {
-        padding: 0 6px;
-        display: inline-block;
-        background-color: rgba(0,0,0,.04);
-        border-radius: 3px 0 0 3px;
-    }
-    .facets-active .facet-active .facet-active-value {
-        padding: 0 6px;
-        color: inherit;
+        & .facet-active {
+            display: inline-block;
+            font-size: 13.08px;
+            margin: 0 6px 6px 0;
+            padding: 0;
+            vertical-align: top;
+            background-color: #f0f0f0;
+            border-radius: 3px;
+            & .facet-active-label {
+                padding: 0 6px;
+                display: inline-block;
+                background-color: rgba(0,0,0,.04);
+                border-radius: 3px 0 0 3px;
+            }
+            & .facet-active-value {
+                padding: 0 6px;
+                color: inherit;
+            }
+        }
     }
     .facets-active .facet-active .facet-active-remove,
     .search-results .search-filters .filter a.filter-remove,
@@ -403,112 +409,116 @@
     .facet h4 {
         margin-bottom: 0.5em;
     }
-    .facets .facet-button {
-        display: block;
-        background: initial;
-        border: none;
-        border-bottom: 1px inset transparent;
-        box-shadow: initial;
-        text-align: initial;
-        cursor: pointer;
-        width: 100%;
-        padding: 0;
-        margin: 0 0 0.5em 0;
-        font-weight: bold;
-    }
-    .facets .facet-button:hover {
-        box-shadow: initial;
-        border-bottom: 1px inset;
-        border-radius: 0;
-    }
-    .facets .facet-button::after {
-        float: right;
-        content: '🞃';
-        position: unset;
-        width: auto;
-        height: auto;
-        padding: 0;
-        border: none;
-        background: none;
-    }
-    .facets .facet-button.collapse::after {
-        content: '🞃';
-    }
-    /* Fix for the default public theme. */
-    /*
-    .facets .facet-button.collapse + .collapsible {
-        padding: 7.5px 0 7.5px 16px;
-    }
-    */
-    .facets .facet-button.expand::after {
-        content: '🞂';
+    .facets {
+        & .facet-button {
+            display: block;
+            background: initial;
+            border: none;
+            border-bottom: 1px inset transparent;
+            box-shadow: initial;
+            text-align: initial;
+            cursor: pointer;
+            width: 100%;
+            padding: 0;
+            margin: 0 0 0.5em 0;
+            font-weight: bold;
+            &:hover {
+                box-shadow: initial;
+                border-bottom: 1px inset;
+                border-radius: 0;
+            }
+            &::after {
+                float: right;
+                content: '🞃';
+                position: unset;
+                width: auto;
+                height: auto;
+                padding: 0;
+                border: none;
+                background: none;
+            }
+            &.collapse::after {
+                content: '🞃';
+            }
+            /* Fix for the default public theme. */
+            /*
+            &.collapse + .collapsible {
+                padding: 7.5px 0 7.5px 16px;
+            }
+            */
+            &.expand::after {
+                content: '🞂';
+            }
+        }
     }
 
     .facet-items {
         padding-left: 0;
         list-style: none;
+        & li:not([hidden]) {
+            display: flex;
+            align-items: baseline;
+            gap: 0.4em;
+        }
+        & li[data-level="1"] {
+            margin-left: 1.4em;
+        }
+        & li[data-level="2"] {
+            margin-left: 2.8em;
+        }
+        & li[data-level="3"] {
+            margin-left: 4.2em;
+        }
+        & li[data-level="4"] {
+            margin-left: 5.6em;
+        }
+        & li[data-level="5"] {
+            margin-left: 7em;
+        }
+        & li[data-level="6"] {
+            margin-left: 8.4em;
+        }
+        & li[data-level="7"] {
+            margin-left: 9.8em;
+        }
+        & li[data-level="8"] {
+            margin-left: 11.2em;
+        }
+        & li[data-level="9"] {
+            margin-left: 12.6em;
+        }
+        & li[data-level="10"] {
+            margin-left: 14em;
+        }
+        & li[data-level="11"] {
+            margin-left: 15.4em;
+        }
+        & li[data-level="12"] {
+            margin-left: 16.8em;
+        }
     }
-    .facet-items li:not([hidden]) {
-        display: flex;
-        align-items: baseline;
-        gap: 0.4em;
-    }
-    .facet-items li[data-level="1"] {
-        margin-left: 1.4em;
-    }
-    .facet-items li[data-level="2"] {
-        margin-left: 2.8em;
-    }
-    .facet-items li[data-level="3"] {
-        margin-left: 4.2em;
-    }
-    .facet-items li[data-level="4"] {
-        margin-left: 5.6em;
-    }
-    .facet-items li[data-level="5"] {
-        margin-left: 7em;
-    }
-    .facet-items li[data-level="6"] {
-        margin-left: 8.4em;
-    }
-    .facet-items li[data-level="7"] {
-        margin-left: 9.8em;
-    }
-    .facet-items li[data-level="8"] {
-        margin-left: 11.2em;
-    }
-    .facet-items li[data-level="9"] {
-        margin-left: 12.6em;
-    }
-    .facet-items li[data-level="10"] {
-        margin-left: 14em;
-    }
-    .facet-items li[data-level="11"] {
-        margin-left: 15.4em;
-    }
-    .facet-items li[data-level="12"] {
-        margin-left: 16.8em;
-    }
-    .facet-item input[type=checkbox] {
-        vertical-align: initial;
-    }
-    .facet-item a {
-        color: inherit;
-    }
-    .facet-item a::before {
-        display: inline-block;
-        font-family: 'Font Awesome 5 Free';
-        width: 1.5em;
-        content: "\f0c8";
-    }
-    .facet-item.active a::before {
-        content: "\f14a";
-    }
-    .facet-item label {
-        white-space: normal;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        word-break: break-word;
+    .facet-item {
+        & input[type=checkbox] {
+            vertical-align: initial;
+        }
+        & a {
+            color: inherit;
+            &::before {
+                display: inline-block;
+                font-family: 'Font Awesome 5 Free';
+                width: 1.5em;
+                content: "\f0c8";
+            }
+        }
+        &.active a::before {
+            content: "\f14a";
+        }
+        & label {
+            white-space: normal;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
     }
 
     .facet-search-input {
@@ -534,15 +544,15 @@
         cursor: pointer;
         padding: 6px 10px;
         margin: 0;
-    }
-    .facet-see-more-or-less::after {
-        margin-left: 0.4em;
-    }
-    .facet-see-more-or-less.expand::after {
-        content: "🞃";
-    }
-    .facet-see-more-or-less.collapse::after {
-        content: "🞁";
+        &::after {
+            margin-left: 0.4em;
+        }
+        &.expand::after {
+            content: "🞃";
+        }
+        &.collapse::after {
+            content: "🞁";
+        }
     }
 
     .facet-pagination {
@@ -551,25 +561,25 @@
         align-items: center;
         gap: 0.2em;
         margin: 0.5em 0;
-    }
-    .facet-pagination button {
-        background: none;
-        border: 1px solid #ccc;
-        border-radius: 3px;
-        cursor: pointer;
-        padding: 2px 6px;
-        font-size: 1em;
-        line-height: 1;
-        min-width: 1.8em;
-        text-align: center;
-        box-shadow: none;
-    }
-    .facet-pagination button:hover:not(:disabled) {
-        background-color: #f0f0f0;
-    }
-    .facet-pagination button:disabled {
-        opacity: 0.3;
-        cursor: default;
+        & button {
+            background: none;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            cursor: pointer;
+            padding: 2px 6px;
+            font-size: 1em;
+            line-height: 1;
+            min-width: 1.8em;
+            text-align: center;
+            box-shadow: none;
+            &:hover:not(:disabled) {
+                background-color: #f0f0f0;
+            }
+            &:disabled {
+                opacity: 0.3;
+                cursor: default;
+            }
+        }
     }
     .facet-page-indicator {
         display: inline-flex;
@@ -579,10 +589,10 @@
         padding: 0 0.3em;
         white-space: nowrap;
         line-height: 1;
-    }
-    .facet-page-indicator .page-count,
-    .facet-page-indicator .facet-page-current {
-        line-height: 1;
+        & .page-count,
+        & .facet-page-current {
+            line-height: 1;
+        }
     }
     .facet-page-input {
         width: 3.5em;
@@ -595,37 +605,37 @@
         border-radius: 3px;
         box-sizing: border-box;
         -moz-appearance: textfield;
-    }
-    .facet-page-input::-webkit-outer-spin-button,
-    .facet-page-input::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
+        &::-webkit-outer-spin-button,
+        &::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
     }
 
     /* Search range */
-    /* Render gradient on .range-progress; native tracks are invisible to fix Chrome. */
 
+    /* Render gradient on .range-progress; native tracks are invisible to fix Chrome. */
     .range-double {
         display: flex;
         flex-direction: column;
         gap: 1em;
         margin: 1em auto;
-    }
-    .range-double .range-sliders {
-        position: relative;
-        height: 1em;
-        display: flex;
-        align-items: center;
-    }
-    /* Invisible track to keep thumbs interactive. Events are re-enabled below. */
-    .range-double input[type=range] {
-        -webkit-appearance: none;
-        appearance: none;
-        height: 0;
-        width: 100%;
-        position: absolute;
-        background: transparent;
-        pointer-events: none;
+        & .range-sliders {
+            position: relative;
+            height: 1em;
+            display: flex;
+            align-items: center;
+        }
+        /* Invisible track to keep thumbs interactive. Events are re-enabled below. */
+        & input[type=range] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 0;
+            width: 100%;
+            position: absolute;
+            background: transparent;
+            pointer-events: none;
+        }
     }
     /* Chrome/WebKit-only: lift thumbs over the progress bar. */
     @supports selector(input::-webkit-slider-thumb) {
@@ -635,186 +645,190 @@
     }
     /* Allow pointer events on tracks for both engines. */
     /* Important: do not merge these two rules and keep order. */
-    .range-double input[type=range]::-moz-range-track {
-        pointer-events: all;
-        cursor: pointer;
-        background: transparent;
-        height: 0;
-        border: 0;
-    }
-    .range-double input[type=range]::-webkit-slider-runnable-track {
-        pointer-events: all;
-        cursor: pointer;
-        background: transparent;
-        height: 0;
-        border: 0;
-    }
-    /* Thumbs remain clickable */
-    /* Important: do not merge these two rules and keep order to fix chrome. */
-    .range-double input[type=range]::-moz-range-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        pointer-events: all;
-        cursor: pointer;
-        height: 1em;
-        width: 1em;
-        border-radius: 50%;
-        background: #666;
-        border: 2px solid #fff;
-    }
-    .range-double input[type=range]::-webkit-slider-thumb {
-        -webkit-appearance: none;
-        appearance: none;
-        pointer-events: all;
-        cursor: pointer;
-        height: 1em;
-        width: 1em;
-        border-radius: 50%;
-        background: #666;
-        border: 2px solid #fff;
-    }
-    .range-double input.range-slider-from[type=range] {
-        z-index: 1;
-    }
-    .range-double input.range-slider-to[type=range] {
-        z-index: 0;
-    }
-    /* Visible progress bar with base track and active segment overlay */
-    .range-double .range-progress {
-        position: absolute;
-        left: 0;
-        right: 0;
-        height: 0.2em;
-        border-radius: 0.1em;
-        background: #e9e9ed;
-        overflow: hidden;
-    }
-    .range-double .range-progress::before {
-        content: '';
-        position: absolute;
-        height: 100%;
-        left: var(--from, 0%);
-        right: calc(100% - var(--to, 100%));
-        background: linear-gradient(90deg, #3b82f6, #3b82f6);
-    }
+    .range-double {
+        & input[type=range]::-moz-range-track {
+            pointer-events: all;
+            cursor: pointer;
+            background: transparent;
+            height: 0;
+            border: 0;
+        }
+        & input[type=range]::-webkit-slider-runnable-track {
+            pointer-events: all;
+            cursor: pointer;
+            background: transparent;
+            height: 0;
+            border: 0;
+        }
+        /* Thumbs remain clickable */
+        /* Important: do not merge these two rules and keep order to fix chrome. */
+        & input[type=range]::-moz-range-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            pointer-events: all;
+            cursor: pointer;
+            height: 1em;
+            width: 1em;
+            border-radius: 50%;
+            background: #666;
+            border: 2px solid #fff;
+        }
+        & input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            pointer-events: all;
+            cursor: pointer;
+            height: 1em;
+            width: 1em;
+            border-radius: 50%;
+            background: #666;
+            border: 2px solid #fff;
+        }
+        & input.range-slider-from[type=range] {
+            z-index: 1;
+        }
+        & input.range-slider-to[type=range] {
+            z-index: 0;
+        }
+        /* Visible progress bar with base track and active segment overlay */
+        & .range-progress {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 0.2em;
+            border-radius: 0.1em;
+            background: #e9e9ed;
+            overflow: hidden;
+            &::before {
+                content: '';
+                position: absolute;
+                height: 100%;
+                left: var(--from, 0%);
+                right: calc(100% - var(--to, 100%));
+                background: linear-gradient(90deg, #3b82f6, #3b82f6);
+            }
+        }
 
-    .range-double[data-scale-ticks="1"] .range-sliders {
-        padding-bottom: 2em;
-    }
-    .range-double .range-ticks {
-        position: absolute;
-        left: 0;
-        right: 0;
-        top: 1.4em;
-        height: 1em;
-        pointer-events: none;
-        font-size: 0.75em;
-        color: #666;
-    }
-    .range-double .range-tick {
-        position: absolute;
-        transform: translateX(-50%);
-        white-space: nowrap;
-    }
-    .range-double .range-tick::before {
-        content: '';
-        position: absolute;
-        left: 50%;
-        top: -0.4em;
-        width: 1px;
-        height: 0.4em;
-        background: #999;
-    }
+        &[data-scale-ticks="1"] .range-sliders {
+            padding-bottom: 2em;
+        }
+        & .range-ticks {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 1.4em;
+            height: 1em;
+            pointer-events: none;
+            font-size: 0.75em;
+            color: #666;
+        }
+        & .range-tick {
+            position: absolute;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            &::before {
+                content: '';
+                position: absolute;
+                left: 50%;
+                top: -0.4em;
+                width: 1px;
+                height: 0.4em;
+                background: #999;
+            }
+        }
 
-    .range-double .range-numerics {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 1em;
+        & .range-numerics {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1em;
+        }
+        & .range-numeric {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 0.4em;
+            & > input[type=number] {
+                width: auto;
+            }
+        }
+        & .range-numerics-button {
+            gap: 0.4em;
+        }
+        & input[type=number] {
+            border: none;
+        }
     }
-    .range-double .range-numeric {
-        display: inline-flex;
-        align-items: baseline;
-        gap: 0.4em;
-    }
-    .range-double .range-numeric > input[type=number] {
-        width: auto;
-    }
-    .range-double .range-numerics-button {
-        gap: 0.4em;
-    }
-    .range-double input[type=number] {
-        border: none;
-    }
-    .facets .range-double .range-numerics {
-        flex-wrap: nowrap;
-    }
-    .facets .range-double .range-numeric input {
-        width:  100%;
+    .facets {
+        & .range-double {
+            & .range-numerics {
+                flex-wrap: nowrap;
+            }
+            & .range-numeric input {
+                width:  100%;
+            }
+        }
     }
 
     /* Autocomplete: see common-autocomplete.css (module Common). */
 
     /* Breadcrumbs */
 
-    nav.breadcrumbs > ul,
-    nav.breadcrumbs > ol {
-        list-style: none;
+    nav.breadcrumbs {
+        & > ul,
+        & > ol {
+            list-style: none;
+            & > li {
+                display: inline;
+            }
+        }
     }
-    nav.breadcrumbs > ul > li,
-    nav.breadcrumbs > ol > li {
-        display: inline;
+
+    /* Search results map view */
+
+    .search-results-map {
+        width: 100%;
+        margin: 1em 0;
     }
-}
+    .search-map {
+        width: 100%;
+        min-height: 500px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    .search-view-type-map {
+        cursor: pointer;
+    }
+    .search-map-popup {
+        & .popup-title {
+            font-weight: bold;
+            margin-bottom: 0.5em;
+        }
+        & .popup-thumbnail {
+            max-width: 150px;
+            margin-bottom: 0.5em;
+        }
+        & .popup-metadata {
+            font-size: 0.9em;
+            color: #666;
+            & .metadata-label {
+                font-weight: 600;
+            }
+        }
+        & .popup-link {
+            margin-top: 0.5em;
+        }
+    }
 
-/* Search results map view */
+    /* Resource navigation (prev/next on item page). */
 
-.search-results-map {
-    width: 100%;
-    margin: 1em 0;
-}
-
-.search-map {
-    width: 100%;
-    min-height: 500px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.search-view-type-map {
-    cursor: pointer;
-}
-
-/* Map popup styling */
-.search-map-popup .popup-title {
-    font-weight: bold;
-    margin-bottom: 0.5em;
-}
-
-.search-map-popup .popup-thumbnail {
-    max-width: 150px;
-    margin-bottom: 0.5em;
-}
-
-.search-map-popup .popup-metadata {
-    font-size: 0.9em;
-    color: #666;
-}
-
-.search-map-popup .popup-metadata .metadata-label {
-    font-weight: 600;
-}
-
-.search-map-popup .popup-link {
-    margin-top: 0.5em;
-}
-
-/* Resource navigation (prev/next on item page). */
-.block-resource-nav .resource-nav {
-    display: flex;
-    align-items: center;
-    gap: 0.5em;
-}
-.block-resource-nav .resource-nav-context {
-    margin-right: 0.5em;
+    .block-resource-nav {
+        & .resource-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+        & .resource-nav-context {
+            margin-right: 0.5em;
+        }
+    }
 }

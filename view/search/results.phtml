@@ -130,7 +130,7 @@ $renderProperties = function ($resource, array $propertiesList, string $classes)
 };
 ?>
 
-<ul class="resource-list search-result-list<?= $gridListMode === 'list_only' ? ' list only-mode' : ($gridListMode === 'grid_only' ? ' grid only-mode' : ' grid') ?>">
+<ul class="resource-list search-result-list<?= ['list' => ' list', 'list_only' => ' list only-mode', 'grid_only' => ' grid only-mode'][$gridListMode] ?? ' grid' ?>">
     <?php /** @var \Omeka\Api\Representation\AbstractResourceEntityRepresentation $resource */
     foreach ($resources as $resource):
         $resourceUrl = isset($site) ? $resource->siteUrl($siteSlug) : $resource->adminUrl();

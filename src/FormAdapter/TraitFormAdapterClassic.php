@@ -184,6 +184,7 @@ trait TraitFormAdapterClassic
         $sortBy = null;
         $sortOrder = null;
 
+        $request = $this->convertPropertyToFilter($request);
         $request = $searchResources->expandFieldQueryArgs($request);
 
         foreach ($request as $name => $value) {
@@ -845,5 +846,34 @@ trait TraitFormAdapterClassic
         }
         $availableSortFields = $engineAdapter->getAvailableSortFields();
         return array_intersect_key($sortFieldsSettings, $availableSortFields);
+    }
+
+    /**
+     * Convert the core arguments "property" into filters.
+     *
+     * Links built by the core or by other modules (Reference, etc.) use the
+     * standard query, for example when the item browse page is replaced by a
+     * search page.
+     */
+    protected function convertPropertyToFilter(array $request): array
+    {
+        if (empty($request['property']) || !is_array($request['property'])) {
+            return $request;
+        }
+        foreach ($request['property'] as $row) {
+            if (!is_array($row) || empty($row['property'])) {
+                continue;
+            }
+            foreach ((array) $row['property'] as $field) {
+                $request['filter'][] = [
+                    'join' => $row['joiner'] ?? 'and',
+                    'field' => (string) $field,
+                    'type' => $row['type'] ?? 'eq',
+                    'val' => $row['text'] ?? '',
+                ];
+            }
+        }
+        unset($request['property']);
+        return $request;
     }
 }

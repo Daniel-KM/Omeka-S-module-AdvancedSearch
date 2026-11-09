@@ -22,22 +22,21 @@
     font-weight: bold;
     text-align: left;
     cursor: pointer;
-}
+    &:hover,
+    &:focus {
+        background: none;
+        box-shadow: none;
+    }
 
-.grouped-checkboxes-heading:hover,
-.grouped-checkboxes-heading:focus {
-    background: none;
-    box-shadow: none;
-}
+    &::before {
+        display: inline-block;
+        width: 1em;
+        content: '\25b8';
+    }
 
-.grouped-checkboxes-heading::before {
-    display: inline-block;
-    width: 1em;
-    content: '\25b8';
-}
-
-.grouped-checkboxes-heading[aria-expanded='true']::before {
-    content: '\25be';
+    &[aria-expanded='true']::before {
+        content: '\25be';
+    }
 }
 
 .grouped-checkboxes-count {
@@ -83,11 +82,11 @@
     font-size: 0.9em;
     width: auto;
     flex: 0 0 auto;
-}
-.item-sets-redirect-choice input[type=radio] {
-    margin: 0;
-    width: auto;
-    flex: 0 0 auto;
+    & input[type=radio] {
+        margin: 0;
+        width: auto;
+        flex: 0 0 auto;
+    }
 }
 .item-sets-redirect-target {
     flex: 1 1 8em;

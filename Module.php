@@ -92,12 +92,14 @@ class Module extends AbstractModule
         // Similarly, protect navigation against missing routes during upgrade.
         $config = $this->getNavigationProtectionServiceConfig();
 
-        if (!class_exists('Common\Stdlib\EasyMeta', false)) {
+        // The autoloader is checked first: it uses the directory of Common set
+        // by Omeka, while the directory of this module may be a symbolic link,
+        // so another copy of Common would be loaded.
+        if (!class_exists('Common\Stdlib\EasyMeta')) {
             require_once dirname(__DIR__) . '/Common/src/Stdlib/EasyMeta.php';
             require_once dirname(__DIR__) . '/Common/src/Service/Stdlib/EasyMetaFactory.php';
-
-            $config['factories']['Common\EasyMeta'] = \Common\Service\Stdlib\EasyMetaFactory::class;
         }
+        $config['factories']['Common\EasyMeta'] = \Common\Service\Stdlib\EasyMetaFactory::class;
 
         return $config;
     }

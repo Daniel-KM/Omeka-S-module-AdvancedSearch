@@ -107,7 +107,7 @@ $renderProperties = function ($resource, array $propertiesList, string $classes)
             continue;
         }
         $html .= '<div class="property">'
-            . '<dt>' . $escape($translate($propertyLabel === '' ? $easyMeta->propertyLabel($property) : $propertyLabel)) . '</dt>';
+            . '<dt>' . $escape($propertyLabel === '' ? $translate($easyMeta->propertyLabel($property)) : $translate($propertyLabel)) . '</dt>';
         foreach ($values as $value) {
             $valueType = $value->type();
             $valueLang = $value->lang();

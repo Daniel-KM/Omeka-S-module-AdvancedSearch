@@ -937,6 +937,12 @@ class IndexSuggestionsTest extends AbstractHttpControllerTestCase
         } finally {
             $services->setService('Omeka\Job\Dispatcher', $dispatcher);
             $services->setAllowOverride(false);
+            // The upgrade stores the target version for the background jobs:
+            // restore the current one, else the module is not loaded in the
+            // next tests (needs upgrade).
+            $connection->update('module', [
+                'version' => $services->get('Omeka\ModuleManager')->getModule('AdvancedSearch')->getIni('version'),
+            ], ['id' => 'AdvancedSearch']);
         }
         $this->assertContains(
             [\AdvancedSearch\Job\IndexSuggestions::class, ['search_suggester_id' => $this->suggester->id(), 'force' => true]],

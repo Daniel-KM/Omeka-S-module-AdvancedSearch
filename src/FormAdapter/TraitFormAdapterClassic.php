@@ -467,8 +467,12 @@ trait TraitFormAdapterClassic
                                 }
                             }
                         } else {
+                            // A simple arg (site_id, item set, class…) is a
+                            // separate condition, like in the api: in the chain
+                            // of the advanced filters, it would be joined with
+                            // the first filter, that may be joined with "or".
                             foreach ($valueArray as $val) {
-                                $query->addFilterQuery($name, $val, 'eq');
+                                $query->addFilter($name, $val);
                             }
                         }
                         continue 2;

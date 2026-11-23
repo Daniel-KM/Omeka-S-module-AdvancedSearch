@@ -31,6 +31,7 @@ namespace AdvancedSearch\Job;
 
 use AdvancedSearch\Api\Representation\SearchEngineRepresentation;
 use AdvancedSearch\Query;
+use Common\Job\Exception\RuntimeException;
 use Common\Stdlib\PsrMessage;
 use Doctrine\ORM\EntityManager;
 use Omeka\Job\AbstractJob;
@@ -144,11 +145,11 @@ class IndexSearch extends AbstractJob
         // index amputed of them, without any error.
         $acl = $services->get('Omeka\Acl');
         if (!$acl->userIsAllowed(\Omeka\Entity\Resource::class, 'view-all')) {
-            $message = 'The owner of the job cannot view all resources, so the index would be partial. Run the indexation as a global admin.'; // @translate
-            $this->logger->err($message);
             // Fail the job: a partial index is worse than no indexation, since
             // nothing would tell that resources are missing.
-            throw new \Omeka\Job\Exception\RuntimeException($message);
+            throw new RuntimeException(
+                'The owner of the job cannot view all resources, so the index would be partial. Run the indexation as a global admin.' // @translate
+            );
         }
 
         $searchEngineIds = $this->getArg('search_engine_ids');
@@ -201,11 +202,10 @@ class IndexSearch extends AbstractJob
         // Clean resource ids to avoid check later.
         $ids = array_values(array_filter(array_map('intval', $this->resourceIds)));
         if (count($this->resourceIds) !== count($ids)) {
-            $this->logger->warn(
+            throw new RuntimeException(
                 'Search index #{search_engine_id} ("{name}"): the list of resource ids contains invalid ids.', // @translate
                 ['search_engine_id' => $searchEngine->id(), 'name' => $searchEngine->name()]
             );
-            return;
         }
         $this->resourceIds = $ids;
         unset($ids);
@@ -214,7 +214,7 @@ class IndexSearch extends AbstractJob
         $listJobStatusesByIds = $listJobStatusesByIds(self::class, true, null, $this->job->getId());
         if (count($listJobStatusesByIds)) {
             if (!$force) {
-                $this->logger->err(
+                throw new RuntimeException(
                     'Search index #{search_engine_id} ("{name}"): There are already {total} other jobs "Index Search" (#{list}) and the current one is not forced.', // @translate
                     [
                         'search_engine_id' => $searchEngine->id(),
@@ -223,7 +223,6 @@ class IndexSearch extends AbstractJob
                         'list' => implode(', #', array_keys($listJobStatusesByIds)),
                     ]
                 );
-                return;
             }
             $this->logger->warn(
                 'There are already {total} other jobs "Index Search". Slowdowns may occur on the site.', // @translate

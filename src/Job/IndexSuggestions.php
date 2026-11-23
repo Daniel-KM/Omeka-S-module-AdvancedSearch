@@ -4,6 +4,7 @@ namespace AdvancedSearch\Job;
 
 use AdvancedSearch\Api\Representation\SearchSuggesterRepresentation;
 use AdvancedSearch\Entity\SearchSuggestion;
+use Common\Job\Exception\RuntimeException;
 use Omeka\Job\AbstractJob;
 
 /**
@@ -78,11 +79,10 @@ class IndexSuggestions extends AbstractJob
         $searchEngine = $suggester->searchEngine();
         $engineAdapter = $searchEngine->engineAdapter();
         if (!$engineAdapter || !($engineAdapter instanceof \AdvancedSearch\EngineAdapter\Internal)) {
-            $this->logger->err(
+            throw new RuntimeException(
                 'Suggester #{search_suggester_id} ("{name}"): Only search engine with the internal adapter (sql) can be indexed.', // @translate
                 ['search_suggester_id' => $suggester->id(), 'name' => $suggester->name()]
             );
-            return;
         }
 
         $resourceTypes = $searchEngine->setting('resource_types', []);
@@ -110,7 +110,7 @@ class IndexSuggestions extends AbstractJob
         $force = $this->getArg('force');
         if (count($listJobStatusesByIds)) {
             if (!$force) {
-                $this->logger->err(
+                throw new RuntimeException(
                     'Suggester #{search_suggester_id} ("{name}"): There are already {total} other jobs "Index Suggestion" and the current one is not forced.', // @translate
                     [
                         'search_suggester_id' => $suggester->id(),
@@ -118,7 +118,6 @@ class IndexSuggestions extends AbstractJob
                         'total' => count($listJobStatusesByIds),
                     ]
                 );
-                return;
             }
             $this->logger->warn(
                 'There are already {total} other jobs "Index Suggestions". Slowdowns may occur.', // @translate

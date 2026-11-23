@@ -175,6 +175,45 @@ class MainSearchForm extends Form
         return parent::setData($data);
     }
 
+    /**
+     * Set an attribute, and rebind the fields when the id of the form changes.
+     *
+     * When the option "attribute_form" is set, each field gets the attribute
+     * "form" with the id of the form, so it should follow a new id set by the
+     * theme, else the fields are submitted with another form.
+     */
+    public function setAttribute(string $key, $value)
+    {
+        parent::setAttribute($key, $value);
+        $oldId = $this->elementAttributes['form'] ?? null;
+        if ($key === 'id' && $oldId && $value && $value !== $oldId) {
+            $this->elementAttributes['form'] = $value;
+            $this->rebindFormAttribute($this, $oldId, (string) $value);
+        }
+        return $this;
+    }
+
+    /**
+     * Replace the attribute "form" of the fields of a fieldset, recursively.
+     */
+    protected function rebindFormAttribute(\Laminas\Form\FieldsetInterface $fieldset, string $oldId, string $newId): void
+    {
+        foreach ($fieldset as $element) {
+            if ($element->getAttribute('form') === $oldId) {
+                $element->setAttribute('form', $newId);
+            }
+            if ($element instanceof \Laminas\Form\Element\Collection
+                && ($target = $element->getTargetElement()) instanceof ElementInterface
+                && $target->getAttribute('form') === $oldId
+            ) {
+                $target->setAttribute('form', $newId);
+            }
+            if ($element instanceof \Laminas\Form\FieldsetInterface) {
+                $this->rebindFormAttribute($element, $oldId, $newId);
+            }
+        }
+    }
+
     public function init(): void
     {
         $this->searchConfig = $this->getOption('search_config');

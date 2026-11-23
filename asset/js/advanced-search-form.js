@@ -15,7 +15,7 @@ var Omeka = Omeka || {
     jsTranslate: function(str) { return str; },
 };
 
-$(document).ready(function() {
+$(function() {
 
     const hasChosenSelect = typeof $.fn.chosen === 'function';
 
@@ -110,6 +110,10 @@ $(document).ready(function() {
             }
         });
 
+        // Same as the removed jQuery.isNumeric().
+        const isNumeric = (value) => (typeof value === 'number' || typeof value === 'string')
+            && !isNaN(value - parseFloat(value));
+
         // Second pass: remove grouped inputs whose text/val is now empty
         // (property, filter, datetime, geo, mapping, numeric, sort).
         form.find(":input[name]:not([name='']):not(:disabled)").each(function() {
@@ -120,10 +124,10 @@ $(document).ready(function() {
             if (['geo[around][x]', 'geo[around][y]', 'geo[around][latitude]', 'geo[around][longitude]', 'geo[around][radius]'].includes(inputName)) {
                 const xInput = form.find('[name="geo[around][x]"]');
                 const yInput = form.find('[name="geo[around][y]"]');
-                const hasPosition = $.isNumeric(xInput.val()) && $.isNumeric(yInput.val());
+                const hasPosition = isNumeric(xInput.val()) && isNumeric(yInput.val());
                 const latitudeInput = form.find('[name="geo[around][latitude]"]');
                 const longitudeInput = form.find('[name="geo[around][longitude]"]');
-                const hasCoordinates = $.isNumeric(latitudeInput.val()) && $.isNumeric(longitudeInput.val());
+                const hasCoordinates = isNumeric(latitudeInput.val()) && isNumeric(longitudeInput.val());
                 const radiusInput = form.find('[name="geo[around][radius]"]');
                 const unitInput = form.find('[name="geo[around][unit]"]');
                 const hasRadius = radiusInput.val() !== '';

@@ -1,6 +1,6 @@
 'use strict';
 
-$(document).ready(function () {
+$(function () {
     let selectingElement;
     let currentQuery = '';
 

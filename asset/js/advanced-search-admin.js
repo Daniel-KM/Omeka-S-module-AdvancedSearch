@@ -3,7 +3,7 @@
 /**
  * Manage the simple search field in admin board.
  */
-$(document).ready(function() {
+$(function() {
 
     // A link to the advanced search, next to the submit, like the button of the
     // core for its own advanced options: no visible text, only a title and an

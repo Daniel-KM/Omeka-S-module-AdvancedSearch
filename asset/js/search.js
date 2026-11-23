@@ -255,7 +255,7 @@ var Search = (function() {
             },
             onSelect: function (suggestion) {
                 if (!$(this).data('autosuggest-fill-input')) {
-                    $(this).closest('form').submit();
+                    $(this).closest('form').trigger('submit');
                 }
             },
         };
@@ -1370,7 +1370,7 @@ var Search = (function() {
     return self;
 })();
 
-$(document).ready(function() {
+$(function() {
 
     const hasAutocomplete = typeof $.fn.autocomplete === 'function';
 
@@ -1389,7 +1389,7 @@ $(document).ready(function() {
         }
         toggleLink.attr('aria-expanded', isOpen ? 'true' : 'false');
         // TODO Don't open autosuggestion when toggle.
-        // $('#search-form [name=q]').focus();
+        // $('#search-form [name=q]').trigger('focus');
     });
 
     /**
@@ -1766,7 +1766,7 @@ $(document).ready(function() {
      * @todo Use focus on load, but don't open autosuggestion on focus.
      */
     if (Search.isAdvancedSearchQuery()) {
-        $('.advanced-search-form-toggle a, .advanced-search-form-toggle button').click();
+        $('.advanced-search-form-toggle a, .advanced-search-form-toggle button').trigger('click');
     }
 
     /**
@@ -1789,7 +1789,7 @@ $(document).ready(function() {
         view_type = $activeViewType.hasClass('search-view-type-grid') ? 'grid'
             : ($activeViewType.hasClass('search-view-type-map') ? 'map' : 'list');
     }
-    $('.search-view-type-' + view_type).click();
+    $('.search-view-type-' + view_type).trigger('click');
 
     /**
      * Init chosen select.

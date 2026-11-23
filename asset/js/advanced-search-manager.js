@@ -1,6 +1,6 @@
 'use strict';
 
-$(document).ready(function() {
+$(function() {
 
     /**
      * Copy search config with confirmation dialog.

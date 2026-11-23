@@ -70,7 +70,8 @@ class IndexController extends AbstractActionController
     {
         $settings = $this->settings();
         $keys = [
-            'advancedsearch_main_config' => 'admin', // @translate
+            'advancedsearch_admin_config' => 'admin', // @translate
+            'advancedsearch_main_config' => 'sites', // @translate
             'advancedsearch_items_config' => 'items', // @translate
             'advancedsearch_media_config' => 'media', // @translate
             'advancedsearch_item_sets_config' => 'item sets', // @translate
@@ -78,7 +79,10 @@ class IndexController extends AbstractActionController
         ];
         $result = [];
         foreach ($keys as $key => $role) {
-            $configId = (int) $settings->get($key);
+            // The admin uses the main search page when it has no own page.
+            $configId = $key === 'advancedsearch_admin_config'
+                ? (int) ($settings->get($key) ?: $settings->get('advancedsearch_main_config'))
+                : (int) $settings->get($key);
             if (!$configId) {
                 continue;
             }

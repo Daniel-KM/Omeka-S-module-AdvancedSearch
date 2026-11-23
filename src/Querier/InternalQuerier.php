@@ -1034,6 +1034,17 @@ class InternalQuerier extends AbstractQuerier
                 $values = is_numeric(reset($values))
                     ? array_filter(array_map('intval', $values))
                     : $this->listSiteIds($values);
+                // Within a site, the filter restricts the site scope instead of
+                // extending it.
+                if ($this->query->getSiteId()) {
+                    $this->args['filter'][] = [
+                        'join' => 'and',
+                        'field' => 'site_id',
+                        'type' => 'eq',
+                        'val' => $values ?: [0],
+                    ];
+                    continue 2;
+                }
                 $this->args['site_id'] = empty($this->args['site_id'])
                     ? $values
                     : array_merge(is_array($this->args['site_id']) ? $this->args['site_id'] : [$this->args['site_id']], $values);

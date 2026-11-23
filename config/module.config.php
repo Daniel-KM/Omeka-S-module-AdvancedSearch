@@ -651,6 +651,7 @@ return [
                 'resource_type' => ['items'],
             ],
             'common/advanced-search/media-types' => [
+                'module' => 'AdvancedSearch',
                 'label' => 'Media types', // @translate
                 'resource_type' => ['items'],
             ],

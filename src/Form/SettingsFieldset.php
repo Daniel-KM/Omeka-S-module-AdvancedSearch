@@ -47,6 +47,18 @@ class SettingsFieldset extends Fieldset
                 ],
             ])
             ->add([
+                'name' => 'advancedsearch_engine_fallback',
+                'type' => Element\Checkbox::class,
+                'options' => [
+                    'element_group' => 'advanced_search',
+                    'label' => 'Automatic fallback to the internal engine when Solr fails', // @translate
+                    'info' => 'When an external engine like Solr is unavailable, the searches use the internal sql engine, without the filters and facets specific to the external engine. An error is displayed on the pages of the search manager. Not recommended for big bases or when full texts are stored in the database.', // @translate
+                ],
+                'attributes' => [
+                    'id' => 'advancedsearch_engine_fallback',
+                ],
+            ])
+            ->add([
                 'name' => 'advancedsearch_fulltextsearch_alto',
                 'type' => Element\Checkbox::class,
                 'options' => [

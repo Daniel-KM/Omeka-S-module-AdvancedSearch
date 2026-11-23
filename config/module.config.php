@@ -455,6 +455,9 @@ return [
             'advancedsearch_main_config_replace_quick' => false,
             'advancedsearch_main_config_advanced_link' => 'dialog',
             'advancedsearch_api_config' => '',
+            'advancedsearch_engine_fallback' => false,
+            // Hidden value, storing the last failure of each external engine.
+            'advancedsearch_engine_fallback_last' => [],
             // Hidden value.
             'advancedsearch_all_configs' => [1 => 'find'],
             'advancedsearch_cron_index' => false,

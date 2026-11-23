@@ -186,20 +186,32 @@ class SearchEngineRepresentation extends AbstractEntityRepresentation
     }
 
     /**
-     * @return NoopQuerier is returned when the querier is not available.
+     * Get the querier of the engine.
+     *
+     * When the option is set, an external engine falls back to the internal
+     * querier when its adapter is missing or when it fails. Else, NoopQuerier
+     * is returned when the querier is not available.
      */
     public function querier(): \AdvancedSearch\Querier\QuerierInterface
     {
         $services = $this->getServiceLocator();
         $engineAdapter = $this->engineAdapter();
-        if ($engineAdapter) {
-            $querierClass = $engineAdapter->getQuerierClass() ?: \AdvancedSearch\Querier\NoopQuerier::class;
+        $querierClass = $engineAdapter ? $engineAdapter->getQuerierClass() : null;
+
+        $useFallback = $this->resource->getAdapter() !== 'internal'
+            && $querierClass !== \AdvancedSearch\Querier\InternalQuerier::class
+            && (bool) $services->get('Omeka\Settings')->get('advancedsearch_engine_fallback', true);
+        if ($useFallback) {
+            $querier = new \AdvancedSearch\Querier\FallbackQuerier(
+                $querierClass ? new $querierClass : null,
+                new \AdvancedSearch\Querier\InternalQuerier()
+            );
         } else {
-            $querierClass = \AdvancedSearch\Querier\NoopQuerier::class;
+            $querierClass = $querierClass ?: \AdvancedSearch\Querier\NoopQuerier::class;
+            $querier = new $querierClass;
         }
 
         /** @var \AdvancedSearch\Querier\QuerierInterface $querier */
-        $querier = new $querierClass;
         return $querier
             ->setServiceLocator($services)
             ->setSearchEngine($this)

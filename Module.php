@@ -231,6 +231,23 @@ class Module extends AbstractModule
             [$this, 'addHeaders']
         );
 
+        // Warn the administrators when an external engine is unavailable.
+        $controllers = [
+            Controller\Admin\IndexController::class,
+            Controller\Admin\SearchConfigController::class,
+            Controller\Admin\SearchEngineController::class,
+            Controller\Admin\SearchSuggesterController::class,
+            'SearchSolr\Controller\Admin\CoreController',
+        ];
+        foreach ($controllers as $controller) {
+            $sharedEventManager->attach(
+                $controller,
+                MvcEvent::EVENT_DISPATCH,
+                [$this, 'warnEngineFailures'],
+                10
+            );
+        }
+
         /** @see \AdvancedSearch\Api\ManagerDelegator::search() */
         $adapters = [
             \Omeka\Api\Adapter\ItemAdapter::class,
@@ -1897,6 +1914,41 @@ class Module extends AbstractModule
                 'Unable to delete the search index for the deleted resource #{resource_id} in search engine "{name}": see log.', // @translate
                 ['resource_id' => $id, 'name' => $searchEngine->name()]
             ));
+        }
+    }
+
+    /**
+     * Display an error for each external engine unavailable or failed recently.
+     */
+    public function warnEngineFailures(MvcEvent $event): void
+    {
+        $services = $this->getServiceLocator();
+        $settings = $services->get('Omeka\Settings');
+        $messenger = $services->get('ControllerPluginManager')->get('messenger');
+        $isFallback = (bool) $settings->get('advancedsearch_engine_fallback', true);
+        $failures = $settings->get('advancedsearch_engine_fallback_last') ?: [];
+
+        /** @var \AdvancedSearch\Api\Representation\SearchEngineRepresentation $searchEngine */
+        foreach ($services->get('Omeka\ApiManager')->search('search_engines')->getContent() as $searchEngine) {
+            if ($searchEngine->engineAdapterName() === 'internal') {
+                continue;
+            }
+            if (!$searchEngine->engineAdapter()) {
+                $messenger->addError(new PsrMessage(
+                    $isFallback
+                        ? 'The search engine "{name}" is unavailable (missing adapter "{adapter}", module disabled or to upgrade?): the searches use the internal engine.' // @translate
+                        : 'The search engine "{name}" is unavailable (missing adapter "{adapter}", module disabled or to upgrade?): the searches return no results.', // @translate
+                    ['name' => $searchEngine->name(), 'adapter' => $searchEngine->engineAdapterName()]
+                ));
+                continue;
+            }
+            $failure = $failures[$searchEngine->id()] ?? null;
+            if ($failure && $failure['time'] > time() - 86400) {
+                $messenger->addError(new PsrMessage(
+                    'The search engine "{name}" failed on {date}, so the searches used the internal engine: {reason}', // @translate
+                    ['name' => $searchEngine->name(), 'date' => date('Y-m-d H:i:s', $failure['time']), 'reason' => $failure['reason']]
+                ));
+            }
         }
     }
 

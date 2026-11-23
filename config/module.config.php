@@ -524,9 +524,9 @@ return [
             'advancedsearch_item_sets_config' => 1,
             'advancedsearch_item_sets_template_form' => null,
             'advancedsearch_item_sets_scope' => 0,
-            'advancedsearch_item_sets_browse_config' => 0,
+            'advancedsearch_item_sets_browse_config' => '',
             'advancedsearch_item_sets_browse_page' => '',
-            'advancedsearch_items_browse_config' => 0,
+            'advancedsearch_items_browse_config' => '',
             'advancedsearch_resource_nav_types' => [
                 'search',
                 'collection',

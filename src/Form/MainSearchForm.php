@@ -580,7 +580,7 @@ class MainSearchForm extends Form
         ];
 
         if (!empty($filter['field_value_autosuggest']) && $this->searchConfig) {
-            $attributes['data-autosuggest-url'] = ($this->site ? rtrim($this->site->siteUrl(), '/') : $this->basePath . '/admin')
+            $attributes['data-autosuggest-url'] = $this->suggestBaseUrl()
                 . '/' . $this->searchConfig->slug()
                 . '/suggest?mode=values';
         }
@@ -810,7 +810,7 @@ class MainSearchForm extends Form
         if (!$autoSuggestUrl) {
             $suggester = $filter['suggester'] ?? null;
             if ($suggester) {
-                $autoSuggestUrl = ($this->site ? rtrim($this->site->siteUrl(), '/') : $this->basePath . '/admin')
+                $autoSuggestUrl = $this->suggestBaseUrl()
                 . '/' . ($this->searchConfig ? $this->searchConfig->slug() : 'search')
                 . '/suggest';
             }
@@ -1185,13 +1185,24 @@ class MainSearchForm extends Form
     }
 
     /**
+     * Get the base url of the suggest endpoints, with the site prefix.
+     *
+     * The prefix "/s/{slug}" is forced: CleanUrl removes it from siteUrl() for
+     * the main site, but the suggest routes are only available with it.
+     */
+    protected function suggestBaseUrl(): string
+    {
+        return $this->basePath . ($this->site ? '/s/' . $this->site->slug() : '/admin');
+    }
+
+    /**
      * Append autosuggest attributes to a filter (class, url, autocomplete off).
      */
     protected function appendAutosuggestAttributes(array $filter): array
     {
         $filter['attributes']['class'] = isset($filter['attributes']['class']) ? $filter['attributes']['class'] . ' autosuggest' : 'autosuggest';
         $filter['attributes']['autocomplete'] = 'off';
-        $filter['attributes']['data-autosuggest-url'] ??= ($this->site ? rtrim($this->site->siteUrl(), '/') : $this->basePath . '/admin')
+        $filter['attributes']['data-autosuggest-url'] ??= $this->suggestBaseUrl()
             . '/' . ($this->searchConfig ? $this->searchConfig->slug() : 'search')
             . '/suggest?field=' . rawurlencode($filter['field']);
         $filter['attributes']['data-autosuggest-fill-input'] ??= '1';

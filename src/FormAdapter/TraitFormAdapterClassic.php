@@ -301,11 +301,15 @@ trait TraitFormAdapterClassic
                     if (empty($joiner)) {
                         if (empty($operator)) {
                             foreach ($value as $filter) {
-                                if (isset($filter['field'])
-                                    && isset($filter['val'])
-                                    && $hasValue($filter['val'])
-                                ) {
-                                    $query->addFilterQuery($filter['field'], $filter['val'], $filter['type'] ?? $typeDefault, $filter['join'] ?? null);
+                                if (!isset($filter['field'])) {
+                                    continue;
+                                }
+                                // A type without value is set by a link, not by the form.
+                                $type = $filter['type'] ?? $typeDefault;
+                                if (in_array($type, SearchResources::FIELD_QUERY['value_none'])) {
+                                    $query->addFilterQuery($filter['field'], null, $type, $filter['join'] ?? null);
+                                } elseif (isset($filter['val']) && $hasValue($filter['val'])) {
+                                    $query->addFilterQuery($filter['field'], $filter['val'], $type, $filter['join'] ?? null);
                                 }
                             }
                         } else {
@@ -323,9 +327,14 @@ trait TraitFormAdapterClassic
                     } else {
                         if (empty($operator)) {
                             foreach ($value as $filter) {
-                                if (isset($filter['field']) && isset($filter['val']) && $hasValue($filter['val'])) {
-                                    $type = empty($filter['type']) ? $typeDefault : $filter['type'];
-                                    $join = isset($filter['join']) && in_array($filter['join'], ['or', 'not']) ? $filter['join'] : 'and';
+                                if (!isset($filter['field'])) {
+                                    continue;
+                                }
+                                $type = empty($filter['type']) ? $typeDefault : $filter['type'];
+                                $join = isset($filter['join']) && in_array($filter['join'], ['or', 'not']) ? $filter['join'] : 'and';
+                                if (in_array($type, SearchResources::FIELD_QUERY['value_none'])) {
+                                    $query->addFilterQuery($filter['field'], null, $type, $join);
+                                } elseif (isset($filter['val']) && $hasValue($filter['val'])) {
                                     $query->addFilterQuery($filter['field'], $filter['val'], $type, $join);
                                 }
                             }

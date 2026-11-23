@@ -21,7 +21,7 @@ if (PHP_SAPI !== 'cli') {
     exit(1);
 }
 
-$options = getopt('', ['base::', 'solr-engine::', 'only::', 'json', 'preload::']);
+$options = getopt('', ['base:', 'solr-engine:', 'only:', 'json', 'preload:']);
 $base = $options['base'] ?? getcwd();
 if (!file_exists($base . '/application/config/application.config.php')) {
     // Fallback: script placed inside modules/AdvancedSearch/data/scripts.
@@ -224,7 +224,6 @@ foreach ($golden as $label => $entry) {
     }
     $queries[$label] = $query;
 }
-
 
 if (!empty($options['only'])) {
     $queries = array_intersect_key($queries, array_flip(array_map('trim', explode(',', $options['only']))));

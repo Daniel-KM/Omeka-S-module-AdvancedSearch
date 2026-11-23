@@ -2,7 +2,6 @@
 
 namespace AdvancedSearch\Site\ResourcePageBlockLayout;
 
-use Laminas\Session\Container;
 use Laminas\View\Renderer\PhpRenderer;
 use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
 use Omeka\Api\Representation\ItemRepresentation;
@@ -54,52 +53,55 @@ class ResourceNav implements ResourcePageBlockLayoutInterface
             return '';
         }
 
-        // Ensure session is started, else the Container is empty on item show.
-        $sessionManager = Container::getDefaultManager();
-        if (!$sessionManager->sessionExists()) {
-            try {
-                $sessionManager->start();
-            } catch (\Throwable $e) {
-                return '';
-            }
-        }
-
-        // First, try to rebuild context from URL query params (for shared
-        // links to a collection or a selection). When set, it overrides the
-        // session, and the param is propagated to prev/next links below.
+        // A context set in the url (shared link to a collection or a
+        // selection) is rendered directly, and the param is propagated to the
+        // prev/next links.
         $propagateQuery = [];
         $data = $this->contextFromQuery($view, $site, $limit, $enabledTypes, $propagateQuery);
-
-        // Fallback to session.
-        if (!$data) {
-            $session = new Container('AdvancedSearch');
-            $sessionData = $session->resource_nav ?? null;
-            if (is_array($sessionData)
-                && (int) ($sessionData['site_id'] ?? 0) === $site->id()
-                && in_array($sessionData['type'] ?? '', $enabledTypes, true)
-            ) {
-                $data = $sessionData;
-            }
+        if ($data) {
+            return $this->renderContext($view, $resource, $data, $propagateQuery);
         }
 
-        // When the session/URL context is missing or does not contain the
-        // current item, optionally fall back to an item set of the item.
-        // This covers direct access to an item (bookmark, shared URL
-        // without param). Behavior is driven by a site setting which is
-        // either empty (disabled), the string "first" (first item set) or
-        // a property term used to sort the item sets.
+        // Else the context of the last browse is kept by the browser, so no
+        // session is created: the block is replaced via the endpoint when the
+        // current item is part of it. Meanwhile and without matching context,
+        // an item set of the item may be used as fallback, according to a site
+        // setting that is either empty (disabled), the string "first" (first
+        // item set) or a property term used to sort the item sets.
+        $html = '';
         $fallbackMode = $siteSetting('advancedsearch_resource_nav_fallback_item_set', '');
         $fallbackMode = is_scalar($fallbackMode) ? (string) $fallbackMode : '';
-        if ($fallbackMode !== ''
-            && in_array('collection', $enabledTypes, true)
-            && $this->shouldFallback($data, (int) $resource->id())
-        ) {
+        if ($fallbackMode !== '' && in_array('collection', $enabledTypes, true)) {
             $data = $this->contextFromFallbackItemSet($view, $site, $limit, $resource, $fallbackMode);
+            $html = $data ? $this->renderContext($view, $resource, $data) : '';
         }
 
-        if (!$data || empty($data['ids'])) {
+        // The prefix of the site is forced, because the url helper of the
+        // module CleanUrl removes it for the main site, and the route requires
+        // it.
+        $endpoint = $view->basePath('s/' . rawurlencode($site->slug()) . '/resource-nav/' . $resource->id());
+        $view->headScript()->appendFile($view->assetUrl('js/browse-context.js', 'AdvancedSearch'));
+        $escapeAttr = $plugins->get('escapeHtmlAttr');
+        return sprintf(
+            '<div class="resource-nav-browse-context" data-browse-context-endpoint="%1$s" data-browse-context-require="ids" data-site="%2$s" data-resource-name="items" data-resource-id="%3$s">%4$s</div>',
+            $escapeAttr($endpoint),
+            $escapeAttr($site->slug()),
+            $resource->id(),
+            $html
+        );
+    }
+
+    /**
+     * Render the navigation of an item within a context (list of item ids).
+     */
+    public function renderContext(PhpRenderer $view, ItemRepresentation $resource, array $data, array $propagateQuery = []): string
+    {
+        if (empty($data['ids'])) {
             return '';
         }
+
+        $plugins = $view->getHelperPluginManager();
+        $siteSetting = $plugins->get('siteSetting');
 
         $ids = array_map('intval', $data['ids']);
         $itemId = $resource->id();
@@ -173,18 +175,6 @@ class ResourceNav implements ResourcePageBlockLayoutInterface
             return $url;
         }
         return $url . (strpos($url, '?') === false ? '?' : '&') . http_build_query($queryParams);
-    }
-
-    /**
-     * True when no usable context is known or when the current item is not
-     * part of the known context (so fallback is appropriate).
-     */
-    protected function shouldFallback(?array $data, int $itemId): bool
-    {
-        if (!$data || empty($data['ids'])) {
-            return true;
-        }
-        return !in_array($itemId, array_map('intval', $data['ids']), true);
     }
 
     /**

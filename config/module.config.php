@@ -207,6 +207,7 @@ return [
     'controllers' => [
         'invokables' => [
             Controller\Admin\IndexController::class => Controller\Admin\IndexController::class,
+            Controller\ResourceNavController::class => Controller\ResourceNavController::class,
             Controller\SearchController::class => Controller\SearchController::class,
         ],
         'factories' => [
@@ -225,6 +226,26 @@ return [
     ],
     'router' => [
         'routes' => [
+            'site' => [
+                'child_routes' => [
+                    // Render the block "resourceNav" for the context of the
+                    // browser. See asset/js/browse-context.js.
+                    'resource-nav' => [
+                        'type' => \Laminas\Router\Http\Segment::class,
+                        'options' => [
+                            'route' => '/resource-nav/:id',
+                            'constraints' => [
+                                'id' => '\d+',
+                            ],
+                            'defaults' => [
+                                '__NAMESPACE__' => 'AdvancedSearch\Controller',
+                                'controller' => Controller\ResourceNavController::class,
+                                'action' => 'index',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
             // TODO Include site routes here, not during bootstrap.
             'admin' => [
                 'child_routes' => [

@@ -212,10 +212,11 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
                     $response->getCurrentPage(),
                     $response->getPerPage()
                 );
-                // Store the browse context in session so the resource page
+                // Store the browse context in the browser so the resource page
                 // block "Resource navigation" (ResourceNav) can display a
                 // prev/next navigation on the item page.
                 $this->storeResourceNavFromBlock(
+                    $view,
                     $block,
                     $site,
                     $searchConfig,
@@ -236,12 +237,13 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
     }
 
     /**
-     * Store a "search" browse context in the session so that the resource
-     * page block "ResourceNav" can display a prev/next navigation on the
-     * item page. This mirrors the logic of the SearchController listener
-     * but works for pages that embed the block "searchingForm".
+     * Store a "search" browse context in the browser so that the resource page
+     * block "ResourceNav" can display a prev/next navigation on the item page.
+     * This mirrors the logic of the SearchController listener but works for
+     * pages that embed the block "searchingForm".
      */
     protected function storeResourceNavFromBlock(
+        PhpRenderer $view,
         SitePageBlockRepresentation $block,
         SiteRepresentation $site,
         \AdvancedSearch\Api\Representation\SearchConfigRepresentation $searchConfig,
@@ -306,15 +308,6 @@ class SearchingForm extends AbstractBlockLayout implements TemplateableBlockLayo
             'limit' => $limit,
         ];
 
-        $sessionManager = \Laminas\Session\Container::getDefaultManager();
-        if (!$sessionManager->sessionExists()) {
-            try {
-                $sessionManager->start();
-            } catch (\Throwable $e) {
-                return;
-            }
-        }
-        $session = new \Laminas\Session\Container('AdvancedSearch');
-        $session->resource_nav = $payload;
+        $view->storeResourceNav($payload);
     }
 }

@@ -2,13 +2,12 @@
 
 namespace AdvancedSearch\View\Helper;
 
-use Laminas\Session\Container;
 use Laminas\View\Helper\AbstractHelper;
 use Omeka\Api\Representation\AbstractResourceEntityRepresentation;
 
 /**
- * Store a resource navigation context in the session so the block "resourceNav"
- * can display a prev/next navigation on the item page.
+ * Store a resource navigation context in the browser (session storage), so the
+ * block "resourceNav" can display a prev/next navigation on the item page.
  *
  * Usage (typically called from a page block template):
  *
@@ -88,7 +87,8 @@ class StoreResourceNav extends AbstractHelper
             : ($_SERVER['REQUEST_URI'] ?? '');
 
         $payload = [
-            'site_id' => $site->id(),
+            'site' => $site->slug(),
+            'resource' => 'items',
             'type' => $type,
             'subtype' => (string) ($data['subtype'] ?? ''),
             'label' => (string) ($data['label'] ?? ''),
@@ -105,15 +105,12 @@ class StoreResourceNav extends AbstractHelper
             $payload['selection_id'] = (int) $data['selection_id'];
         }
 
-        $sessionManager = Container::getDefaultManager();
-        if (!$sessionManager->sessionExists()) {
-            try {
-                $sessionManager->start();
-            } catch (\Throwable $e) {
-                return;
-            }
-        }
-        $session = new Container('AdvancedSearch');
-        $session->resource_nav = $payload;
+        // The context is kept by the browser, so no session is created for the
+        // visitors and the bots.
+        $view->headScript()
+            ->appendFile($view->assetUrl('js/browse-context.js', 'AdvancedSearch'))
+            ->appendScript('window.OmekaBrowseContext && window.OmekaBrowseContext.write('
+                . json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP)
+                . ');');
     }
 }

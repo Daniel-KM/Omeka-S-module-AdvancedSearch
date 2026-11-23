@@ -668,6 +668,7 @@ class Module extends AbstractModule
             ->allow(
                 null,
                 [
+                    \AdvancedSearch\Controller\ResourceNavController::class,
                     \AdvancedSearch\Controller\SearchController::class,
                 ]
             )
@@ -1357,7 +1358,7 @@ class Module extends AbstractModule
     }
 
     /**
-     * Store bounded list of the first search ids in session.
+     * Store bounded list of the first search ids in the browser.
      *
      * It allows the resource page block "resourceNav" to display a prev/next
      * navigation within the last search results on the item page.
@@ -1446,7 +1447,7 @@ class Module extends AbstractModule
                 $contextUrl = $itemSet->siteUrl();
             } catch (\Throwable $e) {
             }
-            $this->saveResourceNavSession([
+            $view->storeResourceNav([
                 'site_id' => $site->id(),
                 'type' => 'collection',
                 'subtype' => '',
@@ -1468,7 +1469,7 @@ class Module extends AbstractModule
             }
         }
 
-        $this->saveResourceNavSession([
+        $view->storeResourceNav([
             'site_id' => $site->id(),
             'type' => 'search',
             'subtype' => '',
@@ -1539,7 +1540,7 @@ class Module extends AbstractModule
             return;
         }
 
-        $this->saveResourceNavSession([
+        $view->storeResourceNav([
             'site_id' => $site->id(),
             'type' => 'collection',
             'subtype' => '',
@@ -1635,7 +1636,7 @@ class Module extends AbstractModule
         $request = $services->get('Request');
         $url = method_exists($request, 'getRequestUri') ? $request->getRequestUri() : '';
 
-        $this->saveResourceNavSession([
+        $view->storeResourceNav([
             'site_id' => $site->id(),
             'type' => 'selection',
             'subtype' => '',
@@ -1663,20 +1664,6 @@ class Module extends AbstractModule
             $enabledTypes = [];
         }
         return [$siteSettings, $limit, $enabledTypes];
-    }
-
-    protected function saveResourceNavSession(array $data): void
-    {
-        $sessionManager = \Laminas\Session\Container::getDefaultManager();
-        if (!$sessionManager->sessionExists()) {
-            try {
-                $sessionManager->start();
-            } catch (\Throwable $e) {
-                return;
-            }
-        }
-        $session = new \Laminas\Session\Container('AdvancedSearch');
-        $session->resource_nav = $data;
     }
 
     public function appendBrowseAfter(Event $event): void

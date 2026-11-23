@@ -803,7 +803,9 @@ class MainSearchForm extends Form
         $filter['options'] ??= [];
         $filter['attributes'] = ($filter['attributes'] ?? []) + [
             'placeholder' => 'Search',
-            'aria-label' => 'Search',
+            // Unlike the placeholder, the aria label is not translated by the
+            // form view helpers.
+            'aria-label' => $this->translator->translate('Search'), // @translate
         ];
 
         $autoSuggestUrl = $filter['suggest_url'] ?? null;

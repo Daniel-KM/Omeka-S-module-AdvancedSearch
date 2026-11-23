@@ -55,6 +55,11 @@ class Advanced extends Fieldset
 
         $filterOptions = $this->getOption('options') ?? [];
 
+        // Unlike labels, placeholders and titles, the aria labels of inputs and
+        // buttons are not translated by the form view helpers.
+        $translator = $this->hasTranslator() ? $this->getTranslator() : null;
+        $translate = fn (string $string): string => $translator ? $translator->translate($string) : $string;
+
         $this
             ->setLabel('')
             ->setAttributes([
@@ -139,7 +144,7 @@ class Advanced extends Fieldset
                 'type' => Element\Text::class,
                 'options' => $filterOptions['val']['options'] ?? [],
                 'attributes' => [
-                    'aria-label' => 'Query text', // @translate
+                    'aria-label' => $translate('Query text'), // @translate
                 ] + ($filterOptions['val']['attributes'] ?? []),
             ])
 
@@ -158,7 +163,7 @@ class Advanced extends Fieldset
                 'attributes' => [
                     // Don't use o-icon-delete.
                     'class' => 'search-filter-action search-filter-minus remove-value button',
-                    'aria-label' => 'Remove this filter', // @translate
+                    'aria-label' => $translate('Remove this filter'), // @translate
                 ],
             ])
             /* // TODO Allow to insert a filter between two filters? Useless because order has no special meaning for now.

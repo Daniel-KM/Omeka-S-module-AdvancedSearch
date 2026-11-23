@@ -1,6 +1,9 @@
 /**
  * Manage the simple search field in admin board.
  * Adapted from application/asset/sass/_screen.scss
+ *
+ * The colors follow the main color of the admin interface when it is set, for
+ * example by the module Easy Admin, else the default ones are used.
  */
 @media all {
     #search-form-quick {
@@ -29,8 +32,8 @@
             margin: 0;
             padding: 0;
             text-indent: -9999px;
-            background-color: #222933;
-            color: #bdcde3;
+            background-color: var(--omeka-admin-color-shade-15, #222933);
+            color: var(--omeka-admin-color-text, #bdcde3);
             border: 0;
             border-right: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 0;
@@ -56,8 +59,8 @@
         & button {
             width: 36px;
             text-indent: -9999px;
-            background-color: #222933;
-            color: #bdcde3;
+            background-color: var(--omeka-admin-color-shade-15, #222933);
+            color: var(--omeka-admin-color-text, #bdcde3);
             border: 0;
             float: left;
             margin: 0;
@@ -115,7 +118,7 @@
 }
 
 @media screen and (max-width: 640px) {
-    header.admin-board {
+    header {
         width: 100%;
         min-height: 0;
         padding: 0;

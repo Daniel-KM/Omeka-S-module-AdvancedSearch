@@ -446,7 +446,7 @@ class IndexSuggestions extends AbstractJob
     protected function trimNonWordCharacters(string $expression): string
     {
         if ($this->hasRegexpReplace()) {
-            return "REGEXP_REPLACE(REGEXP_REPLACE($expression, '^[^\\\\pL\\\\pN/]+', ''), '[^\\\\pL\\\\pN/]+$', '')";
+            return "REGEXP_REPLACE(REGEXP_REPLACE($expression, '^[^\\\\p{L}\\\\p{N}/]+', ''), '[^\\\\p{L}\\\\p{N}/]+$', '')";
         }
         $characters = ['.', ',', ';', ':', '!', '?', '"', "'", '(', ')', '[', ']', '{', '}', '«', '»', '“', '”', '‘', '’', '-', '–', '—', '…', '*', '_', '#', '+', '=', '<', '>', '|', '\\', '~', '`', '^', '%', '&', '@', '$', '§', '°'];
         for ($i = 0; $i < 2; $i++) {
